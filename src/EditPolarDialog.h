@@ -39,7 +39,7 @@ public:
     void SetPolarIndex(int i);
 
 private:
-    void OnPolarGridChange( wxGridEvent& event );
+    void OnPolarGridChanged( wxGridEvent& event );
     void OnAddTrueWindAngle( wxCommandEvent& event );
     void OnRemoveTrueWindAngle( wxCommandEvent& event );
     void OnAddTrueWindSpeed( wxCommandEvent& event );
@@ -48,7 +48,8 @@ private:
     void OnRemoveMeasurement( wxCommandEvent& event );
     void OnRemoveAllMeasurements( wxCommandEvent& event );
     void OnGeneratePolar( wxCommandEvent& event );
-                        
+    void OnSave( wxCommandEvent& event ) { EndModal(wxID_SAVE); }
+
     void RebuildTrueWindAngles();
     void RebuildTrueWindSpeeds();
     void RebuildGrid();

@@ -34,9 +34,10 @@ struct SailingVMG
 
 struct PolarMeasurement
 {
-    PolarMeasurement(double va, double a, double vb)
-    : VA(va), A(a), VB(vb) {}
-    double VA, A, VB;
+    PolarMeasurement(double v, double d, double vb, bool apparent=true);
+    double VW() const;
+    double W() const;
+    double VA, A, VB, eta;
 };
 
 class Boat;
@@ -57,7 +58,7 @@ public:
     bool Open(const wxString &filename, wxString &message);
     bool Save(const wxString &filename);
 
-    wxString FileName, WavePolarFileName;
+    wxString FileName;
 
     void OptimizeTackingSpeed();
     void ClosestVWi(double VW, int &VW1i, int &VW2i);
@@ -81,7 +82,9 @@ public:
     void RemoveDegreeStep(int index);
     void AddWindSpeed(double tws);
     void RemoveWindSpeed(int index);
-    
+
+    double m_crossoverpercentage;
+
 private:
     friend class EditPolarDialog;
     friend class BoatDialog;

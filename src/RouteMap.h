@@ -63,6 +63,7 @@ public:
 
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
+    int SailChanges();
 
     double lat, lon;
 

@@ -40,11 +40,12 @@ Boat::~Boat()
 {
 }
 
-wxString Boat::OpenXML(wxString filename)
+wxString Boat::OpenXML(wxString filename, bool shortcut)
 {
-    /* shortcut if already loaded, and boat wasn't modified */
     wxDateTime last_filetime = wxFileName(filename).GetModificationTime();
-    if(m_last_filename == filename && m_last_filetime.IsValid() && m_last_filetime == last_filetime)
+    /* shortcut if already loaded, and boat wasn't modified */
+    if(shortcut && m_last_filename == filename &&
+       m_last_filetime.IsValid() && m_last_filetime == last_filetime)
         return _T("");
 
     bool cleared = false;
@@ -84,6 +85,7 @@ wxString Boat::OpenXML(wxString filename)
                     delete [] data;
                 }
             }
+
             wxString message;
             if(!polar.Open(polar.FileName, message))
                 return message;
@@ -91,7 +93,10 @@ wxString Boat::OpenXML(wxString filename)
 //            polar.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
 //            if(polar.optimize_tacking)
 //                polar.OptimizeTackingSpeed();
-             
+            
+            polar.m_crossoverpercentage =
+                AttributeDouble(e, "CrossOverPercentage", 0) / 100.0;
+            
             Polars.push_back(polar);
         }
     }
@@ -130,7 +135,8 @@ wxString Boat::SaveXML(wxString filename)
         }
 
 //        e->SetAttribute("optimize_tacking", polar.optimize_tacking);
-
+        e->SetAttribute("CrossOverPercentage", 100*polar.m_crossoverpercentage);
+        
         root->LinkEndChild(e);
     }
 
@@ -174,22 +180,21 @@ FindNextSegmentPoint(std::list<Segment> &segments, Point p, bool greater)
     return best;
 }
 
-int Boat::FastestPolar(float H, float VW)
+bool Boat::FastestPolar(int p, float H, float VW)
 {
     const float maxVW = 40;
     if(VW == 0 || VW == maxVW)
-        return -1;
+        return false;
 
-    int maxi = -1;
-    float max = 0;
-    for(unsigned int i=0; i<Polars.size(); i++) {
-        float speed = Polars[i].Speed(H, VW);
-        if(speed > max) {
-            max = speed;
-            maxi = i;
-        }
+    double speed = Polars[p].Speed(H, VW)*(1+Polars[p].m_crossoverpercentage);
+    for(int i=0; i<(int)Polars.size(); i++) {
+        if(i==p)
+            continue;
+        if(Polars[i].Speed(H, VW) > speed)
+            return false;
     }
-    return maxi;
+
+    return speed > 0;
 }
 
 void Boat::GenerateCrossOverChart()
@@ -198,56 +203,55 @@ void Boat::GenerateCrossOverChart()
     const int stepi = 8;
     float step = 1.0f/stepi;
 
-    int buffer[2][maxVW*stepi+1];
-    int bi = 0;
-    std::list<Segment> segments[Polars.size()];
-    for(float H = 0; H <= 180; H+=step) {
-        for(int VWi = 0; VWi <= maxVW*stepi; VWi++) {
-            float VW = VWi * step;
-            buffer[bi][VWi] = FastestPolar(H, VW);
-
-            if(VWi > 0 && H > 0) {
-                int q[4] = {buffer[!bi][VWi-1], buffer[bi][VWi-1],
-                            buffer[!bi][VWi],   buffer[bi][VWi]};
+    for(int p = 0; p < (int)Polars.size(); p++) {
+        bool buffer[2][maxVW*stepi+1];
+        int bi = 0;
+        std::list<Segment> segments;
+        for(float H = 0; H <= 180; H+=step) {
+            for(int VWi = 0; VWi <= maxVW*stepi; VWi++) {
                 float VW = VWi * step;
-                GenerateSegments(H, VW, step, q, segments);
+                buffer[bi][VWi] = FastestPolar(p, H, VW);
+
+                if(VWi > 0 && H > 0) {
+                    bool q[4] = {buffer[!bi][VWi-1], buffer[bi][VWi-1],
+                                 buffer[!bi][VWi],   buffer[bi][VWi]};
+                    GenerateSegments(H, VW, step, q, segments, p);
+                }
             }
+            bi = !bi;
         }
-        bi = !bi;
-    }    
-    
-    for(unsigned int p = 0; p < Polars.size(); p++) {
+
         /* insert wrapping segments for 0 and 180 */
         std::list<Segment> wrapped_segments;
-        for(std::list<Segment>::iterator it = segments[p].begin();
-            it != segments[p].end(); it++) {
+        for(std::list<Segment>::iterator it = segments.begin();
+            it != segments.end(); it++) {
             if(it->p[1].x == 0) {
                 // find next segment starting at 0 with greater y
                 wrapped_segments.push_back
-                    (Segment(it->p[1], FindNextSegmentPoint(segments[p], it->p[1], false)));
+                    (Segment(it->p[1], FindNextSegmentPoint(segments, it->p[1], false)));
             } else if(it->p[1].x == 180) {
                 // find next segment starting at 180 with lesser y
                 wrapped_segments.push_back
-                    (Segment(it->p[1], FindNextSegmentPoint(segments[p], it->p[1], true)));
+                    (Segment(it->p[1], FindNextSegmentPoint(segments, it->p[1], true)));
             }
         }
 
-        segments[p].splice(segments[p].end(), wrapped_segments);
-        Polars[p].CrossOverRegion = PolygonRegion(segments[p]);
+        segments.splice(segments.end(), wrapped_segments);
+        Polars[p].CrossOverRegion = PolygonRegion(segments);
         Polars[p].CrossOverRegion.Simplify(1e-1);
     }
 }
 
 Point Boat::Interp(const Point &p0, const Point &p1,
-                   int q, int q0, int q1)
+                   int q, bool q0, bool q1)
 {
     Point p01((p0.x + p1.x)/2, (p0.y + p1.y)/2);
     if(fabsf(p0.x - p1.x) < 1e-2 && fabsf(p0.y - p1.y) < 1e-2)
         return p01;
     
-    if((q == q0 || q == q1) && (q0 != q1)) {
-        int q01 = FastestPolar(p01.x, p01.y);
-        if((q == q01) == (q == q0))
+    if(q0 != q1) {
+        bool q01 = FastestPolar(q, p01.x, p01.y);
+        if(q01 == q0)
             return Interp(p01, p1, q, q01, q1);
         else
             return Interp(p0, p01, q, q0, q01);
@@ -256,28 +260,9 @@ Point Boat::Interp(const Point &p0, const Point &p1,
     return p0;
 }
 
-void Boat::NewSegment(int q, Point &p0, Point &p1,
-                      std::list<Segment> segments[])
+void Boat::NewSegment(Point &p0, Point &p1, std::list<Segment> &segments)
 {
-//    if(fabsf(p0.x - p1.x) < 1e-1 && fabsf(p0.y - p1.y) < 1e-1)
-        segments[q].push_back(Segment(p0, p1));
-#if 0
-    else {
-        Point p01((p0.x + p1.x)/2, (p0.y + p1.y)/2);
-        float dx = p1.x - p0.x, dy = p1.y - p0.y;
-        Point pa(p01.x + dy / 2, p01.y - dx / 2);
-        Point pb(p01.x - dy / 2, p01.y + dx / 2);
-        int qa = FastestPolar(pa.x, pa.y);
-        int qb = FastestPolar(pb.x, pb.y);
-        Point p = Interp(pa, pb, q, qa, qb);
-        if(p == pa)
-            segments[q].push_back(Segment(p0, p1));
-        else {
-            NewSegment(q, p0, p, segments);
-            NewSegment(q, p, p1, segments);
-        }
-    }
-#endif
+    segments.push_back(Segment(p0, p1));
 }
 
 Point Intersection(Point a0, Point a1, Point b0, Point b1)
@@ -293,8 +278,8 @@ Point Intersection(Point a0, Point a1, Point b0, Point b1)
     return Point(a0.x + ax*na, a0.y + ay * na);
 }
 #define SIMPLE
-void Boat::GenerateSegments(float H, float VW, float step, int q[4],
-                            std::list<Segment> segments[])
+void Boat::GenerateSegments(float H, float VW, float step, bool q[4],
+                            std::list<Segment> &segments, int p)
 {
     float H0 = H-step;
     float VW0 = VW-step;
@@ -310,113 +295,111 @@ void Boat::GenerateSegments(float H, float VW, float step, int q[4],
   
 //    Point c((H0+H)/2, (VW0+VW)/2);
 
-    Point a[Polars.size()][4];
-    for(int p = 0; p < (int)Polars.size(); p++) {
-        a[p][0] = Interp(p0, p1, p, q[0], q[1]);
-        a[p][1] = Interp(p0, p2, p, q[0], q[2]);
-        a[p][2] = Interp(p1, p3, p, q[1], q[3]);
-        a[p][3] = Interp(p2, p3, p, q[2], q[3]);
-        //Point c = Intersection(a[p][0], a[p][3], a[p][1], a[p][2]);        
-        if(p == q[0]) {
-            if(p == q[1]) {
-                if(p == q[2]) {
-                    if(p != q[3]) {
+    Point a[4];
+    a[0] = Interp(p0, p1, p, q[0], q[1]);
+    a[1] = Interp(p0, p2, p, q[0], q[2]);
+    a[2] = Interp(p1, p3, p, q[1], q[3]);
+    a[3] = Interp(p2, p3, p, q[2], q[3]);
+    //Point c = Intersection(a[0], a[3], a[1], a[2]);        
+    if(q[0]) {
+        if(q[1]) {
+            if(q[2]) {
+                if(!q[3]) {
 #ifdef SIMPLE
-                           NewSegment(p, a[p][2], a[p][3], segments);
+                    NewSegment(a[2], a[3], segments);
 #else
-                           NewSegment(p, a[p][2], c, segments);
-                           NewSegment(p, c, a[p][3], segments);
+                    NewSegment(a[2], c, segments);
+                    NewSegment(c, a[3], segments);
 #endif
-                    }
-                } else {
-                    if(p == q[3]) {
-#ifdef SIMPLE
-                        NewSegment(p, a[p][3], a[p][1], segments);
-#else
-                        NewSegment(p, a[p][3], c, segments);
-                        NewSegment(p, c, a[p][1], segments);
-#endif
-                    } else
-                        NewSegment(p, a[p][2], a[p][1], segments);
                 }
             } else {
-                if(p == q[2]) {
-                    if(p == q[3]) {
+                if(q[3]) {
 #ifdef SIMPLE
-                        NewSegment(p, a[p][0], a[p][2], segments);
+                    NewSegment(a[3], a[1], segments);
 #else
-                        NewSegment(p, a[p][0], c, segments);
-                        NewSegment(p, c, a[p][2], segments);
+                    NewSegment(a[3], c, segments);
+                    NewSegment(c, a[1], segments);
 #endif
-                    } else
-                        NewSegment(p, a[p][0], a[p][3], segments);
-                } else {
+                } else
+                    NewSegment(a[2], a[1], segments);
+            }
+        } else {
+            if(q[2]) {
+                if(q[3]) {
 #ifdef SIMPLE
-                    NewSegment(p, a[p][0], a[p][1], segments);
+                    NewSegment(a[0], a[2], segments);
 #else
-                    NewSegment(p, a[p][0], c, segments);
-                    NewSegment(p, c, a[p][1], segments);
+                    NewSegment(a[0], c, segments);
+                    NewSegment(c, a[2], segments);
 #endif
-                    if(p == q[3]) {
+                } else
+                    NewSegment(a[0], a[3], segments);
+            } else {
 #ifdef SIMPLE
-                         NewSegment(p, a[p][3], a[p][2], segments);
+                NewSegment(a[0], a[1], segments);
 #else
-                        NewSegment(p, a[p][3], c, segments);
-                        NewSegment(p, c, a[p][2], segments);
+                NewSegment(a[0], c, segments);
+                NewSegment(c, a[1], segments);
 #endif
-                    }
+                if(q[3]) {
+#ifdef SIMPLE
+                    NewSegment(a[3], a[2], segments);
+#else
+                    NewSegment(a[3], c, segments);
+                    NewSegment(c, a[2], segments);
+#endif
+                }
+            }
+        }
+    } else {
+        if(q[1]) {
+            if(q[2]) {
+#ifdef SIMPLE
+                NewSegment(a[1], a[0], segments);
+#else
+                NewSegment(a[1], c, segments);
+                NewSegment(c, a[0], segments);
+#endif
+                if(!q[3]) {
+#ifdef SIMPLE
+                    NewSegment(a[2], a[3], segments);
+#else
+                    NewSegment(a[2], c, segments);
+                    NewSegment(c, a[3], segments);
+#endif
+                }
+            } else {
+                if(q[3])
+                    NewSegment(a[3], a[0], segments);
+                else {
+#ifdef SIMPLE
+                    NewSegment(a[2], a[0], segments);
+#else
+                    NewSegment(a[2], c, segments);
+                    NewSegment(c, a[0], segments);
+#endif
                 }
             }
         } else {
-            if(p == q[1]) {
-                if(p == q[2]) {
+            if(q[2]) {
+                if(q[3])
+                    NewSegment(a[1], a[2], segments);
+                else {
 #ifdef SIMPLE
-                    NewSegment(p, a[p][1], a[p][0], segments);
+                    NewSegment(a[1], a[3], segments);
 #else
-                    NewSegment(p, a[p][1], c, segments);
-                    NewSegment(p, c, a[p][0], segments);
+                    NewSegment(a[1], c, segments);
+                    NewSegment(c, a[3], segments);
 #endif
-                    if(p != q[3]) {
-#ifdef SIMPLE
-                        NewSegment(p, a[p][2], a[p][3], segments);
-#else
-                        NewSegment(p, a[p][2], c, segments);
-                        NewSegment(p, c, a[p][3], segments);
-#endif
-                    }
-                } else {
-                    if(p == q[3])
-                        NewSegment(p, a[p][3], a[p][0], segments);
-                    else {
-#ifdef SIMPLE
-                        NewSegment(p, a[p][2], a[p][0], segments);
-#else
-                        NewSegment(p, a[p][2], c, segments);
-                        NewSegment(p, c, a[p][0], segments);
-#endif
-                    }
                 }
             } else {
-                if(p == q[2]) {
-                    if(p == q[3])
-                        NewSegment(p, a[p][1], a[p][2], segments);
-                    else {
+                if(q[3]) {
 #ifdef SIMPLE
-                         NewSegment(p, a[p][1], a[p][3], segments);
+                    NewSegment(a[3], a[2], segments);
 #else
-                        NewSegment(p, a[p][1], c, segments);
-                        NewSegment(p, c, a[p][3], segments);
-#endif
-                    }
-                } else {
-                    if(p == q[3]) {
-#ifdef SIMPLE
-                         NewSegment(p, a[p][3], a[p][2], segments);
-#else
-                        NewSegment(p, a[p][3], c, segments);
-                        NewSegment(p, c, a[p][2], segments);
+                    NewSegment(a[3], c, segments);
+                    NewSegment(c, a[2], segments);
 #endif                        
-                    }
                 }
             }
         }

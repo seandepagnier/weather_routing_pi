@@ -65,22 +65,10 @@ ConfigurationDialog::~ConfigurationDialog( )
     pConf->Write ( _T ( "ConfigurationY" ), p.y);
 }
 
-void ConfigurationDialog::EditBoat( )
+void ConfigurationDialog::EditBoat()
 {
-    BoatDialog boatdlg(this, m_tBoat->GetValue());
-
-    wxIcon icon;
-    icon.CopyFromBitmap(*_img_WeatherRouting);
-    boatdlg.SetIcon(icon);
-
-    int updated = boatdlg.ShowModal();
-    m_tBoat->SetValue(boatdlg.m_boatpath);
-
-    if(updated == wxID_OK) {
-        /* update any configurations that use this boat */
-        m_WeatherRouting.UpdateBoatFilename(boatdlg.m_boatpath);
-        Update();
-    }
+    m_WeatherRouting.m_BoatDialog.LoadPolar(m_tBoat->GetValue());
+    m_WeatherRouting.m_BoatDialog.Show();
 }
 
 void ConfigurationDialog::OnGribTime( wxCommandEvent& event )

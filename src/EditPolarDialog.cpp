@@ -29,16 +29,21 @@
 #include "Boat.h"
 #include "BoatDialog.h"
 #include "EditPolarDialog.h"
+#include "Utilities.h"
 
-enum {spWIND_SPEED, spWIND_DIRECTION, spBOAT_SPEED};
+enum {spTRUE_WIND_SPEED, spTRUE_WIND_DIRECTION, spAPPARENT_WIND_SPEED, spAPPARENT_WIND_DIRECTION, spBOAT_SPEED, spETA};
 EditPolarDialog::EditPolarDialog(wxWindow *parent)
     : EditPolarDialogBase(parent),
       m_BoatDialog(static_cast<BoatDialog*>(parent))
 {
-
-    m_lMeasurements->InsertColumn(spWIND_SPEED, _("Wind Speed"));
-    m_lMeasurements->InsertColumn(spWIND_DIRECTION, _("Wind Direction"));
+//	m_gPolar->Connect( wxEVT_GRID_CELL_CHANGED, wxGridEventHandler( EditPolarDialogBase::OnPolarGridChanged ), NULL, this );
+    
+    m_lMeasurements->InsertColumn(spTRUE_WIND_SPEED, _("True Wind Speed"));
+    m_lMeasurements->InsertColumn(spTRUE_WIND_DIRECTION, _("True Wind Direction"));
+    m_lMeasurements->InsertColumn(spAPPARENT_WIND_SPEED, _("Apparent Wind Speed"));
+    m_lMeasurements->InsertColumn(spAPPARENT_WIND_DIRECTION, _("Apparent Wind Direction"));
     m_lMeasurements->InsertColumn(spBOAT_SPEED, _("Boat Speed"));
+    m_lMeasurements->InsertColumn(spETA, _("Sailboat Transform ETA"));
 }
 
 void EditPolarDialog::SetPolarIndex(int i)
@@ -50,7 +55,7 @@ void EditPolarDialog::SetPolarIndex(int i)
     m_lMeasurements->DeleteAllItems();
 }
 
-void EditPolarDialog::OnPolarGridChange( wxGridEvent& event )
+void EditPolarDialog::OnPolarGridChanged( wxGridEvent& event )
 {
     double VB;
     m_gPolar->GetCellValue(event.GetRow(), event.GetCol()).ToDouble(&VB);
@@ -92,15 +97,32 @@ void EditPolarDialog::OnRemoveTrueWindSpeed( wxCommandEvent& event )
     RebuildGrid();
 }
 
+static wxString dtos(double d)
+{
+    return wxString::Format(_T("%f"), d);
+}
+
 void EditPolarDialog::OnAddMeasurement( wxCommandEvent& event )
 {
     wxListItem info;
     info.SetId(m_lMeasurements->GetItemCount());
 //        info.SetData(i);
     long idx = m_lMeasurements->InsertItem(info);
-    m_lMeasurements->SetItem(idx, spWIND_SPEED, m_tWindSpeed->GetValue());
-    m_lMeasurements->SetItem(idx, spWIND_DIRECTION, m_tWindDirection->GetValue());
-    m_lMeasurements->SetItem(idx, spBOAT_SPEED, m_tBoatSpeed->GetValue());
+
+    double windspeed, winddirection, VB;
+
+    m_tWindSpeed->GetValue().ToDouble(&windspeed);
+    m_tWindDirection->GetValue().ToDouble(&winddirection);
+
+    m_tBoatSpeed->GetValue().ToDouble(&VB);
+    PolarMeasurement m(windspeed, winddirection, VB, m_rbApparentWind->GetValue());
+
+    m_lMeasurements->SetItem(idx, spTRUE_WIND_SPEED, dtos(m.VW()));
+    m_lMeasurements->SetItem(idx, spTRUE_WIND_DIRECTION, dtos(m.W()));
+    m_lMeasurements->SetItem(idx, spAPPARENT_WIND_SPEED, dtos(m.VA));
+    m_lMeasurements->SetItem(idx, spAPPARENT_WIND_DIRECTION, dtos(m.A));
+    m_lMeasurements->SetItem(idx, spBOAT_SPEED, dtos(m.VB));
+    m_lMeasurements->SetItem(idx, spETA, dtos(m.eta));
 }
 
 void EditPolarDialog::OnRemoveMeasurement( wxCommandEvent& event )
@@ -122,8 +144,9 @@ void EditPolarDialog::OnGeneratePolar( wxCommandEvent& event )
     std::list<PolarMeasurement> measurements;
     for(int i = 0; i<m_lMeasurements->GetItemCount(); i++) {
         double v[3];
+        const int ind[3] = {spAPPARENT_WIND_SPEED, spAPPARENT_WIND_DIRECTION, spBOAT_SPEED};
         for(int j=0; j<3; j++)
-            m_lMeasurements->GetItemText(i, j).ToDouble(v+j);
+            m_lMeasurements->GetItemText(i, ind[j]).ToDouble(v+j);
         PolarMeasurement m(v[0], v[1], v[2]);
         measurements.push_back(m);
     }

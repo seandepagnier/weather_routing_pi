@@ -43,6 +43,7 @@
 #include <wx/choice.h>
 #include <wx/grid.h>
 #include <wx/scrolwin.h>
+#include <wx/statline.h>
 #include <wx/slider.h>
 #include <wx/radiobut.h>
 #include <wx/html/htmlwin.h>
@@ -210,22 +211,16 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText20;
 		wxSpinCtrl* m_sMaxDivertedCourse;
 		wxStaticText* m_staticText1181;
-		wxStaticText* m_staticText119;
-		wxSpinCtrl* m_sMaxCourseAngle;
-		wxStaticText* m_staticText1251;
-		wxStaticText* m_staticText124;
-		wxSpinCtrl* m_sMaxSearchAngle;
-		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText23;
 		wxSpinCtrl* m_sMaxTrueWindKnots;
 		wxStaticText* m_staticText128;
 		wxStaticText* m_staticText136;
 		wxSpinCtrl* m_sMaxApparentWindKnots;
 		wxStaticText* m_staticText1282;
-		wxPanel* m_panel12;
 		wxStaticText* m_staticText27;
 		wxSpinCtrl* m_sMaxSwellMeters;
 		wxStaticText* m_staticText129;
+		wxPanel* m_panel12;
 		wxStaticText* m_staticText26;
 		wxSpinCtrl* m_sMaxLatitude;
 		wxStaticText* m_staticText131;
@@ -234,6 +229,12 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText121;
 		wxStaticText* m_staticText120;
 		wxSpinCtrl* m_sWindVSCurrent;
+		wxStaticText* m_staticText119;
+		wxSpinCtrl* m_sMaxCourseAngle;
+		wxStaticText* m_staticText1251;
+		wxStaticText* m_staticText124;
+		wxSpinCtrl* m_sMaxSearchAngle;
+		wxStaticText* m_staticText125;
 		wxCheckBox* m_cbAvoidCycloneTracks;
 		wxStaticText* m_staticText1281;
 		wxSpinCtrl* m_sCycloneMonths;
@@ -359,11 +360,17 @@ class BoatDialogBase : public wxDialog
 	
 	protected:
 		wxFlexGridSizer* m_fgSizer;
+		wxSplitterWindow* m_splitter2;
+		wxPanel* m_panel20;
 		wxNotebook* m_nNotebook;
 		wxPanel* m_plot;
 		wxScrolledWindow* m_PlotWindow;
 		wxPanel* m_panel10;
 		wxScrolledWindow* m_CrossOverChart;
+		wxStaticText* m_staticText137;
+		wxSpinCtrl* m_sOverlapPercentage;
+		wxStaticText* m_staticText138;
+		wxGauge* m_gCrossOverChart;
 		wxPanel* m_panel24;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_stBestCourseUpWindPortTack;
@@ -379,21 +386,25 @@ class BoatDialogBase : public wxDialog
 		wxChoice* m_cPlotVariable;
 		wxCheckBox* m_cbFullPlot;
 		wxCheckBox* m_cbOrientation;
+		wxPanel* m_panel21;
 		wxListCtrl* m_lPolars;
 		wxButton* m_bUp;
 		wxButton* m_bDown;
 		wxButton* m_bEditPolar;
 		wxButton* m_bAddPolar;
 		wxButton* m_bRemovePolar;
+		wxStaticLine* m_staticline1;
+		wxButton* m_bOpenBoat;
 		wxButton* m_bSaveBoat;
 		wxButton* m_bSaveAsBoat;
-		wxButton* m_bDiscard;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMouseEventsPolarPlot( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnPaintCrossOverChart( wxPaintEvent& event ) { event.Skip(); }
+		virtual void OnOverlapPercentage( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnVMGWindSpeed( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOrientation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarSelected( wxListEvent& event ) { event.Skip(); }
@@ -402,15 +413,21 @@ class BoatDialogBase : public wxDialog
 		virtual void OnEditPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemovePolar( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOpenBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveAsBoat( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
 		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,500 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BoatDialogBase();
+		
+		void m_splitter2OnIdle( wxIdleEvent& )
+		{
+			m_splitter2->SetSashPosition( 400 );
+			m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( BoatDialogBase::m_splitter2OnIdle ), NULL, this );
+		}
 	
 };
 
@@ -775,8 +792,8 @@ class EditPolarDialogBase : public wxDialog
 		wxButton* m_bAddTrueWindSpeed;
 		wxButton* m_bRemoveTrueWindSpeed;
 		wxPanel* m_panel21;
-		wxRadioButton* m_radioBtn5;
-		wxRadioButton* m_radioBtn6;
+		wxRadioButton* m_rbApparentWind;
+		wxRadioButton* m_rbTrueWind;
 		wxStaticText* m_staticText133;
 		wxTextCtrl* m_tWindSpeed;
 		wxStaticText* m_staticText134;
@@ -789,8 +806,13 @@ class EditPolarDialogBase : public wxDialog
 		wxButton* m_bRemoveAllMeasurements;
 		wxButton* m_button48;
 		wxButton* m_button50;
+		wxStdDialogButtonSizer* m_sdbSizer6;
+		wxButton* m_sdbSizer6Save;
+		wxButton* m_sdbSizer6Cancel;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnPolarGridChanged( wxGridEvent& event ) { event.Skip(); }
+		virtual void d( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddTrueWindAngle( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveTrueWindAngle( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddTrueWindSpeed( wxCommandEvent& event ) { event.Skip(); }
@@ -799,11 +821,12 @@ class EditPolarDialogBase : public wxDialog
 		virtual void OnRemoveMeasurement( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveAllMeasurements( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGeneratePolar( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		EditPolarDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit Polar"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		EditPolarDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit Polar"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~EditPolarDialogBase();
 	
 };

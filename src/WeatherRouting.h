@@ -33,6 +33,7 @@
 #include "WeatherRoutingUI.h"
 #include "ConfigurationDialog.h"
 #include "ConfigurationBatchDialog.h"
+#include "BoatDialog.h"
 #include "SettingsDialog.h"
 #include "StatisticsDialog.h"
 #include "ReportDialog.h"
@@ -87,6 +88,7 @@ public:
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
     CursorPositionDialog m_CursorPositionDialog;
+    BoatDialog m_BoatDialog;
 
     void SetConfigurationRoute(WeatherRoute *weatherroute);
     void UpdateBoatFilename(wxString boatFileName);

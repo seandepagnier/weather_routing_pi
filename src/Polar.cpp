@@ -35,6 +35,60 @@
 #include "Utilities.h"
 #include "Boat.h"
 
+PolarMeasurement::PolarMeasurement(double v, double d, double vb, bool apparent)
+{
+    VB = vb;
+    if(apparent) {
+        VA = v;
+        A = d;
+    } else {
+        double VW = v, W = d;
+        /*
+           ________________________
+          /  2    2
+   VA =  / VW + VB  + 2 VW VB cos(W)
+       \/
+
+           ________________________
+          /  2    2
+   VW =  / VA + VB - 2 VA VB cos(A)
+       \/
+
+      sin A   sin W
+      ----- = --------
+       VW        VA   
+
+        */
+        VA = sqrt(VW*VW + VB*VB + 2*VW*VB*cos(deg2rad(W)));
+//        A = rad2deg(asin(VW*sin(deg2rad(W))/VA));
+        A = rad2deg(acos((VA*VA + VB*VB - VW*VW) / (2*VA*VB)));
+                  
+    }
+    VB = vb;
+    eta = VA*(1-cos(deg2rad(A)))/(2*VB*VB);
+}
+
+double PolarMeasurement::VW() const
+{
+    return sqrt(VA*VA + VB*VB - 2*VA*VB*cos(deg2rad(A)));
+}
+
+double PolarMeasurement::W() const
+{
+//        VB*sin(W)=VA*sin(W-A);
+//        sin(W)/(cos(A)*sin(W)-sin(A)*cos(W)) = VA/ VB;
+//        W = atan(VA*sin(A) / (VA*cos(A)-VB))
+//
+//    return rad2deg(atan(VA*sin(deg2rad(A)) / (VA*cos(deg2rad(A))-VB)));
+//
+//    VA = sqrt(VW^2 + VB^2 + 2*VW*VB*cos(W))
+//    VA*VA = VW*VW + VB*VB + 2*VW*VB*cos(W)
+//    (VA*VA - VW*VW - VB*VB)/(2*VW*VB) = cos(W)
+//    W = acos(VA*VA - VW*VW - VB*VB)/(2*VW*VB))
+    double vw = VW();
+    return rad2deg(acos((VA*VA - vw*vw - VB*VB)/(2*vw*VB)));
+}
+
 /* give value for y at a given x location on a segment */
 double interp_value(double x, double x1, double x2, double y1, double y2)
 {
@@ -200,6 +254,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
         }
 
         // add zero speed for all wind speeds going against wind if not specified
+#if 0        
         if(degree_steps.empty() && W > 0)
         {
             degree_steps.push_back(0);
@@ -207,6 +262,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
             for(int VWi = 0; VWi < (int)wind_speeds.size(); VWi++)
                 wind_speeds[VWi].speeds.push_back(0);
         }
+#endif        
 
         degree_steps.push_back(W);
         lastentryW = W;
@@ -355,7 +411,8 @@ void Polar::ClosestVWi(double VW, int &VW1i, int &VW2i)
             return;
         }
 
-    VW1i = VW2i = wind_speeds.size()-1;
+    VW2i = wind_speeds.size()-1;
+    VW1i = VW2i > 0 ? VW2i - 1 : 0;
 }
 
 /* compute boat speed from true wind angle and true wind speed
@@ -365,14 +422,18 @@ double Polar::Speed(double W, double VW)
     if(VW < 0)
         return NAN;
 
-    if(!degree_steps.size())
+    if(!degree_steps.size() || !wind_speeds.size())
         return NAN;
-    
+
     W = positive_degrees(W);
 
     // assume symmetric
     if(W > 180)
         W = 360 - W;
+
+    if(W < degree_steps[0] || W > degree_steps[degree_steps.size()-1] ||
+       VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW)
+        return NAN;
 
     unsigned int W1i = degree_step_index[(int)floor(W)];
     unsigned int W2i = degree_steps.size() == 1 ? 0 : W1i+1;
@@ -571,7 +632,7 @@ void Polar::UpdateDegreeStepLookup()
     unsigned int Wi = 0;
     for(int d = 0; d < DEGREES; d++) {
         while(Wi < degree_steps.size()-1) {
-            if(d < degree_steps[Wi+1])
+            if(d <= degree_steps[Wi+1])
                 break;
             Wi++;
         }
@@ -630,19 +691,113 @@ float SailboatTransformSpeed(double W, double VW, double eta)
 float BoatSpeedFromMeasurements(const std::list<PolarMeasurement> &measurements,
                                 double W, double VW)
 {
-    double bestVW = INFINITY, besteta = 1;
+#if 1
+    // find 3 closest measurements
+    double dist[3] = {INFINITY, INFINITY, INFINITY};
+    std::list<PolarMeasurement>::const_iterator pos[3] =
+        {measurements.end(), measurements.end(), measurements.end()};
     for(std::list<PolarMeasurement>::const_iterator it = measurements.begin();
         it != measurements.end(); it++) {
-        // eta = VA/VB^2*(1-cos(A))/2
-        
-        double mVA = it->VA, mA = it->A, mVB = it->VB;
-        double mVW = sqrt(mVA*mVA + mVB*mVB - 2*mVA*mVB*cos(deg2rad(mA)));
 
-        if(fabs(VW-mVW) < fabs(VW-bestVW)) {
-            besteta = mVA*(1-cos(deg2rad(mA)))/(2*mVB*mVB);
-            bestVW = mVW;
+        double mVW = it->VW(), mW = it->W();
+
+        // could add constants multiplier for one axis here...
+        double d = pow(mW - W, 2) + pow(mVW - VW, 2);
+
+        if(d < dist[2]) {
+            if(d < dist[1]) {
+                if(d < dist[0]) {
+                    dist[2] = dist[1], dist[1] = dist[0], dist[0] = d;
+                    pos[2] = pos[1], pos[1] = pos[0], pos[0] = it;
+                } else {
+                    dist[2] = dist[1], dist[1] = d;
+                    pos[2] = pos[1], pos[1] = it;
+                }
+            } else {
+                dist[2] = d;
+                pos[2] = it;
+            }
         }
+
+        // eta = VA/VB^2*(1-cos(A))/2
+//            besteta = mVA*(1-cos(deg2rad(mA)))/(2*mVB*mVB);
+//            bestVW = mVW;
     }
+
+    double besteta;
+    if(pos[0] != measurements.end()) {
+        if(pos[1] != measurements.end() && pos[2] != measurements.end()) {
+            // plane fit
+            double mVW[3], mW[3], meta[3];
+            for(int i=0; i<3; i++)
+                mVW[i] = pos[i]->VW(), mW[i] = pos[i]->W(), meta[i] = pos[i]->eta;
+
+            /*
+            m.eta0 = dVW*m0.VW + dW*m0.W + ceta;
+            m.eta1 = dVW*m1.VW + dW*m1.W + ceta;
+            m.eta2 = dVW*m2.VW + dW*m2.W + ceta;
+            */
+            double det = mVW[0]*(mW[2]-mW[1])-mVW[1]*mW[2]+mW[1]*mVW[2]+mW[0]*(mVW[1]-mVW[2]);
+            double dVW = (meta[0]*(mW[2]-mW[1])-
+                          meta[1]*(mW[2])+
+                          meta[2]*mW[1]+(meta[1]-meta[2])*mW[0])
+                /det;
+            double dW = -(meta[0]*(mVW[2]-mVW[1])-
+                          meta[1]*mVW[2]+meta[2]*mVW[1]+
+                          (meta[1]-meta[2])*mVW[0])
+                /det;
+            double ceta = (meta[0]*(mW[1]*mVW[2]-mVW[1]*mW[2])+
+                           mVW[0]*(meta[1]*mW[2]-meta[2]*mW[1])+
+                           mW[0]*(meta[2]*mVW[1]-meta[1]*mVW[2]))
+                /det;
+
+            besteta = dVW*VW + dW*W + ceta;
+            if(det == 0 || isnan(besteta))
+                besteta = pos[0]->eta;
+             
+            if((besteta < pos[0]->eta &&
+                besteta < pos[1]->eta &&
+                besteta < pos[2]->eta) ||
+               (besteta > pos[0]->eta &&
+                besteta > pos[1]->eta &&
+                besteta > pos[2]->eta))
+                besteta = pos[0]->eta;
+        } else
+            besteta = pos[0]->eta;
+    } else
+        besteta = 1;
+#else
+        // find 1 closest measurements
+    double dist = INFINITY;
+    std::list<PolarMeasurement>::const_iterator pos = measurements.end();
+    for(std::list<PolarMeasurement>::const_iterator it = measurements.begin();
+        it != measurements.end(); it++) {
+
+        double mVW = it->VW(), mW = it->W();
+
+        // could add constants multiplier for one axis here...
+        double d = pow(mW - W, 2) + pow(mVW - VW, 2);
+
+        if(d < dist) {
+            pos = it;
+            dist = d;
+        }
+
+        // eta = VA/VB^2*(1-cos(A))/2
+//            besteta = mVA*(1-cos(deg2rad(mA)))/(2*mVB*mVB);
+//            bestVW = mVW;
+    }
+
+    double besteta;
+    if(pos != measurements.end())
+        besteta = pos->eta;
+    else
+        besteta = 1;
+#endif
+    if(besteta < .001)
+        besteta = .001;
+    if(besteta > 1)
+        besteta = 1;
 
     return SailboatTransformSpeed(W, VW, besteta);
 }
@@ -706,6 +861,12 @@ void Polar::CalculateVMG(int VWi)
         }
 
         ws.VMG.values[i] = maxW;
+    }
+
+    // for symmetric polars
+    if(degree_steps[degree_steps.size()-1] <= 180) {
+        ws.VMG.values[0] = ws.VMG.values[1];
+        ws.VMG.values[2] = ws.VMG.values[3];
     }
 }
 

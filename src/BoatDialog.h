@@ -30,35 +30,34 @@
 
 #include "EditPolarDialog.h"
 
-class weather_routing_pi;
+class WeatherRouting;
+class CrossOverGenerationThread;
 
 class BoatDialog : public BoatDialogBase
 {
 public:
-    BoatDialog(wxWindow *parent, wxString boatpath);
+    BoatDialog(WeatherRouting &weatherrouting);
     ~BoatDialog();
 
-    EditPolarDialog m_EditPolarDialog;
-
+    void LoadPolar(const wxString &filename);
+    
     Boat m_Boat;
     wxString m_boatpath;
 
 private:
     void OnMouseEventsPolarPlot( wxMouseEvent& event );
     
-    void PaintPolar(wxPaintDC &dc, long index);
-    void PaintSpeed(wxPaintDC &dc, long index);
-
     void OnPaintPlot( wxPaintEvent& event );
     void OnUpdatePlot( wxSizeEvent& event ) { OnUpdatePlot(); }
     void OnOrientation( wxCommandEvent& event );
     void OnPaintCrossOverChart( wxPaintEvent& event );
-    void OnGenerateCrossOverChart( wxCommandEvent& event );
+    void OnOverlapPercentage( wxSpinEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { RefreshPlots(); }
+    void OnVMGWindSpeed( wxSpinEvent& event ) { UpdateVMG(); }
     void OnUpdatePlot();
     void OnUpdatePlot( wxCommandEvent& event ) { OnUpdatePlot(); }
     void OnUpdatePlot( wxSpinEvent& event ) { OnUpdatePlot(); }
-    void OnOpen( wxCommandEvent& event );
+    void OnOpenBoat( wxCommandEvent& event );
     void SaveBoat();
     void OnSaveAsBoat( wxCommandEvent& event );
     void OnSaveBoat( wxCommandEvent& event ) { SaveBoat(); }
@@ -74,19 +73,27 @@ private:
     void OnAddPolar( wxCommandEvent& event );
     void OnRemovePolar( wxCommandEvent& event );
 
+    void GenerateCrossOverChart();
+    void OnEvtThread( wxThreadEvent & event );
+
     void RepopulatePolars();
 
     void RefreshPlots() { m_PlotWindow->Refresh(); m_CrossOverChart->Refresh(); }
 
     wxString FormatVMG(double W, double VW);
     void UpdateVMG();
-
+    void PlotVMG(wxPaintDC &dc, double lW, double W, double scale, int plottype);
     long SelectedPolar() { return m_lPolars->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); }
+
+    WeatherRouting &m_WeatherRouting;
 
     double m_PlotScale;
     int m_MouseW;
 
     bool m_orientation[2];
+
+    bool m_CrossOverRegenerate;
+    CrossOverGenerationThread *m_CrossOverGenerationThread;
 };
 
 #endif

@@ -34,16 +34,27 @@
 #include "Utilities.h"
 #include "Boat.h"
 #include "BoatDialog.h"
+#include "RouteMapOverlay.h"
+#include "WeatherRouting.h"
 
-enum {spFILENAME, spWAVEPOLARFILENAME};
+wxString dummy_polar = _T("\
+TWA	6	10	14	20\n\
+45	5.5	6.6	7.3	7.6\n\
+60	5.8	7.0	7.6	7.8\n\
+90	6.2	7.3	7.8	8.1\n\
+135	5.2	6.4	7.4	7.9\n\
+150	4.3	5.4	6.5	7.3\n\
+");
+
+enum {spFILENAME};
 
 // for plotting
 static const int wind_speeds[] = {0, 2, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32, 36, 40, 45, 50, 55, 60};
 static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
 
-BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
-    : BoatDialogBase(parent), m_EditPolarDialog(this),
-    m_boatpath(boatpath), m_PlotScale(0)
+BoatDialog::BoatDialog(WeatherRouting &weatherrouting)
+    : BoatDialogBase(&weatherrouting),
+      m_WeatherRouting(weatherrouting), m_PlotScale(0), m_CrossOverRegenerate(false), m_CrossOverGenerationThread(NULL)
 {
     // for small screens: don't let boat dialog be larger than screen
     int w,h;
@@ -54,25 +65,6 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     SetSize(wxSize(w, h));
 
     m_lPolars->InsertColumn(spFILENAME, _("Filename"));
-    m_lPolars->InsertColumn(spWAVEPOLARFILENAME, _("Wave Polar Filename"));
-
-    wxString error = m_Boat.OpenXML(m_boatpath);
-    RepopulatePolars();
-
-    /* select first polar if it exists */
-    if(m_lPolars->GetItemCount())
-        m_lPolars->SetItemState( 0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
-
-    if(error.size()) {
-        wxMessageDialog md(this, error,
-                           _("OpenCPN Weather Routing Plugin"),
-                            wxICON_ERROR | wxOK );
-        md.ShowModal();
-    }
-
-//    m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-
-    UpdateVMG();
 
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
@@ -91,6 +83,30 @@ BoatDialog::~BoatDialog()
 
     pConf->Read ( _T ( "Orientation0" ), m_orientation[0] );
     pConf->Write ( _T ( "Orientation1" ), m_orientation[1] );
+}
+
+void BoatDialog::LoadPolar(const wxString &filename)
+{
+    m_boatpath = filename;
+
+    SetTitle(m_boatpath);
+    wxString error = m_Boat.OpenXML(m_boatpath, false);
+    RepopulatePolars();
+
+    /* select first polar if it exists */
+    if(m_lPolars->GetItemCount())
+        m_lPolars->SetItemState( 0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
+
+    if(error.size()) {
+        wxMessageDialog md(this, error,
+                           _("OpenCPN Weather Routing Plugin"),
+                            wxICON_ERROR | wxOK );
+        md.ShowModal();
+    }
+
+//    m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+
+    UpdateVMG();
 }
 
 void BoatDialog::OnMouseEventsPolarPlot( wxMouseEvent& event )
@@ -193,326 +209,6 @@ void BoatDialog::OnMouseEventsPolarPlot( wxMouseEvent& event )
 #endif
 }
 
-#if 0
-void BoatDialog::PlotVMG(wxPaintDC &dc, double W, double s)
-{
-    if(isnan(W))
-        return;
-
-    int w, h;
-    m_PlotWindow->GetSize( &w, &h);
-
-    double H;
-    if((m_cPlotVariable->GetSelection() & 1) == 0) // true wind
-        H = W;
-    else { // apparent wind
-        Polar &polar = m_Boat.Polars[m_SelectedPolar];
-        int VW = m_sWindSpeed->GetValue();
-        H = rad2posdeg(BoatPlan::DirectionApparentWind(plan.Speed(W, VW), W, VW));
-    }
-
-    if(m_cPlotType->GetSelection() == 0) { // polar
-        int px = s*sin(deg2rad(H));
-        int py = s*cos(deg2rad(H));
-        dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
-    } else {
-        int px = H * w / DEGREES;
-        dc.DrawLine(px, 0, px, h);
-    }
-}
-#endif
-
-static void PlotRectangularData(wxDC &dc, double *values, int count, double scale, int w, int h)
-{
-    int lx, ly;
-    bool lastvalid = false;
-    for(int i = 0; i<count; i++) {
-        if(isnan(values[i])) {
-            lastvalid = false;
-            continue;
-        }
-
-        int px = i * w / count, py = h - scale*values[i];
-
-        if(lastvalid)
-            dc.DrawLine(lx, ly, px, py);
-
-        lx = px, ly = py;
-        lastvalid = true;
-    }
-}
-
-void BoatDialog::PaintPolar(wxPaintDC &dc, long index)
-{
-    int w, h;
-    m_PlotWindow->GetSize( &w, &h);
-    double maxVB = 0;
-
-    Polar &polar = m_Boat.Polars[index];
-    int windspeed = 15; //m_sWindSpeed->GetValue();
-
-    int H, i;
-    /* plot scale */
-    int selection = m_cPlotVariable->GetSelection();
-
-    for(H = 0, i=0; H<DEGREES; H += 3, i++) {
-        double VB;
-        if(selection < 2)
-            VB = polar.Speed(H, windspeed);
-        else
-            VB = polar.SpeedAtApparentWindSpeed(H, windspeed);
-
-        if(VB > maxVB)
-            maxVB = VB;
-    }
-    
-    dc.SetPen(wxPen(wxColor(0, 0, 0)));
-    dc.SetBrush(*wxTRANSPARENT_BRUSH);
-    dc.SetTextForeground(wxColour(0, 55, 75));
-
-    if(maxVB <= 0) maxVB = 1; /* avoid lock */
-    double Vstep = ceil(maxVB / 5);
-    maxVB += Vstep;
-
-    m_PlotScale = (w < h ? w : h)/1.8 / (maxVB+1);
-
-    bool full = m_cbFullPlot->GetValue();
-    int xc = full ? w / 2 : 0;
-
-    /* polar circles */
-    for(double V = Vstep; V <= maxVB; V+=Vstep) {
-        dc.DrawCircle(xc, h/2, V*m_PlotScale);
-        dc.DrawText(wxString::Format(_T("%.0f"), V), xc, h/2+(int)V*m_PlotScale);
-    }
-
-    /* polar meridians */
-    dc.SetTextForeground(wxColour(0, 0, 155));
-    for(double B = 0; B < DEGREES; B+=15) {
-        double x = maxVB*m_PlotScale*sin(deg2rad(B));
-        double y = maxVB*m_PlotScale*cos(deg2rad(B));
-        if(B < 180)
-            dc.DrawLine(xc - x, h/2 + y, xc + x, h/2 - y);
-
-        wxString str = wxString::Format(_T("%.0f"), B);
-        int sw, sh;
-        dc.GetTextExtent(str, &sw, &sh);
-        dc.DrawText(str, xc + .9*x - sw/2, h/2 - .9*y - sh/2);
-    }
-
-    /* vmg */
-//    double s = maxVB*m_PlotScale;
-//    SailingVMG vmg = selection < 2 ? polar.GetVMGTrueWind(windspeed)
-//                                 : polar.GetVMGApparentWind(windspeed);
-
-    dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
-
-//    PlotVMG(dc, vmg.values[SailingVMG::PORT_UPWIND], s);
-//    PlotVMG(dc, vmg.values[SailingVMG::STARBOARD_UPWIND], s);
-
-    dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
-
-//    PlotVMG(dc, vmg.values[SailingVMG::PORT_DOWNWIND], s);
-//    PlotVMG(dc, vmg.values[SailingVMG::STARBOARD_DOWNWIND], s);
-
-    dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
-
-    /* boat speeds */
-    int cx = (full ? w/2 : 0), cy = h/2;
-    for(unsigned int VWi = 0; VWi<polar.wind_speeds.size(); VWi++) {
-        double VW, VA;
-        switch(selection) {
-        case 0: case 1: VW = polar.wind_speeds[VWi].VW; break;
-            // use grid vw for va steps
-        case 2: case 3: VA = polar.wind_speeds[VWi].VW; break;
-        }
-
-        bool lastvalid = false;
-        int lx, ly;
-        for(unsigned int Wi = 0; Wi<polar.degree_steps.size()+1; Wi++) {
-            double W = polar.degree_steps[Wi%polar.degree_steps.size()], VB;
-
-            switch(selection) {
-            case 0: case 1:
-                VB = polar.Speed(W, VW);
-                break;
-            case 2: case 3:
-                VB = polar.SpeedAtApparentWindSpeed(W, VA);
-                VW = Polar::VelocityTrueWind(VA, VB, W);
-                break;
-            }
-
-            double a;
-
-            switch(selection) {
-            case 0: case 2: a = W; break;
-            case 1: case 3: a = Polar::DirectionApparentWind(VB, W, VW); break;
-            }
-
-            int px =  m_PlotScale*VB*sin(deg2rad(a)) + cx;
-            int py = -m_PlotScale*VB*cos(deg2rad(a)) + cy;
-
-            if(lastvalid) {
-                dc.DrawLine(lx, ly, px, py);
-                if(full)
-                    dc.DrawLine(2*cx-lx, ly, 2*cx-px, py);
-
-//            dc.DrawArc(lx, ly, px, py, cx, cy);
-            }
-
-            lx = px, ly = py;
-            lastvalid = true;
-        }
-    }
-}
-
-void BoatDialog::PaintSpeed(wxPaintDC &dc, long index)
-{
-    int w, h;
-    m_PlotWindow->GetSize( &w, &h);
-    double maxVB = 0;
-
-    Polar &polar = m_Boat.Polars[index];
-    int H = 90;//m_sWindDirection->GetValue();
-
-    /* plot scale */
-    int selection = m_cPlotVariable->GetSelection();
-
-    for(int s = 0; s<num_wind_speeds; s++) {
-        double windspeed = wind_speeds[s], VB;
-
-        if(selection < 2)
-            VB = polar.Speed(H, windspeed);
-        else
-            VB = polar.SpeedAtApparentWindSpeed(H, windspeed);
-
-        if(VB > maxVB)
-            maxVB = VB;
-    }
-    
-    dc.SetPen(wxPen(wxColor(0, 0, 0)));
-    dc.SetBrush(*wxTRANSPARENT_BRUSH);
-    dc.SetTextForeground(wxColour(0, 55, 75));
-
-    if(maxVB <= 0) maxVB = 1; /* avoid lock */
-    double Vstep = ceil(maxVB / 5);
-    maxVB += Vstep;
-
-    m_PlotScale = h/1.8 / (maxVB+1);
-
-    for(double V = Vstep; V <= maxVB; V+=Vstep) {
-        int y = h - 2*V*m_PlotScale;
-        dc.DrawLine(0, y, w, y);
-        dc.DrawText(wxString::Format(_T("%.0f"), V), 0, y);
-    }
-
-    dc.SetTextForeground(wxColour(0, 0, 155));
-
-    for(int s = 0; s<num_wind_speeds; s++) {
-        double windspeed = wind_speeds[s];
-
-        double x = s * w / num_wind_speeds;
-        dc.DrawLine(x, 0, x, h);
-
-        wxString str = wxString::Format(_T("%.0f"), windspeed);
-        int sw, sh;
-        dc.GetTextExtent(str, &sw, &sh);
-        dc.DrawText(str, x, 0);
-    }
-
-    /* boat speeds */
-    double *values = new double[num_wind_speeds];
-    for(int s = 0; s<num_wind_speeds; s++) {
-        double windspeed = wind_speeds[s];
-        switch(selection) {
-        case 0: values[s] = polar.Speed(H, windspeed); break;
-        case 1: values[s] = polar.SpeedAtApparentWindSpeed(H, windspeed); break;
-        case 2: values[s] = polar.SpeedAtApparentWindDirection(H, windspeed); break;
-        case 3: values[s] = polar.SpeedAtApparentWind(H, windspeed); break;
-        }
-    }
-
-    dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
-    PlotRectangularData(dc, values, num_wind_speeds, 2*m_PlotScale, w, h);
-    delete [] values;
-}
-#if 0
-void BoatDialog::PaintVMG(wxPaintDC &dc)
-{
-    int w, h;
-    m_PlotWindow->GetSize( &w, &h);
-
-    m_PlotScale = 0; // don't do mouse over
-
-    int mul = 5, count = mul*num_wind_speeds - 1;
-
-    olar &polar = m_Boat.Polars[m_SelectedSailPolar];
-
-    /* plot scale */
-    int selection = m_cPlotVariable->GetSelection();
-
-    double min = 0, max = 190, step = 10;
-    
-    dc.SetPen(wxPen(wxColor(0, 0, 0)));
-    dc.SetBrush(*wxTRANSPARENT_BRUSH);
-    dc.SetTextForeground(wxColour(0, 55, 75));
-
-    double scale = h/(max - min);
-
-    /* draw angles lines and text */
-    for(double V = step; V < max; V+=step) {
-        int y = h - V*scale;
-        dc.DrawLine(0, y, w, y);
-        dc.DrawText(wxString::Format(_T("%.0f"), V), 0, y);
-    }
-
-    /* draw wind speeds and lines and text */
-    dc.SetTextForeground(wxColour(0, 0, 155));
-    for(int s = 0; s<num_wind_speeds; s++) {
-        double windspeed = wind_speeds[s];
-
-        double x = s * w / num_wind_speeds;
-        dc.DrawLine(x, 0, x, h);
-
-        wxString str = wxString::Format(_T("%.0f"), windspeed);
-        int sw, sh;
-        dc.GetTextExtent(str, &sw, &sh);
-        dc.DrawText(str, x, 0);
-    }
-
-    // Only render port tack.. later we could do starboard if the polar is not symmetric
-    double *valuesup = new double[count], *valuesdown = new double[count];
-    for(int s = 0; s<count; s++) {
-        int s0 = s/mul;
-        double d = (double)s/mul - s0, v;
-        double windspeed1 = wind_speeds[s0];
-        double windspeed2 = wind_speeds[s0+1];
-        double windspeed = (1-d)*windspeed1 + d*windspeed2;
-
-        SailingVMG vmg = selection < 2 ? polar.GetVMGTrueWind(windspeed) :
-            polar.GetVMGApparentWind(windspeed);
-
-        v = vmg.values[SailingVMG::PORT_UPWIND];
-        if(selection & 1 && !isnan(v))
-            v = positive_degrees(BoatPolar::DirectionApparentWind
-                                   (polar.Speed(v, windspeed), v, windspeed));
-        valuesup[s] = v;
-
-        v = vmg.values[SailingVMG::PORT_DOWNWIND];
-        if(selection & 1 && !isnan(v))
-            v = rad2posdeg(BoatPolar::DirectionApparentWind
-                                   (polar.Speed(v, windspeed), v, windspeed));
-        valuesdown[s] = v;
-    }
-
-    dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
-    PlotRectangularData(dc, valuesup, count, scale, w, h);
-
-    dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
-    PlotRectangularData(dc, valuesdown, count, scale, w, h);
-    delete [] valuesup;
-    delete [] valuesdown;
-}
-#endif
 void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 {
     wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
@@ -532,9 +228,242 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
         return;
     }
     
-    switch(m_cPlotType->GetSelection()) {
-    case 0: PaintPolar(dc, index); break;
-    case 1: PaintSpeed(dc, index); break;
+    int plottype = m_cPlotType->GetSelection();
+    int w, h;
+    m_PlotWindow->GetSize( &w, &h);
+    double maxVB = 0;
+
+    Polar &polar = m_Boat.Polars[index];
+
+    /* plot scale */
+    int selection = m_cPlotVariable->GetSelection();
+
+    for(unsigned int VWi = 0; VWi<polar.wind_speeds.size(); VWi++) {
+        double windspeed = polar.wind_speeds[VWi].VW;
+        for(unsigned int Wi = 0; Wi<polar.degree_steps.size(); Wi++) {
+            double W = polar.degree_steps[Wi];
+            double VB;
+            if(selection < 2)
+                VB = polar.Speed(W, windspeed);
+            else
+                VB = polar.SpeedAtApparentWindSpeed(W, windspeed);
+            
+            if(VB > maxVB)
+                maxVB = VB;
+        }
+    }
+
+    dc.SetPen(wxPen(wxColor(0, 0, 0)));
+    dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    dc.SetTextForeground(wxColour(0, 55, 75));
+
+    if(maxVB <= 0) maxVB = 1; /* avoid lock */
+    double Vstep = ceil(maxVB / 5);
+    maxVB += Vstep;
+
+    m_PlotScale = (w < h ? w : h)/1.8 / (maxVB+1);
+//    m_PlotScale = h/1.8 / (maxVB+1);
+
+    bool full = m_cbFullPlot->GetValue();
+    int xc = full ? w / 2 : 0;
+
+    if(plottype == 0) {
+        /* polar circles */
+        for(double V = Vstep; V <= maxVB; V+=Vstep) {
+            dc.DrawCircle(xc, h/2, V*m_PlotScale);
+            dc.DrawText(wxString::Format(_T("%.0f"), V), xc, h/2+(int)V*m_PlotScale);
+        }
+    } else {
+        for(double V = Vstep; V <= maxVB; V+=Vstep) {
+            int y = h - 2*V*m_PlotScale;
+            dc.DrawLine(0, y, w, y);
+            dc.DrawText(wxString::Format(_T("%.0f"), V), 0, y);
+        }
+    }
+
+    dc.SetTextForeground(wxColour(0, 0, 155));
+
+    if(plottype == 0) {
+        /* polar meridians */
+        for(double B = 0; B < DEGREES; B+=15) {
+            double x = maxVB*m_PlotScale*sin(deg2rad(B));
+            double y = maxVB*m_PlotScale*cos(deg2rad(B));
+            if(B < 180)
+                dc.DrawLine(xc - x, h/2 + y, xc + x, h/2 - y);
+
+            wxString str = wxString::Format(_T("%.0f"), B);
+            int sw, sh;
+            dc.GetTextExtent(str, &sw, &sh);
+            dc.DrawText(str, xc + .9*x - sw/2, h/2 - .9*y - sh/2);
+        }
+    } else {
+        for(int s = 0; s<num_wind_speeds; s++) {
+            double windspeed = wind_speeds[s];
+
+            double x = s * w / num_wind_speeds;
+            dc.DrawLine(x, 0, x, h);
+
+            wxString str = wxString::Format(_T("%.0f"), windspeed);
+            int sw, sh;
+            dc.GetTextExtent(str, &sw, &sh);
+            dc.DrawText(str, x, 0);
+        }
+    }
+
+    int cx = (full ? w/2 : 0), cy = h/2;
+
+    dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
+
+    /* boat speeds */
+    if(plottype == 0) {
+        for(unsigned int VWi = 0; VWi<polar.wind_speeds.size(); VWi++) {
+            double VW, VA;
+            switch(selection) {
+            case 0: case 1: VW = polar.wind_speeds[VWi].VW; break;
+                // use grid vw for va steps
+            case 2: case 3: VA = polar.wind_speeds[VWi].VW; break;
+            }
+
+            bool lastvalid = false;
+            int lx, ly;
+            for(unsigned int Wi = 0; Wi<polar.degree_steps.size()+full; Wi++) {
+                double W = polar.degree_steps[Wi%polar.degree_steps.size()], VB;
+                
+                switch(selection) {
+                case 0: case 1:
+                    VB = polar.Speed(W, VW);
+                    break;
+                case 2: case 3:
+                    VB = polar.SpeedAtApparentWindSpeed(W, VA);
+                    VW = Polar::VelocityTrueWind(VA, VB, W);
+                    break;
+                }
+                
+                double a;
+                
+                switch(selection) {
+                case 0: case 2: a = W; break;
+                case 1: case 3: a = Polar::DirectionApparentWind(VB, W, VW); break;
+                }
+                
+                int px, py;
+                px =  m_PlotScale*VB*sin(deg2rad(a)) + cx;
+                py = -m_PlotScale*VB*cos(deg2rad(a)) + cy;
+                
+                if(lastvalid) {
+                    dc.DrawLine(lx, ly, px, py);
+                    if(full)
+                        dc.DrawLine(2*cx-lx, ly, 2*cx-px, py);
+                    
+//            dc.DrawArc(lx, ly, px, py, cx, cy);
+                }
+
+                lx = px, ly = py;
+                lastvalid = true;
+            }
+        }
+    } else {
+        for(unsigned int Wi = 0; Wi<polar.degree_steps.size(); Wi++) {
+            double W = polar.degree_steps[Wi], VB;
+
+            bool lastvalid = false;
+            int lx, ly;
+            for(unsigned int VWi = 0; VWi<polar.wind_speeds.size(); VWi++) {
+                double windspeed = polar.wind_speeds[VWi].VW;
+                double VW, VA;
+                switch(selection) {
+                case 0: case 1: VW = windspeed; break;
+                    // use grid vw for va steps
+                case 2: case 3: VA = windspeed; break;
+                }
+                
+                switch(selection) {
+                case 0: case 1:
+                    VB = polar.Speed(W, VW);
+                    break;
+                case 2: case 3:
+                    VB = polar.SpeedAtApparentWindSpeed(W, VA);
+                    VW = Polar::VelocityTrueWind(VA, VB, W);
+                    break;
+                }
+                
+                double a;
+                
+                switch(selection) {
+                case 0: case 2: a = W; break;
+                case 1: case 3: a = Polar::DirectionApparentWind(VB, W, VW); break;
+                }
+                
+                int px, py;
+                int s;
+                for(s = 0; s<num_wind_speeds-1; s++) {
+                    if(wind_speeds[s] > polar.wind_speeds[VWi].VW)
+                        break;
+                }
+                { // interpolate into non-linear windspeed space
+                    double x = windspeed, x1 = wind_speeds[s], x2 = wind_speeds[s+1];
+                    double y1 = s * w / num_wind_speeds;
+                    double y2 = (s+1) * w / num_wind_speeds;
+
+                    px = x2 - x1 ? (y2 - y1)*(x - x1)/(x2 - x1) + y1 : y1;
+                }
+                py = h - 2*VB*m_PlotScale;
+                
+                if(lastvalid) {
+                    dc.DrawLine(lx, ly, px, py);
+                    if(full)
+                        dc.DrawLine(2*cx-lx, ly, 2*cx-px, py);
+                }
+
+                lx = px, ly = py;
+                lastvalid = true;
+            }
+        }
+    }
+
+    /* vmg */
+
+    wxPoint lastp[4];
+    bool lastpvalid[4] = {false, false, false, false};
+    for(unsigned int VWi = 0; VWi<polar.wind_speeds.size(); VWi++) {
+        double VW = polar.wind_speeds[VWi].VW;
+        SailingVMG vmg = polar.GetVMGTrueWind(VW);
+
+        for(int i=0; i<4; i++) {
+            if(i%2 == 0 && !full)
+                continue;
+
+            if(i < 2)
+                dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
+            else
+                dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
+
+            double W = vmg.values[i];
+            if(isnan(W))
+                continue;
+
+            double VB = polar.Speed(W, VW);
+
+            double a;
+            switch(selection) {
+            case 0: case 2: a = W; break;
+            case 1: case 3: a = Polar::DirectionApparentWind(VB, W, VW); break;
+            }
+
+            wxPoint p;
+            if(plottype == 0) {
+                p.x =  m_PlotScale*VB*sin(deg2rad(a)) + cx;
+                p.y = -m_PlotScale*VB*cos(deg2rad(a)) + cy;
+            } else {
+                p.x = a * w / (full ? 360 : 180) + cx;
+                p.y = h - 2*VB*m_PlotScale;
+            }
+
+            if(lastpvalid[i])
+                dc.DrawLine(lastp[i], p);
+            lastp[i] = p;
+            lastpvalid[i] = true;
+        }
     }
 }
 
@@ -598,7 +527,8 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
         }
     }
     
-    wxColour colors[] = {*wxRED, *wxGREEN, *wxBLUE, *wxCYAN, *wxYELLOW, *wxWHITE};
+    wxColour colors[] = {*wxRED, *wxGREEN, *wxBLUE, *wxCYAN, *wxYELLOW,
+                         wxColour(255, 0, 255)};
     int c = 0;
     for(unsigned int i=0; i<m_Boat.Polars.size(); i++) {
         bool bold = i == index;
@@ -608,7 +538,7 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
         dc.SetBrush(wxColour(colors[c].Red(),
                              colors[c].Green(),
                              colors[c].Blue(),
-                             bold ? 220 : 140));
+                             bold ? 230 : 60));
         if(++c == (sizeof colors) / (sizeof *colors))
             c = 0;
 
@@ -689,13 +619,15 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
     }
 }
 
-void BoatDialog::OnGenerateCrossOverChart( wxCommandEvent& event )
+void BoatDialog::OnOverlapPercentage( wxSpinEvent& event )
 {
-    m_Boat.GenerateCrossOverChart();
-    RefreshPlots();
+    long i = SelectedPolar();
+    if(i != -1)
+        m_Boat.Polars[i].m_crossoverpercentage = m_sOverlapPercentage->GetValue()/100.0;
+    GenerateCrossOverChart();
 }
 
-void BoatDialog::OnOpen ( wxCommandEvent& event )
+void BoatDialog::OnOpenBoat ( wxCommandEvent& event )
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
@@ -748,13 +680,19 @@ void BoatDialog::SaveBoat()
             pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
 
             m_boatpath = filename;
+            SetTitle(m_boatpath);
         } else
             return;
     }
 
     wxString error = m_Boat.SaveXML(m_boatpath);
-    if(error.empty())
-        EndModal(wxID_OK);
+    if(error.empty()) {
+        /* update any configurations that use this boat */
+        m_WeatherRouting.UpdateBoatFilename(m_boatpath);
+        Update();
+
+        Hide();
+    }
     else {
         wxMessageDialog md(this, error, _("OpenCPN Weather Routing Plugin"),
                            wxICON_ERROR | wxOK );
@@ -804,13 +742,18 @@ void BoatDialog::OnSaveFile ( wxCommandEvent& event )
 
 void BoatDialog::OnPolarSelected()
 {
-    bool enable = SelectedPolar() != -1;
-    m_bEditPolar->Enable(enable);
-    m_bRemovePolar->Enable(enable);
+    int i = SelectedPolar();
+    m_bEditPolar->Enable(i != -1);
+    m_bRemovePolar->Enable(i != -1);
 
-    m_EditPolarDialog.SetPolarIndex(SelectedPolar());
+// not needed if modal    m_EditPolarDialog.SetPolarIndex(i);
+
+    m_sOverlapPercentage->Enable(i != -1);
+    if(i != -1)
+        m_sOverlapPercentage->SetValue(m_Boat.Polars[i].m_crossoverpercentage*100);
     
     RefreshPlots();
+    UpdateVMG();
 }
 
 void BoatDialog::OnUpdatePlot()
@@ -863,7 +806,31 @@ void BoatDialog::OnDownPolar( wxCommandEvent& event )
 
 void BoatDialog::OnEditPolar( wxCommandEvent& event )
 {
-    m_EditPolarDialog.ShowModal();
+    //m_EditPolarDialog.Show();
+
+    int i = SelectedPolar();
+    if(i == -1)
+        return;
+
+    EditPolarDialog dlg(this);
+         
+    dlg.SetPolarIndex(i);
+    wxString filename = m_Boat.Polars[i].FileName;
+    if(dlg.ShowModal() == wxID_SAVE) {
+        if(!m_Boat.Polars[i].Save(filename))
+            wxMessageBox(_("Failed to save") + _T(": ") + filename,
+                           _("OpenCPN Weather Routing Plugin"),
+                         wxICON_ERROR | wxOK );
+    } else {
+        wxString message;
+        if(!m_Boat.Polars[i].Open(filename, message))
+            wxMessageBox(_("Failed to revert") + _T(": ") + filename + _T("\n")
+                         + message, _("OpenCPN Weather Routing Plugin"),
+                         wxICON_ERROR | wxOK );
+    }
+
+    GenerateCrossOverChart();
+    RefreshPlots();
 }
 
 void BoatDialog::OnAddPolar( wxCommandEvent& event )
@@ -893,11 +860,8 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
     // write dummy file
     if(!existed) {
         wxFile file;
-        if(file.Open(filename, wxFile::write)) {
-//            file.Write(
-//                    #include "../data/polars/Alexandra.csv"
-//                    );
-        }
+        if(file.Open(filename, wxFile::write))
+            file.Write(dummy_polar);
     }
     
     Polar polar;
@@ -907,10 +871,10 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
         m_Boat.Polars.push_back(polar);
         RepopulatePolars();
         m_lPolars->SetItemState(m_Boat.Polars.size()-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-        RefreshPlots();
+        GenerateCrossOverChart();
 
         if(!existed)
-            m_EditPolarDialog.Show();
+            OnEditPolar(event);
     } else {
         wxMessageDialog md(this, message,
                            _("OpenCPN Weather Routing Plugin"),
@@ -927,9 +891,68 @@ void BoatDialog::OnRemovePolar( wxCommandEvent& event )
 
     m_Boat.Polars.erase(m_Boat.Polars.begin() + index);
     RepopulatePolars();
+    if(index == (int)m_Boat.Polars.size())
+        index--;
     m_lPolars->SetItemState(index, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    GenerateCrossOverChart();
+    m_bRemovePolar->Enable(index != -1);
+}
+
+class CrossOverGenerationThread : public wxThread
+{
+public:
+    CrossOverGenerationThread(Boat &boat, wxEvtHandler *message_target)
+        : wxThread(wxTHREAD_JOINABLE), m_Boat(boat),
+          m_pMessageTarget(message_target)
+        {
+            Create();
+        }
+
+    void *Entry() {
+        m_Boat.GenerateCrossOverChart();
+        wxThreadEvent event(wxEVT_THREAD, 0);   
+        m_pMessageTarget->AddPendingEvent(event);
+        return 0;
+    }
+
+    Boat m_Boat;
+    wxEvtHandler        *m_pMessageTarget;
+};
+
+void BoatDialog::GenerateCrossOverChart()
+{
+    if(m_CrossOverGenerationThread) {
+        m_CrossOverRegenerate = true; // regenerate again when done
+        return;
+    }
+
+    m_gCrossOverChart->Enable();
+    m_gCrossOverChart->SetValue(100);
+
+    m_CrossOverGenerationThread = new CrossOverGenerationThread(m_Boat, this);
+
+    Connect( wxEVT_THREAD, (wxEventFunction)&BoatDialog::OnEvtThread);
+    m_CrossOverGenerationThread->Run();
+}
+
+void BoatDialog::OnEvtThread( wxThreadEvent & event )
+{
+    m_gCrossOverChart->Disable();
+    m_gCrossOverChart->SetValue(0);
+
+    m_CrossOverGenerationThread->Wait();
+    Boat &tboat = m_CrossOverGenerationThread->m_Boat;
+    for(unsigned int i=0; i<m_Boat.Polars.size() &&
+            i < tboat.Polars.size(); i++)
+        m_Boat.Polars[i].CrossOverRegion = tboat.Polars[i].CrossOverRegion;
+    delete m_CrossOverGenerationThread;
+    m_CrossOverGenerationThread = NULL;
     RefreshPlots();
-    m_bRemovePolar->Disable();
+
+    if(m_CrossOverRegenerate) {
+        m_CrossOverRegenerate = false;
+        GenerateCrossOverChart();
+    }
 }
 
 void BoatDialog::RepopulatePolars()
@@ -955,7 +978,7 @@ void BoatDialog::RepopulatePolars()
         long idx = m_lPolars->InsertItem(info);
         Polar &polar = m_Boat.Polars[i];
         m_lPolars->SetItem(idx, spFILENAME, wxFileName(polar.FileName).GetFullName());
-        m_lPolars->SetItem(idx, spWAVEPOLARFILENAME, polar.WavePolarFileName);
+        m_lPolars->SetColumnWidth(spFILENAME, wxLIST_AUTOSIZE);
     }
 
 //        m_lPolars->SetColumnWidth(spFILENAME, wxLIST_AUTOSIZE);

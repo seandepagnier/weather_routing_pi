@@ -41,7 +41,7 @@ public:
     ConfigurationDialog(WeatherRouting &weatherrouting);
     ~ConfigurationDialog();
 
-    void EditBoat( );
+    void EditBoat();
     void SetConfigurations(std::list<RouteMapConfiguration>configuration);
     void Update();
 

@@ -104,6 +104,7 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(*this),
       m_ConfigurationBatchDialog(this), m_CursorPositionDialog(this),
+      m_BoatDialog(*this),
       m_SettingsDialog(this), m_StatisticsDialog(this), m_ReportDialog(*this),
       m_PlotDialog(*this), m_FilterRoutesDialog(this),
       m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItems(false),
@@ -116,6 +117,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     icon.CopyFromBitmap(*_img_WeatherRouting);
     m_ConfigurationDialog.SetIcon(icon);
     m_ConfigurationBatchDialog.SetIcon(icon);
+    m_BoatDialog.SetIcon(icon);
     m_SettingsDialog.SetIcon(icon);
     m_StatisticsDialog.SetIcon(icon);
     m_ReportDialog.SetIcon(icon);
@@ -365,15 +367,7 @@ void WeatherRouting::UpdateCursorPositionDialog()
     wxFileName fn = configuration.boat.Polars[p->polar].FileName;
     dlg.m_stPolar->SetLabel(fn.GetFullName());
 
-    int sailchanges = 0;
-    int lpolar = p->polar;
-    for(Position *q = p->parent; q; q=q->parent)
-        if(lpolar != q->polar) {
-            sailchanges++;
-            lpolar = q->polar;
-        }
-
-    dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), sailchanges));
+    dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), p->SailChanges()));
 
     dlg.m_stTacks->SetLabel(wxString::Format(_T("%d"), p->tacks));
 

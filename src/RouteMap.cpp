@@ -872,6 +872,14 @@ bool Position::CrossesLand(double dlat, double dlon)
     return PlugIn_GSHHS_CrossesLand(lat, lon, dlat, dlon);
 }
 
+int Position::SailChanges()
+{
+    if(!parent)
+        return 0;
+
+    return polar != parent->polar + parent->SailChanges();
+}
+
 SkipPosition::SkipPosition(Position *p, int q)
  : point(p), quadrant(q)
 {

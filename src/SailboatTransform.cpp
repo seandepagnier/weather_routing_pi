@@ -150,7 +150,7 @@ cos(Pi-W)=-cos(W)|   |
 
             Law of sines:
 
-      sin A   sin Pi-W   sin W-A
+      sin A    sin W      sin W-A
       ----- = -------- = -------
        VW        VA        VB
 

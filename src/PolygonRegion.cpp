@@ -58,7 +58,7 @@ bool Contour::CCW()
         int pn = i < 2*(n-1) ? i + 2 : 0;
         total += (points[pn+0] - points[i+0]) * (points[pn+1] + points[i+1]);
     }
-    return total > 0;
+    return total < 0;
 }
 
 void Contour::Reverse()
@@ -125,7 +125,7 @@ PolygonRegion::PolygonRegion(std::list<Segment> &segments)
     
     std::list<IncompleteContour*> icontours;
 fullreset:
-    while(segments.size()) {
+    while(!segments.empty()) {
         Segment a = segments.front();
         segments.pop_front();
         IncompleteContour *ic = new IncompleteContour(a);
