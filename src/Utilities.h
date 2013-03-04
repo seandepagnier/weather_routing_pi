@@ -1,10 +1,10 @@
 /******************************************************************************
  *
- * Project:  OpenCPN Advanced Routing plugin
+ * Project:  OpenCPN Weather Routing plugin
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2012 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2013 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,5 +26,8 @@
 
 double deg2rad(double degrees);
 double rad2deg(double radians);
+double positive_degrees(double degrees);
+double rad2posdeg(double radians);
+
 double square(double x);
 double cube(double x);

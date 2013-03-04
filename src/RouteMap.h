@@ -1,10 +1,10 @@
 /******************************************************************************
  *
- * Project:  OpenCPN Advanced Routing plugin
+ * Project:  OpenCPN Weather Routing plugin
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2012 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2013 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -71,9 +71,10 @@ public:
 
   Route *parent; /* outer region if a child */
   RouteList children; /* inner inverted regions */
+
+  int debug;
+  int debug_quit;
 };
-
-
 
 /* list of routes with equal time to reach */
 class RouteIso

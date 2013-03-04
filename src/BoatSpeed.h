@@ -1,10 +1,10 @@
 /******************************************************************************
  *
- * Project:  OpenCPN Advanced Routing plugin
+ * Project:  OpenCPN Weather Routing plugin
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2012 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2013 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -40,26 +40,62 @@ public:
   double w; /* weight of time on each tack */
 };
 
+#define MAX_BOATSPEEDS_IN_TABLE 100
+
+class BoatSpeedTableEntry
+{
+public:
+  double W;
+  double boatspeed[MAX_BOATSPEEDS_IN_TABLE];
+};
+
+#include <list>
+typedef std::list<BoatSpeedTableEntry> BoatSpeedTableEntryList;
+
+class BoatSpeedTable
+{
+public:
+  BoatSpeedTable();
+  ~BoatSpeedTable();
+
+  bool Open(const char *filename);
+  bool Save(const char *filename);
+
+  double InterpolateSpeed(double VW, double W);
+
+  int numwindspeeds;
+  double windspeeds[MAX_BOATSPEEDS_IN_TABLE];
+
+  BoatSpeedTableEntryList table;
+};
+
 /* contain all data for boat under sail with various motor power levels */
 class BoatSpeed
 {
 
 public:
-  double eta; /* sailing constant */
+    static double VelocityApparentWind(double VB, double W, double VW);
+    static double DirectionApparentWind(double VA, double VB, double W, double VW);
+    static void BoatSteadyState(double W, double VW, double eta,
+                                double keel_pressure, double keel_lift, double P,
+                                double &BA, double &VB, double &A, double &VA);
 
-  double powerspeed[MAX_POWER+1]; /* How fast do we power at each power level
-                                      in dead calm. */
+    double eta; /* sailing constant */
 
-  SailingSpeed speed[MAX_POWER+1][MAX_KNOTS][DEGREES];
+    double powerspeed[MAX_POWER+1]; /* How fast do we power at each power level
+                                       in dead calm. */
 
-  BoatSpeed() { computed = false; }
-  void ComputeBoatSpeeds(double eta, double keel_pressure, double keel_lift);
-  void OptimizeTackingSpeed();
+    SailingSpeed speed[MAX_POWER+1][MAX_KNOTS+1][DEGREES];
 
-  void Speed(int P, int W, int VW, double &BA, double &VB);
-  void Set(int P, int W, int VW, double direction, double knots);
+    BoatSpeed() { }
+    void ComputeBoatSpeeds(double eta, double keel_pressure, double keel_lift);
+    void OptimizeTackingSpeed();
+    void SetSpeedsFromTable(BoatSpeedTable &table);
+    BoatSpeedTable CreateTable();
 
-  bool computed;
+    void Speed(int P, double W, double VW, double &BA, double &VB);
+    double TrueWindSpeed(int P, double VB, double W, double maxVW);
+    void Set(int P, int W, int VW, double direction, double knots);
 };
 
 /* calculate power from solar charged battery system
@@ -76,7 +112,6 @@ class ElectricBoatSpeed : public BoatSpeed
   double drive_efficiency; /* factor to compute power */
   double drag_factor;
 
-                      
   double Speed(double kw);
 };
 
@@ -106,5 +141,3 @@ class Boat
   double hull_length;
   double drag;
 };
-
-extern Boat all_boat;

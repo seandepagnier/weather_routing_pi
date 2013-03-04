@@ -1,5 +1,5 @@
 ##---------------------------------------------------------------------------
-## Author:      bdbcat aka. dsr (Dave Register)
+## Author:      Sean D'Epagnier 
 ## Copyright:   
 ## License:     wxWidgets License
 ##---------------------------------------------------------------------------
@@ -14,9 +14,9 @@ IF (COMMAND cmake_policy)
   CMAKE_POLICY(SET CMP0011 OLD)
 ENDIF (COMMAND cmake_policy)
 
-PROJECT(advanced_routing_pi)
+PROJECT(weather_routing_pi)
 
-SET(PACKAGE_NAME advanced_routing_pi)
+SET(PACKAGE_NAME weather_routing_pi)
 SET(PLUGIN_SOURCE_DIR .)
 MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
@@ -60,25 +60,27 @@ FIND_PACKAGE(Gettext REQUIRED)
 # header files and cpp/c files and CMake will sort them out
 
 
-SET(SRC_ADVANCED_ROUTING
-            src/advanced_routing_pi.h
-            src/advanced_routing_pi.cpp
-            src/advancedroutingdialog.h 
-            src/advancedroutingdialog.cpp
-            src/boatdialog.h
-            src/boatdialog.cpp
-            src/boatspeed.h 
-            src/boatspeed.cpp
-            src/routemap.h 
-            src/routemap.cpp
-            src/utilities.cpp
-            src/utilities.h
+SET(SRC_WEATHER_ROUTING
+            src/weather_routing_pi.h
+            src/weather_routing_pi.cpp
+            src/WeatherRoutingDialog.h 
+            src/WeatherRoutingDialog.cpp
+            src/BoatDialog.h
+            src/BoatDialog.cpp
+            src/BoatSpeed.h 
+            src/BoatSpeed.cpp
+            src/RouteMap.h 
+            src/RouteMap.cpp
+            src/Utilities.cpp
+            src/Utilities.h
+            src/WeatherRoutingUI.h
+            src/WeatherRoutingUI.cpp
             src/icons.h 
             src/icons.cpp
             src/georef.h
             src/georef.c
 )
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_ADVANCED_ROUTING})
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING})
 
 IF(WIN32)
   SET(OPENCPN_IMPORT_LIB "../../${CMAKE_CFG_INTDIR}/${PARENT}")
@@ -125,9 +127,9 @@ ADD_CUSTOM_COMMAND(
    COMMAND ${GETTEXT_XGETTEXT_EXECUTABLE} --force-po --package-name=${PACKAGE_NAME} --package-version="${PACKAGE_VERSION}" --output=po/${PACKAGE_NAME}.pot  --keyword=_ --width=80 --files-from=${CMAKE_CURRENT_SOURCE_DIR}/po/POTFILES.in
    DEPENDS po/POTFILES.in po/${PACKAGE_NAME}.pot
    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-   COMMENT "advanced_routing-pot-update [${PACKAGE_NAME}]: Generated pot file."
+   COMMENT "weather_routing-pot-update [${PACKAGE_NAME}]: Generated pot file."
 )
-ADD_CUSTOM_TARGET(advanced_routing-pot-update COMMENT "advanced_routing-pot-update: Done." DEPENDS po/${PACKAGE_NAME}.pot.dummy)
+ADD_CUSTOM_TARGET(weather_routing-pot-update COMMENT "weather_routing-pot-update: Done." DEPENDS po/${PACKAGE_NAME}.pot.dummy)
 
 ENDIF(GETTEXT_XGETTEXT_EXECUTABLE )
 
@@ -143,14 +145,14 @@ MACRO(GETTEXT_UPDATE_PO _potFile)
          OUTPUT ${_absFile}.dummy
          COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --width=80 --strict --quiet --update --backup=none --no-location -s ${_absFile} ${_absPotFile}
          DEPENDS ${_absPotFile} ${_absFile}
-         COMMENT "advanced_routing-po-update [${_poBasename}]: Updated po file."
+         COMMENT "weather_routing-po-update [${_poBasename}]: Updated po file."
       )
 
       SET(_poFiles ${_poFiles} ${_absFile}.dummy)
 
    ENDFOREACH (_currentPoFile )
 
-   ADD_CUSTOM_TARGET(advanced_routing-po-update COMMENT "advanced_routing-po-update: Done." DEPENDS ${_poFiles})
+   ADD_CUSTOM_TARGET(weather_routing-po-update COMMENT "weather_routing-po-update: Done." DEPENDS ${_poFiles})
 ENDMACRO(GETTEXT_UPDATE_PO)
 
 IF (GETTEXT_MSGMERGE_EXECUTABLE)
@@ -169,7 +171,7 @@ MACRO(GETTEXT_BUILD_MO)
          OUTPUT ${_gmoFile}
          COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --check -o ${_gmoFile} ${_absFile}
          DEPENDS ${_absFile}
-         COMMENT "advanced_routing-i18n [${_poBasename}]: Created mo file."
+         COMMENT "weather_routing-i18n [${_poBasename}]: Created mo file."
       )
 
 IF(APPLE)
@@ -185,8 +187,8 @@ ENDMACRO(GETTEXT_BUILD_MO)
 if(GETTEXT_MSGFMT_EXECUTABLE)
    FILE(GLOB PACKAGE_PO_FILES po/*.po)
    GETTEXT_BUILD_MO(${PACKAGE_PO_FILES})
-   ADD_CUSTOM_TARGET(advanced_routing-i18n COMMENT "advanced_routing-i18n: Done." DEPENDS ${_gmoFiles})
-   #ADD_DEPENDENCIES(advanced_routing-i18n ${PACKAGE_PO_FILES})
-   ADD_DEPENDENCIES(${PACKAGE_NAME} advanced_routing-i18n)
+   ADD_CUSTOM_TARGET(weather_routing-i18n COMMENT "weather_routing-i18n: Done." DEPENDS ${_gmoFiles})
+   #ADD_DEPENDENCIES(weather_routing-i18n ${PACKAGE_PO_FILES})
+   ADD_DEPENDENCIES(${PACKAGE_NAME} weather_routing-i18n)
 ENDIF(GETTEXT_MSGFMT_EXECUTABLE)
 

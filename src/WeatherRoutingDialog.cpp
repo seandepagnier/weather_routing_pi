@@ -1,11 +1,11 @@
 /******************************************************************************
  *
  * Project:  OpenCPN
- * Purpose:  Advanced Routing Plugin
+ * Purpose:  Weather Routing Plugin
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2012 by Sean D'Epagnier   *
+ *   Copyright (C) 2013 by Sean D'Epagnier   *
  *   sean@depagnier.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -21,7 +21,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.             *
+ *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
  *
  */
@@ -39,72 +39,10 @@
 #include <math.h>
 #include <time.h>
 
-#include "boatspeed.h"
-#include "boatdialog.h"
-#include "routemap.h"
-#include "advanced_routing_pi.h"
-
-//---------------------------------------------------------------------------------------
-//          Advanced Routing Dialog Implementation
-//---------------------------------------------------------------------------------------
-IMPLEMENT_CLASS ( AdvancedRoutingDialog, wxDialog )
-
-BEGIN_EVENT_TABLE ( AdvancedRoutingDialog, wxDialog )
-
-            EVT_CLOSE ( AdvancedRoutingDialog::OnClose )
-            EVT_BUTTON ( ID_BOAT, AdvancedRoutingDialog::OnIdBoatClick )
-            EVT_BUTTON ( ID_COMPUTE, AdvancedRoutingDialog::OnIdComputeClick )
-            EVT_BUTTON ( ID_CLEAR, AdvancedRoutingDialog::OnIdClearClick )
-            EVT_BUTTON ( ID_ABOUT, AdvancedRoutingDialog::OnIdAboutClick )
-            EVT_BUTTON ( ID_CLOSE, AdvancedRoutingDialog::OnIdCloseClick )
-            EVT_MOVE ( AdvancedRoutingDialog::OnMove )
-            EVT_SIZE ( AdvancedRoutingDialog::OnSize )
-
-END_EVENT_TABLE()
-
-AdvancedRoutingDialog::AdvancedRoutingDialog( )
-: m_boat_lat(180), m_boat_lon(0), m_thCompute(routemap, boat)
-{
-}
-
-AdvancedRoutingDialog::~AdvancedRoutingDialog( )
-{
-}
-
-bool AdvancedRoutingDialog::Create ( wxWindow *parent, advanced_routing_pi *ppi, wxWindowID id,
-                              const wxString& caption,
-                              const wxPoint& pos, const wxSize& size, long style )
-{
-      pParent = parent;
-      pPlugIn = ppi;
-
-      long wstyle = wxDEFAULT_FRAME_STYLE;
-
-      wxSize size_min = size;
-      if ( !wxDialog::Create ( parent, id, caption, pos, size_min, wstyle ) )
-            return false;
-
-      CreateControls();
-
-      DimeWindow(this);
-
-      Fit();
-      SetMinSize(GetBestSize());
-
-      return true;
-}
-
-void AdvancedRoutingDialog::CreateControls()
-{
-      int border_size = 4;
-
-// A top-level sizer
-      wxBoxSizer* topSizer = new wxBoxSizer ( wxVERTICAL );
-      SetSizer ( topSizer );
-
-// A second box sizer to give more space around the controls
-      wxBoxSizer* boxSizer = new wxBoxSizer ( wxVERTICAL );
-      topSizer->Add ( boxSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxEXPAND, 2 );
+#include "BoatSpeed.h"
+#include "BoatDialog.h"
+#include "RouteMap.h"
+#include "weather_routing_pi.h"
 
   /*  User interface:
       Tabs Control
@@ -208,92 +146,44 @@ void AdvancedRoutingDialog::CreateControls()
                   events have automatic delays when replayed
 
   */
-//      Data Box
-      wxStaticBox* itemStaticBoxData = new wxStaticBox(this, wxID_ANY, _("Advanced Routing"));
-      wxStaticBoxSizer* itemStaticBoxSizerData= new wxStaticBoxSizer(itemStaticBoxData, wxVERTICAL);
-                          boxSizer->Add(itemStaticBoxSizerData, 0, wxALL|wxEXPAND, border_size);
 
-      wxFlexGridSizer *pDataGrid = new wxFlexGridSizer(3);
-      pDataGrid->AddGrowableCol(1);
-      itemStaticBoxSizerData->Add(pDataGrid, 0, wxALL|wxEXPAND, border_size);
 
-// A horizontal box sizer to contain close
-      wxBoxSizer* AckBox = new wxBoxSizer ( wxHORIZONTAL );
-      boxSizer->Add ( AckBox, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5 );
-
-// The Boat button
-      wxButton* bBoat = new wxButton ( this, ID_BOAT, _( "&Boat" ),
-                                     wxDefaultPosition, wxDefaultSize, 0 );
-      AckBox->Add ( bBoat, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-// The recompute button
-      m_bCompute = new wxButton ( this, ID_COMPUTE, _( "&Compute" ),
-                                     wxDefaultPosition, wxDefaultSize, 0 );
-      AckBox->Add ( m_bCompute, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-// The recompute button
-      wxButton* bClear = new wxButton ( this, ID_CLEAR, _( "&Clear" ),
-                                     wxDefaultPosition, wxDefaultSize, 0 );
-      AckBox->Add ( bClear, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-// The about button
-      wxButton* bAbout = new wxButton ( this, ID_ABOUT, _( "&About" ),
-                                     wxDefaultPosition, wxDefaultSize, 0 );
-      AckBox->Add ( bAbout, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-// The close button
-      wxButton* bClose = new wxButton ( this, ID_CLOSE, _( "&Close" ),
-                                     wxDefaultPosition, wxDefaultSize, 0 );
-      AckBox->Add ( bClose, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-
-      m_pBoatDialog = new BoatDialog(boat);
-      m_pBoatDialog->Create( pParent, -1, _("Boat Configuration"),
-                             wxPoint(100, 50), wxSize(600, 500));
-      m_pBoatDialog->Hide();
-}
-
-void AdvancedRoutingDialog::SetBoatLatLon(double lat, double lon)
+WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon )
+    : WeatherRoutingDialogBase(parent), m_thCompute(routemap, boat)
 {
-      m_boat_lon = lon;
-      m_boat_lat = lat;
+    m_pBoatDialog = new BoatDialog(this, boat);
+    m_tStartLat->SetLabel(wxString::Format(_T("%.5f"), boat_lat));
+    m_tStartLon->SetLabel(wxString::Format(_T("%.5f"), boat_lon));
+
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+
+    routemap.degree_step = pConf->Read( _T("DegreeStep"), 10L);
+    routemap.dt = wxTimeSpan(0, 0, pConf->Read( _T("TimeSpan"), 1000L), 1);
+
+      double startlat, startlon;
+      m_tStartLat->GetValue().ToDouble(&startlat);
+      m_tStartLon->GetValue().ToDouble(&startlon);
+
+      routemap.Reset(startlat, startlon, wxDateTime::Now());
 }
 
-void AdvancedRoutingDialog::SetCursorLatLon(double lat, double lon)
+WeatherRoutingDialog::~WeatherRoutingDialog( )
 {
-  if(routemap.SetCursorLatLon(lat, lon))
-    RequestRefresh(pParent);
-
-  /* if we don't get nmea messages use last cursor */
-  if(m_boat_lon == 0 && m_boat_lat==180) {
-      m_boat_lon = lon;
-      m_boat_lat = lat;
-  }
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+    pConf->Write( _T("DegreeStep"), routemap.degree_step);
+    pConf->Write( _T("TimeSpan"),  routemap.dt.GetSeconds().ToLong());
 }
 
-void AdvancedRoutingDialog::RenderRouteMap(PlugIn_ViewPort *vp)
+void WeatherRoutingDialog::RenderRouteMap(PlugIn_ViewPort *vp)
 {
     m_thCompute.routemutex.Lock();
     routemap.Render(vp);
     m_thCompute.routemutex.Unlock();
 }
 
-void AdvancedRoutingDialog::OnClose ( wxCloseEvent& event )
-{
-      pPlugIn->OnAdvanced_RoutingDialogClose();
-}
-
-void AdvancedRoutingDialog::OnIdBoatClick ( wxCommandEvent& event )
-{
-      //Toggle Boat Dialog display
-      m_bShowBoatDialog = !m_bShowBoatDialog;
-
-      if(m_bShowBoatDialog)
-            m_pBoatDialog->Show();
-      else
-            m_pBoatDialog->Hide();
-}
-
-void AdvancedRoutingDialog::OnIdComputeClick ( wxCommandEvent& event )
+void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
   if(m_thCompute.IsRunning()) {
     m_bCompute->SetLabel(_( "&Compute" ));
@@ -302,67 +192,59 @@ void AdvancedRoutingDialog::OnIdComputeClick ( wxCommandEvent& event )
   } else {
 //    m_bCompute->SetLabel(_( "&Stop" ));
 //    m_thCompute.Run();
-      if(routemap.origin.size() == 0) {
-        OnIdClearClick(event);
-      }
-    routemap.Propagate(boat);
+
+#if 0
+      double startlat, startlon;
+      m_tStartLat->GetValue().ToDouble(&startlat);
+      m_tStartLon->GetValue().ToDouble(&startlon);
+
+      routemap.Reset(startlat, startlon, wxDateTime::Now());
+      extern int debugstf, debug_quit;
+      debugstf = -1;
+      routemap.Propagate(boat);
+      debug_quit++;
+      debugstf = 0;
+#endif
+
+      routemap.Propagate(boat);
   }
 
-  RequestRefresh(pParent);
+  GetParent()->Refresh();
 }
 
-void AdvancedRoutingDialog::OnIdClearClick ( wxCommandEvent& event )
+void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
 {
-  routemap.Reset(m_boat_lat, m_boat_lon, wxDateTime::Now());
-  boat.ComputeBoatSpeeds(1, 1, 1);
-//        boat.OptimizeTackingSpeed();
+    m_pBoatDialog->Show(!m_pBoatDialog->IsShown());
 }
 
-void AdvancedRoutingDialog::OnIdAboutClick ( wxCommandEvent& event )
+void WeatherRoutingDialog::OnClear ( wxCommandEvent& event )
 {
-  wxString msg(_("Advanced routing plugin\n"));
+    routemap.Clear();
+
+      double startlat, startlon;
+      m_tStartLat->GetValue().ToDouble(&startlat);
+      m_tStartLon->GetValue().ToDouble(&startlon);
+
+      routemap.Reset(startlat, startlon, wxDateTime::Now());
+}
+
+void WeatherRoutingDialog::OnAbout ( wxCommandEvent& event )
+{
+  wxString msg(_("Weather Routing plugin\n"));
   msg.Append(_("Version "));
   msg.Append(wxString::Format(wxT("%i"),PLUGIN_VERSION_MAJOR));  msg.Append(_("."));
   msg.Append(wxString::Format(wxT("%i"),PLUGIN_VERSION_MINOR));  msg.Append(_("\n"));
-  msg.Append(_("Compute iteratively positions the boat could possibly make it to by"
-               " a certain time and merge the results to form iso routes to eventually"
-               " create a map giving the quickest route to any given location\n"));
-  msg.Append(_("The advanced routing plugin makes it possible to pre-compute the "
-               "route you would have sailed that you would have been in to select"
-               "the best route before leaving.\n"));
+  msg.Append(_("Compute iteratively positions the boat could possibly make at"
+               " a certain time.  Merge the results to form a map determining"
+               " the quickest route to any given location.\n"));
 
   msg.Append(_("Written by Sean D'Epagnier email <sean at depagnier dot com>"));
-  wxMessageDialog md(this, msg, _("OpenCPN Advanced Routing Plugin"),
+  wxMessageDialog md(this, msg, _("OpenCPN Weather Routing Plugin"),
                        wxICON_INFORMATION | wxOK );
   md.ShowModal();
 }
 
-void AdvancedRoutingDialog::OnIdCloseClick ( wxCommandEvent& event )
-{
-      Close();
-}
-
-void AdvancedRoutingDialog::OnMove ( wxMoveEvent& event )
-{
-      //    Record the dialog position
-      wxPoint p = event.GetPosition();
-      pPlugIn->SetAdvancedRoutingDialogX(p.x);
-      pPlugIn->SetAdvancedRoutingDialogY(p.y);
-
-      event.Skip();
-}
-
-void AdvancedRoutingDialog::OnSize ( wxSizeEvent& event )
-{
-      //    Record the dialog size
-      wxSize p = event.GetSize();
-      pPlugIn->SetAdvancedRoutingDialogSizeX(p.x);
-      pPlugIn->SetAdvancedRoutingDialogSizeY(p.y);
-
-      event.Skip();
-}
-
-void *AdvancedRoutingThread::Entry()
+void *WeatherRoutingThread::Entry()
 {
   while(!stop) {
     routemutex.Lock();

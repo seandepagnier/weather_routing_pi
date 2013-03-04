@@ -1,10 +1,10 @@
 /******************************************************************************
  *
- * Project:  OpenCPN Advanced Routing plugin
+ * Project:  OpenCPN Weather Routing plugin
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2012 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2013 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -24,11 +24,140 @@
  ***************************************************************************
  */
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
-#include "utilities.h"
-#include "boatspeed.h"
+#include "Utilities.h"
+#include "BoatSpeed.h"
+
+double interp_value(double x, double x1, double x2, double y1, double y2)
+{
+/*
+    y = m*x+b, y1 = m*x1+b, y2 = m*x2+b
+    y = m*x+b, y1 - m*x1=b, y2 = m*x2+y1 - m*x1
+    y = m*x+y1 - m*x1, y2 -y1= m*(x2 - x1)
+    y = m*(x-x1)+y1, m = (y2 - y1)/(x2 - x1)
+    y = (y2 - y1)*(x - x1)/(x2 - x1) + y1
+*/
+    return x2 - x1 ? (y2 - y1)*(x - x1)/(x2 - x1) + y1 : y1;
+}
+
+BoatSpeedTable::BoatSpeedTable()
+{
+}
+
+BoatSpeedTable::~BoatSpeedTable()
+{
+}
+
+bool BoatSpeedTable::Open(const char *filename)
+{
+    FILE *f = fopen(filename, "r");
+    numwindspeeds=0;
+
+    if(!f)
+        return false;
+
+    char line[1024];
+    
+    char *token, *saveptr;
+    if(!fgets(line, sizeof line, f))
+        goto failed; /* error here too */
+    token = strtok_r(line, ";", &saveptr);
+    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
+        goto failed; /* unrecognized format */
+    
+    while((token = strtok_r(NULL, ";", &saveptr))) {
+        windspeeds[numwindspeeds++] = strtod(token, 0);
+        if(numwindspeeds > MAX_BOATSPEEDS_IN_TABLE)
+            goto failed;
+    }
+    
+    while(fgets(line, sizeof line, f)) {
+        token = strtok_r(line, ";", &saveptr);
+        BoatSpeedTableEntry entry;
+        entry.W = strtod(token, 0);
+        int i=0;
+        while((token = strtok_r(NULL, ";", &saveptr)))
+            entry.boatspeed[i++] = strtod(token, 0);
+        if(i > MAX_BOATSPEEDS_IN_TABLE)
+            goto failed;
+        table.push_back(entry);
+    }
+    return true;
+    
+failed:
+    fclose(f);
+    return false;
+}
+
+bool BoatSpeedTable::Save(const char *filename)
+{
+    FILE *f = fopen(filename, "w");
+    int numwindspeeds=0;
+
+    if(!f)
+        return false;
+
+    fputs("twa/tws", f);
+    for(int i = 0; i<=numwindspeeds; i++)
+        fprintf(f, ";%d", (int)windspeeds[i]);
+
+    for(std::list<BoatSpeedTableEntry>::iterator it = table.begin();
+        it != table.end(); it++) {
+        fprintf(f, "%d", (int)(*it).W);
+        for(int i = 0; i<=numwindspeeds; i++) {
+            fprintf(f, ";%.2f", (*it).boatspeed[i]);
+        }
+        fputs("\n", f);
+    }
+    fclose(f);
+    return true;
+}
+
+double BoatSpeedTable::InterpolateSpeed(double VW, double W)
+{
+    BoatSpeedTableEntry *minW = NULL, *maxW = NULL;
+    for(BoatSpeedTableEntryList::iterator it = table.begin(); it != table.end(); ++it) {
+        if((*it).W >= W && (!maxW || maxW->W > (*it).W))
+            maxW = &(*it);
+
+        if((*it).W <= W && (!minW || minW->W < (*it).W))
+            minW = &(*it);
+    }
+
+    int minVWind = -1, maxVWind = -1;
+    for(int i=0; i<numwindspeeds; i++) {
+        if(windspeeds[i] >= VW && (maxVWind == -1 || windspeeds[maxVWind] > windspeeds[i]))
+            maxVWind = i;
+
+        if(windspeeds[i] <= VW && (minVWind == -1 || windspeeds[minVWind] < windspeeds[i]))
+            minVWind = i;
+    }
+
+    if(!minW || !maxW || minVWind == -1 || maxVWind == -1)
+        return 0;
+
+    double x1, x2, y1, y2;
+    x1 = windspeeds[minVWind];
+    x2 = windspeeds[maxVWind];
+    y1 = minW->boatspeed[minVWind];
+    y2 = minW->boatspeed[maxVWind];
+    double minWBoatspeed = interp_value(VW, x1, x2, y1, y2);
+
+    y1 = maxW->boatspeed[minVWind];
+    y2 = maxW->boatspeed[maxVWind];
+    double maxWBoatspeed = interp_value(VW, x1, x2, y1, y2);
+
+    x1 = minW->W;
+    x2 = maxW->W;
+    y1 = minWBoatspeed;
+    y2 = maxWBoatspeed;
+
+    return interp_value(W, x1, x2, y1, y2);
+}
 
 /* to calculate power required to get the boat on plane
 
@@ -52,7 +181,7 @@ apparent
           \|/
 
 technically drag is going against any movement,
-but we can simplifty and have it go against forward movement
+but we can simplify and have it go against forward movement
 
 Since we know BV is related to square root
 of power input, the coefficient k computes speed
@@ -133,7 +262,7 @@ double boat_slip_speed(double eta, double A, double VA, double keel_pressure)
 }
 double boat_forward_speed(double eta, double A, double VA, double keel_pressure, double keel_lift, double P)
 {
-  return (sail_forward_force(eta, A, VA) + P) / (1 + keel_lift * boat_slip_speed(eta, A, VA, keel_pressure));
+  return sail_forward_force(eta, A, VA) + P + keel_lift * boat_slip_speed(eta, A, VA, keel_pressure);
 }
 
 /* difference between direction we face and direction moving thru water */
@@ -141,8 +270,7 @@ double AngleofAttackBoat(double eta, double A, double VA, double keel_pressure, 
 {
   double ss = boat_slip_speed(eta, A, VA, keel_pressure);
   double fs = boat_forward_speed(eta, A, VA, keel_pressure, keel_lift, P);
-  return atan2(ss,
-               fs);
+  return atan2(ss, fs);
 }
 
 /* actual speed over water of boat */
@@ -150,10 +278,8 @@ double VelocityBoat(double eta, double A, double VA, double keel_pressure, doubl
 {
   double ss = boat_slip_speed(eta, A, VA, keel_pressure);
   double fs = boat_forward_speed(eta, A, VA, keel_pressure, keel_lift, P);
-  return hypot(ss,
-               fs);
+  return hypot(ss, fs);
 }
-
 
 /*
    Now that we can convert the wind speed in gribs correctly
@@ -399,7 +525,7 @@ If the overall result is
 
 */
 
-double VelocityApparentWind(double VB, double W, double VW)
+double BoatSpeed::VelocityApparentWind(double VB, double W, double VW)
 {
   return sqrt(VW*VW + VB*VB + 2*VW*VB*cos(W)); /* law of cosines */
 }
@@ -415,9 +541,9 @@ double VelocityApparentWind(double VB, double W, double VW)
    A = cos  |  ------------   |
              \   2 VA VB     /
 */
-double DirectionApparentWind(double VA, double VB, double W, double VW)
+double BoatSpeed::DirectionApparentWind(double VA, double VB, double W, double VW)
 {
-  if(VA == 0) /* apparent wind direction is anything */
+  if(VA == 0) /* apparent wind direction is not defined */
     return 0;
   if(VB == 0) /* trig identity breaks down, but if we aren't */
     return W; /*   moving, apparent wind is true wind */
@@ -432,8 +558,9 @@ double DirectionApparentWind(double VA, double VB, double W, double VW)
 /* start out with the boat stopped, and over time, iterate accelerating boat
    until it reaches steady state.  The speed of the boat is known already
    from apparent wind, this function finds it for true wind */
-void BoatSteadyState(double W, double VW, double eta, double keel_pressure, double keel_lift, double P,
-                     double &BA, double &VB, double &A, double &VA)
+void BoatSpeed::BoatSteadyState(double W, double VW, double eta,
+                                double keel_pressure, double keel_lift, double P,
+                                double &BA, double &VB, double &A, double &VA)
 {
   /* starting out not moving */
   VB = 0, A = W, VA = VW;
@@ -450,6 +577,8 @@ void BoatSteadyState(double W, double VW, double eta, double keel_pressure, doub
   }
 }
 
+/* eta is a measure of efficiency of the boat, from .01 for racing boats to .5 for
+   heavy cruisers */
 void BoatSpeed::ComputeBoatSpeeds(double eta, double keel_pressure, double keel_lift)
 {
   for(int P = 0; P <= 1/*MAX_POWER*/; P++)
@@ -461,7 +590,6 @@ void BoatSpeed::ComputeBoatSpeeds(double eta, double keel_pressure, double keel_
         if(W != 0)
           Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(BA), VB);
     }
-  computed = true;
 }
 
 /* instead of traveling in the direction given, allow traveling at angles
@@ -472,14 +600,13 @@ void BoatSpeed::ComputeBoatSpeeds(double eta, double keel_pressure, double keel_
 */
 void BoatSpeed::OptimizeTackingSpeed()
 {
-#if 0
   for(int P = 0; P <= MAX_POWER; P++)
     for(int VW = 0; VW < MAX_KNOTS; VW++)
       for(int at = 0; at <= DEGREES/2; at+=DEGREE_STEP)
         for(int bt = DEGREE_STEP; bt < DEGREES/2; bt+=DEGREE_STEP)
           for(int ct = -DEGREES/2+DEGREE_STEP; ct < 0; ct+=DEGREE_STEP) {
-            /* don't use speeds which already optimize with tacking */
-            if(speed[P][VW][b]->w != 1 || speed[P][VW][c]->w != 1)
+            /* don't use speeds which already optimized with tacking */
+            if(speed[P][VW][bt].w != 1 || speed[P][VW][ct].w != 1)
               continue;
             /*
               w is the weight between b and c tacks (.5 for equal time on each
@@ -487,45 +614,147 @@ void BoatSpeed::OptimizeTackingSpeed()
               sa * sin(a) = w*sb*sin(b) + (1-w)*sc*sin(c)
               sa * cos(a) = w*sb*cos(b) + (1-w)*sc*cos(c)
             */
-            double a = Direction(P, VW, at), Direction(P, VW, bt), c = Direction(P, VW, ct);
-            double sb = Speed(P, W, VW, b), sc = Speed(P, VW, c + 360);
+            double a, b, c, sa, sb, sc;
+            Speed(P, at,     VW, a, sa);
+            Speed(P, bt,     VW, b, sb);
+            Speed(P, ct+360, VW, c, sc);
             double ar = deg2rad(a), br = deg2rad(b), cr = deg2rad(c);
-            double sa = (sb * sc * (-cos(br)*sin(cr) +  cos(cr)*sin(br)))
+            double sbc = (sb * sc * (-cos(br)*sin(cr) +  cos(cr)*sin(br)))
               / ((cos(ar)*sb*sin(br) - cos(ar)*sc*sin(cr)
                   - sin(ar)*sb*cos(br) + sin(ar)*sc*cos(cr)));
             double w = (sc * (sin(ar) * cos(cr) - cos(ar) * sin(cr)))
               / (cos(ar)*sb*sin(br) - cos(ar)*sc*sin(cr)
                  - sin(ar)*sb*cos(br) + sin(ar)*sc*cos(cr));
 
-            if(sa > speed[P][VW][a] && w > 0 && w < 1) {
-              speed[P][VW][a]->knots = sa;
-              speed[P][VW][a]->b = b;
-              speed[P][VW][a]->c = c;
-              speed[P][VW][a]->w = 1;
-              if(a > 0)
-                speed[P][VW][360-a] = speed[P][VW][a];
+            if(sbc > sa && w > 0 && w < 1) {
+              speed[P][VW][at].knots = sbc;
+              speed[P][VW][at].b = bt;
+              speed[P][VW][at].c = ct;
+              speed[P][VW][at].w = w;
+              if(at > 0)
+                speed[P][VW][360-at] = speed[P][VW][at];
           }
         }
-#endif
 }
 
-void BoatSpeed::Speed(int P, int W, int VW, double &BA, double &VB)
+void BoatSpeed::SetSpeedsFromTable(BoatSpeedTable &table)
 {
-  if(P < 0 || P > MAX_POWER
-     || VW < 0 || VW > MAX_KNOTS
-     || W < 0 || W >= DEGREES)
-    exit(-233);
+    int P = 0;
+    for(int VW = 0; VW < MAX_KNOTS; VW++)
+        for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
+            double VB = table.InterpolateSpeed(VW, W);
+            double BA = 0;
+            Set(P, W, VW, W+rad2deg(BA), VB);
+            if(W != 0)
+                Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(BA), VB);
+        }
+}
 
-  VB = speed[P][VW][W].knots;
-  BA = speed[P][VW][W].direction;
+BoatSpeedTable BoatSpeed::CreateTable()
+{
+    BoatSpeedTable boatspeedtable;
+    boatspeedtable.numwindspeeds = MAX_KNOTS / 5;
+    int VW, i;
+    for(VW = 0, i=0; VW < MAX_KNOTS; VW+=5, i++)
+        boatspeedtable.windspeeds[i] = VW;
+
+    for(int W = 0; W <= DEGREES/2; W+=5) {
+        BoatSpeedTableEntry entry;
+        for(VW = 0, i=0; VW < MAX_KNOTS; VW+=5, i++) {
+            entry.W = W;
+            double BA, VB;
+            Speed(0, W, VW, BA, VB);
+            entry.boatspeed[i] = VB;
+        }
+        boatspeedtable.table.push_back(entry);
+    }
+    return boatspeedtable;
+}
+
+void BoatSpeed::Speed(int P, double W, double VW, double &BA, double &VB)
+{
+    if(P < 0 || P > MAX_POWER || VW < 0 || VW > MAX_KNOTS || W < 0 || W >= DEGREES) {
+        BA = 0.0/0.0;
+        VB = 0.0/0.0;
+        return;
+    }
+
+    double W1 = floor(W/DEGREE_STEP)*DEGREE_STEP;
+    double W2 = ceil(W/DEGREE_STEP)*DEGREE_STEP;
+
+    /* get headings nearby */
+    while(W1 - W2 > 180)
+        W2 += 360;
+    while(W2 - W1 > 180)
+        W1 += 360;
+
+    int W1i = positive_degrees(W1);
+    int W2i = positive_degrees(W2);
+
+    int VW1 = floor(VW), VW2 = ceil(VW);
+
+    double VB11 = speed[P][VW1][W1i].knots;
+    double VB12 = speed[P][VW1][W2i].knots;
+    double VB21 = speed[P][VW2][W1i].knots;
+    double VB22 = speed[P][VW2][W2i].knots;
+
+    double VB1 = interp_value(VW, VW1, VW2, VB11, VB21);
+    double VB2 = interp_value(VW, VW1, VW2, VB12, VB22);
+
+    VB = interp_value(W, W1, W2, VB1, VB2);
+
+    BA = positive_degrees(-W); /* fix this so we can deal with side slip, right now no slip */
+}
+
+/* find true wind speed from boat speed and true wind direction, because often at high
+ winds the polar inverts and boat speed is lower, we canspecify the max VW to search */
+double BoatSpeed::TrueWindSpeed(int P, double VB, double W, double maxVW)
+{
+    if(P < 0 || P > MAX_POWER)
+        return 0.0/0.0;
+
+    double W1 = floor(W/DEGREE_STEP)*DEGREE_STEP;
+    double W2 = ceil(W/DEGREE_STEP)*DEGREE_STEP;
+
+    /* get headings nearby */
+    while(W1 - W2 > 180)
+        W2 += 360;
+    while(W2 - W1 > 180)
+        W1 += 360;
+
+    int W1i = positive_degrees(W1);
+    int W2i = positive_degrees(W2);
+
+    double VB1min = 1.0/0.0, VW1min = 0.0/0.0, VB1max = 0, VW1max = 0.0/0.0;
+    double VB2min = 1.0/0.0, VW2min = 0.0/0.0, VB2max = 0, VW2max = 0.0/0.0;
+
+    for(int VWi = 0; VWi < maxVW; VWi++) {
+        double VB1 = speed[P][VWi][W1i].knots;
+        if(VB1 > VB && VB1 < VB1min) VB1min = VB1, VW1min = VWi;
+        if(VB1 < VB && VB1 > VB1max) VB1max = VB1, VW1max = VWi;
+
+        double VB2 = speed[P][VWi][W2i].knots;
+        if(VB2 > VB && VB2 < VB2min) VB2min = VB2, VW2min = VWi;
+        if(VB2 < VB && VB2 > VB2max) VB2max = VB2, VW2max = VWi;
+    }
+
+    double VBmin = interp_value(W, W1, W2, VB1min, VB2min);
+    double VWmin = interp_value(W, W1, W2, VW1min, VW2min);
+    double VBmax = interp_value(W, W1, W2, VB1max, VB2max);
+    double VWmax = interp_value(W, W1, W2, VW1max, VW2max);
+
+    return interp_value(VB, VBmin, VBmax, VWmin, VWmax);
 }
 
 void BoatSpeed::Set(int P, int W, int VW, double direction, double knots)
 {
-  speed[P][VW][W].knots = knots;
-  speed[P][VW][W].direction = direction;
-  speed[P][VW][W].b = W;
-  speed[P][VW][W].w = 1; /* weighted all on first course */
+    if(P < 0 || P > MAX_POWER || W < 0 || W >= DEGREES || VW < 0 || VW > MAX_KNOTS)
+        return; /* maybe log warning here? */
+    
+    speed[P][VW][W].knots = knots;
+    speed[P][VW][W].direction = direction;
+    speed[P][VW][W].b = W;
+    speed[P][VW][W].w = 1; /* weighted all on first course */
 }
 
 /* to calculate power required to move the boat:

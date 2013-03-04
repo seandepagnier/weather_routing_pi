@@ -1,12 +1,12 @@
 /******************************************************************************
- * $Id: advanced_routing_pi.h $
+ * $Id: weather_routing_pi.h $
  *
  * Project:  OpenCPN
- * Purpose:  Advanced Routing Plugin
+ * Purpose:  Weather Routing Plugin
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2012 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2013 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,30 +26,30 @@
  ***************************************************************************
  */
 
-#ifndef _ADVANCED_ROUTINGPI_H_
-#define _ADVANCED_ROUTINGPI_H_
+#ifndef _WEATHER_ROUTINGPI_H_
+#define _WEATHER_ROUTINGPI_H_
 
-#define     PLUGIN_VERSION_MAJOR    1
-#define     PLUGIN_VERSION_MINOR    5
+#define     PLUGIN_VERSION_MAJOR    0
+#define     PLUGIN_VERSION_MINOR    1
 
 #define     MY_API_VERSION_MAJOR    1
 #define     MY_API_VERSION_MINOR    8
 
 #include "../../../include/ocpn_plugin.h"
 
-#include "advancedroutingdialog.h"
+#include "WeatherRoutingDialog.h"
 
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition
 //----------------------------------------------------------------------------------------------------------
 
-#define ADVANCED_ROUTING_TOOL_POSITION    -1          // Request default positioning of toolbar tool
+#define WEATHER_ROUTING_TOOL_POSITION    -1          // Request default positioning of toolbar tool
 
-class advanced_routing_pi : public opencpn_plugin_18
+class weather_routing_pi : public opencpn_plugin_18
 {
 public:
-      advanced_routing_pi(void *ppimgr);
-      ~advanced_routing_pi(void);
+      weather_routing_pi(void *ppimgr);
+      ~weather_routing_pi(void);
 
 //    The required PlugIn Methods
       int Init(void);
@@ -66,13 +66,13 @@ public:
 
 //    The override PlugIn Methods
       bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
-      void SetCursorLatLon(double lat, double lon);
       bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
 
       void SetDefaults(void);
 
       int GetToolbarToolCount(void);
 
+      void SetCursorLatLon(double lat, double lon);
       void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
       void ShowPreferencesDialog( wxWindow* parent );
 
@@ -81,13 +81,7 @@ public:
 
 // Other public methods
 
-      void SetAdvancedRoutingDialogX    (int x){ m_dialog_x = x;};
-      void SetAdvancedRoutingDialogY    (int x){ m_dialog_y = x;}
-      void SetAdvancedRoutingDialogSizeX(int x){ m_dialog_sx = x;}
-      void SetAdvancedRoutingDialogSizeY(int x){ m_dialog_sy = x;}
       void SetColorScheme(PI_ColorScheme cs);
-
-      void OnAdvanced_RoutingDialogClose();
 
 private:
       bool LoadConfig(void);
@@ -96,15 +90,12 @@ private:
       wxFileConfig     *m_pconfig;
       wxWindow         *m_parent_window;
 
-      AdvancedRoutingDialog     *m_pAdvanced_RoutingDialog;
+      WeatherRoutingDialog     *m_pWeather_RoutingDialog;
 
       int              m_display_width, m_display_height;
       int              m_leftclick_tool_id;
 
-      bool             m_bShowAdvanced_Routing;
-
-      int              m_dialog_x, m_dialog_y;
-      int              m_dialog_sx, m_dialog_sy;
+      double m_boat_lat, m_boat_lon;
 };
 
 #endif
