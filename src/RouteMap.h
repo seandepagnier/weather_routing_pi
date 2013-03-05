@@ -56,7 +56,7 @@ typedef std::list<Route*> RouteList;
 class Route
 {
 public:
-  Route(Position *p, int dir) : points(p), direction(dir), parent(NULL) {}
+Route(Position *p, int dir) : points(p), direction(dir), parent(NULL), unmerged(0) {}
 
   void RepositionForStarting();
   bool Contains(Position *p);
@@ -72,8 +72,7 @@ public:
   Route *parent; /* outer region if a child */
   RouteList children; /* inner inverted regions */
 
-  int debug;
-  int debug_quit;
+  int unmerged;
 };
 
 /* list of routes with equal time to reach */

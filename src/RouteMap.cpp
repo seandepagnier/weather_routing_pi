@@ -140,8 +140,8 @@
 static void Wind(double &winddirground, double &windspeedground,
                  double lat, double lon, wxDateTime time)
 {
-    windspeedground = 3+100*(lon-174);
-    winddirground = remainder(300*(lat+35), 180);//rand()%60;
+    windspeedground = 3;//+100*(lon-174);
+    winddirground = remainder(300*(lat+35), 360);//rand()%60;
 }
 
 static void Current(double &currentspeed, double &currentdir,
@@ -216,6 +216,11 @@ Route *Position::PropagateRoutePosition(wxDateTime time, wxTimeSpan dt,
         double VB, BA;
         double P = 0; /* for now using sails only no power */
         boat.Speed(P, W-WA, VW, BA, VB);
+
+        /* failed to determine speed.. I guess we can always drift? */
+        if(isnan(BA) || isnan(VB)) {
+            BA = VB = 0;
+        }
 
         double BtA = BA - WA;
         if(BtA < 0)
@@ -298,6 +303,11 @@ bool Route::Contains(Position *pos)
 
 void Route::Render(PlugIn_ViewPort *vp)
 {
+    if(unmerged)
+        glColor3f(0, 0, 1);
+    else
+        glColor3f(1, 0, 0);
+
     glBegin(GL_LINE_LOOP);
     Position *p = points;
     do {
@@ -373,7 +383,7 @@ double TestIntersection(Position *p1, Position *p2, Position *p3, Position *p4)
   }
 */
 
-    /* optimization to avoid calculations */
+    /* optimization to avoid calculations if segments are far apart */
 #if 1
     if((x3 > x1 && x3 > x2 && x4 > x1 && x4 > x2) ||
        (x3 < x1 && x3 < x2 && x4 < x1 && x4 < x2) ||
@@ -387,16 +397,18 @@ double TestIntersection(Position *p1, Position *p2, Position *p3, Position *p4)
     if(dem == 0) /* parallel */
         return 0;
 
+    /* find intersection point */
     double x = (x1*(x3*y4-x4*y3+y2*(x4-x3)) + x2*(x4*y3-x3*y4+y1*(x3-x4)))/dem;
     double y = (y1*(x3*y4-x4*y3+x2*(y3-y4)) + y2*(x4*y3-x3*y4+x1*(y4-y3)))/dem;
 
+    /* is this point outside either segment */
     if((x > x1 && x > x2) || (x > x3 && x > x4) ||
        (x < x1 && x < x2) || (x < x3 && x < x4) ||
        (y > y1 && y > y2) || (y > y3 && y > y4) ||
        (y < y1 && y < y2) || (y < y3 && y < y4))
         return 0;
     else
-        return dem < 0 ? -1 : 1;
+        return dem < 0 ? 1 : -1;
 }
 
 int debugstf, debug_quit;
@@ -417,7 +429,6 @@ RouteList Route::Normalize()
             return ret;
         }
 
-again:
     p = points;
     q = p->next;
     do {
@@ -434,24 +445,26 @@ again:
 
                 Route *x = new Route(r, dir * direction);
 
-#if 0
+#if 1
                 RouteList inner = x->Normalize();
                 for(RouteList::iterator it = inner.begin(); it != inner.end(); ++it) {        
                     if(direction != (*it)->direction) {
+#if 0
                         if((*it)->children.size()) {
                             printf("inner route has children, should not be physically possible");
                             exit(45);
                         }
                         children.push_back(*it);
+#endif
                     } else {
-                        /* if it has same dir then it is contained, remove it */
-                        delete x;
+                        /* if it has same dir, we need to merge with it later */
+                        ret.push_back(x);
                     }
                 }
 #endif
 
                 q = p->next;
-                goto again;
+                goto reset;
             }
 
             r = s;
@@ -459,7 +472,7 @@ again:
         }
         p = q;
         q = q->next;
-//    again:;
+    reset:;
     } while(q != points);
 
     ret.push_back(this);
@@ -569,20 +582,26 @@ RouteIso *RouteIso::Propagate(wxTimeSpan dt, double degree_step, BoatSpeed &boat
         } while(p != (*it)->points);
     }
 
-    /* normalize the propagated routes before merging */
+    RouteList merged;
+    RouteList unmerged;
     RouteList nroutelist;
+
+
+    /* normalize the propagated routes before merging */
     for(RouteList::iterator it = routelist.begin(); it != routelist.end(); ++it) {
         RouteList nl = (*it)->Normalize();
         nroutelist.splice(nroutelist.end(), nl);
     }
 
-    RouteList merged;
-#if 1
-    while(nroutelist.size() > 1) {
+
+    int lastunmergedsize = 0, unmergedsize = 0;
+again:
+
+    while(nroutelist.size()) {
         Route *r1 = nroutelist.front();
         nroutelist.pop_front();
 
-        RouteList unmerged;
+//        unmerged.clear();
         while(nroutelist.size()) {
             Route *r2 = nroutelist.front();
             nroutelist.pop_front();
@@ -597,30 +616,47 @@ RouteIso *RouteIso::Propagate(wxTimeSpan dt, double degree_step, BoatSpeed &boat
 
             Route *r = Merge(r1, r2);
             if(r) {
-                r1 = r;
-#if 1
-                static int static_norm;
-//                if(static_norm < 1)
-                {
                 RouteList nr = r->Normalize();
                 r1 = nr.front();
                 nr.pop_front();
                 nroutelist.splice(nroutelist.end(), nr);
 
-                static_norm++;
-                }
-#endif
+                /* if there is a successfull merge, we must now
+                   try again to merge the unmerged routes */
+//                nroutelist.splice(nroutelist.end(), unmerged);
+//                unmerged.clear();
             } else {
+                r2->unmerged = 1;
                 unmerged.push_back(r2);
             }
         }
-        nroutelist.splice(nroutelist.end(), unmerged);
+//        nroutelist.splice(nroutelist.end(), unmerged);
         merged.push_back(r1);
+    }
+
+    unmergedsize = unmerged.size();
+#if 1
+    if(unmergedsize != lastunmergedsize) {
+        lastunmergedsize = unmergedsize;
+        nroutelist = merged;
+        merged.clear();
+
+        nroutelist.splice(nroutelist.end(), unmerged);
+
+        goto again;
     }
 #endif
 
-quit:
-    merged.splice(merged.end(), nroutelist);
+#if 0
+    goto skipq;
+quit:;
+
+        nroutelist.splice(nroutelist.end(), unmerged);
+skipq:
+#endif
+
+
+    merged.splice(merged.end(), unmerged);
 
     return new RouteIso(merged, time + dt);
 }
@@ -681,7 +717,6 @@ void RouteMap::Render(PlugIn_ViewPort *vp)
     glLineWidth(2);
     int i = 0;
     for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it) {
-        glColor3f(c, 0, (1-c));
         c += 1/(double)s;
 #if 0
         if(i == s-1)

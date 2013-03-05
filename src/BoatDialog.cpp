@@ -182,31 +182,33 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
 void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
-    wxFileDialog openDialog( this, _( "Select CSV Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
-                             wxT ( "CSV files (*.CSV)|*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_OPEN  );
+    wxFileDialog openDialog( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
+                             wxT ( "Boat Polar files (*.obp, *.cvs)|*.OBP;*.obp;*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_OPEN  );
     if( openDialog.ShowModal() == wxID_OK ) {
-        BoatSpeedTable table;
+        wxFileName filename = openDialog.GetPath();
+        bool binary = filename.GetExt() == _("obp") || filename.GetExt() == _("OBP");
 
-        if(table.Open(openDialog.GetPath().ToAscii()))
-            boat.SetSpeedsFromTable(table);
+        if(boat.Open(openDialog.GetPath().ToAscii(), binary))
+           m_PlotWindow->Refresh();
         else
         {
             wxMessageDialog md(this, _("Failed Loading boat polar"), _("OpenCPN Weather Routing Plugin"),
                                wxICON_INFORMATION | wxOK );
             md.ShowModal();
         }
-
-        m_PlotWindow->Refresh();
     }
 }
 
 void BoatDialog::OnSave ( wxCommandEvent& event )
 {
-    wxFileDialog saveDialog( this, _( "Select CSV Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
-                             wxT ( "CSV files (*.CSV)|*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
+    wxFileDialog saveDialog( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
+                             wxT ( "Boat Polar files (*.obp, *.cvs)|*.OBP;*.obp;*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
     if( saveDialog.ShowModal() == wxID_OK ) {
-        BoatSpeedTable table = boat.CreateTable();
-        if(!table.Save(saveDialog.GetPath().ToAscii())) {
+        wxFileName filename = saveDialog.GetPath();
+        bool binary = filename.GetExt() == _("obp") || filename.GetExt() == _("OBP");
+
+
+        if(!boat.Save(saveDialog.GetPath().ToAscii(), binary)) {
             wxMessageDialog md(this, _("Failed saving boat polar"), _("OpenCPN Weather Routing Plugin"),
                                wxICON_INFORMATION | wxOK );
             md.ShowModal();

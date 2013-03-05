@@ -40,13 +40,13 @@ public:
   double w; /* weight of time on each tack */
 };
 
-#define MAX_BOATSPEEDS_IN_TABLE 100
+#define MAX_WINDSPEEDS_IN_TABLE 100
 
 class BoatSpeedTableEntry
 {
 public:
   double W;
-  double boatspeed[MAX_BOATSPEEDS_IN_TABLE];
+  double boatspeed[MAX_WINDSPEEDS_IN_TABLE];
 };
 
 #include <list>
@@ -61,10 +61,13 @@ public:
   bool Open(const char *filename);
   bool Save(const char *filename);
 
+  bool OpenBinary(const char *filename);
+  bool SaveBinary(const char *filename);
+
   double InterpolateSpeed(double VW, double W);
 
   int numwindspeeds;
-  double windspeeds[MAX_BOATSPEEDS_IN_TABLE];
+  double windspeeds[MAX_WINDSPEEDS_IN_TABLE];
 
   BoatSpeedTableEntryList table;
 };
@@ -80,6 +83,12 @@ public:
                                 double keel_pressure, double keel_lift, double P,
                                 double &BA, double &VB, double &A, double &VA);
 
+    BoatSpeed();
+    ~BoatSpeed();
+
+    bool Open(const char *filename, bool binary);
+    bool Save(const char *filename, bool binary);
+
     double eta; /* sailing constant */
 
     double powerspeed[MAX_POWER+1]; /* How fast do we power at each power level
@@ -87,7 +96,6 @@ public:
 
     SailingSpeed speed[MAX_POWER+1][MAX_KNOTS+1][DEGREES];
 
-    BoatSpeed() { }
     void ComputeBoatSpeeds(double eta, double keel_pressure, double keel_lift);
     void OptimizeTackingSpeed();
     void SetSpeedsFromTable(BoatSpeedTable &table);

@@ -71,7 +71,7 @@ bool BoatSpeedTable::Open(const char *filename)
     
     while((token = strtok_r(NULL, ";", &saveptr))) {
         windspeeds[numwindspeeds++] = strtod(token, 0);
-        if(numwindspeeds > MAX_BOATSPEEDS_IN_TABLE)
+        if(numwindspeeds > MAX_WINDSPEEDS_IN_TABLE)
             goto failed;
     }
     
@@ -82,10 +82,11 @@ bool BoatSpeedTable::Open(const char *filename)
         int i=0;
         while((token = strtok_r(NULL, ";", &saveptr)))
             entry.boatspeed[i++] = strtod(token, 0);
-        if(i > MAX_BOATSPEEDS_IN_TABLE)
+        if(i > MAX_WINDSPEEDS_IN_TABLE)
             goto failed;
         table.push_back(entry);
     }
+    fclose(f);
     return true;
     
 failed:
@@ -115,6 +116,78 @@ bool BoatSpeedTable::Save(const char *filename)
     }
     fclose(f);
     return true;
+}
+
+bool BoatSpeedTable::OpenBinary(const char *filename)
+{
+    FILE *f = fopen(filename, "r");
+    if(!f)
+        return false;
+
+    int n, s;
+    if(fscanf(f, "obs %d %d\n", &n, &s) != 2) goto failed;
+    numwindspeeds = n;
+
+    float windspeeds32[MAX_WINDSPEEDS_IN_TABLE];
+    if((int)fread(windspeeds32, sizeof *windspeeds32, n, f) != n) goto failed;
+    for(int j = 0; j<n; j++)
+        windspeeds[j] = windspeeds32[j];
+
+    for(int i=0; i<s; i++) {
+        BoatSpeedTableEntry entry;
+        float W32;
+        if((int)fread(&W32, sizeof W32, 1, f) != 1) goto failed;
+        entry.W = W32;
+
+        float boatspeed32[MAX_WINDSPEEDS_IN_TABLE];
+        if((int)fread(boatspeed32, sizeof *boatspeed32, n, f) != n) goto failed;
+
+        for(int j = 0; j<n; j++)
+            entry.boatspeed[j] = boatspeed32[j];
+
+        table.push_back(entry);
+    }
+
+    fclose(f);
+    return true;
+
+failed:
+    fclose(f);
+    return false;
+}
+
+bool BoatSpeedTable::SaveBinary(const char *filename)
+{
+    FILE *f = fopen(filename, "w");
+    if(!f)
+        return false;
+
+    int n = numwindspeeds;
+
+    fprintf(f, "obs %d %d\n", n, table.size());
+
+    float windspeeds32[MAX_WINDSPEEDS_IN_TABLE];
+    for(int j = 0; j<n; j++)
+        windspeeds32[j] = windspeeds[j];
+    if((int)fwrite(windspeeds32, sizeof *windspeeds32, n, f) != n) goto failed;
+
+    for(BoatSpeedTableEntryList::iterator it = table.begin(); it != table.end(); ++it) {
+        float W32 = (*it).W;
+        if(fwrite(&W32, sizeof W32, 1, f) != 1) goto failed;
+
+        float boatspeed32[MAX_WINDSPEEDS_IN_TABLE];
+        for(int j = 0; j<n; j++)
+            boatspeed32[j] = (*it).boatspeed[j];
+
+        if((int)fwrite(boatspeed32, sizeof *boatspeed32, n, f) != n) goto failed;
+    }
+
+    fclose(f);
+    return true;
+
+failed:
+    fclose(f);
+    return false;
 }
 
 double BoatSpeedTable::InterpolateSpeed(double VW, double W)
@@ -577,6 +650,38 @@ void BoatSpeed::BoatSteadyState(double W, double VW, double eta,
   }
 }
 
+BoatSpeed::BoatSpeed()
+{
+    Open("/home/sean/boat.obs", true);
+}
+
+BoatSpeed::~BoatSpeed()
+{
+    Save("/home/sean/boat.obs", true);
+}
+
+bool BoatSpeed::Open(const char *filename, bool binary)
+{
+    BoatSpeedTable table;
+    if(binary) {
+        if(!table.OpenBinary(filename))
+            return false;
+    } else
+        if(!table.Open(filename))
+            return false;
+
+    SetSpeedsFromTable(table);
+    return true;
+}
+
+bool BoatSpeed::Save(const char *filename, bool binary)
+{
+    BoatSpeedTable table = CreateTable();
+    if(binary)
+        return table.SaveBinary(filename);
+    return table.Save(filename);
+}
+
 /* eta is a measure of efficiency of the boat, from .01 for racing boats to .5 for
    heavy cruisers */
 void BoatSpeed::ComputeBoatSpeeds(double eta, double keel_pressure, double keel_lift)
@@ -653,14 +758,23 @@ void BoatSpeed::SetSpeedsFromTable(BoatSpeedTable &table)
 BoatSpeedTable BoatSpeed::CreateTable()
 {
     BoatSpeedTable boatspeedtable;
-    boatspeedtable.numwindspeeds = MAX_KNOTS / 5;
+    int windsstep = 3;
+    int winddstep = 5;
+
+    for(;;) {
+        boatspeedtable.numwindspeeds = MAX_KNOTS / windsstep;
+        if(boatspeedtable.numwindspeeds < MAX_WINDSPEEDS_IN_TABLE)
+            break;
+        windsstep *= 2;
+    }
+
     int VW, i;
-    for(VW = 0, i=0; VW < MAX_KNOTS; VW+=5, i++)
+    for(VW = 0, i=0; VW < MAX_KNOTS; VW+=windsstep, i++)
         boatspeedtable.windspeeds[i] = VW;
 
-    for(int W = 0; W <= DEGREES/2; W+=5) {
+    for(int W = 0; W <= DEGREES/2; W+=winddstep) {
         BoatSpeedTableEntry entry;
-        for(VW = 0, i=0; VW < MAX_KNOTS; VW+=5, i++) {
+        for(VW = 0, i=0; VW < MAX_KNOTS; VW+=windsstep, i++) {
             entry.W = W;
             double BA, VB;
             Speed(0, W, VW, BA, VB);
@@ -673,7 +787,8 @@ BoatSpeedTable BoatSpeed::CreateTable()
 
 void BoatSpeed::Speed(int P, double W, double VW, double &BA, double &VB)
 {
-    if(P < 0 || P > MAX_POWER || VW < 0 || VW > MAX_KNOTS || W < 0 || W >= DEGREES) {
+    W = positive_degrees(W);
+    if(P < 0 || P > MAX_POWER || VW < 0 || VW > MAX_KNOTS) {
         BA = 0.0/0.0;
         VB = 0.0/0.0;
         return;

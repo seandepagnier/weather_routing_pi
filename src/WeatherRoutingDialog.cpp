@@ -201,6 +201,7 @@ void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
       routemap.Reset(startlat, startlon, wxDateTime::Now());
       extern int debugstf, debug_quit;
       debugstf = -1;
+//      routemap.Propagate(boat);
       routemap.Propagate(boat);
       debug_quit++;
       debugstf = 0;
@@ -220,6 +221,10 @@ void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
 void WeatherRoutingDialog::OnClear ( wxCommandEvent& event )
 {
     routemap.Clear();
+
+    extern int debug_quit;
+    debug_quit=0;
+
 
       double startlat, startlon;
       m_tStartLat->GetValue().ToDouble(&startlat);
