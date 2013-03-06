@@ -149,7 +149,7 @@
 
 
 WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon )
-    : WeatherRoutingDialogBase(parent), m_thCompute(routemap, boat)
+    : WeatherRoutingDialogBase(parent), m_thCompute(*parent, routemap, boat)
 {
     m_pBoatDialog = new BoatDialog(this, boat);
     m_tStartLat->SetLabel(wxString::Format(_T("%.5f"), boat_lat));
@@ -160,6 +160,11 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, d
 
     routemap.degree_step = pConf->Read( _T("DegreeStep"), 10L);
     routemap.dt = wxTimeSpan(0, 0, pConf->Read( _T("TimeSpan"), 1000L), 1);
+
+    wxPoint p = GetPosition();
+    pConf->Read ( _T ( "DialogX" ), &p.x, p.x);
+    pConf->Read ( _T ( "DialogY" ), &p.y, p.y);
+    SetPosition(p);
 
       double startlat, startlon;
       m_tStartLat->GetValue().ToDouble(&startlat);
@@ -172,45 +177,75 @@ WeatherRoutingDialog::~WeatherRoutingDialog( )
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+
+    wxPoint p = GetPosition();
+    pConf->Write ( _T ( "DialogX" ), p.x);
+    pConf->Write ( _T ( "DialogY" ), p.y);
+
     pConf->Write( _T("DegreeStep"), routemap.degree_step);
     pConf->Write( _T("TimeSpan"),  routemap.dt.GetSeconds().ToLong());
 }
 
 void WeatherRoutingDialog::RenderRouteMap(PlugIn_ViewPort *vp)
 {
-    m_thCompute.routemutex.Lock();
+//    m_thCompute.routemutex.Lock();
     routemap.Render(vp);
-    m_thCompute.routemutex.Unlock();
+//    m_thCompute.routemutex.Unlock();
 }
 
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
-  if(m_thCompute.IsRunning()) {
-    m_bCompute->SetLabel(_( "&Compute" ));
-    m_thCompute.End();
-    m_thCompute.Wait();
-  } else {
-//    m_bCompute->SetLabel(_( "&Stop" ));
-//    m_thCompute.Run();
-
 #if 0
-      double startlat, startlon;
-      m_tStartLat->GetValue().ToDouble(&startlat);
-      m_tStartLon->GetValue().ToDouble(&startlon);
+    OnClear(event);
 
-      routemap.Reset(startlat, startlon, wxDateTime::Now());
-      extern int debugstf, debug_quit;
-      debugstf = -1;
-//      routemap.Propagate(boat);
-      routemap.Propagate(boat);
-      debug_quit++;
-      debugstf = 0;
+    extern int     debugcurstep;
+    debugcurstep = 0;
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+            routemap.Propagate(boat);
+
+            try {
+            routemap.Propagate(boat);
+            } catch (...) {
+                extern int debugmaxstep;
+                debugmaxstep++;
+            }
+            GetParent()->Refresh();
+
+
+            return;
+#else
+            routemap.Propagate(boat);
 #endif
 
-      routemap.Propagate(boat);
-  }
+#if 0
+    if(m_thCompute.IsRunning()) {
+        m_bCompute->SetLabel(_( "&Compute" ));
+        m_thCompute.End();
+        m_thCompute.Wait();
+    } else {
+        m_bCompute->SetLabel(_( "&Stop" ));
+        m_thCompute.Run();
+    }
+#endif
 
-  GetParent()->Refresh();
+    GetParent()->Refresh();
+}
+
+extern void RouteDebugStep();
+
+void WeatherRoutingDialog::OnStep ( wxCommandEvent& event )
+{
+    RouteDebugStep();
 }
 
 void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
@@ -221,10 +256,6 @@ void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
 void WeatherRoutingDialog::OnClear ( wxCommandEvent& event )
 {
     routemap.Clear();
-
-    extern int debug_quit;
-    debug_quit=0;
-
 
       double startlat, startlon;
       m_tStartLat->GetValue().ToDouble(&startlat);
@@ -249,13 +280,20 @@ void WeatherRoutingDialog::OnAbout ( wxCommandEvent& event )
   md.ShowModal();
 }
 
+extern wxMutex routemutex;
 void *WeatherRoutingThread::Entry()
 {
-  while(!stop) {
-    routemutex.Lock();
-    routemap.Propagate(boat);
-    routemutex.Unlock();
-    wxThread::Yield();
-  }
-  return 0;
+    int cnt = 0;
+    while(!stop) {
+        if(cnt < 12) {
+            routemutex.Lock();
+            routemap.Propagate(boat);
+            routemutex.Unlock();
+//            parent.Refresh();
+            cnt++;
+        }
+        wxThread::Yield();
+        wxThread::Sleep(2000);
+    }
+    return 0;
 }

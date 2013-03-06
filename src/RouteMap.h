@@ -38,16 +38,18 @@ class Route;
 class Position
 {
 public:
-  Position(double latitude, double longitude, Position *p);
-  Route *PropagateRoutePosition(wxDateTime time, wxTimeSpan dt,
-                                double degree_step, BoatSpeed &boat);
-  double Distance(Position *p);
+    Position(double latitude, double longitude, Position *p=NULL, bool hl=false);
+    Route *PropagateRoutePosition(wxDateTime time, wxTimeSpan dt,
+                                  double degree_step, BoatSpeed &boat);
+    double Distance(Position *p);
+    bool CrossesLand(double dlat, double dlon);
 
-  double lat, lon;
-  Position *parent; /* previous position in time */
-  Position *prev, *next; /* doubly linked circular list of positions */
+    double lat, lon;
+    Position *parent; /* previous position in time */
+    bool hitland; /* did we hit land on the route to this point (for rendering) */
+    Position *prev, *next; /* doubly linked circular list of positions */
 
-  wxPoint GedesicXY();
+    bool propagated;
 };
 
 typedef std::list<Route*> RouteList;
@@ -56,23 +58,23 @@ typedef std::list<Route*> RouteList;
 class Route
 {
 public:
-Route(Position *p, int dir) : points(p), direction(dir), parent(NULL), unmerged(0) {}
+    Route(Position *p, int dir);
 
-  void RepositionForStarting();
-  bool Contains(Position *p);
-  void Render(PlugIn_ViewPort *vp);
-  int size();
-  void FindRouteBounds(double bounds[4]);
-  RouteList Normalize();
-
-  Position *points;
-
-  int direction; /* 1 or -1 for inverted region */
-
-  Route *parent; /* outer region if a child */
-  RouteList children; /* inner inverted regions */
-
-  int unmerged;
+    void RepositionForStarting();
+    bool Contains(Position *p);
+    void Render(PlugIn_ViewPort *vp);
+    int size();
+    void FindRouteBounds(double bounds[4]);
+    RouteList Normalize();
+    
+    Position *points;
+  
+    int direction; /* 1 or -1 for inverted region */
+    
+    Route *parent; /* outer region if a child */
+    RouteList children; /* inner inverted regions */
+    
+    int unmerged;
 };
 
 /* list of routes with equal time to reach */

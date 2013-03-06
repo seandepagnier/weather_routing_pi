@@ -41,12 +41,14 @@ class BoatDialog;
 class WeatherRoutingThread : public wxThread
 {
 public:
-WeatherRoutingThread(RouteMap &r, BoatSpeed &b) : routemap(r), boat(b), stop(false) {}
+WeatherRoutingThread(wxWindow &p,RouteMap &r, BoatSpeed &b)
+    : wxThread(wxTHREAD_JOINABLE), parent(p), routemap(r), boat(b), stop(false) { Create(); }
     void End() { stop = true; }
     void *Entry();
+    wxWindow &parent;
     RouteMap &routemap;
     BoatSpeed &boat;
-    wxMutex routemutex;
+//    wxMutex routemutex;
     bool stop;
 };
 
@@ -62,6 +64,7 @@ public:
 
 private:
     void OnCompute( wxCommandEvent& event );
+    void OnStep ( wxCommandEvent& event );
     void OnBoat( wxCommandEvent& event );
     void OnClear( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
@@ -73,7 +76,6 @@ private:
 
     BoatSpeed boat;
 
-    wxButton* m_bCompute;
     bool m_bComputing;
 
     WeatherRoutingThread m_thCompute;
