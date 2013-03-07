@@ -25,24 +25,25 @@
  */
 
 #include <list>
-WX_DECLARE_LIST(wxRealPoint, wxRealPointList);
-
 
 #define MAX_LEVELS 12
 
 class PlugIn_ViewPort;
 
 class Route;
+typedef std::list<Route*> RouteList;
 
 /* list of positions which take equal time to reach */
 class Position
 {
 public:
     Position(double latitude, double longitude, Position *p=NULL, bool hl=false);
-    Route *PropagateRoutePosition(wxDateTime time, wxTimeSpan dt,
+    Position(Position *p);
+    RouteList PropagateRoutePosition(wxDateTime time, wxTimeSpan dt,
                                   double degree_step, BoatSpeed &boat);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
+    Position *Copy();
 
     double lat, lon;
     Position *parent; /* previous position in time */
@@ -52,29 +53,46 @@ public:
     bool propagated;
 };
 
-typedef std::list<Route*> RouteList;
-
 /* a closed loop of positions */
 class Route
 {
 public:
-    Route(Position *p, int dir);
+    Route(Position *p, int cnt, int dir);
+    Route(Route *r);
 
     void RepositionForStarting();
-    bool Contains(Position *p);
+    bool Contains(Route *r);
     void Render(PlugIn_ViewPort *vp);
     int size();
     void FindRouteBounds(double bounds[4]);
+    void RemovePosition(Position *p);
     RouteList Normalize();
     
-    Position *points;
+    Position *points; /* pointer to point with maximum latitude */
+    int count;
   
     int direction; /* 1 or -1 for inverted region */
     
     Route *parent; /* outer region if a child */
     RouteList children; /* inner inverted regions */
-    
-    int unmerged;
+};
+
+/* contain routes in a heap to process smallest first (to minimize O(n^2) runtime of merging) */
+class RouteHeap
+{
+public:
+    RouteHeap();
+    ~RouteHeap();
+    void Insert(Route *r);
+    Route *Remove();
+    int Size() { return size; }
+
+private:
+    int size, maxsize;
+    Route **Heap;
+    void expand();
+    int parent(int a) { return (a-!(a&1)) >> 1; }
+    int child(int a) { return (a<<1) + 1; }
 };
 
 /* list of routes with equal time to reach */

@@ -67,7 +67,7 @@ private:
     void OnStep ( wxCommandEvent& event );
     void OnBoat( wxCommandEvent& event );
     void OnClear( wxCommandEvent& event );
-    void OnAbout( wxCommandEvent& event );
+    void OnInformation( wxCommandEvent& event );
 
     //    Data
     weather_routing_pi   *pPlugIn;

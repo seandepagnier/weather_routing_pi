@@ -100,6 +100,10 @@ int weather_routing_pi::Init(void)
                                               _("Weather_Routing"), _T(""), NULL,
                                               WEATHER_ROUTING_TOOL_POSITION, 0, this);
 
+#if 0
+      OnToolbarToolCallback(m_leftclick_tool_id);
+#endif
+
       //    And load the configuration items
       LoadConfig();
 
@@ -109,8 +113,7 @@ int weather_routing_pi::Init(void)
            INSTALLS_TOOLBAR_TOOL     |
            WANTS_CONFIG              |
            WANTS_CURSOR_LATLON       |
-           WANTS_NMEA_EVENTS         |
-           WANTS_PREFERENCES
+           WANTS_NMEA_EVENTS
             );
 }
 
@@ -200,39 +203,6 @@ void weather_routing_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
 
 void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 {
-  wxDialog *dialog = new wxDialog( parent, wxID_ANY, _("Weather Routing Preferences"),
-                                   wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE );
-  wxFlexGridSizer* pGrid = new wxFlexGridSizer(2);
-  dialog->SetSizer(pGrid);
-
-  wxStaticText *stime_step = new wxStaticText( dialog, -1, _("degree step for apparent wind angles"));
-  pGrid->Add(stime_step, 0, wxALIGN_LEFT|wxALL, 1);
-  wxSlider* degree_step = new wxSlider(dialog, wxID_ANY,
-                                       m_pWeather_RoutingDialog->routemap.degree_step, DEGREE_STEP, 60,
-                                       wxDefaultPosition, wxDefaultSize,
-                                       wxSL_HORIZONTAL | wxSL_AUTOTICKS | wxSL_LABELS);
-  pGrid->Add(degree_step, 1, wxEXPAND | wxALL, 1);
-
-  wxStaticText *ptime_step = new wxStaticText( dialog, -1, _("time step between iterations"));
-  pGrid->Add(ptime_step, 0, wxALIGN_LEFT | wxALL, 1);
-  wxTextCtrl *time_step = new wxTextCtrl( dialog, -1 );
-  pGrid->Add(time_step, 1, wxALIGN_RIGHT | wxALL, 1);
-  wxString s;
-  s.Printf(_T("%ld"), m_pWeather_RoutingDialog->routemap.dt.GetSeconds().ToLong());
-  time_step->SetValue(s);
-
-  wxStdDialogButtonSizer* DialogButtonSizer = dialog->CreateStdDialogButtonSizer(wxOK|wxCANCEL);
-  pGrid->Add(DialogButtonSizer, 0, wxALIGN_RIGHT|wxALL, 1);
-
-  if(dialog->ShowModal() == wxID_OK)
-  {
-    m_pWeather_RoutingDialog->routemap.degree_step = degree_step->GetValue();
-    double ts;
-    if(time_step->GetValue().ToDouble(&ts))
-      m_pWeather_RoutingDialog->routemap.dt = wxTimeSpan(0, 0, ts, 0);
-    SaveConfig();
-  }
-  dialog->Destroy();
 }
 
 void weather_routing_pi::OnToolbarToolCallback(int id)

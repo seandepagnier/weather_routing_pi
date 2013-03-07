@@ -198,29 +198,17 @@ void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 #if 0
     OnClear(event);
 
-    extern int     debugcurstep;
-    debugcurstep = 0;
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
-            routemap.Propagate(boat);
+            extern int debugstep, debugcount;
+            debugstep = 0;
+            debugcount++;
+
+            extern double gdist;
+            gdist = 1;
             routemap.Propagate(boat);
 
-            try {
+            gdist = .8;
             routemap.Propagate(boat);
-            } catch (...) {
-                extern int debugmaxstep;
-                debugmaxstep++;
-            }
             GetParent()->Refresh();
-
 
             return;
 #else
@@ -264,20 +252,18 @@ void WeatherRoutingDialog::OnClear ( wxCommandEvent& event )
       routemap.Reset(startlat, startlon, wxDateTime::Now());
 }
 
-void WeatherRoutingDialog::OnAbout ( wxCommandEvent& event )
+void WeatherRoutingDialog::OnInformation ( wxCommandEvent& event )
 {
-  wxString msg(_("Weather Routing plugin\n"));
-  msg.Append(_("Version "));
-  msg.Append(wxString::Format(wxT("%i"),PLUGIN_VERSION_MAJOR));  msg.Append(_("."));
-  msg.Append(wxString::Format(wxT("%i"),PLUGIN_VERSION_MINOR));  msg.Append(_("\n"));
-  msg.Append(_("Compute iteratively positions the boat could possibly make at"
-               " a certain time.  Merge the results to form a map determining"
-               " the quickest route to any given location.\n"));
-
-  msg.Append(_("Written by Sean D'Epagnier email <sean at depagnier dot com>"));
-  wxMessageDialog md(this, msg, _("OpenCPN Weather Routing Plugin"),
-                       wxICON_INFORMATION | wxOK );
-  md.ShowModal();
+    InformationDialog dlg(this);
+    wxString infolocation = *GetpSharedDataLocation()
+        + _("plugins/weather_routing/data/WeatherRoutingInformation.html");
+    if(dlg.m_htmlInformation->LoadFile(infolocation))
+        dlg.ShowModal();
+    else {
+        wxMessageDialog mdlg(this, _("Failed to load file:\n") + infolocation,
+                             wxString(_("OpenCPN Alert"), wxOK | wxICON_ERROR));
+        mdlg.ShowModal();
+    }
 }
 
 extern wxMutex routemutex;
