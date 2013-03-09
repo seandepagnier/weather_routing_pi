@@ -26,11 +26,11 @@
 
 #include <list>
 
-#define MAX_LEVELS 12
-
 class PlugIn_ViewPort;
 
 class Route;
+class RouteHeap;
+class RouteMap;
 typedef std::list<Route*> RouteList;
 
 /* list of positions which take equal time to reach */
@@ -39,8 +39,7 @@ class Position
 public:
     Position(double latitude, double longitude, Position *p=NULL, bool hl=false);
     Position(Position *p);
-    RouteList PropagateRoutePosition(wxDateTime time, wxTimeSpan dt,
-                                  double degree_step, BoatSpeed &boat);
+    void Propagate(RouteHeap &routeheap, RouteMap &map, wxDateTime time);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
     Position *Copy();
@@ -58,15 +57,18 @@ class Route
 {
 public:
     Route(Position *p, int cnt, int dir);
-    Route(Route *r);
+    Route(Route *r, Route *p=NULL);
+    ~Route();
 
-    void RepositionForStarting();
+    void Print();
     bool Contains(Route *r);
     void Render(PlugIn_ViewPort *vp);
     int size();
-    void FindRouteBounds(double bounds[4]);
+    bool FindRouteBounds(double bounds[4]);
     void RemovePosition(Position *p);
-    RouteList Normalize();
+    RouteList Normalize(int level);
+    Position *ClosestPosition(double lat, double lon);
+    void Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime time);
     
     Position *points; /* pointer to point with maximum latitude */
     int count;
@@ -103,7 +105,7 @@ public:
   RouteIso(RouteList r, wxDateTime t);
   ~RouteIso();
 
-  RouteIso *Propagate(wxTimeSpan dt, double degree_step, BoatSpeed &boat);
+  RouteIso *Propagate(RouteMap &routemap);
   void Render(PlugIn_ViewPort *vp);
 
   RouteList routes;
@@ -118,25 +120,33 @@ typedef std::list<RouteIso*> RouteIsoList;
 class RouteMap
 {
 public:
-  static void Wind(double &windspeed, double &winddir,
-                   double lat, double lon, wxDateTime time);
-  RouteMap();
-  ~RouteMap();
+    static void Wind(double &windspeed, double &winddir,
+                     double lat, double lon, wxDateTime time);
+    RouteMap(BoatSpeed &b);
+    ~RouteMap();
 
-  void Propagate(BoatSpeed &boat);
-  Position *ClosestPosition(double lat, double lon);
-  void Render(PlugIn_ViewPort *vp);
-  void Reset(double lat, double lon, wxDateTime t);
-  void Clear();
-  bool SetCursorLatLon(double lat, double lon);
+    void Propagate();
+    Position *ClosestPosition(double lat, double lon);
+    void Render(PlugIn_ViewPort *vp);
+    void Reset(double lat, double lon, wxDateTime time);
+    void Clear();
+    bool SetCursorLatLon(double lat, double lon);
 
-  wxDateTime time; /* time of last isos */
-  wxTimeSpan dt; /* time in seconds between propagations */
-  double degree_step;
-  double max_dist; /* maximum distance between points when merging iso routes */
+    double EndLat, EndLon;
 
-  RouteIsoList origin; /* initial route iso */
+    wxTimeSpan dt; /* time in seconds between propagations */
+    double DegreeStep, MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
+    double MaxLatitude, TackingTime;
+
+    int SubSteps;
+
+    bool DetectLand, InvertedRegions, Anchoring, AllowDataDeficient;
+
+    BoatSpeed &boat;
+
+    RouteIsoList origin; /* initial route iso */
 
 private:
-  Position *last_cursor_position;
+
+    Position *last_cursor_position;
 };

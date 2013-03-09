@@ -35,19 +35,21 @@
 
 #include "WeatherRoutingUI.h"
 
+#include "../../grib_pi/src/GribUIDialog.h"
+
 class weather_routing_pi;
 class BoatDialog;
+class GribUIDialog;
 
 class WeatherRoutingThread : public wxThread
 {
 public:
-WeatherRoutingThread(wxWindow &p,RouteMap &r, BoatSpeed &b)
-    : wxThread(wxTHREAD_JOINABLE), parent(p), routemap(r), boat(b), stop(false) { Create(); }
+WeatherRoutingThread(wxWindow &p,RouteMap &r)
+    : wxThread(wxTHREAD_JOINABLE), parent(p), routemap(r), stop(false) { Create(); }
     void End() { stop = true; }
     void *Entry();
     wxWindow &parent;
     RouteMap &routemap;
-    BoatSpeed &boat;
 //    wxMutex routemutex;
     bool stop;
 };
@@ -63,16 +65,19 @@ public:
     RouteMap routemap;
 
 private:
+    bool GetGribDialog();
+
     void OnCompute( wxCommandEvent& event );
     void OnStep ( wxCommandEvent& event );
     void OnBoat( wxCommandEvent& event );
-    void OnClear( wxCommandEvent& event );
+    void OnReset( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
+
+    void Reset();
+    void ReconfigureRouteMap();
 
     //    Data
     weather_routing_pi   *pPlugIn;
-
-    wxFont            *m_dFont;
 
     BoatSpeed boat;
 

@@ -149,28 +149,74 @@
 
 
 WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon )
-    : WeatherRoutingDialogBase(parent), m_thCompute(*parent, routemap, boat)
+    : WeatherRoutingDialogBase(parent), routemap(boat),
+      m_thCompute(*parent, routemap)
 {
     m_pBoatDialog = new BoatDialog(this, boat);
-    m_tStartLat->SetLabel(wxString::Format(_T("%.5f"), boat_lat));
-    m_tStartLon->SetLabel(wxString::Format(_T("%.5f"), boat_lon));
 
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
-    routemap.degree_step = pConf->Read( _T("DegreeStep"), 10L);
-    routemap.dt = wxTimeSpan(0, 0, pConf->Read( _T("TimeSpan"), 1000L), 1);
+    m_tStartLat->SetValue(pConf->Read( _T("StartLat"), wxString::Format(_T("%.5f"), boat_lat)));
+    m_tStartLon->SetValue(pConf->Read( _T("StartLon"), wxString::Format(_T("%.5f"), boat_lon)));
+    m_tEndLat->SetValue(pConf->Read( _T("EndLat"), wxString::Format(_T("%.5f"), boat_lat+1)));
+    m_tEndLon->SetValue(pConf->Read( _T("EndLon"), wxString::Format(_T("%.5f"), boat_lon+1)));
+
+    int degreestep;
+    pConf->Read( _T("DegreeStep"), &degreestep, 15);
+    m_sDegreeStep->SetValue(degreestep);
+
+    int timespan;
+    pConf->Read( _T("TimeSpan"), &timespan, 1000);
+    m_sTimeStep->SetValue(timespan);
+
+    int maxdivertedcourse;
+    pConf->Read( _T("MaxDivertedCourse"), &maxdivertedcourse, 100);
+    m_sMaxDivertedCourse->SetValue(maxdivertedcourse);
+
+    int maxwindknots;
+    pConf->Read( _T("MaxWindKnots"), &maxwindknots, 100);
+    m_sMaxWindKnots->SetValue(maxwindknots);
+
+    int maxswellmeters;
+    pConf->Read( _T("MaxSwellMeters"), &maxswellmeters, 20);
+    m_sMaxSwellMeters->SetValue(maxswellmeters);
+
+    int maxlatitude;
+    pConf->Read( _T("MaxLatitude"), &maxlatitude, 90);
+    m_sMaxLatitude->SetValue(maxlatitude);
+
+    int tackingtime;
+    pConf->Read( _T("TackingTime"), &tackingtime, 10);
+    m_sTackingTime->SetValue(tackingtime);
+
+    int substeps;
+    pConf->Read( _T("SubSteps"), &substeps, 90);
+    m_sSubSteps->SetValue(substeps);
+
+    bool detectland;
+    pConf->Read( _T("DetectLand"), &detectland, true);
+    m_cbDetectLand->SetValue(detectland);
+
+    bool invertedregions;
+    pConf->Read( _T("InvertedRegions"), &invertedregions, false);
+    m_cbInvertedRegions->SetValue(invertedregions);
+
+    bool anchoring;
+    pConf->Read( _T("Anchoring"), &anchoring, false);
+    m_cbAnchoring->SetValue(anchoring);
+
+    bool allowdatadeficient;
+    pConf->Read( _T("AllowDataDeficient"), &allowdatadeficient, false);
+    m_cbAllowDataDeficient->SetValue(allowdatadeficient);
 
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "DialogX" ), &p.x, p.x);
     pConf->Read ( _T ( "DialogY" ), &p.y, p.y);
     SetPosition(p);
 
-      double startlat, startlon;
-      m_tStartLat->GetValue().ToDouble(&startlat);
-      m_tStartLon->GetValue().ToDouble(&startlon);
-
-      routemap.Reset(startlat, startlon, wxDateTime::Now());
+    GetGribDialog();
+    ReconfigureRouteMap();
 }
 
 WeatherRoutingDialog::~WeatherRoutingDialog( )
@@ -178,12 +224,28 @@ WeatherRoutingDialog::~WeatherRoutingDialog( )
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
+    pConf->Write( _T("StartLat"), m_tStartLat->GetValue());
+    pConf->Write( _T("StartLon"), m_tStartLon->GetValue());
+    pConf->Write( _T("EndLat"), m_tEndLat->GetValue());
+    pConf->Write( _T("EndLon"), m_tEndLon->GetValue());
+
+    pConf->Write( _T("DegreeStep"), m_sDegreeStep->GetValue());
+    pConf->Write( _T("TimeSpan"), m_sTimeStep->GetValue());
+    pConf->Write( _T("MaxDivertedCourse"), m_sMaxDivertedCourse->GetValue());
+    pConf->Write( _T("MaxWindKnots"), m_sMaxWindKnots->GetValue());
+    pConf->Write( _T("MaxSwellMeters"), m_sMaxSwellMeters->GetValue());
+    pConf->Write( _T("MaxLatittude"), m_sMaxLatitude->GetValue());
+    pConf->Write( _T("TackingTime"), m_sTackingTime->GetValue());
+    pConf->Write( _T("SubSteps"), m_sSubSteps->GetValue());
+
+    pConf->Write( _T("DetectLand"), m_cbDetectLand->GetValue());
+    pConf->Write( _T("InvertedRegions"), m_cbInvertedRegions->GetValue());
+    pConf->Write( _T("Anchoring"), m_cbAnchoring->GetValue());
+    pConf->Write( _T("AllowDataDeficient"), m_cbAllowDataDeficient->GetValue());
+
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "DialogX" ), p.x);
     pConf->Write ( _T ( "DialogY" ), p.y);
-
-    pConf->Write( _T("DegreeStep"), routemap.degree_step);
-    pConf->Write( _T("TimeSpan"),  routemap.dt.GetSeconds().ToLong());
 }
 
 void WeatherRoutingDialog::RenderRouteMap(PlugIn_ViewPort *vp)
@@ -193,26 +255,47 @@ void WeatherRoutingDialog::RenderRouteMap(PlugIn_ViewPort *vp)
 //    m_thCompute.routemutex.Unlock();
 }
 
-void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
+extern GRIBUIDialog *g_pGribDialog;
+
+bool WeatherRoutingDialog::GetGribDialog()
 {
 #if 0
-    OnClear(event);
+    return true;
+#endif
+    if(!g_pGribDialog) {
+        SendPluginMessage(wxString(_T("GRIB_DIALOG_REQUEST")), _T(""));
 
-            extern int debugstep, debugcount;
-            debugstep = 0;
-            debugcount++;
+        if(g_pGribDialog)
+            Reset();
+        else {
+            wxMessageDialog mdlg(this, _("Failed to get handle to Grib Dialog, is it loaded?\n"),
+                                 wxString(_("OpenCPN Alert"), wxOK | wxICON_ERROR));
+            mdlg.ShowModal();
+            return false;
+        }
+    }
+    return true;
+}
 
-            extern double gdist;
-            gdist = 1;
-            routemap.Propagate(boat);
+void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
+{
+    if(!GetGribDialog())
+        return;
 
-            gdist = .8;
-            routemap.Propagate(boat);
-            GetParent()->Refresh();
+    ReconfigureRouteMap();
 
-            return;
+    extern int debugstep, debugcount;
+#if 0
+    debugcount++;
+    Reset();
+    debugstep = -1;
+    routemap.Propagate();
+    routemap.Propagate();
+    debugstep = 0;
+    routemap.Propagate();
 #else
-            routemap.Propagate(boat);
+    debugstep = -1;
+    routemap.Propagate();
 #endif
 
 #if 0
@@ -241,15 +324,9 @@ void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
     m_pBoatDialog->Show(!m_pBoatDialog->IsShown());
 }
 
-void WeatherRoutingDialog::OnClear ( wxCommandEvent& event )
+void WeatherRoutingDialog::OnReset ( wxCommandEvent& event )
 {
-    routemap.Clear();
-
-      double startlat, startlon;
-      m_tStartLat->GetValue().ToDouble(&startlat);
-      m_tStartLon->GetValue().ToDouble(&startlon);
-
-      routemap.Reset(startlat, startlon, wxDateTime::Now());
+    Reset();
 }
 
 void WeatherRoutingDialog::OnInformation ( wxCommandEvent& event )
@@ -266,6 +343,39 @@ void WeatherRoutingDialog::OnInformation ( wxCommandEvent& event )
     }
 }
 
+void WeatherRoutingDialog::Reset()
+{
+    if(!GetGribDialog())
+        return;
+
+    double startlat, startlon;
+    m_tStartLat->GetValue().ToDouble(&startlat);
+    m_tStartLon->GetValue().ToDouble(&startlon);
+
+    wxDateTime time = g_pGribDialog ? g_pGribDialog->TimelineTime() : wxDateTime::Now();
+    routemap.Reset(startlat, startlon, time);
+}
+
+void WeatherRoutingDialog::ReconfigureRouteMap()
+{
+      m_tEndLat->GetValue().ToDouble(&routemap.EndLat);
+      m_tEndLon->GetValue().ToDouble(&routemap.EndLat);
+
+      routemap.dt = wxTimeSpan(0, 0, m_sTimeStep->GetValue());
+      routemap.DegreeStep = m_sDegreeStep->GetValue();
+      routemap.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
+      routemap.MaxWindKnots= m_sMaxWindKnots->GetValue();
+      routemap.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
+      routemap.MaxLatitude = m_sMaxLatitude->GetValue();
+      routemap.TackingTime = m_sTackingTime->GetValue();
+      routemap.SubSteps = m_sSubSteps->GetValue();
+
+      routemap.DetectLand = m_cbDetectLand->GetValue();
+      routemap.InvertedRegions = m_cbInvertedRegions->GetValue();
+      routemap.Anchoring = m_cbAnchoring->GetValue();
+      routemap.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
+}
+
 extern wxMutex routemutex;
 void *WeatherRoutingThread::Entry()
 {
@@ -273,7 +383,7 @@ void *WeatherRoutingThread::Entry()
     while(!stop) {
         if(cnt < 12) {
             routemutex.Lock();
-            routemap.Propagate(boat);
+//            routemap.Propagate(boat);
             routemutex.Unlock();
 //            parent.Refresh();
             cnt++;

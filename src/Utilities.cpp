@@ -40,6 +40,15 @@ double rad2deg(double radians)
   return 180.0 * radians / M_PI;
 }
 
+double heading_resolve(double degrees)
+{
+    while(degrees < -180)
+        degrees += 360;
+    while(degrees >= 180)
+        degrees -= 360;
+    return degrees;
+}
+
 double positive_degrees(double degrees)
 {
     while(degrees < 0)

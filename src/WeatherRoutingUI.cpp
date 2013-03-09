@@ -77,8 +77,8 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_bCompute = new wxButton( this, wxID_ANY, wxT("Compute"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer1->Add( m_bCompute, 0, wxALL, 5 );
 	
-	m_bClear = new wxButton( this, wxID_ANY, wxT("Clear"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer1->Add( m_bClear, 0, wxALL, 5 );
+	m_bReset = new wxButton( this, wxID_ANY, wxT("Reset"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1->Add( m_bReset, 0, wxALL, 5 );
 	
 	m_staticText21 = new wxStaticText( this, wxID_ANY, wxT("Degree Step"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText21->Wrap( -1 );
@@ -91,14 +91,14 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_staticText22->Wrap( -1 );
 	fgSizer1->Add( m_staticText22, 0, wxALL, 5 );
 	
-	m_sTimeStep = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_sTimeStep = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 100000, 3600 );
 	fgSizer1->Add( m_sTimeStep, 0, wxALL, 5 );
 	
 	m_staticText20 = new wxStaticText( this, wxID_ANY, wxT("Max Diverted Course"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText20->Wrap( -1 );
 	fgSizer1->Add( m_staticText20, 0, wxALL, 5 );
 	
-	m_sMaxDivertedCourse = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 90 );
+	m_sMaxDivertedCourse = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 180 );
 	fgSizer1->Add( m_sMaxDivertedCourse, 0, wxALL, 5 );
 	
 	m_staticText23 = new wxStaticText( this, wxID_ANY, wxT("Max Wind Knots"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -112,7 +112,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_staticText27->Wrap( -1 );
 	fgSizer1->Add( m_staticText27, 0, wxALL, 5 );
 	
-	m_sMaxSwellMeters = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
+	m_sMaxSwellMeters = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 20 );
 	fgSizer1->Add( m_sMaxSwellMeters, 0, wxALL, 5 );
 	
 	m_staticText26 = new wxStaticText( this, wxID_ANY, wxT("Max Latitude"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -127,6 +127,8 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	fgSizer1->Add( m_staticText24, 0, wxALL, 5 );
 	
 	m_sTackingTime = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 10 );
+	m_sTackingTime->Enable( false );
+	
 	fgSizer1->Add( m_sTackingTime, 0, wxALL, 5 );
 	
 	m_staticText25 = new wxStaticText( this, wxID_ANY, wxT("Substeps"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -134,6 +136,8 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	fgSizer1->Add( m_staticText25, 0, wxALL, 5 );
 	
 	m_sSubSteps = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_sSubSteps->Enable( false );
+	
 	fgSizer1->Add( m_sSubSteps, 0, wxALL, 5 );
 	
 	m_cbDetectLand = new wxCheckBox( this, wxID_ANY, wxT("Detect Land"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -145,6 +149,8 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	fgSizer1->Add( m_cbInvertedRegions, 0, wxALL, 5 );
 	
 	m_cbAnchoring = new wxCheckBox( this, wxID_ANY, wxT("Anchoring"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbAnchoring->Enable( false );
+	
 	fgSizer1->Add( m_cbAnchoring, 0, wxALL, 5 );
 	
 	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, wxT("Allow Data Deficient"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -165,7 +171,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	
 	// Connect Events
 	m_bCompute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnCompute ), NULL, this );
-	m_bClear->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnClear ), NULL, this );
+	m_bReset->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnReset ), NULL, this );
 	m_bBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnBoat ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnInformation ), NULL, this );
 }
@@ -174,7 +180,7 @@ WeatherRoutingDialogBase::~WeatherRoutingDialogBase()
 {
 	// Disconnect Events
 	m_bCompute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnCompute ), NULL, this );
-	m_bClear->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnClear ), NULL, this );
+	m_bReset->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnReset ), NULL, this );
 	m_bBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnBoat ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnInformation ), NULL, this );
 	

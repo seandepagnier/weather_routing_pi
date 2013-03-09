@@ -26,6 +26,7 @@
 
 double deg2rad(double degrees);
 double rad2deg(double radians);
+double heading_resolve(double degrees);
 double positive_degrees(double degrees);
 double rad2posdeg(double radians);
 

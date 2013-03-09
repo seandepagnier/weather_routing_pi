@@ -1,0 +1,122 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+    <title>Weather Routing Plugin for OpenCPN</title>
+  </head>
+<body alink="#ff0000" bgcolor="#efe0ac" link="#0000e2" text="#000000" vlink="#bb0000">
+    <center><h1><u>Weather Routing</u></h1></center>
+    <hr>
+    <h3><u>Introduction</u></h3>
+    <blockquote>
+      <p>
+        Someone please help me write this better.
+    </p><h3><u>Definitions of terms</u></h3>
+
+<p>The Weather Routing Plugin is designed to
+compute iteratively positions the boat could possibly make at
+a certain time.  By merging the results of many calculations,
+it is possible to form a map determining the quickest route
+to any given location within the map.
+
+<p>Integration with the grib plugin (version 2.1 or later) allows for
+knowledge of weather conditions.  Eventually the climatology plugin will
+also provide a source of data for longer voyages.
+
+<p>The grib time selected on the timeline at the time the computation is
+started is syncronized.  From there, the grib timeline data is accessed
+as the computation proceeds.  Once a computation is completed, the
+course and position of the boat as it sails can be viewed during grib
+playback.
+
+<p>Eventually we can provide graphs for various data parameters over
+the course of the optimal route.
+
+<p>
+The Supported Options Include:
+<ul>
+  <li><b>Degree Step</b> Difference in degrees between courses to attempt.</li>
+  <li><b>Time Step</b> Time in seconds to sail before attempting course change.</li>
+  <li><b>Max Diverted Course</b> Maximum course error from heading toward target destination to attempt.
+  If set to 180, the map will expand in all directions. </li>
+  <li><b>Max Wind Knots</b> Do not navigate in areas with more wind than this value.</li>
+  <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
+  <li><b>Max Latitude</b> Do not navigate above (or below) this latitude.</li>
+  <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.</li>
+  <li><b>Substeps</b> In areas where we frequently encounter land collisions, it is possible to generate
+        a more refined map in smaller time steps to find routes, then merge these substeps at each
+        full step</li>
+  <li><b>Detect Land</b> Use coastline data to avoid sailing through land</li>
+  <li><b>Inverted Regons</b> This is relatively rare, but in some cases it may be
+    possible to reach a destination farther away sooner than a closer one, and
+    cause there to be an area which contains positions not yet reached entirely
+    enclosed by an area which has been reached.  he program must work inwards on
+    this inverted region to reach a possible goal, if disabled this area
+    will be ignored.</li>
+  <li><b>Anchoring</b>  In some cases, it may be preferable to anchor (assuming it
+    isn't too deep) rather than navigate if going against a swift current as you
+    may actually reach the destination sooner if holding still until the current abades.</li>
+  <li><b>Allow Data Deficient</b> Continue to navigate on last valid wind data
+    even if there is no more valid wind data in the area/time.</li>
+</ul>
+
+<H3>Boat</H3>
+The boat configuration allows one to enter the parameters used to specify the performance of a boat.
+Currently supported polar files are csv (same format as qtVlm) and binary files in this format
+(specific only to this plugin)  These files specify sailing speed at each wind speed and wind direction.
+
+<p>
+It is also possible to compute boat polar from an augmented sailboat transform calculation.
+The original sailboat transform:
+<pre>
+                                2
+                  /  sin(A/2)  \
+   sin(W) sin(A) |  ----------  | = VW eta
+                  \ sin(W - A) /
+
+W is true wind angle
+A is apparent Wind angle
+VW is true wind speed
+eta is a boat specific constant specifying it's sailing efficiency.
+</pre>
+<p>
+This computation is very useful for the standard rig, but doesn't really apply correctly in many cases.  It also doesn't really factor in a huge range of variables as there is only one constant.
+
+<p>I have augmented the sailboat transform to add a few more parameters in the hope that
+it may come closer to resembling the sailing characteristics of more vessels.
+
+<p>For many users, it may be best to enter measured values for the boat in csv format rather
+than attemp to compute then, eventually it may even be possible to use the plugin to obtain
+them from gps during passage.  It may also be eventually supported to overlay the obtained
+data with the transform calculation to better optimize the coefficents used to calculate it.
+
+<p>The basic polar describing boat speed at various wind settings fails on many fronts.
+First of all, various sail combinations become impractical in certain sea states,
+even if the actual wind speed is the same.  The boat also does not sail the same
+speed in these cases, so the actual boat speed may widely vary with identical wind
+speed/direction values in different conditions.   Secondly, the wind is 3 dimensional,
+and near land often has a strong vertical component.  Thirdly, there may be certain
+areas conditions, or times when the user may selectively want to essentially use
+a different polar diagram (sail plan, navigating in fog or near ice, night vs day,
+autopilot vs wind vane)  Fourthly, the actual speed of the boat may change due
+to various parameters besides currents, wind, and sea state for various reasons
+(more on this below)  Fifthly.. wait I have like 10 of these I'll stop now.
+
+<p>There is also extension for the possibility of other sources of propulsion
+besides wind power (namely PV-solar electric) which (dependent on solar radiation) may be
+used in conjunction with sails.  Finally, it may be possible to store some of this radiation,
+(during day with sun and wind) or in the case of anchoring in an adverse tidal flow with a
+hydro generator in the form of chemical energy to be used later (at night or when the
+tide is right) in an electric drive to reach the final destination
+at a sooner possible time than any other method employed. 
+(all of this is mostly still unimplemented, but there is some c++)
+
+<p>It is also possible to factor slow changing, but important changes to the boat's
+passage-making ability over the course of the voyage.  One example is bottom growth,
+and the rate it might grow given the sailing course and various parameters.  This
+would enable you to gauge how essential it is to actually paint a bottom, or if
+you don't mind (as I have done) to dive and scrape mid-ocean every week or two,
+you might be able to actually determine how much time it would save (usually more
+than the time spent swimming).  There is also the case of sails losing shape, and
+becoming less efficient over the course of a long upwind passage.
+
+<p>The Weather Routing plugin is written and maintained by Sean D'Epagnier
+</body></html>

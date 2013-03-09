@@ -979,7 +979,7 @@
                         <property name="gripper">0</property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="label">Clear</property>
+                        <property name="label">Reset</property>
                         <property name="max_size"></property>
                         <property name="maximize_button">0</property>
                         <property name="maximum_size"></property>
@@ -987,7 +987,7 @@
                         <property name="minimize_button">0</property>
                         <property name="minimum_size"></property>
                         <property name="moveable">1</property>
-                        <property name="name">m_bClear</property>
+                        <property name="name">m_bReset</property>
                         <property name="pane_border">1</property>
                         <property name="pane_position"></property>
                         <property name="pane_size"></property>
@@ -1008,7 +1008,7 @@
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
                         <property name="window_style"></property>
-                        <event name="OnButtonClick">OnClear</event>
+                        <event name="OnButtonClick">OnReset</event>
                         <event name="OnChar"></event>
                         <event name="OnEnterWindow"></event>
                         <event name="OnEraseBackground"></event>
@@ -1319,12 +1319,12 @@
                         <property name="gripper">0</property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="initial">0</property>
-                        <property name="max">10</property>
+                        <property name="initial">3600</property>
+                        <property name="max">100000</property>
                         <property name="max_size"></property>
                         <property name="maximize_button">0</property>
                         <property name="maximum_size"></property>
-                        <property name="min">0</property>
+                        <property name="min">1</property>
                         <property name="min_size"></property>
                         <property name="minimize_button">0</property>
                         <property name="minimum_size"></property>
@@ -1489,7 +1489,7 @@
                         <property name="gripper">0</property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="initial">90</property>
+                        <property name="initial">180</property>
                         <property name="max">180</property>
                         <property name="max_size"></property>
                         <property name="maximize_button">0</property>
@@ -1829,7 +1829,7 @@
                         <property name="gripper">0</property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
-                        <property name="initial">0</property>
+                        <property name="initial">20</property>
                         <property name="max">100</property>
                         <property name="max_size"></property>
                         <property name="maximize_button">0</property>
@@ -2162,7 +2162,7 @@
                         <property name="dock">Dock</property>
                         <property name="dock_fixed">0</property>
                         <property name="docking">Left</property>
-                        <property name="enabled">1</property>
+                        <property name="enabled">0</property>
                         <property name="fg"></property>
                         <property name="floatable">1</property>
                         <property name="font"></property>
@@ -2332,7 +2332,7 @@
                         <property name="dock">Dock</property>
                         <property name="dock_fixed">0</property>
                         <property name="docking">Left</property>
-                        <property name="enabled">1</property>
+                        <property name="enabled">0</property>
                         <property name="fg"></property>
                         <property name="floatable">1</property>
                         <property name="font"></property>
@@ -2596,7 +2596,7 @@
                         <property name="dock">Dock</property>
                         <property name="dock_fixed">0</property>
                         <property name="docking">Left</property>
-                        <property name="enabled">1</property>
+                        <property name="enabled">0</property>
                         <property name="fg"></property>
                         <property name="floatable">1</property>
                         <property name="font"></property>

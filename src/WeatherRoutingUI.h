@@ -53,7 +53,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxStaticText* m_staticText61;
 		wxTextCtrl* m_tEndLon;
 		wxButton* m_bCompute;
-		wxButton* m_bClear;
+		wxButton* m_bReset;
 		wxStaticText* m_staticText21;
 		wxSpinCtrl* m_sDegreeStep;
 		wxStaticText* m_staticText22;
@@ -79,7 +79,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		

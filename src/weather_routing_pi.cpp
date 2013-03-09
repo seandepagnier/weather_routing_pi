@@ -40,6 +40,8 @@
 #include "weather_routing_pi.h"
 
 
+GRIBUIDialog *g_pGribDialog = NULL;
+
 // the class factories, used to create and destroy instances of the PlugIn
 
 extern "C" DECL_EXP opencpn_plugin* create_pi(void *ppimgr)
@@ -76,9 +78,6 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
       initialize_images();
 
       m_pWeather_RoutingDialog = NULL;
-
-      m_boat_lat = -35;
-      m_boat_lon = 174;
 }
 
 weather_routing_pi::~weather_routing_pi(void)
@@ -99,8 +98,7 @@ int weather_routing_pi::Init(void)
       m_leftclick_tool_id  = InsertPlugInTool(_T(""), _img_WeatherRouting, _img_WeatherRouting, wxITEM_CHECK,
                                               _("Weather_Routing"), _T(""), NULL,
                                               WEATHER_ROUTING_TOOL_POSITION, 0, this);
-
-#if 0
+#if 1
       OnToolbarToolCallback(m_leftclick_tool_id);
 #endif
 
@@ -108,12 +106,13 @@ int weather_routing_pi::Init(void)
       LoadConfig();
 
       return (WANTS_OVERLAY_CALLBACK |
-           WANTS_OPENGL_OVERLAY_CALLBACK |
-           WANTS_TOOLBAR_CALLBACK    |
-           INSTALLS_TOOLBAR_TOOL     |
-           WANTS_CONFIG              |
-           WANTS_CURSOR_LATLON       |
-           WANTS_NMEA_EVENTS
+              WANTS_OPENGL_OVERLAY_CALLBACK |
+              WANTS_TOOLBAR_CALLBACK    |
+              INSTALLS_TOOLBAR_TOOL     |
+              WANTS_CONFIG              |
+              WANTS_CURSOR_LATLON       |
+              WANTS_NMEA_EVENTS         |
+              WANTS_PLUGIN_MESSAGING
             );
 }
 
@@ -195,6 +194,21 @@ void weather_routing_pi::SetCursorLatLon(double lat, double lon)
             RequestRefresh(m_parent_window);
 }
 
+void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
+{
+    if(message_id == _T("GRIB_DIALOG"))
+    {
+        wxJSONReader r;
+        wxJSONValue v;
+        r.Parse(message_body, &v);
+
+        wxString sptr = v[_T("GribDialogPtr")].AsString();
+        wxCharBuffer bptr = sptr.To8BitData();
+        const char* ptr = bptr.data();
+        sscanf(ptr, "%p", &g_pGribDialog);
+    }
+}
+
 void weather_routing_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
 {
     m_boat_lat = pfix.Lat;
@@ -207,8 +221,14 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
-    if(!m_pWeather_RoutingDialog)
-        m_pWeather_RoutingDialog = new WeatherRoutingDialog(m_parent_window, m_boat_lat, m_boat_lon);
+    if(!m_pWeather_RoutingDialog) {
+        m_pWeather_RoutingDialog = new WeatherRoutingDialog(m_parent_window,
+                                                            m_boat_lat, m_boat_lon);
+        wxPoint p = m_pWeather_RoutingDialog->GetPosition();
+        m_pWeather_RoutingDialog->Move(0,0);        // workaround for gtk autocentre dialog behavior
+        m_pWeather_RoutingDialog->Move(p);
+    }
+
     m_pWeather_RoutingDialog->Show(!m_pWeather_RoutingDialog->IsShown());
 }
 
@@ -230,41 +250,22 @@ bool weather_routing_pi::LoadConfig(void)
 {
       wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
 
-      if(pConf)
-      {
-            pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+      if(!pConf)
+          return false;
 
- #if 0
-           m_dialog_sx = pConf->Read ( _T ( "DialogSizeX" ), 300L );
-            m_dialog_sy = pConf->Read ( _T ( "DialogSizeY" ), 540L );
-            m_dialog_x =  pConf->Read ( _T ( "DialogPosX" ), 20L );
-            m_dialog_y =  pConf->Read ( _T ( "DialogPosY" ), 170L );
-#endif
-
-            return true;
-      }
-      else
-            return false;
+      pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+      return true;
 }
 
 bool weather_routing_pi::SaveConfig(void)
 {
       wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
 
-      if(pConf)
-      {
-            pConf->SetPath ( _T ( "/PlugIns/WeatherRouting" ) );
+      if(!pConf)
+          return false;
 
-#if 0
-            pConf->Write ( _T ( "DialogSizeX" ),  m_dialog_sx );
-            pConf->Write ( _T ( "DialogSizeY" ),  m_dialog_sy );
-            pConf->Write ( _T ( "DialogPosX" ),   m_dialog_x );
-            pConf->Write ( _T ( "DialogPosY" ),   m_dialog_y );
-#endif
-            return true;
-      }
-      else
-            return false;
+      pConf->SetPath ( _T ( "/PlugIns/WeatherRouting" ) );
+      return true;
 }
 
 void weather_routing_pi::SetColorScheme(PI_ColorScheme cs)

@@ -36,6 +36,8 @@
 #define     MY_API_VERSION_MINOR    8
 
 #include "../../../include/ocpn_plugin.h"
+#include "../../../include/wx/jsonreader.h"
+#include "../../../include/wx/jsonwriter.h"
 
 #include "WeatherRoutingDialog.h"
 
@@ -45,6 +47,7 @@
 
 #define WEATHER_ROUTING_TOOL_POSITION    -1          // Request default positioning of toolbar tool
 
+class GribUIDialog;
 class weather_routing_pi : public opencpn_plugin_18
 {
 public:
@@ -73,13 +76,11 @@ public:
       int GetToolbarToolCount(void);
 
       void SetCursorLatLon(double lat, double lon);
+      void SetPluginMessage(wxString &message_id, wxString &message_body);
       void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
       void ShowPreferencesDialog( wxWindow* parent );
 
       void OnToolbarToolCallback(int id);
-
-
-// Other public methods
 
       void SetColorScheme(PI_ColorScheme cs);
 
