@@ -633,14 +633,14 @@ double BoatSpeed::DirectionApparentWind(double VA, double VB, double W, double V
    from apparent wind, this function finds it for true wind */
 void BoatSpeed::BoatSteadyState(double W, double VW, double eta,
                                 double keel_pressure, double keel_lift, double P,
-                                double &BA, double &VB, double &A, double &VA)
+                                double &B, double &VB, double &A, double &VA)
 {
   /* starting out not moving */
   VB = 0, A = W, VA = VW;
   for(;;) {
     double v = VelocityBoat(eta, A, VA, keel_pressure, keel_lift, P);
     if(v - VB < 1e-10) {
-      BA = AngleofAttackBoat(eta, A, VA, keel_pressure, keel_lift, P);
+      B = AngleofAttackBoat(eta, A, VA, keel_pressure, keel_lift, P);
       return; /* reached steady state */
     }
 
@@ -689,11 +689,11 @@ void BoatSpeed::ComputeBoatSpeeds(double eta, double keel_pressure, double keel_
   for(int P = 0; P <= 1/*MAX_POWER*/; P++)
     for(int VW = 0; VW < MAX_KNOTS; VW++)
       for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
-        double BA, VB, A, VA;
-        BoatSteadyState(deg2rad(W), VW, eta, keel_pressure, keel_lift, P, BA, VB, A, VA);
-        Set(P, W, VW, W+rad2deg(BA), VB);
+        double B, VB, A, VA;
+        BoatSteadyState(deg2rad(W), VW, eta, keel_pressure, keel_lift, P, B, VB, A, VA);
+        Set(P, W, VW, W+rad2deg(B), VB);
         if(W != 0)
-          Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(BA), VB);
+          Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(B), VB);
     }
 }
 
@@ -719,10 +719,14 @@ void BoatSpeed::OptimizeTackingSpeed()
               sa * sin(a) = w*sb*sin(b) + (1-w)*sc*sin(c)
               sa * cos(a) = w*sb*cos(b) + (1-w)*sc*cos(c)
             */
+
             double a, b, c, sa, sb, sc;
+#if 0
+
             Speed(P, at,     VW, a, sa);
             Speed(P, bt,     VW, b, sb);
             Speed(P, ct+360, VW, c, sc);
+#endif
             double ar = deg2rad(a), br = deg2rad(b), cr = deg2rad(c);
             double sbc = (sb * sc * (-cos(br)*sin(cr) +  cos(cr)*sin(br)))
               / ((cos(ar)*sb*sin(br) - cos(ar)*sc*sin(cr)
@@ -748,10 +752,10 @@ void BoatSpeed::SetSpeedsFromTable(BoatSpeedTable &table)
     for(int VW = 0; VW < MAX_KNOTS; VW++)
         for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
             double VB = table.InterpolateSpeed(VW, W);
-            double BA = 0;
-            Set(P, W, VW, W+rad2deg(BA), VB);
+            double B = 0;
+            Set(P, W, VW, W+rad2deg(B), VB);
             if(W != 0)
-                Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(BA), VB);
+                Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(B), VB);
         }
 }
 
@@ -776,23 +780,19 @@ BoatSpeedTable BoatSpeed::CreateTable()
         BoatSpeedTableEntry entry;
         for(VW = 0, i=0; VW < MAX_KNOTS; VW+=windsstep, i++) {
             entry.W = W;
-            double BA, VB;
-            Speed(0, W, VW, BA, VB);
-            entry.boatspeed[i] = VB;
+            entry.boatspeed[i] = Speed(0, W, VW);
         }
         boatspeedtable.table.push_back(entry);
     }
     return boatspeedtable;
 }
 
-void BoatSpeed::Speed(int P, double W, double VW, double &BA, double &VB)
+/* compute boat speed from given power level, true wind angle and true wind speed */
+double BoatSpeed::Speed(int P, double W, double VW)
 {
     W = positive_degrees(W);
-    if(P < 0 || P > MAX_POWER || VW < 0 || VW > MAX_KNOTS) {
-        BA = 0.0/0.0;
-        VB = 0.0/0.0;
-        return;
-    }
+    if(P < 0 || P > MAX_POWER || VW < 0 || VW > MAX_KNOTS)
+        return 0.0/0.0;
 
     double W1 = floor(W/DEGREE_STEP)*DEGREE_STEP;
     double W2 = ceil(W/DEGREE_STEP)*DEGREE_STEP;
@@ -816,9 +816,9 @@ void BoatSpeed::Speed(int P, double W, double VW, double &BA, double &VB)
     double VB1 = interp_value(VW, VW1, VW2, VB11, VB21);
     double VB2 = interp_value(VW, VW1, VW2, VB12, VB22);
 
-    VB = interp_value(W, W1, W2, VB1, VB2);
+    double VB = interp_value(W, W1, W2, VB1, VB2);
 
-    BA = positive_degrees(-W); /* fix this so we can deal with side slip, right now no slip */
+    return VB;
 }
 
 /* find true wind speed from boat speed and true wind direction, because often at high

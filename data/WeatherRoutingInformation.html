@@ -27,6 +27,9 @@ as the computation proceeds.  Once a computation is completed, the
 course and position of the boat as it sails can be viewed during grib
 playback.
 
+<p>The Wind, Current and wave height data is read from the grib file.
+If no Current or wave height is available, they are assumed to be 0.
+
 <p>Eventually we can provide graphs for various data parameters over
 the course of the optimal route.
 
@@ -46,11 +49,11 @@ The Supported Options Include:
         full step</li>
   <li><b>Detect Land</b> Use coastline data to avoid sailing through land</li>
   <li><b>Inverted Regons</b> This is relatively rare, but in some cases it may be
-    possible to reach a destination farther away sooner than a closer one, and
-    cause there to be an area which contains positions not yet reached entirely
-    enclosed by an area which has been reached.  he program must work inwards on
-    this inverted region to reach a possible goal, if disabled this area
-    will be ignored.</li>
+    possible to reach a destination further away sooner than a closer one.  In
+    cases where there are multiple routes to reach this further destination which
+    travel on different sides of a region that cannot yet be reached, an inversion
+    occurs.  The program must work inwards on this inverted region to reach a
+    possible goal, if disabled these areas will be ignored.</li>
   <li><b>Anchoring</b>  In some cases, it may be preferable to anchor (assuming it
     isn't too deep) rather than navigate if going against a swift current as you
     may actually reach the destination sooner if holding still until the current abades.</li>

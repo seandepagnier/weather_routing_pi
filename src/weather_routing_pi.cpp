@@ -98,7 +98,15 @@ int weather_routing_pi::Init(void)
       m_leftclick_tool_id  = InsertPlugInTool(_T(""), _img_WeatherRouting, _img_WeatherRouting, wxITEM_CHECK,
                                               _("Weather_Routing"), _T(""), NULL,
                                               WEATHER_ROUTING_TOOL_POSITION, 0, this);
-#if 1
+
+      wxMenu dummy_menu;
+      m_startroute_menu_id = AddCanvasContextMenuItem
+          (new wxMenuItem(&dummy_menu, -1, _("Start Weather Route")), this );
+      SetCanvasContextMenuItemViz(m_startroute_menu_id, false);
+      m_endroute_menu_id = AddCanvasContextMenuItem
+          (new wxMenuItem(&dummy_menu, -1, _("End Weather Route")), this );
+      SetCanvasContextMenuItemViz(m_endroute_menu_id, false);
+#if 0
       OnToolbarToolCallback(m_leftclick_tool_id);
 #endif
 
@@ -109,6 +117,7 @@ int weather_routing_pi::Init(void)
               WANTS_OPENGL_OVERLAY_CALLBACK |
               WANTS_TOOLBAR_CALLBACK    |
               INSTALLS_TOOLBAR_TOOL     |
+              INSTALLS_CONTEXTMENU_ITEMS |
               WANTS_CONFIG              |
               WANTS_CURSOR_LATLON       |
               WANTS_NMEA_EVENTS         |
@@ -190,8 +199,11 @@ int weather_routing_pi::GetToolbarToolCount(void)
 void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 {
     if(m_pWeather_RoutingDialog)
-        if(m_pWeather_RoutingDialog->routemap.SetCursorLatLon(lat, lon))
+        if(m_pWeather_RoutingDialog->m_routemap.SetCursorLatLon(lat, lon))
             RequestRefresh(m_parent_window);
+
+    m_cursor_lat = lat;
+    m_cursor_lon = lon;
 }
 
 void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
@@ -227,9 +239,28 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
         wxPoint p = m_pWeather_RoutingDialog->GetPosition();
         m_pWeather_RoutingDialog->Move(0,0);        // workaround for gtk autocentre dialog behavior
         m_pWeather_RoutingDialog->Move(p);
+
+        SetCanvasContextMenuItemViz(m_startroute_menu_id, true);
+        SetCanvasContextMenuItemViz(m_endroute_menu_id, true);
     }
 
     m_pWeather_RoutingDialog->Show(!m_pWeather_RoutingDialog->IsShown());
+}
+
+void weather_routing_pi::OnContextMenuItemCallback(int id)
+{
+    if(!m_pWeather_RoutingDialog)
+        return;
+
+    if(id == m_startroute_menu_id) {
+        m_pWeather_RoutingDialog->m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
+        m_pWeather_RoutingDialog->m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
+    }
+
+    if(id == m_endroute_menu_id) {
+        m_pWeather_RoutingDialog->m_tEndLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
+        m_pWeather_RoutingDialog->m_tEndLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
+    }
 }
 
 bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)

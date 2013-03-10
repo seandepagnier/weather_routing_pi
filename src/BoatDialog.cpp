@@ -109,10 +109,10 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
         m_stTrueWindAngle->SetLabel(wxString::Format(_T("%03.0f"), W));
         m_stTrueWindKnots->SetLabel(wxString::Format(_T("%.1f"), VW));
 
-        double BA, VB;
-        boat.Speed(0, W, VW, BA, VB);
+        double VB = boat.Speed(0, W, VW);
+        double B = -W;
 
-        m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), BA));
+        m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));
         m_stBoatKnots->SetLabel(wxString::Format(_T("%.1f"), VB));
 
         double VA = BoatSpeed::VelocityApparentWind(VB, W, VW);
@@ -149,8 +149,8 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
         wxPoint points[DEGREES / DEGREE_STEP];
         int W, i;
         for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++) {
-            double BA, VB;
-            boat.Speed(0, W, VW, BA, VB);
+            double B = -W;
+            double VB = boat.Speed(0, W, VW);
 
             if(VW == maxVW && VB > maxVB)
                 maxVB = VB;
@@ -158,7 +158,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
             switch(m_cPlotAxis->GetSelection()) {
             case 0: /* boat */
             {
-                points[i] = wxPoint(1000*VB*sin(deg2rad(BA)), -1000*VB*cos(deg2rad(BA)));
+                points[i] = wxPoint(1000*VB*sin(deg2rad(B)), -1000*VB*cos(deg2rad(B)));
             } break;
             case 1: /* true wind */
             {

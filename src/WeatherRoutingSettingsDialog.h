@@ -25,71 +25,32 @@
  ***************************************************************************
  */
 
-#ifndef _WEATHER_ROUTING_H_
-#define _WEATHER_ROUTING_H_
+#ifndef _WEATHER_ROUTING_SETTINGS_H_
+#define _WEATHER_ROUTING_SETTINGS_H_
 
 
 #include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
-#include "WeatherRoutingSettingsDialog.h"
 
-#include "../../grib_pi/src/GribUIDialog.h"
-
-class weather_routing_pi;
-class BoatDialog;
-class GribUIDialog;
-
-class WeatherRoutingThread : public wxThread
+class WeatherRoutingSettingsDialog : public WeatherRoutingSettingsDialogBase
 {
 public:
-WeatherRoutingThread(wxWindow &p,RouteMap &r)
-    : wxThread(wxTHREAD_JOINABLE), parent(p), routemap(r), stop(false) { Create(); }
-    void End() { stop = true; }
-    void *Entry();
-    wxWindow &parent;
-    RouteMap &routemap;
-//    wxMutex routemutex;
-    bool stop;
-};
+    WeatherRoutingSettingsDialog( wxWindow *parent, RouteMap &routemap );
+    ~WeatherRoutingSettingsDialog( );
 
-class WeatherRoutingDialog : public WeatherRoutingDialogBase
-{
-public:
-    WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon );
-    ~WeatherRoutingDialog( );
-
-    void RenderRouteMap(PlugIn_ViewPort *vp);
-
-    RouteMap m_routemap;
-
-private:
-    bool GetGribDialog();
-
-    void OnCompute( wxCommandEvent& event );
-    void OnBoat( wxCommandEvent& event );
-    void OnReset( wxCommandEvent& event );
-    void OnInformation( wxCommandEvent& event );
-    void OnSettings( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event );
-
-    void Reset();
+    void LoadSettings();
+    void SaveSettings();
     void ReconfigureRouteMap();
 
-    //    Data
-    weather_routing_pi   *pPlugIn;
+protected:
+    void OnAddDegreeStep( wxCommandEvent& event );
+    void OnRemoveDegreeStep( wxCommandEvent& event );
+    void OnGenerateDegreeSteps( wxCommandEvent& event );
+    void OnClearDegreeSteps( wxCommandEvent& event );
 
-    BoatSpeed boat;
-
-    bool m_bComputing;
-
-    bool m_bShowBoatDialog;
-    BoatDialog *m_pBoatDialog;
-
-    WeatherRoutingSettingsDialog m_SettingsDialog;
-
-    WeatherRoutingThread m_thCompute;
+    RouteMap &m_routemap;
 };
 
 #endif

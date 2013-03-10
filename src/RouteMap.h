@@ -37,7 +37,7 @@ typedef std::list<Route*> RouteList;
 class Position
 {
 public:
-    Position(double latitude, double longitude, Position *p=NULL, bool hl=false);
+    Position(double latitude, double longitude, Position *p=NULL);
     Position(Position *p);
     void Propagate(RouteHeap &routeheap, RouteMap &map, wxDateTime time);
     double Distance(Position *p);
@@ -46,7 +46,6 @@ public:
 
     double lat, lon;
     Position *parent; /* previous position in time */
-    bool hitland; /* did we hit land on the route to this point (for rendering) */
     Position *prev, *next; /* doubly linked circular list of positions */
 
     bool propagated;
@@ -63,7 +62,7 @@ public:
     void Print();
     bool Contains(Route *r);
     void Render(PlugIn_ViewPort *vp);
-    int size();
+    void ApplyCurrent(RouteMap &routemap, wxDateTime time);
     bool FindRouteBounds(double bounds[4]);
     void RemovePosition(Position *p);
     RouteList Normalize(int level);
@@ -135,7 +134,10 @@ public:
     double EndLat, EndLon;
 
     wxTimeSpan dt; /* time in seconds between propagations */
-    double DegreeStep, MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
+
+    std::list<double> DegreeSteps;
+
+    double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
     double MaxLatitude, TackingTime;
 
     int SubSteps;

@@ -20,9 +20,10 @@
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/button.h>
+#include <wx/dialog.h>
+#include <wx/listbox.h>
 #include <wx/spinctrl.h>
 #include <wx/checkbox.h>
-#include <wx/dialog.h>
 #include <wx/scrolwin.h>
 #include <wx/choice.h>
 #include <wx/panel.h>
@@ -45,17 +46,54 @@ class WeatherRoutingDialogBase : public wxDialog
 	
 	protected:
 		wxStaticText* m_staticText5;
-		wxTextCtrl* m_tStartLat;
 		wxStaticText* m_staticText6;
-		wxTextCtrl* m_tStartLon;
+		wxStaticText* m_staticText28;
+		wxStaticText* m_stStartDate;
+		wxStaticText* m_staticText30;
+		wxStaticText* m_stStartTime;
 		wxStaticText* m_staticText51;
-		wxTextCtrl* m_tEndLat;
 		wxStaticText* m_staticText61;
-		wxTextCtrl* m_tEndLon;
 		wxButton* m_bCompute;
 		wxButton* m_bReset;
-		wxStaticText* m_staticText21;
-		wxSpinCtrl* m_sDegreeStep;
+		wxButton* m_bSettings;
+		wxButton* m_bBoat;
+		wxButton* m_bInformation;
+		wxButton* m_bClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxTextCtrl* m_tStartLat;
+		wxTextCtrl* m_tStartLon;
+		wxTextCtrl* m_tEndLat;
+		wxTextCtrl* m_tEndLon;
+		
+		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxDIALOG_NO_PARENT|wxRESIZE_BORDER|wxSYSTEM_MENU ); 
+		~WeatherRoutingDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class WeatherRoutingSettingsDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class WeatherRoutingSettingsDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxListBox* m_lDegreeSteps;
+		wxTextCtrl* m_tDegreeStep;
+		wxButton* m_bAddDegreeStep;
+		wxButton* m_bRemoveDegreeStep;
+		wxButton* m_bGenerateDegreeSteps;
+		wxButton* m_bClearDegreeSteps;
 		wxStaticText* m_staticText22;
 		wxSpinCtrl* m_sTimeStep;
 		wxStaticText* m_staticText20;
@@ -74,20 +112,21 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
 		wxCheckBox* m_cbAllowDataDeficient;
-		wxButton* m_bBoat;
-		wxButton* m_bInformation;
+		wxStdDialogButtonSizer* m_sdbSizer1;
+		wxButton* m_sdbSizer1OK;
+		wxButton* m_sdbSizer1Cancel;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnBoat( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddDegreeStep( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveDegreeStep( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGenerateDegreeSteps( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClearDegreeSteps( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxDIALOG_NO_PARENT|wxRESIZE_BORDER|wxSYSTEM_MENU ); 
-		~WeatherRoutingDialogBase();
+		WeatherRoutingSettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~WeatherRoutingSettingsDialogBase();
 	
 };
 
@@ -153,8 +192,9 @@ class InformationDialog : public wxDialog
 	private:
 	
 	protected:
-		wxStdDialogButtonSizer* m_sdbSizer1;
-		wxButton* m_sdbSizer1OK;
+		wxStdDialogButtonSizer* m_sdbSizer2;
+		wxButton* m_sdbSizer2OK;
+		wxButton* m_sdbSizer2Cancel;
 	
 	public:
 		wxHtmlWindow* m_htmlInformation;

@@ -101,7 +101,7 @@ public:
     void SetSpeedsFromTable(BoatSpeedTable &table);
     BoatSpeedTable CreateTable();
 
-    void Speed(int P, double W, double VW, double &BA, double &VB);
+    double Speed(int P, double W, double VW);
     double TrueWindSpeed(int P, double VB, double W, double maxVW);
     void Set(int P, int W, int VW, double direction, double knots);
 };

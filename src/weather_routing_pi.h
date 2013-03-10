@@ -81,6 +81,7 @@ public:
       void ShowPreferencesDialog( wxWindow* parent );
 
       void OnToolbarToolCallback(int id);
+      void OnContextMenuItemCallback(int id);
 
       void SetColorScheme(PI_ColorScheme cs);
 
@@ -95,8 +96,11 @@ private:
 
       int              m_display_width, m_display_height;
       int              m_leftclick_tool_id;
+      int              m_startroute_menu_id, m_endroute_menu_id;
 
       double m_boat_lat, m_boat_lon;
+
+      double m_cursor_lat, m_cursor_lon;
 };
 
 #endif
