@@ -6390,7 +6390,7 @@
                                                     <property name="validator_style">wxFILTER_NONE</property>
                                                     <property name="validator_type">wxDefaultValidator</property>
                                                     <property name="validator_variable"></property>
-                                                    <property name="value">500</property>
+                                                    <property name="value">127</property>
                                                     <property name="window_extra_style"></property>
                                                     <property name="window_name"></property>
                                                     <property name="window_style"></property>
@@ -6573,7 +6573,7 @@
                                                     <property name="pos"></property>
                                                     <property name="resize">Resizable</property>
                                                     <property name="show">1</property>
-                                                    <property name="size"></property>
+                                                    <property name="size">60,-1</property>
                                                     <property name="style">wxSP_ARROW_KEYS</property>
                                                     <property name="subclass"></property>
                                                     <property name="toolbar_pane">0</property>
@@ -6751,7 +6751,7 @@
                                                     <property name="validator_style">wxFILTER_NONE</property>
                                                     <property name="validator_type">wxDefaultValidator</property>
                                                     <property name="validator_variable"></property>
-                                                    <property name="value">10</property>
+                                                    <property name="value">11</property>
                                                     <property name="window_extra_style"></property>
                                                     <property name="window_name"></property>
                                                     <property name="window_style"></property>
@@ -6934,7 +6934,7 @@
                                                     <property name="pos"></property>
                                                     <property name="resize">Resizable</property>
                                                     <property name="show">1</property>
-                                                    <property name="size"></property>
+                                                    <property name="size">60,-1</property>
                                                     <property name="style">wxSP_ARROW_KEYS</property>
                                                     <property name="subclass"></property>
                                                     <property name="toolbar_pane">0</property>
@@ -7295,7 +7295,7 @@
                                                     <property name="pos"></property>
                                                     <property name="resize">Resizable</property>
                                                     <property name="show">1</property>
-                                                    <property name="size"></property>
+                                                    <property name="size">60,-1</property>
                                                     <property name="style">wxSP_ARROW_KEYS</property>
                                                     <property name="subclass"></property>
                                                     <property name="toolbar_pane">0</property>

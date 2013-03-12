@@ -527,28 +527,28 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText12->Wrap( -1 );
 	fgSizer10->Add( m_staticText12, 0, wxALL, 5 );
 	
-	m_sEta = new wxSlider( m_panel5, wxID_ANY, 500, 0, 1000, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	m_sEta = new wxSlider( m_panel5, wxID_ANY, 127, 0, 1000, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	fgSizer10->Add( m_sEta, 0, wxEXPAND, 5 );
 	
 	m_staticText57 = new wxStaticText( m_panel5, wxID_ANY, wxT("lwl ft"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText57->Wrap( -1 );
 	fgSizer10->Add( m_staticText57, 0, wxALL, 5 );
 	
-	m_sLWL = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 24 );
+	m_sLWL = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 1000, 24 );
 	fgSizer10->Add( m_sLWL, 0, wxALL, 5 );
 	
 	m_staticText35 = new wxStaticText( m_panel5, wxID_ANY, wxT("Hull Drag"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText35->Wrap( -1 );
 	fgSizer10->Add( m_staticText35, 0, wxALL, 5 );
 	
-	m_sHullDrag = new wxSlider( m_panel5, wxID_ANY, 10, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	m_sHullDrag = new wxSlider( m_panel5, wxID_ANY, 11, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	fgSizer10->Add( m_sHullDrag, 0, wxEXPAND, 5 );
 	
 	m_staticText58 = new wxStaticText( m_panel5, wxID_ANY, wxT("disp lbs"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText58->Wrap( -1 );
 	fgSizer10->Add( m_staticText58, 0, wxALL, 5 );
 	
-	m_sDisplacement = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100000, 8000 );
+	m_sDisplacement = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100000, 8000 );
 	fgSizer10->Add( m_sDisplacement, 0, wxALL, 5 );
 	
 	m_staticText13 = new wxStaticText( m_panel5, wxID_ANY, wxT("Keel Pressure"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -562,7 +562,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText60->Wrap( -1 );
 	fgSizer10->Add( m_staticText60, 0, wxALL, 5 );
 	
-	m_sPlaningConstant = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_sPlaningConstant = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
 	fgSizer10->Add( m_sPlaningConstant, 0, wxALL, 5 );
 	
 	m_staticText14 = new wxStaticText( m_panel5, wxID_ANY, wxT("Keel Lift"), wxDefaultPosition, wxDefaultSize, 0 );

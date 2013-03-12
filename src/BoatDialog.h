@@ -60,6 +60,7 @@ private:
     
     BoatSpeed &boat;
     double m_PlotScale;
+    int m_MouseW;
 };
 
 #endif

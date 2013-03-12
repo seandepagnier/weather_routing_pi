@@ -684,9 +684,9 @@ void BoatSpeed::ComputeBoatSpeeds()
             for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
                 double B, VB, A, VA;
                 BoatSteadyState(deg2rad(W), VW, P, B, VB, A, VA);
-                Set(P, W, VW, W+rad2deg(B), VB);
+                Set(P, W, VW, VB);
                 if(W != 0)
-                    Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(B), VB);
+                    Set(P, DEGREES-W, VW, VB);
             }
 }
 
@@ -694,49 +694,47 @@ void BoatSpeed::ComputeBoatSpeeds()
    closer to +- 90.  Basically we are trying every two tack angles and combining
    to determine if alternating between these two courses is actually faster than
    the current strategy for the given course, and if so, use it.
-   has implications
 */
 void BoatSpeed::OptimizeTackingSpeed()
 {
-  for(int P = 0; P <= MAX_POWER; P++)
-    for(int VW = 0; VW < MAX_KNOTS; VW++)
-      for(int at = 0; at <= DEGREES/2; at+=DEGREE_STEP)
-        for(int bt = DEGREE_STEP; bt < DEGREES/2; bt+=DEGREE_STEP)
-          for(int ct = -DEGREES/2+DEGREE_STEP; ct < 0; ct+=DEGREE_STEP) {
-            /* don't use speeds which already optimized with tacking */
-            if(speed[P][VW][bt].w != 1 || speed[P][VW][ct].w != 1)
-              continue;
-            /*
-              w is the weight between b and c tacks (.5 for equal time on each
-              t is the improvement factor]
-              sa * sin(a) = w*sb*sin(b) + (1-w)*sc*sin(c)
-              sa * cos(a) = w*sb*cos(b) + (1-w)*sc*cos(c)
-            */
+    for(int P = 0; P <= 0/*MAX_POWER*/; P++)
+        for(int VW = 0; VW < MAX_KNOTS; VW++)
+            for(int at = 0; at <= DEGREES; at+=DEGREE_STEP) {
+                SailingSpeed &a = speed[P][VW][at];
+                for(int bt = DEGREE_STEP; bt < DEGREES/2; bt+=DEGREE_STEP) {
+                    SailingSpeed &b = speed[P][VW][bt];
+                    for(int ct = DEGREES/2+DEGREE_STEP; ct < DEGREES; ct+=DEGREE_STEP) {
+                        SailingSpeed &c = speed[P][VW][ct];
+                        /* don't use speeds which already optimized with tacking */
+                        if(b.w != 1 || c.w != 1)
+                            continue;
 
-            double a, b, c, sa, sb, sc;
-#if 0
+                        /* w is the weight between b and c tacks (.5 for equal time on each
+                           t is the improvement factor]
+                           bcVB * sin(a) = w*b.VB*sin(b) + (1-w)*c.VB*sin(c)
+                           bcVB * cos(a) = w*b.VB*cos(b) + (1-w)*c.VB*cos(c) */
+                        double ar = deg2rad(at), br = deg2rad(bt), cr = deg2rad(ct);
+                        double sa = sin(ar), ca = cos(ar);
+                        double sb = sin(br), cb = cos(br);
+                        double sc = sin(cr), cc = cos(cr);
+                        double X = ca*sc-sa*cc, Y = sa*cb-ca*sb;
+                        double d = (X*c.VB + Y*b.VB);
+                        double w = X*c.VB / d;
 
-            Speed(P, at,     VW, a, sa);
-            Speed(P, bt,     VW, b, sb);
-            Speed(P, ct+360, VW, c, sc);
-#endif
-            double ar = deg2rad(a), br = deg2rad(b), cr = deg2rad(c);
-            double sbc = (sb * sc * (-cos(br)*sin(cr) +  cos(cr)*sin(br)))
-              / ((cos(ar)*sb*sin(br) - cos(ar)*sc*sin(cr)
-                  - sin(ar)*sb*cos(br) + sin(ar)*sc*cos(cr)));
-            double w = (sc * (sin(ar) * cos(cr) - cos(ar) * sin(cr)))
-              / (cos(ar)*sb*sin(br) - cos(ar)*sc*sin(cr)
-                 - sin(ar)*sb*cos(br) + sin(ar)*sc*cos(cr));
-
-            if(sbc > sa && w > 0 && w < 1) {
-              speed[P][VW][at].knots = sbc;
-              speed[P][VW][at].b = bt;
-              speed[P][VW][at].c = ct;
-              speed[P][VW][at].w = w;
-              if(at > 0)
-                speed[P][VW][360-at] = speed[P][VW][at];
-          }
-        }
+                        if(w > 0 && w < 1) {
+                            double Z = cb*sc-sb*cc;
+                            double bcVB = Z*b.VB*c.VB / d;
+                            if(bcVB > a.VB) {
+                                a.VB = bcVB;
+                                if(at < 180)
+                                    a.b = bt, a.c = ct, a.w = w;
+                                else
+                                    a.b = ct, a.c = bt, a.w = (1-w);
+                            }
+                        }
+                    }
+                }
+            }
 }
 
 void BoatSpeed::SetSpeedsFromTable(BoatSpeedTable &table)
@@ -745,10 +743,9 @@ void BoatSpeed::SetSpeedsFromTable(BoatSpeedTable &table)
     for(int VW = 0; VW < MAX_KNOTS; VW++)
         for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
             double VB = table.InterpolateSpeed(VW, W);
-            double B = 0;
-            Set(P, W, VW, W+rad2deg(B), VB);
+            Set(P, W, VW, VB);
             if(W != 0)
-                Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(B), VB);
+                Set(P, DEGREES-W, VW, VB);
         }
 }
 
@@ -801,10 +798,10 @@ double BoatSpeed::Speed(int P, double W, double VW)
 
     int VW1 = floor(VW), VW2 = ceil(VW);
 
-    double VB11 = speed[P][VW1][W1i].knots;
-    double VB12 = speed[P][VW1][W2i].knots;
-    double VB21 = speed[P][VW2][W1i].knots;
-    double VB22 = speed[P][VW2][W2i].knots;
+    double VB11 = speed[P][VW1][W1i].VB;
+    double VB12 = speed[P][VW1][W2i].VB;
+    double VB21 = speed[P][VW2][W1i].VB;
+    double VB22 = speed[P][VW2][W2i].VB;
 
     double VB1 = interp_value(VW, VW1, VW2, VB11, VB21);
     double VB2 = interp_value(VW, VW1, VW2, VB12, VB22);
@@ -837,11 +834,11 @@ double BoatSpeed::TrueWindSpeed(int P, double VB, double W, double maxVW)
     double VB2min = 1.0/0.0, VW2min = 0.0/0.0, VB2max = 0, VW2max = 0.0/0.0;
 
     for(int VWi = 0; VWi < maxVW; VWi++) {
-        double VB1 = speed[P][VWi][W1i].knots;
+        double VB1 = speed[P][VWi][W1i].VB;
         if(VB1 > VB && VB1 < VB1min) VB1min = VB1, VW1min = VWi;
         if(VB1 < VB && VB1 > VB1max) VB1max = VB1, VW1max = VWi;
 
-        double VB2 = speed[P][VWi][W2i].knots;
+        double VB2 = speed[P][VWi][W2i].VB;
         if(VB2 > VB && VB2 < VB2min) VB2min = VB2, VW2min = VWi;
         if(VB2 < VB && VB2 > VB2max) VB2max = VB2, VW2max = VWi;
     }
@@ -854,13 +851,13 @@ double BoatSpeed::TrueWindSpeed(int P, double VB, double W, double maxVW)
     return interp_value(VB, VBmin, VBmax, VWmin, VWmax);
 }
 
-void BoatSpeed::Set(int P, int W, int VW, double direction, double knots)
+void BoatSpeed::Set(int P, int W, int VW, double VB)
 {
     if(P < 0 || P > MAX_POWER || W < 0 || W >= DEGREES || VW < 0 || VW > MAX_KNOTS)
         return; /* maybe log warning here? */
     
-    speed[P][VW][W].knots = knots;
-    speed[P][VW][W].direction = direction;
+    speed[P][VW][W].VB = VB;
+    speed[P][VW][W].slipangle = 0;
     speed[P][VW][W].b = W;
     speed[P][VW][W].w = 1; /* weighted all on first course */
 }

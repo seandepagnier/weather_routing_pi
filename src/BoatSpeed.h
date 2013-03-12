@@ -34,10 +34,11 @@
 class SailingSpeed
 {
 public:
-  double knots, direction;
+    double VB; /* speed in knots */
+    double slipangle; /* angle of boat relative to its movement thru water */
 
-  int b, c; /* tacks to sail relative to true wind */
-  double w; /* weight of time on each tack */
+    int b, c; /* tacks to sail relative to true wind */
+    double w; /* weight of time on each tack */
 };
 
 #define MAX_WINDSPEEDS_IN_TABLE 100
@@ -103,7 +104,7 @@ public:
 
     double Speed(int P, double W, double VW);
     double TrueWindSpeed(int P, double VB, double W, double maxVW);
-    void Set(int P, int W, int VW, double direction, double knots);
+    void Set(int P, int W, int VW, double VB);
 
 private:
     double sail_forward_force(double A, double VA);
@@ -112,6 +113,8 @@ private:
     double boat_forward_speed(double A, double VA, double P);
     double AngleofAttackBoat(double A, double VA, double P);
     double VelocityBoat(double A, double VA, double P);
+
+    double m_MouseW;
 };
 
 /* calculate power from solar charged battery system
