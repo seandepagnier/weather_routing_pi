@@ -24,6 +24,17 @@
  ***************************************************************************
  */
 
+/* min must have correct paren to make predence correct */
+#ifdef MIN
+#undef MIN
+#endif
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+#ifdef MAX
+#undef MAX
+#endif
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 double deg2rad(double degrees);
 double rad2deg(double radians);
 double heading_resolve(double degrees);

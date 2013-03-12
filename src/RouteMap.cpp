@@ -97,8 +97,8 @@
 
 static bool inverted_regions = false;
 
-extern GRIBUIDialog *g_pGribDialog;
-static GribRecordSet *g_GribRecord;
+GribRecordSet *g_GribRecord;
+wxDateTime g_GribTimelineTime;
 
 static double Swell(double lat, double lon, wxDateTime time)
 {
@@ -418,6 +418,10 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
     double bearing;
     ll_gc_ll_reverse(lat, lon, routemap.EndLat, routemap.EndLon, &bearing, 0);
 
+    double parentbearing = 0.0/0.0;
+    if(parent)
+        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
+
     for(std::list<double>::iterator it = routemap.DegreeSteps.begin();
         it != routemap.DegreeSteps.end(); it++) {
         double H = *it;
@@ -440,8 +444,16 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
         if(fabs(heading_resolve(BG - bearing)) > routemap.MaxDivertedCourse)
             continue;
 
+        double timeseconds = routemap.dt.GetSeconds().ToDouble();
+        /* did we tack? apply penalty */
+        if(!isnan(parentbearing)) {
+            double hrpb = heading_resolve(parentbearing), hrb = heading_resolve(bearing);
+            if(hrpb*hrb < 0 && fabs(hrpb - hrb) < 180)
+                timeseconds -= routemap.TackingTime;
+        }
+
         /* distance over ground */
-        double dist = VBG / 3600000.0 * routemap.dt.GetMilliseconds().ToDouble();
+        double dist = VBG * timeseconds / 3600.0;
 
         double dlat, dlon;
         ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
@@ -589,76 +601,83 @@ tryagain:
     return false;
 }
 
-void SetGLColor(Position *p)
+void SetColor(ocpnDC &dc, bool penifgl, unsigned char c[3], int w)
 {
-    if(p->propagated)
-        glColor3f(.3, .8, 0);
-    else
-        glColor3f(.8, .3, 0);
+    if(!dc.GetDC()) {
+        glColor4ub(c[0], c[1], c[2], 192);
+        glLineWidth(w);
+        if(!penifgl)
+            return;
+    }
+    dc.SetPen(wxPen(wxColour(c[0], c[1], c[2]), w));
 }
 
-void DrawGLLine(Position *p1, Position *p2, bool c, PlugIn_ViewPort *vp)
+static unsigned char overcolor[3];
+void SetPointColor(ocpnDC &dc, Position *p)
+{
+    unsigned char cp[3] = {60, 220, 0}, cnp[3] = {240, 40, 0};
+    if(p->propagated) {
+        for(int i=0; i<3; i++)
+            cp[i] += overcolor[i];
+        SetColor(dc, false, cp, 2);
+    } else
+        SetColor(dc, false, cnp, 2);
+}
+
+void DrawLine(Position *p1, Position *p2, unsigned char *color,
+              ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     double p1plon = positive_degrees(p1->lon), p2plon = positive_degrees(p2->lon);
-    if((p1plon+180 < vp->clon && p2plon+180 > vp->clon) ||
-       (p1plon+180 > vp->clon && p2plon+180 < vp->clon) ||
-       (p1plon-180 < vp->clon && p2plon-180 > vp->clon) ||
-       (p1plon-180 > vp->clon && p2plon-180 < vp->clon))
+    if((p1plon+180 < vp.clon && p2plon+180 > vp.clon) ||
+       (p1plon+180 > vp.clon && p2plon+180 < vp.clon) ||
+       (p1plon-180 < vp.clon && p2plon-180 > vp.clon) ||
+       (p1plon-180 > vp.clon && p2plon-180 < vp.clon))
         return;
 
     wxPoint p1p, p2p;
-    GetCanvasPixLL(vp, &p1p, p1->lat, p1->lon);
-    GetCanvasPixLL(vp, &p2p, p2->lat, p2->lon);
-     
-    if(c) SetGLColor(p1);
-    glVertex2i(p1p.x, p1p.y);
-    if(c) SetGLColor(p2);
-    glVertex2i(p2p.x, p2p.y);
+    GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
+    GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
+
+    if(color == overcolor) SetPointColor(dc, p1);
+    else if(color) SetColor(dc, false, color, 2);
+
+    if(dc.GetDC()) {
+        dc.DrawLine(p1p.x, p1p.y, p2p.x, p2p.y);
+    } else {
+        glBegin(GL_LINES);
+        glVertex2i(p1p.x, p1p.y);
+        if(color == overcolor) SetPointColor(dc, p2);
+        glVertex2i(p2p.x, p2p.y);
+        glEnd();
+    }
 }
 
-void Route::Render(PlugIn_ViewPort *vp)
+void Route::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     if(!points)
         return;
 
     Position *p = points;
-    glBegin(GL_LINES); /* bug in GL_LINE_LOOP gives some invalid rendering */
-
     do {
-        bool setc = false;
+        unsigned char cyan[3] = {0, 255, 255};
+        unsigned char blue[3] = {0, 0, 255};
+        unsigned char *c;
         if(parent)
-            glColor3f(0, 1, 1);
+            c = cyan;
         else if(direction == -1)
-            glColor3f(0, 0, 1);
-        else setc = true;
-
-        DrawGLLine(p, p->next, setc, vp);
-
-        p = p->next;
-    } while(p != points);
-    glEnd();
-
-#if 0
-    glPointSize(1);
-    glBegin(GL_POINTS);
-    p = points;
-    do {
-        wxPoint point;
-        if(p->propagated)
-            glColor3f(.5, 0, 0);
+            c = blue;
         else
-            glColor3f(1, .5, 0);
+            c = overcolor;
 
-        GetCanvasPixLL(vp, &point, p->lat, p->lon);
-        glVertex2i(point.x, point.y);
+        DrawLine(p, p->next, c, dc, vp);
+
         p = p->next;
     } while(p != points);
-    glEnd();
-#endif
+
 
     /* now draw the children */
     for(RouteList::iterator it = children.begin(); it != children.end(); ++it)
-        (*it)->Render(vp);
+        (*it)->Render(dc, vp);
 }
 
 /* apply current to given route */
@@ -681,17 +700,6 @@ void Route::ApplyCurrent(RouteMap &routemap, wxDateTime time)
 }
 
 enum { MINLON, MAXLON, MINLAT, MAXLAT };
-
-/* min must have correct paren to make predence correct */
-#ifdef MIN
-#undef MIN
-#endif
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
-#ifdef MAX
-#undef MAX
-#endif
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 /* return false if longitude is possibly invalid */
 bool Route::FindRouteBounds(double bounds[4])
@@ -1119,27 +1127,36 @@ RouteIso::~RouteIso()
 int debugstep, debugcount = 28;
 RouteIso *RouteIso::Propagate(RouteMap &routemap)
 {
+    wxDateTime ntime = time + routemap.dt;
+    g_GribRecord = NULL; /* invalidate */
+
+    {
+        wxJSONValue v;
+        v[_T("Day")] = ntime.GetDay();
+        v[_T("Month")] = ntime.GetMonth();
+        v[_T("Year")] = ntime.GetYear();
+        v[_T("Hour")] = ntime.GetHour();
+        v[_T("Minute")] = ntime.GetMinute();
+        v[_T("Second")] = ntime.GetSecond();
+    
+        wxJSONWriter w;
+        wxString out;
+        w.Write(v, out);
+        SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+    }
+
+    if(!g_GribRecord ||
+       !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VX] ||
+       !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VY]) {
+        wxMessageDialog mdlg(NULL, _("Failed to get grib data at this time step\n"),
+                             wxString(_("OpenCPN Alert"), wxOK | wxICON_ERROR));
+        mdlg.ShowModal();
+        return NULL;
+    }
+
     /* build up a list of iso regions for each point
        in the current iso */
     RouteHeap routeheap;
-    wxDateTime ntime = time + routemap.dt;
-
-    if(g_pGribDialog) {
-        g_GribRecord = g_pGribDialog->GetTimeLineRecordSet(ntime);
-        if(!g_GribRecord && routemap.AllowDataDeficient)
-            g_GribRecord = g_pGribDialog->GetTimeLineRecordSet
-                (g_pGribDialog->MaxTime());
-
-        if(!g_GribRecord ||
-           !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VX] ||
-           !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VY]) {
-            wxMessageDialog mdlg(NULL, _("Failed to get grib data at this time step\n"),
-                                 wxString(_("OpenCPN Alert"), wxOK | wxICON_ERROR));
-            mdlg.ShowModal();
-            return NULL;
-        }
-    }
-
     for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         (*it)->Propagate(routeheap, routemap, ntime);
 
@@ -1154,7 +1171,6 @@ RouteIso *RouteIso::Propagate(RouteMap &routemap)
             routeheap.Insert(new Route(*it));
     }
 
-    delete g_GribRecord;
     g_GribRecord = NULL;
 
     RouteList merged, unmerged;
@@ -1167,7 +1183,7 @@ RouteIso *RouteIso::Propagate(RouteMap &routemap)
 #if 0
                 for(RouteList::iterator it = rl.begin(); it != rl.end(); ++it)
                     routeheap.Insert(*it);
-#else
+#else /* optimization to merge new routes with eachother right away before hitting the main heap */
                 RouteList unmerged2;
                 while(rl.size() > 0) {
                     r1 = rl.front();
@@ -1204,10 +1220,10 @@ RouteIso *RouteIso::Propagate(RouteMap &routemap)
     return new RouteIso(merged, ntime);
 }
 
-void RouteIso::Render(PlugIn_ViewPort *vp)
+void RouteIso::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
-        (*it)->Render(vp);
+        (*it)->Render(dc, vp);
 }
 
 RouteMap::RouteMap(BoatSpeed &b)
@@ -1252,39 +1268,55 @@ Position *RouteMap::ClosestPosition(double lat, double lon)
     return minpos;
 }
 
-void RouteMap::Render(PlugIn_ViewPort *vp)
+void RouteMap::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-    glLineWidth(2);
+    unsigned char routecolors[][3] = {{255, 128, 255}, {128, 128, 255}, {0, 230, 152},
+                                      {152, 152, 0}, {0, 220, 200}, {202, 0, 180},
+                                      {34, 69, 198}, {244, 30, 38}, {100, 240, 20}};
 
-    int s = origin.size();
-    double c = 0;
     int i = 0;
+
     for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it) {
-        c += 1/(double)s;
-#if 0
-        if(i == s-1)
-#endif
-            (*it)->Render(vp);
-        i++;
+        for(int j=0; j<3; j++)
+            overcolor[j] = routecolors[i][j];
+
+        (*it)->Render(dc, vp);
+        if(++i == (sizeof routecolors) / (sizeof *routecolors))
+            i = 0;
     }
+
+    unsigned char lcc[3] = {220, 220, 80}, erc[3] = {80, 40, 200};
+    SetColor(dc, true, lcc, 4);
+    RenderCourse(last_cursor_position, dc, vp);
+    SetColor(dc, true, erc, 4);
+    RenderCourse(ClosestPosition(EndLat, EndLon), dc, vp);
+}
+
+void RouteMap::RenderCourse(Position *pos,
+                            ocpnDC &dc, PlugIn_ViewPort &vp)
+{
+    if(!pos)
+        return;
+
+    /* draw lines to this route */
+    Position *p;
+    for(p = pos; p && p->parent; p = p->parent)
+        DrawLine(p, p->parent, NULL, dc, vp);
 
     /* render boat on optimal course at current grib time */
     wxDateTime time;
     RouteIsoList::iterator it = origin.begin();
-    Position *p = last_cursor_position;
-    if(!g_pGribDialog || !p)
-        goto skipboatdraw;
 
     /* get route iso for this position */
-    for(p=p->parent; p; p=p->parent)
+    for(p=pos->parent; p; p=p->parent)
         if(++it == origin.end())
-            goto skipboatdraw;
+            return;
 
     if(it != origin.begin())
         it--;
 
-    time = g_pGribDialog->TimelineTime();
-    for(p = last_cursor_position; p; p = p->parent) {
+    time = g_GribTimelineTime;
+    for(p = pos; p; p = p->parent) {
         wxDateTime ittime = (*it)->time;
         if(time >= ittime && p->parent) {
             wxDateTime timestart = (*it)->time;
@@ -1298,31 +1330,16 @@ void RouteMap::Render(PlugIn_ViewPort *vp)
                 d = 1;
 
             wxPoint r;
-            GetCanvasPixLL(vp, &r,
+            GetCanvasPixLL(&vp, &r,
                            p->parent->lat + d*(p->lat - p->parent->lat),
-                           p->parent->lon + d*(p->lon - p->parent->lon));
+                           p->parent->lon + d*heading_resolve(p->lon - p->parent->lon));
 
-            glColor3f(.8, .3, .4);
-            glBegin(GL_TRIANGLE_FAN);
-            glVertex2i(r.x, r.y);
-            for(int i=0; i<9; i++)
-                glVertex2i(r.x + 7*sin(2*M_PI*i/8),
-                           r.y + 7*cos(2*M_PI*i/8));
-            glEnd();
+            dc.DrawCircle( r.x, r.y, 7 );
             break;
         }
         it--;
     }
-
-skipboatdraw:
     
-    glColor3f(1, 0, 1);
-    glBegin(GL_LINES);
-    glLineWidth(4);
-    for(p = last_cursor_position; p && p->parent; p = p->parent)
-        DrawGLLine(p, p->parent, false, vp);
-
-    glEnd();
 }
 
 void RouteMap::Clear()

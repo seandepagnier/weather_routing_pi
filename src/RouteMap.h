@@ -28,6 +28,7 @@
 
 class PlugIn_ViewPort;
 
+class ocpnDC;
 class Route;
 class RouteHeap;
 class RouteMap;
@@ -61,7 +62,7 @@ public:
 
     void Print();
     bool Contains(Route *r);
-    void Render(PlugIn_ViewPort *vp);
+    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
     void ApplyCurrent(RouteMap &routemap, wxDateTime time);
     bool FindRouteBounds(double bounds[4]);
     void RemovePosition(Position *p);
@@ -105,7 +106,7 @@ public:
   ~RouteIso();
 
   RouteIso *Propagate(RouteMap &routemap);
-  void Render(PlugIn_ViewPort *vp);
+  void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
 
   RouteList routes;
   wxDateTime time;
@@ -126,7 +127,8 @@ public:
 
     void Propagate();
     Position *ClosestPosition(double lat, double lon);
-    void Render(PlugIn_ViewPort *vp);
+    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
+    void RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp);
     void Reset(double lat, double lon, wxDateTime time);
     void Clear();
     bool SetCursorLatLon(double lat, double lon);

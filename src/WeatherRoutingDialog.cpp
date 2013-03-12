@@ -162,9 +162,10 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, d
     pConf->Read ( _T ( "DialogY" ), &p.y, p.y);
     SetPosition(p);
 
-    GetGribDialog();
-
     ReconfigureRouteMap();
+
+    SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
+    Reset();
 }
 
 WeatherRoutingDialog::~WeatherRoutingDialog( )
@@ -182,42 +183,31 @@ WeatherRoutingDialog::~WeatherRoutingDialog( )
     pConf->Write ( _T ( "DialogY" ), p.y);
 }
 
-void WeatherRoutingDialog::RenderRouteMap(PlugIn_ViewPort *vp)
+void WeatherRoutingDialog::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
+    if(!dc.GetDC()) {
+        glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_HINT_BIT ); //Save state
+        glEnable( GL_LINE_SMOOTH );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+    }
+
 //    m_thCompute.routemutex.Lock();
-    m_routemap.Render(vp);
+    m_routemap.Render(dc, vp);
 //    m_thCompute.routemutex.Unlock();
+
+    if(!dc.GetDC())
+        glPopAttrib();
 }
 
-extern GRIBUIDialog *g_pGribDialog;
-
-bool WeatherRoutingDialog::GetGribDialog()
+void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
 {
-#if 0
-    return true;
-#endif
-    if(!g_pGribDialog) {
-        SendPluginMessage(wxString(_T("GRIB_DIALOG_REQUEST")), _T(""));
-
-        if(g_pGribDialog)
-            Reset();
-        else {
-            wxMessageDialog mdlg(this, _("Failed to get handle to Grib Dialog, is it loaded?\n"),
-                                 wxString(_("Weather Routing"), wxOK | wxICON_ERROR));
-            mdlg.ShowModal();
-            return false;
-        }
-    }
-    return true;
+    UpdateEnd();
 }
 
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
-    if(!GetGribDialog())
-        return;
-
-    ReconfigureRouteMap();
-
     extern int debugstep;
 #if 0
     extern int debugcount;
@@ -291,14 +281,11 @@ void WeatherRoutingDialog::OnClose( wxCommandEvent& event )
 
 void WeatherRoutingDialog::Reset()
 {
-    if(!GetGribDialog())
-        return;
-
     double startlat, startlon;
     m_tStartLat->GetValue().ToDouble(&startlat);
     m_tStartLon->GetValue().ToDouble(&startlon);
 
-    wxDateTime time = g_pGribDialog ? g_pGribDialog->TimelineTime() : wxDateTime::Now();
+    wxDateTime time = g_GribTimelineTime;
 
     m_stStartDate->SetLabel(time.FormatISODate());
     m_stStartTime->SetLabel(time.FormatISOTime());
@@ -306,11 +293,15 @@ void WeatherRoutingDialog::Reset()
     m_routemap.Reset(startlat, startlon, time);
 }
 
-void WeatherRoutingDialog::ReconfigureRouteMap()
+void WeatherRoutingDialog::UpdateEnd()
 {
     m_tEndLat->GetValue().ToDouble(&m_routemap.EndLat);
-    m_tEndLon->GetValue().ToDouble(&m_routemap.EndLat);
+    m_tEndLon->GetValue().ToDouble(&m_routemap.EndLon);
+}
 
+void WeatherRoutingDialog::ReconfigureRouteMap()
+{
+    UpdateEnd();
     m_SettingsDialog.ReconfigureRouteMap();
 }
 

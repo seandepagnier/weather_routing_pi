@@ -319,39 +319,47 @@ BV =   / 2    2
      \/ f  + s
    */
 
-double sail_forward_force(double eta, double A, double VA)
+double BoatSpeed::sail_forward_force(double A, double VA)
 {
   return eta * sin(A/2) * sqrt(VA);
 }
 
-double sail_slip_force(double eta, double A, double VA)
+double BoatSpeed::sail_slip_force(double A, double VA)
 {
   return eta * cos(A/2) * sqrt(VA);
 }
 
-double boat_slip_speed(double eta, double A, double VA, double keel_pressure)
+double BoatSpeed::boat_slip_speed(double A, double VA)
 {
-  return sail_slip_force(eta, A, VA) / keel_pressure;
+  return sail_slip_force(A, VA) / keel_pressure;
 }
-double boat_forward_speed(double eta, double A, double VA, double keel_pressure, double keel_lift, double P)
+
+double BoatSpeed::boat_forward_speed(double A, double VA, double P)
 {
-  return sail_forward_force(eta, A, VA) + P + keel_lift * boat_slip_speed(eta, A, VA, keel_pressure);
+  return sail_forward_force(A, VA) + P + keel_lift * boat_slip_speed(A, VA);
 }
 
 /* difference between direction we face and direction moving thru water */
-double AngleofAttackBoat(double eta, double A, double VA, double keel_pressure, double keel_lift, double P)
+double BoatSpeed::AngleofAttackBoat(double A, double VA, double P)
 {
-  double ss = boat_slip_speed(eta, A, VA, keel_pressure);
-  double fs = boat_forward_speed(eta, A, VA, keel_pressure, keel_lift, P);
+  double ss = boat_slip_speed(A, VA);
+  double fs = boat_forward_speed(A, VA, P);
   return atan2(ss, fs);
 }
 
 /* actual speed over water of boat */
-double VelocityBoat(double eta, double A, double VA, double keel_pressure, double keel_lift, double P)
+double BoatSpeed::VelocityBoat(double A, double VA, double P)
 {
-  double ss = boat_slip_speed(eta, A, VA, keel_pressure);
-  double fs = boat_forward_speed(eta, A, VA, keel_pressure, keel_lift, P);
+#if 0
+  double ss = boat_slip_speed(eta, A, VA);
+  double fs = boat_forward_speed(eta, A, VA, P);
   return hypot(ss, fs);
+#else
+  double v = sin(A/2) * sqrt(VA / eta);
+  v -= v*v*hull_drag;
+  if(v < 0 || isnan(v)) v = 0;
+  return v;
+#endif
 }
 
 /*
@@ -367,8 +375,6 @@ double VelocityBoat(double eta, double A, double VA, double keel_pressure, doubl
 
    optionally could include slippage here
 */
-
-
 
 /* Solve for the augmented sailboat transform for apparent wind
 
@@ -392,7 +398,6 @@ cos(Pi-W)=-cos(W)|   |
                  |/
               Angle is A
 
-
             Law of sines:
 
       sin A   sin W   sin W-A
@@ -413,7 +418,6 @@ cos(Pi-W)=-cos(W)|   |
    VB =  / VW + VA  - 2 VW VA cos(W-A)
        \/
 
- 
    The original sailboat transform relating W and A to VW and eta:
                                 2
                   /  sin(A/2)  \
@@ -425,6 +429,7 @@ cos(Pi-W)=-cos(W)|   |
    sin(W) sin (A/2)
    ---------------- = VB eta
       sin(W - A)
+
 
                       VB
     sin(W-A) = sin(W) --    Law of sines
@@ -446,7 +451,7 @@ VB =  sin (-)  /---
 To decompose further to forces
 BF - Boat Force
 
-Since at maximum velocity drag force exactly cancels boat force:
+Since at speed, drag force exactly cancels boat force (no acceleration):
 F = m a
 V = integral(F / m)
 
@@ -469,10 +474,8 @@ DF(t) = DC VB(t)
 
         int(BF, 0..t) - DC int(VB, 0..t) = VB(t)
 
-
 F(t) = BF(A(t), VA(t)) - DF(t)
 F(t) = BF(A(t), VA(t)) - DC VB(t)
-
 
                       /                 /
                      |                 |
@@ -485,14 +488,11 @@ F(t) = BF(A(t), VA(t)) - DC VB(t)
 BF = DC sin (-)  /---
              2 \/ eta
 
-
                       /                 /
                      |                 |
                      |  BF(t) dt - DC  |  VB(t) dt = m VB(t)
                      |                 |
                     /                 /
-
-
 
 Finally we have simplified to this equation to have boat speed in
 apparent wind components only.  The above formula states that boat speed
@@ -528,7 +528,6 @@ power = work / time
 work  = force * distance
 velocity = distance / time
 
-
               2 A
 SP = SC VA sin (-)
                 2
@@ -537,7 +536,6 @@ SF = SC sin (-)
              2
 
 We can express A as a function:
-A(
 
 The steady state speed (time is infinity) for the boat's mass
 is irrelevant.  It is convenient to calculate but we are
@@ -566,7 +564,6 @@ If the overall result is
 (define (rad2deg x) (* 180 (/ 3.14) x))
 (define (deg2rad x) (* 3.14 (/ 180) x))
 
-
 (define (compute-VB A VA eta P)
   (let ((d (+ (* 64 (square eta) (square (sin (/ A 2))) VA) (* P (abs P)))))
     ((if (negative? d) - +) (sqrt (abs d)))))
@@ -575,7 +572,6 @@ If the overall result is
    (let ((d (+ (square VW) (square VB) (* 2 VW VB (cos W)))))
      (if (negative? d) (error "d < 0 : " d) (sqrt d))))
       
-
 (define (compute-A VA VB VW W) ; law of sines
    (if (zero? VA) 0
      (if (zero? VB) W
@@ -595,7 +591,6 @@ If the overall result is
                   (nVA (compute-VA VW nVB W))
                   (nA (compute-A nVA nVB VW W)))
                (each-vb nA nVA nVB)))))))
-
 */
 
 double BoatSpeed::VelocityApparentWind(double VB, double W, double VW)
@@ -608,7 +603,6 @@ double BoatSpeed::VelocityApparentWind(double VB, double W, double VW)
      A = undefined
    VB == 0
      A = W
-
              /   2    2    2 \
          -1 |  VA + VB - VW   |
    A = cos  |  ------------   |
@@ -631,16 +625,15 @@ double BoatSpeed::DirectionApparentWind(double VA, double VB, double W, double V
 /* start out with the boat stopped, and over time, iterate accelerating boat
    until it reaches steady state.  The speed of the boat is known already
    from apparent wind, this function finds it for true wind */
-void BoatSpeed::BoatSteadyState(double W, double VW, double eta,
-                                double keel_pressure, double keel_lift, double P,
+void BoatSpeed::BoatSteadyState(double W, double VW, double P,
                                 double &B, double &VB, double &A, double &VA)
 {
   /* starting out not moving */
   VB = 0, A = W, VA = VW;
   for(;;) {
-    double v = VelocityBoat(eta, A, VA, keel_pressure, keel_lift, P);
+    double v = VelocityBoat(A, VA, P);
     if(v - VB < 1e-10) {
-      B = AngleofAttackBoat(eta, A, VA, keel_pressure, keel_lift, P);
+      B = AngleofAttackBoat(A, VA, P);
       return; /* reached steady state */
     }
 
@@ -684,17 +677,17 @@ bool BoatSpeed::Save(const char *filename, bool binary)
 
 /* eta is a measure of efficiency of the boat, from .01 for racing boats to .5 for
    heavy cruisers */
-void BoatSpeed::ComputeBoatSpeeds(double eta, double keel_pressure, double keel_lift)
+void BoatSpeed::ComputeBoatSpeeds()
 {
-  for(int P = 0; P <= 1/*MAX_POWER*/; P++)
-    for(int VW = 0; VW < MAX_KNOTS; VW++)
-      for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
-        double B, VB, A, VA;
-        BoatSteadyState(deg2rad(W), VW, eta, keel_pressure, keel_lift, P, B, VB, A, VA);
-        Set(P, W, VW, W+rad2deg(B), VB);
-        if(W != 0)
-          Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(B), VB);
-    }
+    for(int P = 0; P <= 1/*MAX_POWER*/; P++)
+        for(int VW = 0; VW < MAX_KNOTS; VW++)
+            for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
+                double B, VB, A, VA;
+                BoatSteadyState(deg2rad(W), VW, P, B, VB, A, VA);
+                Set(P, W, VW, W+rad2deg(B), VB);
+                if(W != 0)
+                    Set(P, DEGREES-W, VW, DEGREES-W-rad2deg(B), VB);
+            }
 }
 
 /* instead of traveling in the direction given, allow traveling at angles

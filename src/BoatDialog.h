@@ -48,8 +48,10 @@ private:
     void OnPaintPlot( wxPaintEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlot( wxCommandEvent& event ) { m_PlotWindow->Refresh(); }
+    void OnUpdatePlot( wxSpinEvent& event ) { m_PlotWindow->Refresh(); }
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event ) { Hide(); }
     void OnRecompute( wxScrollEvent& event ) { Compute(); m_PlotWindow->Refresh(); }
     void OnOptimizeTacking( wxCommandEvent& event );
 

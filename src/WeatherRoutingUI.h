@@ -61,6 +61,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdateEnd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
@@ -143,6 +144,7 @@ class BoatDialogBase : public wxDialog
 		wxPanel* m_panel3;
 		wxChoice* m_cPlotType;
 		wxChoice* m_cPlotAxis;
+		wxSpinCtrl* m_sWindSpeed;
 		wxStaticText* m_stTrueWindAngle;
 		wxStaticText* m_staticText21;
 		wxStaticText* m_stTrueWindKnots;
@@ -155,13 +157,23 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText212;
 		wxStaticText* m_stBoatKnots;
 		wxStaticText* m_staticText232;
+		wxPanel* m_panel31;
 		wxButton* m_bOpen;
 		wxButton* m_bSave;
+		wxButton* m_bClose;
 		wxPanel* m_panel5;
 		wxStaticText* m_staticText12;
 		wxSlider* m_sEta;
+		wxStaticText* m_staticText57;
+		wxSpinCtrl* m_sLWL;
+		wxStaticText* m_staticText35;
+		wxSlider* m_sHullDrag;
+		wxStaticText* m_staticText58;
+		wxSpinCtrl* m_sDisplacement;
 		wxStaticText* m_staticText13;
 		wxSlider* m_sKeelPressure;
+		wxStaticText* m_staticText60;
+		wxSpinCtrl* m_sPlaningConstant;
 		wxStaticText* m_staticText14;
 		wxSlider* m_sKeelLift;
 		wxButton* m_bOptimizeTacking;
@@ -171,9 +183,12 @@ class BoatDialogBase : public wxDialog
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdatePlot( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecompute( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnRecompute( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
 		
 	

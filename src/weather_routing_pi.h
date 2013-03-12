@@ -36,6 +36,7 @@
 #define     MY_API_VERSION_MINOR    8
 
 #include "../../../include/ocpn_plugin.h"
+#include "../../../include/ocpndc.h"
 #include "../../../include/wx/jsonreader.h"
 #include "../../../include/wx/jsonwriter.h"
 
@@ -103,7 +104,7 @@ private:
       double m_cursor_lat, m_cursor_lon;
 };
 
+extern GribRecordSet *g_GribRecord;
+extern wxDateTime g_GribTimelineTime;
+
 #endif
-
-
-

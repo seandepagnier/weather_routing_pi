@@ -79,9 +79,8 @@ class BoatSpeed
 public:
     static double VelocityApparentWind(double VB, double W, double VW);
     static double DirectionApparentWind(double VA, double VB, double W, double VW);
-    static void BoatSteadyState(double W, double VW, double eta,
-                                double keel_pressure, double keel_lift, double P,
-                                double &BA, double &VB, double &A, double &VA);
+    void BoatSteadyState(double W, double VW, double P,
+                         double &B, double &VB, double &A, double &VA);
 
     BoatSpeed();
     ~BoatSpeed();
@@ -89,14 +88,15 @@ public:
     bool Open(const char *filename, bool binary);
     bool Save(const char *filename, bool binary);
 
-    double eta; /* sailing constant */
+    double eta, hull_drag, keel_pressure, keel_lift; /* sailing constant */
+    double lwl_ft, displacement_lbs, planing_constant;
 
     double powerspeed[MAX_POWER+1]; /* How fast do we power at each power level
                                        in dead calm. */
 
     SailingSpeed speed[MAX_POWER+1][MAX_KNOTS+1][DEGREES];
 
-    void ComputeBoatSpeeds(double eta, double keel_pressure, double keel_lift);
+    void ComputeBoatSpeeds();
     void OptimizeTackingSpeed();
     void SetSpeedsFromTable(BoatSpeedTable &table);
     BoatSpeedTable CreateTable();
@@ -104,6 +104,14 @@ public:
     double Speed(int P, double W, double VW);
     double TrueWindSpeed(int P, double VB, double W, double maxVW);
     void Set(int P, int W, int VW, double direction, double knots);
+
+private:
+    double sail_forward_force(double A, double VA);
+    double sail_slip_force(double A, double VA);
+    double boat_slip_speed(double A, double VA);
+    double boat_forward_speed(double A, double VA, double P);
+    double AngleofAttackBoat(double A, double VA, double P);
+    double VelocityBoat(double A, double VA, double P);
 };
 
 /* calculate power from solar charged battery system

@@ -60,13 +60,11 @@ public:
     WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon );
     ~WeatherRoutingDialog( );
 
-    void RenderRouteMap(PlugIn_ViewPort *vp);
-
+    void RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp);
     RouteMap m_routemap;
 
 private:
-    bool GetGribDialog();
-
+    void OnUpdateEnd( wxCommandEvent& event );
     void OnCompute( wxCommandEvent& event );
     void OnBoat( wxCommandEvent& event );
     void OnReset( wxCommandEvent& event );
@@ -75,6 +73,7 @@ private:
     void OnClose( wxCommandEvent& event );
 
     void Reset();
+    void UpdateEnd();
     void ReconfigureRouteMap();
 
     //    Data

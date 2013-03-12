@@ -40,8 +40,6 @@
 #include "weather_routing_pi.h"
 
 
-GRIBUIDialog *g_pGribDialog = NULL;
-
 // the class factories, used to create and destroy instances of the PlugIn
 
 extern "C" DECL_EXP opencpn_plugin* create_pi(void *ppimgr)
@@ -208,16 +206,32 @@ void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 
 void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
 {
-    if(message_id == _T("GRIB_DIALOG"))
+    if(message_id == _T("GRIB_TIMELINE"))
     {
         wxJSONReader r;
         wxJSONValue v;
         r.Parse(message_body, &v);
 
-        wxString sptr = v[_T("GribDialogPtr")].AsString();
+        g_GribTimelineTime.Set(v[_T("Day")].AsInt(),
+                               (wxDateTime::Month)v[_T("Month")].AsInt(),
+                               v[_T("Year")].AsInt(),
+                               v[_T("Hour")].AsInt(),
+                               v[_T("Minute")].AsInt(),
+                               v[_T("Second")].AsInt());
+
+    }
+    if(message_id == _T("GRIB_TIMELINE_RECORD"))
+    {
+        wxJSONReader r;
+        wxJSONValue v;
+        r.Parse(message_body, &v);
+
+        wxString sptr = v[_T("TimelineSetPtr")].AsString();
         wxCharBuffer bptr = sptr.To8BitData();
         const char* ptr = bptr.data();
-        sscanf(ptr, "%p", &g_pGribDialog);
+
+        /* need to copy record once we do threads */
+        sscanf(ptr, "%p", &g_GribRecord);
     }
 }
 
@@ -265,16 +279,22 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
 
 bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 {
+    if(m_pWeather_RoutingDialog && m_pWeather_RoutingDialog->IsShown()) {
+        ocpnDC odc(dc);
+        m_pWeather_RoutingDialog->RenderRouteMap(odc, *vp);
+        return true;
+    }
     return false;
 }
 
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_RoutingDialog && m_pWeather_RoutingDialog->IsShown()) {
-        m_pWeather_RoutingDialog->RenderRouteMap(vp);
+        ocpnDC odc;
+        m_pWeather_RoutingDialog->RenderRouteMap(odc, *vp);
         return true;
-    } else
-        return false;
+    }
+    return false;
 }
 
 bool weather_routing_pi::LoadConfig(void)

@@ -188,6 +188,7 @@ void WeatherRoutingSettingsDialog::OnAddDegreeStep( wxCommandEvent& event )
     double step;
     m_tDegreeStep->GetValue().ToDouble(&step);
     m_lDegreeSteps->Insert(wxString::Format(_T("%f"), step), s);
+    m_tDegreeStep->Clear();
 }
 
 void WeatherRoutingSettingsDialog::OnRemoveDegreeStep( wxCommandEvent& event )
@@ -202,7 +203,7 @@ void WeatherRoutingSettingsDialog::OnGenerateDegreeSteps( wxCommandEvent& event 
     double value, v;
     m_tDegreeStep->GetValue().ToDouble(&value);
     m_lDegreeSteps->Clear();
-    for(v = 0; v < 360; v+=value)
+    for(v = value; v < 360; v+=value)
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
 }
 

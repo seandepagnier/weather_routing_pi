@@ -83,21 +83,8 @@ SET(SRC_WEATHER_ROUTING
             src/georef.h
             src/georef.c
 
-            src/grib_pi.cpp
-            ../grib_pi/src/GribRecordTree.cpp
-            ../grib_pi/src/GribRecordTree.h
-            ../grib_pi/src/GribOverlayFactory.cpp
-            ../grib_pi/src/GribOverlayFactory.h
-            ../grib_pi/src/GribUIDialogBase.cpp
-            ../grib_pi/src/GribUIDialogBase.h
-            ../grib_pi/src/GribConfigDialog.cpp
-            ../grib_pi/src/GribConfigDialog.h
-            ../grib_pi/src/GribUIDialog.cpp
-            ../grib_pi/src/GribUIDialog.h
-            ../grib_pi/src/GribReader.cpp 
             ../grib_pi/src/GribRecord.cpp  
             ../grib_pi/src/zuFile.cpp 
-            ../grib_pi/src/IsoLine.cpp
 
             ../../src/wxJSON/jsonval.cpp
             ../../src/wxJSON/jsonreader.cpp

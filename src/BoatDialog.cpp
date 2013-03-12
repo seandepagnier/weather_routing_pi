@@ -136,48 +136,88 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
         return;
 
     wxPaintDC dc(window);
-    dc.SetTextForeground(wxColour(1, 0, 0));
     dc.SetBackgroundMode(wxTRANSPARENT);
 
     int w, h;
     m_PlotWindow->GetSize( &w, &h);
     m_PlotScale = (w < h ? w : h)/1.8;
     double maxVB = 0;
-    const double maxVW = 25;
 
-    for(int VW = maxVW; VW > 0; VW -= 5) {
-        wxPoint points[DEGREES / DEGREE_STEP];
-        int W, i;
-        for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++) {
-            double B = -W;
-            double VB = boat.Speed(0, W, VW);
+    double VW = m_sWindSpeed->GetValue();
+    wxPoint points[DEGREES / DEGREE_STEP];
+    int W, i;
+    for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++) {
+        double B = W;
+        double VB = boat.Speed(0, W, VW);
+        
+        if(VB > maxVB)
+            maxVB = VB;
+        
+        switch(m_cPlotAxis->GetSelection()) {
+        case 0: /* boat */
+        {
+            points[i] = wxPoint(1000*VB*sin(deg2rad(B)), -1000*VB*cos(deg2rad(B)));
+        } break;
+        case 1: /* true wind */
+        {
+            
+        } break;
+        case 2: /* apparent wind */
+        {
+        } break;
+        }
+    }
+    
+    dc.SetPen(wxPen(wxColor(0, 0, 0)));
+    dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    dc.SetTextForeground(wxColour(0, 55, 75));
 
-            if(VW == maxVW && VB > maxVB)
-                maxVB = VB;
+    if(maxVB <= 0) maxVB = 1; /* avoid lock */
+    double Vstep = ceil(maxVB / 5);
+    maxVB += Vstep;
 
-            switch(m_cPlotAxis->GetSelection()) {
-            case 0: /* boat */
-            {
-                points[i] = wxPoint(1000*VB*sin(deg2rad(B)), -1000*VB*cos(deg2rad(B)));
-            } break;
-            case 1: /* true wind */
-            {
+    m_PlotScale = m_PlotScale / (maxVB+1);
 
-            } break;
-            case 2: /* apparent wind */
-            {
-            } break;
-            }
+    for(double V = Vstep; V <= maxVB; V+=Vstep) {
+        dc.DrawCircle(w/2, h/2, V*m_PlotScale);
+        dc.DrawText(wxString::Format(_T("%.0f"), V), w/2, h/2+(int)V*m_PlotScale);
+    }
+
+    dc.SetTextForeground(wxColour(0, 0, 155));
+    for(double B = -165; B <= 180; B+=15) {
+        double x = maxVB*m_PlotScale*sin(deg2rad(B));
+        double y = -maxVB*m_PlotScale*cos(deg2rad(B));
+        if(B > 0)
+            dc.DrawLine(w/2 - x, h/2 - y, w/2 + x, h/2 + y);
+        dc.DrawText(wxString::Format(_T("%.0f"), B), w/2 + x, h/2 + y);
+    }
+
+    int gi = 0, ri = 0, miny = 0, maxy = 1000000;
+    for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++) {
+        if(points[i].y < miny) {
+            gi = i;
+            miny = points[i].y;
+        }
+        if(points[i].y > maxy) {
+            ri = i;
+            miny = points[i].y;
         }
 
-        if(VW == maxVW)
-            m_PlotScale = m_PlotScale / (maxVB+1);
-
-        for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++)
-            points[i] = wxPoint(m_PlotScale * points[i].x / 1000, m_PlotScale * points[i].y / 1000);
-
-        dc.DrawPolygon(i, points, w/2, h/2, 0);
+        points[i] = wxPoint(m_PlotScale * points[i].x / 1000 + w/2,
+                            m_PlotScale * points[i].y / 1000 + h/2);
     }
+
+    dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
+    for(int j=1; j<i; j++) {
+        if(j == gi)
+            dc.SetPen(wxPen(wxColor(0, 255, 0), 2));
+        else if (j == ri)
+            dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
+
+        dc.DrawLine(points[j-1].x, points[j-1].y, points[j].x, points[j].y);
+    }
+
+
 }
 
 void BoatDialog::OnOpen ( wxCommandEvent& event )
@@ -224,7 +264,13 @@ void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
 
 void BoatDialog::Compute()
 {
-    boat.ComputeBoatSpeeds(m_sEta->GetValue() / 1000.0,
-                           m_sKeelPressure->GetValue() / 100.0,
-                           m_sKeelLift->GetValue() / 100.0);
+    boat.eta = m_sEta->GetValue() / 1000.0;
+    boat.hull_drag = m_sHullDrag->GetValue() / 100;
+    boat.keel_pressure = m_sKeelPressure->GetValue() / 100.0 + 3.0;
+    boat.keel_lift = m_sKeelLift->GetValue() / 100.0;
+    boat.lwl_ft = m_sLWL->GetValue();
+    boat.displacement_lbs = m_sDisplacement->GetValue();
+    boat.planing_constant = m_sPlaningConstant->GetValue();
+
+    boat.ComputeBoatSpeeds();
 }
