@@ -44,14 +44,16 @@ class GribUIDialog;
 class WeatherRoutingThread : public wxThread
 {
 public:
-WeatherRoutingThread(wxWindow &p,RouteMap &r)
-    : wxThread(wxTHREAD_JOINABLE), parent(p), routemap(r), stop(false) { Create(); }
-    void End() { stop = true; }
+WeatherRoutingThread(RouteMap &r)
+    : wxThread(wxTHREAD_JOINABLE), routemap(r), computing(false), needgrib(false), updated(false) { Create(); }
     void *Entry();
-    wxWindow &parent;
+    bool Updated();
     RouteMap &routemap;
-//    wxMutex routemutex;
-    bool stop;
+    wxMutex routemutex, gribmutex, computemutex;
+
+    bool computing, needgrib;
+private:
+    bool updated;
 };
 
 class WeatherRoutingDialog : public WeatherRoutingDialogBase
@@ -71,6 +73,7 @@ private:
     void OnInformation( wxCommandEvent& event );
     void OnSettings( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
+    void OnComputationTimer( wxTimerEvent & );
 
     void Reset();
     void UpdateEnd();
@@ -86,8 +89,11 @@ private:
     bool m_bShowBoatDialog;
     BoatDialog *m_pBoatDialog;
 
+    wxString m_default_boat_path;
+
     WeatherRoutingSettingsDialog m_SettingsDialog;
 
+    wxTimer m_tCompute;
     WeatherRoutingThread m_thCompute;
 };
 

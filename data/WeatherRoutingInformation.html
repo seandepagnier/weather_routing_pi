@@ -37,11 +37,14 @@ The Supported Options Include:
   <li><b>Degree Step</b> Difference in degrees between courses to attempt.</li>
   <li><b>Time Step</b> Time in seconds to sail before attempting course change.</li>
   <li><b>Max Diverted Course</b> Maximum course error from heading toward target destination to attempt.
-  If set to 180, the map will expand in all directions. </li>
+  If set to 180, the map will expand in all directions, and can be used to find multiple destinations
+  from a given source.  If set less than 180, computation time is reduced (as it tends to take a very long
+  time as the map expands), but possible courses which take directions on a bearing too far from the closest great circle route (even if just for 1 iteration) will be lost, and therefore the optimal route may not be achieved.
+    finding routes</li>
   <li><b>Max Wind Knots</b> Do not navigate in areas with more wind than this value.</li>
   <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
   <li><b>Max Latitude</b> Do not navigate above (or below) this latitude.</li>
-  <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.</li>
+  <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.  This is normally irrelevant except for very close isochrons.  Setting to 0 avoids these calculations.  </li>
   <li><b>Substeps</b> In areas where we frequently encounter land collisions, it is possible to generate
         a more refined map in smaller time steps to find routes, then merge these substeps at each
         full step</li>
@@ -60,6 +63,13 @@ The Supported Options Include:
 </ul>
 
 <H3>Boat</H3>
+
+<p>
+The boat dialog displays the polar plot of the boat's speed vs true wind direction as well as showing other details.  Two file types are supported.  CSV (same as qtVlm) and binary which is specific to this plugin.   The binary contains much more data.
+
+<p>
+The VMG tab shows the best courses for up and down wind on each tack.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If tacking is not optimized, then weather routing will perform optimal tacking at isochrons, but will not be able to take advantage of courses which spend more than one time on a tack than another as well because the resolution is limited to the isochron period.
+
 The boat configuration allows one to enter the parameters used to specify the performance of a boat.
 Currently supported polar files are csv (same format as qtVlm) and binary files in this format
 (specific only to this plugin)  These files specify sailing speed at each wind speed and wind direction.
@@ -85,9 +95,10 @@ This computation is very useful for the standard rig, but doesn't really apply c
 it may come closer to resembling the sailing characteristics of more vessels.
 
 <p>For many users, it may be best to enter measured values for the boat in csv format rather
-than attemp to compute then, eventually it may even be possible to use the plugin to obtain
-them from gps during passage.  It may also be eventually supported to overlay the obtained
-data with the transform calculation to better optimize the coefficents used to calculate it.
+than attempt to compute. Eventually it may even be possible to use the plugin to obtain
+the polar values from gps during passage (given enough wind states).  It may also be eventually
+supported to overlay the obtained data with the transform calculation to better optimize the
+coefficents used to calculate it.
 
 <p>The basic polar describing boat speed at various wind settings fails on many fronts.
 First of all, various sail combinations become impractical in certain sea states,
@@ -102,12 +113,13 @@ to various parameters besides currents, wind, and sea state for various reasons
 (more on this below)  Fifthly.. wait I have like 10 of these I'll stop now.
 
 <p>There is also extension for the possibility of other sources of propulsion
-besides wind power (namely PV-solar electric) which (dependent on solar radiation) may be
-used in conjunction with sails.  Finally, it may be possible to store some of this radiation,
-(during day with sun and wind) or in the case of anchoring in an adverse tidal flow with a
-hydro generator in the form of chemical energy to be used later (at night or when the
-tide is right) in an electric drive to reach the final destination
-at a sooner possible time than any other method employed. 
+besides wind power (namely PV-solar electric) which  may be
+used in conjunction with sails.  This form of power falls into the category of weather
+routing as it is dependent on solar radiation.  Finally, it may be possible to store
+some of this radiation, (during day with sun and wind) or in the case of anchoring in
+an adverse tidal flow with a hydro generator in the form of chemical energy to be used
+later (at night or when the tide is right) in an electric drive to reach the final destination
+at a sooner possible time than any other method employed.
 (all of this is mostly still unimplemented, but there is some c++)
 
 <p>It is also possible to factor slow changing, but important changes to the boat's

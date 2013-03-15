@@ -5,8 +5,8 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier   *
- *   sean@depagnier.com   *
+ *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -51,6 +51,15 @@
 BoatDialog::BoatDialog( wxWindow *parent, BoatSpeed &b)
     : BoatDialogBase(parent), boat(b), m_PlotScale(0)
 {
+    m_sEta->SetValue(boat.eta * 1000.0);
+    m_sHullDrag->SetValue(boat.hull_drag * 100.0);
+    m_sKeelPressure->SetValue(boat.keel_pressure * 100.0);
+    m_sKeelLift->SetValue(boat.keel_lift * 100.0);
+    m_sLWL->SetValue(boat.lwl_ft);
+    m_sDisplacement->SetValue(boat.displacement_lbs);
+    m_sPlaningConstant->SetValue(boat.planing_constant);
+
+    UpdateVMG();    
 }
 
 BoatDialog::~BoatDialog()
@@ -194,13 +203,45 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
     /* polar meridians */
     dc.SetTextForeground(wxColour(0, 0, 155));
-    for(double B = -165; B <= 180; B+=15) {
+    for(double B = 0; B < 360; B+=15) {
         double x = maxVB*m_PlotScale*sin(deg2rad(B));
-        double y = -maxVB*m_PlotScale*cos(deg2rad(B));
-        if(B > 0)
-            dc.DrawLine(w/2 - x, h/2 - y, w/2 + x, h/2 + y);
-        dc.DrawText(wxString::Format(_T("%.0f"), B), w/2 + x, h/2 + y);
+        double y = maxVB*m_PlotScale*cos(deg2rad(B));
+        if(B < 180)
+            dc.DrawLine(w/2 - x, h/2 + y, w/2 + x, h/2 - y);
+
+        wxString str = wxString::Format(_T("%.0f"), B);
+        int sw, sh;
+        dc.GetTextExtent(str, &sw, &sh);
+        dc.DrawText(str, w/2 + x - sw/2, h/2 - y - sh/2);
     }
+
+    /* vmg */
+    int P = 0, px, py;
+    dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
+
+    double s = maxVB*m_PlotScale;
+
+    W = boat.VMG[P][VW].PortUpWind;
+    px = s*sin(deg2rad(W));
+    py = s*cos(deg2rad(W));
+    dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
+
+    W = boat.VMG[P][VW].StarboardUpWind;
+    px = s*sin(deg2rad(W));
+    py = s*cos(deg2rad(W));
+    dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
+
+    dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
+
+    W = boat.VMG[P][VW].PortDownWind;
+    px = s*sin(deg2rad(W));
+    py = s*cos(deg2rad(W));
+    dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
+
+    W = boat.VMG[P][VW].StarboardDownWind;
+    px = s*sin(deg2rad(W));
+    py = s*cos(deg2rad(W));
+    dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
     /* boat speeds */
     int lx, ly;
@@ -238,6 +279,12 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     }
 }
 
+void BoatDialog::OnUpdateWindSpeed( wxSpinEvent& event )
+{
+    UpdateVMG();
+    m_PlotWindow->Refresh();
+}
+
 void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
     wxFileDialog openDialog( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
@@ -246,10 +293,24 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
         wxFileName filename = openDialog.GetPath();
         bool binary = filename.GetExt() == _("obp") || filename.GetExt() == _("OBP");
 
-        if(boat.Open(openDialog.GetPath().ToAscii(), binary))
-           m_PlotWindow->Refresh();
-        else
-        {
+        bool success;
+        if(binary) {
+            success = boat.OpenBinary(openDialog.GetPath().ToAscii());
+        } else {
+            BoatSpeedTable table;
+            int wind_speed_step, wind_degree_step;
+            if((success = table.Open(openDialog.GetPath().ToAscii(),
+                                     wind_speed_step, wind_degree_step))) {
+                m_sFileCSVWindSpeedStep->SetValue(wind_speed_step);
+                m_sFileCSVWindDegreeStep->SetValue(wind_degree_step);
+                boat.SetSpeedsFromTable(table);
+            }
+        }
+             
+        if(success) {
+            UpdateVMG();
+            m_PlotWindow->Refresh();
+        } else {
             wxMessageDialog md(this, _("Failed Loading boat polar"), _("OpenCPN Weather Routing Plugin"),
                                wxICON_INFORMATION | wxOK );
             md.ShowModal();
@@ -260,14 +321,24 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
 void BoatDialog::OnSave ( wxCommandEvent& event )
 {
     wxFileDialog saveDialog( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
-                             wxT ( "Boat Polar files (*.obp, *.cvs)|*.OBP;*.obp;*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
+                             wxT ( "Boat Polar files (*.obs, *.cvs)|*.OBS;*.obs;*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
     if( saveDialog.ShowModal() == wxID_OK ) {
         wxFileName filename = saveDialog.GetPath();
-        bool binary = filename.GetExt() == _("obp") || filename.GetExt() == _("OBP");
+        bool binary = filename.GetExt() == _("obs") || filename.GetExt() == _("OBS");
 
+        bool success;
+        if(binary)
+            success = boat.SaveBinary(saveDialog.GetPath().ToAscii());
+        else {
+            BoatSpeedTable table = boat.CreateTable
+                (m_sFileCSVWindSpeedStep->GetValue(),
+                 m_sFileCSVWindDegreeStep->GetValue());
+            success = table.Save(saveDialog.GetPath().ToAscii());
+        }
 
-        if(!boat.Save(saveDialog.GetPath().ToAscii(), binary)) {
-            wxMessageDialog md(this, _("Failed saving boat polar"), _("OpenCPN Weather Routing Plugin"),
+        if(!success) {
+            wxMessageDialog md(this, _("Failed saving boat polar"),
+                               _("OpenCPN Weather Routing Plugin"),
                                wxICON_INFORMATION | wxOK );
             md.ShowModal();
         }
@@ -280,15 +351,39 @@ void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
     m_PlotWindow->Refresh();
 }
 
+void BoatDialog::OnResetOptimalTackingSpeed( wxCommandEvent& event )
+{
+    boat.ResetOptimalTackingSpeed();
+    m_PlotWindow->Refresh();
+}
+
 void BoatDialog::Compute()
 {
     boat.eta = m_sEta->GetValue() / 1000.0;
     boat.hull_drag = m_sHullDrag->GetValue() / 100.0;
-    boat.keel_pressure = m_sKeelPressure->GetValue() / 100.0 + 3.0;
+    boat.keel_pressure = m_sKeelPressure->GetValue() / 100.0;
     boat.keel_lift = m_sKeelLift->GetValue() / 100.0;
     boat.lwl_ft = m_sLWL->GetValue();
     boat.displacement_lbs = m_sDisplacement->GetValue();
     boat.planing_constant = m_sPlaningConstant->GetValue();
 
     boat.ComputeBoatSpeeds();
+
+    UpdateVMG();
+    m_PlotWindow->Refresh();
+}
+
+void BoatDialog::UpdateVMG()
+{
+    int P = 0;
+    int VW = m_sWindSpeed->GetValue();
+
+    m_stBestCourseUpWindPort->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortUpWind));
+    m_stBestCourseUpWindStarboard->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardUpWind));
+    m_stBestCourseDownWindPort->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortDownWind));
+    m_stBestCourseDownWindStarboard->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardDownWind));
 }

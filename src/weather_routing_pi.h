@@ -1,5 +1,4 @@
 /******************************************************************************
- * $Id: weather_routing_pi.h $
  *
  * Project:  OpenCPN
  * Purpose:  Weather Routing Plugin
@@ -105,6 +104,6 @@ private:
 };
 
 extern GribRecordSet *g_GribRecord;
-extern wxDateTime g_GribTimelineTime;
+extern wxDateTime g_GribRecordTime, g_GribTimelineTime;
 
 #endif

@@ -56,7 +56,7 @@ public:
 class Route
 {
 public:
-    Route(Position *p, int cnt, int dir);
+    Route(Position *p, int cnt = 1, int dir = 1);
     Route(Route *r, Route *p=NULL);
     ~Route();
 
@@ -101,15 +101,16 @@ private:
 class RouteIso
 {
 public:
-  RouteIso(Position *p, wxDateTime t);
-  RouteIso(RouteList r, wxDateTime t);
-  ~RouteIso();
+    RouteIso(Position *p, wxDateTime t);
+    RouteIso(RouteList r, wxDateTime t);
+    ~RouteIso();
 
-  RouteIso *Propagate(RouteMap &routemap);
-  void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
-
-  RouteList routes;
-  wxDateTime time;
+    RouteIso *Propagate(RouteMap &routemap);
+    bool Contains(double lat, double lon);
+    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
+  
+    RouteList routes;
+    wxDateTime time;
 };
 
 typedef std::list<RouteIso*> RouteIsoList;
@@ -132,6 +133,7 @@ public:
     void Reset(double lat, double lon, wxDateTime time);
     void Clear();
     bool SetCursorLatLon(double lat, double lon);
+    bool ReachedDestination();
 
     double EndLat, EndLon;
 
@@ -147,9 +149,9 @@ public:
     bool DetectLand, InvertedRegions, Anchoring, AllowDataDeficient;
 
     BoatSpeed &boat;
-
     RouteIsoList origin; /* initial route iso */
 
+    bool m_bFinished, m_bReachedDestination, m_bGribFailed;
 private:
 
     Position *last_cursor_position;

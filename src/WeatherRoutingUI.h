@@ -144,7 +144,6 @@ class BoatDialogBase : public wxDialog
 		wxPanel* m_panel3;
 		wxChoice* m_cPlotType;
 		wxChoice* m_cPlotAxis;
-		wxSpinCtrl* m_sWindSpeed;
 		wxStaticText* m_stTrueWindAngle;
 		wxStaticText* m_staticText21;
 		wxStaticText* m_stTrueWindKnots;
@@ -158,9 +157,25 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stBoatKnots;
 		wxStaticText* m_staticText232;
 		wxPanel* m_panel31;
+		wxStaticText* m_staticText351;
+		wxSpinCtrl* m_sFileCSVWindSpeedStep;
+		wxStaticText* m_staticText36;
+		wxStaticText* m_staticText37;
+		wxSpinCtrl* m_sFileCSVWindDegreeStep;
+		wxStaticText* m_staticText38;
 		wxButton* m_bOpen;
 		wxButton* m_bSave;
-		wxButton* m_bClose;
+		wxPanel* m_panel311;
+		wxStaticText* m_staticText3511;
+		wxStaticText* m_stBestCourseUpWindPort;
+		wxStaticText* m_staticText35111;
+		wxStaticText* m_stBestCourseUpWindStarboard;
+		wxStaticText* m_staticText35112;
+		wxStaticText* m_stBestCourseDownWindPort;
+		wxStaticText* m_staticText35113;
+		wxStaticText* m_stBestCourseDownWindStarboard;
+		wxButton* m_bOptimizeTacking;
+		wxButton* m_bResetOptimizeTacking;
 		wxPanel* m_panel5;
 		wxStaticText* m_staticText12;
 		wxSlider* m_sEta;
@@ -176,25 +191,27 @@ class BoatDialogBase : public wxDialog
 		wxSpinCtrl* m_sPlaningConstant;
 		wxStaticText* m_staticText14;
 		wxSlider* m_sKeelLift;
-		wxButton* m_bOptimizeTacking;
+		wxSpinCtrl* m_sWindSpeed;
+		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMouseEventsPlot( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdatePlot( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnResetOptimalTackingSpeed( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecompute( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnRecompute( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Boat Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BoatDialogBase();
 	
 };

@@ -29,16 +29,22 @@
 /* from 0 to 100% motor power 10% at a time */
 #define MAX_POWER 10
 #define DEGREES 360
-#define DEGREE_STEP 5
+#define DEGREE_STEP 1
 
-class SailingSpeed
+struct SailingSpeed
 {
-public:
-    double VB; /* speed in knots */
-    double slipangle; /* angle of boat relative to its movement thru water */
+    float VB; /* speed in knots */
+    float origVB; /* speed before VMG optimization */
+    float slipangle; /* angle of boat relative to its movement thru water */
 
-    int b, c; /* tacks to sail relative to true wind */
-    double w; /* weight of time on each tack */
+    float w; /* weight of time on each tack */
+    short int b, c; /* tacks to sail relative to true wind */
+};
+
+struct SailingVMG
+{
+    int PortUpWind, StarboardUpWind;
+    int PortDownWind, StarboardDownWind;
 };
 
 #define MAX_WINDSPEEDS_IN_TABLE 100
@@ -56,21 +62,18 @@ typedef std::list<BoatSpeedTableEntry> BoatSpeedTableEntryList;
 class BoatSpeedTable
 {
 public:
-  BoatSpeedTable();
-  ~BoatSpeedTable();
+    BoatSpeedTable();
+    ~BoatSpeedTable();
 
-  bool Open(const char *filename);
-  bool Save(const char *filename);
+    bool Open(const char *filename, int &wind_speed_step, int &wind_degree_step);
+    bool Save(const char *filename);
 
-  bool OpenBinary(const char *filename);
-  bool SaveBinary(const char *filename);
-
-  double InterpolateSpeed(double VW, double W);
-
-  int numwindspeeds;
-  double windspeeds[MAX_WINDSPEEDS_IN_TABLE];
-
-  BoatSpeedTableEntryList table;
+    double InterpolateSpeed(double VW, double W);
+    
+    int numwindspeeds;
+    double windspeeds[MAX_WINDSPEEDS_IN_TABLE];
+    
+    BoatSpeedTableEntryList table;
 };
 
 /* contain all data for boat under sail with various motor power levels */
@@ -86,8 +89,8 @@ public:
     BoatSpeed();
     ~BoatSpeed();
 
-    bool Open(const char *filename, bool binary);
-    bool Save(const char *filename, bool binary);
+    bool OpenBinary(const char *filename);
+    bool SaveBinary(const char *filename);
 
     double eta, hull_drag, keel_pressure, keel_lift; /* sailing constant */
     double lwl_ft, displacement_lbs, planing_constant;
@@ -97,16 +100,22 @@ public:
 
     SailingSpeed speed[MAX_POWER+1][MAX_KNOTS+1][DEGREES];
 
+    SailingVMG VMG[MAX_POWER+1][MAX_KNOTS+1];
+
     void ComputeBoatSpeeds();
     void OptimizeTackingSpeed();
+    void ResetOptimalTackingSpeed();
     void SetSpeedsFromTable(BoatSpeedTable &table);
-    BoatSpeedTable CreateTable();
+    BoatSpeedTable CreateTable(int wind_speed_step, int wind_degree_step);
 
     double Speed(int P, double W, double VW);
     double TrueWindSpeed(int P, double VB, double W, double maxVW);
     void Set(int P, int W, int VW, double VB);
 
 private:
+    int BestVMG(int P, int VW, int startW, int endW, int upwind);
+    void CalculateVMG();
+
     double sail_forward_force(double A, double VA);
     double sail_slip_force(double A, double VA);
     double boat_slip_speed(double A, double VA);

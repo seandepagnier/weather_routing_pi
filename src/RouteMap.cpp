@@ -25,39 +25,27 @@
  */
 
 /* generate a datastructure which contains positions for
-   orthonormal lines which describe the position of the boat.
+   isochron line segments which describe the position of the boat at a given time..
 
    Starting at a given location, propagate outwards in all directions.
-   the outward propagation is guarenteed a closed region, except it may
-   be shifted significantly.  There are wall regions
-   which must be tested to determine intersections.  If the route
-   crosses a wall, then the resulting position of the point is reduced
-   to the position of intersection, and tagged as dead so it is not
+   the outward propagation is guarenteed a closed region, and circular linked
+   lists are used. If the route comes upon a boundary or reason to stop
+   searching, then the point is tagged as propagated so that it is not
    propagated any further.
 
-   The previous route can be treated as a wall because normally we
-   don't sail in one direction then turn around and sail the other way.
+   To merge regions requires virtually the same algorithm for descrambling
+   (normalizing) a single region.
 
-   Once the first region is established, repeat this process for
-   each outward point merging each region together.  It is best
-   to merge small regions, inserting to the end of the list
-   so that typically you merge regions with similar point count.
-
-   To merge regions requires the same algorithm for descrambling
-   single regions.  Therefore just append them to the list of positive
-   regions before descrambling.
-
-   To normalize a region means that no two line segments between border points
-   will intersect.  So given a complete route, and a list of
-   both positive and negative regions, the normalized route will no longer intersect
-   or contain any points from any of the positive or negative regions,
-   but may append additional regions to both of these lists.
+   To normalize a region means that no two line segments intersect.
 
    For each segment go through and see if it intersects
    with any other line segment.  When it does the old route will follow
    the correct direction of the intersection on the intersected route,
+   and the new region generated will be recursively normalized and then
+   merged.
 
-   A positive intersection comes in from the right.
+   A positive intersection comes in from the right.  Negative intersections
+   signal negative regions.
 
    For each segment in a given route
    If the intersection occurs with the route and itself
@@ -80,6 +68,10 @@
    Any inside routes may be discarded leaving only inverted subroutes
 */
 
+#ifdef __MSVC__
+#define isnan _isnan
+#endif
+
 #include "wx/wxprec.h"
 
 #ifndef  WX_PRECOMP
@@ -87,7 +79,6 @@
 #endif //precompiled headers
 
 #include "wx/datetime.h"
-
 #include "BoatSpeed.h"
 #include "RouteMap.h"
 #include "weather_routing_pi.h"
@@ -97,8 +88,8 @@
 
 static bool inverted_regions = false;
 
-GribRecordSet *g_GribRecord;
-wxDateTime g_GribTimelineTime;
+GribRecordSet *g_GribRecord = NULL;
+wxDateTime g_GribRecordTime, g_GribTimelineTime;
 
 static double Swell(double lat, double lon, wxDateTime time)
 {
@@ -118,12 +109,6 @@ static double Swell(double lat, double lon, wxDateTime time)
 static bool Wind(double &winddirground, double &windspeedground,
                  double lat, double lon, wxDateTime time)
 {
-#if 0
-    windspeedground = 20;//+100*(lon-174);
-    winddirground = 0;//remainder(300*(lat+35), 360);//rand()%60;
-    return true;
-#endif
-
     if(!g_GribRecord)
         return false;
 
@@ -394,7 +379,7 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
     if(Swell(lat, lon, time) > routemap.MaxSwellMeters)
         return;
 
-    if(lat > routemap.MaxLatitude)
+    if(fabs(lat) > routemap.MaxLatitude)
         return;
 
     double WG, VWG;
@@ -415,12 +400,14 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
     double W, VW;
     WindOverWater(C, VC, WG, VWG, W, VW);
 
-    double bearing;
-    ll_gc_ll_reverse(lat, lon, routemap.EndLat, routemap.EndLon, &bearing, 0);
-
-    double parentbearing = 0.0/0.0;
-    if(parent)
+    double bearing = 0, parentbearing = 0.0/0.0;
+    if(parent && routemap.TackingTime)
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
+    else if(routemap.MaxDivertedCourse == 180)
+        goto skipbearingcomputation;
+
+    ll_gc_ll_reverse(lat, lon, routemap.EndLat, routemap.EndLon, &bearing, 0);
+skipbearingcomputation:
 
     for(std::list<double>::iterator it = routemap.DegreeSteps.begin();
         it != routemap.DegreeSteps.end(); it++) {
@@ -435,14 +422,9 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
         if(isnan(B) || isnan(VB))
             B = VB = 0;
 
-//        VB = 1.6;
-
         /* compound boatspeed with current */
         double BG, VBG;
         BoatOverGround(B, VB, C, VC, BG, VBG);
-
-        if(fabs(heading_resolve(BG - bearing)) > routemap.MaxDivertedCourse)
-            continue;
 
         double timeseconds = routemap.dt.GetSeconds().ToDouble();
         /* did we tack? apply penalty */
@@ -461,6 +443,14 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
         bool hitland = routemap.DetectLand ? CrossesLand(dlat, dlon) : false;
         if(!hitland && dist) {
             Position *rp = new Position(dlat, dlon, this);
+
+            /* avoid propagating from positions which go in a direction too much
+               diverted from the correct course.  The reason to have this position
+               at all (and not move this test to before the position exists), is
+               to maintain continuity in the generated map (it looks much better) */
+            if(fabs(heading_resolve(BG - bearing)) > routemap.MaxDivertedCourse)
+                rp->propagated = true;
+
             if(points) {
                 rp->prev=points->prev;
                 rp->next=points;
@@ -475,7 +465,7 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
     if(count < 3) /* tested in normalize, but save the extra new and delete */
         return;
 
-    RouteList rl = (new Route(points, count, 1))->Normalize(0);
+    RouteList rl = (new Route(points, count))->Normalize(0);
     for(RouteList::iterator it = rl.begin(); it != rl.end(); it++)
         routeheap.Insert(*it);
 }
@@ -627,7 +617,12 @@ void SetPointColor(ocpnDC &dc, Position *p)
 void DrawLine(Position *p1, Position *p2, unsigned char *color,
               ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-    double p1plon = positive_degrees(p1->lon), p2plon = positive_degrees(p2->lon);
+    double p1plon, p2plon;
+    if(fabs(vp.clon) > 90)
+        p1plon = positive_degrees(p1->lon), p2plon = positive_degrees(p2->lon);
+    else
+        p1plon = heading_resolve(p1->lon), p2plon = heading_resolve(p2->lon);
+
     if((p1plon+180 < vp.clon && p2plon+180 > vp.clon) ||
        (p1plon+180 > vp.clon && p2plon+180 < vp.clon) ||
        (p1plon-180 < vp.clon && p2plon-180 > vp.clon) ||
@@ -1026,10 +1021,8 @@ Position *Route::ClosestPosition(double lat, double lon)
 
 void Route::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime time)
 {
-    if(!points) {
-        printf("propagating empty route\n");
-        exit(1);
-    }
+    if(!points)
+        return;
         
     Position *p = points;
     do {
@@ -1110,7 +1103,7 @@ Route *RouteHeap::Remove()
 RouteIso::RouteIso(Position *p, wxDateTime t)
     : time(t)
 {
-    routes.push_back(new Route(p, 1, 1));
+    routes.push_back(new Route(p));
 }
 
 RouteIso::RouteIso(RouteList r, wxDateTime t)
@@ -1124,54 +1117,37 @@ RouteIso::~RouteIso()
         delete *it;
 }
 
-int debugstep, debugcount = 28;
 RouteIso *RouteIso::Propagate(RouteMap &routemap)
 {
-    wxDateTime ntime = time + routemap.dt;
-    g_GribRecord = NULL; /* invalidate */
-
-    {
-        wxJSONValue v;
-        v[_T("Day")] = ntime.GetDay();
-        v[_T("Month")] = ntime.GetMonth();
-        v[_T("Year")] = ntime.GetYear();
-        v[_T("Hour")] = ntime.GetHour();
-        v[_T("Minute")] = ntime.GetMinute();
-        v[_T("Second")] = ntime.GetSecond();
-    
-        wxJSONWriter w;
-        wxString out;
-        w.Write(v, out);
-        SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
-    }
-
     if(!g_GribRecord ||
        !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VX] ||
        !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VY]) {
-        wxMessageDialog mdlg(NULL, _("Failed to get grib data at this time step\n"),
-                             wxString(_("OpenCPN Alert"), wxOK | wxICON_ERROR));
-        mdlg.ShowModal();
+        routemap.m_bGribFailed = true;
         return NULL;
     }
 
     /* build up a list of iso regions for each point
        in the current iso */
     RouteHeap routeheap;
-    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
-        (*it)->Propagate(routeheap, routemap, ntime);
+    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+        (*it)->Propagate(routeheap, routemap, g_GribRecordTime);
 
+    /* if none propagated we are finished */
+    if(routeheap.Size() == 0)
+        return NULL;
+
+    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         /* also keep previous route to avoid backtracking,
            but update it to drift with the current */
         Route *x = new Route(*it);
-        x->ApplyCurrent(routemap, ntime);
+        x->ApplyCurrent(routemap, g_GribRecordTime);
         routeheap.Insert(x);
 
         /* Is anchoring possible? Add the old route without currents */
         if(routemap.Anchoring)
             routeheap.Insert(new Route(*it));
     }
-
-    g_GribRecord = NULL;
+    g_GribRecord = NULL; /* done with it */
 
     RouteList merged, unmerged;
     while(routeheap.Size()) {
@@ -1179,11 +1155,11 @@ RouteIso *RouteIso::Propagate(RouteMap &routemap)
         while(routeheap.Size()) {
             Route *r2 = routeheap.Remove();
             RouteList rl;
-            if((debugstep == -1 || (debugstep++ < debugcount)) && Merge(rl, r1, r2)) {
+            if(Merge(rl, r1, r2)) {
 #if 0
                 for(RouteList::iterator it = rl.begin(); it != rl.end(); ++it)
                     routeheap.Insert(*it);
-#else /* optimization to merge new routes with eachother right away before hitting the main heap */
+#else /* merge new routes with each other right away before hitting the main heap */
                 RouteList unmerged2;
                 while(rl.size() > 0) {
                     r1 = rl.front();
@@ -1217,7 +1193,16 @@ RouteIso *RouteIso::Propagate(RouteMap &routemap)
         unmerged.clear();
     }
 
-    return new RouteIso(merged, ntime);
+    return new RouteIso(merged, g_GribRecordTime);
+}
+
+bool RouteIso::Contains(double lat, double lon)
+{
+    Route r(new Position(lat, lon));
+    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+        if((*it)->Contains(&r))
+            return true;
+    return false;
 }
 
 void RouteIso::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
@@ -1239,14 +1224,21 @@ RouteMap::~RouteMap()
 /* enlarge the map by 1 level */
 void RouteMap::Propagate()
 {
-    if(origin.size() == 0)
+    if(origin.size() == 0 || m_bFinished)
         return;
 
     inverted_regions = InvertedRegions;
 
     RouteIso* update = origin.back()->Propagate(*this);
-    if(update)
+
+    if(update) {
         origin.push_back(update);
+        if(update->Contains(EndLat, EndLon)) {
+            m_bFinished = true;
+            m_bReachedDestination = true;
+        }
+    } else
+        m_bFinished = true;
 }
 
 Position *RouteMap::ClosestPosition(double lat, double lon)
@@ -1356,6 +1348,9 @@ void RouteMap::Reset(double lat, double lon, wxDateTime time)
 {
     Clear();
     origin.push_back(new RouteIso(new Position(lat, lon), time));
+    m_bFinished = false;
+    m_bReachedDestination = false;
+    m_bGribFailed = false;
 }
 
 bool RouteMap::SetCursorLatLon(double lat, double lon)

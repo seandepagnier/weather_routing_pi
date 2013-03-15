@@ -49,14 +49,17 @@ private:
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlot( wxCommandEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlot( wxSpinEvent& event ) { m_PlotWindow->Refresh(); }
+    void OnUpdateWindSpeed( wxSpinEvent& event );
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event ) { Hide(); }
-    void OnRecompute( wxScrollEvent& event ) { Compute(); m_PlotWindow->Refresh(); }
+    void OnRecompute( wxScrollEvent& event ) { Compute(); }
     void OnOptimizeTacking( wxCommandEvent& event );
+    void OnResetOptimalTackingSpeed( wxCommandEvent& event );
 
     void Compute();
     void UpdateTrackingControls();
+    void UpdateVMG();
     
     BoatSpeed &boat;
     double m_PlotScale;

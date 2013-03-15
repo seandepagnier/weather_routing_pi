@@ -230,8 +230,24 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         wxCharBuffer bptr = sptr.To8BitData();
         const char* ptr = bptr.data();
 
-        /* need to copy record once we do threads */
-        sscanf(ptr, "%p", &g_GribRecord);
+        static GribRecordSet *gptr;
+        sscanf(ptr, "%p", &gptr);
+
+#if 1
+        g_GribRecord = gptr;
+#else /* copy data could  be useful if other plugins use the grib data */
+        static GribRecordSet s_GribRecordData;
+        g_GribRecord = &s_GribRecordData;
+
+        g_GribRecord->m_Reference_Time = gptr->m_Reference_Time;
+        for(int i=0; i<Idx_COUNT; i++) {
+            if(gptr->m_GribRecordPtrArray[i]) {
+                GribRecord &rec = *gptr->m_GribRecordPtrArray[i];
+                g_GribRecord->m_GribRecordPtrArray[i] = new GribRecord(rec);
+            } else
+                g_GribRecord->m_GribRecordPtrArray[i] = NULL;
+        }
+#endif
     }
 }
 

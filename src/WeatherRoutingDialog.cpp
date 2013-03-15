@@ -35,6 +35,7 @@
 #include <wx/filename.h>
 #include <wx/debug.h>
 #include <wx/graphics.h>
+#include "wx/stdpaths.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -100,7 +101,6 @@
                                                will slow boat down
                        Wind Generator coefficients for efficiency wind-loading etc..
                                                can slow beating and help running
-                       Fuel Generator coefficients for efficiency and capacity (will cut on in fuel shortage)
                        Human Generator coefficients for efficiency, human and willingness
                    Other propulsion...
 
@@ -143,10 +143,23 @@
 
 WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon )
     : WeatherRoutingDialogBase(parent), m_routemap(boat), m_SettingsDialog(this, m_routemap),
-      m_thCompute(*parent, m_routemap)
+      m_thCompute(m_routemap)
 {
-    m_SettingsDialog.Hide();
+    wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
+#ifdef __WXMSW__
+    wxString stdPath  = std_path.GetConfigDir();
+#endif
+#ifdef __WXGTK__
+    wxString stdPath  = std_path.GetUserDataDir();
+#endif
+#ifdef __WXOSX__
+    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
+#endif
 
+    m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.obs");
+    boat.OpenBinary(m_default_boat_path.ToAscii());
+
+    m_SettingsDialog.Hide();
     m_pBoatDialog = new BoatDialog(this, boat);
 
     wxFileConfig *pConf = GetOCPNConfigObject();
@@ -166,10 +179,21 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, d
 
     SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
     Reset();
+
+    /* periodically check for updates from computation thread */
+    m_tCompute.Connect(wxEVT_TIMER, wxTimerEventHandler
+                       ( WeatherRoutingDialog::OnComputationTimer ), NULL, this);
+    m_tCompute.Start(100);
+
+    m_thCompute.computemutex.Lock();
+    m_thCompute.gribmutex.Lock();
+    m_thCompute.Run();
 }
 
 WeatherRoutingDialog::~WeatherRoutingDialog( )
 {
+    boat.SaveBinary(m_default_boat_path.ToAscii());
+
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
@@ -181,6 +205,11 @@ WeatherRoutingDialog::~WeatherRoutingDialog( )
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "DialogX" ), p.x);
     pConf->Write ( _T ( "DialogY" ), p.y);
+
+    if(!m_thCompute.computing)
+        m_thCompute.computemutex.Unlock();
+    m_thCompute.gribmutex.Unlock();
+    m_thCompute.Delete();
 }
 
 void WeatherRoutingDialog::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
@@ -193,9 +222,9 @@ void WeatherRoutingDialog::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
         glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     }
 
-//    m_thCompute.routemutex.Lock();
+    m_thCompute.routemutex.Lock();
     m_routemap.Render(dc, vp);
-//    m_thCompute.routemutex.Unlock();
+    m_thCompute.routemutex.Unlock();
 
     if(!dc.GetDC())
         glPopAttrib();
@@ -208,35 +237,17 @@ void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
 
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
-    extern int debugstep;
-#if 0
-    extern int debugcount;
-    debugcount++;
-    Reset();
-    debugstep = -1;
-    for(int i=0; i<13; i++)
-        m_routemap.Propagate();
-    debugstep = 0;
-    m_routemap.Propagate();
-#else
-    if(m_routemap.origin.size() == 0)
-        Reset();
-
-    debugstep = -1;
-    for(int i=0; i<1; i++)
-        m_routemap.Propagate();
-#endif
-
-#if 0
-    if(m_thCompute.IsRunning()) {
-        m_bCompute->SetLabel(_( "&Compute" ));
-        m_thCompute.End();
-        m_thCompute.Wait();
+    if(m_thCompute.computing) {
+        m_bCompute->SetLabel(_( "&Start" ));
+        m_thCompute.computemutex.Lock();
+        m_thCompute.computing = false;
     } else {
         m_bCompute->SetLabel(_( "&Stop" ));
-        m_thCompute.Run();
+        if(m_routemap.origin.size() == 0)
+            Reset();
+        m_thCompute.computing = true;
+        m_thCompute.computemutex.Unlock();
     }
-#endif
 
     GetParent()->Refresh();
 }
@@ -244,6 +255,9 @@ void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
 {
     m_pBoatDialog->Show(!m_pBoatDialog->IsShown());
+//    m_thCompute.routemutex.Lock();
+//    m_pBoatDialog->ShowModal();
+//    m_thCompute.routemutex.Unlock();
 }
 
 void WeatherRoutingDialog::OnReset ( wxCommandEvent& event )
@@ -260,7 +274,7 @@ void WeatherRoutingDialog::OnInformation ( wxCommandEvent& event )
         dlg.ShowModal();
     else {
         wxMessageDialog mdlg(this, _("Failed to load file:\n") + infolocation,
-                             wxString(_("OpenCPN Alert"), wxOK | wxICON_ERROR));
+                             _("OpenCPN Alert"), wxOK | wxICON_ERROR);
         mdlg.ShowModal();
     }
 }
@@ -269,7 +283,7 @@ void WeatherRoutingDialog::OnSettings( wxCommandEvent& event )
 {
     m_SettingsDialog.LoadSettings();
     if(m_SettingsDialog.ShowModal() == wxID_OK) {
-        m_SettingsDialog.ReconfigureRouteMap();
+        ReconfigureRouteMap();
         m_SettingsDialog.SaveSettings();
     }
 }
@@ -277,6 +291,64 @@ void WeatherRoutingDialog::OnSettings( wxCommandEvent& event )
 void WeatherRoutingDialog::OnClose( wxCommandEvent& event )
 {
     Hide();
+}
+
+void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
+{
+    if(m_thCompute.needgrib) {
+        if(m_routemap.origin.size() == 0) {
+            wxMessageDialog mdlg(this, _("routemap should not be empty here"),
+                             _("Weather Routing"), wxOK);
+            mdlg.ShowModal();
+            return;
+        }
+
+        g_GribRecordTime = m_routemap.origin.back()->time + m_routemap.dt;
+        g_GribRecord = NULL; /* invalidate */
+        {
+            wxJSONValue v;
+            v[_T("Day")] = g_GribRecordTime.GetDay();
+            v[_T("Month")] = g_GribRecordTime.GetMonth();
+            v[_T("Year")] = g_GribRecordTime.GetYear();
+            v[_T("Hour")] = g_GribRecordTime.GetHour();
+            v[_T("Minute")] = g_GribRecordTime.GetMinute();
+            v[_T("Second")] = g_GribRecordTime.GetSecond();
+    
+            wxJSONWriter w;
+            wxString out;
+            w.Write(v, out);
+            SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+        }
+        m_thCompute.gribmutex.Unlock();
+        wxThread::Sleep(10);
+        m_thCompute.gribmutex.Lock();
+    }
+
+    if(m_thCompute.Updated())
+        GetParent()->Refresh();
+
+    if(!m_thCompute.computing)
+        return;
+
+    if(!m_routemap.m_bFinished)
+        return;
+
+    m_thCompute.computemutex.Lock();
+    m_thCompute.computing = false;
+
+    m_bCompute->SetLabel(_( "&Start" ));
+
+    if(m_routemap.m_bReachedDestination) {
+        wxMessageDialog mdlg(this, _("Computation completed, destination reached\n"),
+                             _("Weather Routing"), wxOK);
+        mdlg.ShowModal();
+    } else {
+        wxString gribfailmsg = _("Failed to get grib data at this time step\n");
+        wxMessageDialog mdlg(this, _("Computation completed, destination not reached.\n")
+                             + (m_routemap.m_bGribFailed ? gribfailmsg : _T("")),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+    }
 }
 
 void WeatherRoutingDialog::Reset()
@@ -289,36 +361,61 @@ void WeatherRoutingDialog::Reset()
 
     m_stStartDate->SetLabel(time.FormatISODate());
     m_stStartTime->SetLabel(time.FormatISOTime());
+    
+    if(m_thCompute.computing) {
+        m_thCompute.computemutex.Lock();
+        m_thCompute.computing = false;
+        m_bCompute->SetLabel(_( "&Start" ));
+    }
 
+    m_thCompute.routemutex.Lock();
     m_routemap.Reset(startlat, startlon, time);
+    m_thCompute.routemutex.Unlock();
+    GetParent()->Refresh();
 }
 
 void WeatherRoutingDialog::UpdateEnd()
 {
+    m_thCompute.routemutex.Lock();
     m_tEndLat->GetValue().ToDouble(&m_routemap.EndLat);
     m_tEndLon->GetValue().ToDouble(&m_routemap.EndLon);
+    m_thCompute.routemutex.Unlock();
 }
 
 void WeatherRoutingDialog::ReconfigureRouteMap()
 {
     UpdateEnd();
+    m_thCompute.routemutex.Lock();
     m_SettingsDialog.ReconfigureRouteMap();
+    m_thCompute.routemutex.Unlock();
 }
 
-wxMutex routemutex;
 void *WeatherRoutingThread::Entry()
 {
-    int cnt = 0;
-    while(!stop) {
-        if(cnt < 12) {
-            routemutex.Lock();
-//            routemap.Propagate(boat);
-            routemutex.Unlock();
-//            parent.Refresh();
-            cnt++;
-        }
-        wxThread::Yield();
-        wxThread::Sleep(2000);
+    while(!TestDestroy()) {
+
+        computemutex.Lock();
+
+        needgrib = true;
+        gribmutex.Lock();
+        gribmutex.Unlock();
+        needgrib = false;
+
+        routemutex.Lock();
+        routemap.Propagate();
+        updated = true;
+        routemutex.Unlock();
+
+        computemutex.Unlock();
+
+        wxThread::Sleep(100);
     }
     return 0;
+}
+
+bool WeatherRoutingThread::Updated()
+{
+    bool ret = updated;
+    updated = false;
+    return ret;
 }

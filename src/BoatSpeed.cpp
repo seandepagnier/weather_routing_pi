@@ -32,6 +32,10 @@
 #include "Utilities.h"
 #include "BoatSpeed.h"
 
+#ifdef __MSVC__
+#define isnan _isnan
+#endif
+
 double interp_value(double x, double x1, double x2, double y1, double y2)
 {
 /*
@@ -52,7 +56,7 @@ BoatSpeedTable::~BoatSpeedTable()
 {
 }
 
-bool BoatSpeedTable::Open(const char *filename)
+bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_degree_step)
 {
     FILE *f = fopen(filename, "r");
     numwindspeeds=0;
@@ -74,7 +78,9 @@ bool BoatSpeedTable::Open(const char *filename)
         if(numwindspeeds > MAX_WINDSPEEDS_IN_TABLE)
             goto failed;
     }
-    
+    wind_speed_step = windspeeds[numwindspeeds-1] / numwindspeeds;
+
+    wind_degree_step = 0;
     while(fgets(line, sizeof line, f)) {
         token = strtok_r(line, ";", &saveptr);
         BoatSpeedTableEntry entry;
@@ -85,7 +91,13 @@ bool BoatSpeedTable::Open(const char *filename)
         if(i > MAX_WINDSPEEDS_IN_TABLE)
             goto failed;
         table.push_back(entry);
+        wind_degree_step++;
     }
+
+    if(wind_degree_step < 2)
+        wind_degree_step = 2;
+    wind_degree_step = 180 / (wind_degree_step - 1);
+
     fclose(f);
     return true;
     
@@ -116,78 +128,6 @@ bool BoatSpeedTable::Save(const char *filename)
     }
     fclose(f);
     return true;
-}
-
-bool BoatSpeedTable::OpenBinary(const char *filename)
-{
-    FILE *f = fopen(filename, "r");
-    if(!f)
-        return false;
-
-    int n, s;
-    if(fscanf(f, "obs %d %d\n", &n, &s) != 2) goto failed;
-    numwindspeeds = n;
-
-    float windspeeds32[MAX_WINDSPEEDS_IN_TABLE];
-    if((int)fread(windspeeds32, sizeof *windspeeds32, n, f) != n) goto failed;
-    for(int j = 0; j<n; j++)
-        windspeeds[j] = windspeeds32[j];
-
-    for(int i=0; i<s; i++) {
-        BoatSpeedTableEntry entry;
-        float W32;
-        if((int)fread(&W32, sizeof W32, 1, f) != 1) goto failed;
-        entry.W = W32;
-
-        float boatspeed32[MAX_WINDSPEEDS_IN_TABLE];
-        if((int)fread(boatspeed32, sizeof *boatspeed32, n, f) != n) goto failed;
-
-        for(int j = 0; j<n; j++)
-            entry.boatspeed[j] = boatspeed32[j];
-
-        table.push_back(entry);
-    }
-
-    fclose(f);
-    return true;
-
-failed:
-    fclose(f);
-    return false;
-}
-
-bool BoatSpeedTable::SaveBinary(const char *filename)
-{
-    FILE *f = fopen(filename, "w");
-    if(!f)
-        return false;
-
-    int n = numwindspeeds;
-
-    fprintf(f, "obs %d %d\n", n, table.size());
-
-    float windspeeds32[MAX_WINDSPEEDS_IN_TABLE];
-    for(int j = 0; j<n; j++)
-        windspeeds32[j] = windspeeds[j];
-    if((int)fwrite(windspeeds32, sizeof *windspeeds32, n, f) != n) goto failed;
-
-    for(BoatSpeedTableEntryList::iterator it = table.begin(); it != table.end(); ++it) {
-        float W32 = (*it).W;
-        if(fwrite(&W32, sizeof W32, 1, f) != 1) goto failed;
-
-        float boatspeed32[MAX_WINDSPEEDS_IN_TABLE];
-        for(int j = 0; j<n; j++)
-            boatspeed32[j] = (*it).boatspeed[j];
-
-        if((int)fwrite(boatspeed32, sizeof *boatspeed32, n, f) != n) goto failed;
-    }
-
-    fclose(f);
-    return true;
-
-failed:
-    fclose(f);
-    return false;
 }
 
 double BoatSpeedTable::InterpolateSpeed(double VW, double W)
@@ -645,34 +585,40 @@ void BoatSpeed::BoatSteadyState(double W, double VW, double P,
 
 BoatSpeed::BoatSpeed()
 {
-    Open("/home/sean/boat.obs", true);
 }
 
 BoatSpeed::~BoatSpeed()
 {
-    Save("/home/sean/boat.obs", true);
 }
 
-bool BoatSpeed::Open(const char *filename, bool binary)
+bool BoatSpeed::OpenBinary(const char *filename)
 {
-    BoatSpeedTable table;
-    if(binary) {
-        if(!table.OpenBinary(filename))
-            return false;
-    } else
-        if(!table.Open(filename))
-            return false;
+    FILE *f = fopen(filename, "r");
+    if(!f)
+        return false;
 
-    SetSpeedsFromTable(table);
-    return true;
+    int s = sizeof *this;
+    bool ret = true;
+    if(fread(this, s, 1, f) != 1)
+        ret = false;
+
+    fclose(f);
+    return ret;
 }
 
-bool BoatSpeed::Save(const char *filename, bool binary)
+bool BoatSpeed::SaveBinary(const char *filename)
 {
-    BoatSpeedTable table = CreateTable();
-    if(binary)
-        return table.SaveBinary(filename);
-    return table.Save(filename);
+    FILE *f = fopen(filename, "w");
+    if(!f)
+        return false;
+
+    int s = sizeof *this;
+    bool ret = true;
+    if(fwrite(this, s, 1, f) != 1)
+        ret = false;
+
+    fclose(f);
+    return ret;
 }
 
 /* eta is a measure of efficiency of the boat, from .01 for racing boats to .5 for
@@ -688,6 +634,8 @@ void BoatSpeed::ComputeBoatSpeeds()
                 if(W != 0)
                     Set(P, DEGREES-W, VW, VB);
             }
+
+    CalculateVMG();
 }
 
 /* instead of traveling in the direction given, allow traveling at angles
@@ -698,42 +646,58 @@ void BoatSpeed::ComputeBoatSpeeds()
 void BoatSpeed::OptimizeTackingSpeed()
 {
     for(int P = 0; P <= 0/*MAX_POWER*/; P++)
-        for(int VW = 0; VW < MAX_KNOTS; VW++)
-            for(int at = 0; at <= DEGREES; at+=DEGREE_STEP) {
-                SailingSpeed &a = speed[P][VW][at];
-                for(int bt = DEGREE_STEP; bt < DEGREES/2; bt+=DEGREE_STEP) {
-                    SailingSpeed &b = speed[P][VW][bt];
-                    for(int ct = DEGREES/2+DEGREE_STEP; ct < DEGREES; ct+=DEGREE_STEP) {
-                        SailingSpeed &c = speed[P][VW][ct];
-                        /* don't use speeds which already optimized with tacking */
-                        if(b.w != 1 || c.w != 1)
-                            continue;
+        for(int VW = 0; VW < MAX_KNOTS; VW++) {
+            for(int W = 0; W <= DEGREES; W+=DEGREE_STEP) {
+                int at = W, bt, ct;
 
-                        /* w is the weight between b and c tacks (.5 for equal time on each
-                           t is the improvement factor]
-                           bcVB * sin(a) = w*b.VB*sin(b) + (1-w)*c.VB*sin(c)
-                           bcVB * cos(a) = w*b.VB*cos(b) + (1-w)*c.VB*cos(c) */
-                        double ar = deg2rad(at), br = deg2rad(bt), cr = deg2rad(ct);
-                        double sa = sin(ar), ca = cos(ar);
-                        double sb = sin(br), cb = cos(br);
-                        double sc = sin(cr), cc = cos(cr);
-                        double X = ca*sc-sa*cc, Y = sa*cb-ca*sb;
-                        double d = (X*c.VB + Y*b.VB);
-                        double w = X*c.VB / d;
-
-                        if(w > 0 && w < 1) {
-                            double Z = cb*sc-sb*cc;
-                            double bcVB = Z*b.VB*c.VB / d;
-                            if(bcVB > a.VB) {
-                                a.VB = bcVB;
-                                if(at < 180)
-                                    a.b = bt, a.c = ct, a.w = w;
-                                else
-                                    a.b = ct, a.c = bt, a.w = (1-w);
-                            }
-                        }
-                    }
+                if(W >= DEGREES*1/4 && W < DEGREES*3/4) {
+                    bt = VMG[P][VW].StarboardDownWind;
+                    ct = VMG[P][VW].PortDownWind;
+                } else {
+                    bt = VMG[P][VW].StarboardUpWind;
+                    ct = VMG[P][VW].PortUpWind;
                 }
+
+                SailingSpeed &a = speed[P][VW][at];
+                SailingSpeed &b = speed[P][VW][bt];
+                SailingSpeed &c = speed[P][VW][ct];
+
+                /* w is the weight between b and c tacks (.5 for equal time on each
+                   t is the improvement factor]
+                   bcVB * sin(a) = w*b.VB*sin(b) + (1-w)*c.VB*sin(c)
+                   bcVB * cos(a) = w*b.VB*cos(b) + (1-w)*c.VB*cos(c) */
+                double ar = deg2rad(at), br = deg2rad(bt), cr = deg2rad(ct);
+                double sa = sin(ar), ca = cos(ar);
+                double sb = sin(br), cb = cos(br);
+                double sc = sin(cr), cc = cos(cr);
+                double X = ca*sc-sa*cc, Y = sa*cb-ca*sb;
+                double d = (X*c.VB + Y*b.VB);
+                double w = X*c.VB / d;
+
+                if(w > 0 && w < 1) {
+                    double Z = cb*sc-sb*cc;
+                    double bcVB = Z*b.VB*c.VB / d;
+                    if(bcVB > a.VB) {
+                        a.VB = bcVB;
+                        if(at > 180)
+                            a.b = bt, a.c = ct, a.w = w;
+                        else
+                            a.b = ct, a.c = bt, a.w = (1-w);
+                    }
+                }           
+            }
+        }
+}
+
+void BoatSpeed::ResetOptimalTackingSpeed()
+{
+    for(int P = 0; P <= 0/*MAX_POWER*/; P++)
+        for(int VW = 0; VW < MAX_KNOTS; VW++)
+            for(int W = 0; W <= DEGREES; W+=DEGREE_STEP) {
+                SailingSpeed &a = speed[P][VW][W];
+                a.VB = a.origVB;
+                a.b = W;
+                a.w = 1;
             }
 }
 
@@ -747,28 +711,27 @@ void BoatSpeed::SetSpeedsFromTable(BoatSpeedTable &table)
             if(W != 0)
                 Set(P, DEGREES-W, VW, VB);
         }
+    CalculateVMG();
 }
 
-BoatSpeedTable BoatSpeed::CreateTable()
+BoatSpeedTable BoatSpeed::CreateTable(int wind_speed_step, int wind_degree_step)
 {
     BoatSpeedTable boatspeedtable;
-    int windsstep = 3;
-    int winddstep = 5;
 
     for(;;) {
-        boatspeedtable.numwindspeeds = MAX_KNOTS / windsstep;
+        boatspeedtable.numwindspeeds = MAX_KNOTS / wind_speed_step;
         if(boatspeedtable.numwindspeeds < MAX_WINDSPEEDS_IN_TABLE)
             break;
-        windsstep *= 2;
+        wind_speed_step *= 2;
     }
 
     int VW, i;
-    for(VW = 0, i=0; VW < MAX_KNOTS; VW+=windsstep, i++)
+    for(VW = 0, i=0; VW < MAX_KNOTS; VW+=wind_speed_step, i++)
         boatspeedtable.windspeeds[i] = VW;
 
-    for(int W = 0; W <= DEGREES/2; W+=winddstep) {
+    for(int W = 0; W <= DEGREES/2; W+=wind_degree_step) {
         BoatSpeedTableEntry entry;
-        for(VW = 0, i=0; VW < MAX_KNOTS; VW+=windsstep, i++) {
+        for(VW = 0, i=0; VW < MAX_KNOTS; VW+=wind_speed_step, i++) {
             entry.W = W;
             entry.boatspeed[i] = Speed(0, W, VW);
         }
@@ -857,9 +820,35 @@ void BoatSpeed::Set(int P, int W, int VW, double VB)
         return; /* maybe log warning here? */
     
     speed[P][VW][W].VB = VB;
+    speed[P][VW][W].origVB = VB;
     speed[P][VW][W].slipangle = 0;
     speed[P][VW][W].b = W;
     speed[P][VW][W].w = 1; /* weighted all on first course */
+}
+
+int BoatSpeed::BestVMG(int P, int VW, int startW, int endW, int upwind)
+{
+    double maxVB = 0;
+    int maxW = 0;
+    for(int W = startW; W <= endW; W+=DEGREE_STEP) {
+        double VB = upwind*cos(deg2rad(W))*speed[P][VW][(W%360)].origVB;
+        if(VB > maxVB) {
+            maxVB = VB;
+            maxW = W;
+        }
+    }
+    return maxW;
+}
+
+void BoatSpeed::CalculateVMG()
+{
+    for(int P = 0; P <= 0/*MAX_POWER*/; P++)
+        for(int VW = 0; VW < MAX_KNOTS; VW++) {
+            VMG[P][VW].StarboardUpWind   = BestVMG(P, VW, DEGREES*3/4, DEGREES*4/4,  1);
+            VMG[P][VW].PortUpWind        = BestVMG(P, VW, DEGREES*0/4, DEGREES*1/4,  1);
+            VMG[P][VW].StarboardDownWind = BestVMG(P, VW, DEGREES*2/4, DEGREES*3/4, -1);
+            VMG[P][VW].PortDownWind      = BestVMG(P, VW, DEGREES*1/4, DEGREES*2/4, -1);
+        }
 }
 
 /* to calculate power required to move the boat:

@@ -91,7 +91,7 @@ void WeatherRoutingSettingsDialog::LoadSettings()
     m_sMaxLatitude->SetValue(maxlatitude);
 
     int tackingtime;
-    pConf->Read( _T("TackingTime"), &tackingtime, 10);
+    pConf->Read( _T("TackingTime"), &tackingtime, 0);
     m_sTackingTime->SetValue(tackingtime);
 
     int substeps;
@@ -134,7 +134,7 @@ void WeatherRoutingSettingsDialog::SaveSettings( )
     pConf->Write( _T("MaxDivertedCourse"), m_sMaxDivertedCourse->GetValue());
     pConf->Write( _T("MaxWindKnots"), m_sMaxWindKnots->GetValue());
     pConf->Write( _T("MaxSwellMeters"), m_sMaxSwellMeters->GetValue());
-    pConf->Write( _T("MaxLatittude"), m_sMaxLatitude->GetValue());
+    pConf->Write( _T("MaxLatitude"), m_sMaxLatitude->GetValue());
     pConf->Write( _T("TackingTime"), m_sTackingTime->GetValue());
     pConf->Write( _T("SubSteps"), m_sSubSteps->GetValue());
 
