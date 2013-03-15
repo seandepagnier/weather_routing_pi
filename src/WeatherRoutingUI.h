@@ -167,13 +167,13 @@ class BoatDialogBase : public wxDialog
 		wxButton* m_bSave;
 		wxPanel* m_panel311;
 		wxStaticText* m_staticText3511;
-		wxStaticText* m_stBestCourseUpWindPort;
+		wxStaticText* m_stBestCourseUpWindPortTack;
 		wxStaticText* m_staticText35111;
-		wxStaticText* m_stBestCourseUpWindStarboard;
+		wxStaticText* m_stBestCourseUpWindStarboardTack;
 		wxStaticText* m_staticText35112;
-		wxStaticText* m_stBestCourseDownWindPort;
+		wxStaticText* m_stBestCourseDownWindPortTack;
 		wxStaticText* m_staticText35113;
-		wxStaticText* m_stBestCourseDownWindStarboard;
+		wxStaticText* m_stBestCourseDownWindStarboardTack;
 		wxButton* m_bOptimizeTacking;
 		wxButton* m_bResetOptimizeTacking;
 		wxPanel* m_panel5;

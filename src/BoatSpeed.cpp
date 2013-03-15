@@ -568,19 +568,23 @@ double BoatSpeed::DirectionApparentWind(double VA, double VB, double W, double V
 void BoatSpeed::BoatSteadyState(double W, double VW, double P,
                                 double &B, double &VB, double &A, double &VA)
 {
-  /* starting out not moving */
-  VB = 0, A = W, VA = VW;
-  for(;;) {
-    double v = VelocityBoat(A, VA, P);
-    if(v - VB < 1e-10) {
-      B = AngleofAttackBoat(A, VA, P);
-      return; /* reached steady state */
-    }
+    /* starting out not moving */
+    VB = 0, A = W, VA = VW;
+    double lp = .5;
+    for(;;) {
+        double v = VelocityBoat(A, VA, P);
+        if(fabs(v - VB) < 1e-2 || lp < 1e-2) {
+            B = AngleofAttackBoat(A, VA, P);
+            return; /* reached steady state */
+        }
 
-    VB = (VB + v) / 2; /* average to avoid overshoot */
-    VA = VelocityApparentWind(VB, W, VW);
-    A =  DirectionApparentWind(VA, VB, W, VW);
-  }
+        if(v - VB < 0) /* overshoot */
+            lp *= .75;
+
+        VB = (1-lp)*VB + lp*v; /* average to avoid overshoot */
+        VA = VelocityApparentWind(VB, W, VW);
+        A =  DirectionApparentWind(VA, VB, W, VW);
+    }
 }
 
 BoatSpeed::BoatSpeed()
@@ -625,8 +629,9 @@ bool BoatSpeed::SaveBinary(const char *filename)
    heavy cruisers */
 void BoatSpeed::ComputeBoatSpeeds()
 {
-    for(int P = 0; P <= 1/*MAX_POWER*/; P++)
-        for(int VW = 0; VW < MAX_KNOTS; VW++)
+    double vw_step = 1;
+    for(int P = 0; P <= 1/*MAX_POWER*/; P++) {
+        for(int VW = 0; VW < MAX_KNOTS; VW+=vw_step)
             for(int W = 0; W <= DEGREES/2; W+=DEGREE_STEP) {
                 double B, VB, A, VA;
                 BoatSteadyState(deg2rad(W), VW, P, B, VB, A, VA);
@@ -634,6 +639,17 @@ void BoatSpeed::ComputeBoatSpeeds()
                 if(W != 0)
                     Set(P, DEGREES-W, VW, VB);
             }
+
+        for(int VW = 0; VW < MAX_KNOTS; VW++) {
+            for(int W = 0; W < DEGREES/2; W+=DEGREE_STEP) {
+                double VB = Speed(P, W, VW, vw_step);
+
+                Set(P, W, VW, VB);
+                if(W != 0)
+                    Set(P,DEGREES-W, VW, VB);
+            }
+        }
+    }
 
     CalculateVMG();
 }
@@ -651,11 +667,11 @@ void BoatSpeed::OptimizeTackingSpeed()
                 int at = W, bt, ct;
 
                 if(W >= DEGREES*1/4 && W < DEGREES*3/4) {
-                    bt = VMG[P][VW].StarboardDownWind;
-                    ct = VMG[P][VW].PortDownWind;
+                    bt = VMG[P][VW].StarboardTackDownWind;
+                    ct = VMG[P][VW].PortTackDownWind;
                 } else {
-                    bt = VMG[P][VW].StarboardUpWind;
-                    ct = VMG[P][VW].PortUpWind;
+                    bt = VMG[P][VW].StarboardTackUpWind;
+                    ct = VMG[P][VW].PortTackUpWind;
                 }
 
                 SailingSpeed &a = speed[P][VW][at];
@@ -741,7 +757,7 @@ BoatSpeedTable BoatSpeed::CreateTable(int wind_speed_step, int wind_degree_step)
 }
 
 /* compute boat speed from given power level, true wind angle and true wind speed */
-double BoatSpeed::Speed(int P, double W, double VW)
+double BoatSpeed::Speed(int P, double W, double VW, double vw_step)
 {
     W = positive_degrees(W);
     if(P < 0 || P > MAX_POWER || VW < 0 || VW > MAX_KNOTS)
@@ -759,7 +775,7 @@ double BoatSpeed::Speed(int P, double W, double VW)
     int W1i = positive_degrees(W1);
     int W2i = positive_degrees(W2);
 
-    int VW1 = floor(VW), VW2 = ceil(VW);
+    int VW1 = floor(VW/vw_step)*vw_step, VW2 = ceil(VW/vw_step)*vw_step;
 
     double VB11 = speed[P][VW1][W1i].VB;
     double VB12 = speed[P][VW1][W2i].VB;
@@ -844,10 +860,10 @@ void BoatSpeed::CalculateVMG()
 {
     for(int P = 0; P <= 0/*MAX_POWER*/; P++)
         for(int VW = 0; VW < MAX_KNOTS; VW++) {
-            VMG[P][VW].StarboardUpWind   = BestVMG(P, VW, DEGREES*3/4, DEGREES*4/4,  1);
-            VMG[P][VW].PortUpWind        = BestVMG(P, VW, DEGREES*0/4, DEGREES*1/4,  1);
-            VMG[P][VW].StarboardDownWind = BestVMG(P, VW, DEGREES*2/4, DEGREES*3/4, -1);
-            VMG[P][VW].PortDownWind      = BestVMG(P, VW, DEGREES*1/4, DEGREES*2/4, -1);
+            VMG[P][VW].StarboardTackUpWind   = BestVMG(P, VW, DEGREES*3/4, DEGREES*4/4,  1);
+            VMG[P][VW].PortTackUpWind        = BestVMG(P, VW, DEGREES*0/4, DEGREES*1/4,  1);
+            VMG[P][VW].StarboardTackDownWind = BestVMG(P, VW, DEGREES*2/4, DEGREES*3/4, -1);
+            VMG[P][VW].PortTackDownWind      = BestVMG(P, VW, DEGREES*1/4, DEGREES*2/4, -1);
         }
 }
 

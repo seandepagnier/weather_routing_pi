@@ -52,7 +52,7 @@ BoatDialog::BoatDialog( wxWindow *parent, BoatSpeed &b)
     : BoatDialogBase(parent), boat(b), m_PlotScale(0)
 {
     m_sEta->SetValue(boat.eta * 1000.0);
-    m_sHullDrag->SetValue(boat.hull_drag * 100.0);
+    m_sHullDrag->SetValue(boat.hull_drag * 1000.0);
     m_sKeelPressure->SetValue(boat.keel_pressure * 100.0);
     m_sKeelLift->SetValue(boat.keel_lift * 100.0);
     m_sLWL->SetValue(boat.lwl_ft);
@@ -91,16 +91,20 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
     x /= m_PlotScale;
     y /= m_PlotScale;
 
+#if 0
     switch(m_cPlotAxis->GetSelection()) {
     case 0: /* Boat */
     {
-        double W = rad2posdeg(atan2(x, -y)), VB = hypot(x, y);
-        m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), W));
+#endif
+
+        double B = rad2posdeg(atan2(x, -y));
+        double W = -B, VW = m_sWindSpeed->GetValue();
+        double VB = boat.Speed(0, B, VW);
+
+        m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));
         m_stBoatKnots->SetLabel(wxString::Format(_T("%.1f"), VB));
 
-        double VW = boat.TrueWindSpeed(0, VB, W, 30);
-
-        int newmousew = round(W/DEGREE_STEP)*DEGREE_STEP;
+        int newmousew = round(B);
         if(newmousew != m_MouseW) {
             m_MouseW = newmousew;
             m_PlotWindow->Refresh();
@@ -116,6 +120,7 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
 
         m_stApparentWindKnots->SetLabel(wxString::Format(_T("%.1f"), VA));
 
+#if 0
     } break;
     case 1: /* True Wind */
     {
@@ -142,6 +147,7 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
 
     } break;
     }
+#endif
 }
 
 void BoatDialog::OnPaintPlot(wxPaintEvent& event)
@@ -221,24 +227,24 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
     double s = maxVB*m_PlotScale;
 
-    W = boat.VMG[P][VW].PortUpWind;
+    W = boat.VMG[P][VW].PortTackUpWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
-    W = boat.VMG[P][VW].StarboardUpWind;
+    W = boat.VMG[P][VW].StarboardTackUpWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
     dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
 
-    W = boat.VMG[P][VW].PortDownWind;
+    W = boat.VMG[P][VW].PortTackDownWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
-    W = boat.VMG[P][VW].StarboardDownWind;
+    W = boat.VMG[P][VW].StarboardTackDownWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
@@ -360,7 +366,7 @@ void BoatDialog::OnResetOptimalTackingSpeed( wxCommandEvent& event )
 void BoatDialog::Compute()
 {
     boat.eta = m_sEta->GetValue() / 1000.0;
-    boat.hull_drag = m_sHullDrag->GetValue() / 100.0;
+    boat.hull_drag = m_sHullDrag->GetValue() / 1000.0;
     boat.keel_pressure = m_sKeelPressure->GetValue() / 100.0;
     boat.keel_lift = m_sKeelLift->GetValue() / 100.0;
     boat.lwl_ft = m_sLWL->GetValue();
@@ -378,12 +384,12 @@ void BoatDialog::UpdateVMG()
     int P = 0;
     int VW = m_sWindSpeed->GetValue();
 
-    m_stBestCourseUpWindPort->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortUpWind));
-    m_stBestCourseUpWindStarboard->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardUpWind));
-    m_stBestCourseDownWindPort->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortDownWind));
-    m_stBestCourseDownWindStarboard->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardDownWind));
+    m_stBestCourseUpWindPortTack->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortTackUpWind));
+    m_stBestCourseUpWindStarboardTack->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardTackUpWind));
+    m_stBestCourseDownWindPortTack->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortTackDownWind));
+    m_stBestCourseDownWindStarboardTack->SetLabel
+        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardTackDownWind));
 }

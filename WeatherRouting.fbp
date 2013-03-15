@@ -4274,7 +4274,7 @@
                                 <object class="notebookpage" expanded="0">
                                     <property name="bitmap"></property>
                                     <property name="label">Plot Details</property>
-                                    <property name="select">0</property>
+                                    <property name="select">1</property>
                                     <object class="wxPanel" expanded="0">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
@@ -5685,7 +5685,7 @@
                                 <object class="notebookpage" expanded="0">
                                     <property name="bitmap"></property>
                                     <property name="label">Polar File</property>
-                                    <property name="select">1</property>
+                                    <property name="select">0</property>
                                     <object class="wxPanel" expanded="0">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
@@ -6663,7 +6663,7 @@
                                                             <property name="gripper">0</property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="label">Best Course Up Wind Port</property>
+                                                            <property name="label">Best Course Up Wind Port Tack</property>
                                                             <property name="max_size"></property>
                                                             <property name="maximize_button">0</property>
                                                             <property name="maximum_size"></property>
@@ -6754,7 +6754,7 @@
                                                             <property name="minimize_button">0</property>
                                                             <property name="minimum_size"></property>
                                                             <property name="moveable">1</property>
-                                                            <property name="name">m_stBestCourseUpWindPort</property>
+                                                            <property name="name">m_stBestCourseUpWindPortTack</property>
                                                             <property name="pane_border">1</property>
                                                             <property name="pane_position"></property>
                                                             <property name="pane_size"></property>
@@ -6829,7 +6829,7 @@
                                                             <property name="gripper">0</property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="label">Best Course Up Wind Starboard</property>
+                                                            <property name="label">Best Course Up Wind Starboard Tack</property>
                                                             <property name="max_size"></property>
                                                             <property name="maximize_button">0</property>
                                                             <property name="maximum_size"></property>
@@ -6920,7 +6920,7 @@
                                                             <property name="minimize_button">0</property>
                                                             <property name="minimum_size"></property>
                                                             <property name="moveable">1</property>
-                                                            <property name="name">m_stBestCourseUpWindStarboard</property>
+                                                            <property name="name">m_stBestCourseUpWindStarboardTack</property>
                                                             <property name="pane_border">1</property>
                                                             <property name="pane_position"></property>
                                                             <property name="pane_size"></property>
@@ -6995,7 +6995,7 @@
                                                             <property name="gripper">0</property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="label">Best Course Down Wind Port</property>
+                                                            <property name="label">Best Course Down Wind Port Tack</property>
                                                             <property name="max_size"></property>
                                                             <property name="maximize_button">0</property>
                                                             <property name="maximum_size"></property>
@@ -7086,7 +7086,7 @@
                                                             <property name="minimize_button">0</property>
                                                             <property name="minimum_size"></property>
                                                             <property name="moveable">1</property>
-                                                            <property name="name">m_stBestCourseDownWindPort</property>
+                                                            <property name="name">m_stBestCourseDownWindPortTack</property>
                                                             <property name="pane_border">1</property>
                                                             <property name="pane_position"></property>
                                                             <property name="pane_size"></property>
@@ -7161,7 +7161,7 @@
                                                             <property name="gripper">0</property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="label">Best Course Down Wind Starboard</property>
+                                                            <property name="label">Best Course Down Wind Starboard Tack</property>
                                                             <property name="max_size"></property>
                                                             <property name="maximize_button">0</property>
                                                             <property name="maximum_size"></property>
@@ -7252,7 +7252,7 @@
                                                             <property name="minimize_button">0</property>
                                                             <property name="minimum_size"></property>
                                                             <property name="moveable">1</property>
-                                                            <property name="name">m_stBestCourseDownWindStarboard</property>
+                                                            <property name="name">m_stBestCourseDownWindStarboardTack</property>
                                                             <property name="pane_border">1</property>
                                                             <property name="pane_position"></property>
                                                             <property name="pane_size"></property>
@@ -7699,7 +7699,7 @@
                                                     <property name="gripper">0</property>
                                                     <property name="hidden">0</property>
                                                     <property name="id">wxID_ANY</property>
-                                                    <property name="maxValue">1000</property>
+                                                    <property name="maxValue">100</property>
                                                     <property name="max_size"></property>
                                                     <property name="maximize_button">0</property>
                                                     <property name="maximum_size"></property>
@@ -7726,7 +7726,7 @@
                                                     <property name="validator_style">wxFILTER_NONE</property>
                                                     <property name="validator_type">wxDefaultValidator</property>
                                                     <property name="validator_variable"></property>
-                                                    <property name="value">127</property>
+                                                    <property name="value">10</property>
                                                     <property name="window_extra_style"></property>
                                                     <property name="window_name"></property>
                                                     <property name="window_style"></property>
@@ -8924,11 +8924,11 @@
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
                                                 <property name="initial">10</property>
-                                                <property name="max">100</property>
+                                                <property name="max">59</property>
                                                 <property name="max_size"></property>
                                                 <property name="maximize_button">0</property>
                                                 <property name="maximum_size"></property>
-                                                <property name="min">0</property>
+                                                <property name="min">1</property>
                                                 <property name="min_size"></property>
                                                 <property name="minimize_button">0</property>
                                                 <property name="minimum_size"></property>

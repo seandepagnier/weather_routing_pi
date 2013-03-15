@@ -29,7 +29,7 @@
 /* from 0 to 100% motor power 10% at a time */
 #define MAX_POWER 10
 #define DEGREES 360
-#define DEGREE_STEP 1
+#define DEGREE_STEP 5
 
 struct SailingSpeed
 {
@@ -43,8 +43,8 @@ struct SailingSpeed
 
 struct SailingVMG
 {
-    int PortUpWind, StarboardUpWind;
-    int PortDownWind, StarboardDownWind;
+    int PortTackUpWind, StarboardTackUpWind;
+    int PortTackDownWind, StarboardTackDownWind;
 };
 
 #define MAX_WINDSPEEDS_IN_TABLE 100
@@ -108,7 +108,7 @@ public:
     void SetSpeedsFromTable(BoatSpeedTable &table);
     BoatSpeedTable CreateTable(int wind_speed_step, int wind_degree_step);
 
-    double Speed(int P, double W, double VW);
+    double Speed(int P, double W, double VW, double vw_step=1);
     double TrueWindSpeed(int P, double VB, double W, double maxVW);
     void Set(int P, int W, int VW, double VB);
 
