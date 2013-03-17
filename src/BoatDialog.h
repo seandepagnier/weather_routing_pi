@@ -39,8 +39,10 @@ class BoatDialog : public BoatDialogBase
 {
 public:
 
-    BoatDialog( wxWindow *parent, BoatSpeed &boat );
-    ~BoatDialog( );
+    BoatDialog( wxWindow *parent);
+    ~BoatDialog();
+
+    BoatSpeed m_Boat;
 
 private:
 
@@ -60,8 +62,8 @@ private:
     void Compute();
     void UpdateTrackingControls();
     void UpdateVMG();
-    
-    BoatSpeed &boat;
+
+    wxString m_default_boat_path;    
     double m_PlotScale;
     int m_MouseW;
 };

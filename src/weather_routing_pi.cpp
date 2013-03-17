@@ -24,19 +24,18 @@
  ***************************************************************************
  */
 
-
 #include "wx/wxprec.h"
 
 #ifndef  WX_PRECOMP
   #include "wx/wx.h"
 #endif //precompiled headers
 
-
 #include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
 #include "BoatSpeed.h"
-#include "RouteMap.h"
+#include "RouteMapOverlay.h"
+#include "WeatherRoutingDialog.h"
 #include "weather_routing_pi.h"
 
 
@@ -104,9 +103,6 @@ int weather_routing_pi::Init(void)
       m_endroute_menu_id = AddCanvasContextMenuItem
           (new wxMenuItem(&dummy_menu, -1, _("End Weather Route")), this );
       SetCanvasContextMenuItemViz(m_endroute_menu_id, false);
-#if 0
-      OnToolbarToolCallback(m_leftclick_tool_id);
-#endif
 
       //    And load the configuration items
       LoadConfig();
@@ -183,11 +179,9 @@ p");
 
 }
 
-
 void weather_routing_pi::SetDefaults(void)
 {
 }
-
 
 int weather_routing_pi::GetToolbarToolCount(void)
 {
@@ -197,7 +191,7 @@ int weather_routing_pi::GetToolbarToolCount(void)
 void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 {
     if(m_pWeather_RoutingDialog)
-        if(m_pWeather_RoutingDialog->m_routemap.SetCursorLatLon(lat, lon))
+        if(m_pWeather_RoutingDialog->m_RouteMapOverlay.SetCursorLatLon(lat, lon))
             RequestRefresh(m_parent_window);
 
     m_cursor_lat = lat;
@@ -212,12 +206,9 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         wxJSONValue v;
         r.Parse(message_body, &v);
 
-        g_GribTimelineTime.Set(v[_T("Day")].AsInt(),
-                               (wxDateTime::Month)v[_T("Month")].AsInt(),
-                               v[_T("Year")].AsInt(),
-                               v[_T("Hour")].AsInt(),
-                               v[_T("Minute")].AsInt(),
-                               v[_T("Second")].AsInt());
+        m_pWeather_RoutingDialog->m_RouteMapOverlay.m_GribTimelineTime.Set
+            (v[_T("Day")].AsInt(), (wxDateTime::Month)v[_T("Month")].AsInt(), v[_T("Year")].AsInt(),
+             v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
 
     }
     if(message_id == _T("GRIB_TIMELINE_RECORD"))
@@ -230,24 +221,14 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         wxCharBuffer bptr = sptr.To8BitData();
         const char* ptr = bptr.data();
 
-        static GribRecordSet *gptr;
+        GribRecordSet *gptr;
         sscanf(ptr, "%p", &gptr);
 
-#if 1
-        g_GribRecord = gptr;
-#else /* copy data could  be useful if other plugins use the grib data */
-        static GribRecordSet s_GribRecordData;
-        g_GribRecord = &s_GribRecordData;
-
-        g_GribRecord->m_Reference_Time = gptr->m_Reference_Time;
-        for(int i=0; i<Idx_COUNT; i++) {
-            if(gptr->m_GribRecordPtrArray[i]) {
-                GribRecord &rec = *gptr->m_GribRecordPtrArray[i];
-                g_GribRecord->m_GribRecordPtrArray[i] = new GribRecord(rec);
-            } else
-                g_GribRecord->m_GribRecordPtrArray[i] = NULL;
+        if(m_pWeather_RoutingDialog) {
+            RouteMap &RouteMap = m_pWeather_RoutingDialog->m_RouteMapOverlay;
+            /* should probably check to make sure the time is correct */
+            RouteMap.SetNewGrib(gptr);
         }
-#endif
     }
 }
 

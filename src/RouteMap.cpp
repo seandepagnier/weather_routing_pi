@@ -68,35 +68,22 @@
    Any inside routes may be discarded leaving only inverted subroutes
 */
 
-#ifdef __MSVC__
-#define isnan _isnan
-#endif
-
-#include "wx/wxprec.h"
-
 #ifndef  WX_PRECOMP
 #include "wx/wx.h"
 #endif //precompiled headers
+#include "wx/wxprec.h"
 
-#include "wx/datetime.h"
+#include "../../grib_pi/src/GribRecordSet.h"
+
 #include "BoatSpeed.h"
 #include "RouteMap.h"
-#include "weather_routing_pi.h"
 #include "Utilities.h"
 
 #include "georef.h"
 
-static bool inverted_regions = false;
-
-GribRecordSet *g_GribRecord = NULL;
-wxDateTime g_GribRecordTime, g_GribTimelineTime;
-
-static double Swell(double lat, double lon, wxDateTime time)
+static double Swell(GribRecordSet &grib, double lat, double lon)
 {
-    if(!g_GribRecord)
-        return 0;
-
-    GribRecord *grh = g_GribRecord->m_GribRecordPtrArray[Idx_HTSIGW];
+    GribRecord *grh = grib.m_GribRecordPtrArray[Idx_HTSIGW];
     if(!grh)
         return 0;
 
@@ -106,14 +93,11 @@ static double Swell(double lat, double lon, wxDateTime time)
     return height;
 }
 
-static bool Wind(double &winddirground, double &windspeedground,
-                 double lat, double lon, wxDateTime time)
+static bool Wind(GribRecordSet &grib, double &winddirground, double &windspeedground,
+                 double lat, double lon)
 {
-    if(!g_GribRecord)
-        return false;
-
-    GribRecord *grx = g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VX];
-    GribRecord *gry = g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VY];
+    GribRecord *grx = grib.m_GribRecordPtrArray[Idx_WIND_VX];
+    GribRecord *gry = grib.m_GribRecordPtrArray[Idx_WIND_VY];
 
     if(!grx || !gry)
         return false;
@@ -129,14 +113,12 @@ static bool Wind(double &winddirground, double &windspeedground,
     return true;
 }
 
-static bool Current(double &currentspeed, double &currentdir,
-                    double lat, double lon, wxDateTime time)
+static bool Current(GribRecordSet &grib,
+                    double &currentspeed, double &currentdir,
+                    double lat, double lon)
 {
-    if(!g_GribRecord)
-        return false;
-
-    GribRecord *grx = g_GribRecord->m_GribRecordPtrArray[Idx_SEACURRENT_VX];
-    GribRecord *gry = g_GribRecord->m_GribRecordPtrArray[Idx_SEACURRENT_VY];
+    GribRecord *grx = grib.m_GribRecordPtrArray[Idx_SEACURRENT_VX];
+    GribRecord *gry = grib.m_GribRecordPtrArray[Idx_SEACURRENT_VY];
 
     if(!grx || !gry)
         return false;
@@ -301,11 +283,27 @@ int TestIntersection(Position *p1, Position *p2, Position *p3, Position *p4)
     }
 
     /* quick test to avoid calculations if segments are far apart */
+#if 0 /* is this faster? */
+    double max1x, min1x, max1y, min1y;
+    double max2x, min2x, max2y, min2y;
+    if(x1 > x2) max1x = x1, min1x = x2; else max1x = x2, min1x = x1;
+    if(x3 > x4) max2x = x3, min2x = x4; else max2x = x3, min2x = x4;
+
+    if(max1x < min2x || max2x < min1x)
+        return 0;
+
+    if(y1 > y2) max1y = y1, min1y = y2; else max1y = y2, min1y = y1;
+    if(y3 > y4) max2y = y3, min2y = y4; else max2y = y3, min2y = y4;
+
+    if(max1y < min2y || max2y < min1y)
+        return 0;
+#else
     if((x3 > x1 && x3 > x2 && x4 > x1 && x4 > x2) ||
        (x3 < x1 && x3 < x2 && x4 < x1 && x4 < x2) ||
        (y3 > y1 && y3 > y2 && y4 > y1 && y4 > y2) ||
        (y3 < y1 && y3 < y2 && y4 < y1 && y4 < y2))
         return 0;
+#endif
 
     double ax = x2 - x1, ay = y2 - y1;
     double bx = x3 - x4, by = y3 - y4;
@@ -364,7 +362,7 @@ Position::Position(Position *p)
 /* create a looped route by propagating from a position by computing
    the location the boat would be in if sailed at every angle
    relative to the true wind. */
-void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime time)
+void Position::Propagate(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
 {
     /* already propagated from this position, don't need to again */
     if(propagated)
@@ -376,46 +374,47 @@ void Position::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime ti
     /* through all angles relative to wind */
     int count = 0;
 
-    if(Swell(lat, lon, time) > routemap.MaxSwellMeters)
+    if(Swell(grib, lat, lon) > options.MaxSwellMeters)
         return;
 
-    if(fabs(lat) > routemap.MaxLatitude)
+    if(fabs(lat) > options.MaxLatitude)
         return;
 
     double WG, VWG;
     Position *p = this;
-    while(!Wind(WG, VWG, p->lat, p->lon, time)) {
+    while(!Wind(grib, WG, VWG, p->lat, p->lon)) {
         p = p->parent; /* should we use parent's time here ? */
-        if(!routemap.AllowDataDeficient || !p)
+        if(!options.AllowDataDeficient || !p)
             return;
     }
 
-    if(VWG > routemap.MaxWindKnots)
+    if(VWG > options.MaxWindKnots)
         return;
 
     double C, VC;
-    if(!Current(VC, C, lat, lon, time))
+    if(!Current(grib, VC, C, lat, lon))
         C = VC = 0;
 
     double W, VW;
     WindOverWater(C, VC, WG, VWG, W, VW);
 
-    double bearing = 0, parentbearing = 0.0/0.0;
-    if(parent && routemap.TackingTime)
+    double bearing = 0, parentbearing = NAN;
+    if(parent && options.TackingTime)
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
-    else if(routemap.MaxDivertedCourse == 180)
+    else if(options.MaxDivertedCourse == 180)
         goto skipbearingcomputation;
 
-    ll_gc_ll_reverse(lat, lon, routemap.EndLat, routemap.EndLon, &bearing, 0);
+    ll_gc_ll_reverse(lat, lon, options.EndLat, options.EndLon, &bearing, 0);
 skipbearingcomputation:
 
-    for(std::list<double>::iterator it = routemap.DegreeSteps.begin();
-        it != routemap.DegreeSteps.end(); it++) {
+    double timeseconds = options.dt;
+    for(std::list<double>::iterator it = options.DegreeSteps.begin();
+        it != options.DegreeSteps.end(); it++) {
         double H = *it;
         double P = 0; /* for now using sails only no power */
         double B, VB;
 
-        VB = routemap.boat.Speed(P, H, VW);
+        VB = options.boat->Speed(P, H, VW);
         B = W + H; /* rotated relative to wind */
 
         /* failed to determine speed.. I guess we can always drift? */
@@ -426,12 +425,11 @@ skipbearingcomputation:
         double BG, VBG;
         BoatOverGround(B, VB, C, VC, BG, VBG);
 
-        double timeseconds = routemap.dt.GetSeconds().ToDouble();
         /* did we tack? apply penalty */
         if(!isnan(parentbearing)) {
             double hrpb = heading_resolve(parentbearing), hrb = heading_resolve(bearing);
             if(hrpb*hrb < 0 && fabs(hrpb - hrb) < 180)
-                timeseconds -= routemap.TackingTime;
+                timeseconds -= options.TackingTime;
         }
 
         /* distance over ground */
@@ -440,7 +438,7 @@ skipbearingcomputation:
         double dlat, dlon;
         ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
         
-        bool hitland = routemap.DetectLand ? CrossesLand(dlat, dlon) : false;
+        bool hitland = options.DetectLand ? CrossesLand(dlat, dlon) : false;
         if(!hitland && dist) {
             Position *rp = new Position(dlat, dlon, this);
 
@@ -448,7 +446,7 @@ skipbearingcomputation:
                diverted from the correct course.  The reason to have this position
                at all (and not move this test to before the position exists), is
                to maintain continuity in the generated map (it looks much better) */
-            if(fabs(heading_resolve(BG - bearing)) > routemap.MaxDivertedCourse)
+            if(fabs(heading_resolve(BG - bearing)) > options.MaxDivertedCourse)
                 rp->propagated = true;
 
             if(points) {
@@ -465,7 +463,7 @@ skipbearingcomputation:
     if(count < 3) /* tested in normalize, but save the extra new and delete */
         return;
 
-    RouteList rl = (new Route(points, count))->Normalize(0);
+    RouteList rl = (new Route(points, count))->Normalize(0, options.InvertedRegions);
     for(RouteList::iterator it = rl.begin(); it != rl.end(); it++)
         routeheap.Insert(*it);
 }
@@ -555,10 +553,10 @@ void Route::Print()
 bool Route::Contains(Route *r)
 {
     if(count < 3)
-        return false; /* I hope never to get here */
+        return false; /* I hope never to get here.. but obviously these regions contain nothing */
 
     Position *pos = r->points;
-    Position np(91, 9);
+    Position np(91, 0); /* latitude 91 should be farther north than anywhere */
 
 tryagain:
     // Now go through each of the lines in the polygon and test intersections
@@ -591,102 +589,19 @@ tryagain:
     return false;
 }
 
-void SetColor(ocpnDC &dc, bool penifgl, unsigned char c[3], int w)
-{
-    if(!dc.GetDC()) {
-        glColor4ub(c[0], c[1], c[2], 192);
-        glLineWidth(w);
-        if(!penifgl)
-            return;
-    }
-    dc.SetPen(wxPen(wxColour(c[0], c[1], c[2]), w));
-}
-
-static unsigned char overcolor[3];
-void SetPointColor(ocpnDC &dc, Position *p)
-{
-    unsigned char cp[3] = {60, 220, 0}, cnp[3] = {240, 40, 0};
-    if(p->propagated) {
-        for(int i=0; i<3; i++)
-            cp[i] += overcolor[i];
-        SetColor(dc, false, cp, 2);
-    } else
-        SetColor(dc, false, cnp, 2);
-}
-
-void DrawLine(Position *p1, Position *p2, unsigned char *color,
-              ocpnDC &dc, PlugIn_ViewPort &vp)
-{
-    double p1plon, p2plon;
-    if(fabs(vp.clon) > 90)
-        p1plon = positive_degrees(p1->lon), p2plon = positive_degrees(p2->lon);
-    else
-        p1plon = heading_resolve(p1->lon), p2plon = heading_resolve(p2->lon);
-
-    if((p1plon+180 < vp.clon && p2plon+180 > vp.clon) ||
-       (p1plon+180 > vp.clon && p2plon+180 < vp.clon) ||
-       (p1plon-180 < vp.clon && p2plon-180 > vp.clon) ||
-       (p1plon-180 > vp.clon && p2plon-180 < vp.clon))
-        return;
-
-    wxPoint p1p, p2p;
-    GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
-    GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
-
-    if(color == overcolor) SetPointColor(dc, p1);
-    else if(color) SetColor(dc, false, color, 2);
-
-    if(dc.GetDC()) {
-        dc.DrawLine(p1p.x, p1p.y, p2p.x, p2p.y);
-    } else {
-        glBegin(GL_LINES);
-        glVertex2i(p1p.x, p1p.y);
-        if(color == overcolor) SetPointColor(dc, p2);
-        glVertex2i(p2p.x, p2p.y);
-        glEnd();
-    }
-}
-
-void Route::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
-{
-    if(!points)
-        return;
-
-    Position *p = points;
-    do {
-        unsigned char cyan[3] = {0, 255, 255};
-        unsigned char blue[3] = {0, 0, 255};
-        unsigned char *c;
-        if(parent)
-            c = cyan;
-        else if(direction == -1)
-            c = blue;
-        else
-            c = overcolor;
-
-        DrawLine(p, p->next, c, dc, vp);
-
-        p = p->next;
-    } while(p != points);
-
-
-    /* now draw the children */
-    for(RouteList::iterator it = children.begin(); it != children.end(); ++it)
-        (*it)->Render(dc, vp);
-}
-
 /* apply current to given route */
-void Route::ApplyCurrent(RouteMap &routemap, wxDateTime time)
+void Route::ApplyCurrent(GribRecordSet &grib, RouteMapOptions &options)
 {
     if(!points)
         return;
 
     Position *p = points;
+    double timeseconds = options.dt;
     do {
         double C, VC;
-        if(Current(VC, C, p->lat, p->lon, time)) {
+        if(Current(grib, VC, C, p->lat, p->lon)) {
             /* drift distance over ground */
-            double dist = VC / 3600000.0 * routemap.dt.GetMilliseconds().ToDouble();
+            double dist = VC * timeseconds / 3600.0;
             ll_gc_ll(p->lat, p->lon, C, dist, &p->lat, &p->lon);
         }
 
@@ -738,7 +653,7 @@ void Route::RemovePosition(Position *p)
 
 /* Take a route which may overlaps with itself and convert to a list
    of normalized routes which no longer have overlaps */
-RouteList Route::Normalize(int level)
+RouteList Route::Normalize(int level, bool inverted_regions)
 {
     RouteList ret;
 reset:
@@ -780,7 +695,7 @@ reset:
 
                 count -= innercount;
                 Route *x = new Route(q, innercount, dir);
-                RouteList sub = x->Normalize(level + 1);
+                RouteList sub = x->Normalize(level + 1, inverted_regions);
 
                 if(inverted_regions) {
                     if(level == 0) {
@@ -833,7 +748,7 @@ reset:
 }
 
 /* merge another route into this one */
-bool Merge(RouteList &rl, Route *route1, Route *route2)
+bool Merge(RouteList &rl, Route *route1, Route *route2, bool inverted_regions)
 {
     static int mergecnt;
     mergecnt++;
@@ -912,8 +827,6 @@ bool Merge(RouteList &rl, Route *route1, Route *route2)
                     }
                 } else if(dir == 1) {
                     if(route1->direction == 1 && route2->direction == -1) {
-//                        printf("route direction wrong B\n");
-//                        exit(1);
                         goto skip;
                     }
                 }
@@ -936,7 +849,7 @@ bool Merge(RouteList &rl, Route *route1, Route *route2)
 
                 route2->points = NULL; /* all points are now in route1 */
                 delete route2;
-                rl = route1->Normalize(0);
+                rl = route1->Normalize(0, inverted_regions);
                 return true;
             }
         skip:
@@ -964,7 +877,7 @@ bool Merge(RouteList &rl, Route *route1, Route *route2)
             for(RouteList::iterator it = route1->children.begin();
                 it != route1->children.end(); it++) {
                 RouteList childrl; /* see if route2 can merge with this child */
-                if(Merge(childrl, route2, *it)) { 
+                if(Merge(childrl, route2, *it, inverted_regions)) { 
                     route1->children.erase(it);
                     for(RouteList::iterator cit = childrl.begin(); cit != childrl.end(); cit++)
                         if((*cit)->direction == 1)
@@ -1019,19 +932,19 @@ Position *Route::ClosestPosition(double lat, double lon)
     return minpos;
 }
 
-void Route::Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime time)
+void Route::Propagate(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
 {
     if(!points)
         return;
         
     Position *p = points;
     do {
-        p->Propagate(routeheap, routemap, time);
+        p->Propagate(routeheap, grib, options);
         p = p->next;
     } while(p != points);
 
     for(RouteList::iterator it = children.begin(); it != children.end(); it++)
-        (*it)->Propagate(routeheap, routemap, time);
+        (*it)->Propagate(routeheap, grib, options);
 }
 
 RouteHeap::RouteHeap()
@@ -1117,45 +1030,60 @@ RouteIso::~RouteIso()
         delete *it;
 }
 
-RouteIso *RouteIso::Propagate(RouteMap &routemap)
+void RouteIso::PropagateIntoHeap(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
 {
-    if(!g_GribRecord ||
-       !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VX] ||
-       !g_GribRecord->m_GribRecordPtrArray[Idx_WIND_VY]) {
-        routemap.m_bGribFailed = true;
-        return NULL;
-    }
-
     /* build up a list of iso regions for each point
        in the current iso */
-    RouteHeap routeheap;
     for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
-        (*it)->Propagate(routeheap, routemap, g_GribRecordTime);
+        (*it)->Propagate(routeheap, grib, options);
 
-    /* if none propagated we are finished */
+    /* if none propagated we aren't going anywhere */
     if(routeheap.Size() == 0)
-        return NULL;
+        return;
 
     for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         /* also keep previous route to avoid backtracking,
            but update it to drift with the current */
         Route *x = new Route(*it);
-        x->ApplyCurrent(routemap, g_GribRecordTime);
+        x->ApplyCurrent(grib, options);
         routeheap.Insert(x);
-
+        
         /* Is anchoring possible? Add the old route without currents */
-        if(routemap.Anchoring)
+        if(options.Anchoring)
             routeheap.Insert(new Route(*it));
     }
-    g_GribRecord = NULL; /* done with it */
+}
 
+bool RouteIso::Contains(double lat, double lon)
+{
+    Route r(new Position(lat, lon));
+    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+        if((*it)->Contains(&r))
+            return true;
+    return false;
+}
+
+RouteMap::RouteMap()
+{
+}
+
+RouteMap::~RouteMap()
+{
+    Clear();
+}
+
+RouteList RouteMap::ReduceHeap(RouteHeap &routeheap, RouteMapOptions &options)
+{
+    /* once we have multiple worker threads, we can delegate a workers here
+       to merge routes. */
+               
     RouteList merged, unmerged;
     while(routeheap.Size()) {
         Route *r1 = routeheap.Remove();
         while(routeheap.Size()) {
             Route *r2 = routeheap.Remove();
             RouteList rl;
-            if(Merge(rl, r1, r2)) {
+            if(Merge(rl, r1, r2, options.InvertedRegions)) {
 #if 0
                 for(RouteList::iterator it = rl.begin(); it != rl.end(); ++it)
                     routeheap.Insert(*it);
@@ -1168,7 +1096,7 @@ RouteIso *RouteIso::Propagate(RouteMap &routemap)
                         r2 = rl.front();
                         rl.pop_front();
                         RouteList rl2;
-                        if(Merge(rl2, r1, r2)) {
+                        if(Merge(rl2, r1, r2, options.InvertedRegions)) {
                             rl.splice(rl.end(), rl2);
                             goto remerge2;
                         } else
@@ -1192,59 +1120,88 @@ RouteIso *RouteIso::Propagate(RouteMap &routemap)
             routeheap.Insert(*it);
         unmerged.clear();
     }
-
-    return new RouteIso(merged, g_GribRecordTime);
-}
-
-bool RouteIso::Contains(double lat, double lon)
-{
-    Route r(new Position(lat, lon));
-    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
-        if((*it)->Contains(&r))
-            return true;
-    return false;
-}
-
-void RouteIso::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
-{
-    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
-        (*it)->Render(dc, vp);
-}
-
-RouteMap::RouteMap(BoatSpeed &b)
-: boat(b), last_cursor_position(NULL)
-{
-}
-
-RouteMap::~RouteMap()
-{
-    Clear();
+    return merged;
 }
 
 /* enlarge the map by 1 level */
-void RouteMap::Propagate()
+bool RouteMap::Propagate()
 {
-    if(origin.size() == 0 || m_bFinished)
-        return;
+    Lock();
+    bool notready = !origin.size() || m_bFinished || m_bNeedsGrib;
 
-    inverted_regions = InvertedRegions;
+    if(notready) {
+        Unlock();
+        return false;
+    }
 
-    RouteIso* update = origin.back()->Propagate(*this);
+    if(!m_NewGrib ||
+       !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+       !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) {
+        m_bGribFailed = true;
+        Unlock();
+        return false;
+    }
 
+    /* copy the grib record set */
+    GribRecordSet grib;
+    grib.m_Reference_Time = m_NewGrib->m_Reference_Time;
+    for(int i=0; i<Idx_COUNT; i++) {
+        if(m_NewGrib->m_GribRecordPtrArray[i])
+            grib.m_GribRecordPtrArray[i] = new GribRecord(*m_NewGrib->m_GribRecordPtrArray[i]);
+        else
+            grib.m_GribRecordPtrArray[i] = NULL;
+    }
+
+    wxDateTime GribTime = m_NewGribTime;
+
+    if(m_bUpdateBoat) {
+        m_Options.boat = &m_boats[m_currentboat];
+        m_currentboat = !m_currentboat;
+    }
+
+    RouteMapOptions options = m_Options;
+    Unlock();
+
+    RouteHeap routeheap;
+    RouteIso *last = origin.back();
+    last->PropagateIntoHeap(routeheap, grib, options);
+
+    /* done with grib, so free memory and request next one */
+    for(int i=0; i<Idx_COUNT; i++)
+        delete grib.m_GribRecordPtrArray[i];
+
+    Lock();
+    m_NewGrib = NULL;
+    m_NewGribTime = last->time + wxTimeSpan(0, 0, options.dt);
+    m_bNeedsGrib = true;
+    Unlock();
+
+    RouteIso* update;
+    if(routeheap.Size()) {
+        RouteList merged = ReduceHeap(routeheap, options);
+        update = new RouteIso(merged, GribTime);
+    } else
+        update = NULL;
+
+    Lock();
     if(update) {
         origin.push_back(update);
-        if(update->Contains(EndLat, EndLon)) {
+        if(update->Contains(m_Options.EndLat, m_Options.EndLon)) {
             m_bFinished = true;
             m_bReachedDestination = true;
         }
     } else
         m_bFinished = true;
+
+    Unlock();
+    return true;
 }
 
 Position *RouteMap::ClosestPosition(double lat, double lon)
 {
     Position p(lat, lon), *minpos = NULL;
     double mindist = 0;
+    Lock();
     for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it) {
         for(RouteList::iterator rit = (*it)->routes.begin(); rit != (*it)->routes.end(); ++rit) {
             Position *pos = (*rit)->ClosestPosition(lat, lon);
@@ -1257,107 +1214,32 @@ Position *RouteMap::ClosestPosition(double lat, double lon)
             }
         }
     }
+    Unlock();
     return minpos;
-}
-
-void RouteMap::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
-{
-    unsigned char routecolors[][3] = {{255, 128, 255}, {128, 128, 255}, {0, 230, 152},
-                                      {152, 152, 0}, {0, 220, 200}, {202, 0, 180},
-                                      {34, 69, 198}, {244, 30, 38}, {100, 240, 20}};
-
-    int i = 0;
-
-    for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it) {
-        for(int j=0; j<3; j++)
-            overcolor[j] = routecolors[i][j];
-
-        (*it)->Render(dc, vp);
-        if(++i == (sizeof routecolors) / (sizeof *routecolors))
-            i = 0;
-    }
-
-    unsigned char lcc[3] = {220, 220, 80}, erc[3] = {80, 40, 200};
-    SetColor(dc, true, lcc, 4);
-    RenderCourse(last_cursor_position, dc, vp);
-    SetColor(dc, true, erc, 4);
-    RenderCourse(ClosestPosition(EndLat, EndLon), dc, vp);
-}
-
-void RouteMap::RenderCourse(Position *pos,
-                            ocpnDC &dc, PlugIn_ViewPort &vp)
-{
-    if(!pos)
-        return;
-
-    /* draw lines to this route */
-    Position *p;
-    for(p = pos; p && p->parent; p = p->parent)
-        DrawLine(p, p->parent, NULL, dc, vp);
-
-    /* render boat on optimal course at current grib time */
-    wxDateTime time;
-    RouteIsoList::iterator it = origin.begin();
-
-    /* get route iso for this position */
-    for(p=pos->parent; p; p=p->parent)
-        if(++it == origin.end())
-            return;
-
-    if(it != origin.begin())
-        it--;
-
-    time = g_GribTimelineTime;
-    for(p = pos; p; p = p->parent) {
-        wxDateTime ittime = (*it)->time;
-        if(time >= ittime && p->parent) {
-            wxDateTime timestart = (*it)->time;
-            it++;
-            wxDateTime timeend = (*it)->time;
-
-            wxTimeSpan span = timeend - timestart, cspan = time - timestart;
-            double d = cspan.GetSeconds().ToDouble() / span.GetSeconds().ToDouble();
-
-            if(d > 1)
-                d = 1;
-
-            wxPoint r;
-            GetCanvasPixLL(&vp, &r,
-                           p->parent->lat + d*(p->lat - p->parent->lat),
-                           p->parent->lon + d*heading_resolve(p->lon - p->parent->lon));
-
-            dc.DrawCircle( r.x, r.y, 7 );
-            break;
-        }
-        it--;
-    }
-    
-}
-
-void RouteMap::Clear()
-{
-    for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it)
-        delete *it;
-
-    origin.clear();
-
-    last_cursor_position = NULL;
 }
 
 void RouteMap::Reset(double lat, double lon, wxDateTime time)
 {
     Clear();
+    Lock();
     origin.push_back(new RouteIso(new Position(lat, lon), time));
-    m_bFinished = false;
+
+    m_NewGrib = NULL;
+    m_NewGribTime = time;
+    m_bNeedsGrib = true;
+
     m_bReachedDestination = false;
     m_bGribFailed = false;
+    m_bFinished = false;
+    Unlock();
 }
 
-bool RouteMap::SetCursorLatLon(double lat, double lon)
+void RouteMap::Clear()
 {
-    Position *p = ClosestPosition(lat, lon);
-    if(p == last_cursor_position)
-        return false;
-    last_cursor_position = p;
-    return true;
+    Lock();
+    for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it)
+        delete *it;
+
+    origin.clear();
+    Unlock();
 }

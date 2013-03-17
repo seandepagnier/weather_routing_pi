@@ -27,28 +27,20 @@
  */
 
 #include "wx/wx.h"
-#include "wx/tokenzr.h"
-#include "wx/datetime.h"
-#include "wx/sound.h"
-#include <wx/wfstream.h>
-#include <wx/dir.h>
-#include <wx/filename.h>
-#include <wx/debug.h>
-#include <wx/graphics.h>
 
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
 #include "BoatSpeed.h"
-#include "BoatDialog.h"
 #include "RouteMap.h"
+#include "WeatherRoutingSettingsDialog.h"
 #include "weather_routing_pi.h"
 
 #include "Utilities.h"
 
-WeatherRoutingSettingsDialog::WeatherRoutingSettingsDialog( wxWindow *parent, RouteMap &routemap )
-    : WeatherRoutingSettingsDialogBase(parent), m_routemap(routemap)
+WeatherRoutingSettingsDialog::WeatherRoutingSettingsDialog( wxWindow *parent )
+    : WeatherRoutingSettingsDialogBase(parent)
 {
     LoadSettings();
 }
@@ -148,9 +140,9 @@ void WeatherRoutingSettingsDialog::SaveSettings( )
     pConf->Write ( _T ( "SettingsDialogY" ), p.y);
 }
 
-void WeatherRoutingSettingsDialog::ReconfigureRouteMap()
+void WeatherRoutingSettingsDialog::UpdateOptions(RouteMapOptions &options)
 {
-    m_routemap.dt = wxTimeSpan(0, 0, m_sTimeStep->GetValue());
+    options.dt = m_sTimeStep->GetValue();
 
     if(m_lDegreeSteps->GetCount() < 4) {
         wxMessageDialog mdlg(this, _("Warning: less than 4 degree steps specified\n"),
@@ -158,25 +150,25 @@ void WeatherRoutingSettingsDialog::ReconfigureRouteMap()
         mdlg.ShowModal();
     }
 
-    m_routemap.DegreeSteps.clear();
+    options.DegreeSteps.clear();
     for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++) {
         double step;
         m_lDegreeSteps->GetString(i).ToDouble(&step);
-        m_routemap.DegreeSteps.push_back(positive_degrees(step));
+        options.DegreeSteps.push_back(positive_degrees(step));
     }
-    m_routemap.DegreeSteps.sort();
+    options.DegreeSteps.sort();
 
-    m_routemap.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
-    m_routemap.MaxWindKnots= m_sMaxWindKnots->GetValue();
-    m_routemap.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
-    m_routemap.MaxLatitude = m_sMaxLatitude->GetValue();
-    m_routemap.TackingTime = m_sTackingTime->GetValue();
-    m_routemap.SubSteps = m_sSubSteps->GetValue();
+    options.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
+    options.MaxWindKnots= m_sMaxWindKnots->GetValue();
+    options.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
+    options.MaxLatitude = m_sMaxLatitude->GetValue();
+    options.TackingTime = m_sTackingTime->GetValue();
+    options.SubSteps = m_sSubSteps->GetValue();
 
-    m_routemap.DetectLand = m_cbDetectLand->GetValue();
-    m_routemap.InvertedRegions = m_cbInvertedRegions->GetValue();
-    m_routemap.Anchoring = m_cbAnchoring->GetValue();
-    m_routemap.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
+    options.DetectLand = m_cbDetectLand->GetValue();
+    options.InvertedRegions = m_cbInvertedRegions->GetValue();
+    options.Anchoring = m_cbAnchoring->GetValue();
+    options.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
 }
 
 void WeatherRoutingSettingsDialog::OnAddDegreeStep( wxCommandEvent& event )

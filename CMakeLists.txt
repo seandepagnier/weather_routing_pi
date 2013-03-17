@@ -74,6 +74,8 @@ SET(SRC_WEATHER_ROUTING
             src/BoatSpeed.cpp
             src/RouteMap.h 
             src/RouteMap.cpp
+            src/RouteMapOverlay.h 
+            src/RouteMapOverlay.cpp
             src/Utilities.cpp
             src/Utilities.h
             src/WeatherRoutingUI.h

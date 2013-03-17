@@ -37,20 +37,18 @@
 class WeatherRoutingSettingsDialog : public WeatherRoutingSettingsDialogBase
 {
 public:
-    WeatherRoutingSettingsDialog( wxWindow *parent, RouteMap &routemap );
+    WeatherRoutingSettingsDialog( wxWindow *parent );
     ~WeatherRoutingSettingsDialog( );
 
     void LoadSettings();
     void SaveSettings();
-    void ReconfigureRouteMap();
+    void UpdateOptions(RouteMapOptions &options);
 
 protected:
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );
     void OnGenerateDegreeSteps( wxCommandEvent& event );
     void OnClearDegreeSteps( wxCommandEvent& event );
-
-    RouteMap &m_routemap;
 };
 
 #endif

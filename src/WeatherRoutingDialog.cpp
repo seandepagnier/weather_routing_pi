@@ -35,7 +35,6 @@
 #include <wx/filename.h>
 #include <wx/debug.h>
 #include <wx/graphics.h>
-#include "wx/stdpaths.h"
 
 #include <stdlib.h>
 #include <math.h>
@@ -43,124 +42,15 @@
 
 #include "BoatSpeed.h"
 #include "BoatDialog.h"
-#include "RouteMap.h"
+#include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
-
-  /*  User interface:
-      Tabs Control
-             Routing
-                 Button to start computing routing changes to stop, continue and restart
-                 Buttons load/save current routing
-                 Timeline showing each iso region with data, can render each one and go back
-                             rewind, clear before etc..
-                             min and max lat/lon, area covered,
-                             average speed
-                             selectable to display
-                                    route with min/max boat-speed,wind-speed,wave-height,
-                                                       current-speed,temperature,cloud-cover etc..
-                                    
-
-             Configuration
-                 Save Load buttons for configuration
-                 Timespan
-                      In seconds
-                         Fixed
-                         Variable (is based on the curvature of the isoregion/walls etc..
-                 Allow inversions (current overpowering for a time to reverse later (maybe)
-                 Rendering Colors/Enabled for
-                         Positive/Negative Routes
-                         
-             Boat
-                 List of boats with current boat selected
-                 Buttons - New Edit Save Load Clone Simulate
-                   New/Edit Dialog Tabs
-                     Performance with
-                       Polar graph showing boat performance with and without tacking optimizations
-                       with each sail plan different color selectable wind speed and thrust level
-                       Graph showing boat speed over wind speed and over thrust level with selectable
-                       angle of attack.
-                       Graph showing apparent wind vs true wind 
-                       Setup hull characteristics drag etc...
-                       Can precompute these from a few values for actual measured performance
-                     Sailing
-                       Can add/remove sail configurations from table (reefs different sails etc..)
-                       Has rules for when to switch to another configuration from each configuration
-                       Always have "none" when sails are down
-                     Electric Power
-                       Timeline over current route graph
-                       Renewable Storage
-                         Battery capacity, efficiency leakage etc type etc..
-                                  initial charge allow negative value?
-                                        with type have coefficents for temp charge discharge tetc..
-                         hydrogen tanks capacity efficiency etc..
-                         pressurized air tanks  efficiency and capacity
-                       
-                       Photo Voltaic coefficients for power vs light
-                       Hydro Generator coefficients for efficiency, use if
-                                               wind speed is > x, boat speed is > x, battery charge
-                                               will slow boat down
-                       Wind Generator coefficients for efficiency wind-loading etc..
-                                               can slow beating and help running
-                       Human Generator coefficients for efficiency, human and willingness
-                   Other propulsion...
-
-                 Overall boat has 
-                   Simulate mode renders the boats sailing various selectable patterns
-                   with various winds
-                 Interactive mode allows you to sail in realtime
-             Goal
-                  Save Load goal
-                  Start Point1 ... End
-                      Lat Lon Time  Reaching a point effectively kills the last iso and restarts from there
-
-             Route Blockers
-                  Configure areas to avoid
-                  Can draw them, import coastline data etc, have a list of areas
-                  Can select how to render them or not
-                  Collisions with other vessels ais etc..
-                  Rules to prevent certain boat conditions from occuring
-
-                      If (VB VW VA A E B Fuel etc...) (< > = != etc..) 
-                         (VB VW VA A E B Fuel etc...) (AND OR 
-
-                         So if the swell is > 7 meters we may choose that 50 < VA < 65 || VA > 120
-             Weather/Sea
-                  Can import from grib file
-                  Selecting either Wind or Current
-                     Also allow user to specifyd speed and direction for a given:
-                      timespan, and distance from cursor
-                      Can render on screen speed and direction at a given time
-
-                  Allow generated weather systems to simulate dynamic weather
-                  Can use high and low pressure positions with value and weight
-                  to create isobar map and from this generate wind map
-
-                  Can import current data
-
-                  Coefficients to reduce boat speed given swell data
-  */
-
+#include "WeatherRoutingDialog.h"
 
 WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon )
-    : WeatherRoutingDialogBase(parent), m_routemap(boat), m_SettingsDialog(this, m_routemap),
-      m_thCompute(m_routemap)
+    : WeatherRoutingDialogBase(parent), m_SettingsDialog(this)
 {
-    wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
-#ifdef __WXMSW__
-    wxString stdPath  = std_path.GetConfigDir();
-#endif
-#ifdef __WXGTK__
-    wxString stdPath  = std_path.GetUserDataDir();
-#endif
-#ifdef __WXOSX__
-    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
-#endif
-
-    m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.obs");
-    boat.OpenBinary(m_default_boat_path.ToAscii());
-
     m_SettingsDialog.Hide();
-    m_pBoatDialog = new BoatDialog(this, boat);
+    m_pBoatDialog = new BoatDialog(this);
 
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -185,15 +75,11 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, d
                        ( WeatherRoutingDialog::OnComputationTimer ), NULL, this);
     m_tCompute.Start(100);
 
-    m_thCompute.computemutex.Lock();
-    m_thCompute.gribmutex.Lock();
-    m_thCompute.Run();
+    m_RouteMapOverlay.Run();
 }
 
 WeatherRoutingDialog::~WeatherRoutingDialog( )
 {
-    boat.SaveBinary(m_default_boat_path.ToAscii());
-
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
@@ -206,10 +92,7 @@ WeatherRoutingDialog::~WeatherRoutingDialog( )
     pConf->Write ( _T ( "DialogX" ), p.x);
     pConf->Write ( _T ( "DialogY" ), p.y);
 
-    if(!m_thCompute.computing)
-        m_thCompute.computemutex.Unlock();
-    m_thCompute.gribmutex.Unlock();
-    m_thCompute.Delete();
+    m_RouteMapOverlay.Delete();
 }
 
 void WeatherRoutingDialog::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
@@ -222,9 +105,7 @@ void WeatherRoutingDialog::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
         glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     }
 
-    m_thCompute.routemutex.Lock();
-    m_routemap.Render(dc, vp);
-    m_thCompute.routemutex.Unlock();
+    m_RouteMapOverlay.Render(dc, vp);
 
     if(!dc.GetDC())
         glPopAttrib();
@@ -237,27 +118,21 @@ void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
 
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
-    if(m_thCompute.computing) {
-        m_bCompute->SetLabel(_( "&Start" ));
-        m_thCompute.computemutex.Lock();
-        m_thCompute.computing = false;
-    } else {
+    if(m_RouteMapOverlay.Paused()) {
         m_bCompute->SetLabel(_( "&Stop" ));
-        if(m_routemap.origin.size() == 0)
+        if(m_RouteMapOverlay.Empty())
             Reset();
-        m_thCompute.computing = true;
-        m_thCompute.computemutex.Unlock();
-    }
+    } else
+        m_bCompute->SetLabel(_( "&Start" ));
 
-    GetParent()->Refresh();
+    m_RouteMapOverlay.TogglePaused();
 }
 
 void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
 {
     m_pBoatDialog->Show(!m_pBoatDialog->IsShown());
-//    m_thCompute.routemutex.Lock();
-//    m_pBoatDialog->ShowModal();
-//    m_thCompute.routemutex.Unlock();
+//    if(m_pBoatDialog->ShowModal() == wxID_OK) {
+//    }
 }
 
 void WeatherRoutingDialog::OnReset ( wxCommandEvent& event )
@@ -295,57 +170,55 @@ void WeatherRoutingDialog::OnClose( wxCommandEvent& event )
 
 void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
 {
-    if(m_thCompute.needgrib) {
-        if(m_routemap.origin.size() == 0) {
-            wxMessageDialog mdlg(this, _("routemap should not be empty here"),
-                             _("Weather Routing"), wxOK);
-            mdlg.ShowModal();
-            return;
-        }
+    if(m_RouteMapOverlay.Paused())
+        return;
 
-        g_GribRecordTime = m_routemap.origin.back()->time + m_routemap.dt;
-        g_GribRecord = NULL; /* invalidate */
-        {
-            wxJSONValue v;
-            v[_T("Day")] = g_GribRecordTime.GetDay();
-            v[_T("Month")] = g_GribRecordTime.GetMonth();
-            v[_T("Year")] = g_GribRecordTime.GetYear();
-            v[_T("Hour")] = g_GribRecordTime.GetHour();
-            v[_T("Minute")] = g_GribRecordTime.GetMinute();
-            v[_T("Second")] = g_GribRecordTime.GetSecond();
+    /* get a new grib for the route map if needed */
+    if(m_RouteMapOverlay.NeedsGrib()) {
+        wxDateTime time = m_RouteMapOverlay.NewGribTime();
+        wxJSONValue v;
+        v[_T("Day")] = time.GetDay();
+        v[_T("Month")] = time.GetMonth();
+        v[_T("Year")] = time.GetYear();
+        v[_T("Hour")] = time.GetHour();
+        v[_T("Minute")] = time.GetMinute();
+        v[_T("Second")] = time.GetSecond();
     
-            wxJSONWriter w;
-            wxString out;
-            w.Write(v, out);
-            SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+        wxJSONWriter w;
+        wxString out;
+        w.Write(v, out);
+        SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+
+        m_RouteMapOverlay.Lock();
+        if(!m_RouteMapOverlay.HasGrib()) {
+            wxMessageDialog mdlg(this, _("Failed to obtain grib for timestep\n"),
+                                 _("Weather Routing"), wxOK);
+            mdlg.ShowModal();
         }
-        m_thCompute.gribmutex.Unlock();
-        wxThread::Sleep(10);
-        m_thCompute.gribmutex.Lock();
+        m_RouteMapOverlay.Unlock();
     }
 
-    if(m_thCompute.Updated())
+    static int cycles; /* don't refresh all the time */
+    if(++cycles > 20 && m_RouteMapOverlay.Updated()) {
+        cycles = 0;
         GetParent()->Refresh();
+    }
 
-    if(!m_thCompute.computing)
+    if(!m_RouteMapOverlay.Finished())
         return;
-
-    if(!m_routemap.m_bFinished)
-        return;
-
-    m_thCompute.computemutex.Lock();
-    m_thCompute.computing = false;
 
     m_bCompute->SetLabel(_( "&Start" ));
 
-    if(m_routemap.m_bReachedDestination) {
+    m_RouteMapOverlay.Pause();
+
+    if( m_RouteMapOverlay.ReachedDestination()) {
         wxMessageDialog mdlg(this, _("Computation completed, destination reached\n"),
                              _("Weather Routing"), wxOK);
         mdlg.ShowModal();
     } else {
-        wxString gribfailmsg = _("Failed to get grib data at this time step\n");
+        wxString gribfailmsg = _("Grib Data Failed to contain required information\n");
         wxMessageDialog mdlg(this, _("Computation completed, destination not reached.\n")
-                             + (m_routemap.m_bGribFailed ? gribfailmsg : _T("")),
+                             + (m_RouteMapOverlay.GribFailed() ? gribfailmsg : _T("")),
                              _("Weather Routing"), wxOK | wxICON_WARNING);
         mdlg.ShowModal();
     }
@@ -357,65 +230,29 @@ void WeatherRoutingDialog::Reset()
     m_tStartLat->GetValue().ToDouble(&startlat);
     m_tStartLon->GetValue().ToDouble(&startlon);
 
-    wxDateTime time = g_GribTimelineTime;
+    wxDateTime time = m_RouteMapOverlay.m_GribTimelineTime;
 
     m_stStartDate->SetLabel(time.FormatISODate());
     m_stStartTime->SetLabel(time.FormatISOTime());
-    
-    if(m_thCompute.computing) {
-        m_thCompute.computemutex.Lock();
-        m_thCompute.computing = false;
-        m_bCompute->SetLabel(_( "&Start" ));
-    }
 
-    m_thCompute.routemutex.Lock();
-    m_routemap.Reset(startlat, startlon, time);
-    m_thCompute.routemutex.Unlock();
+    m_RouteMapOverlay.SetBoat(m_pBoatDialog->m_Boat);
+    
+    m_RouteMapOverlay.Reset(startlat, startlon, time);
     GetParent()->Refresh();
 }
 
 void WeatherRoutingDialog::UpdateEnd()
 {
-    m_thCompute.routemutex.Lock();
-    m_tEndLat->GetValue().ToDouble(&m_routemap.EndLat);
-    m_tEndLon->GetValue().ToDouble(&m_routemap.EndLon);
-    m_thCompute.routemutex.Unlock();
+    RouteMapOptions options = m_RouteMapOverlay.GetOptions();
+    m_tEndLat->GetValue().ToDouble(&options.EndLat);
+    m_tEndLon->GetValue().ToDouble(&options.EndLon);
+    m_RouteMapOverlay.SetOptions(options);
 }
 
 void WeatherRoutingDialog::ReconfigureRouteMap()
 {
     UpdateEnd();
-    m_thCompute.routemutex.Lock();
-    m_SettingsDialog.ReconfigureRouteMap();
-    m_thCompute.routemutex.Unlock();
-}
-
-void *WeatherRoutingThread::Entry()
-{
-    while(!TestDestroy()) {
-
-        computemutex.Lock();
-
-        needgrib = true;
-        gribmutex.Lock();
-        gribmutex.Unlock();
-        needgrib = false;
-
-        routemutex.Lock();
-        routemap.Propagate();
-        updated = true;
-        routemutex.Unlock();
-
-        computemutex.Unlock();
-
-        wxThread::Sleep(100);
-    }
-    return 0;
-}
-
-bool WeatherRoutingThread::Updated()
-{
-    bool ret = updated;
-    updated = false;
-    return ret;
+    RouteMapOptions options = m_RouteMapOverlay.GetOptions();
+    m_SettingsDialog.UpdateOptions(options);
+    m_RouteMapOverlay.SetOptions(options);
 }

@@ -39,13 +39,13 @@
 #include "../../../include/wx/jsonreader.h"
 #include "../../../include/wx/jsonwriter.h"
 
-#include "WeatherRoutingDialog.h"
-
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition
 //----------------------------------------------------------------------------------------------------------
 
 #define WEATHER_ROUTING_TOOL_POSITION    -1          // Request default positioning of toolbar tool
+
+class WeatherRoutingDialog;
 
 class GribUIDialog;
 class weather_routing_pi : public opencpn_plugin_18
@@ -54,7 +54,6 @@ public:
       weather_routing_pi(void *ppimgr);
       ~weather_routing_pi(void);
 
-//    The required PlugIn Methods
       int Init(void);
       bool DeInit(void);
 
@@ -67,7 +66,6 @@ public:
       wxString GetShortDescription();
       wxString GetLongDescription();
 
-//    The override PlugIn Methods
       bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
       bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
 
@@ -102,8 +100,5 @@ private:
 
       double m_cursor_lat, m_cursor_lon;
 };
-
-extern GribRecordSet *g_GribRecord;
-extern wxDateTime g_GribRecordTime, g_GribTimelineTime;
 
 #endif

@@ -34,6 +34,7 @@
 #include <wx/filename.h>
 #include <wx/debug.h>
 #include <wx/graphics.h>
+#include <wx/stdpaths.h>
 
 #include <stdlib.h>
 #include <math.h>
@@ -48,22 +49,37 @@
 //---------------------------------------------------------------------------------------
 
 
-BoatDialog::BoatDialog( wxWindow *parent, BoatSpeed &b)
-    : BoatDialogBase(parent), boat(b), m_PlotScale(0)
+BoatDialog::BoatDialog( wxWindow *parent )
+    : BoatDialogBase(parent), m_PlotScale(0)
 {
-    m_sEta->SetValue(boat.eta * 1000.0);
-    m_sHullDrag->SetValue(boat.hull_drag * 1000.0);
-    m_sKeelPressure->SetValue(boat.keel_pressure * 100.0);
-    m_sKeelLift->SetValue(boat.keel_lift * 100.0);
-    m_sLWL->SetValue(boat.lwl_ft);
-    m_sDisplacement->SetValue(boat.displacement_lbs);
-    m_sPlaningConstant->SetValue(boat.planing_constant);
+    wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
+#ifdef __WXMSW__
+    wxString stdPath  = std_path.GetConfigDir();
+#endif
+#ifdef __WXGTK__
+    wxString stdPath  = std_path.GetUserDataDir();
+#endif
+#ifdef __WXOSX__
+    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
+#endif
+
+    m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.obs");
+    m_Boat.OpenBinary(m_default_boat_path.ToAscii());
+
+    m_sEta->SetValue(m_Boat.eta * 1000.0);
+    m_sHullDrag->SetValue(m_Boat.hull_drag * 1000.0);
+    m_sKeelPressure->SetValue(m_Boat.keel_pressure * 100.0);
+    m_sKeelLift->SetValue(m_Boat.keel_lift * 100.0);
+    m_sLWL->SetValue(m_Boat.lwl_ft);
+    m_sDisplacement->SetValue(m_Boat.displacement_lbs);
+    m_sPlaningConstant->SetValue(m_Boat.planing_constant);
 
     UpdateVMG();    
 }
 
 BoatDialog::~BoatDialog()
 {
+    m_Boat.SaveBinary(m_default_boat_path.ToAscii());
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -99,7 +115,7 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
 
         double B = rad2posdeg(atan2(x, -y));
         double W = -B, VW = m_sWindSpeed->GetValue();
-        double VB = boat.Speed(0, B, VW);
+        double VB = m_Boat.Speed(0, B, VW);
 
         m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));
         m_stBoatKnots->SetLabel(wxString::Format(_T("%.1f"), VB));
@@ -129,7 +145,7 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
         m_stTrueWindAngle->SetLabel(wxString::Format(_T("%03.0f"), W));
         m_stTrueWindKnots->SetLabel(wxString::Format(_T("%.1f"), VW));
 
-        double VB = boat.Speed(0, W, VW);
+        double VB = m_Boat.Speed(0, W, VW);
         double B = -W;
 
         m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));
@@ -185,7 +201,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     int W, i;
     /* plot scale */
     for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++) {
-        SailingSpeed &speed = boat.speed[0][VW][W];
+        SailingSpeed &speed = m_Boat.speed[0][VW][W];
         double VB = speed.VB;
         if(VB > maxVB)
             maxVB = VB;
@@ -227,24 +243,24 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
     double s = maxVB*m_PlotScale;
 
-    W = boat.VMG[P][VW].PortTackUpWind;
+    W = m_Boat.VMG[P][VW].PortTackUpWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
-    W = boat.VMG[P][VW].StarboardTackUpWind;
+    W = m_Boat.VMG[P][VW].StarboardTackUpWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
     dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
 
-    W = boat.VMG[P][VW].PortTackDownWind;
+    W = m_Boat.VMG[P][VW].PortTackDownWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
-    W = boat.VMG[P][VW].StarboardTackDownWind;
+    W = m_Boat.VMG[P][VW].StarboardTackDownWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
@@ -252,7 +268,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     /* boat speeds */
     int lx, ly;
     for(W = 0; W<=DEGREES; W += DEGREE_STEP) {
-        SailingSpeed speed = boat.speed[0][VW][(W%DEGREES)];
+        SailingSpeed speed = m_Boat.speed[0][VW][(W%DEGREES)];
         double VB = speed.VB;
 
         if(speed.w == 0)
@@ -269,7 +285,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
         if(W == m_MouseW) {
             int B = speed.b;
-            SailingSpeed speedB = boat.speed[0][VW][B];
+            SailingSpeed speedB = m_Boat.speed[0][VW][B];
             double BVB = speedB.VB;
             int pxb =  m_PlotScale*speed.w*BVB*sin(deg2rad(B)) + w/2;
             int pyb = -m_PlotScale*speed.w*BVB*cos(deg2rad(B)) + h/2;
@@ -301,7 +317,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
 
         bool success;
         if(binary) {
-            success = boat.OpenBinary(openDialog.GetPath().ToAscii());
+            success = m_Boat.OpenBinary(openDialog.GetPath().ToAscii());
         } else {
             BoatSpeedTable table;
             int wind_speed_step, wind_degree_step;
@@ -309,7 +325,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
                                      wind_speed_step, wind_degree_step))) {
                 m_sFileCSVWindSpeedStep->SetValue(wind_speed_step);
                 m_sFileCSVWindDegreeStep->SetValue(wind_degree_step);
-                boat.SetSpeedsFromTable(table);
+                m_Boat.SetSpeedsFromTable(table);
             }
         }
              
@@ -334,9 +350,9 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
 
         bool success;
         if(binary)
-            success = boat.SaveBinary(saveDialog.GetPath().ToAscii());
+            success = m_Boat.SaveBinary(saveDialog.GetPath().ToAscii());
         else {
-            BoatSpeedTable table = boat.CreateTable
+            BoatSpeedTable table = m_Boat.CreateTable
                 (m_sFileCSVWindSpeedStep->GetValue(),
                  m_sFileCSVWindDegreeStep->GetValue());
             success = table.Save(saveDialog.GetPath().ToAscii());
@@ -353,27 +369,27 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
 
 void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
 {
-    boat.OptimizeTackingSpeed();
+    m_Boat.OptimizeTackingSpeed();
     m_PlotWindow->Refresh();
 }
 
 void BoatDialog::OnResetOptimalTackingSpeed( wxCommandEvent& event )
 {
-    boat.ResetOptimalTackingSpeed();
+    m_Boat.ResetOptimalTackingSpeed();
     m_PlotWindow->Refresh();
 }
 
 void BoatDialog::Compute()
 {
-    boat.eta = m_sEta->GetValue() / 1000.0;
-    boat.hull_drag = m_sHullDrag->GetValue() / 1000.0;
-    boat.keel_pressure = m_sKeelPressure->GetValue() / 100.0;
-    boat.keel_lift = m_sKeelLift->GetValue() / 100.0;
-    boat.lwl_ft = m_sLWL->GetValue();
-    boat.displacement_lbs = m_sDisplacement->GetValue();
-    boat.planing_constant = m_sPlaningConstant->GetValue();
+    m_Boat.eta = m_sEta->GetValue() / 1000.0;
+    m_Boat.hull_drag = m_sHullDrag->GetValue() / 1000.0;
+    m_Boat.keel_pressure = m_sKeelPressure->GetValue() / 100.0;
+    m_Boat.keel_lift = m_sKeelLift->GetValue() / 100.0;
+    m_Boat.lwl_ft = m_sLWL->GetValue();
+    m_Boat.displacement_lbs = m_sDisplacement->GetValue();
+    m_Boat.planing_constant = m_sPlaningConstant->GetValue();
 
-    boat.ComputeBoatSpeeds();
+    m_Boat.ComputeBoatSpeeds();
 
     UpdateVMG();
     m_PlotWindow->Refresh();
@@ -385,11 +401,11 @@ void BoatDialog::UpdateVMG()
     int VW = m_sWindSpeed->GetValue();
 
     m_stBestCourseUpWindPortTack->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortTackUpWind));
+        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].PortTackUpWind));
     m_stBestCourseUpWindStarboardTack->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardTackUpWind));
+        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].StarboardTackUpWind));
     m_stBestCourseDownWindPortTack->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].PortTackDownWind));
+        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].PortTackDownWind));
     m_stBestCourseDownWindStarboardTack->SetLabel
-        (wxString::Format(_T("%d"), boat.VMG[P][VW].StarboardTackDownWind));
+        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].StarboardTackDownWind));
 }

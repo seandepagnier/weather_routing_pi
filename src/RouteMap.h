@@ -24,23 +24,24 @@
  ***************************************************************************
  */
 
+#include "wx/datetime.h"
+
 #include <list>
 
-class PlugIn_ViewPort;
-
-class ocpnDC;
+class RouteMapOptions;
 class Route;
 class RouteHeap;
-class RouteMap;
+class GribRecordSet;
+
 typedef std::list<Route*> RouteList;
 
-/* list of positions which take equal time to reach */
+/* circular linked list node for positions which take equal time to reach */
 class Position
 {
 public:
     Position(double latitude, double longitude, Position *p=NULL);
     Position(Position *p);
-    void Propagate(RouteHeap &routeheap, RouteMap &map, wxDateTime time);
+    void Propagate(RouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
     Position *Copy();
@@ -62,13 +63,12 @@ public:
 
     void Print();
     bool Contains(Route *r);
-    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
-    void ApplyCurrent(RouteMap &routemap, wxDateTime time);
+    void ApplyCurrent(GribRecordSet &grib, RouteMapOptions &options);
     bool FindRouteBounds(double bounds[4]);
     void RemovePosition(Position *p);
-    RouteList Normalize(int level);
+    RouteList Normalize(int level, bool inverted_regions);
     Position *ClosestPosition(double lat, double lon);
-    void Propagate(RouteHeap &routeheap, RouteMap &routemap, wxDateTime time);
+    void Propagate(RouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
     
     Position *points; /* pointer to point with maximum latitude */
     int count;
@@ -105,9 +105,8 @@ public:
     RouteIso(RouteList r, wxDateTime t);
     ~RouteIso();
 
-    RouteIso *Propagate(RouteMap &routemap);
+    void PropagateIntoHeap(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options);
     bool Contains(double lat, double lon);
-    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
   
     RouteList routes;
     wxDateTime time;
@@ -115,44 +114,73 @@ public:
 
 typedef std::list<RouteIso*> RouteIsoList;
 
-/* contains pointers to reach
-   complete datastructure describing
-   the optimal sailing route */
+struct RouteMapOptions {
+    double EndLat, EndLon;
+    double dt; /* time in seconds between propagations */
+
+    std::list<double> DegreeSteps;
+    
+    double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
+    double MaxLatitude, TackingTime;
+    
+    int SubSteps;
+    bool DetectLand, InvertedRegions, Anchoring, AllowDataDeficient;
+
+    BoatSpeed *boat;
+};
+
 class RouteMap
 {
 public:
     static void Wind(double &windspeed, double &winddir,
                      double lat, double lon, wxDateTime time);
-    RouteMap(BoatSpeed &b);
+    RouteMap();
     ~RouteMap();
 
-    void Propagate();
-    Position *ClosestPosition(double lat, double lon);
-    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
-    void RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp);
     void Reset(double lat, double lon, wxDateTime time);
-    void Clear();
-    bool SetCursorLatLon(double lat, double lon);
-    bool ReachedDestination();
 
-    double EndLat, EndLon;
+#define LOCKING_ACCESSOR(name, flag) bool name() { Lock(); bool ret = flag; Unlock(); return ret; }
+    LOCKING_ACCESSOR(Finished, m_bFinished)
+    LOCKING_ACCESSOR(ReachedDestination, m_bReachedDestination)
+    LOCKING_ACCESSOR(GribFailed, m_bGribFailed)
 
-    wxTimeSpan dt; /* time in seconds between propagations */
+    bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
+    bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
+    void SetNewGrib(GribRecordSet *grib) { Lock(); m_NewGrib = grib; m_bNeedsGrib = false; Unlock(); }
+    wxDateTime NewGribTime() { Lock(); wxDateTime time =  m_NewGribTime; Unlock(); return time; }
+    bool HasGrib() { return m_NewGrib; }
 
-    std::list<double> DegreeSteps;
+    void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; Unlock(); }
+    RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
+    void SetBoat(BoatSpeed &b) {
+        Lock();
+        m_boats[m_currentboat] = b;
+        m_bUpdateBoat = true;
+        Unlock();
+    }
 
-    double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
-    double MaxLatitude, TackingTime;
+protected:
+    RouteList ReduceHeap(RouteHeap &routeheap, RouteMapOptions &options);
+    bool Propagate();
+    Position *ClosestPosition(double lat, double lon);
 
-    int SubSteps;
+    /* protect any member variables with mutexes if needed */
+    virtual void Lock() = 0;
+    virtual void Unlock() = 0;
 
-    bool DetectLand, InvertedRegions, Anchoring, AllowDataDeficient;
+    RouteIsoList origin; /* list of route isos in order of time */
 
-    BoatSpeed &boat;
-    RouteIsoList origin; /* initial route iso */
-
-    bool m_bFinished, m_bReachedDestination, m_bGribFailed;
 private:
+    virtual void Clear();
 
-    Position *last_cursor_position;
+    RouteMapOptions m_Options;
+    bool m_bNeedsGrib, m_bFinished, m_bReachedDestination, m_bGribFailed;
+
+    GribRecordSet *m_NewGrib;
+    wxDateTime m_NewGribTime;
+
+    bool m_bUpdateBoat;
+    BoatSpeed m_boats[2]; /* page flip boats to allow safe threaded access
+                             without copying the whole boat very often */
+    int m_currentboat;
 };

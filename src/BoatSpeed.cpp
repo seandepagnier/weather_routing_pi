@@ -32,10 +32,6 @@
 #include "Utilities.h"
 #include "BoatSpeed.h"
 
-#ifdef __MSVC__
-#define isnan _isnan
-#endif
-
 double interp_value(double x, double x1, double x2, double y1, double y2)
 {
 /*
@@ -70,7 +66,7 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
     if(!fgets(line, sizeof line, f))
         goto failed; /* error here too */
     token = strtok_r(line, ";", &saveptr);
-    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
+    if(strcmp(token, "twa/tws") && strcmp(token, "twa\\tws"))
         goto failed; /* unrecognized format */
     
     while((token = strtok_r(NULL, ";", &saveptr))) {
@@ -761,7 +757,7 @@ double BoatSpeed::Speed(int P, double W, double VW, double vw_step)
 {
     W = positive_degrees(W);
     if(P < 0 || P > MAX_POWER || VW < 0 || VW > MAX_KNOTS)
-        return 0.0/0.0;
+        return NAN;
 
     double W1 = floor(W/DEGREE_STEP)*DEGREE_STEP;
     double W2 = ceil(W/DEGREE_STEP)*DEGREE_STEP;
@@ -795,7 +791,7 @@ double BoatSpeed::Speed(int P, double W, double VW, double vw_step)
 double BoatSpeed::TrueWindSpeed(int P, double VB, double W, double maxVW)
 {
     if(P < 0 || P > MAX_POWER)
-        return 0.0/0.0;
+        return NAN;
 
     double W1 = floor(W/DEGREE_STEP)*DEGREE_STEP;
     double W2 = ceil(W/DEGREE_STEP)*DEGREE_STEP;
@@ -809,8 +805,8 @@ double BoatSpeed::TrueWindSpeed(int P, double VB, double W, double maxVW)
     int W1i = positive_degrees(W1);
     int W2i = positive_degrees(W2);
 
-    double VB1min = 1.0/0.0, VW1min = 0.0/0.0, VB1max = 0, VW1max = 0.0/0.0;
-    double VB2min = 1.0/0.0, VW2min = 0.0/0.0, VB2max = 0, VW2max = 0.0/0.0;
+    double VB1min = 1.0/0.0, VW1min = NAN, VB1max = 0, VW1max = NAN;
+    double VB2min = 1.0/0.0, VW2min = NAN, VB2max = 0, VW2max = NAN;
 
     for(int VWi = 0; VWi < maxVW; VWi++) {
         double VB1 = speed[P][VWi][W1i].VB;

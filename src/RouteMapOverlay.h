@@ -24,45 +24,36 @@
  ***************************************************************************
  */
 
-#ifdef __WXMSW__
-#include <float.h>
-#include <iostream>
-#include <limits>
-#define M_PI		3.14159265358979323846	/* pi */
-#define NAN std::numeric_limits<double>::quiet_NaN ()
+#include "RouteMap.h"
 
-#define isnan _isnan
-#define isinf(x) (!_finite(x))
+class PlugIn_ViewPort;
 
-inline double trunc(double d){ return (d>0) ? floor(d) : ceil(d) ; }
-inline double round(double n) { return n < 0.0 ? ceil(n - 0.5) : floor(n + 0.5); }
+class ocpnDC;
 
+class RouteMapOverlay : public RouteMap, public wxThread
+{
+public:
+    RouteMapOverlay();
+    void *Entry();
+    bool Updated();
+    bool Paused() { return m_bPaused; }
+    void TogglePaused() { m_bPaused = !m_bPaused; }
+    void Pause() { m_bPaused = true; }
 
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
+    bool SetCursorLatLon(double lat, double lon);
+    void RenderRoute(Route *r, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
+    void RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp);
 
-#define strtok_r(a, b, c) strtok_r(a, b)
-#endif
+    virtual void Clear();
+    virtual void Lock() { routemutex.Lock(); }
+    virtual void Unlock() { routemutex.Unlock(); }
 
+    wxMutex routemutex;
 
-/* min must have correct paren to make predence correct */
-#ifdef MIN
-#undef MIN
-#endif
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
+    wxDateTime m_GribTimelineTime;
 
-#ifdef MAX
-#undef MAX
-#endif
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-double deg2rad(double degrees);
-double rad2deg(double radians);
-double heading_resolve(double degrees);
-double positive_degrees(double degrees);
-double rad2posdeg(double radians);
-
-double square(double x);
-double cube(double x);
+private:
+    Position *last_cursor_position;
+    bool m_bPaused, m_bUpdated;
+};
