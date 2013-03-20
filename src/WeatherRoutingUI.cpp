@@ -37,7 +37,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_staticText6->Wrap( -1 );
 	fgSizer6->Add( m_staticText6, 0, wxALL, 5 );
 	
-	m_tStartLon = new wxTextCtrl( this, wxID_ANY, wxT("166.5"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_tStartLon = new wxTextCtrl( this, wxID_ANY, wxT("166.5"), wxDefaultPosition, wxSize( 100,-1 ), 0 );
 	fgSizer6->Add( m_tStartLon, 0, wxALL, 5 );
 	
 	m_staticText28 = new wxStaticText( this, wxID_ANY, wxT("Date"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -74,14 +74,14 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_staticText51->Wrap( -1 );
 	fgSizer61->Add( m_staticText51, 0, wxALL, 5 );
 	
-	m_tEndLat = new wxTextCtrl( this, wxID_ANY, wxT("-35"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_tEndLat = new wxTextCtrl( this, wxID_ANY, wxT("-35"), wxDefaultPosition, wxSize( 100,-1 ), 0 );
 	fgSizer61->Add( m_tEndLat, 0, wxALL, 5 );
 	
 	m_staticText61 = new wxStaticText( this, wxID_ANY, wxT("Lon"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText61->Wrap( -1 );
 	fgSizer61->Add( m_staticText61, 0, wxALL, 5 );
 	
-	m_tEndLon = new wxTextCtrl( this, wxID_ANY, wxT("175"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_tEndLon = new wxTextCtrl( this, wxID_ANY, wxT("175"), wxDefaultPosition, wxSize( 100,-1 ), 0 );
 	fgSizer61->Add( m_tEndLon, 0, wxALL, 5 );
 	
 	
@@ -89,6 +89,68 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	
 	
 	fgSizer17->Add( sbSizer5, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer10;
+	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Statistics") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer29;
+	fgSizer29 = new wxFlexGridSizer( 0, 4, 0, 0 );
+	fgSizer29->SetFlexibleDirection( wxBOTH );
+	fgSizer29->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText47 = new wxStaticText( this, wxID_ANY, wxT("State"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText47->Wrap( -1 );
+	fgSizer29->Add( m_staticText47, 0, wxALL, 5 );
+	
+	m_stState = new wxStaticText( this, wxID_ANY, wxT("Stopped"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stState->Wrap( -1 );
+	fgSizer29->Add( m_stState, 0, wxALL, 5 );
+	
+	m_staticText511 = new wxStaticText( this, wxID_ANY, wxT("Run Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText511->Wrap( -1 );
+	fgSizer29->Add( m_staticText511, 0, wxALL, 5 );
+	
+	m_stRunTime = new wxStaticText( this, wxID_ANY, wxT("0000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stRunTime->Wrap( -1 );
+	fgSizer29->Add( m_stRunTime, 0, wxALL, 5 );
+	
+	m_staticText53 = new wxStaticText( this, wxID_ANY, wxT("Iso Chrons"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText53->Wrap( -1 );
+	fgSizer29->Add( m_staticText53, 0, wxALL, 5 );
+	
+	m_stIsoChrons = new wxStaticText( this, wxID_ANY, wxT("0000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stIsoChrons->Wrap( -1 );
+	fgSizer29->Add( m_stIsoChrons, 0, wxALL, 5 );
+	
+	m_staticText55 = new wxStaticText( this, wxID_ANY, wxT("Routes"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText55->Wrap( -1 );
+	fgSizer29->Add( m_staticText55, 0, wxALL, 5 );
+	
+	m_stRoutes = new wxStaticText( this, wxID_ANY, wxT("0000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stRoutes->Wrap( -1 );
+	fgSizer29->Add( m_stRoutes, 0, wxALL, 5 );
+	
+	m_staticText57 = new wxStaticText( this, wxID_ANY, wxT("InvRoutes"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText57->Wrap( -1 );
+	fgSizer29->Add( m_staticText57, 0, wxALL, 5 );
+	
+	m_stInvRoutes = new wxStaticText( this, wxID_ANY, wxT("0000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stInvRoutes->Wrap( -1 );
+	fgSizer29->Add( m_stInvRoutes, 0, wxALL, 5 );
+	
+	m_staticText49 = new wxStaticText( this, wxID_ANY, wxT("Positions"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText49->Wrap( -1 );
+	fgSizer29->Add( m_staticText49, 0, wxALL, 5 );
+	
+	m_stPositions = new wxStaticText( this, wxID_ANY, wxT("0000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stPositions->Wrap( -1 );
+	fgSizer29->Add( m_stPositions, 0, wxALL, 5 );
+	
+	
+	sbSizer10->Add( fgSizer29, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer17->Add( sbSizer10, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer24;
 	fgSizer24 = new wxFlexGridSizer( 0, 3, 0, 0 );
@@ -101,11 +163,20 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_bReset = new wxButton( this, wxID_ANY, wxT("Reset"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer24->Add( m_bReset, 0, wxALL, 5 );
 	
+	m_bConfiguration = new wxButton( this, wxID_ANY, wxT("Configuration"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer24->Add( m_bConfiguration, 0, wxALL, 5 );
+	
 	m_bSettings = new wxButton( this, wxID_ANY, wxT("Settings"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer24->Add( m_bSettings, 0, wxALL, 5 );
 	
 	m_bBoat = new wxButton( this, wxID_ANY, wxT("Boat"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer24->Add( m_bBoat, 0, wxALL, 5 );
+	
+	m_bPlot = new wxButton( this, wxID_ANY, wxT("Plot"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer24->Add( m_bPlot, 0, wxALL, 5 );
+	
+	m_bExport = new wxButton( this, wxID_ANY, wxT("Export"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer24->Add( m_bExport, 0, wxALL, 5 );
 	
 	m_bInformation = new wxButton( this, wxID_ANY, wxT("Information"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer24->Add( m_bInformation, 0, wxALL, 5 );
@@ -128,8 +199,11 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_tEndLon->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( WeatherRoutingDialogBase::OnUpdateEnd ), NULL, this );
 	m_bCompute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnCompute ), NULL, this );
 	m_bReset->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnReset ), NULL, this );
+	m_bConfiguration->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnConfiguration ), NULL, this );
 	m_bSettings->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnSettings ), NULL, this );
 	m_bBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnBoat ), NULL, this );
+	m_bPlot->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnPlot ), NULL, this );
+	m_bExport->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnExport ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnInformation ), NULL, this );
 	m_bClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnClose ), NULL, this );
 }
@@ -141,14 +215,17 @@ WeatherRoutingDialogBase::~WeatherRoutingDialogBase()
 	m_tEndLon->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( WeatherRoutingDialogBase::OnUpdateEnd ), NULL, this );
 	m_bCompute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnCompute ), NULL, this );
 	m_bReset->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnReset ), NULL, this );
+	m_bConfiguration->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnConfiguration ), NULL, this );
 	m_bSettings->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnSettings ), NULL, this );
 	m_bBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnBoat ), NULL, this );
+	m_bPlot->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnPlot ), NULL, this );
+	m_bExport->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnExport ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnInformation ), NULL, this );
 	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnClose ), NULL, this );
 	
 }
 
-WeatherRoutingSettingsDialogBase::WeatherRoutingSettingsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+WeatherRoutingConfigurationDialogBase::WeatherRoutingConfigurationDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
@@ -163,6 +240,7 @@ WeatherRoutingSettingsDialogBase::WeatherRoutingSettingsDialogBase( wxWindow* pa
 	wxFlexGridSizer* fgSizer20;
 	fgSizer20 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer20->AddGrowableCol( 0 );
+	fgSizer20->AddGrowableRow( 0 );
 	fgSizer20->SetFlexibleDirection( wxBOTH );
 	fgSizer20->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -306,20 +384,96 @@ WeatherRoutingSettingsDialogBase::WeatherRoutingSettingsDialogBase( wxWindow* pa
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	m_bAddDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnAddDegreeStep ), NULL, this );
-	m_bRemoveDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnRemoveDegreeStep ), NULL, this );
-	m_bGenerateDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnGenerateDegreeSteps ), NULL, this );
-	m_bClearDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnClearDegreeSteps ), NULL, this );
+	m_bAddDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
+	m_bRemoveDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
+	m_bGenerateDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnGenerateDegreeSteps ), NULL, this );
+	m_bClearDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );
+}
+
+WeatherRoutingConfigurationDialogBase::~WeatherRoutingConfigurationDialogBase()
+{
+	// Disconnect Events
+	m_bAddDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
+	m_bRemoveDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
+	m_bGenerateDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnGenerateDegreeSteps ), NULL, this );
+	m_bClearDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );
+	
+}
+
+WeatherRoutingSettingsDialogBase::WeatherRoutingSettingsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer18;
+	fgSizer18 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer18->SetFlexibleDirection( wxBOTH );
+	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer42;
+	fgSizer42 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer42->SetFlexibleDirection( wxBOTH );
+	fgSizer42->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText74 = new wxStaticText( this, wxID_ANY, wxT("Cursor Route Color"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText74->Wrap( -1 );
+	fgSizer42->Add( m_staticText74, 0, wxALL, 5 );
+	
+	m_cpCursorRoute = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 255, 0 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	fgSizer42->Add( m_cpCursorRoute, 0, wxALL, 5 );
+	
+	m_staticText73 = new wxStaticText( this, wxID_ANY, wxT("Destination Route Color"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText73->Wrap( -1 );
+	fgSizer42->Add( m_staticText73, 0, wxALL, 5 );
+	
+	m_cpDestinationRoute = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 0, 255 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	fgSizer42->Add( m_cpDestinationRoute, 0, wxALL, 5 );
+	
+	m_staticText75 = new wxStaticText( this, wxID_ANY, wxT("Route Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText75->Wrap( -1 );
+	fgSizer42->Add( m_staticText75, 0, wxALL, 5 );
+	
+	m_sRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 10, 4 );
+	fgSizer42->Add( m_sRouteThickness, 0, wxALL, 5 );
+	
+	m_staticText70 = new wxStaticText( this, wxID_ANY, wxT("Iso Chron Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText70->Wrap( -1 );
+	fgSizer42->Add( m_staticText70, 0, wxALL, 5 );
+	
+	m_sIsoChronThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 2 );
+	fgSizer42->Add( m_sIsoChronThickness, 0, wxALL, 5 );
+	
+	m_staticText71 = new wxStaticText( this, wxID_ANY, wxT("Alternate Routes Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText71->Wrap( -1 );
+	fgSizer42->Add( m_staticText71, 0, wxALL, 5 );
+	
+	m_sAlternateRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer42->Add( m_sAlternateRouteThickness, 0, wxALL, 5 );
+	
+	m_cbAlternatesForAll = new wxCheckBox( this, wxID_ANY, wxT("Alternates for all IsoChrons"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer42->Add( m_cbAlternatesForAll, 0, wxALL, 5 );
+	
+	
+	fgSizer18->Add( fgSizer42, 1, wxEXPAND, 5 );
+	
+	m_sdbSizer1 = new wxStdDialogButtonSizer();
+	m_sdbSizer1OK = new wxButton( this, wxID_OK );
+	m_sdbSizer1->AddButton( m_sdbSizer1OK );
+	m_sdbSizer1Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer1->AddButton( m_sdbSizer1Cancel );
+	m_sdbSizer1->Realize();
+	
+	fgSizer18->Add( m_sdbSizer1, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer18 );
+	this->Layout();
+	fgSizer18->Fit( this );
+	
+	this->Centre( wxBOTH );
 }
 
 WeatherRoutingSettingsDialogBase::~WeatherRoutingSettingsDialogBase()
 {
-	// Disconnect Events
-	m_bAddDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnAddDegreeStep ), NULL, this );
-	m_bRemoveDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnRemoveDegreeStep ), NULL, this );
-	m_bGenerateDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnGenerateDegreeSteps ), NULL, this );
-	m_bClearDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingSettingsDialogBase::OnClearDegreeSteps ), NULL, this );
-	
 }
 
 BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
@@ -837,6 +991,214 @@ BoatDialogBase::~BoatDialogBase()
 	m_sKeelLift->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
 	m_sWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
 	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnClose ), NULL, this );
+	
+}
+
+PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer3;
+	fgSizer3 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer3->AddGrowableCol( 0 );
+	fgSizer3->AddGrowableRow( 0 );
+	fgSizer3->SetFlexibleDirection( wxBOTH );
+	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_PlotWindow = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_PlotWindow->SetScrollRate( 5, 5 );
+	fgSizer3->Add( m_PlotWindow, 1, wxEXPAND | wxALL, 5 );
+	
+	wxFlexGridSizer* fgSizer12;
+	fgSizer12 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer12->AddGrowableCol( 0 );
+	fgSizer12->SetFlexibleDirection( wxBOTH );
+	fgSizer12->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer77;
+	fgSizer77 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer77->AddGrowableCol( 1 );
+	fgSizer77->SetFlexibleDirection( wxBOTH );
+	fgSizer77->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText138 = new wxStaticText( this, wxID_ANY, wxT("Position"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText138->Wrap( -1 );
+	fgSizer77->Add( m_staticText138, 0, wxALL, 5 );
+	
+	m_sPosition = new wxSlider( this, wxID_ANY, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	fgSizer77->Add( m_sPosition, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticText139 = new wxStaticText( this, wxID_ANY, wxT("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText139->Wrap( -1 );
+	fgSizer77->Add( m_staticText139, 0, wxALL, 5 );
+	
+	m_sScale = new wxSlider( this, wxID_ANY, 100, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	fgSizer77->Add( m_sScale, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer77->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer78;
+	fgSizer78 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer78->SetFlexibleDirection( wxBOTH );
+	fgSizer78->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText140 = new wxStaticText( this, wxID_ANY, wxT("Variable"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText140->Wrap( -1 );
+	m_staticText140->SetForegroundColour( wxColour( 255, 0, 0 ) );
+	
+	fgSizer78->Add( m_staticText140, 0, wxALL, 5 );
+	
+	wxString m_cVariable1Choices[] = { wxT("Boat Velocity Ground"), wxT("Boat Course Ground"), wxT("Boat Velocity Water"), wxT("Boat Course Water"), wxT("Wind Velocity"), wxT("Wind Direction"), wxT("Wind Course"), wxT("Wind Velocity Ground"), wxT("Wind Direction Ground"), wxT("Wind Course Ground"), wxT("Apparent Wind Velocity"), wxT("Apparent Wind Direction"), wxT("Current Velocity"), wxT("Current Direction"), wxT("Sig Wave Height") };
+	int m_cVariable1NChoices = sizeof( m_cVariable1Choices ) / sizeof( wxString );
+	m_cVariable1 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable1NChoices, m_cVariable1Choices, 0 );
+	m_cVariable1->SetSelection( 3 );
+	fgSizer78->Add( m_cVariable1, 0, wxALL, 5 );
+	
+	m_stMousePosition1 = new wxStaticText( this, wxID_ANY, wxT("        N/A         "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stMousePosition1->Wrap( -1 );
+	fgSizer78->Add( m_stMousePosition1, 0, wxALL, 5 );
+	
+	m_staticText1401 = new wxStaticText( this, wxID_ANY, wxT("Variable"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1401->Wrap( -1 );
+	m_staticText1401->SetForegroundColour( wxColour( 0, 255, 0 ) );
+	
+	fgSizer78->Add( m_staticText1401, 0, wxALL, 5 );
+	
+	wxString m_cVariable2Choices[] = { wxT("Boat Velocity Ground"), wxT("Boat Course Ground"), wxT("Boat Velocity Water"), wxT("Boat Course Water"), wxT("Wind Velocity"), wxT("Wind Direction"), wxT("Wind Course"), wxT("Wind Velocity Ground"), wxT("Wind Direction Ground"), wxT("Wind Course Ground"), wxT("Apparent Wind Velocity"), wxT("Apparent Wind Direction"), wxT("Current Velocity"), wxT("Current Direction"), wxT("Sig Wave Height") };
+	int m_cVariable2NChoices = sizeof( m_cVariable2Choices ) / sizeof( wxString );
+	m_cVariable2 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable2NChoices, m_cVariable2Choices, 0 );
+	m_cVariable2->SetSelection( 5 );
+	fgSizer78->Add( m_cVariable2, 0, wxALL, 5 );
+	
+	m_stMousePosition2 = new wxStaticText( this, wxID_ANY, wxT("        N/A         "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stMousePosition2->Wrap( -1 );
+	fgSizer78->Add( m_stMousePosition2, 0, wxALL, 5 );
+	
+	m_staticText14011 = new wxStaticText( this, wxID_ANY, wxT("Variable"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText14011->Wrap( -1 );
+	m_staticText14011->SetForegroundColour( wxColour( 0, 0, 255 ) );
+	
+	fgSizer78->Add( m_staticText14011, 0, wxALL, 5 );
+	
+	wxString m_cVariable3Choices[] = { wxT("Boat Velocity Ground"), wxT("Boat Course Ground"), wxT("Boat Velocity Water"), wxT("Boat Course Water"), wxT("Wind Velocity"), wxT("Wind Direction"), wxT("Wind Course"), wxT("Wind Velocity Ground"), wxT("Wind Direction Ground"), wxT("Wind Course Ground"), wxT("Apparent Wind Velocity"), wxT("Apparent Wind Direction"), wxT("Current Velocity"), wxT("Current Direction"), wxT("Sig Wave Height") };
+	int m_cVariable3NChoices = sizeof( m_cVariable3Choices ) / sizeof( wxString );
+	m_cVariable3 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable3NChoices, m_cVariable3Choices, 0 );
+	m_cVariable3->SetSelection( 11 );
+	fgSizer78->Add( m_cVariable3, 0, wxALL, 5 );
+	
+	m_stMousePosition3 = new wxStaticText( this, wxID_ANY, wxT("        N/A         "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stMousePosition3->Wrap( -1 );
+	fgSizer78->Add( m_stMousePosition3, 0, wxALL, 5 );
+	
+	
+	fgSizer77->Add( fgSizer78, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer12->Add( fgSizer77, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer16;
+	fgSizer16 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer16->SetFlexibleDirection( wxBOTH );
+	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_sdbSizer4 = new wxStdDialogButtonSizer();
+	m_sdbSizer4OK = new wxButton( this, wxID_OK );
+	m_sdbSizer4->AddButton( m_sdbSizer4OK );
+	m_sdbSizer4->Realize();
+	
+	fgSizer16->Add( m_sdbSizer4, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer12->Add( fgSizer16, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer3->Add( fgSizer12, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer3 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_PlotWindow->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_MIDDLE_UP, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_RIGHT_UP, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_MOTION, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_PAINT, wxPaintEventHandler( PlotDialogBase::OnPaintPlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_SIZE, wxSizeEventHandler( PlotDialogBase::OnSizePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_cVariable1->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
+	m_cVariable2->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
+	m_cVariable3->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
+}
+
+PlotDialogBase::~PlotDialogBase()
+{
+	// Disconnect Events
+	m_PlotWindow->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_MIDDLE_UP, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_RIGHT_UP, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_MOTION, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_PAINT, wxPaintEventHandler( PlotDialogBase::OnPaintPlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_SIZE, wxSizeEventHandler( PlotDialogBase::OnSizePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sPosition->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_sScale->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
+	m_cVariable1->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
+	m_cVariable2->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
+	m_cVariable3->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
 	
 }
 

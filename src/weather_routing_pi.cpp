@@ -51,7 +51,6 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
     delete p;
 }
 
-
 //---------------------------------------------------------------------------------------------------------
 //
 //    Weather_Routing PlugIn Implementation
@@ -59,8 +58,6 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 //---------------------------------------------------------------------------------------------------------
 
 #include "icons.h"
-
-
 
 //---------------------------------------------------------------------------------------------------------
 //
@@ -73,8 +70,6 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
-
-      m_pWeather_RoutingDialog = NULL;
 }
 
 weather_routing_pi::~weather_routing_pi(void)
@@ -91,6 +86,12 @@ int weather_routing_pi::Init(void)
 
       // Get a pointer to the opencpn display canvas, to use as a parent for the WEATHER_ROUTING dialog
       m_parent_window = GetOCPNCanvasWindow();
+
+      m_pWeather_RoutingDialog = new WeatherRoutingDialog(m_parent_window,
+                                                          m_boat_lat, m_boat_lon);
+      wxPoint p = m_pWeather_RoutingDialog->GetPosition();
+      m_pWeather_RoutingDialog->Move(0,0);        // workaround for gtk autocentre dialog behavior
+      m_pWeather_RoutingDialog->Move(p);
 
       m_leftclick_tool_id  = InsertPlugInTool(_T(""), _img_WeatherRouting, _img_WeatherRouting, wxITEM_CHECK,
                                               _("Weather_Routing"), _T(""), NULL,
@@ -121,10 +122,9 @@ int weather_routing_pi::Init(void)
 
 bool weather_routing_pi::DeInit(void)
 {
-      if(m_pWeather_RoutingDialog)
-            m_pWeather_RoutingDialog->Close();
-
-      return true;
+    m_pWeather_RoutingDialog->Close();
+    delete m_pWeather_RoutingDialog;
+    return true;
 }
 
 int weather_routing_pi::GetAPIVersionMajor()
@@ -157,12 +157,10 @@ wxString weather_routing_pi::GetCommonName()
       return _("WeatherRouting");
 }
 
-
 wxString weather_routing_pi::GetShortDescription()
 {
       return _("Weather Routing PlugIn for OpenCPN");
 }
-
 
 wxString weather_routing_pi::GetLongDescription()
 {
@@ -176,7 +174,6 @@ Provides Weather routing features include:\n\
           \n\
           , great circle route, constrained routes, optimal routing. \n\
 p");
-
 }
 
 void weather_routing_pi::SetDefaults(void)
@@ -190,9 +187,8 @@ int weather_routing_pi::GetToolbarToolCount(void)
 
 void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 {
-    if(m_pWeather_RoutingDialog)
-        if(m_pWeather_RoutingDialog->m_RouteMapOverlay.SetCursorLatLon(lat, lon))
-            RequestRefresh(m_parent_window);
+    if(m_pWeather_RoutingDialog->m_RouteMapOverlay.SetCursorLatLon(lat, lon))
+        RequestRefresh(m_parent_window);
 
     m_cursor_lat = lat;
     m_cursor_lon = lon;
@@ -206,10 +202,12 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         wxJSONValue v;
         r.Parse(message_body, &v);
 
-        m_pWeather_RoutingDialog->m_RouteMapOverlay.m_GribTimelineTime.Set
+        wxDateTime time;
+        time.Set
             (v[_T("Day")].AsInt(), (wxDateTime::Month)v[_T("Month")].AsInt(), v[_T("Year")].AsInt(),
              v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
 
+        m_pWeather_RoutingDialog->m_RouteMapOverlay.m_GribTimelineTime = time;
     }
     if(message_id == _T("GRIB_TIMELINE_RECORD"))
     {
@@ -224,11 +222,9 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         GribRecordSet *gptr;
         sscanf(ptr, "%p", &gptr);
 
-        if(m_pWeather_RoutingDialog) {
-            RouteMap &RouteMap = m_pWeather_RoutingDialog->m_RouteMapOverlay;
-            /* should probably check to make sure the time is correct */
-            RouteMap.SetNewGrib(gptr);
-        }
+        RouteMapOverlay &RouteMapOverlay = m_pWeather_RoutingDialog->m_RouteMapOverlay;
+        /* should probably check to make sure the time is correct */
+        RouteMapOverlay.SetNewGrib(gptr);
     }
 }
 
@@ -244,25 +240,20 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
-    if(!m_pWeather_RoutingDialog) {
-        m_pWeather_RoutingDialog = new WeatherRoutingDialog(m_parent_window,
-                                                            m_boat_lat, m_boat_lon);
-        wxPoint p = m_pWeather_RoutingDialog->GetPosition();
-        m_pWeather_RoutingDialog->Move(0,0);        // workaround for gtk autocentre dialog behavior
-        m_pWeather_RoutingDialog->Move(p);
+    static bool nevershown = true;
+    bool show = !m_pWeather_RoutingDialog->IsShown();
+    m_pWeather_RoutingDialog->Show(show);
+    SetCanvasContextMenuItemViz(m_startroute_menu_id, show);
+    SetCanvasContextMenuItemViz(m_endroute_menu_id, show);
 
-        SetCanvasContextMenuItemViz(m_startroute_menu_id, true);
-        SetCanvasContextMenuItemViz(m_endroute_menu_id, true);
+    if(show && nevershown) {
+        m_pWeather_RoutingDialog->Reset();
+        nevershown = false;
     }
-
-    m_pWeather_RoutingDialog->Show(!m_pWeather_RoutingDialog->IsShown());
 }
 
 void weather_routing_pi::OnContextMenuItemCallback(int id)
 {
-    if(!m_pWeather_RoutingDialog)
-        return;
-
     if(id == m_startroute_menu_id) {
         m_pWeather_RoutingDialog->m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
         m_pWeather_RoutingDialog->m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
@@ -276,7 +267,7 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
 
 bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 {
-    if(m_pWeather_RoutingDialog && m_pWeather_RoutingDialog->IsShown()) {
+    if(m_pWeather_RoutingDialog->IsShown()) {
         ocpnDC odc(dc);
         m_pWeather_RoutingDialog->RenderRouteMap(odc, *vp);
         return true;
@@ -286,7 +277,7 @@ bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
-    if(m_pWeather_RoutingDialog && m_pWeather_RoutingDialog->IsShown()) {
+    if(m_pWeather_RoutingDialog->IsShown()) {
         ocpnDC odc;
         m_pWeather_RoutingDialog->RenderRouteMap(odc, *vp);
         return true;

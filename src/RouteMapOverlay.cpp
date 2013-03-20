@@ -32,42 +32,75 @@
 
 #include "../../../include/ocpn_plugin.h"
 #include "../../../include/ocpndc.h"
+#include "../../../include/wx/jsonreader.h"
+#include "../../../include/wx/jsonwriter.h"
 
 #include "BoatSpeed.h"
 #include "RouteMapOverlay.h"
 #include "Utilities.h"
 
-RouteMapOverlay::RouteMapOverlay()
-    : wxThread(wxTHREAD_JOINABLE), last_cursor_position(NULL), m_bPaused(true), m_bUpdated(false)
+RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
+    : wxThread(wxTHREAD_JOINABLE), m_RouteMapOverlay(routemapoverlay)
 {
     Create();
 }
 
-void SetColor(ocpnDC &dc, bool penifgl, unsigned char c[3], int w)
+void *RouteMapOverlayThread::Entry()
+{
+    while(!TestDestroy())
+        if(!m_RouteMapOverlay.Propagate())
+            wxThread::Sleep(150);
+        else {
+            m_RouteMapOverlay.UpdateDestination();
+            wxThread::Sleep(50);
+        }
+    return 0;
+}
+
+RouteMapOverlay::RouteMapOverlay()
+    : m_Thread(NULL),
+      last_cursor_position(NULL), last_destination_position(NULL),
+      m_bUpdated(false)
+{
+}
+
+RouteMapOverlay::~RouteMapOverlay()
+{
+    if(m_Thread)
+        Stop();
+}
+
+void RouteMapOverlay::Start()
+{
+    if(m_Thread) {
+        printf("error, thread already created\n");
+        return;
+    }
+    m_Thread = new RouteMapOverlayThread(*this);
+    m_Thread->Run();
+}
+
+void RouteMapOverlay::Stop()
+{
+    m_Thread->Delete();
+    delete m_Thread;
+    m_Thread = NULL;
+}
+
+void SetColor(ocpnDC &dc, bool penifgl, wxColour c, int w)
 {
     if(!dc.GetDC()) {
-        glColor4ub(c[0], c[1], c[2], 192);
+        glColor4ub(c.Red(), c.Green(), c.Blue(), 168);
         glLineWidth(w);
         if(!penifgl)
             return;
     }
-    dc.SetPen(wxPen(wxColour(c[0], c[1], c[2]), w));
+    dc.SetPen(wxPen(c, w));
 }
 
-static unsigned char overcolor[3];
-void SetPointColor(ocpnDC &dc, Position *p)
-{
-    unsigned char cp[3] = {60, 220, 0}, cnp[3] = {240, 40, 0};
-    if(p->propagated) {
-        for(int i=0; i<3; i++)
-            cp[i] += overcolor[i];
-        SetColor(dc, false, cp, 2);
-    } else
-        SetColor(dc, false, cnp, 2);
-}
 
-void DrawLine(Position *p1, Position *p2, unsigned char *color,
-              ocpnDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
+                               ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     double p1plon, p2plon;
     if(fabs(vp.clon) > 90)
@@ -85,75 +118,130 @@ void DrawLine(Position *p1, Position *p2, unsigned char *color,
     GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
     GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
 
-    if(color == overcolor) SetPointColor(dc, p1);
-    else if(color) SetColor(dc, false, color, 2);
-
-    if(dc.GetDC()) {
+    if(dc.GetDC())
         dc.DrawLine(p1p.x, p1p.y, p2p.x, p2p.y);
-    } else {
+    else {
         glBegin(GL_LINES);
         glVertex2i(p1p.x, p1p.y);
-        if(color == overcolor) SetPointColor(dc, p2);
         glVertex2i(p2p.x, p2p.y);
         glEnd();
     }
 }
 
-void RouteMapOverlay::RenderRoute(Route *r, ocpnDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     if(!r->points)
         return;
 
     Position *p = r->points;
     do {
-        unsigned char cyan[3] = {0, 255, 255};
-        unsigned char blue[3] = {0, 0, 255};
-        unsigned char *c;
-        if(r->parent)
-            c = cyan;
-        else if(r->direction == -1)
-            c = blue;
-        else
-            c = overcolor;
-
-        DrawLine(p, p->next, c, dc, vp);
-
+        SetColor(dc, false, color, m_IsoChronThickness);
+        DrawLine(p, p->next, dc, vp);
         p = p->next;
     } while(p != r->points);
 
     /* now render any children */
-    for(RouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
-        RenderRoute(*it, dc, vp);
+    wxColour cyan(0, 255, 255);
+    for(IsoRouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
+        RenderIsoRoute(*it, cyan, dc, vp);
+}
+
+void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
+                                           ocpnDC &dc, PlugIn_ViewPort &vp)
+{
+    Position *pos = r->points;
+    do {
+        if(each_parent || !pos->propagated)
+            for(Position *p = pos; p && p->parent; p = p->parent) {
+                DrawLine(p, p->parent, dc, vp);
+                if(!each_parent)
+                    break;
+        }
+        pos = pos->next;
+    } while(pos != r->points);
+
+    for(IsoRouteList::iterator cit = r->children.begin(); cit != r->children.end(); cit++) {
+        wxColour blue(0, 0, 255);
+        SetColor(dc, false, blue, m_AlternateRouteThickness);
+        RenderAlternateRoute(*cit, each_parent, dc, vp);
+    }
 }
 
 void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-    unsigned char routecolors[][3] = {{255, 128, 255}, {128, 128, 255}, {0, 230, 152},
-                                      {152, 152, 0}, {0, 220, 200}, {202, 0, 180},
-                                      {34, 69, 198}, {244, 30, 38}, {100, 240, 20}};
-    int c = 0;
-    Lock();
-    for(RouteIsoList::iterator i = origin.begin(); i != origin.end(); ++i) {
-        Unlock();
-        for(int d=0; d<3; d++)
-            overcolor[d] = routecolors[c][d];
+#if 1
+    /* render start and end */
+    RouteMapOptions options = GetOptions();
+    wxPoint r;
+    GetCanvasPixLL(&vp, &r, options.StartLat, options.StartLon);
+    SetColor(dc, true, *wxBLUE, 3);
+    dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
+    dc.DrawLine(r.x, r.y-10, r.x-10, r.y+7);
+    dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
 
-        for(RouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
-            RenderRoute(*j, dc, vp);
+    GetCanvasPixLL(&vp, &r, options.EndLat, options.EndLon);
+    SetColor(dc, true, *wxRED, 3);
+    dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
+    dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
+#endif
 
-        if(++c == (sizeof routecolors) / (sizeof *routecolors))
-            c = 0;
+    if(!origin.size())
+       return;
+
+    /* draw alternate routes first */
+    if(m_AlternateRouteThickness) {
         Lock();
-    }
-    Unlock();
+        IsoChronList::iterator it;
+        if(m_bAlternatesForAll)
+            it = origin.begin();
+        else {
+            it = origin.end();
+            it--;
+        }
 
-    unsigned char lcc[3] = {220, 220, 80}, erc[3] = {80, 40, 200};
-    SetColor(dc, true, lcc, 4);
+        for(; it != origin.end(); ++it)
+            for(IsoRouteList::iterator rit = (*it)->routes.begin();
+                rit != (*it)->routes.end(); ++rit) {
+                wxColour black(0, 0, 0);
+                SetColor(dc, false, black, m_AlternateRouteThickness);
+                RenderAlternateRoute(*rit, !m_bAlternatesForAll, dc, vp);
+            }
+        Unlock();
+    }
+
+    unsigned char routecolors[][3] = {
+                         {  0,   0, 127}, {  0,   0, 255},
+        {255, 127,   0}, {255, 127, 127},
+        {  0, 255,   0}, {  0, 255, 127},
+        {127, 255,   0}, {127, 255, 127},
+        {127, 127,   0},                  {127, 127, 255},
+        {255,   0,   0}, {255,   0, 127}, {255,   0, 255},
+        {127,   0,   0}, {127,   0, 127}, {127,   0, 255},
+        {  0, 127,   0}, {  0, 127, 127}, {  0, 127, 255},
+        {255, 255,   0},                  };
+
+    if(m_RouteThickness) {
+        Lock();
+        int c = 0;
+        for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
+            Unlock();
+            wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
+
+            for(IsoRouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
+                RenderIsoRoute(*j, color, dc, vp);
+            
+            if(++c == (sizeof routecolors) / (sizeof *routecolors))
+                c = 0;
+            Lock();
+        }
+        Unlock();
+    }
+    
+    SetColor(dc, true, m_CursorColor, m_RouteThickness);
     RenderCourse(last_cursor_position, dc, vp);
 
-    RouteMapOptions options = GetOptions();
-    SetColor(dc, true, erc, 4);
-    RenderCourse(ClosestPosition(options.EndLat, options.EndLon), dc, vp);
+    SetColor(dc, true, m_DestinationColor, m_RouteThickness);
+    RenderCourse(last_destination_position, dc, vp);
 }
 
 void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp)
@@ -161,15 +249,16 @@ void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &v
     if(!pos)
         return;
 
+    Lock();
+
     /* draw lines to this route */
     Position *p;
     for(p = pos; p && p->parent; p = p->parent)
-        DrawLine(p, p->parent, NULL, dc, vp);
+        DrawLine(p, p->parent, dc, vp);
 
     /* render boat on optimal course at current grib time */
     wxDateTime time;
-    Lock();
-    RouteIsoList::iterator it = origin.begin();
+    IsoChronList::iterator it = origin.begin();
 
     /* get route iso for this position */
     for(p=pos->parent; p; p=p->parent)
@@ -178,12 +267,13 @@ void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &v
 
     if(it != origin.begin())
         it--;
-    Unlock();
 
     time = m_GribTimelineTime;
-    for(p = pos; p; p = p->parent) {
+    for(p = pos; p->parent; p = p->parent) {
         wxDateTime ittime = (*it)->time;
-        if(time >= ittime && p->parent) {
+        wxPoint r;
+
+        if(time >= ittime) {
             wxDateTime timestart = (*it)->time;
             it++;
             wxDateTime timeend = (*it)->time;
@@ -194,22 +284,99 @@ void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &v
             if(d > 1)
                 d = 1;
 
-            wxPoint r;
             GetCanvasPixLL(&vp, &r,
                            p->parent->lat + d*(p->lat - p->parent->lat),
                            p->parent->lon + d*heading_resolve(p->lon - p->parent->lon));
 
-            dc.DrawCircle( r.x, r.y, 7 );
-            break;
+        } else if(it == origin.begin())
+            GetCanvasPixLL(&vp, &r, p->parent->lat, p->parent->lon);
+        else {
+            it--;
+            continue;
         }
+        
+        dc.DrawCircle( r.x, r.y, 7 );
+        break;
+    }
+    Unlock();
+}
+
+void RouteMapOverlay::RequestGrib(wxDateTime time)
+{
+    wxJSONValue v;
+    v[_T("Day")] = time.GetDay();
+    v[_T("Month")] = time.GetMonth();
+    v[_T("Year")] = time.GetYear();
+    v[_T("Hour")] = time.GetHour();
+    v[_T("Minute")] = time.GetMinute();
+    v[_T("Second")] = time.GetSecond();
+    
+    wxJSONWriter w;
+    wxString out;
+    w.Write(v, out);
+    SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+}
+
+std::list<PlotData> RouteMapOverlay::GetPlotData()
+{
+    Position *pos = last_destination_position;
+    std::list<PlotData> plotdatalist;
+    if(!pos)
+        return plotdatalist;
+
+    Lock();
+    IsoChronList::iterator it = origin.begin(), itp;
+
+    /* get route iso for this position */
+    Position *p;
+    for(p=pos->parent; p; p=p->parent)
+        if(++it == origin.end())
+            return plotdatalist;
+
+    if(it != origin.begin())
         it--;
-    }    
+
+    for(p = pos; p->parent && it != origin.begin(); p = p->parent) {
+        GribRecordSet *grib = (*it)->m_Grib;
+        if(grib) {
+            PlotData data;
+            itp = it, itp--;
+            /* this omits the starting position */
+            double dt = ((*it)->time - (*itp)->time).GetSeconds().ToDouble();
+            data.time = (*it)->time;
+            data.lat = p->lat, data.lon = p->lon;
+            if(p->GetPlotData(*grib, data, dt))
+                plotdatalist.push_front(data);
+        }
+        
+        it--;
+    }
+
+    m_NewGrib = NULL;
+    m_bNeedsGrib = true;
+
+    Unlock();
+    return plotdatalist;
+}
+
+void RouteMapOverlay::SetSettings(wxColor CursorColor, wxColor DestinationColor,
+                                  int RouteThickness, int IsoChronThickness,
+                                  int AlternateRouteThickness, bool AlternatesForAll)
+                                  
+{
+    m_CursorColor = CursorColor;
+    m_DestinationColor = DestinationColor;
+    m_RouteThickness = RouteThickness;
+    m_IsoChronThickness = IsoChronThickness;
+    m_AlternateRouteThickness = AlternateRouteThickness;
+    m_bAlternatesForAll = AlternatesForAll;
 }
 
 void RouteMapOverlay::Clear()
 {
     RouteMap::Clear();
     last_cursor_position = NULL;
+    last_destination_position = NULL;
 }
 
 bool RouteMapOverlay::SetCursorLatLon(double lat, double lon)
@@ -222,19 +389,16 @@ bool RouteMapOverlay::SetCursorLatLon(double lat, double lon)
     return true;
 }
 
-void *RouteMapOverlay::Entry()
-{
-    while(!TestDestroy())
-        if(m_bPaused || !Propagate())
-            wxThread::Sleep(250);
-        else
-            m_bUpdated = true;
-    return 0;
-}
-
 bool RouteMapOverlay::Updated()
 {
     bool updated = m_bUpdated;
     m_bUpdated = false;
     return updated;
+}
+
+void RouteMapOverlay::UpdateDestination()
+{
+    RouteMapOptions options = GetOptions();
+    last_destination_position = ClosestPosition(options.EndLat, options.EndLon);
+    m_bUpdated = true;
 }

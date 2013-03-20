@@ -142,13 +142,11 @@ static bool Current(GribRecordSet &grib,
    VWG - Velocity of wind over ground
    C   - Sea Current Direction over ground
    VC  - Velocity of Current
-   Wx - X component of wind
-   Wy - Y component of wind
-   VW - velocity of wind over water
    WA  - Angle of wind relative to true north
+   VW - velocity of wind over water
 */
 
-void WindOverWater(double C, double VC, double WG, double VWG, double &WA, double &VW)
+void OverWater(double C, double VC, double WG, double VWG, double &WA, double &VW)
 {
     double Cx = VC * cos(deg2rad(C));
     double Cy = VC * sin(deg2rad(C));
@@ -256,10 +254,9 @@ int TestIntersectionGoodButSlow(Position *p1, Position *p2, Position *p3, Positi
     if(db > da || dc > da)
         return 0;
 
-        return dem < 0 ? 1 : -1;
+    return dem < 0 ? 1 : -1;
 }
 
-/* I don't actually think the speed of this is critical anymore */
 int TestIntersection(Position *p1, Position *p2, Position *p3, Position *p4)
 {
     double x1 = p1->lon, x2 = p2->lon, x3 = p3->lon, x4 = p4->lon;
@@ -283,21 +280,57 @@ int TestIntersection(Position *p1, Position *p2, Position *p3, Position *p4)
     }
 
     /* quick test to avoid calculations if segments are far apart */
-#if 0 /* is this faster? */
-    double max1x, min1x, max1y, min1y;
-    double max2x, min2x, max2y, min2y;
-    if(x1 > x2) max1x = x1, min1x = x2; else max1x = x2, min1x = x1;
-    if(x3 > x4) max2x = x3, min2x = x4; else max2x = x3, min2x = x4;
-
-    if(max1x < min2x || max2x < min1x)
+    if((x3 > x1 && x3 > x2 && x4 > x1 && x4 > x2) ||
+       (x3 < x1 && x3 < x2 && x4 < x1 && x4 < x2) ||
+       (y3 > y1 && y3 > y2 && y4 > y1 && y4 > y2) ||
+       (y3 < y1 && y3 < y2 && y4 < y1 && y4 < y2))
         return 0;
 
-    if(y1 > y2) max1y = y1, min1y = y2; else max1y = y2, min1y = y1;
-    if(y3 > y4) max2y = y3, min2y = y4; else max2y = y3, min2y = y4;
+    double ax = x2 - x1, ay = y2 - y1;
+    double bx = x3 - x4, by = y3 - y4;
+    double cx = x1 - x3, cy = y1 - y3;
 
-    if(max1y < min2y || max2y < min1y)
+    double denom = ay * bx - ax * by;
+
+#define EPS 2e-10
+#define EPS2 2e-5
+    if(fabs(denom) < EPS) { /* parallel or really close to parallel */
+        if(fabs((y1 + by*ax*x3) - (y3 + ay*bx*x1)) > EPS2)
+            return 0; /* different intercepts, no intersection */
+
+        /* we already know from initial test we are overlapping,
+           for parallel line segments, there is no way to tell
+           which direction the intersection occurs */
+        if(!ax && !ay) /* first segment is a zero segment */
+            return -2;
+        else
+            return 2;
+    }
+
+    double recip = 1 / denom;
+    double na = (by * cx - bx * cy) * recip;
+    if(na < -EPS2 || na > 1 + EPS2)
         return 0;
-#else
+
+    double nb = (ax * cy - ay * cx) * recip;
+    if(nb < -EPS2 || nb > 1 + EPS2)
+        return 0;
+
+    /* too close to call.. floating point loses bits with arithmetic so
+       in this case we must avoid potential false guesses */
+    if(na < EPS2 || na > 1 - EPS2 ||
+       nb < EPS2 || nb > 1 - EPS2)
+        return 2;
+
+    return denom < 0 ? -1 : 1;
+}
+
+
+inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
+                              double x3, double y3, double x4, double y4)
+{
+#if 0
+    /* quick test to avoid calculations if segments are far apart */
     if((x3 > x1 && x3 > x2 && x4 > x1 && x4 > x2) ||
        (x3 < x1 && x3 < x2 && x4 < x1 && x4 < x2) ||
        (y3 > y1 && y3 > y2 && y4 > y1 && y4 > y2) ||
@@ -359,14 +392,36 @@ Position::Position(Position *p)
 {
 }
 
+bool Position::GetPlotData(GribRecordSet &grib, PlotData &data, double dt)
+{
+    data.WVHT = Swell(grib, lat, lon);
+    if(!Wind(grib, data.WG, data.VWG, lat, lon))
+        return false;
+
+    if(!Current(grib, data.VC, data.C, lat, lon))
+        data.C = data.VC = 0;
+
+    OverWater(data.C, data.VC, data.WG, data.VWG, data.W, data.VW);
+
+    if(parent) {
+        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &data.BG, &data.VBG);
+        data.VBG *= 3600 / dt;
+
+        OverWater(data.C, data.VC, data.BG, data.VBG, data.B, data.VB);
+
+        return true;
+    }
+    return false;
+}
+
 /* create a looped route by propagating from a position by computing
    the location the boat would be in if sailed at every angle
    relative to the true wind. */
-void Position::Propagate(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
+bool Position::Propagate(IsoRouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
 {
     /* already propagated from this position, don't need to again */
     if(propagated)
-        return;
+        return false;
 
     propagated = true;
 
@@ -375,28 +430,28 @@ void Position::Propagate(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOpti
     int count = 0;
 
     if(Swell(grib, lat, lon) > options.MaxSwellMeters)
-        return;
+        return false;
 
     if(fabs(lat) > options.MaxLatitude)
-        return;
+        return false;
 
     double WG, VWG;
-    Position *p = this;
+    Position *p = this; /* get wind from parent position if not available */
     while(!Wind(grib, WG, VWG, p->lat, p->lon)) {
         p = p->parent; /* should we use parent's time here ? */
         if(!options.AllowDataDeficient || !p)
-            return;
+            return false;
     }
 
     if(VWG > options.MaxWindKnots)
-        return;
+        return false;
 
     double C, VC;
     if(!Current(grib, VC, C, lat, lon))
         C = VC = 0;
 
     double W, VW;
-    WindOverWater(C, VC, WG, VWG, W, VW);
+    OverWater(C, VC, WG, VWG, W, VW);
 
     double bearing = 0, parentbearing = NAN;
     if(parent && options.TackingTime)
@@ -414,8 +469,14 @@ skipbearingcomputation:
         double P = 0; /* for now using sails only no power */
         double B, VB;
 
-        VB = options.boat->Speed(P, H, VW);
         B = W + H; /* rotated relative to wind */
+
+        /* avoid propagating from positions which go in a direction too much
+           diverted from the correct course.  */
+        if(fabs(heading_resolve(B - bearing)) > options.MaxDivertedCourse)
+            continue;
+
+        VB = options.boat->Speed(P, H, VW);
 
         /* failed to determine speed.. I guess we can always drift? */
         if(isnan(B) || isnan(VB))
@@ -442,13 +503,6 @@ skipbearingcomputation:
         if(!hitland && dist) {
             Position *rp = new Position(dlat, dlon, this);
 
-            /* avoid propagating from positions which go in a direction too much
-               diverted from the correct course.  The reason to have this position
-               at all (and not move this test to before the position exists), is
-               to maintain continuity in the generated map (it looks much better) */
-            if(fabs(heading_resolve(BG - bearing)) > options.MaxDivertedCourse)
-                rp->propagated = true;
-
             if(points) {
                 rp->prev=points->prev;
                 rp->next=points;
@@ -461,11 +515,13 @@ skipbearingcomputation:
     }
 
     if(count < 3) /* tested in normalize, but save the extra new and delete */
-        return;
+        return false;
 
-    RouteList rl = (new Route(points, count))->Normalize(0, options.InvertedRegions);
-    for(RouteList::iterator it = rl.begin(); it != rl.end(); it++)
+    IsoRouteList rl = (new IsoRoute(points, count))->Normalize(0, options.InvertedRegions);
+    for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); it++)
         routeheap.Insert(*it);
+
+    return true;
 }
 
 double Position::Distance(Position *p)
@@ -506,23 +562,23 @@ Position* Position::Copy()
     return fp;
 }
 
-Route::Route(Position *p, int cnt, int dir)
+IsoRoute::IsoRoute(Position *p, int cnt, int dir)
     : points(p), count(cnt), direction(dir), parent(NULL)
 {
 }
 
 /* copy constructor */
-Route::Route(Route *r, Route *p)
+IsoRoute::IsoRoute(IsoRoute *r, IsoRoute *p)
     : points(r->points->Copy()), count(r->count), direction(r->direction), parent(p)
 {
     /* copy children */
-    for(RouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
-        children.push_back(new Route(*it, this));
+    for(IsoRouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
+        children.push_back(new IsoRoute(*it, this));
 }
 
-Route::~Route()
+IsoRoute::~IsoRoute()
 {
-    for(RouteList::iterator it = children.begin(); it != children.end(); ++it)
+    for(IsoRouteList::iterator it = children.begin(); it != children.end(); ++it)
         delete *it;
 
     if(!points)
@@ -536,65 +592,106 @@ Route::~Route()
     } while(p != points);
 }
 
-void Route::Print()
+void IsoRoute::Print()
 {
     if(!points)
-        printf("Empty Route\n");
+        printf("Empty IsoRoute\n");
     else {
         Position *p = points;
         do {
-            printf("(%.2f %.2f) ", p->lat, p->lon);
+            printf("%.4f %.4f\n", p->lon, p->lat);
             p = p->next;
         } while(p != points);
         printf("\n");
     }
 }
 
-bool Route::Contains(Route *r)
+/* how many times do we cross this route going from this point to infinity,
+   return -1 if inconclusive */
+int IsoRoute::IntersectionCount(Position *pos)
 {
     if(count < 3)
-        return false; /* I hope never to get here.. but obviously these regions contain nothing */
+        return 0; /* I hope never to get here.. but obviously these regions contain nothing */
 
-    Position *pos = r->points;
     Position np(91, 0); /* latitude 91 should be farther north than anywhere */
 
-tryagain:
-    // Now go through each of the lines in the polygon and test intersections
     int   wnumintsct = 0 ;
     Position *r1 = points;
-    Position *r2 = r1->next;
     do {
+        Position *r2 = r1->next;
         int ret = TestIntersection(r1, r2, pos, &np);
-        if(ret == -2)  { // this case should actually never get hit
-            printf("cannot deal with failed region for containment test\n");
-            exit(1);
-        }
-        if(ret == 2) { // not conclusive, try another point
-            pos = pos->next;
-            if(pos == r->points) /* avoid deadlock.. lets hope we dont do this often */
-                return true; /* probably good to delete route in this case */
-
-            goto tryagain;
-        } else if(ret)
+        if(ret) {
+            if(ret == -2)  { // this case should actually never get hit
+                printf("cannot deal with failed region for intersection count\n");
+                exit(1);
+            }
+            if(ret == 2) { // not conclusive, try another point
+                return -1;
+            }
             wnumintsct++;
+        }
 
         r1 = r2;
-        r2 = r2->next;
     } while(r1 != points);
-
-    // odd number of intersections?
-    if(wnumintsct&1)
-        return true;
-
-    return false;
+    return wnumintsct;
 }
 
-/* apply current to given route */
-void Route::ApplyCurrent(GribRecordSet &grib, RouteMapOptions &options)
+/* determine if a route contains a position
+   0 for outside, 1 for inside, -1 for inconclusive (on border or really close) */
+int IsoRoute::Contains(Position *pos, bool test_children)
+{
+    int wnumintsct = IntersectionCount(pos);
+    if(wnumintsct == -1)
+        return -1;
+
+    if(test_children)
+        for(IsoRouteList::iterator it = children.begin();
+            it != children.end(); it++) {
+            int cnumintsct = (*it)->Contains(pos, test_children);
+            if(cnumintsct == -1)
+                return -1;
+            wnumintsct += cnumintsct;
+        }
+
+    return wnumintsct&1; /* odd */
+}
+
+bool IsoRoute::CompletelyContained(IsoRoute *r)
+{
+    Position *pos = r->points;
+    do {
+        if(Contains(pos, false) != 1)
+            return false;
+
+        pos = pos->next;
+    } while(pos != r->points);
+    return true;
+}
+
+/* only test first point, but if it fails try other points */
+bool IsoRoute::ContainsRoute(IsoRoute *r)
+{
+    Position *pos = r->points;
+
+    do {
+        switch(Contains(pos, false)) {
+        case 0: return false;
+        case 1: return true;
+        }
+
+        pos = pos->next;
+    } while(pos != r->points); /* avoid deadlock.. lets hope we dont do this often */
+
+    return true; /* probably good to say it is contained in this rare case */
+}
+
+/* apply current to given route, and return if it changed at all */
+bool IsoRoute::ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options)
 {
     if(!points)
-        return;
+        return false;
 
+    bool ret = false;
     Position *p = points;
     double timeseconds = options.dt;
     do {
@@ -602,17 +699,20 @@ void Route::ApplyCurrent(GribRecordSet &grib, RouteMapOptions &options)
         if(Current(grib, VC, C, p->lat, p->lon)) {
             /* drift distance over ground */
             double dist = VC * timeseconds / 3600.0;
+            if(dist)
+                ret = true;
             ll_gc_ll(p->lat, p->lon, C, dist, &p->lat, &p->lon);
         }
 
         p = p->next;
     } while(p != points);
+    return ret;
 }
 
 enum { MINLON, MAXLON, MINLAT, MAXLAT };
 
 /* return false if longitude is possibly invalid */
-bool Route::FindRouteBounds(double bounds[4])
+bool IsoRoute::FindIsoRouteBounds(double bounds[4])
 {
     bounds[MINLAT] = bounds[MAXLAT] = points->lat;
     bounds[MINLON] = bounds[MAXLON] = points->lon;
@@ -637,7 +737,7 @@ bool Route::FindRouteBounds(double bounds[4])
     return true;
 }
 
-void Route::RemovePosition(Position *p)
+void IsoRoute::RemovePosition(Position *p)
 {
     if(points == points->next)
         points = NULL;
@@ -653,29 +753,165 @@ void Route::RemovePosition(Position *p)
 
 /* Take a route which may overlaps with itself and convert to a list
    of normalized routes which no longer have overlaps */
-RouteList Route::Normalize(int level, bool inverted_regions)
+IsoRouteList IsoRoute::Normalize(int level, bool inverted_regions)
 {
-    RouteList ret;
-reset:
+    IsoRouteList ret;
+reset: /* maybe can just use outer continue */
     /* don't do anything with triangles or fewer points */
     if(count < 4) {
         if(count < 3)
-            delete this;
+            delete this; /* less than 3 positions covers nothing */
         else
-            ret.push_back(this);
+            ret.push_back(this); /* triangles are already normalized */
         return ret;
     }
 
     Position *p = points;
     Position *q = p->next;
+
+    Position *end = points->prev;
+
     do {
         Position *r = q->next;
         Position *s = r->next;
 
+#if 1
+        double px = p->lon, qx = q->lon, py = p->lat, qy = q->lat;
+        
+        double minx, maxx, miny, maxy;
+        if(px > qx) minx = qx, maxx = px; else minx = px, maxx = qx;
+        if(py > qy) miny = qy, maxy = py; else miny = py, maxy = qy;
+        
+        double rx = r->lon, ry = r->lat;
+#endif
+
+        int state = 0;
+        if(rx > minx) state++;
+        if(rx > maxx) state++;
+        if(ry > miny) state+=3;
+        if(ry > maxy) state+=3;
+
         int innercount = 2;
         /* dont test adjacent segments, so in the case p first, we skip the last segment */
-        while(!(p == points && s == points) && r != points) {
+        while(r != end) {
+            double sx = s->lon, sy = s->lat;
+#if 1
+            int dir;
+            /*  0 1 2
+                3 4 5
+                6 7 8 */
+            switch(state) {
+            case 0:
+                if(sx < minx) {
+                    if(sy > miny) {
+                        if(sy > maxy)
+                            state = 6;
+                        else state = 3;
+                    }
+                    goto skipit;
+                }
+                if(sy < miny) {
+                    if(sx > maxx)
+                        state = 2;
+                    else
+                        state = 1;
+                    goto skipit;
+                } break;
+            case 1:
+                if(sy < miny) {
+                    if(sx < minx)
+                        state = 0;
+                    else if(sx > maxx)
+                        state = 2;
+                    goto skipit;
+                } break;
+            case 2:
+                if(sx > maxx) {
+                    if(sy > miny) {
+                        if(sy > maxy)
+                            state = 8;
+                        else
+                            state = 5;
+                    }
+                    goto skipit;
+                }
+                if(sy < miny) {
+                    if(sx < minx)
+                        state = 0;
+                    else
+                        state = 1;
+                    goto skipit;
+                } break;
+            case 3:
+                if(sx < minx) {
+                    if(sy < miny)
+                        state = 0;
+                    else if(sy > maxy)
+                        state = 6;
+                    goto skipit;
+                } break;
+            case 5:
+                if(sx > maxx) {
+                    if(sy < miny)
+                        state = 2;
+                    else if(sy > maxy)
+                        state = 8;
+                    goto skipit;
+                } break;
+            case 6:
+                if(sx < minx) {
+                    if(sy < maxy) {
+                        if(sy < miny)
+                            state = 0;
+                        else
+                            state = 3;
+                    }
+                    goto skipit;
+                }
+                if(sy > maxy) {
+                    if(sx > maxx)
+                        state = 8;
+                    else
+                        state = 7;
+                    goto skipit;
+                } break;
+            case 7:
+                if(sy > maxy) {
+                    if(sx < minx)
+                        state = 6;
+                    else if(sx > maxx)
+                        state = 8;
+                    goto skipit;
+                } break;
+            case 8:
+                if(sx > maxx) {
+                    if(sy < maxy) {
+                        if(sy < miny)
+                            state = 2;
+                        else
+                            state = 5;
+                    }
+                    goto skipit;
+                }
+                if(sy > maxy) {
+                    if(sx < minx)
+                        state = 6;
+                    else
+                        state = 7;
+                    goto skipit;
+                } break;
+            }
+
+            state = 0; /* recompute state */
+            if(sx > minx) state++;
+            if(sx > maxx) state++;
+            if(sy > miny) state+=3;
+            if(sy > maxy) state+=3;
+
+            dir = TestIntersectionXY(px, py, qx, qy, rx, ry, sx, sy);
+#else
             int dir = TestIntersection(p, q, r, s);
+#endif
                 /* this can change points, so reset to be safe
                    in the future maybe we can avoid this and not reset */
             if(dir) {
@@ -693,83 +929,96 @@ reset:
                 r->next = q;
                 q->prev = r;
 
-                count -= innercount;
-                Route *x = new Route(q, innercount, dir);
-                RouteList sub = x->Normalize(level + 1, inverted_regions);
+                count -= innercount; /* TODO: skip making if its getting removed anyway */
+                IsoRoute *x = new IsoRoute(q, innercount, dir);
+                IsoRouteList sub = x->Normalize(level + 1, inverted_regions);
 
                 if(inverted_regions) {
                     if(level == 0) {
-                        if(dir == -1) {
-                            /* we should not actually get here, slight numerical error */
-                            for(RouteList::iterator it = sub.begin(); it != sub.end(); ++it)
+                        if(dir != direction) {
+                            /* slight numerical error, or outer inversion */
+                            for(IsoRouteList::iterator it = sub.begin(); it != sub.end(); ++it)
                                 delete *it; /* discard */
                         } else
-                        for(RouteList::iterator it = sub.begin(); it != sub.end(); ++it) {
-                            if(direction == (*it)->direction)
+                        for(IsoRouteList::iterator it = sub.begin(); it != sub.end(); ++it) {
+                            if((*it)->children.size()) {
+                                printf("grandchild detected\n");
+                                delete *it;
+                            } else if(direction == (*it)->direction) {
                                 ret.push_back(*it); /* sibling */
-                            else if(parent) /* no grandchildren allowed */
+                            } else if((*it)->count < 16) {
+                                printf("too small to be a useful child: %d\n", (*it)->count);
                                 delete *it;
-                            else if(!Contains(*it)) {
-                                printf("error, supposed child wasn't contained\n");
+                            } else if(!CompletelyContained(*it)) {
+                                printf("not correct to be child: %d\n", (*it)->count);
                                 delete *it;
-                            } else
-                                /* better be completely inside us
-                                    and not intersect with any existing children */
-                            {
-                                (*it)->parent = this;
-                                children.push_back(*it); 
+                            } /* different direction contained.. it is a child */
+                            else {
+                                printf("Child route: %d\n", (*it)->count);
+                                IsoRoute *child = *it;
+                                child->parent = this;
+                                children.push_back(child);
                             }
                         }
                     } else
                         ret.splice(ret.end(), sub); /* all subregions are siblings */
 
                 } else { /* no inverted regions mode */
-                    for(RouteList::iterator it = sub.begin(); it != sub.end(); ++it) {
+                    for(IsoRouteList::iterator it = sub.begin(); it != sub.end(); ++it) {
                         if(direction != (*it)->direction || dir != 1)
                             delete *it; /* discard inversion or outer region */
                         else
                             ret.push_back(*it); /* merge as sibling */
                     }
                 }
-                goto reset; /* should be possible to do something faster than
-                               complete reset here */
-            }
 
+                if(count < 3) { /* nothing left of us! */
+                    delete this;
+                    return ret;
+                }
+
+                goto outer_continue; /* should be ok */
+            }
+#if 1
+        skipit:
+            rx = sx, ry = sy;
+#endif
             innercount++;
             r = s;
-            s = s->next;
+            s = r->next;
         }
+
         p = q;
-        q = q->next;
+    outer_continue:
+        q = p->next;
+        end = points; /* now we can go one more */
     } while(q != points);
 
     ret.push_back(this);
     return ret;
 }
 
-/* merge another route into this one */
-bool Merge(RouteList &rl, Route *route1, Route *route2, bool inverted_regions)
+/* take two routes that may overlap, and combine into a list of non-overlapping routes */
+bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, bool inverted_regions, int level)
 {
     static int mergecnt;
     mergecnt++;
 
-    /* quick sanity check */
-    if(route1->direction != route2->direction) {
-        if(!inverted_regions) {
-            printf("cannot merge routes in different direction\n");
-            exit(1);
-        }
+    if(mergecnt == 84238) {
+        route1->Print();
+        printf("\n\n");
+        route2->Print();
     }
 
     if(route1->direction == -1 && route2->direction == -1) {
-        printf("cannot merge inverted routes\n");
+        printf("cannot merge two inverted routes yet\n");
         exit(1);
     }
 
     /* quick test to make sure we could possibly intersect with bounds */
     double bounds1[4], bounds2[4];
-    bool r1bv = route1->FindRouteBounds(bounds1);
-    bool r2bv = route2->FindRouteBounds(bounds2);
+    bool r1bv = route1->FindIsoRouteBounds(bounds1);
+    bool r2bv = route2->FindIsoRouteBounds(bounds2);
     if(bounds1[MINLAT] > bounds2[MAXLAT] || bounds1[MAXLAT] < bounds2[MINLAT])
         return false;
     if(r1bv && r2bv && (bounds1[MINLON] > bounds2[MAXLON] || bounds1[MAXLON] < bounds2[MINLON]))
@@ -777,44 +1026,43 @@ bool Merge(RouteList &rl, Route *route1, Route *route2, bool inverted_regions)
 
     /* make sure we start on the outside */
     if(route2->points->lat > route1->points->lat) {
-        Route *t = route1;
+        IsoRoute *t = route1;
         route1 = route2;
         route2 = t;
     }
 
     Position *p = route1->points;
-    Position *q = p->next;
     do {
+        Position *q = p->next;
+
         Position *r = route2->points;
-        Position *s = r->next;
         do {
+            Position *s = r->next;
             double dir = TestIntersection(p, q, r, s);
-            /* too close to call, delete s and try next point */
-            if(dir == -2) {
-                route1->RemovePosition(q);
-                if(route1->count < 3) { /* nothing left to merge */
-                    delete route1;
-                    rl.push_back(route2); /* no need to normalize */
-                    return true;
+            if(dir) {
+                /* too close to call, delete s and try next point */
+                if(dir == -2) {
+                    route1->RemovePosition(q);
+                    if(route1->count < 3) { /* nothing left to merge */
+                        delete route1;
+                        rl.push_back(route2); /* no need to normalize */
+                        return true;
+                    }
+                    q = p->next;
+                    goto outer_continue;
+                }
+
+                if(dir == 2) { 
+                    route2->RemovePosition(s);
+                    if(route2->count < 3) { /* nothing left to merge */
+                        delete route2;
+                        rl.push_back(route1); /* no need to normalize */
+                        return true;
+                    }
+                    s = r->next;
+                    continue;
                 }
                 
-                q = p->next;
-                goto outer_continue;
-            }
-
-            if(dir == 2) { 
-                route2->RemovePosition(s);
-                if(route2->count < 3) { /* nothing left to merge */
-                    delete route2;
-                    rl.push_back(route1); /* no need to normalize */
-                    return true;
-                }
-                
-                s = r->next;
-                continue;
-            }
-
-            if(dir == 1 || dir == -1) {
                 /* debugging sanity check */
                 if(dir == -1) {
                     if(route1->direction != 1 || route2->direction != -1) {
@@ -825,7 +1073,7 @@ bool Merge(RouteList &rl, Route *route1, Route *route2, bool inverted_regions)
                            still get the right result...  */
                         goto skip;
                     }
-                } else if(dir == 1) {
+                } else /*if(dir == 1)*/ {
                     if(route1->direction == 1 && route2->direction == -1) {
                         goto skip;
                     }
@@ -839,71 +1087,113 @@ bool Merge(RouteList &rl, Route *route1, Route *route2, bool inverted_regions)
 
                 route1->count += route2->count;
 
-                /* combine children, if route1 is top level */
-                if(!route1->parent) {
-                    for(RouteList::iterator it = route2->children.begin();
-                        it != route2->children.end(); it++)
-                        (*it)->parent = route1;
-                    route1->children.splice(route1->children.end(), route2->children);
-                }
+                for(IsoRouteList::iterator it = route2->children.begin();
+                    it != route2->children.end(); it++)
+                    (*it)->parent = route1;
 
+                /* merge children (append is currently incorrect)
+                   the children need to be merged, and any overlapping regions
+                   incremented so they don't get removed if contained */
+                int sc1 = route1->children.size();
+                int sc2 = route2->children.size();
+                if(sc1 && sc2)
+                    printf("both have children: %d %d\n", sc1, sc2);
+
+                route1->children.splice(route1->children.end(), route2->children);
+            
                 route2->points = NULL; /* all points are now in route1 */
                 delete route2;
-                rl = route1->Normalize(0, inverted_regions);
+
+                IsoRouteList nrl = route1->Normalize(level, inverted_regions);
+                rl.splice(rl.end(), nrl);
                 return true;
             }
         skip:
 
             r = s;
-            s = s->next;
         } while(r != route2->points);
 
         p = q;
-        q = q->next;
     outer_continue:;
     } while(p != route1->points);
 
     /* no intersection found, test if the second route is completely
        inside the first */
-    if(route1->Contains(route2)) {
+    if(route1->ContainsRoute(route2)) {
         if(inverted_regions) {
-            /* remove all of route2's children, route1 clears them */
-            for(RouteList::iterator it2 = route2->children.begin();
-                it2 != route2->children.end(); it2++)
-                delete *it2;
-            route2->children.clear();
+            if(route1->direction == 1 && route2->direction == 1) {
 
-            /* now determine if route2 affects any of route1's children */
-            for(RouteList::iterator it = route1->children.begin();
-                it != route1->children.end(); it++) {
-                RouteList childrl; /* see if route2 can merge with this child */
-                if(Merge(childrl, route2, *it, inverted_regions)) { 
-                    route1->children.erase(it);
-                    for(RouteList::iterator cit = childrl.begin(); cit != childrl.end(); cit++)
-                        if((*cit)->direction == 1)
-                            rl.push_back(*cit); /* could affect other children.. keep it */
-                        else {
-                            (*cit)->parent = route1;
-                            route1->children.push_back(*cit);
-                        }
-                    goto childmerge;
+                int sc1 = route1->children.size();
+                int sc2 = route2->children.size();
+                    /* if both region have children, they should get merged
+                       correctly here instead of this */
+                if(sc1 && sc2)
+                    printf("both have children contains: %d %d\n", sc1, sc2);
+
+                /* remove all of route2's children, route1 clears them
+                   (unless they interected with route1 children which we don't handle yet */
+                for(IsoRouteList::iterator it2 = route2->children.begin();
+                    it2 != route2->children.end(); it2++)
+                    delete *it2;
+                route2->children.clear();
+                
+                /* now determine if route2 affects any of route1's children,
+                   if there are any intersections, it should mask away that area.
+                   once completely merged, all the masks are removed and children
+                   remain */
+                IsoRouteList childrenmask; /* non-inverted */
+                IsoRouteList mergedchildren; /* inverted */
+                childrenmask.push_back(route2);
+                while(childrenmask.size() > 0) {
+                    IsoRoute *r1 = childrenmask.front();
+                    childrenmask.pop_front();
+                    while(route1->children.size() > 0) {
+                        IsoRoute *r2 = route1->children.front();
+                        route1->children.pop_front();
+                        IsoRouteList childrl; /* see if there is a merge */
+
+                        if(Merge(childrl, r1, r2, true, 1)) { 
+                            for(IsoRouteList::iterator cit = childrl.begin(); cit != childrl.end(); cit++)
+                                if((*cit)->direction == route1->direction)
+                                    childrenmask.push_back(*cit);
+                                else {
+                                    IsoRoute *child = *cit;
+                                    child->parent = route1;
+                                    route1->children.push_back(child);
+                                }
+                            goto remerge_children;
+                        } else
+                            mergedchildren.push_back(r2);
+                    }
+                    delete r1; /* all children have been tried, so done with this mask */
+                    
+                remerge_children:
+                    route1->children.splice(route1->children.end(), mergedchildren);
                 }
+            } else if(route1->direction == -1 && route2->direction == -1) {
+                delete route1; /* keep smaller region if both inverted */
+                route1 = route2;
+            } else if(route1->direction == 1 && route2->direction == -1) {
+                delete route2;
+            } else {
+                /* probably delete both routes in this case considering how contrived
+                   of a situation it is, should not get here often */
+                printf("contrived delete: %d, %d\n", route1->count, route2->count);
+                delete route2;
             }
-        }
+        } else
+            delete route2; /* it covers a sub area, delete it */
 
-        delete route2; /* it covers a sub area, can remove */
-
-    childmerge:
         rl.push_back(route1); /* no need to normalize */
         return true;
     }
 
-    /* routes close enough to fail initial rectangle test but no
+    /* routes close enough to pass initial rectangle test but no
        actual intersection or overlap occurs so no merge takes places */
     return false;
 }
 
-Position *Route::ClosestPosition(double lat, double lon)
+Position *IsoRoute::ClosestPosition(double lat, double lon)
 {
     Position pos(lat, lon), *minpos = NULL;
     double mindist = 0;
@@ -918,7 +1208,7 @@ Position *Route::ClosestPosition(double lat, double lon)
     } while(p != points);
 
     /* now try children */
-    for(RouteList::iterator it = children.begin(); it != children.end();  it++) {
+    for(IsoRouteList::iterator it = children.begin(); it != children.end();  it++) {
         p = (*it)->ClosestPosition(lat, lon);
         if(p) {
             double dist = pos.Distance(p);
@@ -932,42 +1222,54 @@ Position *Route::ClosestPosition(double lat, double lon)
     return minpos;
 }
 
-void Route::Propagate(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
+bool IsoRoute::Propagate(IsoRouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
 {
-    if(!points)
-        return;
-        
     Position *p = points;
-    do {
-        p->Propagate(routeheap, grib, options);
-        p = p->next;
-    } while(p != points);
-
-    for(RouteList::iterator it = children.begin(); it != children.end(); it++)
-        (*it)->Propagate(routeheap, grib, options);
+    bool ret = false;
+    if(p)
+        do {
+            if(p->Propagate(routeheap, grib, options))
+                ret = true;
+            p = p->next;
+        } while(p != points);
+    return ret;
 }
 
-RouteHeap::RouteHeap()
+void IsoRoute::UpdateStatistics(int &routes, int &invroutes, int &positions)
+{
+    invroutes += children.size();
+    routes += children.size() + 1;
+
+    for(IsoRouteList::iterator it = children.begin(); it != children.end(); it++)
+        positions += (*it)->count;
+
+    positions += count;
+}
+
+IsoRouteHeap::IsoRouteHeap()
   : size(0), maxsize(256)
 {
-    Heap = (Route **)malloc((sizeof *Heap) * maxsize);
+    Heap = (IsoRoute **)malloc((sizeof *Heap) * maxsize);
 }
 
-RouteHeap::~RouteHeap()
+IsoRouteHeap::~IsoRouteHeap()
 {
     free(Heap);
 }
 
-void RouteHeap::expand()
+void IsoRouteHeap::expand()
 {
     if(++size <= maxsize)
         return;
     maxsize = size;
-    Heap = (Route **)realloc(Heap, (sizeof *Heap) * maxsize);
+    Heap = (IsoRoute **)realloc(Heap, (sizeof *Heap) * maxsize);
 }
 
-void RouteHeap::Insert(Route *r)
+void IsoRouteHeap::Insert(IsoRoute *r)
 {
+    m_List.push_back(r);
+    return;
+
     int n = size;
     expand();
 
@@ -983,9 +1285,14 @@ void RouteHeap::Insert(Route *r)
     }
 }
 
-Route *RouteHeap::Remove()
+IsoRoute *IsoRouteHeap::Remove()
 {
-    Route *ret = Heap[0];
+    IsoRoute *r = m_List.front();
+    m_List.pop_front();
+    return r;
+
+
+    IsoRoute *ret = Heap[0];
 
     int o = 0; /* remove index 0 */
     int c = child(o);
@@ -1013,53 +1320,96 @@ Route *RouteHeap::Remove()
     return ret;
 }
 
-RouteIso::RouteIso(Position *p, wxDateTime t)
-    : time(t)
-{
-    routes.push_back(new Route(p));
-}
-
-RouteIso::RouteIso(RouteList r, wxDateTime t)
-    : routes(r), time(t)
+IsoChron::IsoChron(IsoRouteList r, wxDateTime t, GribRecordSet *g)
+    : routes(r), time(t), m_Grib(g)
 {
 }
 
-RouteIso::~RouteIso()
+IsoChron::~IsoChron()
 {
-    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
         delete *it;
+
+    /* done with grib, so free memory and request next one */
+    for(int i=0; i<Idx_COUNT; i++)
+        delete m_Grib->m_GribRecordPtrArray[i];
+
+    delete m_Grib;
 }
 
-void RouteIso::PropagateIntoHeap(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
+#if 1
+void IsoChron::PropagateIntoHeap(IsoRouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
+{
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
+        /* use previous route to avoid backtracking,
+           but update it to drift with the current */
+        IsoRoute *x = new IsoRoute(*it);
+        bool keep = false;
+
+        /* build up a list of iso regions for each point
+           in the current iso */
+        if(x->Propagate(routeheap, grib, options)) {
+            if(x->ApplyCurrents(grib, options)) {
+                /* Is anchoring possible? Add the old route without currents
+                   if this one moved from currents any */
+                if(options.Anchoring)
+                    routeheap.Insert(new IsoRoute(*it));
+            }
+            keep = true;
+        }
+
+        for(IsoRouteList::iterator cit = x->children.begin(); cit != x->children.end(); cit++)
+            if((*cit)->Propagate(routeheap, grib, options))
+                keep = true;
+            else
+            {
+                delete *cit; /* if the child route isn't propagating, we should remove it */
+                x->children.erase(cit);
+            }
+
+        /* if any propagation occured even for children, then we keep it,
+           this prevents backtracking, otherwise, we don't need this route
+           (it's a dead end) */
+        if(keep)
+            routeheap.Insert(x);
+        else
+            delete x;
+    }
+}
+#endif
+
+#if 0
+void IsoChron::PropagateIntoHeap(IsoRouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options)
 {
     /* build up a list of iso regions for each point
        in the current iso */
-    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
         (*it)->Propagate(routeheap, grib, options);
-
     /* if none propagated we aren't going anywhere */
     if(routeheap.Size() == 0)
         return;
 
-    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         /* also keep previous route to avoid backtracking,
            but update it to drift with the current */
-        Route *x = new Route(*it);
-        x->ApplyCurrent(grib, options);
+        IsoRoute *x = new IsoRoute(*it);
+        x->ApplyCurrents(grib, options);
         routeheap.Insert(x);
         
         /* Is anchoring possible? Add the old route without currents */
         if(options.Anchoring)
-            routeheap.Insert(new Route(*it));
-    }
+            routeheap.Insert(new IsoRoute(*it));
+     }
 }
+#endif
 
-bool RouteIso::Contains(double lat, double lon)
+bool IsoChron::Contains(double lat, double lon)
 {
-    Route r(new Position(lat, lon));
-    for(RouteList::iterator it = routes.begin(); it != routes.end(); ++it)
-        if((*it)->Contains(&r))
+    Position p(lat, lon);
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+        if((*it)->Contains(&p, true))
             return true;
+
     return false;
 }
 
@@ -1072,31 +1422,36 @@ RouteMap::~RouteMap()
     Clear();
 }
 
-RouteList RouteMap::ReduceHeap(RouteHeap &routeheap, RouteMapOptions &options)
+bool RouteMap::ReduceHeap(IsoRouteList &merged,
+                          IsoRouteHeap &routeheap,
+                          RouteMapOptions &options)
 {
     /* once we have multiple worker threads, we can delegate a workers here
        to merge routes. */
                
-    RouteList merged, unmerged;
+    IsoRouteList unmerged;
     while(routeheap.Size()) {
-        Route *r1 = routeheap.Remove();
+        if(TestAbort())
+            return false;
+
+        IsoRoute *r1 = routeheap.Remove();
         while(routeheap.Size()) {
-            Route *r2 = routeheap.Remove();
-            RouteList rl;
-            if(Merge(rl, r1, r2, options.InvertedRegions)) {
+            IsoRoute *r2 = routeheap.Remove();
+            IsoRouteList rl;
+            if(Merge(rl, r1, r2, options.InvertedRegions, 0)) {
 #if 0
-                for(RouteList::iterator it = rl.begin(); it != rl.end(); ++it)
+                for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); ++it)
                     routeheap.Insert(*it);
 #else /* merge new routes with each other right away before hitting the main heap */
-                RouteList unmerged2;
+                IsoRouteList unmerged2;
                 while(rl.size() > 0) {
                     r1 = rl.front();
                     rl.pop_front();
                     while(rl.size() > 0) {
                         r2 = rl.front();
                         rl.pop_front();
-                        RouteList rl2;
-                        if(Merge(rl2, r1, r2, options.InvertedRegions)) {
+                        IsoRouteList rl2;
+                        if(Merge(rl2, r1, r2, options.InvertedRegions, 0)) {
                             rl.splice(rl.end(), rl2);
                             goto remerge2;
                         } else
@@ -1116,70 +1471,78 @@ RouteList RouteMap::ReduceHeap(RouteHeap &routeheap, RouteMapOptions &options)
 
     remerge:
         /* put any unmerged back in heap to continue */
-        for(RouteList::iterator it = unmerged.begin(); it != unmerged.end(); ++it)
+        for(IsoRouteList::iterator it = unmerged.begin(); it != unmerged.end(); ++it)
             routeheap.Insert(*it);
         unmerged.clear();
     }
-    return merged;
+    return true;
 }
 
 /* enlarge the map by 1 level */
 bool RouteMap::Propagate()
 {
     Lock();
-    bool notready = !origin.size() || m_bFinished || m_bNeedsGrib;
+    bool notready = m_bFinished || m_bNeedsGrib;
 
     if(notready) {
+//        printf("not ready\n");
         Unlock();
         return false;
     }
 
-    if(!m_NewGrib ||
-       !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
-       !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) {
+    if((!m_NewGrib ||
+        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
+       !m_Options.AllowDataDeficient) {
         m_bGribFailed = true;
         Unlock();
         return false;
     }
 
     /* copy the grib record set */
-    GribRecordSet grib;
-    grib.m_Reference_Time = m_NewGrib->m_Reference_Time;
+    GribRecordSet *grib = new GribRecordSet;
+    grib->m_Reference_Time = m_NewGrib->m_Reference_Time;
     for(int i=0; i<Idx_COUNT; i++) {
         if(m_NewGrib->m_GribRecordPtrArray[i])
-            grib.m_GribRecordPtrArray[i] = new GribRecord(*m_NewGrib->m_GribRecordPtrArray[i]);
+            grib->m_GribRecordPtrArray[i] = new GribRecord(*m_NewGrib->m_GribRecordPtrArray[i]);
         else
-            grib.m_GribRecordPtrArray[i] = NULL;
+            grib->m_GribRecordPtrArray[i] = NULL;
     }
 
     wxDateTime GribTime = m_NewGribTime;
 
+    /* has the boat been changed? */
     if(m_bUpdateBoat) {
         m_Options.boat = &m_boats[m_currentboat];
         m_currentboat = !m_currentboat;
+        m_bUpdateBoat = false;
     }
 
     RouteMapOptions options = m_Options;
+
+    IsoRouteHeap routeheap;
     Unlock();
 
-    RouteHeap routeheap;
-    RouteIso *last = origin.back();
-    last->PropagateIntoHeap(routeheap, grib, options);
-
-    /* done with grib, so free memory and request next one */
-    for(int i=0; i<Idx_COUNT; i++)
-        delete grib.m_GribRecordPtrArray[i];
+    if(origin.size())
+        origin.back()->PropagateIntoHeap(routeheap, *grib, options);
+    else
+        routeheap.Insert(new IsoRoute(new Position(options.StartLat, options.StartLon)));
 
     Lock();
     m_NewGrib = NULL;
-    m_NewGribTime = last->time + wxTimeSpan(0, 0, options.dt);
+    m_NewGribTime = GribTime + wxTimeSpan(0, 0, options.dt);
     m_bNeedsGrib = true;
     Unlock();
 
-    RouteIso* update;
+    IsoChron* update;
     if(routeheap.Size()) {
-        RouteList merged = ReduceHeap(routeheap, options);
-        update = new RouteIso(merged, GribTime);
+        IsoRouteList merged;
+        if(!ReduceHeap(merged, routeheap, options)) {
+            Unlock();
+            return false;
+        }
+
+        update = new IsoChron(merged, GribTime, grib);
     } else
         update = NULL;
 
@@ -1202,8 +1565,8 @@ Position *RouteMap::ClosestPosition(double lat, double lon)
     Position p(lat, lon), *minpos = NULL;
     double mindist = 0;
     Lock();
-    for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it) {
-        for(RouteList::iterator rit = (*it)->routes.begin(); rit != (*it)->routes.end(); ++rit) {
+    for(IsoChronList::iterator it = origin.begin(); it != origin.end(); ++it) {
+        for(IsoRouteList::iterator rit = (*it)->routes.begin(); rit != (*it)->routes.end(); ++rit) {
             Position *pos = (*rit)->ClosestPosition(lat, lon);
             if(pos) {
                 double dist = p.Distance(pos);
@@ -1218,11 +1581,10 @@ Position *RouteMap::ClosestPosition(double lat, double lon)
     return minpos;
 }
 
-void RouteMap::Reset(double lat, double lon, wxDateTime time)
+void RouteMap::Reset(wxDateTime time)
 {
-    Clear();
     Lock();
-    origin.push_back(new RouteIso(new Position(lat, lon), time));
+    Clear();
 
     m_NewGrib = NULL;
     m_NewGribTime = time;
@@ -1234,12 +1596,28 @@ void RouteMap::Reset(double lat, double lon, wxDateTime time)
     Unlock();
 }
 
-void RouteMap::Clear()
+void RouteMap::SetBoat(BoatSpeed &b) {
+    Lock();
+    m_boats[m_currentboat] = b;
+    m_bUpdateBoat = true;
+    Unlock();
+}
+
+void RouteMap::GetStatistics(int &isochrons, int &routes, int &invroutes, int &positions)
 {
     Lock();
-    for(RouteIsoList::iterator it = origin.begin(); it != origin.end(); ++it)
+    isochrons = origin.size();
+    routes = invroutes = positions = 0;
+    for(IsoChronList::iterator it = origin.begin(); it != origin.end(); ++it)
+        for(IsoRouteList::iterator rit = (*it)->routes.begin(); rit != (*it)->routes.end(); ++rit)
+            (*rit)->UpdateStatistics(routes, invroutes, positions);
+    Unlock();
+}
+
+void RouteMap::Clear()
+{
+    for(IsoChronList::iterator it = origin.begin(); it != origin.end(); ++it)
         delete *it;
 
     origin.clear();
-    Unlock();
 }

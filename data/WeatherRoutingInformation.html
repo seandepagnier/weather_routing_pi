@@ -68,7 +68,7 @@ The Supported Options Include:
 The boat dialog displays the polar plot of the boat's speed vs true wind direction as well as showing other details.  Two file types are supported.  CSV (same as qtVlm) and binary which is specific to this plugin.   The binary contains much more data.
 
 <p>
-The VMG tab shows the best courses for up and down wind on each tack.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If tacking is not optimized, then weather routing will perform optimal tacking at isochrons, but will not be able to take advantage of courses which spend more than one time on a tack than another as well because the resolution is limited to the isochron period.
+The VMG tab shows the best courses for up and down wind on each tack.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If this option is chosen, then the boat will assume the ability to sail in these angles (it is assumed you can tack periodically to maintain this course)  If tacking is not optimized, then weather routing will naturally tack only at the isochrons, resulting in overlapping alternate routes, and potentially less optimal course (but will specifically display where to tack)
 
 The boat configuration allows one to enter the parameters used to specify the performance of a boat.
 Currently supported polar files are csv (same format as qtVlm) and binary files in this format

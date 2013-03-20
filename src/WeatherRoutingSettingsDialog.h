@@ -42,13 +42,8 @@ public:
 
     void LoadSettings();
     void SaveSettings();
-    void UpdateOptions(RouteMapOptions &options);
 
 protected:
-    void OnAddDegreeStep( wxCommandEvent& event );
-    void OnRemoveDegreeStep( wxCommandEvent& event );
-    void OnGenerateDegreeSteps( wxCommandEvent& event );
-    void OnClearDegreeSteps( wxCommandEvent& event );
 };
 
 #endif

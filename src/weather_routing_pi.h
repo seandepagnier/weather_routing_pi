@@ -29,7 +29,7 @@
 #define _WEATHER_ROUTINGPI_H_
 
 #define     PLUGIN_VERSION_MAJOR    0
-#define     PLUGIN_VERSION_MINOR    1
+#define     PLUGIN_VERSION_MINOR    2
 
 #define     MY_API_VERSION_MAJOR    1
 #define     MY_API_VERSION_MINOR    8
@@ -91,6 +91,7 @@ private:
       wxWindow         *m_parent_window;
 
       WeatherRoutingDialog     *m_pWeather_RoutingDialog;
+      wxDateTime m_GribTime;
 
       int              m_display_width, m_display_height;
       int              m_leftclick_tool_id;

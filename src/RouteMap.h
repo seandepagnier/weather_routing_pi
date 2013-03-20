@@ -29,11 +29,18 @@
 #include <list>
 
 class RouteMapOptions;
-class Route;
-class RouteHeap;
+class IsoRoute;
+class IsoRouteHeap;
 class GribRecordSet;
 
-typedef std::list<Route*> RouteList;
+typedef std::list<IsoRoute*> IsoRouteList;
+
+struct PlotData
+{
+    wxDateTime time;
+    double lat, lon;
+    double VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
+};
 
 /* circular linked list node for positions which take equal time to reach */
 class Position
@@ -41,7 +48,8 @@ class Position
 public:
     Position(double latitude, double longitude, Position *p=NULL);
     Position(Position *p);
-    void Propagate(RouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
+    bool GetPlotData(GribRecordSet &grib, PlotData &data, double dt);
+    bool Propagate(IsoRouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
     Position *Copy();
@@ -54,67 +62,78 @@ public:
 };
 
 /* a closed loop of positions */
-class Route
+class IsoRoute
 {
 public:
-    Route(Position *p, int cnt = 1, int dir = 1);
-    Route(Route *r, Route *p=NULL);
-    ~Route();
+    IsoRoute(Position *p, int cnt = 1, int dir = 1);
+    IsoRoute(IsoRoute *r, IsoRoute *p=NULL);
+    ~IsoRoute();
 
     void Print();
-    bool Contains(Route *r);
-    void ApplyCurrent(GribRecordSet &grib, RouteMapOptions &options);
-    bool FindRouteBounds(double bounds[4]);
+
+    int IntersectionCount(Position *pos);
+    int Contains(Position *pos, bool test_children);
+
+    bool CompletelyContained(IsoRoute *r);
+    bool ContainsRoute(IsoRoute *r);
+
+    bool ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options);
+    bool FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(Position *p);
-    RouteList Normalize(int level, bool inverted_regions);
+    IsoRouteList Normalize(int level, bool inverted_regions);
     Position *ClosestPosition(double lat, double lon);
-    void Propagate(RouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
+    bool Propagate(IsoRouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
+    void UpdateStatistics( int &routes, int &invroutes, int &positions);
     
     Position *points; /* pointer to point with maximum latitude */
     int count;
   
     int direction; /* 1 or -1 for inverted region */
     
-    Route *parent; /* outer region if a child */
-    RouteList children; /* inner inverted regions */
+    IsoRoute *parent; /* outer region if a child */
+    IsoRouteList children; /* inner inverted regions */
 };
 
 /* contain routes in a heap to process smallest first (to minimize O(n^2) runtime of merging) */
-class RouteHeap
+class IsoRouteHeap
 {
 public:
-    RouteHeap();
-    ~RouteHeap();
-    void Insert(Route *r);
-    Route *Remove();
-    int Size() { return size; }
+    IsoRouteHeap();
+    ~IsoRouteHeap();
+    void Insert(IsoRoute *r);
+    IsoRoute *Remove();
+//    int Size() { return size; }
+    int Size() { return m_List.size(); }
 
 private:
+    IsoRouteList m_List;
+
     int size, maxsize;
-    Route **Heap;
+    IsoRoute **Heap;
     void expand();
     int parent(int a) { return (a-!(a&1)) >> 1; }
     int child(int a) { return (a<<1) + 1; }
 };
 
 /* list of routes with equal time to reach */
-class RouteIso
+class IsoChron
 {
 public:
-    RouteIso(Position *p, wxDateTime t);
-    RouteIso(RouteList r, wxDateTime t);
-    ~RouteIso();
+    IsoChron(IsoRouteList r, wxDateTime t, GribRecordSet *g);
+    ~IsoChron();
 
-    void PropagateIntoHeap(RouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options);
+    void PropagateIntoHeap(IsoRouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options);
     bool Contains(double lat, double lon);
   
-    RouteList routes;
+    IsoRouteList routes;
     wxDateTime time;
+    GribRecordSet *m_Grib;
 };
 
-typedef std::list<RouteIso*> RouteIsoList;
+typedef std::list<IsoChron*> IsoChronList;
 
 struct RouteMapOptions {
+    double StartLat, StartLon;
     double EndLat, EndLon;
     double dt; /* time in seconds between propagations */
 
@@ -135,9 +154,9 @@ public:
     static void Wind(double &windspeed, double &winddir,
                      double lat, double lon, wxDateTime time);
     RouteMap();
-    ~RouteMap();
+    virtual ~RouteMap();
 
-    void Reset(double lat, double lon, wxDateTime time);
+    void Reset(wxDateTime time);
 
 #define LOCKING_ACCESSOR(name, flag) bool name() { Lock(); bool ret = flag; Unlock(); return ret; }
     LOCKING_ACCESSOR(Finished, m_bFinished)
@@ -146,37 +165,35 @@ public:
 
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
-    void SetNewGrib(GribRecordSet *grib) { Lock(); m_NewGrib = grib; m_bNeedsGrib = false; Unlock(); }
+    void SetNewGrib(GribRecordSet *grib) { Lock(); m_bNeedsGrib = !(m_NewGrib = grib); Unlock(); }
     wxDateTime NewGribTime() { Lock(); wxDateTime time =  m_NewGribTime; Unlock(); return time; }
     bool HasGrib() { return m_NewGrib; }
 
     void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; Unlock(); }
     RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
-    void SetBoat(BoatSpeed &b) {
-        Lock();
-        m_boats[m_currentboat] = b;
-        m_bUpdateBoat = true;
-        Unlock();
-    }
+    void SetBoat(BoatSpeed &b);
+    void GetStatistics(int &isochrons, int &routes, int &invroutes, int &positions);
+
+    bool Propagate();
 
 protected:
-    RouteList ReduceHeap(RouteHeap &routeheap, RouteMapOptions &options);
-    bool Propagate();
+    virtual void Clear();
+    bool ReduceHeap(IsoRouteList &merged, IsoRouteHeap &routeheap, RouteMapOptions &options);
     Position *ClosestPosition(double lat, double lon);
 
     /* protect any member variables with mutexes if needed */
     virtual void Lock() = 0;
     virtual void Unlock() = 0;
+    virtual bool TestAbort() = 0;
 
-    RouteIsoList origin; /* list of route isos in order of time */
+    IsoChronList origin; /* list of route isos in order of time */
+    bool m_bNeedsGrib;
+    GribRecordSet *m_NewGrib;
 
 private:
-    virtual void Clear();
-
     RouteMapOptions m_Options;
-    bool m_bNeedsGrib, m_bFinished, m_bReachedDestination, m_bGribFailed;
+    bool m_bFinished, m_bReachedDestination, m_bGribFailed;
 
-    GribRecordSet *m_NewGrib;
     wxDateTime m_NewGribTime;
 
     bool m_bUpdateBoat;

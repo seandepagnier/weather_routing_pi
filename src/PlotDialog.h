@@ -25,8 +25,10 @@
  ***************************************************************************
  */
 
-#ifndef _BOAT_DIALOG_H_
-#define _BOAT_DIALOG_H_
+#ifndef _PLOT_DIALOG_H_
+#define _PLOT_DIALOG_H_
+
+#include <list>
 
 #include <wx/fileconf.h>
 
@@ -34,37 +36,37 @@
 
 class weather_routing_pi;
 
-class BoatDialog : public BoatDialogBase
+class PlotDialog : public PlotDialogBase
 {
 public:
 
-    BoatDialog( wxWindow *parent);
-    ~BoatDialog();
-
-    BoatSpeed m_Boat;
+    PlotDialog( wxWindow *parent, std::list<PlotData> &PlotData);
+    ~PlotDialog();
 
 private:
+    enum Variable { BOAT_VELOCITY_GROUND, BOAT_COURSE_GROUND, BOAT_VELOCITY_WATER, BOAT_COURSE_WATER,
+                    WIND_VELOCITY, WIND_DIRECTION, WIND_COURSE,
+                    WIND_VELOCITY_GROUND, WIND_DIRECTION_GROUND, WIND_COURSE_GROUND,
+                    APPARENT_WIND_VELOCITY, APPARENT_WIND_DIRECTION,
+                    CURRENT_VELOCITY, CURRENT_DIRECTION,
+                    SIG_WAVE_HEIGHT };
 
     void OnMouseEventsPlot( wxMouseEvent& event );
     void OnPaintPlot( wxPaintEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxCommandEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxSpinEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdateWindSpeed( wxSpinEvent& event );
-    void OnOpen( wxCommandEvent& event );
-    void OnSave( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event ) { Hide(); }
-    void OnRecompute( wxScrollEvent& event ) { Compute(); }
-    void OnOptimizeTacking( wxCommandEvent& event );
-    void OnResetOptimalTackingSpeed( wxCommandEvent& event );
+    void OnUpdatePlot( wxScrollEvent& event ) { m_PlotWindow->Refresh(); }
+    void OnUpdatePlotVariable( wxCommandEvent& event ) { GetScale(); m_PlotWindow->Refresh(); }
 
-    void Compute();
-    void UpdateTrackingControls();
-    void UpdateVMG();
+private:
+    double GetValue(PlotData &data, int var);
+    void GetScale();
 
-    wxString m_default_boat_path;    
-    double m_PlotScale;
-    int m_MouseW;
+    wxDateTime m_StartTime;
+
+    double m_mintime, m_maxtime;
+    double m_minvalue, m_maxvalue;
+
+    std::list<PlotData> &m_PlotData;
 };
 
 #endif

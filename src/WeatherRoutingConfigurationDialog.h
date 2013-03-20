@@ -25,46 +25,30 @@
  ***************************************************************************
  */
 
-#ifndef _BOAT_DIALOG_H_
-#define _BOAT_DIALOG_H_
+#ifndef _WEATHER_ROUTING_CONFIGURATION_H_
+#define _WEATHER_ROUTING_CONFIGURATION_H_
 
+
+#include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
 
-class weather_routing_pi;
-
-class BoatDialog : public BoatDialogBase
+class WeatherRoutingConfigurationDialog : public WeatherRoutingConfigurationDialogBase
 {
 public:
+    WeatherRoutingConfigurationDialog( wxWindow *parent );
+    ~WeatherRoutingConfigurationDialog( );
 
-    BoatDialog( wxWindow *parent);
-    ~BoatDialog();
+    void LoadConfiguration();
+    void SaveConfiguration();
+    void UpdateOptions(RouteMapOptions &options);
 
-    BoatSpeed m_Boat;
-
-private:
-
-    void OnMouseEventsPlot( wxMouseEvent& event );
-    void OnPaintPlot( wxPaintEvent& event );
-    void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxCommandEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxSpinEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdateWindSpeed( wxSpinEvent& event );
-    void OnOpen( wxCommandEvent& event );
-    void OnSave( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event ) { Hide(); }
-    void OnRecompute( wxScrollEvent& event ) { Compute(); }
-    void OnOptimizeTacking( wxCommandEvent& event );
-    void OnResetOptimalTackingSpeed( wxCommandEvent& event );
-
-    void Compute();
-    void UpdateTrackingControls();
-    void UpdateVMG();
-
-    wxString m_default_boat_path;    
-    double m_PlotScale;
-    int m_MouseW;
+protected:
+    void OnAddDegreeStep( wxCommandEvent& event );
+    void OnRemoveDegreeStep( wxCommandEvent& event );
+    void OnGenerateDegreeSteps( wxCommandEvent& event );
+    void OnClearDegreeSteps( wxCommandEvent& event );
 };
 
 #endif

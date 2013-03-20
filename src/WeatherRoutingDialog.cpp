@@ -45,11 +45,16 @@
 #include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
 #include "WeatherRoutingDialog.h"
+#include "PlotDialog.h"
 
 WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon )
-    : WeatherRoutingDialogBase(parent), m_SettingsDialog(this)
+    : WeatherRoutingDialogBase(parent), m_ConfigurationDialog(this), m_SettingsDialog(this)
 {
+    m_ConfigurationDialog.Hide();
+
+    m_SettingsDialog.LoadSettings();
     m_SettingsDialog.Hide();
+
     m_pBoatDialog = new BoatDialog(this);
 
     wxFileConfig *pConf = GetOCPNConfigObject();
@@ -65,17 +70,13 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, d
     pConf->Read ( _T ( "DialogY" ), &p.y, p.y);
     SetPosition(p);
 
+    SetRouteMapOverlaySettings();
     ReconfigureRouteMap();
-
-    SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
-    Reset();
 
     /* periodically check for updates from computation thread */
     m_tCompute.Connect(wxEVT_TIMER, wxTimerEventHandler
                        ( WeatherRoutingDialog::OnComputationTimer ), NULL, this);
     m_tCompute.Start(100);
-
-    m_RouteMapOverlay.Run();
 }
 
 WeatherRoutingDialog::~WeatherRoutingDialog( )
@@ -91,8 +92,6 @@ WeatherRoutingDialog::~WeatherRoutingDialog( )
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "DialogX" ), p.x);
     pConf->Write ( _T ( "DialogY" ), p.y);
-
-    m_RouteMapOverlay.Delete();
 }
 
 void WeatherRoutingDialog::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
@@ -118,21 +117,75 @@ void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
 
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
-    if(m_RouteMapOverlay.Paused()) {
-        m_bCompute->SetLabel(_( "&Stop" ));
-        if(m_RouteMapOverlay.Empty())
-            Reset();
-    } else
-        m_bCompute->SetLabel(_( "&Start" ));
-
-    m_RouteMapOverlay.TogglePaused();
+    if(m_RouteMapOverlay.Running())
+        Stop();
+    else
+        Start();
 }
 
 void WeatherRoutingDialog::OnBoat ( wxCommandEvent& event )
 {
     m_pBoatDialog->Show(!m_pBoatDialog->IsShown());
-//    if(m_pBoatDialog->ShowModal() == wxID_OK) {
-//    }
+}
+
+void WeatherRoutingDialog::OnPlot ( wxCommandEvent& event )
+{
+    std::list<PlotData> plotdata = m_RouteMapOverlay.GetPlotData();
+    PlotDialog plotdialog(this, plotdata);
+    plotdialog.ShowModal();
+}
+
+#include "../../../include/chart1.h"
+#include "../../../include/chcanv.h"
+#include "../../../include/chartdb.h"
+#include "../../../include/navutil.h"
+#include "../../../include/routeprop.h"
+#include "../../../include/routemanagerdialog.h"
+
+extern RouteList        *pRouteList;
+extern MyConfig         *pConfig;
+extern RouteProp        *pRoutePropDialog;
+extern RouteManagerDialog *pRouteManagerDialog;
+
+void WeatherRoutingDialog::OnExport ( wxCommandEvent& event )
+{
+    std::list<PlotData> plotdata = m_RouteMapOverlay.GetPlotData();
+
+    if(plotdata.size() == 0) {
+        wxMessageDialog mdlg(this, _("Empty Route, nothing to export\n"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+        return;
+    }
+
+    Track* newTrack = new Track;
+    newTrack->m_RouteNameString = _("Weather Route");
+
+    for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
+        RoutePoint* newPoint = new RoutePoint
+            ((*it).lat, (*it).lon, _T("circle"), _("Weather Route Point"));
+        newPoint->m_CreateTime = (*it).time;
+        newPoint->m_bIsolatedMark = false;
+        newPoint->m_bIsVisible = true;
+        newPoint->m_bShowName = false;
+        newPoint->m_bKeepXRoute = false;
+        newPoint->m_bIsInRoute = false;
+        newPoint->m_bIsInTrack = true;
+
+        newTrack->AddPoint(newPoint);
+    }
+
+    pRouteList->Append( newTrack );
+    pConfig->AddNewRoute( newTrack );
+    newTrack->RebuildGUIDList(); // ensure the GUID list is intact and good
+
+    if( pRoutePropDialog && ( pRoutePropDialog->IsShown() ) ) {
+        pRoutePropDialog->SetRouteAndUpdate( newTrack );
+        pRoutePropDialog->UpdateProperties();
+    }
+
+    if( pRouteManagerDialog && pRouteManagerDialog->IsShown() )
+        pRouteManagerDialog->UpdateRouteListCtrl();
 }
 
 void WeatherRoutingDialog::OnReset ( wxCommandEvent& event )
@@ -154,12 +207,22 @@ void WeatherRoutingDialog::OnInformation ( wxCommandEvent& event )
     }
 }
 
+void WeatherRoutingDialog::OnConfiguration( wxCommandEvent& event )
+{
+    m_ConfigurationDialog.LoadConfiguration();
+    if(m_ConfigurationDialog.ShowModal() == wxID_OK) {
+        ReconfigureRouteMap();
+        m_ConfigurationDialog.SaveConfiguration();
+    }
+}
+
 void WeatherRoutingDialog::OnSettings( wxCommandEvent& event )
 {
     m_SettingsDialog.LoadSettings();
     if(m_SettingsDialog.ShowModal() == wxID_OK) {
-        ReconfigureRouteMap();
         m_SettingsDialog.SaveSettings();
+        SetRouteMapOverlaySettings();
+        GetParent()->Refresh();
     }
 }
 
@@ -170,46 +233,35 @@ void WeatherRoutingDialog::OnClose( wxCommandEvent& event )
 
 void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
 {
-    if(m_RouteMapOverlay.Paused())
+    if(!m_RouteMapOverlay.Running())
         return;
 
     /* get a new grib for the route map if needed */
     if(m_RouteMapOverlay.NeedsGrib()) {
-        wxDateTime time = m_RouteMapOverlay.NewGribTime();
-        wxJSONValue v;
-        v[_T("Day")] = time.GetDay();
-        v[_T("Month")] = time.GetMonth();
-        v[_T("Year")] = time.GetYear();
-        v[_T("Hour")] = time.GetHour();
-        v[_T("Minute")] = time.GetMinute();
-        v[_T("Second")] = time.GetSecond();
-    
-        wxJSONWriter w;
-        wxString out;
-        w.Write(v, out);
-        SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+        m_RouteMapOverlay.RequestGrib(m_RouteMapOverlay.NewGribTime());
 
-        m_RouteMapOverlay.Lock();
         if(!m_RouteMapOverlay.HasGrib()) {
             wxMessageDialog mdlg(this, _("Failed to obtain grib for timestep\n"),
                                  _("Weather Routing"), wxOK);
             mdlg.ShowModal();
+            Stop();
+            return;
         }
-        m_RouteMapOverlay.Unlock();
     }
 
     static int cycles; /* don't refresh all the time */
-    if(++cycles > 20 && m_RouteMapOverlay.Updated()) {
+    if(++cycles > 10 && m_RouteMapOverlay.Updated()) {
         cycles = 0;
+
+        m_RunTime += wxDateTime::Now() - m_StartTime;
+        m_StartTime = wxDateTime::Now();
+
+        UpdateStatistics();
         GetParent()->Refresh();
     }
 
     if(!m_RouteMapOverlay.Finished())
         return;
-
-    m_bCompute->SetLabel(_( "&Start" ));
-
-    m_RouteMapOverlay.Pause();
 
     if( m_RouteMapOverlay.ReachedDestination()) {
         wxMessageDialog mdlg(this, _("Computation completed, destination reached\n"),
@@ -222,13 +274,49 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
                              _("Weather Routing"), wxOK | wxICON_WARNING);
         mdlg.ShowModal();
     }
+
+    Stop();
+}
+
+void WeatherRoutingDialog::Start()
+{
+    Reset();
+    m_RouteMapOverlay.Start();
+        
+    m_bCompute->SetLabel(_( "&Stop" ));
+    m_bReset->Disable();
+    m_StartTime = wxDateTime::Now();
+}
+
+void WeatherRoutingDialog::Stop()
+{
+    m_RouteMapOverlay.Stop();
+
+    m_bCompute->SetLabel(_( "&Start" ));
+    m_bReset->Enable();
+    m_RunTime += wxDateTime::Now() - m_StartTime;
+    UpdateStatistics();
+}
+
+void WeatherRoutingDialog::UpdateStatistics()
+{
+    m_stState->SetLabel(m_RouteMapOverlay.Running() ? _("Running") : _("Stopped"));
+    m_stRunTime->SetLabel(m_RunTime.Format());
+    
+    int isochrons, routes, invroutes, positions;
+    m_RouteMapOverlay.GetStatistics(isochrons, routes, invroutes, positions);
+    m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
+    m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
+    m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
+    m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
 }
 
 void WeatherRoutingDialog::Reset()
 {
-    double startlat, startlon;
-    m_tStartLat->GetValue().ToDouble(&startlat);
-    m_tStartLon->GetValue().ToDouble(&startlon);
+    RouteMapOptions options = m_RouteMapOverlay.GetOptions();
+    m_tStartLat->GetValue().ToDouble(&options.StartLat);
+    m_tStartLon->GetValue().ToDouble(&options.StartLon);
+    m_RouteMapOverlay.SetOptions(options);
 
     wxDateTime time = m_RouteMapOverlay.m_GribTimelineTime;
 
@@ -237,7 +325,10 @@ void WeatherRoutingDialog::Reset()
 
     m_RouteMapOverlay.SetBoat(m_pBoatDialog->m_Boat);
     
-    m_RouteMapOverlay.Reset(startlat, startlon, time);
+    m_RouteMapOverlay.Reset(time);
+
+    m_RunTime = wxTimeSpan(0);
+    UpdateStatistics();
     GetParent()->Refresh();
 }
 
@@ -253,6 +344,17 @@ void WeatherRoutingDialog::ReconfigureRouteMap()
 {
     UpdateEnd();
     RouteMapOptions options = m_RouteMapOverlay.GetOptions();
-    m_SettingsDialog.UpdateOptions(options);
+    m_ConfigurationDialog.UpdateOptions(options);
     m_RouteMapOverlay.SetOptions(options);
+}
+
+void WeatherRoutingDialog::SetRouteMapOverlaySettings()
+{
+    m_RouteMapOverlay.SetSettings(
+        m_SettingsDialog.m_cpCursorRoute->GetColour(),
+        m_SettingsDialog.m_cpDestinationRoute->GetColour(),
+        m_SettingsDialog.m_sRouteThickness->GetValue(),
+        m_SettingsDialog.m_sIsoChronThickness->GetValue(),
+        m_SettingsDialog.m_sAlternateRouteThickness->GetValue(),
+        m_SettingsDialog.m_cbAlternatesForAll->GetValue());
 }

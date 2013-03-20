@@ -32,6 +32,7 @@
 #include "Utilities.h"
 #include "BoatSpeed.h"
 
+/* give value for y at a given x location on a segment */
 double interp_value(double x, double x1, double x2, double y1, double y2)
 {
 /*
@@ -66,7 +67,7 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
     if(!fgets(line, sizeof line, f))
         goto failed; /* error here too */
     token = strtok_r(line, ";", &saveptr);
-    if(strcmp(token, "twa/tws") && strcmp(token, "twa\\tws"))
+    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
         goto failed; /* unrecognized format */
     
     while((token = strtok_r(NULL, ";", &saveptr))) {
@@ -298,8 +299,7 @@ double BoatSpeed::VelocityBoat(double A, double VA, double P)
 #endif
 }
 
-/*
-   Now that we can convert the wind speed in gribs correctly
+/* Now that we can convert the wind speed in gribs correctly
    still need more coefficients.  We can run calculations
    relative to motion thru water rather  than over ground
    now.  Also the wind angle is the true bearing of the wind
@@ -310,9 +310,8 @@ double BoatSpeed::VelocityBoat(double A, double VA, double P)
    W  - true wind direction (relative to vessel)
 
    optionally could include slippage here
-*/
 
-/* Solve for the augmented sailboat transform for apparent wind
+   Solve for the augmented sailboat transform for apparent wind
 
    W  - true wind direction (relative to vessel)
    A  - apparent wind direction
@@ -543,19 +542,28 @@ double BoatSpeed::VelocityApparentWind(double VB, double W, double VW)
          -1 |  VA + VB - VW   |
    A = cos  |  ------------   |
              \   2 VA VB     /
+
+        -1 / VW      \
+  A = sin |  -- sin W |
+           \ VA      /
+
 */
 double BoatSpeed::DirectionApparentWind(double VA, double VB, double W, double VW)
 {
   if(VA == 0) /* apparent wind direction is not defined */
     return 0;
+#if 1 /* law of cosines doesn't work for negative angle, law of sines seems simpler here */
+  double sinA = VW/VA*sin(W);
+  if(sinA > 1) sinA = 1; else if(sinA < -1) sinA = -1; /* slight arithematic errors */
+  return asin(sinA);
+#else
   if(VB == 0) /* trig identity breaks down, but if we aren't */
     return W; /*   moving, apparent wind is true wind */
   double cosA = (VA*VA + VB*VB - VW*VW) / (2*VA*VB);
-  if(cosA > 1) /* slight arithematic errors */
-    cosA = 1;
-  if(cosA < -1)
-    cosA = -1;
-  return acos(cosA);
+  if(cosA > 1) cosA = 1; else if(cosA < -1) cosA = -1; /* slight arithematic errors */
+  double ac = acos(cosA);
+  return W > 0 ? ac : -ac;
+#endif
 }
 
 /* start out with the boat stopped, and over time, iterate accelerating boat

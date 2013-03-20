@@ -33,6 +33,7 @@
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
+#include "WeatherRoutingConfigurationDialog.h"
 #include "WeatherRoutingSettingsDialog.h"
 
 class weather_routing_pi;
@@ -45,22 +46,31 @@ public:
     WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon );
     ~WeatherRoutingDialog( );
 
+    void Reset();
+
     void RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp);
     RouteMapOverlay m_RouteMapOverlay;
 
 private:
     void OnUpdateEnd( wxCommandEvent& event );
     void OnCompute( wxCommandEvent& event );
-    void OnBoat( wxCommandEvent& event );
     void OnReset( wxCommandEvent& event );
-    void OnInformation( wxCommandEvent& event );
     void OnSettings( wxCommandEvent& event );
+    void OnConfiguration( wxCommandEvent& event );
+    void OnBoat( wxCommandEvent& event );
+    void OnPlot( wxCommandEvent& event );
+    void OnExport( wxCommandEvent& event );
+    void OnInformation( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnComputationTimer( wxTimerEvent & );
 
-    void Reset();
+    void UpdateStatistics();
+
     void UpdateEnd();
+    void Start();
+    void Stop();
     void ReconfigureRouteMap();
+    void SetRouteMapOverlaySettings();
 
     //    Data
     weather_routing_pi   *pPlugIn;
@@ -70,9 +80,13 @@ private:
     bool m_bShowBoatDialog;
     BoatDialog *m_pBoatDialog;
 
+    WeatherRoutingConfigurationDialog m_ConfigurationDialog;
     WeatherRoutingSettingsDialog m_SettingsDialog;
 
     wxTimer m_tCompute;
+
+    wxTimeSpan m_RunTime;
+    wxDateTime m_StartTime;
 };
 
 #endif
