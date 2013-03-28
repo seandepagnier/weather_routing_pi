@@ -26,21 +26,13 @@
  *
  */
 
-#include "wx/wx.h"
-#include "wx/tokenzr.h"
-#include "wx/datetime.h"
-#include "wx/sound.h"
-#include <wx/wfstream.h>
-#include <wx/dir.h>
-#include <wx/filename.h>
-#include <wx/debug.h>
-#include <wx/graphics.h>
+#include <wx/wx.h>
 
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
-#include "BoatSpeed.h"
+#include "Boat.h"
 #include "BoatDialog.h"
 #include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
@@ -226,11 +218,6 @@ void WeatherRoutingDialog::OnSettings( wxCommandEvent& event )
     }
 }
 
-void WeatherRoutingDialog::OnClose( wxCommandEvent& event )
-{
-    Hide();
-}
-
 void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
 {
     if(!m_RouteMapOverlay.Running())
@@ -316,14 +303,13 @@ void WeatherRoutingDialog::Reset()
     RouteMapOptions options = m_RouteMapOverlay.GetOptions();
     m_tStartLat->GetValue().ToDouble(&options.StartLat);
     m_tStartLon->GetValue().ToDouble(&options.StartLon);
+    options.boat = m_pBoatDialog->m_Boat;
     m_RouteMapOverlay.SetOptions(options);
 
     wxDateTime time = m_RouteMapOverlay.m_GribTimelineTime;
 
     m_stStartDate->SetLabel(time.FormatISODate());
     m_stStartTime->SetLabel(time.FormatISOTime());
-
-    m_RouteMapOverlay.SetBoat(m_pBoatDialog->m_Boat);
     
     m_RouteMapOverlay.Reset(time);
 

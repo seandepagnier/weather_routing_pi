@@ -181,9 +181,6 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_bInformation = new wxButton( this, wxID_ANY, wxT("Information"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer24->Add( m_bInformation, 0, wxALL, 5 );
 	
-	m_bClose = new wxButton( this, wxID_ANY, wxT("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer24->Add( m_bClose, 0, wxALL, 5 );
-	
 	
 	fgSizer17->Add( fgSizer24, 1, wxEXPAND, 5 );
 	
@@ -205,7 +202,6 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_bPlot->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnPlot ), NULL, this );
 	m_bExport->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnExport ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnInformation ), NULL, this );
-	m_bClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnClose ), NULL, this );
 }
 
 WeatherRoutingDialogBase::~WeatherRoutingDialogBase()
@@ -221,7 +217,6 @@ WeatherRoutingDialogBase::~WeatherRoutingDialogBase()
 	m_bPlot->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnPlot ), NULL, this );
 	m_bExport->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnExport ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnInformation ), NULL, this );
-	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::OnClose ), NULL, this );
 	
 }
 
@@ -492,7 +487,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer3->Add( m_PlotWindow, 1, wxEXPAND | wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer12;
-	fgSizer12 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer12 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer12->AddGrowableCol( 0 );
 	fgSizer12->SetFlexibleDirection( wxBOTH );
 	fgSizer12->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -629,11 +625,53 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer18->Add( fgSizer23, 1, wxEXPAND, 5 );
 	
+	wxFlexGridSizer* fgSizer16;
+	fgSizer16 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer16->SetFlexibleDirection( wxBOTH );
+	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer8;
+	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Wind Kts") ), wxVERTICAL );
+	
+	m_sWindSpeed = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 1, 59, 15 );
+	sbSizer8->Add( m_sWindSpeed, 0, wxALL, 5 );
+	
+	
+	fgSizer16->Add( sbSizer8, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer11;
+	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Sig Wv Ht") ), wxVERTICAL );
+	
+	m_spinCtrl20 = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_spinCtrl20->Enable( false );
+	
+	sbSizer11->Add( m_spinCtrl20, 0, wxALL, 5 );
+	
+	
+	fgSizer16->Add( sbSizer11, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer12;
+	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Wv Period") ), wxVERTICAL );
+	
+	m_spinCtrl21 = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_spinCtrl21->Enable( false );
+	
+	sbSizer12->Add( m_spinCtrl21, 0, wxALL, 5 );
+	
+	
+	fgSizer16->Add( sbSizer12, 1, wxEXPAND, 5 );
+	
+	m_bClose = new wxButton( m_panel3, wxID_ANY, wxT("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer16->Add( m_bClose, 0, wxALL, 5 );
+	
+	
+	fgSizer18->Add( fgSizer16, 1, wxEXPAND, 5 );
+	
 	
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_notebook1->AddPage( m_panel3, wxT("Plot Details"), true );
+	m_notebook1->AddPage( m_panel3, wxT("Plot Details"), false );
 	m_panel31 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer181;
 	fgSizer181 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -768,89 +806,215 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel311->Layout();
 	fgSizer1811->Fit( m_panel311 );
 	m_notebook1->AddPage( m_panel311, wxT("VMG"), false );
-	m_panel5 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxFlexGridSizer* fgSizer10;
-	fgSizer10 = new wxFlexGridSizer( 0, 4, 0, 0 );
-	fgSizer10->AddGrowableCol( 1 );
-	fgSizer10->SetFlexibleDirection( wxBOTH );
-	fgSizer10->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	m_panel3111 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer46;
+	fgSizer46 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer46->SetFlexibleDirection( wxBOTH );
+	fgSizer46->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText12 = new wxStaticText( m_panel5, wxID_ANY, wxT("Eta"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText12->Wrap( -1 );
-	fgSizer10->Add( m_staticText12, 0, wxALL, 5 );
+	wxFlexGridSizer* fgSizer58;
+	fgSizer58 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer58->SetFlexibleDirection( wxBOTH );
+	fgSizer58->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_sEta = new wxSlider( m_panel5, wxID_ANY, 10, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
-	fgSizer10->Add( m_sEta, 0, wxEXPAND, 5 );
+	m_staticText100 = new wxStaticText( m_panel3111, wxID_ANY, wxT("type"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText100->Wrap( -1 );
+	fgSizer58->Add( m_staticText100, 0, wxALL, 5 );
 	
-	m_staticText57 = new wxStaticText( m_panel5, wxID_ANY, wxT("lwl ft"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText57->Wrap( -1 );
-	fgSizer10->Add( m_staticText57, 0, wxALL, 5 );
+	wxString m_cHullTypeChoices[] = { wxT("Mono"), wxT("Catamaran"), wxT("Trimaran"), wxT("Proa"), wxT("Submarine") };
+	int m_cHullTypeNChoices = sizeof( m_cHullTypeChoices ) / sizeof( wxString );
+	m_cHullType = new wxChoice( m_panel3111, wxID_ANY, wxDefaultPosition, wxSize( 100,-1 ), m_cHullTypeNChoices, m_cHullTypeChoices, 0 );
+	m_cHullType->SetSelection( 0 );
+	fgSizer58->Add( m_cHullType, 0, wxALL, 5 );
 	
-	m_sLWL = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 1000, 24 );
-	fgSizer10->Add( m_sLWL, 0, wxALL, 5 );
-	
-	m_staticText35 = new wxStaticText( m_panel5, wxID_ANY, wxT("Hull Drag"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText35->Wrap( -1 );
-	fgSizer10->Add( m_staticText35, 0, wxALL, 5 );
-	
-	m_sHullDrag = new wxSlider( m_panel5, wxID_ANY, 11, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
-	fgSizer10->Add( m_sHullDrag, 0, wxEXPAND, 5 );
-	
-	m_staticText58 = new wxStaticText( m_panel5, wxID_ANY, wxT("disp lbs"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText58 = new wxStaticText( m_panel3111, wxID_ANY, wxT("disp lbs"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText58->Wrap( -1 );
-	fgSizer10->Add( m_staticText58, 0, wxALL, 5 );
+	fgSizer58->Add( m_staticText58, 0, wxALL, 5 );
 	
-	m_sDisplacement = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100000, 8000 );
-	fgSizer10->Add( m_sDisplacement, 0, wxALL, 5 );
+	m_sDisplacement = new wxSpinCtrl( m_panel3111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100000, 8000 );
+	fgSizer58->Add( m_sDisplacement, 0, wxALL, 5 );
 	
-	m_staticText13 = new wxStaticText( m_panel5, wxID_ANY, wxT("Keel Pressure"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText13->Wrap( -1 );
-	fgSizer10->Add( m_staticText13, 0, wxALL, 5 );
+	m_staticText57 = new wxStaticText( m_panel3111, wxID_ANY, wxT("lwl ft"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText57->Wrap( -1 );
+	fgSizer58->Add( m_staticText57, 0, wxALL, 5 );
 	
-	m_sKeelPressure = new wxSlider( m_panel5, wxID_ANY, 30, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
-	fgSizer10->Add( m_sKeelPressure, 0, wxEXPAND, 5 );
-	
-	m_staticText60 = new wxStaticText( m_panel5, wxID_ANY, wxT("plane"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText60->Wrap( -1 );
-	fgSizer10->Add( m_staticText60, 0, wxALL, 5 );
-	
-	m_sPlaningConstant = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
-	fgSizer10->Add( m_sPlaningConstant, 0, wxALL, 5 );
-	
-	m_staticText14 = new wxStaticText( m_panel5, wxID_ANY, wxT("Keel Lift"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText14->Wrap( -1 );
-	fgSizer10->Add( m_staticText14, 0, wxALL, 5 );
-	
-	m_sKeelLift = new wxSlider( m_panel5, wxID_ANY, 10, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
-	fgSizer10->Add( m_sKeelLift, 0, wxEXPAND, 5 );
+	m_sLWL = new wxSpinCtrl( m_panel3111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 1000, 24 );
+	fgSizer58->Add( m_sLWL, 0, wxALL, 5 );
 	
 	
-	m_panel5->SetSizer( fgSizer10 );
+	fgSizer46->Add( fgSizer58, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer14;
+	sbSizer14 = new wxStaticBoxSizer( new wxStaticBox( m_panel3111, wxID_ANY, wxT("Drag") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer57;
+	fgSizer57 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer57->SetFlexibleDirection( wxBOTH );
+	fgSizer57->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText35 = new wxStaticText( m_panel3111, wxID_ANY, wxT("Frictional"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText35->Wrap( -1 );
+	fgSizer57->Add( m_staticText35, 0, wxALL, 5 );
+	
+	m_sFrictionalDrag = new wxSpinCtrl( m_panel3111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100, 0 );
+	fgSizer57->Add( m_sFrictionalDrag, 0, wxALL, 5 );
+	
+	m_staticText112 = new wxStaticText( m_panel3111, wxID_ANY, wxT("Wake"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText112->Wrap( -1 );
+	fgSizer57->Add( m_staticText112, 0, wxALL, 5 );
+	
+	m_sWakeDrag = new wxSpinCtrl( m_panel3111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100, 0 );
+	fgSizer57->Add( m_sWakeDrag, 0, wxALL, 5 );
+	
+	m_bRecomputeDrag = new wxButton( m_panel3111, wxID_ANY, wxT("Recompute"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer57->Add( m_bRecomputeDrag, 0, wxALL, 5 );
+	
+	m_bDragInfo = new wxButton( m_panel3111, wxID_ANY, wxT("Info"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer57->Add( m_bDragInfo, 0, wxALL, 5 );
+	
+	
+	sbSizer14->Add( fgSizer57, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer46->Add( sbSizer14, 1, wxEXPAND, 5 );
+	
+	
+	m_panel3111->SetSizer( fgSizer46 );
+	m_panel3111->Layout();
+	fgSizer46->Fit( m_panel3111 );
+	m_notebook1->AddPage( m_panel3111, wxT("Hull"), true );
+	m_panel311111 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer1811111;
+	fgSizer1811111 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer1811111->AddGrowableCol( 0 );
+	fgSizer1811111->AddGrowableRow( 0 );
+	fgSizer1811111->SetFlexibleDirection( wxBOTH );
+	fgSizer1811111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_lBoatPlans = new wxListCtrl( m_panel311111, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_ICON|wxLC_REPORT|wxLC_SINGLE_SEL );
+	fgSizer1811111->Add( m_lBoatPlans, 0, wxALL|wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer49;
+	fgSizer49 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer49->AddGrowableCol( 1 );
+	fgSizer49->AddGrowableRow( 0 );
+	fgSizer49->SetFlexibleDirection( wxBOTH );
+	fgSizer49->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText961 = new wxStaticText( m_panel311111, wxID_ANY, wxT("Eta"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText961->Wrap( -1 );
+	fgSizer49->Add( m_staticText961, 0, wxALL, 5 );
+	
+	m_sEta = new wxSlider( m_panel311111, wxID_ANY, 400, 1, 1000, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	fgSizer49->Add( m_sEta, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticText91 = new wxStaticText( m_panel311111, wxID_ANY, wxT("Maximum Pointing Angle Apparent Wind"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText91->Wrap( -1 );
+	fgSizer49->Add( m_staticText91, 0, wxALL, 5 );
+	
+	m_sLuffAngle = new wxSpinCtrl( m_panel311111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 15 );
+	fgSizer49->Add( m_sLuffAngle, 0, wxALL, 5 );
+	
+	
+	fgSizer1811111->Add( fgSizer49, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer40;
+	fgSizer40 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer40->SetFlexibleDirection( wxBOTH );
+	fgSizer40->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_bNewBoatPlan = new wxButton( m_panel311111, wxID_ANY, wxT("New"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer40->Add( m_bNewBoatPlan, 0, wxALL, 5 );
+	
+	m_bEditBoatPlan = new wxButton( m_panel311111, wxID_ANY, wxT("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer40->Add( m_bEditBoatPlan, 0, wxALL, 5 );
+	
+	m_bDeleteBoatPlan = new wxButton( m_panel311111, wxID_ANY, wxT("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer40->Add( m_bDeleteBoatPlan, 0, wxALL, 5 );
+	
+	
+	fgSizer1811111->Add( fgSizer40, 1, wxEXPAND, 5 );
+	
+	
+	m_panel311111->SetSizer( fgSizer1811111 );
+	m_panel311111->Layout();
+	fgSizer1811111->Fit( m_panel311111 );
+	m_notebook1->AddPage( m_panel311111, wxT("Sail Plan"), false );
+	m_panel5 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer52;
+	fgSizer52 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer52->SetFlexibleDirection( wxBOTH );
+	fgSizer52->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer59;
+	fgSizer59 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer59->SetFlexibleDirection( wxBOTH );
+	fgSizer59->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText113 = new wxStaticText( m_panel5, wxID_ANY, wxT("beam"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText113->Wrap( -1 );
+	fgSizer59->Add( m_staticText113, 0, wxALL, 5 );
+	
+	m_sBeam = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100, 8 );
+	fgSizer59->Add( m_sBeam, 0, wxALL, 5 );
+	
+	m_staticText109 = new wxStaticText( m_panel5, wxID_ANY, wxT("loa ft"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText109->Wrap( -1 );
+	fgSizer59->Add( m_staticText109, 0, wxALL, 5 );
+	
+	m_sLOA = new wxSpinCtrl( m_panel5, wxID_ANY, wxT("27"), wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 1000, 0 );
+	fgSizer59->Add( m_sLOA, 0, wxALL, 5 );
+	
+	
+	fgSizer52->Add( fgSizer59, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer43;
+	fgSizer43 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer43->SetFlexibleDirection( wxBOTH );
+	fgSizer43->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText92 = new wxStaticText( m_panel5, wxID_ANY, wxT("Hull Speed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText92->Wrap( -1 );
+	fgSizer43->Add( m_staticText92, 0, wxALL, 5 );
+	
+	m_stHullSpeed = new wxStaticText( m_panel5, wxID_ANY, wxT("0"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stHullSpeed->Wrap( -1 );
+	fgSizer43->Add( m_stHullSpeed, 0, wxALL, 5 );
+	
+	m_staticText94 = new wxStaticText( m_panel5, wxID_ANY, wxT("Capsize Risk"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText94->Wrap( -1 );
+	fgSizer43->Add( m_staticText94, 0, wxALL, 5 );
+	
+	m_stCapsizeRisk = new wxStaticText( m_panel5, wxID_ANY, wxT("0"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stCapsizeRisk->Wrap( -1 );
+	fgSizer43->Add( m_stCapsizeRisk, 0, wxALL, 5 );
+	
+	m_staticText96 = new wxStaticText( m_panel5, wxID_ANY, wxT("Comfort Factor"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText96->Wrap( -1 );
+	fgSizer43->Add( m_staticText96, 0, wxALL, 5 );
+	
+	m_stComfortFactor = new wxStaticText( m_panel5, wxID_ANY, wxT("0"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stComfortFactor->Wrap( -1 );
+	fgSizer43->Add( m_stComfortFactor, 0, wxALL, 5 );
+	
+	m_staticText105 = new wxStaticText( m_panel5, wxID_ANY, wxT("Displacement Length Ratio"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText105->Wrap( -1 );
+	fgSizer43->Add( m_staticText105, 0, wxALL, 5 );
+	
+	m_stDisplacementLengthRatio = new wxStaticText( m_panel5, wxID_ANY, wxT("0"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stDisplacementLengthRatio->Wrap( -1 );
+	fgSizer43->Add( m_stDisplacementLengthRatio, 0, wxALL, 5 );
+	
+	
+	fgSizer52->Add( fgSizer43, 1, wxEXPAND, 5 );
+	
+	
+	m_panel5->SetSizer( fgSizer52 );
 	m_panel5->Layout();
-	fgSizer10->Fit( m_panel5 );
-	m_notebook1->AddPage( m_panel5, wxT("Compute"), false );
+	fgSizer52->Fit( m_panel5 );
+	m_notebook1->AddPage( m_panel5, wxT("Statistics"), false );
 	
 	fgSizer12->Add( m_notebook1, 1, wxEXPAND | wxALL, 5 );
-	
-	wxFlexGridSizer* fgSizer16;
-	fgSizer16 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer16->SetFlexibleDirection( wxBOTH );
-	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticBoxSizer* sbSizer8;
-	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Wind Speed") ), wxVERTICAL );
-	
-	m_sWindSpeed = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 59, 10 );
-	sbSizer8->Add( m_sWindSpeed, 0, wxALL, 5 );
-	
-	
-	fgSizer16->Add( sbSizer8, 1, wxEXPAND, 5 );
-	
-	m_bClose = new wxButton( this, wxID_ANY, wxT("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer16->Add( m_bClose, 0, wxALL, 5 );
-	
-	
-	fgSizer12->Add( fgSizer16, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer3->Add( fgSizer12, 1, wxEXPAND, 5 );
@@ -879,51 +1043,35 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_PlotWindow->Connect( wxEVT_SIZE, wxSizeEventHandler( BoatDialogBase::OnSizePlot ), NULL, this );
 	m_cPlotType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotAxis->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_sWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
+	m_bClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnClose ), NULL, this );
 	m_bOpen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOpen ), NULL, this );
 	m_bSave->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSave ), NULL, this );
 	m_bOptimizeTacking->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );
 	m_bResetOptimizeTacking->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnResetOptimalTackingSpeed ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_cHullType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
+	m_sDisplacement->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
 	m_sLWL->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sDisplacement->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sPlaningConstant->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
-	m_bClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnClose ), NULL, this );
+	m_sFrictionalDrag->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_sWakeDrag->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_bRecomputeDrag->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecomputeDrag ), NULL, this );
+	m_bDragInfo->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDragInfo ), NULL, this );
+	m_lBoatPlans->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( BoatDialogBase::OnSailPlanSelected ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sLuffAngle->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_bNewBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnNewBoatPlan ), NULL, this );
+	m_bEditBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditBoatPlan ), NULL, this );
+	m_bDeleteBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDeleteBoatPlan ), NULL, this );
+	m_sBeam->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
+	m_sLOA->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
 }
 
 BoatDialogBase::~BoatDialogBase()
@@ -946,51 +1094,259 @@ BoatDialogBase::~BoatDialogBase()
 	m_PlotWindow->Disconnect( wxEVT_SIZE, wxSizeEventHandler( BoatDialogBase::OnSizePlot ), NULL, this );
 	m_cPlotType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotAxis->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_sWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
+	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnClose ), NULL, this );
 	m_bOpen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOpen ), NULL, this );
 	m_bSave->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSave ), NULL, this );
 	m_bOptimizeTacking->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );
 	m_bResetOptimizeTacking->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnResetOptimalTackingSpeed ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sEta->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_cHullType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
+	m_sDisplacement->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
 	m_sLWL->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sHullDrag->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sDisplacement->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelPressure->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sPlaningConstant->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sKeelLift->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_sWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
-	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnClose ), NULL, this );
+	m_sFrictionalDrag->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_sWakeDrag->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_bRecomputeDrag->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecomputeDrag ), NULL, this );
+	m_bDragInfo->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDragInfo ), NULL, this );
+	m_lBoatPlans->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( BoatDialogBase::OnSailPlanSelected ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_PAGEUP, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sEta->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( BoatDialogBase::OnEta ), NULL, this );
+	m_sLuffAngle->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_bNewBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnNewBoatPlan ), NULL, this );
+	m_bEditBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditBoatPlan ), NULL, this );
+	m_bDeleteBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDeleteBoatPlan ), NULL, this );
+	m_sBeam->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
+	m_sLOA->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
+	
+}
+
+BoatPlanDialogBase::BoatPlanDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer41;
+	fgSizer41 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer41->AddGrowableCol( 0 );
+	fgSizer41->AddGrowableRow( 1 );
+	fgSizer41->SetFlexibleDirection( wxBOTH );
+	fgSizer41->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer44;
+	fgSizer44 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer44->AddGrowableCol( 1 );
+	fgSizer44->SetFlexibleDirection( wxBOTH );
+	fgSizer44->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText87 = new wxStaticText( this, wxID_ANY, wxT("Name"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText87->Wrap( -1 );
+	fgSizer44->Add( m_staticText87, 0, wxALL, 5 );
+	
+	m_tBoatPlanName = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer44->Add( m_tBoatPlanName, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer41->Add( fgSizer44, 1, wxEXPAND, 5 );
+	
+	m_notebook2 = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panel10 = new wxPanel( m_notebook2, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer45;
+	fgSizer45 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer45->AddGrowableCol( 0 );
+	fgSizer45->AddGrowableRow( 0 );
+	fgSizer45->SetFlexibleDirection( wxBOTH );
+	fgSizer45->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_lSwitchPlans = new wxListBox( m_panel10, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_SINGLE ); 
+	fgSizer45->Add( m_lSwitchPlans, 0, wxALL|wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer46;
+	fgSizer46 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer46->SetFlexibleDirection( wxBOTH );
+	fgSizer46->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_bNewSwitchPlanRule = new wxButton( m_panel10, wxID_ANY, wxT("New"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer46->Add( m_bNewSwitchPlanRule, 0, wxALL, 5 );
+	
+	m_bEditSwitchBoatPlan = new wxButton( m_panel10, wxID_ANY, wxT("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer46->Add( m_bEditSwitchBoatPlan, 0, wxALL, 5 );
+	
+	m_bDeleteSwitchBoatPlan = new wxButton( m_panel10, wxID_ANY, wxT("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer46->Add( m_bDeleteSwitchBoatPlan, 0, wxALL, 5 );
+	
+	
+	fgSizer45->Add( fgSizer46, 1, wxEXPAND, 5 );
+	
+	
+	m_panel10->SetSizer( fgSizer45 );
+	m_panel10->Layout();
+	fgSizer45->Fit( m_panel10 );
+	m_notebook2->AddPage( m_panel10, wxT("Switch Plan Rules"), false );
+	
+	fgSizer41->Add( m_notebook2, 1, wxEXPAND | wxALL, 5 );
+	
+	wxFlexGridSizer* fgSizer52;
+	fgSizer52 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer52->SetFlexibleDirection( wxBOTH );
+	fgSizer52->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_bDone = new wxButton( this, wxID_ANY, wxT("Done"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer52->Add( m_bDone, 0, wxALL, 5 );
+	
+	
+	fgSizer41->Add( fgSizer52, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer41 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_bNewSwitchPlanRule->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnNewSwitchPlanRule ), NULL, this );
+	m_bEditSwitchBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnEditSwitchPlanRule ), NULL, this );
+	m_bDeleteSwitchBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnDeleteSwitchPlanRule ), NULL, this );
+	m_bDone->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnDone ), NULL, this );
+}
+
+BoatPlanDialogBase::~BoatPlanDialogBase()
+{
+	// Disconnect Events
+	m_bNewSwitchPlanRule->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnNewSwitchPlanRule ), NULL, this );
+	m_bEditSwitchBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnEditSwitchPlanRule ), NULL, this );
+	m_bDeleteSwitchBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnDeleteSwitchPlanRule ), NULL, this );
+	m_bDone->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatPlanDialogBase::OnDone ), NULL, this );
+	
+}
+
+SwitchPlanDialogBase::SwitchPlanDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer55;
+	fgSizer55 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer55->SetFlexibleDirection( wxBOTH );
+	fgSizer55->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer15;
+	sbSizer15 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Conditions") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer52;
+	fgSizer52 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer52->SetFlexibleDirection( wxBOTH );
+	fgSizer52->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_cbMaxWindSpeed = new wxCheckBox( this, wxID_ANY, wxT("Wind Speed >"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer52->Add( m_cbMaxWindSpeed, 0, wxALL, 5 );
+	
+	m_sMaxWindSpeed = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer52->Add( m_sMaxWindSpeed, 0, wxALL, 5 );
+	
+	m_staticText101 = new wxStaticText( this, wxID_ANY, wxT("Knots"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText101->Wrap( -1 );
+	fgSizer52->Add( m_staticText101, 0, wxALL, 5 );
+	
+	m_cbMinWindSpeed = new wxCheckBox( this, wxID_ANY, wxT("Wind Speed <"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer52->Add( m_cbMinWindSpeed, 0, wxALL, 5 );
+	
+	m_sMinWindSpeed = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer52->Add( m_sMinWindSpeed, 0, wxALL, 5 );
+	
+	m_staticText102 = new wxStaticText( this, wxID_ANY, wxT("Knots"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText102->Wrap( -1 );
+	fgSizer52->Add( m_staticText102, 0, wxALL, 5 );
+	
+	m_cbMaxWindDirection = new wxCheckBox( this, wxID_ANY, wxT("Wind Direction >"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer52->Add( m_cbMaxWindDirection, 0, wxALL, 5 );
+	
+	m_sMaxWindDirection = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer52->Add( m_sMaxWindDirection, 0, wxALL, 5 );
+	
+	m_staticText103 = new wxStaticText( this, wxID_ANY, wxT("Degrees"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText103->Wrap( -1 );
+	fgSizer52->Add( m_staticText103, 0, wxALL, 5 );
+	
+	m_cbMinWindDirection = new wxCheckBox( this, wxID_ANY, wxT("Wind Direction <"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer52->Add( m_cbMinWindDirection, 0, wxALL, 5 );
+	
+	m_sMinWindDirection = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer52->Add( m_sMinWindDirection, 0, wxALL, 5 );
+	
+	m_staticText104 = new wxStaticText( this, wxID_ANY, wxT("Degrees"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText104->Wrap( -1 );
+	fgSizer52->Add( m_staticText104, 0, wxALL, 5 );
+	
+	m_cbMaxWaveHeight = new wxCheckBox( this, wxID_ANY, wxT("Wave Height >"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer52->Add( m_cbMaxWaveHeight, 0, wxALL, 5 );
+	
+	m_sMaxWaveHeight = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer52->Add( m_sMaxWaveHeight, 0, wxALL, 5 );
+	
+	m_staticText105 = new wxStaticText( this, wxID_ANY, wxT("Meters"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText105->Wrap( -1 );
+	fgSizer52->Add( m_staticText105, 0, wxALL, 5 );
+	
+	m_cbMinWaveHeight = new wxCheckBox( this, wxID_ANY, wxT("Wave Height <"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer52->Add( m_cbMinWaveHeight, 0, wxALL, 5 );
+	
+	m_sMinWaveHeight = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer52->Add( m_sMinWaveHeight, 0, wxALL, 5 );
+	
+	m_staticText106 = new wxStaticText( this, wxID_ANY, wxT("Meters"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText106->Wrap( -1 );
+	fgSizer52->Add( m_staticText106, 0, wxALL, 5 );
+	
+	
+	sbSizer15->Add( fgSizer52, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer55->Add( sbSizer15, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer56;
+	fgSizer56 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer56->SetFlexibleDirection( wxBOTH );
+	fgSizer56->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText107 = new wxStaticText( this, wxID_ANY, wxT("Then Switch to"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText107->Wrap( -1 );
+	fgSizer56->Add( m_staticText107, 0, wxALL, 5 );
+	
+	wxArrayString m_cPlansChoices;
+	m_cPlans = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlansChoices, 0 );
+	m_cPlans->SetSelection( 0 );
+	fgSizer56->Add( m_cPlans, 0, wxALL, 5 );
+	
+	m_bDone = new wxButton( this, wxID_ANY, wxT("Done"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer56->Add( m_bDone, 0, wxALL, 5 );
+	
+	m_bInformation = new wxButton( this, wxID_ANY, wxT("Information"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer56->Add( m_bInformation, 0, wxALL, 5 );
+	
+	
+	fgSizer55->Add( fgSizer56, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer55 );
+	this->Layout();
+	fgSizer55->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_bDone->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnDone ), NULL, this );
+	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnInformation ), NULL, this );
+}
+
+SwitchPlanDialogBase::~SwitchPlanDialogBase()
+{
+	// Disconnect Events
+	m_bDone->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnDone ), NULL, this );
+	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnInformation ), NULL, this );
 	
 }
 

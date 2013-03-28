@@ -24,50 +24,37 @@
  ***************************************************************************
  */
 
-#ifdef __WXMSW__
-#include <float.h>
-#include <iostream>
-#include <limits>
-#define M_PI		3.14159265358979323846	/* pi */
-#define NAN std::numeric_limits<double>::quiet_NaN ()
+#include "BoatPlan.h"
 
-#define isnan _isnan
-#define isinf(x) (!_finite(x))
+class Boat
+{
+public:
+    Boat();
+    ~Boat();
 
-inline double trunc(double d){ return (d>0) ? floor(d) : ceil(d) ; }
-inline double round(double n) { return n < 0.0 ? ceil(n - 0.5) : floor(n + 0.5); }
+    bool OpenBinary(const char *filename);
+    bool SaveBinary(const char *filename);
 
+    BoatPlan &Plan(int plan) { return *Plans[plan]; }
 
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
+    std::vector<BoatPlan*> Plans;
 
-#define strtok_r(a, b, c) strtok_r(a, b)
-#endif
+    int TrySwitchBoatPlan(int curplan, double VW, double H, double Swell);
+    double Hulls();
+    double CapsizeRisk();
+    double ComfortFactor();
+    double DisplacementLengthRatio();
+    double SailAreaDisplacementRatio();
+    double DisplacementLongTons();
+    double HullSLRatio();
+    double HullSpeed();
+    double FrictionDrag(double VB);
+    double WakeDrag(double VB);
+    void RecomputeDrag();
 
+    enum HullType {MONO, CATAMARAN, TRIMARAN, PROA, SUBMARINE};
+    HullType hulltype;
 
-/* min must have correct paren to make predence correct */
-#ifdef MIN
-#undef MIN
-#endif
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
-#ifdef MAX
-#undef MAX
-#endif
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-
-double deg2rad(double degrees);
-double rad2deg(double radians);
-double heading_resolve(double degrees);
-double positive_degrees(double degrees);
-double rad2posdeg(double radians);
-
-#define ft2m(X) (X*.3048)
-#define m2ft(X) (X*3.28084)
-#define m_s2knots(X) (X*1.94384)
-#define knots2m_s(X) (X*.514444)
-
-double square(double x);
-double cube(double x);
+    double displacement_lbs, lwl_ft, loa_ft, beam_ft;
+    double frictional_drag, wake_drag;
+};

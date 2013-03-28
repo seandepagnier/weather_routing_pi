@@ -31,6 +31,7 @@
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
+#include <wx/listctrl.h>
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/html/htmlwin.h>
@@ -74,7 +75,6 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxButton* m_bPlot;
 		wxButton* m_bExport;
 		wxButton* m_bInformation;
-		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateEnd( wxCommandEvent& event ) { event.Skip(); }
@@ -86,7 +86,6 @@ class WeatherRoutingDialogBase : public wxDialog
 		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -95,7 +94,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxTextCtrl* m_tEndLat;
 		wxTextCtrl* m_tEndLon;
 		
-		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxDIALOG_NO_PARENT|wxRESIZE_BORDER|wxSYSTEM_MENU ); 
+		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDIALOG_NO_PARENT|wxSYSTEM_MENU ); 
 		~WeatherRoutingDialogBase();
 	
 };
@@ -205,6 +204,10 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText212;
 		wxStaticText* m_stBoatKnots;
 		wxStaticText* m_staticText232;
+		wxSpinCtrl* m_sWindSpeed;
+		wxSpinCtrl* m_spinCtrl20;
+		wxSpinCtrl* m_spinCtrl21;
+		wxButton* m_bClose;
 		wxPanel* m_panel31;
 		wxStaticText* m_staticText351;
 		wxSpinCtrl* m_sFileCSVWindSpeedStep;
@@ -225,43 +228,144 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stBestCourseDownWindStarboardTack;
 		wxButton* m_bOptimizeTacking;
 		wxButton* m_bResetOptimizeTacking;
-		wxPanel* m_panel5;
-		wxStaticText* m_staticText12;
-		wxSlider* m_sEta;
+		wxPanel* m_panel3111;
+		wxStaticText* m_staticText100;
+		wxChoice* m_cHullType;
+		wxStaticText* m_staticText58;
+		wxSpinCtrl* m_sDisplacement;
 		wxStaticText* m_staticText57;
 		wxSpinCtrl* m_sLWL;
 		wxStaticText* m_staticText35;
-		wxSlider* m_sHullDrag;
-		wxStaticText* m_staticText58;
-		wxSpinCtrl* m_sDisplacement;
-		wxStaticText* m_staticText13;
-		wxSlider* m_sKeelPressure;
-		wxStaticText* m_staticText60;
-		wxSpinCtrl* m_sPlaningConstant;
-		wxStaticText* m_staticText14;
-		wxSlider* m_sKeelLift;
-		wxSpinCtrl* m_sWindSpeed;
-		wxButton* m_bClose;
+		wxSpinCtrl* m_sFrictionalDrag;
+		wxStaticText* m_staticText112;
+		wxSpinCtrl* m_sWakeDrag;
+		wxButton* m_bRecomputeDrag;
+		wxButton* m_bDragInfo;
+		wxPanel* m_panel311111;
+		wxListCtrl* m_lBoatPlans;
+		wxStaticText* m_staticText961;
+		wxSlider* m_sEta;
+		wxStaticText* m_staticText91;
+		wxSpinCtrl* m_sLuffAngle;
+		wxButton* m_bNewBoatPlan;
+		wxButton* m_bEditBoatPlan;
+		wxButton* m_bDeleteBoatPlan;
+		wxPanel* m_panel5;
+		wxStaticText* m_staticText113;
+		wxSpinCtrl* m_sBeam;
+		wxStaticText* m_staticText109;
+		wxSpinCtrl* m_sLOA;
+		wxStaticText* m_staticText92;
+		wxStaticText* m_stHullSpeed;
+		wxStaticText* m_staticText94;
+		wxStaticText* m_stCapsizeRisk;
+		wxStaticText* m_staticText96;
+		wxStaticText* m_stComfortFactor;
+		wxStaticText* m_staticText105;
+		wxStaticText* m_stDisplacementLengthRatio;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMouseEventsPlot( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetOptimalTackingSpeed( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRecompute( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateStatistics( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnRecompute( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSailPlanSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnEta( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnNewBoatPlan( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditBoatPlan( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeleteBoatPlan( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
 		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BoatDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class BoatPlanDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class BoatPlanDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText87;
+		wxTextCtrl* m_tBoatPlanName;
+		wxNotebook* m_notebook2;
+		wxPanel* m_panel10;
+		wxListBox* m_lSwitchPlans;
+		wxButton* m_bNewSwitchPlanRule;
+		wxButton* m_bEditSwitchBoatPlan;
+		wxButton* m_bDeleteSwitchBoatPlan;
+		wxButton* m_bDone;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnNewSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeleteSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		BoatPlanDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Sail Plan"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,300 ), long style = wxCAPTION|wxRESIZE_BORDER ); 
+		~BoatPlanDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class SwitchPlanDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class SwitchPlanDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxCheckBox* m_cbMaxWindSpeed;
+		wxSpinCtrl* m_sMaxWindSpeed;
+		wxStaticText* m_staticText101;
+		wxCheckBox* m_cbMinWindSpeed;
+		wxSpinCtrl* m_sMinWindSpeed;
+		wxStaticText* m_staticText102;
+		wxCheckBox* m_cbMaxWindDirection;
+		wxSpinCtrl* m_sMaxWindDirection;
+		wxStaticText* m_staticText103;
+		wxCheckBox* m_cbMinWindDirection;
+		wxSpinCtrl* m_sMinWindDirection;
+		wxStaticText* m_staticText104;
+		wxCheckBox* m_cbMaxWaveHeight;
+		wxSpinCtrl* m_sMaxWaveHeight;
+		wxStaticText* m_staticText105;
+		wxCheckBox* m_cbMinWaveHeight;
+		wxSpinCtrl* m_sMinWaveHeight;
+		wxStaticText* m_staticText106;
+		wxStaticText* m_staticText107;
+		wxChoice* m_cPlans;
+		wxButton* m_bDone;
+		wxButton* m_bInformation;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		SwitchPlanDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Switch Sail Plan Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
+		~SwitchPlanDialogBase();
 	
 };
 

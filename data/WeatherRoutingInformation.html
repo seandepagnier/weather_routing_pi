@@ -88,11 +88,44 @@ A is apparent Wind angle
 VW is true wind speed
 eta is a boat specific constant specifying it's sailing efficiency.
 </pre>
+<p>Solving for boat speed based on apparent wind we get:
+<pre>
+                      __
+                A    /VA
+VB(inf) =  sin (-)  /---
+                2 \/ eta
+</pre>
 <p>
 This computation is very useful for the standard rig, but doesn't really apply correctly in many cases.  It also doesn't really factor in a huge range of variables as there is only one constant.
 
-<p>I have augmented the sailboat transform to add a few more parameters in the hope that
-it may come closer to resembling the sailing characteristics of more vessels.
+<p>I have augmented the sailboat transform to also take into account two types of drag in the hoppe that it may come closer to resembling the sailing characteristics of more vessels.  This way hull speed is properly taken into account, and for boats with planing ability, also you may get the right result if the correct values are used.
+
+<p>The Frictional drag reduces the maximum speed based on the square of its speed.  The Wake drag component uses a complex math formula to compute the energy lost creating a wake:
+<pre>
+                                       2
+           /      sin(Pi - F^-2)      \
+   Drag = |  -----------------------   |
+           \ (Pi - F^-2) (1 + Pi F^2) /
+
+              ___
+    V = F * \/g l
+
+    F = sqrt(g * l) / V;
+
+    g = 9.8 (gravity constant)
+    l is length of vessel in meters
+    V is meters per second
+
+    Reaches a peak at F=Pi^-.5 which is about .56
+
+    The huge increase starts at F = .4  (normal hull speed setting)
+    
+    Also interesting to note that at 80% of normal hull speed, the wave
+    drag is zero as well, but the first hump occurs from .32 to .4, and
+    therefore causes more drag than right at .4.
+
+    This works for the full range from displacement to planing mode.
+</pre>
 
 <p>For many users, it may be best to enter measured values for the boat in csv format rather
 than attempt to compute. Eventually it may even be possible to use the plugin to obtain

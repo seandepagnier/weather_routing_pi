@@ -30,7 +30,6 @@
 
 class RouteMapOptions;
 class IsoRoute;
-class IsoRouteHeap;
 class GribRecordSet;
 
 typedef std::list<IsoRoute*> IsoRouteList;
@@ -46,30 +45,49 @@ struct PlotData
 class Position
 {
 public:
-    Position(double latitude, double longitude, Position *p=NULL);
+    Position(double latitude, double longitude, int sp=0, Position *p=NULL);
     Position(Position *p);
+
+    SkipPosition *BuildSkipList();
+
     bool GetPlotData(GribRecordSet &grib, PlotData &data, double dt);
-    bool Propagate(IsoRouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
+    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, RouteMapOptions &options);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
-    Position *Copy();
 
     double lat, lon;
+    int sailplan; /* which sail plan in the boat we are using */
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */
 
     bool propagated;
 };
 
+/* circular skip list of positions which point to where we
+   change direction of quadrant.
+   That way we can eliminate a long string of positions very quickly
+   all go in the same direction.  */
+class SkipPosition
+{
+    SkipPosition(Position *p, int q);
+    ~SkipPosition();
+    SkipPosition *Copy();
+
+    Position *point;
+    SkipPosition *prev, *next;
+};
+
 /* a closed loop of positions */
 class IsoRoute
 {
 public:
-    IsoRoute(Position *p, int cnt = 1, int dir = 1);
+    IsoRoute(SkipPosition *p, int dir = 1);
     IsoRoute(IsoRoute *r, IsoRoute *p=NULL);
     ~IsoRoute();
 
-    void Print();
+    void DeleteSkipPoints();
+
+    void Print(); /* for debugging */
 
     int IntersectionCount(Position *pos);
     int Contains(Position *pos, bool test_children);
@@ -82,37 +100,17 @@ public:
     void RemovePosition(Position *p);
     IsoRouteList Normalize(int level, bool inverted_regions);
     Position *ClosestPosition(double lat, double lon);
-    bool Propagate(IsoRouteHeap &routeheap, GribRecordSet &Grib, RouteMapOptions &options);
+    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, RouteMapOptions &options);
+
+    int Count();
     void UpdateStatistics( int &routes, int &invroutes, int &positions);
     
-    Position *points; /* pointer to point with maximum latitude */
-    int count;
-  
+    SkipPosition *skippoints; /* skip list of positions */
+
     int direction; /* 1 or -1 for inverted region */
     
     IsoRoute *parent; /* outer region if a child */
     IsoRouteList children; /* inner inverted regions */
-};
-
-/* contain routes in a heap to process smallest first (to minimize O(n^2) runtime of merging) */
-class IsoRouteHeap
-{
-public:
-    IsoRouteHeap();
-    ~IsoRouteHeap();
-    void Insert(IsoRoute *r);
-    IsoRoute *Remove();
-//    int Size() { return size; }
-    int Size() { return m_List.size(); }
-
-private:
-    IsoRouteList m_List;
-
-    int size, maxsize;
-    IsoRoute **Heap;
-    void expand();
-    int parent(int a) { return (a-!(a&1)) >> 1; }
-    int child(int a) { return (a<<1) + 1; }
 };
 
 /* list of routes with equal time to reach */
@@ -122,7 +120,7 @@ public:
     IsoChron(IsoRouteList r, wxDateTime t, GribRecordSet *g);
     ~IsoChron();
 
-    void PropagateIntoHeap(IsoRouteHeap &routeheap, GribRecordSet &grib, RouteMapOptions &options);
+    void PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib, RouteMapOptions &options);
     bool Contains(double lat, double lon);
   
     IsoRouteList routes;
@@ -145,7 +143,7 @@ struct RouteMapOptions {
     int SubSteps;
     bool DetectLand, InvertedRegions, Anchoring, AllowDataDeficient;
 
-    BoatSpeed *boat;
+    Boat boat;
 };
 
 class RouteMap
@@ -171,14 +169,13 @@ public:
 
     void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; Unlock(); }
     RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
-    void SetBoat(BoatSpeed &b);
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &positions);
 
     bool Propagate();
 
 protected:
     virtual void Clear();
-    bool ReduceHeap(IsoRouteList &merged, IsoRouteHeap &routeheap, RouteMapOptions &options);
+    bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapOptions &options);
     Position *ClosestPosition(double lat, double lon);
 
     /* protect any member variables with mutexes if needed */
@@ -195,9 +192,4 @@ private:
     bool m_bFinished, m_bReachedDestination, m_bGribFailed;
 
     wxDateTime m_NewGribTime;
-
-    bool m_bUpdateBoat;
-    BoatSpeed m_boats[2]; /* page flip boats to allow safe threaded access
-                             without copying the whole boat very often */
-    int m_currentboat;
 };

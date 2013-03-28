@@ -26,7 +26,7 @@
  *
  */
 
-#include "wx/wx.h"
+#include <wx/wx.h>
 
 #include <stdlib.h>
 #include <math.h>

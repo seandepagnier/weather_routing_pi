@@ -25,60 +25,28 @@
  ***************************************************************************
  */
 
-#ifndef _BOAT_DIALOG_H_
-#define _BOAT_DIALOG_H_
-
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
 
 class weather_routing_pi;
 
-class BoatDialog : public BoatDialogBase
+class BoatPlanDialog : public BoatPlanDialogBase
 {
 public:
 
-    BoatDialog( wxWindow *parent);
-    ~BoatDialog();
-
-    Boat m_Boat;
-
-private:
+    BoatPlanDialog( wxWindow *parent, BoatPlan &BoatPlan, std::vector<wxString> &PlanNames);
+    ~BoatPlanDialog();
 
     void OnMouseEventsPlot( wxMouseEvent& event );
-    void OnPaintPlot( wxPaintEvent& event );
-    void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxCommandEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxSpinEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdateWindSpeed( wxSpinEvent& event );
-    void OnOpen( wxCommandEvent& event );
-    void OnSave( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event ) { Hide(); }
-    void OnRecompute( wxSpinEvent& event ) { StoreBoatParameters(); Compute(); UpdateStats(); }
-    void OnOptimizeTacking( wxCommandEvent& event );
-    void OnResetOptimalTackingSpeed( wxCommandEvent& event );
-    void OnUpdateStatistics( wxCommandEvent& event ) { StoreBoatParameters(); UpdateStats(); }
-    void OnUpdateStatistics( wxSpinEvent& event ) { StoreBoatParameters(); UpdateStats(); }
-    void OnRecomputeDrag( wxCommandEvent& event );
-    void OnDragInfo( wxCommandEvent& event );
-    void OnSailPlanSelected( wxListEvent& event );
-    void OnEta( wxScrollEvent& event );
-    void OnNewBoatPlan( wxCommandEvent& event );
-    void OnEditBoatPlan( wxCommandEvent& event );
-    void OnDeleteBoatPlan( wxCommandEvent& event );
+    void OnPaintPlot(wxPaintEvent& event);
 
-    void StoreBoatParameters();
-    void RepopulatePlans();
-    void Compute();
-    void UpdateTrackingControls();
-    void UpdateVMG();
-    void UpdateStats();
+    void OnNewSwitchPlanRule( wxCommandEvent& event );
+    void OnEditSwitchPlanRule( wxCommandEvent& event );
+    void OnDeleteSwitchPlanRule( wxCommandEvent& event );
+    void OnDone( wxCommandEvent& event );
 
-    wxString m_default_boat_path;    
-    double m_PlotScale;
-    int m_MouseW;
-
-    int m_SelectedSailPlan;
+private:
+    BoatPlan &m_BoatPlan;
+    std::vector<wxString> &m_PlanNames;
 };
-
-#endif

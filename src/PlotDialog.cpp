@@ -26,10 +26,8 @@
  *
  */
 
-#include "wx/wx.h"
-#include "wx/datetime.h"
-#include <wx/filename.h>
-#include <wx/graphics.h>
+
+#include <wx/wx.h>
 #include <wx/stdpaths.h>
 
 #include <stdlib.h>
@@ -37,7 +35,7 @@
 #include <time.h>
 
 #include "Utilities.h"
-#include "BoatSpeed.h"
+#include "Boat.h"
 #include "RouteMap.h"
 #include "PlotDialog.h"
 
@@ -98,9 +96,9 @@ double PlotDialog::GetValue(PlotData &data, int var)
     case WIND_DIRECTION_GROUND:        return heading_resolve(data.BG - data.WG);
     case WIND_COURSE_GROUND:           return data.WG;
     case APPARENT_WIND_VELOCITY:
-        return BoatSpeed::VelocityApparentWind(data.VB, deg2rad(GetValue(data, WIND_DIRECTION)), data.VW);
+        return BoatPlan::VelocityApparentWind(data.VB, deg2rad(GetValue(data, WIND_DIRECTION)), data.VW);
     case APPARENT_WIND_DIRECTION: {
-        return rad2deg(BoatSpeed::DirectionApparentWind
+        return rad2deg(BoatPlan::DirectionApparentWind
                        (GetValue(data, APPARENT_WIND_VELOCITY), data.VB,
                         deg2rad(GetValue(data, WIND_DIRECTION)), data.VW));
     }

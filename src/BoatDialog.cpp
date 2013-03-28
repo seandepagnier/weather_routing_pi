@@ -25,15 +25,8 @@
  ***************************************************************************
  *
  */
-#include "wx/wx.h"
-#include "wx/tokenzr.h"
-#include "wx/datetime.h"
-#include "wx/sound.h"
-#include <wx/wfstream.h>
-#include <wx/dir.h>
-#include <wx/filename.h>
-#include <wx/debug.h>
-#include <wx/graphics.h>
+
+#include <wx/wx.h>
 #include <wx/stdpaths.h>
 
 #include <stdlib.h>
@@ -41,17 +34,21 @@
 #include <time.h>
 
 #include "Utilities.h"
-#include "BoatSpeed.h"
+#include "Boat.h"
 #include "BoatDialog.h"
+#include "BoatPlanDialog.h"
 
-//---------------------------------------------------------------------------------------
-//          Weather Routing Dialog Implementation
-//---------------------------------------------------------------------------------------
-
+enum {spNAME, spETA};
 
 BoatDialog::BoatDialog( wxWindow *parent )
     : BoatDialogBase(parent), m_PlotScale(0)
 {
+    m_lBoatPlans->InsertColumn(spNAME, _("Name"));
+    m_lBoatPlans->InsertColumn(spETA, _("Eta"));
+
+    m_lBoatPlans->SetColumnWidth(spNAME, 100);
+    m_lBoatPlans->SetColumnWidth(spETA, 100);
+
     wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
 #ifdef __WXMSW__
     wxString stdPath  = std_path.GetConfigDir();
@@ -66,13 +63,18 @@ BoatDialog::BoatDialog( wxWindow *parent )
     m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.obs");
     m_Boat.OpenBinary(m_default_boat_path.ToAscii());
 
-    m_sEta->SetValue(m_Boat.eta * 1000.0);
-    m_sHullDrag->SetValue(m_Boat.hull_drag * 1000.0);
-    m_sKeelPressure->SetValue(m_Boat.keel_pressure * 100.0);
-    m_sKeelLift->SetValue(m_Boat.keel_lift * 100.0);
-    m_sLWL->SetValue(m_Boat.lwl_ft);
+    RepopulatePlans();
+
+    m_SelectedSailPlan = 0;
+
     m_sDisplacement->SetValue(m_Boat.displacement_lbs);
-    m_sPlaningConstant->SetValue(m_Boat.planing_constant);
+    m_sLWL->SetValue(m_Boat.lwl_ft);
+    m_sLOA->SetValue(m_Boat.loa_ft);
+
+    m_sFrictionalDrag->SetValue(m_Boat.frictional_drag * 1000.0);
+    m_sWakeDrag->SetValue(m_Boat.wake_drag * 100.0);
+
+//    m_sEta->SetValue(m_Boat.eta * 1000.0);
 
     UpdateVMG();    
 }
@@ -115,7 +117,8 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
 
         double B = rad2posdeg(atan2(x, -y));
         double W = -B, VW = m_sWindSpeed->GetValue();
-        double VB = m_Boat.Speed(0, B, VW);
+
+        double VB = m_Boat.Plans[m_SelectedSailPlan]->Speed(B, VW);
 
         m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));
         m_stBoatKnots->SetLabel(wxString::Format(_T("%.1f"), VB));
@@ -129,8 +132,8 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
         m_stTrueWindAngle->SetLabel(wxString::Format(_T("%03.0f"), W));
         m_stTrueWindKnots->SetLabel(wxString::Format(_T("%.1f"), VW));
 
-        double VA = BoatSpeed::VelocityApparentWind(VB, deg2rad(W), VW);
-        double A = rad2posdeg(BoatSpeed::DirectionApparentWind(VA, VB, deg2rad(W), VW));
+        double VA = BoatPlan::VelocityApparentWind(VB, deg2rad(W), VW);
+        double A = rad2posdeg(BoatPlan::DirectionApparentWind(VA, VB, deg2rad(W), VW));
 
         m_stApparentWindAngle->SetLabel(wxString::Format(_T("%03.0f"), A));
 
@@ -201,8 +204,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     int W, i;
     /* plot scale */
     for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++) {
-        SailingSpeed &speed = m_Boat.speed[0][VW][W];
-        double VB = speed.VB;
+        double VB = m_Boat.Plans[m_SelectedSailPlan]->Speed(W, VW);
         if(VB > maxVB)
             maxVB = VB;
     }
@@ -238,29 +240,30 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     }
 
     /* vmg */
-    int P = 0, px, py;
+    int px, py;
     dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
 
     double s = maxVB*m_PlotScale;
+    SailingVMG vmg = m_Boat.Plans[m_SelectedSailPlan]->GetVMG(VW);
 
-    W = m_Boat.VMG[P][VW].PortTackUpWind;
+    W = vmg.PortTackUpWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
-    W = m_Boat.VMG[P][VW].StarboardTackUpWind;
+    W = vmg.StarboardTackUpWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
     dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
 
-    W = m_Boat.VMG[P][VW].PortTackDownWind;
+    W = vmg.PortTackDownWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
 
-    W = m_Boat.VMG[P][VW].StarboardTackDownWind;
+    W = vmg.StarboardTackDownWind;
     px = s*sin(deg2rad(W));
     py = s*cos(deg2rad(W));
     dc.DrawLine(w/2, h/2, w/2 + px, h/2 - py);
@@ -268,13 +271,10 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     /* boat speeds */
     int lx, ly;
     for(W = 0; W<=DEGREES; W += DEGREE_STEP) {
-        SailingSpeed speed = m_Boat.speed[0][VW][(W%DEGREES)];
-        double VB = speed.VB;
+//        SailingSpeed speed = m_Boat.Plans[m_SelectedSailPlan]->speed[VW][(W%DEGREES)];
+        double VB = m_Boat.Plans[m_SelectedSailPlan]->Speed(W, VW);
 
-        if(speed.w == 0)
-            dc.SetPen(wxPen(wxColor(0, 255, 0), 2));
-        else
-            dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
+        dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
 
         int px =  m_PlotScale*VB*sin(deg2rad(W)) + w/2;
         int py = -m_PlotScale*VB*cos(deg2rad(W)) + h/2;
@@ -283,9 +283,10 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
             dc.DrawLine(lx, ly, px, py);
         lx = px, ly = py;
 
+#if 0
         if(W == m_MouseW) {
             int B = speed.b;
-            SailingSpeed speedB = m_Boat.speed[0][VW][B];
+            SailingSpeed speedB = m_Boat.Plans[m_SelectedSailPlan]->speed[VW][B];
             double BVB = speedB.VB;
             int pxb =  m_PlotScale*speed.w*BVB*sin(deg2rad(B)) + w/2;
             int pyb = -m_PlotScale*speed.w*BVB*cos(deg2rad(B)) + h/2;
@@ -298,6 +299,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                 dc.DrawLine(pxb, pyb, px, py);
             }
         }
+#endif
     }
 }
 
@@ -309,8 +311,11 @@ void BoatDialog::OnUpdateWindSpeed( wxSpinEvent& event )
 
 void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
-    wxFileDialog openDialog( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
-                             wxT ( "Boat Polar files (*.obp, *.cvs)|*.OBP;*.obp;*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_OPEN  );
+    wxFileDialog openDialog
+        ( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
+          wxT ( "Boat Polar files (*.obp, *.cvs)|*.OBP;*.obp;*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxFD_OPEN  );
+
     if( openDialog.ShowModal() == wxID_OK ) {
         wxFileName filename = openDialog.GetPath();
         bool binary = filename.GetExt() == _("obp") || filename.GetExt() == _("OBP");
@@ -318,6 +323,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
         bool success;
         if(binary) {
             success = m_Boat.OpenBinary(openDialog.GetPath().ToAscii());
+            RepopulatePlans();
         } else {
             BoatSpeedTable table;
             int wind_speed_step, wind_degree_step;
@@ -325,7 +331,8 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
                                      wind_speed_step, wind_degree_step))) {
                 m_sFileCSVWindSpeedStep->SetValue(wind_speed_step);
                 m_sFileCSVWindDegreeStep->SetValue(wind_degree_step);
-                m_Boat.SetSpeedsFromTable(table);
+
+                m_Boat.Plans[m_SelectedSailPlan]->SetSpeedsFromTable(table);
             }
         }
              
@@ -352,9 +359,9 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
         if(binary)
             success = m_Boat.SaveBinary(saveDialog.GetPath().ToAscii());
         else {
-            BoatSpeedTable table = m_Boat.CreateTable
+            BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
                 (m_sFileCSVWindSpeedStep->GetValue(),
-                 m_sFileCSVWindDegreeStep->GetValue());
+                     m_sFileCSVWindDegreeStep->GetValue());
             success = table.Save(saveDialog.GetPath().ToAscii());
         }
 
@@ -369,27 +376,126 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
 
 void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
 {
-    m_Boat.OptimizeTackingSpeed();
+    m_Boat.Plans[m_SelectedSailPlan]->OptimizeTackingSpeed();
     m_PlotWindow->Refresh();
 }
 
 void BoatDialog::OnResetOptimalTackingSpeed( wxCommandEvent& event )
 {
-    m_Boat.ResetOptimalTackingSpeed();
+    m_Boat.Plans[m_SelectedSailPlan]->ResetOptimalTackingSpeed();
     m_PlotWindow->Refresh();
+}
+
+void BoatDialog::OnRecomputeDrag( wxCommandEvent& event )
+{
+    StoreBoatParameters();
+    m_Boat.RecomputeDrag();
+    m_sFrictionalDrag->SetValue(1000.0 * m_Boat.frictional_drag);
+    m_sWakeDrag->SetValue(100.0 * m_Boat.wake_drag);
+
+    Compute();
+}
+
+void BoatDialog::OnDragInfo( wxCommandEvent& event )
+{
+    wxMessageDialog md(this, _("\
+Drag is both frictional and wave based\n\
+This can be computed based on boat values above then modified manually.\n\
+With proper settings hull speed will be achieved, but also break into planing mode possible.\n\
+A value 0 zero means no wake, where 100 is heaviest displacement.\n\
+This also takes into account the different harmonics of wakes before hull speed is reached, \
+so resulting boat polar may appear bumpy.\n"),
+                       _("Drag Computation"),
+                       wxICON_INFORMATION | wxOK );
+    md.ShowModal();
+}
+
+void BoatDialog::OnSailPlanSelected( wxListEvent& event )
+{
+    m_SelectedSailPlan = event.GetIndex();
+    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan]->eta * 1000.0);
+    m_sLuffAngle->SetValue(m_Boat.Plans[m_SelectedSailPlan]->luff_angle);
+    m_PlotWindow->Refresh();
+}
+
+void BoatDialog::OnEta( wxScrollEvent& event )
+{
+    Compute();
+    m_lBoatPlans->SetItem(m_SelectedSailPlan, spETA, wxString::Format(_T("%.3f"),
+                                                                       m_sEta->GetValue()/1000.0));
+}
+
+void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
+{
+    long index = m_lBoatPlans->InsertItem(0, _("New Plan"));
+    m_Boat.Plans.push_back(new BoatPlan(_("New Plan")));
+
+    m_lBoatPlans->SetItemState(index, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    OnEditBoatPlan(event);
+
+    m_bDeleteBoatPlan->Enable();
+}
+
+void BoatDialog::OnEditBoatPlan( wxCommandEvent& event )
+{
+    std::vector<wxString> PlanNames;
+    for(unsigned int i=0; i<m_Boat.Plans.size(); i++)
+        if(i != (unsigned int)m_SelectedSailPlan)
+            PlanNames.push_back(m_Boat.Plans[i]->Name);
+
+    BoatPlanDialog dialog(this, *m_Boat.Plans[m_SelectedSailPlan], PlanNames);
+    dialog.ShowModal();
+}
+
+void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
+{
+    m_lBoatPlans->DeleteItem(m_SelectedSailPlan);
+    delete m_Boat.Plans[m_SelectedSailPlan];
+
+    m_Boat.Plans.erase(m_Boat.Plans.begin() + m_SelectedSailPlan);
+
+    if(m_Boat.Plans.size() < 2)
+        m_bDeleteBoatPlan->Disable();
+}
+
+void BoatDialog::StoreBoatParameters()
+{
+    m_Boat.Plans[m_SelectedSailPlan]->eta = m_sEta->GetValue() / 1000.0;
+    m_Boat.Plans[m_SelectedSailPlan]->luff_angle = m_sLuffAngle->GetValue();
+
+    m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
+
+    m_Boat.displacement_lbs = m_sDisplacement->GetValue();
+    m_Boat.lwl_ft = m_sLWL->GetValue();
+    m_Boat.loa_ft = m_sLOA->GetValue();
+    m_Boat.beam_ft = m_sBeam->GetValue();
+
+    m_Boat.frictional_drag = m_sFrictionalDrag->GetValue() / 1000.0;
+    m_Boat.wake_drag = m_sWakeDrag->GetValue() / 100.0;
+}
+
+void BoatDialog::RepopulatePlans()
+{
+    m_lBoatPlans->DeleteAllItems();
+    for(unsigned int i=0; i<m_Boat.Plans.size(); i++) {
+        long idx = m_lBoatPlans->InsertItem(0, m_Boat.Plans[i]->Name);
+        m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), m_Boat.Plans[i]->eta));
+    }
+
+    m_lBoatPlans->SetColumnWidth(1, wxLIST_AUTOSIZE);
+    m_lBoatPlans->SetColumnWidth(2, wxLIST_AUTOSIZE);
+
+    if(m_Boat.Plans.size() > 1)
+        m_bDeleteBoatPlan->Enable();
+    else
+        m_bDeleteBoatPlan->Disable();
 }
 
 void BoatDialog::Compute()
 {
-    m_Boat.eta = m_sEta->GetValue() / 1000.0;
-    m_Boat.hull_drag = m_sHullDrag->GetValue() / 1000.0;
-    m_Boat.keel_pressure = m_sKeelPressure->GetValue() / 100.0;
-    m_Boat.keel_lift = m_sKeelLift->GetValue() / 100.0;
-    m_Boat.lwl_ft = m_sLWL->GetValue();
-    m_Boat.displacement_lbs = m_sDisplacement->GetValue();
-    m_Boat.planing_constant = m_sPlaningConstant->GetValue();
+    StoreBoatParameters();
 
-    m_Boat.ComputeBoatSpeeds();
+    m_Boat.Plans[m_SelectedSailPlan]->ComputeBoatSpeeds(m_Boat);
 
     UpdateVMG();
     m_PlotWindow->Refresh();
@@ -397,15 +503,23 @@ void BoatDialog::Compute()
 
 void BoatDialog::UpdateVMG()
 {
-    int P = 0;
     int VW = m_sWindSpeed->GetValue();
+    SailingVMG vmg = m_Boat.Plans[m_SelectedSailPlan]->GetVMG(VW);
 
     m_stBestCourseUpWindPortTack->SetLabel
-        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].PortTackUpWind));
+        (wxString::Format(_T("%d"), vmg.PortTackUpWind));
     m_stBestCourseUpWindStarboardTack->SetLabel
-        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].StarboardTackUpWind));
+        (wxString::Format(_T("%d"), vmg.StarboardTackUpWind));
     m_stBestCourseDownWindPortTack->SetLabel
-        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].PortTackDownWind));
+        (wxString::Format(_T("%d"), vmg.PortTackDownWind));
     m_stBestCourseDownWindStarboardTack->SetLabel
-        (wxString::Format(_T("%d"), m_Boat.VMG[P][VW].StarboardTackDownWind));
+        (wxString::Format(_T("%d"), vmg.StarboardTackDownWind));
+}
+
+void BoatDialog::UpdateStats()
+{
+    m_stHullSpeed->SetLabel(wxString::Format(_T("%.3f"), m_Boat.HullSpeed()));
+    m_stCapsizeRisk->SetLabel(wxString::Format(_T("%.3f"), m_Boat.CapsizeRisk()));
+    m_stComfortFactor->SetLabel(wxString::Format(_T("%.3f"), m_Boat.ComfortFactor()));
+    m_stDisplacementLengthRatio->SetLabel(wxString::Format(_T("%.3f"), m_Boat.DisplacementLengthRatio()));
 }

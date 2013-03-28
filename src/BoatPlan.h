@@ -24,12 +24,14 @@
  ***************************************************************************
  */
 
-#define MAX_KNOTS 60
+static const int wind_speeds[] = {0, 2, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32, 36, 40, 45, 50, 55, 60};
+static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
 
-/* from 0 to 100% motor power 10% at a time */
-#define MAX_POWER 10
+#define MAX_KNOTS wind_speeds[num_wind_speeds - 1]
+
 #define DEGREES 360
-#define DEGREE_STEP 5
+#define DEGREE_STEP 3
+#define DEGREE_COUNT (DEGREES / DEGREE_STEP)
 
 struct SailingSpeed
 {
@@ -38,7 +40,7 @@ struct SailingSpeed
     float slipangle; /* angle of boat relative to its movement thru water */
 
     float w; /* weight of time on each tack */
-    short int b, c; /* tacks to sail relative to true wind */
+    unsigned char b, c; /* tacks to sail relative to true wind */
 };
 
 struct SailingVMG
@@ -57,6 +59,7 @@ public:
 };
 
 #include <list>
+#include <vector>
 typedef std::list<BoatSpeedTableEntry> BoatSpeedTableEntryList;
 
 class BoatSpeedTable
@@ -76,52 +79,63 @@ public:
     BoatSpeedTableEntryList table;
 };
 
-/* contain all data for boat under sail with various motor power levels */
-class BoatSpeed
+class SwitchPlan
+{
+public:
+    SwitchPlan() :
+        MaxWindSpeed(NAN), MinWindSpeed(NAN),
+        MaxWindDirection(NAN), MinWindDirection(NAN),
+        MaxWaveHeight(NAN), MinWaveHeight(NAN) {}
+
+    double MaxWindSpeed, MinWindSpeed;
+    double MaxWindDirection, MinWindDirection;
+    double MaxWaveHeight, MinWaveHeight;
+
+    wxString Name;
+};
+
+class Boat;
+
+class BoatPlan
 {
 
 public:
     static double VelocityApparentWind(double VB, double W, double VW);
     static double DirectionApparentWind(double VA, double VB, double W, double VW);
-    void BoatSteadyState(double W, double VW, double P,
-                         double &B, double &VB, double &A, double &VA);
+    void BoatSteadyState(double W, double VW, double &B, double &VB, double &A, double &VA,
+                         Boat &boat);
+    wxString TrySwitchBoatPlan(double VW, double H, double Swell);
 
-    BoatSpeed();
-    ~BoatSpeed();
+    BoatPlan(wxString PlanName);
+    ~BoatPlan();
 
-    bool OpenBinary(const char *filename);
-    bool SaveBinary(const char *filename);
+    std::vector<SwitchPlan> SwitchPlans;
 
-    double eta, hull_drag, keel_pressure, keel_lift; /* sailing constant */
-    double lwl_ft, displacement_lbs, planing_constant;
+    wxString Name;
+    double eta, luff_angle;
 
-    double powerspeed[MAX_POWER+1]; /* How fast do we power at each power level
-                                       in dead calm. */
-
-    SailingSpeed speed[MAX_POWER+1][MAX_KNOTS+1][DEGREES];
-
-    SailingVMG VMG[MAX_POWER+1][MAX_KNOTS+1];
-
-    void ComputeBoatSpeeds();
+    void ComputeBoatSpeeds(Boat &boat);
     void OptimizeTackingSpeed();
     void ResetOptimalTackingSpeed();
     void SetSpeedsFromTable(BoatSpeedTable &table);
     BoatSpeedTable CreateTable(int wind_speed_step, int wind_degree_step);
 
-    double Speed(int P, double W, double VW, double vw_step=1);
-    double TrueWindSpeed(int P, double VB, double W, double maxVW);
-    void Set(int P, int W, int VW, double VB);
+    static int ClosestVWi(int VW);
+
+    double Speed(double W, double VW);
+    SailingVMG GetVMG(double VW);
+    double TrueWindSpeed(double VB, double W, double maxVW);
+    void Set(int Wi, int VWi, double VB);
 
 private:
-    int BestVMG(int P, int VW, int startW, int endW, int upwind);
+    SailingSpeed speed[num_wind_speeds][DEGREE_COUNT];
+    SailingVMG VMG[num_wind_speeds];
+
+    int BestVMG(int VW, int startW, int endW, int upwind);
     void CalculateVMG();
 
-    double sail_forward_force(double A, double VA);
-    double sail_slip_force(double A, double VA);
-    double boat_slip_speed(double A, double VA);
-    double boat_forward_speed(double A, double VA, double P);
-    double AngleofAttackBoat(double A, double VA, double P);
-    double VelocityBoat(double A, double VA, double P);
+    double AngleofAttackBoat(double A, double VA);
+    double VelocityBoat(double A, double VA);
 
     double m_MouseW;
 };
@@ -130,7 +144,7 @@ private:
    driving electric motors to power the boat.  The
    wind involved can be assumed negligable because the
 */
-class ElectricBoatSpeed : public BoatSpeed
+class ElectricBoatPlan : public BoatPlan
 {
 /* charge */
 //  ChargeSources sources;
@@ -140,10 +154,10 @@ class ElectricBoatSpeed : public BoatSpeed
   double drive_efficiency; /* factor to compute power */
   double drag_factor;
 
-  double Speed(double kw);
+  double Plan(double kw);
 };
 
-class SteamPoweredBoat : public BoatSpeed
+class SteamPoweredBoat : public BoatPlan
 {
   double efficiency;
   double power;
@@ -156,16 +170,9 @@ class SteamPoweredBoat : public BoatSpeed
 /* given willingness of participants to participate,
    it is possible to power the boat using oar or sweep.
 */
-class HumanPoweredBoatSpeed : BoatSpeed
+class HumanPoweredBoatPlan : BoatPlan
 {
   double humans;
   double JoulsPerPerson;
   double drive_efficiency;
-};
-
-class Boat
-{
-  BoatSpeed *DriveMethod;
-  double hull_length;
-  double drag;
 };

@@ -26,13 +26,13 @@
  *
  */
 
-#include "wx/wx.h"
+#include <wx/wx.h>
 
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
-#include "BoatSpeed.h"
+#include "Boat.h"
 #include "RouteMap.h"
 #include "WeatherRoutingConfigurationDialog.h"
 #include "weather_routing_pi.h"

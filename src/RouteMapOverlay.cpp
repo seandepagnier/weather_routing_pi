@@ -24,18 +24,14 @@
  ***************************************************************************
  */
 
-#include "wx/wxprec.h"
-
-#ifndef  WX_PRECOMP
-  #include "wx/wx.h"
-#endif //precompiled headers
+#include <wx/wx.h>
 
 #include "../../../include/ocpn_plugin.h"
 #include "../../../include/ocpndc.h"
 #include "../../../include/wx/jsonreader.h"
 #include "../../../include/wx/jsonwriter.h"
 
-#include "BoatSpeed.h"
+#include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "Utilities.h"
 
@@ -151,12 +147,12 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
 {
     Position *pos = r->points;
     do {
-        if(each_parent || !pos->propagated)
-            for(Position *p = pos; p && p->parent; p = p->parent) {
-                DrawLine(p, p->parent, dc, vp);
-                if(!each_parent)
-                    break;
+        for(Position *p = pos; p && p->parent; p = p->parent) {
+            DrawLine(p, p->parent, dc, vp);
+            if(!each_parent)
+                break;
         }
+
         pos = pos->next;
     } while(pos != r->points);
 

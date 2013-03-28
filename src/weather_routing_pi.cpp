@@ -24,16 +24,12 @@
  ***************************************************************************
  */
 
-#include "wx/wxprec.h"
-
-#ifndef  WX_PRECOMP
-  #include "wx/wx.h"
-#endif //precompiled headers
+#include <wx/wx.h>
 
 #include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
-#include "BoatSpeed.h"
+#include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "WeatherRoutingDialog.h"
 #include "weather_routing_pi.h"
