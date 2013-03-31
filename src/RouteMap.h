@@ -41,6 +41,8 @@ struct PlotData
     double VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
 };
 
+class SkipPosition;
+
 /* circular linked list node for positions which take equal time to reach */
 class Position
 {
@@ -69,12 +71,15 @@ public:
    all go in the same direction.  */
 class SkipPosition
 {
+public:
     SkipPosition(Position *p, int q);
     ~SkipPosition();
+    void Remove();
     SkipPosition *Copy();
 
     Position *point;
     SkipPosition *prev, *next;
+    int quadrant;
 };
 
 /* a closed loop of positions */
@@ -97,8 +102,7 @@ public:
 
     bool ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options);
     bool FindIsoRouteBounds(double bounds[4]);
-    void RemovePosition(Position *p);
-    IsoRouteList Normalize(int level, bool inverted_regions);
+    void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon);
     bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, RouteMapOptions &options);
 

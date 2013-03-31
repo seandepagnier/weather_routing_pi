@@ -126,15 +126,15 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
 
 void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-    if(!r->points)
+    Position *p = r->skippoints->point;
+    if(!p)
         return;
 
-    Position *p = r->points;
     do {
         SetColor(dc, false, color, m_IsoChronThickness);
         DrawLine(p, p->next, dc, vp);
         p = p->next;
-    } while(p != r->points);
+    } while(p != r->skippoints->point);
 
     /* now render any children */
     wxColour cyan(0, 255, 255);
@@ -145,7 +145,7 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, ocpnDC &dc, P
 void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
                                            ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-    Position *pos = r->points;
+    Position *pos = r->skippoints->point;
     do {
         for(Position *p = pos; p && p->parent; p = p->parent) {
             DrawLine(p, p->parent, dc, vp);
@@ -154,7 +154,7 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
         }
 
         pos = pos->next;
-    } while(pos != r->points);
+    } while(pos != r->skippoints->point);
 
     for(IsoRouteList::iterator cit = r->children.begin(); cit != r->children.end(); cit++) {
         wxColour blue(0, 0, 255);
