@@ -106,13 +106,14 @@ public:
                          Boat &boat);
     wxString TrySwitchBoatPlan(double VW, double H, double Swell);
 
-    BoatPlan(wxString PlanName);
+    BoatPlan(wxString PlanName, Boat &boat);
     ~BoatPlan();
 
     std::vector<SwitchPlan> SwitchPlans;
 
     wxString Name;
     double eta, luff_angle;
+    bool computed;
 
     void ComputeBoatSpeeds(Boat &boat);
     void OptimizeTackingSpeed();

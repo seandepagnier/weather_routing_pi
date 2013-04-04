@@ -155,12 +155,12 @@ wxString weather_routing_pi::GetCommonName()
 
 wxString weather_routing_pi::GetShortDescription()
 {
-      return _("Weather Routing PlugIn for OpenCPN");
+    return _("Weather Routing PlugIn by Sean d'Epagnier");
 }
 
 wxString weather_routing_pi::GetLongDescription()
 {
-      return _("Weather Routing PlugIn for OpenCPN\n\n\
+    return _("Weather Routing PlugIn for OpenCPN\n\n\
 Provides Weather routing features include:\n\
   automatic routing subject to various constraints:\n\
           islands or inverted regions (places we can't go in a boat)\n\

@@ -32,8 +32,8 @@ public:
     Boat();
     ~Boat();
 
-    bool OpenBinary(const char *filename);
-    bool SaveBinary(const char *filename);
+    bool OpenXML(const char *filename);
+    bool SaveXML(const char *filename);
 
     BoatPlan &Plan(int plan) { return *Plans[plan]; }
 

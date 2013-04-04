@@ -73,7 +73,7 @@ class SkipPosition
 {
 public:
     SkipPosition(Position *p, int q);
-    ~SkipPosition();
+
     void Remove();
     SkipPosition *Copy();
 
@@ -90,10 +90,10 @@ public:
     IsoRoute(IsoRoute *r, IsoRoute *p=NULL);
     ~IsoRoute();
 
-    void DeleteSkipPoints();
-
     void Print(); /* for debugging */
+    void PrintSkip();
 
+    int OldIntersectionCount(Position *pos);
     int IntersectionCount(Position *pos);
     int Contains(Position *pos, bool test_children);
 
@@ -106,8 +106,9 @@ public:
     Position *ClosestPosition(double lat, double lon);
     bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, RouteMapOptions &options);
 
+    int SkipCount();
     int Count();
-    void UpdateStatistics( int &routes, int &invroutes, int &positions);
+    void UpdateStatistics(int &routes, int &invroutes, int &skippositions, int &positions);
     
     SkipPosition *skippoints; /* skip list of positions */
 
@@ -173,7 +174,7 @@ public:
 
     void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; Unlock(); }
     RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
-    void GetStatistics(int &isochrons, int &routes, int &invroutes, int &positions);
+    void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
 
     bool Propagate();
 

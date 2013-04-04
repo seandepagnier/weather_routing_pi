@@ -29,8 +29,8 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 
 #  IF NOT DEBUGGING CFLAGS="-O2 -march=native"
 IF(NOT WIN32)
-  #ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
- ADD_DEFINITIONS( "-Wall -g -fexceptions" )
+ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
+# ADD_DEFINITIONS( "-Wall -g -fexceptions" )
 # ADD_DEFINITIONS( "-Wall -g -O2 -fexceptions" )
 
  IF(NOT APPLE)
@@ -101,6 +101,11 @@ SET(SRC_WEATHER_ROUTING
             ../../src/wxJSON/jsonval.cpp
             ../../src/wxJSON/jsonreader.cpp
             ../../src/wxJSON/jsonwriter.cpp
+
+	    ../../../include/tinyxml.h
+            ../../../src/tinyxml.cpp
+            ../../../src/tinyxmlparser.cpp
+            ../../../src/tinyxmlerror.cpp
 )
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING})
 

@@ -122,6 +122,12 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_stIsoChrons->Wrap( -1 );
 	fgSizer29->Add( m_stIsoChrons, 0, wxALL, 5 );
 	
+	
+	fgSizer29->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer29->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	m_staticText55 = new wxStaticText( this, wxID_ANY, wxT("Routes"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText55->Wrap( -1 );
 	fgSizer29->Add( m_staticText55, 0, wxALL, 5 );
@@ -137,6 +143,14 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_stInvRoutes = new wxStaticText( this, wxID_ANY, wxT("0000"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_stInvRoutes->Wrap( -1 );
 	fgSizer29->Add( m_stInvRoutes, 0, wxALL, 5 );
+	
+	m_staticText90 = new wxStaticText( this, wxID_ANY, wxT("Skip Positions"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText90->Wrap( -1 );
+	fgSizer29->Add( m_staticText90, 0, wxALL, 5 );
+	
+	m_stSkipPositions = new wxStaticText( this, wxID_ANY, wxT("0000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stSkipPositions->Wrap( -1 );
+	fgSizer29->Add( m_stSkipPositions, 0, wxALL, 5 );
 	
 	m_staticText49 = new wxStaticText( this, wxID_ANY, wxT("Positions"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText49->Wrap( -1 );
@@ -282,7 +296,7 @@ WeatherRoutingConfigurationDialogBase::WeatherRoutingConfigurationDialogBase( wx
 	fgSizer18->Add( sbSizer7, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer1;
-	fgSizer1 = new wxFlexGridSizer( 4, 2, 0, 0 );
+	fgSizer1 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer1->SetFlexibleDirection( wxVERTICAL );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
 	
@@ -882,7 +896,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3111->SetSizer( fgSizer46 );
 	m_panel3111->Layout();
 	fgSizer46->Fit( m_panel3111 );
-	m_notebook1->AddPage( m_panel3111, wxT("Hull"), true );
+	m_notebook1->AddPage( m_panel3111, wxT("Hull"), false );
 	m_panel311111 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer1811111;
 	fgSizer1811111 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -891,7 +905,9 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer1811111->SetFlexibleDirection( wxBOTH );
 	fgSizer1811111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_lBoatPlans = new wxListCtrl( m_panel311111, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_ICON|wxLC_REPORT|wxLC_SINGLE_SEL );
+	m_lBoatPlans = new wxListCtrl( m_panel311111, wxID_ANY, wxDefaultPosition, wxSize( -1,100 ), wxLC_REPORT|wxLC_SINGLE_SEL );
+	m_lBoatPlans->SetMaxSize( wxSize( -1,100 ) );
+	
 	fgSizer1811111->Add( m_lBoatPlans, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer49;
@@ -1012,7 +1028,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel5->SetSizer( fgSizer52 );
 	m_panel5->Layout();
 	fgSizer52->Fit( m_panel5 );
-	m_notebook1->AddPage( m_panel5, wxT("Statistics"), false );
+	m_notebook1->AddPage( m_panel5, wxT("Statistics"), true );
 	
 	fgSizer12->Add( m_notebook1, 1, wxEXPAND | wxALL, 5 );
 	

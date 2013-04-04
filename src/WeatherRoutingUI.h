@@ -65,6 +65,8 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxStaticText* m_stRoutes;
 		wxStaticText* m_staticText57;
 		wxStaticText* m_stInvRoutes;
+		wxStaticText* m_staticText90;
+		wxStaticText* m_stSkipPositions;
 		wxStaticText* m_staticText49;
 		wxStaticText* m_stPositions;
 		wxButton* m_bCompute;

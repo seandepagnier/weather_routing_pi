@@ -43,12 +43,6 @@ enum {spNAME, spETA};
 BoatDialog::BoatDialog( wxWindow *parent )
     : BoatDialogBase(parent), m_PlotScale(0)
 {
-    m_lBoatPlans->InsertColumn(spNAME, _("Name"));
-    m_lBoatPlans->InsertColumn(spETA, _("Eta"));
-
-    m_lBoatPlans->SetColumnWidth(spNAME, 100);
-    m_lBoatPlans->SetColumnWidth(spETA, 100);
-
     wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
 #ifdef __WXMSW__
     wxString stdPath  = std_path.GetConfigDir();
@@ -60,12 +54,16 @@ BoatDialog::BoatDialog( wxWindow *parent )
     wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
 #endif
 
-    m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.obs");
-    m_Boat.OpenBinary(m_default_boat_path.ToAscii());
+    m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.xml");
+    if(!m_Boat.OpenXML(m_default_boat_path.ToAscii())) {
+        m_Boat.Plans.push_back(new BoatPlan(_("Initial Plan"), m_Boat));
+        m_Boat.Plans[0]->ComputeBoatSpeeds(m_Boat);
+    }
+
+    m_lBoatPlans->InsertColumn(spNAME, _("Name"));
+    m_lBoatPlans->InsertColumn(spETA, _("Eta"));
 
     RepopulatePlans();
-
-    m_SelectedSailPlan = 0;
 
     m_sDisplacement->SetValue(m_Boat.displacement_lbs);
     m_sLWL->SetValue(m_Boat.lwl_ft);
@@ -74,14 +72,16 @@ BoatDialog::BoatDialog( wxWindow *parent )
     m_sFrictionalDrag->SetValue(m_Boat.frictional_drag * 1000.0);
     m_sWakeDrag->SetValue(m_Boat.wake_drag * 100.0);
 
-//    m_sEta->SetValue(m_Boat.eta * 1000.0);
+    m_SelectedSailPlan = 0;
+    m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan]->eta * 1000.0);
 
     UpdateVMG();    
 }
 
 BoatDialog::~BoatDialog()
 {
-    m_Boat.SaveBinary(m_default_boat_path.ToAscii());
+    m_Boat.SaveXML(m_default_boat_path.ToAscii());
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -313,16 +313,16 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
     wxFileDialog openDialog
         ( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
-          wxT ( "Boat Polar files (*.obp, *.cvs)|*.OBP;*.obp;*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxT ( "XML Weather Routing files (*.xml, *.cvs)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
         wxFileName filename = openDialog.GetPath();
-        bool binary = filename.GetExt() == _("obp") || filename.GetExt() == _("OBP");
+        bool binary = filename.GetExt() == _("xml") || filename.GetExt() == _("XML");
 
         bool success;
         if(binary) {
-            success = m_Boat.OpenBinary(openDialog.GetPath().ToAscii());
+            success = m_Boat.OpenXML(openDialog.GetPath().ToAscii());
             RepopulatePlans();
         } else {
             BoatSpeedTable table;
@@ -357,7 +357,7 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
 
         bool success;
         if(binary)
-            success = m_Boat.SaveBinary(saveDialog.GetPath().ToAscii());
+            success = m_Boat.SaveXML(saveDialog.GetPath().ToAscii());
         else {
             BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
                 (m_sFileCSVWindSpeedStep->GetValue(),
@@ -427,8 +427,9 @@ void BoatDialog::OnEta( wxScrollEvent& event )
 
 void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
 {
-    long index = m_lBoatPlans->InsertItem(0, _("New Plan"));
-    m_Boat.Plans.push_back(new BoatPlan(_("New Plan")));
+    wxString np = _("New Plan");
+    long index = m_lBoatPlans->InsertItem(0, np);
+    m_Boat.Plans.push_back(new BoatPlan(np, m_Boat));
 
     m_lBoatPlans->SetItemState(index, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     OnEditBoatPlan(event);
@@ -477,13 +478,18 @@ void BoatDialog::StoreBoatParameters()
 void BoatDialog::RepopulatePlans()
 {
     m_lBoatPlans->DeleteAllItems();
+
     for(unsigned int i=0; i<m_Boat.Plans.size(); i++) {
-        long idx = m_lBoatPlans->InsertItem(0, m_Boat.Plans[i]->Name);
+        wxListItem info;
+        info.SetId(i);
+        info.SetData(i);
+        long idx = m_lBoatPlans->InsertItem(info);
+        m_lBoatPlans->SetItem(idx, spNAME, m_Boat.Plans[i]->Name);
         m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), m_Boat.Plans[i]->eta));
     }
 
-    m_lBoatPlans->SetColumnWidth(1, wxLIST_AUTOSIZE);
-    m_lBoatPlans->SetColumnWidth(2, wxLIST_AUTOSIZE);
+    m_lBoatPlans->SetColumnWidth(spNAME, wxLIST_AUTOSIZE);
+    m_lBoatPlans->SetColumnWidth(spETA, wxLIST_AUTOSIZE);
 
     if(m_Boat.Plans.size() > 1)
         m_bDeleteBoatPlan->Enable();

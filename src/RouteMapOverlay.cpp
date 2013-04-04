@@ -54,7 +54,8 @@ void *RouteMapOverlayThread::Entry()
 }
 
 RouteMapOverlay::RouteMapOverlay()
-    : m_Thread(NULL),
+    : m_GribTimelineTime(wxDateTime::Now()),
+      m_Thread(NULL),
       last_cursor_position(NULL), last_destination_position(NULL),
       m_bUpdated(false)
 {
@@ -126,16 +127,24 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
 
 void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-    Position *p = r->skippoints->point;
-    if(!p)
+    SkipPosition *s = r->skippoints;
+    if(!s)
         return;
 
+    Position *p = s->point;
     do {
         SetColor(dc, false, color, m_IsoChronThickness);
         DrawLine(p, p->next, dc, vp);
         p = p->next;
-    } while(p != r->skippoints->point);
+    } while(p != s->point);
 
+#if 0
+    do {
+        SetColor(dc, false, wxColour(255, 0, 0), m_IsoChronThickness);
+        DrawLine(s->point, s->next->point, dc, vp);
+        s = s->next;
+    } while(s != r->skippoints);
+#endif
     /* now render any children */
     wxColour cyan(0, 255, 255);
     for(IsoRouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
@@ -165,7 +174,6 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
 
 void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-#if 1
     /* render start and end */
     RouteMapOptions options = GetOptions();
     wxPoint r;
@@ -179,7 +187,6 @@ void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
     SetColor(dc, true, *wxRED, 3);
     dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
     dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
-#endif
 
     if(!origin.size())
        return;
@@ -220,6 +227,10 @@ void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
         Lock();
         int c = 0;
         for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
+#if 0
+            if(*i != origin.back())
+                continue;
+#endif
             Unlock();
             wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
 

@@ -26,52 +26,143 @@
 
 #include <wx/wx.h>
 
+#include "../../../include/tinyxml.h"
+
+#include "weather_routing_pi.h"
 #include "Utilities.h"
 #include "Boat.h"
 
 Boat::Boat()
+    : displacement_lbs(8000), lwl_ft(24), loa_ft(27), beam_ft(8),
+      frictional_drag(0), wake_drag(0)
 {
-    Plans.push_back(new BoatPlan(_("Initial Plan")));
-    displacement_lbs = 8000, lwl_ft = 24, loa_ft = 27, beam_ft = 8;
-    frictional_drag = 0, wake_drag = 0;
 }
 
 Boat::~Boat()
 {
 }
 
-bool Boat::OpenBinary(const char *filename)
+bool Boat::OpenXML(const char *filename)
 {
-    return false;
+    TiXmlDocument doc;
+    if(!doc.LoadFile( filename ))
+       return false;
 
-    FILE *f = fopen(filename, "r");
-    if(!f)
+    TiXmlHandle root( doc.RootElement() );
+    if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingBoat")) {
         return false;
+    }
 
-    int s = sizeof *this;
-    bool ret = true;
-    if(fread(this, s, 1, f) != 1)
-        ret = false;
+    bool cleared = false;
+    for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
+        if(!strcmp(e->Value(), "BoatCharacteristics")) {
+            displacement_lbs = strtod(e->Attribute("displacement_lbs"), 0);
+            lwl_ft = strtod(e->Attribute("lwl_ft"), 0);
+            loa_ft = strtod(e->Attribute("loa_ft"), 0);
+            beam_ft = strtod(e->Attribute("beam_ft"), 0);
+        } else
+        if(!strcmp(e->Value(), "BoatDrag")) {
+            frictional_drag = strtod(e->Attribute("frictional_drag"), 0);
+            wake_drag = strtod(e->Attribute("wake_drag"), 0);
+        } else
+        if(!strcmp(e->Value(), "Plan")) {
+            if(!cleared) {
+                for(unsigned int i=0; i<Plans.size(); i++)
+                    delete Plans[i];
+                Plans.clear();
+                cleared = true;
+            }
 
-    fclose(f);
-    return ret;
+            BoatPlan *plan = new BoatPlan(e->Attribute("Name"), *this);
+
+            plan->eta = strtod(e->Attribute("eta"), 0);
+            plan->luff_angle = strtod(e->Attribute("luff_angle"), 0);
+            plan->computed = strtod(e->Attribute("computed"), 0);
+
+            if(plan->computed)
+                plan->ComputeBoatSpeeds(*this);
+
+            for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
+                if(!strcmp(e->Value(), "SwitchPlan")) {
+                    SwitchPlan switchplan;
+                    switchplan.MaxWindSpeed = strtod(f->Attribute("MaxWindSpeed"), 0);
+                    switchplan.MinWindSpeed = strtod(f->Attribute("MinWindSpeed"), 0);
+                    switchplan.MaxWindDirection = strtod(f->Attribute("MaxWindDirection"), 0);
+                    switchplan.MinWindDirection = strtod(f->Attribute("MinWindDirection"), 0);
+                    switchplan.MaxWaveHeight = strtod(f->Attribute("MaxWaveHeight"), 0);
+                    switchplan.MinWaveHeight = strtod(f->Attribute("MinWaveHeight"), 0);
+                    switchplan.Name = f->Attribute("Name");
+                    plan->SwitchPlans.push_back(switchplan);
+                }
+            }
+
+            Plans.push_back(plan);
+        }
+    }
+    return true;
 }
 
-bool Boat::SaveBinary(const char *filename)
+bool Boat::SaveXML(const char *filename)
 {
-    return false;
+    TiXmlDocument doc;
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
+    doc.LinkEndChild( decl );
+    TiXmlElement * root = new TiXmlElement( "OCPNWeatherRoutingBoat" );
 
-    FILE *f = fopen(filename, "w");
-    if(!f)
-        return false;
+    doc.LinkEndChild( root );
+    char version[24];
+    sprintf(version, "%d.%d", PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR);
+    root->SetAttribute("version", version);
+    root->SetAttribute("creator", "Weather Routing by Sean DEpagnier");
 
-    int s = sizeof *this;
-    bool ret = true;
-    if(fwrite(this, s, 1, f) != 1)
-        ret = false;
+    TiXmlElement *boatcharacteristics = new TiXmlElement( "BoatCharacteristics" );
+    boatcharacteristics->SetAttribute("displacement_lbs", displacement_lbs);
+    boatcharacteristics->SetAttribute("lwl_ft", lwl_ft);
+    boatcharacteristics->SetAttribute("loa_ft", loa_ft);
+    boatcharacteristics->SetAttribute("beam_ft", beam_ft);
+    root->LinkEndChild(boatcharacteristics);
 
-    fclose(f);
-    return ret;
+    TiXmlElement *boatdrag = new TiXmlElement( "BoatDrag" );
+    char str[24];
+
+    sprintf(str, "%.4f", frictional_drag);
+    boatdrag->SetAttribute("frictional_drag", str);
+
+    sprintf(str, "%.4f", wake_drag);
+    boatdrag->SetAttribute("wake_drag", str);
+
+    root->LinkEndChild(boatdrag);
+
+    for(unsigned int i=0; i<Plans.size(); i++) {
+        TiXmlElement *plan = new TiXmlElement( "Plan" );
+        
+        plan->SetAttribute("Name", Plans[i]->Name.ToAscii());
+
+        sprintf(str, "%.4f", Plans[i]->eta);
+        plan->SetAttribute("eta", str);
+
+        sprintf(str, "%.4f", Plans[i]->luff_angle);
+        plan->SetAttribute("luff_angle", str);
+
+        plan->SetAttribute("computed", Plans[i]->computed);
+
+        for(unsigned int j=0; j<Plans[i]->SwitchPlans.size(); j++) {
+            TiXmlElement *switchplan = new TiXmlElement( "SwitchPlan" );
+            switchplan->SetAttribute("MaxWindSpeed", Plans[i]->SwitchPlans[j].MaxWindSpeed);
+            switchplan->SetAttribute("MinWindSpeed", Plans[i]->SwitchPlans[j].MinWindSpeed);
+            switchplan->SetAttribute("MaxWindDirection", Plans[i]->SwitchPlans[j].MaxWindDirection);
+            switchplan->SetAttribute("MinWindDirection", Plans[i]->SwitchPlans[j].MinWindDirection);
+            switchplan->SetAttribute("MaxWaveHeight", Plans[i]->SwitchPlans[j].MaxWaveHeight);
+            switchplan->SetAttribute("MinWaveHeight", Plans[i]->SwitchPlans[j].MinWaveHeight);
+            switchplan->SetAttribute("Name", Plans[i]->SwitchPlans[j].Name.ToAscii());
+            plan->LinkEndChild(switchplan);
+        }
+
+        root->LinkEndChild(plan);
+    }
+
+    doc.SaveFile(filename);
+    return true;
 }
 
 int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell)

@@ -107,11 +107,18 @@ void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
     UpdateEnd();
 }
 
+int debugcnt, debuglimit = -1, debugsize = 14;
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
-    if(m_RouteMapOverlay.Running())
+    if(m_RouteMapOverlay.Running()) {
         Stop();
-    else
+#if 1
+    debugcnt = 0;
+    debuglimit++;
+    Start();
+#endif
+
+    } else
         Start();
 }
 
@@ -267,6 +274,7 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
 
 void WeatherRoutingDialog::Start()
 {
+
     Reset();
     m_RouteMapOverlay.Start();
         
@@ -290,11 +298,12 @@ void WeatherRoutingDialog::UpdateStatistics()
     m_stState->SetLabel(m_RouteMapOverlay.Running() ? _("Running") : _("Stopped"));
     m_stRunTime->SetLabel(m_RunTime.Format());
     
-    int isochrons, routes, invroutes, positions;
-    m_RouteMapOverlay.GetStatistics(isochrons, routes, invroutes, positions);
+    int isochrons, routes, invroutes, skippositions, positions;
+    m_RouteMapOverlay.GetStatistics(isochrons, routes, invroutes, skippositions, positions);
     m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
     m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
     m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
+    m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
     m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
 }
 

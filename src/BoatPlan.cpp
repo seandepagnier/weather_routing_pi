@@ -273,6 +273,9 @@ double BoatPlan::VelocityBoat(double A, double VA)
     if(A < deg2rad(luff_angle))
         return 0;
 
+    if(eta <= 0) /* not ideal but prevent nans */
+        return 0;
+
     return sin(A/2) * sqrt(VA / eta);
 }
 
@@ -587,8 +590,8 @@ wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell)
     return _("");
 }
 
-BoatPlan::BoatPlan(wxString PlanName)
-    : Name(PlanName)
+BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
+    : Name(PlanName), eta(.25), luff_angle(15)
 {
 }
 
@@ -612,6 +615,7 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat)
         }
 
     CalculateVMG();
+    computed = true;
 }
 
 /* instead of traveling in the direction given, allow traveling at angles
@@ -687,6 +691,7 @@ void BoatPlan::SetSpeedsFromTable(BoatSpeedTable &table)
                 Set(DEGREE_COUNT-Wi, VWi, VB);
         }
     CalculateVMG();
+    computed = false;
 }
 
 BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
