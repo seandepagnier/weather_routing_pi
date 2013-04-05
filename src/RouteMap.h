@@ -93,7 +93,6 @@ public:
     void Print(); /* for debugging */
     void PrintSkip();
 
-    int OldIntersectionCount(Position *pos);
     int IntersectionCount(Position *pos);
     int Contains(Position *pos, bool test_children);
 
@@ -136,6 +135,8 @@ public:
 typedef std::list<IsoChron*> IsoChronList;
 
 struct RouteMapOptions {
+    void UpdateLongitudes();
+
     double StartLat, StartLon;
     double EndLat, EndLon;
     double dt; /* time in seconds between propagations */
@@ -149,6 +150,11 @@ struct RouteMapOptions {
     bool DetectLand, InvertedRegions, Anchoring, AllowDataDeficient;
 
     Boat boat;
+
+    bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,
+    this means the map cannot cross both 0 and 180 longitude.
+    To fully support this requires a lot more logic and would probably slow the algorithm
+    by about 8%.  Is it even useful?  */
 };
 
 class RouteMap
@@ -172,7 +178,7 @@ public:
     wxDateTime NewGribTime() { Lock(); wxDateTime time =  m_NewGribTime; Unlock(); return time; }
     bool HasGrib() { return m_NewGrib; }
 
-    void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; Unlock(); }
+    void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.UpdateLongitudes(); Unlock(); }
     RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
 

@@ -96,7 +96,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxTextCtrl* m_tEndLat;
 		wxTextCtrl* m_tEndLon;
 		
-		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDIALOG_NO_PARENT|wxSYSTEM_MENU ); 
+		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDIALOG_NO_PARENT ); 
 		~WeatherRoutingDialogBase();
 	
 };

@@ -253,12 +253,14 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
     if(id == m_startroute_menu_id) {
         m_pWeather_RoutingDialog->m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
         m_pWeather_RoutingDialog->m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
-    }
-
+    } else
     if(id == m_endroute_menu_id) {
         m_pWeather_RoutingDialog->m_tEndLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
         m_pWeather_RoutingDialog->m_tEndLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
-    }
+    } else
+        return;
+
+    m_pWeather_RoutingDialog->Reset();
 }
 
 bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)

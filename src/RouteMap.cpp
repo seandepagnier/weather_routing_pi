@@ -421,6 +421,9 @@ skipbearingcomputation:
         
         bool hitland = options.DetectLand ? CrossesLand(dlat, dlon) : false;
         if(!hitland && dist) {
+            if(options.positive_longitudes && dlon < 0)
+                dlon += 360;
+
             Position *rp = new Position(dlat, dlon, newsailplan, this);
 
             if(points) {
@@ -598,25 +601,6 @@ void IsoRoute::PrintSkip()
     }
 }
 
-int IsoRoute::OldIntersectionCount(Position *pos)
-{
-    int numintsct = 0;
-    Position *p1 = skippoints->point;
-    do {
-        Position *p2 = p1->next;
-
-        int dir = TestIntersectionXY(p1->lon, p1->lat, p2->lon, p2->lat,
-                                     pos->lon, pos->lat, pos->lon, 91);
-        switch(dir) {
-        case -2: case 2: return -1;
-        case 1: case -1: numintsct++;
-        }
-
-        p1 = p2;
-    } while(p1 != skippoints->point);
-    return numintsct;
- }
-
 /* how many times do we cross this route going from this point to infinity,
    return -1 if inconclusive */
 int IsoRoute::IntersectionCount(Position *pos)
@@ -632,7 +616,8 @@ int IsoRoute::IntersectionCount(Position *pos)
         /* we could avoid completely recomputing the state every time,
            and use all 9 states, cutting comparison tests and switches
            in half (nearly double the speed of this routine)
-           but it would complicate things.. how often is this called? */
+           but it would complicate things, and this routine tends to
+           take less than 1% of the total runtime */
         int state = (lon < s1plon) + (lon < s2plon);
         if(state == 1) {
             double s1plat = s1->point->lat, s2plat = s2->point->lat;
@@ -682,22 +667,6 @@ int IsoRoute::IntersectionCount(Position *pos)
 int IsoRoute::Contains(Position *pos, bool test_children)
 {
     int numintsct = IntersectionCount(pos);
-
-#if 0
-    static int runs;
-    runs++;
-    int oldnumintsct = OldIntersectionCount(pos);
-    if(oldnumintsct != numintsct) {
-        printf("oldint doesnot match intsct: %d %d, runs %d\n", numintsct, oldnumintsct, runs);
-        Print();
-        printf("\n");
-        PrintSkip();
-        printf("\n%.4f %.4f\n", pos->lon, pos->lat);
-
-        int a = IntersectionCount(pos);
-        int b = OldIntersectionCount(pos);
-    }
-#endif
 
     if(numintsct == -1)
         return -1;
@@ -803,9 +772,11 @@ bool IsoRoute::FindIsoRouteBounds(double bounds[4])
     }
     skippoints = maxlat; /* set to max lat for merging to keep outside */
     
+#if 0
     /* cross date line? */
     if(bounds[MAXLON] - bounds[MINLON] > 180)
         return false; /* possibly invalid for longitude */
+#endif
     return true;
 }
 
@@ -813,9 +784,9 @@ bool IsoRoute::FindIsoRouteBounds(double bounds[4])
    we need to update the skip list if this point falls on a skip position*/
 void IsoRoute::RemovePosition(SkipPosition *s, Position *p)
 {
-    if(skippoints == skippoints->next) {
-        delete skippoints->point;
-        delete skippoints;
+    if(s == s->next) {
+        delete s->point;
+        delete s;
         skippoints = NULL;
     } else {
         p->next->prev = p->prev;
@@ -853,7 +824,6 @@ void IsoRoute::RemovePosition(SkipPosition *s, Position *p)
         skippoints = points->BuildSkipList();
 #endif
     }
-
     delete p;
 }
 
@@ -891,12 +861,14 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
     if(sp->point == p) {
         sp->quadrant = quadrant; /* reuse p with this quadrant */
 
-        if(quadrant == sp->prev->quadrant) {
+        if(quadrant == sp->prev->quadrant && sp != ss) {
             sp->point = sp->prev->point;
             if(sp->prev == spend)
                 spend = sp;
             if(sp->prev == ssend)
                 ssend = sp;
+            if(ss == sp->prev)
+                ss = sp;
             sp->prev->Remove();
         }
 
@@ -922,6 +894,9 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
         } else if(ss->point == s) {
             if(quadrant == ss->quadrant) {
             remove:
+              if(sp == ss)
+                printf("sp == ss.. this is bad\n");
+
                 if(ss == spend)
                     spend = ss->next;
                 if(ss == ssend)
@@ -966,18 +941,81 @@ bool UpdateEnd(SkipPosition *spend, SkipPosition *sr)
     return false;
 }
 
+#define COMPUTE_MIN_MAX(quadrant, A, B, N)        \
+      switch(quadrant) { \
+      default: min##N##x = B##x; max##N##x = A##x; min##N##y = B##y, max##N##y = A##y; break; \
+      case 1:  min##N##x = A##x; max##N##x = B##x; min##N##y = B##y, max##N##y = A##y; break; \
+      case 2:  min##N##x = B##x; max##N##x = A##x; min##N##y = A##y, max##N##y = B##y; break; \
+      case 3:  min##N##x = A##x; max##N##x = B##x; min##N##y = A##y, max##N##y = B##y; break; \
+      }
+
+#define COMPUTE_STATE(state, S, N)            \
+    state = 0; \
+    if(S##x >= min##N##x) state+=4; \
+    if(S##x >  max##N##x) state+=4; \
+    if(S##y >= min##N##y) state+=12; \
+    if(S##y >  max##N##y) state+=12; \
+
+    /* 0 1    0  4  8
+       2 3   12 16 20
+             24 28 32 */
+#define UPDATE_STATE(state, quadrant, skip, S, N)       \
+    switch(state + quadrant) { \
+    case 1:  if(S##x >= min##N##x) { skip##c1: if(S##x > max##N##x) state = 8; else state = 4; } /*f*/ \
+    case 0:  goto skip; \
+    case 3:  if(S##x >= min##N##x) { if(S##y >= min##N##y) break; goto skip##c1; } /*f*/ \
+    case 2:  if(S##y >= min##N##y) { if(S##y > max##N##y) state = 24; else state = 12; } goto skip; \
+    \
+    case 6:  if(S##y >= min##N##y) break; /*f*/ \
+    case 4:  if(S##x < min##N##x) state = 0; goto skip; \
+    case 7:  if(S##y >= min##N##y) break; /*f*/ \
+    case 5:  if(S##x > max##N##x) state = 8; goto skip; \
+    \
+    case 8:  if(S##x <= max##N##x) { skip##c8: if(S##x < min##N##x) state = 0; else state = 4; } /*f*/ \
+    case 9:  goto skip; \
+    case 10: if(S##x <= max##N##x) { if(S##y >= min##N##y) break; goto skip##c8; } /*f*/ \
+    case 11: if(S##y >= min##N##y) { if(S##y > max##N##y) state = 32; else state = 20; } goto skip; \
+    \
+    case 13: if(S##x >= min##N##x) break; /*f*/ \
+    case 12: if(S##y < min##N##y) state = 0;  goto skip; \
+    case 15: if(S##x >= min##N##x) break; /*f*/ \
+    case 14: if(S##y > max##N##y) state = 24; goto skip; \
+      /* 16-19 fall through */ \
+    case 20: if(S##x <= max##N##x) break; /*f*/ \
+    case 21: if(S##y < min##N##y) state = 8;  goto skip; \
+    case 22: if(S##x <= max##N##x) break; /*f*/ \
+    case 23: if(S##y > max##N##y) state = 32; goto skip; \
+    \
+    case 25: if(S##x >= min##N##x) { if(S##y <= max##N##y) break; goto skip##c27; } /*f*/ \
+    case 24: if(S##y <= max##N##y) { if(S##y < min##N##y) state = 0; else state = 12; } goto skip; \
+    case 27: if(S##x >= min##N##x) { skip##c27: if(S##x > max##N##x) state = 32; else state = 28; } /*f*/ \
+    case 26: goto skip; \
+    \
+    case 28: if(S##y <= max##N##y) break; /*f*/ \
+    case 30: if(S##x < min##N##x) state = 24; goto skip; \
+    case 29: if(S##y <= max##N##y) break; /*f*/ \
+    case 31: if(S##x > max##N##x) state = 32; goto skip; \
+    \
+    case 32: if(S##x <= max##N##x) { if(S##y <= max##N##y) break; goto skip##c34; } /*f*/ \
+    case 33: if(S##y <= max##N##y) { if(S##y < min##N##y) state = 8; else state = 20; } goto skip; \
+    case 34: if(S##x <= max##N##x) { skip##c34: if(S##x < min##N##x) state = 24; else state = 28; } /*f*/ \
+    case 35: goto skip; \
+    }
+
 /* This function is the heart of the route map algorithm.
    Essentially search for intersecting line segments, and flip them correctly
    while maintaining a skip list.
  */
 bool Normalize(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions)
 {
+#if 1
   static int ncount;
   ncount++;
+#endif
 
-reset:
   bool normalizing;
 
+reset:
   SkipPosition *spend=route1->skippoints, *ssend=route2->skippoints;
 
   if(!spend) {
@@ -989,7 +1027,7 @@ reset:
   }
 
   if(route1 == route2) {
-    if(spend->prev == spend->next) { /* 1 or 2 items only? */
+    if(spend->prev == spend->next) { /* 1 or 2 items only? could test points instead of skip points.. */
       delete route1;
       return true;
     }
@@ -997,31 +1035,43 @@ reset:
     normalizing = true;
   } else {
     if(!ssend) {
-        if(spend) {
-            route1->skippoints = spend;
-            rl.push_back(route1);
-        }
+      if(spend) {
+        route1->skippoints = spend;
+        rl.push_back(route1);
+      }
       return true;
     }
+
+    if(ssend->point->lat > spend->point->lat) {
+        IsoRoute *t = route1;
+        route1 = route2;
+        route2 = t;
+        printf("attempting to correct\n");
+        goto reset;
+    }
+
     normalizing = false;
   }
 
-#if 0
- {
-     printf("n: %d\n", ncount);
-  printf("r1:\n");
-  route1->Print();
-  if(!normalizing) {
-      printf("r2:\n");
-      route2->Print();
-  }
-  }
-#endif
 
   SkipPosition *sp = spend;
 
-  do {
   startnormalizing:
+#if 0
+  if(ncount == 29331)
+ {
+   printf("n: %d\n", ncount);
+   printf("r1:\n");
+   route1->skippoints = spend;
+   route1->Print();
+   if(!normalizing) {
+     printf("r2:\n");
+     route2->Print();
+   }
+ }
+#endif
+
+  do {
 
     SkipPosition *sq = sp->next;
     SkipPosition *sr, *ss;
@@ -1034,12 +1084,7 @@ reset:
     double px = p->lon, qx = q->lon, py = p->lat, qy = q->lat;
         
     double minx, maxx, miny, maxy;
-    switch(sp->quadrant) {
-    case 0: minx = qx; maxx = px; miny = qy, maxy = py; break;
-    case 1: minx = px; maxx = qx; miny = qy, maxy = py; break;
-    case 2: minx = qx; maxx = px; miny = py, maxy = qy; break;
-    case 3: minx = px; maxx = qx; miny = py, maxy = qy; break;
-    }
+    COMPUTE_MIN_MAX(sp->quadrant, p, q,)
         
     Position *r, *s = ss->point;
 
@@ -1047,14 +1092,11 @@ reset:
     double rx, ry;
     double sx = s->lon, sy = s->lat;
 
-    int state = 0;
-    if(sx >= minx) state+=4;
-    if(sx >  maxx) state+=4;
-    if(sy >= miny) state+=12;
-    if(sy >  maxy) state+=12;
+    int state, rstate, pstate;
+    COMPUTE_STATE(state, s,)
 
     int nr;
-    Position *pend, *rend;
+    Position *pstart, *pend, *rstart, *rend;
 
     do {
     sr = ss;
@@ -1063,190 +1105,143 @@ reset:
     s = ss->point;
     sx = s->lon, sy = s->lat;
 
-    /* 0 1    0  4  8
-       2 3   12 16 20
-             24 28 32 */
-    switch(state + sr->quadrant) {
-    case 1:  if(sx >= minx) { c1: if(sx > maxx) state = 8; else state = 4; } /* fall */
-    case 0:  goto skip;
-    case 3:  if(sx >= minx) { if(sy >= miny) break; goto c1; } /* fall */
-    case 2:  if(sy >= miny) { if(sy > maxy) state = 24; else state = 12; } goto skip;
-
-    case 6:  if(sy >= miny) break; /* fall */
-    case 4:  if(sx < minx) state = 0; goto skip;
-    case 7:  if(sy >= miny) break; /* fall */
-    case 5:  if(sx > maxx) state = 8; goto skip;
-
-    case 8:  if(sx <= maxx) { c8: if(sx < minx) state = 0; else state = 4; } /* fall */
-    case 9:  goto skip;
-    case 10: if(sx <= maxx) { if(sy >= miny) break; goto c8; } /* fall */
-    case 11: if(sy >= miny) { if(sy > maxy) state = 32; else state = 20; } goto skip;
-
-    case 13: if(sx >= minx) break; /* fall */
-    case 12: if(sy < miny) state = 0;  goto skip;
-    case 15: if(sx >= minx) break; /* fall */
-    case 14: if(sy > maxy) state = 24; goto skip;
-
-      /* 16-19 unused (state is recomputed below) */
-
-    case 20: if(sx <= maxx) break; /* fall */
-    case 21: if(sy < miny) state = 8;  goto skip;
-    case 22: if(sx <= maxx) break; /* fall */
-    case 23: if(sy > maxy) state = 32; goto skip;
-  
-    case 25: if(sx >= minx) { if(sy <= maxy) break; goto c27; } /* fall */
-    case 24: if(sy <= maxy) { if(sy < miny) state = 0; else state = 12; } goto skip;
-    case 27: if(sx >= minx) { c27: if(sx > maxx) state = 32; else state = 28; } /* fall */
-    case 26: goto skip;
-
-    case 28: if(sy <= maxy) break; /* fall */
-    case 30: if(sx < minx) state = 24; goto skip;
-    case 29: if(sy <= maxy) break; /* fall */
-    case 31: if(sx > maxx) state = 32; goto skip;
-
-    case 32: if(sx <= maxx) { if(sy <= maxy) break; goto c34; } /* fall */
-    case 33: if(sy <= maxy) { if(sy < miny) state = 8; else state = 20; } goto skip;
-    case 34: if(sx <= maxx) { c34: if(sx < minx) state = 24; else state = 28; } /* fall */
-    case 35: goto skip;
-    }
+    UPDATE_STATE(state, sr->quadrant, skip, s,)
 
     nr = 0;
     if(normalizing) {
-        if(sp == sr)
-            nr = 1; /* only occurs during normalizing (first round) */
-        else if (sq == sr)
-            nr = 2; /* only occurs normalizing (second round) */
-        else if(ss == sp)
-            nr = 3; /* only occurs normalizing (last round) */
-    }
-
-    if(nr == 1 || 1/* ok to always take this */) {
-        /* normalizing and overlapping round.. don't bother to calculate smaaller bounds */
+      if(sp == sr) {
+        nr = 1; /* only occurs during normalizing (first round) */
+        /* normalizing and overlapping round.. don't bother to calculate smaller bounds */
         pstart = sp->point;
         pend = sq->point;
-
+      
         rstart = sr->point;
         rend = ss->point;
-    } else {
-        double minrx, maxrx, minry, maxry;
-        switch(sr->quadrant) {
-        case 0: minrx = sx; maxrx = rx; minry = sy, maxry = ry; break;
-        case 1: minrx = rx; maxrx = sx; minry = sy, maxry = ry; break;
-        case 2: minrx = sx; maxrx = rx; minry = ry, maxry = sy; break;
-        case 3: minrx = rx; maxrx = sx; minry = ry, maxry = sy; break;
-        }
-
-        pstart = NULL;
-        p = sp->point;
-        COMPUTE_STATE();
-        do {
-            UPDATE_STATE();
-            if(!pstart) {
-                if(p == sp->point)
-                    pstart = p;
-                else
-                    pstart = p->prev;
-            }
-            pend = p;
-        skipp:
-            p = p->next;
-        } while(p != sq->point);
-        p = pstart;
-        
-        rstart = NULL;
-        r = sr->point;
-        rstate = state; /* still valid from before */
-        do {
-            UPDATE_STATE();
-            if(!rstart) {
-                if(r == rp->point)
-                    rstart = r;
-                else
-                    rstart = r->prev;
-            }
-            rend = p;
-        skipr:
-            r = r->next;
-        } while(r != ss->point);
+        goto skip_bounds_compute;
+      }
+      else if (sq == sr)
+        nr = 2; /* only occurs normalizing (second round) */
+      else if(ss == sp)
+        nr = 3; /* only occurs normalizing (last round) */
     }
 
-    p =  pstart;
-    rnewend = rend;
+#if 1 /* this is only slightly faster, barely can measure a difference */
+    /* compute bounds for these skip segments */
+    double minrx, maxrx, minry, maxry;
+    rx = sr->point->lon, ry = sr->point->lat;
+    COMPUTE_MIN_MAX(sr->quadrant, r, s, r)
+        
+    pstart = pend = NULL;
+    q = sp->point;
+    qx = q->lon, qy = q->lat;
+    COMPUTE_STATE(pstate, q, r)
+    do {
+      p = q;
+      q = q->next;
+      qx = q->lon, qy = q->lat;
+      UPDATE_STATE(pstate, sp->quadrant, skipp, q, r)
+      if(!pstart)
+        pstart = p;
+      pend = q;
+      COMPUTE_STATE(pstate, q, r)
+      goto startingp;
+      skipp:
+      if(pstart)
+        break; /* have start, must be done */
+    startingp:;
+    } while(q != sq->point);
+    p = pstart;
+    if(!pstart)
+      goto done;
+    if(pstart == pend)
+      goto done;
+    
+    rstart = rend = NULL;
+    s = sr->point;
+    rstate = state; /* still valid from before */
+    do {
+      r = s;
+      s = s->next;
+      sx = s->lon, sy = s->lat;
+      UPDATE_STATE(rstate, sr->quadrant, skipr, s,)
+      if(!rstart)
+        rstart = r;
+      rend = s;
+      COMPUTE_STATE(rstate, s,)
+      goto startingr;
+      skipr:
+      if(rstart)
+        break; /* have start, must be done */
+    startingr:;
+    } while(s != ss->point);
+
+    if(!rstart)
+      goto done;
+#else
+    pstart = sp->point;
+    pend = sq->point;
+      
+    rstart = sr->point;
+    rend = ss->point;
+#endif
+    skip_bounds_compute:
+    
+    p = pstart;
     do {
       q = p->next;
       
       switch(nr) {
       case 1:
-        r = q;
-        if(r == rnewend)
+        s = q;
+        if(s == rend)
           goto done;
-        r = r->next;
-        if(r == rnewend)
-          goto done;
+        s = s->next;
         break;
       case 2:
-        r = sr->point;
-        if(r == q) {
-          r = r->next;
-          if(r == rnewend)
-            goto done;
-        }
+        s = rstart;
+        if(s == q)
+          s = s->next;
         break;
       case 3:
-        r = sr->point;
-        if(ss->point == p) {
-            rnewend = rend->prev;
-            if(r == rnewend)
-                goto done;
-        }
+        s = rstart;
+        if(rend == p)
+          rend = rend->prev;
         break;
       default:
-        r = sr->point;
+        s = rstart;
       }
+
+      if(s == rend)
+        goto done;
 
       px = p->lon, py = p->lat;
       qx = q->lon, qy = q->lat;
 
       double minpqx, maxpqx, minpqy, maxpqy;
-      switch(sp->quadrant) {
-      case 0: minpqx = qx; maxpqx = px; minpqy = qy, maxpqy = py; break;
-      case 1: minpqx = px; maxpqx = qx; minpqy = qy, maxpqy = py; break;
-      case 2: minpqx = qx; maxpqx = px; minpqy = py, maxpqy = qy; break;
-      case 3: minpqx = px; maxpqx = qx; minpqy = py, maxpqy = qy; break;
-      }
+      COMPUTE_MIN_MAX(sp->quadrant, p, q, pq)
 
-      COMPUTE_STATE(pr);
+      sx = s->lon, sy = s->lat;
+      COMPUTE_STATE(state, s, pq);
       do {
+        r = s;
         s = r->next;
 
-        rx = r->lon, ry = r->lat;
         sx = s->lon, sy = s->lat;
+        UPDATE_STATE(state, sr->quadrant, skippr, s, pq);
 
-        UPDATE_STATE(pr);
-                
+        rx = r->lon, ry = r->lat;
         dir = TestIntersectionXY(px, py, qx, qy, rx, ry, sx, sy);
         switch(dir) {
         case -2:
+          route1->skippoints = spend;
+          route2->skippoints = ssend;
           route1->RemovePosition(sq, q);
-          printf("remove -2\n");
-          if(!route1->skippoints) { /* nothing left to merge */
-            delete route1;
-            if(!normalizing)
-                rl.push_back(route2);
-            return true;
-          }
-          goto reset; /* must reset until removeposition is optimized */
-          break;
+          goto reset;
         case 2:
+          route1->skippoints = spend;
+          route2->skippoints = ssend;
           route2->RemovePosition(ss, s);
-          printf("remove 2\n");
-          if(!route2->skippoints) { /* nothing left to merge */
-            delete route2;
-            rl.push_back(route1);
-            return true;
-          }
-          goto reset; /* must reset until removeposition is optimized */
-          break;
+          goto reset;
         case -1:
         case 1:
           if(!normalizing) { /* sanity check for merging */
@@ -1344,9 +1339,10 @@ reset:
             route2 = route1;
             ssend = spend;
             spend = sr->next; /* after old sq we are done.. this is known */
-            /* continue from here and begin to normalize, could in theory somehow skip to
-               p for this round instead of starting at sp->point.. would this matter? */
+            /* continue from here and begin to normalize */
 #if 0 /* these only needed if we could jump back in too a more optimal spot */
+            /*  could in theory somehow skip to p for this round instead of starting
+                at sp->point.. but I doubt it would speed things up that much. */
             sr = sp, ss = sr->next;
             pend = rend = ss->point;
 #endif
@@ -1355,20 +1351,13 @@ reset:
           goto startnormalizing;
         }
       skipmerge:        
-      skippr:
-        COMPUTE_STATE(pr);
-        r = s;
-      } while(r != rnewend);
-
+        COMPUTE_STATE(state, s, pq);
+      skippr: ;
+      } while(s != rend);
       p = q;
     } while(p != pend);
  done:
-
-    state = 0; /* recompute state, could use past state to optimize here, is it worth it? */
-    if(sx >= minx) state+=4;
-    if(sx >  maxx) state+=4;
-    if(sy >= miny) state+=12;
-    if(sy >  maxy) state+=12;
+    COMPUTE_STATE(state, s,)
   skip: ;
     } while(ss != ssend);
   sp = sq;
@@ -1386,7 +1375,7 @@ reset:
 bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions)
 {
     if(route1->direction == -1 && route2->direction == -1) {
-        printf("cannot merge two inverted routes yet\n");
+        printf("cannot merge two inverted routes\n");
         exit(1);
     }
 
@@ -1396,7 +1385,8 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
     bool r2bv = route2->FindIsoRouteBounds(bounds2);
     if(bounds1[MINLAT] > bounds2[MAXLAT] || bounds1[MAXLAT] < bounds2[MINLAT])
         return false;
-    if(r1bv && r2bv && (bounds1[MINLON] > bounds2[MAXLON] || bounds1[MAXLON] < bounds2[MINLON]))
+    if(/*r1bv && r2bv &&*/
+       (bounds1[MINLON] > bounds2[MAXLON] || bounds1[MAXLON] < bounds2[MINLON]))
         return false;
 
     /* make sure we start on the outside */
@@ -1616,7 +1606,7 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib, R
             } else
                 x->ApplyCurrents(grib, options);
 
-            routelist.push_back(x); /* TODO: is it faster if we push front here instead? */
+            routelist.push_back(x);
         } else
             delete x; /* didn't need it */
     }
@@ -1630,6 +1620,14 @@ bool IsoChron::Contains(double lat, double lon)
             return true;
 
     return false;
+}
+
+void RouteMapOptions::UpdateLongitudes()
+{
+    if((positive_longitudes = fabs(average_longitude(StartLon, EndLon)) > 90)) {
+        StartLon = positive_degrees(StartLon);
+        EndLon = positive_degrees(EndLon);
+    }
 }
 
 RouteMap::RouteMap()
@@ -1661,14 +1659,19 @@ bool RouteMap::ReduceList(IsoRouteList &merged,
             IsoRouteList rl;
 
             extern int debugcnt, debuglimit;
-            if((origin.size() <= 16 || debugcnt++ < debuglimit)
-               && Merge(rl, r1, r2, 0, options.InvertedRegions)) {
+            if(
 #if 0
+              (origin.size() <= 50 || debugcnt++ < debuglimit) &&
+#endif
+              Merge(rl, r1, r2, 0, options.InvertedRegions)) {
+#if 1 /* TODO: find fastest method */
+# if 1
+              routelist.splice(routelist.end(), rl);
+# else
                 for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); ++it)
-//                    routelist.push_back(*it);
                     routelist.push_front(*it);
-#else /* merge new routes with each other right away before hitting the main list,
-         TODO: does this still offer a speed improvement? if so make this a recursive function instead */
+# endif
+#else /* merge new routes with each other right away before hitting the main list */
                 IsoRouteList unmerged2;
                 while(rl.size() > 0) {
                     r1 = rl.front();
@@ -1697,13 +1700,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged,
 
     remerge:
         /* put any unmerged back in list to continue */
-#if 0
-        for(IsoRouteList::iterator it = unmerged.begin(); it != unmerged.end(); ++it)
-            routelist.push_back(*it);
-        unmerged.clear();
-#else
         routelist.splice(routelist.end(), unmerged);
-#endif
     }
     return true;
 }
@@ -1711,7 +1708,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged,
 /* enlarge the map by 1 level */
 bool RouteMap::Propagate()
 {
-#if 1
+#if 0
     extern int debugsize;
     if((int)origin.size() > debugsize)
         return false;

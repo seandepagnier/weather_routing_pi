@@ -71,3 +71,5 @@ double rad2posdeg(double radians);
 
 double square(double x);
 double cube(double x);
+
+double average_longitude(double lon1, double lon2);

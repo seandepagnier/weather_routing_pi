@@ -107,12 +107,12 @@ void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
     UpdateEnd();
 }
 
-int debugcnt, debuglimit = -1, debugsize = 14;
+int debugcnt, debuglimit = -1, debugsize = 18;
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
     if(m_RouteMapOverlay.Running()) {
         Stop();
-#if 1
+#if 0
     debugcnt = 0;
     debuglimit++;
     Start();
@@ -244,13 +244,14 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
     }
 
     static int cycles; /* don't refresh all the time */
-    if(++cycles > 10 && m_RouteMapOverlay.Updated()) {
+    if(++cycles > 40 && m_RouteMapOverlay.Updated()) {
         cycles = 0;
 
         m_RunTime += wxDateTime::Now() - m_StartTime;
         m_StartTime = wxDateTime::Now();
 
         UpdateStatistics();
+        Refresh();
         GetParent()->Refresh();
     }
 
@@ -274,7 +275,6 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
 
 void WeatherRoutingDialog::Start()
 {
-
     Reset();
     m_RouteMapOverlay.Start();
         
@@ -309,6 +309,9 @@ void WeatherRoutingDialog::UpdateStatistics()
 
 void WeatherRoutingDialog::Reset()
 {
+    if(m_RouteMapOverlay.Running())
+        return;
+
     RouteMapOptions options = m_RouteMapOverlay.GetOptions();
     m_tStartLat->GetValue().ToDouble(&options.StartLat);
     m_tStartLon->GetValue().ToDouble(&options.StartLon);
