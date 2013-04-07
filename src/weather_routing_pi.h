@@ -36,6 +36,16 @@
 
 #include "../../../include/ocpn_plugin.h"
 #include "../../../include/ocpndc.h"
+
+/* make some warnings go away */
+#ifdef MIN
+#undef MIN
+#endif
+
+#ifdef MAX
+#undef MAX
+#endif
+
 #include "../../../include/wx/jsonreader.h"
 #include "../../../include/wx/jsonwriter.h"
 

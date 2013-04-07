@@ -24,16 +24,21 @@
  ***************************************************************************
  */
 
-#ifdef __WXMSW__
+#ifdef __MSVC__
 #include <float.h>
 #include <iostream>
 #include <limits>
+
 # if !defined(M_PI)
 # define M_PI		3.14159265358979323846	/* pi */
 # endif
 
 # if !defined(NAN)
 # define NAN std::numeric_limits<double>::quiet_NaN ()
+# endif
+
+# if !defined(INFINITY)
+# define INFINITY std::numeric_limits<double>::infinity ()
 # endif
 
 #define isnan _isnan

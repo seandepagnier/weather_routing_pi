@@ -798,8 +798,8 @@ double BoatPlan::TrueWindSpeed(double VB, double W, double maxVW)
 
     int W1i = W1/DEGREE_STEP, W2i = W2/DEGREE_STEP;
 
-    double VB1min = 1.0/0.0, VW1min = NAN, VB1max = 0, VW1max = NAN;
-    double VB2min = 1.0/0.0, VW2min = NAN, VB2max = 0, VW2max = NAN;
+    double VB1min = INFINITY, VW1min = NAN, VB1max = 0, VW1max = NAN;
+    double VB2min = INFINITY, VW2min = NAN, VB2max = 0, VW2max = NAN;
 
     for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
         if(wind_speeds[VWi] > maxVW)

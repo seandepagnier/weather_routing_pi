@@ -322,7 +322,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
         bool binary = filename.GetExt() == _("xml") || filename.GetExt() == _("XML");
 
         if(binary) {
-            wxString error = m_Boat.OpenXML(openDialog.GetPath().ToAscii());
+            wxString error = m_Boat.OpenXML(openDialog.GetPath().mb_str());
             if(error.empty())
                 RepopulatePlans();
             else {
@@ -366,7 +366,7 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
         bool binary = filename.GetExt() == _("obs") || filename.GetExt() == _("OBS");
 
         if(binary) {
-            wxString error = m_Boat.SaveXML(saveDialog.GetPath().ToAscii());
+            wxString error = m_Boat.SaveXML(saveDialog.GetPath().mb_str());
             if(!error.empty()) {
                 wxMessageDialog md(this, error,
                                    _("OpenCPN Weather Routing Plugin"),

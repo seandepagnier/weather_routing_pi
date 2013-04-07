@@ -72,7 +72,7 @@ wxString Boat::OpenXML(wxString filename)
                 cleared = true;
             }
 
-            BoatPlan *plan = new BoatPlan(e->Attribute("Name"), *this);
+            BoatPlan *plan = new BoatPlan(wxString::FromUTF8(e->Attribute("Name")), *this);
 
             plan->computed = strtod(e->Attribute("computed"), 0);
 
@@ -101,7 +101,7 @@ wxString Boat::OpenXML(wxString filename)
                     switchplan.MinWindDirection = strtod(f->Attribute("MinWindDirection"), 0);
                     switchplan.MaxWaveHeight = strtod(f->Attribute("MaxWaveHeight"), 0);
                     switchplan.MinWaveHeight = strtod(f->Attribute("MinWaveHeight"), 0);
-                    switchplan.Name = f->Attribute("Name");
+                    switchplan.Name = wxString::FromUTF8(f->Attribute("Name"));
                     plan->SwitchPlans.push_back(switchplan);
                 }
             }

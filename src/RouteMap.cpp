@@ -184,7 +184,7 @@ void BoatOverGround(double B, double VB, double C, double VC, double &BG, double
 inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
                               double x3, double y3, double x4, double y4)
 {
-#if 1
+#if 0 /* this never gets hit due to the use of states.. so it doens't help performance */
     /* quick test to avoid calculations if segments are far apart */
     if((x3 > x1 && x3 > x2 && x4 > x1 && x4 > x2) ||
        (x3 < x1 && x3 < x2 && x4 < x1 && x4 < x2) ||
@@ -258,7 +258,8 @@ int ComputeQuadrant(Position *p, Position *q)
 
     double diff = p->lon - q->lon;
     if(diff > 0) {
-        if(diff > 180)
+        if(diff > 180) /* since we don't fully support crossing both 0 and 180 merdians,
+                          this never actually occurs.. but it is needed if support is extended */
             quadrant += 1;
     } else if(diff > -180)
         quadrant += 1;
@@ -1038,7 +1039,7 @@ reset:
       return true;
     }
 
-    if(ssend->point->lat > spend->point->lat) {
+    if(ssend->point->lat > spend->point->lat) { // this is never hit, should remove
         IsoRoute *t = route1;
         route1 = route2;
         route2 = t;
@@ -1147,8 +1148,8 @@ reset:
     p = pstart;
     if(!pstart)
       goto done;
-    if(pstart == pend)
-      goto done;
+//    if(pstart == pend)  // this is never hit in practice
+//      goto done;
     
     rstart = rend = NULL;
     s = sr->point;
