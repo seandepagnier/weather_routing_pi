@@ -31,9 +31,9 @@
 #include "../../../include/wx/jsonreader.h"
 #include "../../../include/wx/jsonwriter.h"
 
+#include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
-#include "Utilities.h"
 
 RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
     : wxThread(wxTHREAD_JOINABLE), m_RouteMapOverlay(routemapoverlay)

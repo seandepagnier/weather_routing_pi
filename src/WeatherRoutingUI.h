@@ -96,7 +96,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxTextCtrl* m_tEndLat;
 		wxTextCtrl* m_tEndLon;
 		
-		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDIALOG_NO_PARENT ); 
+		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxRESIZE_BORDER ); 
 		~WeatherRoutingDialogBase();
 	
 };
@@ -176,7 +176,7 @@ class WeatherRoutingSettingsDialogBase : public wxDialog
 		wxSpinCtrl* m_sAlternateRouteThickness;
 		wxCheckBox* m_cbAlternatesForAll;
 		
-		WeatherRoutingSettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		WeatherRoutingSettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
 		~WeatherRoutingSettingsDialogBase();
 	
 };
@@ -194,6 +194,9 @@ class BoatDialogBase : public wxDialog
 		wxPanel* m_panel3;
 		wxChoice* m_cPlotType;
 		wxChoice* m_cPlotAxis;
+		wxSpinCtrl* m_sWindSpeed;
+		wxSpinCtrl* m_spinCtrl20;
+		wxSpinCtrl* m_spinCtrl21;
 		wxStaticText* m_stTrueWindAngle;
 		wxStaticText* m_staticText21;
 		wxStaticText* m_stTrueWindKnots;
@@ -206,11 +209,10 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText212;
 		wxStaticText* m_stBoatKnots;
 		wxStaticText* m_staticText232;
-		wxSpinCtrl* m_sWindSpeed;
-		wxSpinCtrl* m_spinCtrl20;
-		wxSpinCtrl* m_spinCtrl21;
 		wxButton* m_bClose;
 		wxPanel* m_panel31;
+		wxStaticText* m_staticText93;
+		wxStaticText* m_stCSVFile;
 		wxStaticText* m_staticText351;
 		wxSpinCtrl* m_sFileCSVWindSpeedStep;
 		wxStaticText* m_staticText36;

@@ -42,16 +42,15 @@ Boat::~Boat()
 {
 }
 
-bool Boat::OpenXML(const char *filename)
+wxString Boat::OpenXML(wxString filename)
 {
     TiXmlDocument doc;
-    if(!doc.LoadFile( filename ))
-       return false;
+    if(!doc.LoadFile( filename.ToAscii() ))
+        return _("Failed to load file");
 
     TiXmlHandle root( doc.RootElement() );
-    if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingBoat")) {
-        return false;
-    }
+    if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingBoat"))
+        return _("Failed to read xml file (no OCPWeatherRoutingBoat node)");
 
     bool cleared = false;
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
@@ -75,12 +74,23 @@ bool Boat::OpenXML(const char *filename)
 
             BoatPlan *plan = new BoatPlan(e->Attribute("Name"), *this);
 
-            plan->eta = strtod(e->Attribute("eta"), 0);
-            plan->luff_angle = strtod(e->Attribute("luff_angle"), 0);
             plan->computed = strtod(e->Attribute("computed"), 0);
 
-            if(plan->computed)
+            if(plan->computed) {
+                plan->eta = strtod(e->Attribute("eta"), 0);
+                plan->luff_angle = strtod(e->Attribute("luff_angle"), 0);
+                plan->wind_speed_step = 3;
+                plan->wind_degree_step = DEGREE_STEP;
+                plan->csvFileName = _("<Computed>");
                 plan->ComputeBoatSpeeds(*this);
+            } else {
+                plan->csvFileName = e->Attribute("csvFileName");
+                BoatSpeedTable table;
+                if(table.Open(plan->csvFileName.ToAscii(), plan->wind_speed_step, plan->wind_degree_step)) {
+                    plan->SetSpeedsFromTable(table);
+                } else
+                    return _("Failed to open file: ") + plan->csvFileName;
+            }
 
             for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
                 if(!strcmp(e->Value(), "SwitchPlan")) {
@@ -99,10 +109,10 @@ bool Boat::OpenXML(const char *filename)
             Plans.push_back(plan);
         }
     }
-    return true;
+    return wxString();
 }
 
-bool Boat::SaveXML(const char *filename)
+wxString Boat::SaveXML(wxString filename)
 {
     TiXmlDocument doc;
     TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
@@ -138,13 +148,16 @@ bool Boat::SaveXML(const char *filename)
         
         plan->SetAttribute("Name", Plans[i]->Name.ToAscii());
 
-        sprintf(str, "%.4f", Plans[i]->eta);
-        plan->SetAttribute("eta", str);
-
-        sprintf(str, "%.4f", Plans[i]->luff_angle);
-        plan->SetAttribute("luff_angle", str);
-
         plan->SetAttribute("computed", Plans[i]->computed);
+        if(Plans[i]->computed) {
+            sprintf(str, "%.4f", Plans[i]->eta);
+            plan->SetAttribute("eta", str);
+
+            sprintf(str, "%.4f", Plans[i]->luff_angle);
+            plan->SetAttribute("luff_angle", str);
+        } else {
+            plan->SetAttribute("csvFileName", Plans[i]->csvFileName.ToAscii());
+        }
 
         for(unsigned int j=0; j<Plans[i]->SwitchPlans.size(); j++) {
             TiXmlElement *switchplan = new TiXmlElement( "SwitchPlan" );
@@ -161,8 +174,9 @@ bool Boat::SaveXML(const char *filename)
         root->LinkEndChild(plan);
     }
 
-    doc.SaveFile(filename);
-    return true;
+    if(!doc.SaveFile(filename.ToAscii()))
+        return _("Failed saving file: ") + filename;
+    return wxString();
 }
 
 int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell)

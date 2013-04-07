@@ -32,6 +32,7 @@
 #include <math.h>
 #include <time.h>
 
+#include "Utilities.h"
 #include "Boat.h"
 #include "BoatDialog.h"
 #include "RouteMapOverlay.h"
@@ -218,6 +219,7 @@ void WeatherRoutingDialog::OnConfiguration( wxCommandEvent& event )
 void WeatherRoutingDialog::OnSettings( wxCommandEvent& event )
 {
     m_SettingsDialog.LoadSettings();
+
     if(m_SettingsDialog.ShowModal() == wxID_OK) {
         m_SettingsDialog.SaveSettings();
         SetRouteMapOverlaySettings();
@@ -227,6 +229,17 @@ void WeatherRoutingDialog::OnSettings( wxCommandEvent& event )
 
 void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
 {
+#if 1
+    /* complete hack to make window size right.. not sure why we can't call fit earlier,
+       but it doesn't work */
+    static int fitstartup = 2;
+    if(IsShown() && fitstartup) {
+        Fit();
+        m_SettingsDialog.Fit();
+        fitstartup--;
+    }
+#endif
+
     if(!m_RouteMapOverlay.Running())
         return;
 
@@ -251,7 +264,6 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
         m_StartTime = wxDateTime::Now();
 
         UpdateStatistics();
-        Refresh();
         GetParent()->Refresh();
     }
 
@@ -305,6 +317,8 @@ void WeatherRoutingDialog::UpdateStatistics()
     m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
     m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
     m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
+
+    Refresh();
 }
 
 void WeatherRoutingDialog::Reset()

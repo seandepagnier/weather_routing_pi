@@ -32,12 +32,11 @@
 #include <math.h>
 #include <time.h>
 
+#include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
 #include "WeatherRoutingConfigurationDialog.h"
 #include "weather_routing_pi.h"
-
-#include "Utilities.h"
 
 WeatherRoutingConfigurationDialog::WeatherRoutingConfigurationDialog( wxWindow *parent )
     : WeatherRoutingConfigurationDialogBase(parent)

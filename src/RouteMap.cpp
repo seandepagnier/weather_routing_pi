@@ -72,9 +72,9 @@
 
 #include "../../grib_pi/src/GribRecordSet.h"
 
+#include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
-#include "Utilities.h"
 
 #include "georef.h"
 
@@ -580,7 +580,7 @@ void IsoRoute::Print()
     else {
         Position *p = skippoints->point;
         do {
-            printf("%.4f %.4f\n", p->lon, p->lat);
+            printf("%.8f %.8f\n", p->lon, p->lat);
             p = p->next;
         } while(p != skippoints->point);
         printf("\n");
@@ -867,8 +867,11 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
                 spend = sp;
             if(sp->prev == ssend)
                 ssend = sp;
-            if(ss == sp->prev)
-                ss = sp;
+            if(ss == sp->prev) {
+              if(ssend == ss)
+                ssend = sp;
+              ss = sp;
+            }
             sp->prev->Remove();
         }
 
@@ -1018,27 +1021,20 @@ bool Normalize(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, 
 reset:
   SkipPosition *spend=route1->skippoints, *ssend=route2->skippoints;
 
-  if(!spend) {
-      if(ssend) {
-          route2->skippoints = ssend;
+  if(!spend || spend->prev == spend->next) { /* less than 3 items */
+      delete route1;
+      if(route1 != route2)
           rl.push_back(route2);
-      }
     return true;
   }
 
   if(route1 == route2) {
-    if(spend->prev == spend->next) { /* 1 or 2 items only? could test points instead of skip points.. */
-      delete route1;
-      return true;
-    }
-
     normalizing = true;
   } else {
-    if(!ssend) {
-      if(spend) {
-        route1->skippoints = spend;
+    if(!ssend || ssend->prev == ssend->next) { /* less than 3 items */
+      delete route2;
+      if(spend)
         rl.push_back(route1);
-      }
       return true;
     }
 
@@ -1049,16 +1045,14 @@ reset:
         printf("attempting to correct\n");
         goto reset;
     }
-
     normalizing = false;
   }
-
 
   SkipPosition *sp = spend;
 
   startnormalizing:
 #if 0
-  if(ncount == 29331)
+  if(ncount == 1320)
  {
    printf("n: %d\n", ncount);
    printf("r1:\n");
@@ -1261,6 +1255,10 @@ reset:
 
           SwapSegments(p, q, r, s); /* update position list */
           SwapSkipSegments(sp, sq, sr, ss); /* update skip lists */
+
+          if(ncount == 1320) {
+            printf("here\n");
+          }
 
           /* now update skip list properly */
           if(sp->quadrant != sr->quadrant) {

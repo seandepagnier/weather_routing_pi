@@ -112,8 +112,14 @@ public:
     std::vector<SwitchPlan> SwitchPlans;
 
     wxString Name;
-    double eta, luff_angle;
     bool computed;
+
+    /* if computed */
+    double eta, luff_angle;
+
+    /* if not computed (csv table) */
+    wxString csvFileName;
+    int wind_speed_step, wind_degree_step;
 
     void ComputeBoatSpeeds(Boat &boat);
     void OptimizeTackingSpeed();

@@ -593,6 +593,8 @@ wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell)
 BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
     : Name(PlanName), eta(.25), luff_angle(15)
 {
+    memset(speed, 0, sizeof speed);
+    memset(VMG, 0, sizeof VMG);
 }
 
 BoatPlan::~BoatPlan()
@@ -683,9 +685,9 @@ void BoatPlan::ResetOptimalTackingSpeed()
 
 void BoatPlan::SetSpeedsFromTable(BoatSpeedTable &table)
 {
-    for(int VWi = 0; VWi < MAX_KNOTS; VWi++)
-        for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi+=DEGREE_STEP) {
-            double VB = table.InterpolateSpeed(VWi, Wi);
+    for(int VWi = 0; VWi < num_wind_speeds; VWi++)
+        for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi++) {
+            double VB = table.InterpolateSpeed(wind_speeds[VWi], Wi*DEGREE_STEP);
             Set(Wi, VWi, VB);
             if(Wi != 0)
                 Set(DEGREE_COUNT-Wi, VWi, VB);

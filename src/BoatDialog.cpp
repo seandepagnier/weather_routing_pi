@@ -55,14 +55,14 @@ BoatDialog::BoatDialog( wxWindow *parent )
 #endif
 
     m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.xml");
-    if(!m_Boat.OpenXML(m_default_boat_path.ToAscii())) {
+    wxString error = m_Boat.OpenXML(m_default_boat_path);
+    if(!error.empty()) {
         m_Boat.Plans.push_back(new BoatPlan(_("Initial Plan"), m_Boat));
         m_Boat.Plans[0]->ComputeBoatSpeeds(m_Boat);
     }
 
     m_lBoatPlans->InsertColumn(spNAME, _("Name"));
     m_lBoatPlans->InsertColumn(spETA, _("Eta"));
-
     RepopulatePlans();
 
     m_sDisplacement->SetValue(m_Boat.displacement_lbs);
@@ -76,12 +76,13 @@ BoatDialog::BoatDialog( wxWindow *parent )
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan]->eta * 1000.0);
 
+    UpdateStats();
     UpdateVMG();    
 }
 
 BoatDialog::~BoatDialog()
 {
-    m_Boat.SaveXML(m_default_boat_path.ToAscii());
+    m_Boat.SaveXML(m_default_boat_path);
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -320,30 +321,39 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
         wxFileName filename = openDialog.GetPath();
         bool binary = filename.GetExt() == _("xml") || filename.GetExt() == _("XML");
 
-        bool success;
         if(binary) {
-            success = m_Boat.OpenXML(openDialog.GetPath().ToAscii());
-            RepopulatePlans();
+            wxString error = m_Boat.OpenXML(openDialog.GetPath().ToAscii());
+            if(error.empty())
+                RepopulatePlans();
+            else {
+                wxMessageDialog md(this, error, _("OpenCPN Weather Routing Plugin"),
+                                   wxICON_ERROR | wxOK );
+                md.ShowModal();
+                return;
+            }
         } else {
+            BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
             BoatSpeedTable table;
-            int wind_speed_step, wind_degree_step;
-            if((success = table.Open(openDialog.GetPath().ToAscii(),
-                                     wind_speed_step, wind_degree_step))) {
-                m_sFileCSVWindSpeedStep->SetValue(wind_speed_step);
-                m_sFileCSVWindDegreeStep->SetValue(wind_degree_step);
-
-                m_Boat.Plans[m_SelectedSailPlan]->SetSpeedsFromTable(table);
+            wxString filename = openDialog.GetPath();
+            if(table.Open(filename.ToAscii(),
+                          plan->wind_speed_step, plan->wind_degree_step)) {
+                plan->csvFileName = filename;
+                m_stCSVFile->SetLabel(plan->csvFileName);
+                m_sFileCSVWindSpeedStep->SetValue(plan->wind_speed_step);
+                m_sFileCSVWindDegreeStep->SetValue(plan->wind_degree_step);
+                plan->SetSpeedsFromTable(table);
+            } else {
+                wxMessageDialog md(this, _("Failed reading csv: ") + filename,
+                                   _("OpenCPN Weather Routing Plugin"),
+                                   wxICON_ERROR | wxOK );
+                md.ShowModal();
+                return;
             }
         }
-             
-        if(success) {
-            UpdateVMG();
-            m_PlotWindow->Refresh();
-        } else {
-            wxMessageDialog md(this, _("Failed Loading boat polar"), _("OpenCPN Weather Routing Plugin"),
-                               wxICON_INFORMATION | wxOK );
-            md.ShowModal();
-        }
+
+        UpdateStats();
+        UpdateVMG();
+        m_PlotWindow->Refresh();
     }
 }
 
@@ -355,21 +365,23 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
         wxFileName filename = saveDialog.GetPath();
         bool binary = filename.GetExt() == _("obs") || filename.GetExt() == _("OBS");
 
-        bool success;
-        if(binary)
-            success = m_Boat.SaveXML(saveDialog.GetPath().ToAscii());
-        else {
+        if(binary) {
+            wxString error = m_Boat.SaveXML(saveDialog.GetPath().ToAscii());
+            if(!error.empty()) {
+                wxMessageDialog md(this, error,
+                                   _("OpenCPN Weather Routing Plugin"),
+                                   wxICON_ERROR | wxOK );
+                md.ShowModal();
+            }
+        } else {
             BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
-                (m_sFileCSVWindSpeedStep->GetValue(),
-                     m_sFileCSVWindDegreeStep->GetValue());
-            success = table.Save(saveDialog.GetPath().ToAscii());
-        }
-
-        if(!success) {
-            wxMessageDialog md(this, _("Failed saving boat polar"),
-                               _("OpenCPN Weather Routing Plugin"),
-                               wxICON_INFORMATION | wxOK );
-            md.ShowModal();
+                (m_sFileCSVWindSpeedStep->GetValue(), m_sFileCSVWindDegreeStep->GetValue());
+            if(!table.Save(saveDialog.GetPath().ToAscii())) {
+                wxMessageDialog md(this, _("Failed saving boat polar to csv"),
+                                   _("OpenCPN Weather Routing Plugin"),
+                                   wxICON_ERROR | wxOK );
+                md.ShowModal();
+            }
         }
     }
 }
@@ -495,6 +507,11 @@ void BoatDialog::RepopulatePlans()
         m_bDeleteBoatPlan->Enable();
     else
         m_bDeleteBoatPlan->Disable();
+
+    BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
+    m_stCSVFile->SetLabel(plan->csvFileName);
+    m_sFileCSVWindSpeedStep->SetValue(plan->wind_speed_step);
+    m_sFileCSVWindDegreeStep->SetValue(plan->wind_degree_step);
 }
 
 void BoatDialog::Compute()

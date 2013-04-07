@@ -16,7 +16,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	wxFlexGridSizer* fgSizer17;
 	fgSizer17 = new wxFlexGridSizer( 4, 1, 0, 0 );
 	fgSizer17->SetFlexibleDirection( wxBOTH );
-	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
 	
 	wxStaticBoxSizer* sbSizer3;
 	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("Start") ), wxVERTICAL );
@@ -167,7 +167,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	fgSizer17->Add( sbSizer10, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer24;
-	fgSizer24 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer24 = new wxFlexGridSizer( 3, 3, 0, 0 );
 	fgSizer24->SetFlexibleDirection( wxBOTH );
 	fgSizer24->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -196,7 +196,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	fgSizer24->Add( m_bInformation, 0, wxALL, 5 );
 	
 	
-	fgSizer17->Add( fgSizer24, 1, wxEXPAND, 5 );
+	fgSizer17->Add( fgSizer24, 0, 0, 5 );
 	
 	
 	this->SetSizer( fgSizer17 );
@@ -411,12 +411,12 @@ WeatherRoutingConfigurationDialogBase::~WeatherRoutingConfigurationDialogBase()
 
 WeatherRoutingSettingsDialogBase::WeatherRoutingSettingsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxSize( -1,290 ), wxDefaultSize );
 	
 	wxFlexGridSizer* fgSizer18;
 	fgSizer18 = new wxFlexGridSizer( 2, 1, 0, 0 );
 	fgSizer18->SetFlexibleDirection( wxBOTH );
-	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
 	
 	wxFlexGridSizer* fgSizer42;
 	fgSizer42 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -514,7 +514,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* fgSizer24;
-	fgSizer24 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer24 = new wxFlexGridSizer( 0, 4, 0, 0 );
 	fgSizer24->SetFlexibleDirection( wxBOTH );
 	fgSizer24->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -538,11 +538,42 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer24->Add( sbSizer7, 1, wxEXPAND, 5 );
 	
+	wxStaticBoxSizer* sbSizer8;
+	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Wind Kts") ), wxVERTICAL );
+	
+	m_sWindSpeed = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 1, 59, 15 );
+	sbSizer8->Add( m_sWindSpeed, 0, wxALL, 5 );
+	
+	
+	fgSizer24->Add( sbSizer8, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer11;
+	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Sig Wv Ht") ), wxVERTICAL );
+	
+	m_spinCtrl20 = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_spinCtrl20->Enable( false );
+	
+	sbSizer11->Add( m_spinCtrl20, 0, wxALL, 5 );
+	
+	
+	fgSizer24->Add( sbSizer11, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer12;
+	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Wv Period") ), wxVERTICAL );
+	
+	m_spinCtrl21 = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_spinCtrl21->Enable( false );
+	
+	sbSizer12->Add( m_spinCtrl21, 0, wxALL, 5 );
+	
+	
+	fgSizer24->Add( sbSizer12, 1, wxEXPAND, 5 );
+	
 	
 	fgSizer18->Add( fgSizer24, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer23;
-	fgSizer23 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer23 = new wxFlexGridSizer( 0, 4, 0, 0 );
 	fgSizer23->SetFlexibleDirection( wxBOTH );
 	fgSizer23->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -636,59 +667,21 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer23->Add( sbSizer62, 1, wxEXPAND, 5 );
 	
+	m_bClose = new wxButton( m_panel3, wxID_ANY, wxT("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer23->Add( m_bClose, 0, wxALL, 5 );
+	
 	
 	fgSizer18->Add( fgSizer23, 1, wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer16;
-	fgSizer16 = new wxFlexGridSizer( 1, 0, 0, 0 );
-	fgSizer16->SetFlexibleDirection( wxBOTH );
-	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticBoxSizer* sbSizer8;
-	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Wind Kts") ), wxVERTICAL );
-	
-	m_sWindSpeed = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 1, 59, 15 );
-	sbSizer8->Add( m_sWindSpeed, 0, wxALL, 5 );
-	
-	
-	fgSizer16->Add( sbSizer8, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer11;
-	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Sig Wv Ht") ), wxVERTICAL );
-	
-	m_spinCtrl20 = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
-	m_spinCtrl20->Enable( false );
-	
-	sbSizer11->Add( m_spinCtrl20, 0, wxALL, 5 );
-	
-	
-	fgSizer16->Add( sbSizer11, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer12;
-	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, wxT("Wv Period") ), wxVERTICAL );
-	
-	m_spinCtrl21 = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
-	m_spinCtrl21->Enable( false );
-	
-	sbSizer12->Add( m_spinCtrl21, 0, wxALL, 5 );
-	
-	
-	fgSizer16->Add( sbSizer12, 1, wxEXPAND, 5 );
-	
-	m_bClose = new wxButton( m_panel3, wxID_ANY, wxT("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer16->Add( m_bClose, 0, wxALL, 5 );
-	
-	
-	fgSizer18->Add( fgSizer16, 1, wxEXPAND, 5 );
 	
 	
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_notebook1->AddPage( m_panel3, wxT("Plot Details"), false );
+	m_notebook1->AddPage( m_panel3, wxT("Plot Details"), true );
 	m_panel31 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer181;
 	fgSizer181 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer181->AddGrowableCol( 0 );
 	fgSizer181->SetFlexibleDirection( wxBOTH );
 	fgSizer181->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -699,6 +692,23 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer34 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer34->SetFlexibleDirection( wxBOTH );
 	fgSizer34->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer54;
+	fgSizer54 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer54->AddGrowableCol( 1 );
+	fgSizer54->SetFlexibleDirection( wxBOTH );
+	fgSizer54->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText93 = new wxStaticText( m_panel31, wxID_ANY, wxT("FileName"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText93->Wrap( -1 );
+	fgSizer54->Add( m_staticText93, 0, wxALL, 5 );
+	
+	m_stCSVFile = new wxStaticText( m_panel31, wxID_ANY, wxT("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stCSVFile->Wrap( -1 );
+	fgSizer54->Add( m_stCSVFile, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer34->Add( fgSizer54, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer241;
 	fgSizer241 = new wxFlexGridSizer( 0, 3, 0, 0 );
@@ -905,13 +915,13 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer1811111->SetFlexibleDirection( wxBOTH );
 	fgSizer1811111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_lBoatPlans = new wxListCtrl( m_panel311111, wxID_ANY, wxDefaultPosition, wxSize( -1,100 ), wxLC_REPORT|wxLC_SINGLE_SEL );
-	m_lBoatPlans->SetMaxSize( wxSize( -1,100 ) );
+	m_lBoatPlans = new wxListCtrl( m_panel311111, wxID_ANY, wxDefaultPosition, wxSize( -1,60 ), wxLC_REPORT|wxLC_SINGLE_SEL );
+	m_lBoatPlans->SetMaxSize( wxSize( -1,60 ) );
 	
 	fgSizer1811111->Add( m_lBoatPlans, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer49;
-	fgSizer49 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer49 = new wxFlexGridSizer( 0, 4, 0, 0 );
 	fgSizer49->AddGrowableCol( 1 );
 	fgSizer49->AddGrowableRow( 0 );
 	fgSizer49->SetFlexibleDirection( wxBOTH );
@@ -924,11 +934,11 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sEta = new wxSlider( m_panel311111, wxID_ANY, 400, 1, 1000, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	fgSizer49->Add( m_sEta, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticText91 = new wxStaticText( m_panel311111, wxID_ANY, wxT("Maximum Pointing Angle Apparent Wind"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText91 = new wxStaticText( m_panel311111, wxID_ANY, wxT("Max Pointing Angle"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText91->Wrap( -1 );
 	fgSizer49->Add( m_staticText91, 0, wxALL, 5 );
 	
-	m_sLuffAngle = new wxSpinCtrl( m_panel311111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 15 );
+	m_sLuffAngle = new wxSpinCtrl( m_panel311111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 0, 180, 15 );
 	fgSizer49->Add( m_sLuffAngle, 0, wxALL, 5 );
 	
 	
@@ -1028,7 +1038,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel5->SetSizer( fgSizer52 );
 	m_panel5->Layout();
 	fgSizer52->Fit( m_panel5 );
-	m_notebook1->AddPage( m_panel5, wxT("Statistics"), true );
+	m_notebook1->AddPage( m_panel5, wxT("Statistics"), false );
 	
 	fgSizer12->Add( m_notebook1, 1, wxEXPAND | wxALL, 5 );
 	

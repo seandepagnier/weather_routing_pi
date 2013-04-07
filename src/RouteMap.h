@@ -28,7 +28,7 @@
 
 #include <list>
 
-class RouteMapOptions;
+struct RouteMapOptions;
 class IsoRoute;
 class GribRecordSet;
 
@@ -135,6 +135,7 @@ public:
 typedef std::list<IsoChron*> IsoChronList;
 
 struct RouteMapOptions {
+    RouteMapOptions () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
     void UpdateLongitudes();
 
     double StartLat, StartLon;

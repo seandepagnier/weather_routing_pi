@@ -32,8 +32,8 @@ public:
     Boat();
     ~Boat();
 
-    bool OpenXML(const char *filename);
-    bool SaveXML(const char *filename);
+    wxString OpenXML(wxString filename);
+    wxString SaveXML(wxString filename);
 
     BoatPlan &Plan(int plan) { return *Plans[plan]; }
 

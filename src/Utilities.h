@@ -28,8 +28,13 @@
 #include <float.h>
 #include <iostream>
 #include <limits>
-#define M_PI		3.14159265358979323846	/* pi */
-#define NAN std::numeric_limits<double>::quiet_NaN ()
+# if !defined(M_PI)
+# define M_PI		3.14159265358979323846	/* pi */
+# endif
+
+# if !defined(NAN)
+# define NAN std::numeric_limits<double>::quiet_NaN ()
+# endif
 
 #define isnan _isnan
 #define isinf(x) (!_finite(x))
@@ -37,13 +42,14 @@
 inline double trunc(double d){ return (d>0) ? floor(d) : ceil(d) ; }
 inline double round(double n) { return n < 0.0 ? ceil(n - 0.5) : floor(n + 0.5); }
 
-
-#define snprintf _snprintf
+# if !defined(snprintf)
+# define snprintf _snprintf
+# endif
 #define vsnprintf _vsnprintf
 #define strcasecmp _stricmp
 #define strncasecmp _strnicmp
 
-#define strtok_r(a, b, c) strtok_r(a, b)
+#define strtok_r strtok_s
 #endif
 
 
