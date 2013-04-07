@@ -33,7 +33,7 @@
 #include "Boat.h"
 
 Boat::Boat()
-    : displacement_lbs(8000), lwl_ft(24), loa_ft(27), beam_ft(8),
+    : displacement_tons(4), lwl_ft(24), loa_ft(27), beam_ft(8),
       frictional_drag(0), wake_drag(0)
 {
 }
@@ -42,10 +42,22 @@ Boat::~Boat()
 {
 }
 
+double AttributeDouble(TiXmlElement *e, const char *name, double def)
+{
+    const char *attr = e->Attribute("displacement_tons");
+    if(!attr)
+        return def;
+    char *end;
+    double d = strtod(attr, &end);
+    if(end == attr)
+        return def;
+    return d;
+}
+
 wxString Boat::OpenXML(wxString filename)
 {
     TiXmlDocument doc;
-    if(!doc.LoadFile( filename.ToAscii() ))
+    if(!doc.LoadFile( filename.mb_str() ))
         return _("Failed to load file");
 
     TiXmlHandle root( doc.RootElement() );
@@ -55,14 +67,14 @@ wxString Boat::OpenXML(wxString filename)
     bool cleared = false;
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
         if(!strcmp(e->Value(), "BoatCharacteristics")) {
-            displacement_lbs = strtod(e->Attribute("displacement_lbs"), 0);
-            lwl_ft = strtod(e->Attribute("lwl_ft"), 0);
-            loa_ft = strtod(e->Attribute("loa_ft"), 0);
-            beam_ft = strtod(e->Attribute("beam_ft"), 0);
+            displacement_tons = AttributeDouble(e, "displacement_tons", 4);
+            lwl_ft = AttributeDouble(e, "lwl_ft", 24);
+            loa_ft = AttributeDouble(e, "loa_ft", 27);
+            beam_ft = AttributeDouble(e, "beam_ft", 8);
         } else
         if(!strcmp(e->Value(), "BoatDrag")) {
-            frictional_drag = strtod(e->Attribute("frictional_drag"), 0);
-            wake_drag = strtod(e->Attribute("wake_drag"), 0);
+            frictional_drag = AttributeDouble(e, "frictional_drag", 0);
+            wake_drag = AttributeDouble(e, "wake_drag", 0);
         } else
         if(!strcmp(e->Value(), "Plan")) {
             if(!cleared) {
@@ -74,19 +86,18 @@ wxString Boat::OpenXML(wxString filename)
 
             BoatPlan *plan = new BoatPlan(wxString::FromUTF8(e->Attribute("Name")), *this);
 
-            plan->computed = strtod(e->Attribute("computed"), 0);
+            plan->computed = AttributeDouble(e, "computed", 1);
 
             if(plan->computed) {
-                plan->eta = strtod(e->Attribute("eta"), 0);
-                plan->luff_angle = strtod(e->Attribute("luff_angle"), 0);
+                plan->eta = AttributeDouble(e, "eta", .5);
+                plan->luff_angle = AttributeDouble(e, "luff_angle", 15);
                 plan->wind_speed_step = 3;
                 plan->wind_degree_step = DEGREE_STEP;
-                plan->csvFileName = _("<Computed>");
                 plan->ComputeBoatSpeeds(*this);
             } else {
                 plan->csvFileName = e->Attribute("csvFileName");
                 BoatSpeedTable table;
-                if(table.Open(plan->csvFileName.ToAscii(), plan->wind_speed_step, plan->wind_degree_step)) {
+                if(table.Open(plan->csvFileName.mb_str(), plan->wind_speed_step, plan->wind_degree_step)) {
                     plan->SetSpeedsFromTable(table);
                 } else
                     return _("Failed to open file: ") + plan->csvFileName;
@@ -126,7 +137,7 @@ wxString Boat::SaveXML(wxString filename)
     root->SetAttribute("creator", "Weather Routing by Sean DEpagnier");
 
     TiXmlElement *boatcharacteristics = new TiXmlElement( "BoatCharacteristics" );
-    boatcharacteristics->SetAttribute("displacement_lbs", displacement_lbs);
+    boatcharacteristics->SetAttribute("displacement_tons", displacement_tons);
     boatcharacteristics->SetAttribute("lwl_ft", lwl_ft);
     boatcharacteristics->SetAttribute("loa_ft", loa_ft);
     boatcharacteristics->SetAttribute("beam_ft", beam_ft);
@@ -146,7 +157,7 @@ wxString Boat::SaveXML(wxString filename)
     for(unsigned int i=0; i<Plans.size(); i++) {
         TiXmlElement *plan = new TiXmlElement( "Plan" );
         
-        plan->SetAttribute("Name", Plans[i]->Name.ToAscii());
+        plan->SetAttribute("Name", Plans[i]->Name.mb_str());
 
         plan->SetAttribute("computed", Plans[i]->computed);
         if(Plans[i]->computed) {
@@ -156,7 +167,7 @@ wxString Boat::SaveXML(wxString filename)
             sprintf(str, "%.4f", Plans[i]->luff_angle);
             plan->SetAttribute("luff_angle", str);
         } else {
-            plan->SetAttribute("csvFileName", Plans[i]->csvFileName.ToAscii());
+            plan->SetAttribute("csvFileName", Plans[i]->csvFileName.mb_str());
         }
 
         for(unsigned int j=0; j<Plans[i]->SwitchPlans.size(); j++) {
@@ -167,14 +178,14 @@ wxString Boat::SaveXML(wxString filename)
             switchplan->SetAttribute("MinWindDirection", Plans[i]->SwitchPlans[j].MinWindDirection);
             switchplan->SetAttribute("MaxWaveHeight", Plans[i]->SwitchPlans[j].MaxWaveHeight);
             switchplan->SetAttribute("MinWaveHeight", Plans[i]->SwitchPlans[j].MinWaveHeight);
-            switchplan->SetAttribute("Name", Plans[i]->SwitchPlans[j].Name.ToAscii());
+            switchplan->SetAttribute("Name", Plans[i]->SwitchPlans[j].Name.mb_str());
             plan->LinkEndChild(switchplan);
         }
 
         root->LinkEndChild(plan);
     }
 
-    if(!doc.SaveFile(filename.ToAscii()))
+    if(!doc.SaveFile(filename.mb_str()))
         return _("Failed saving file: ") + filename;
     return wxString();
 }
@@ -193,7 +204,7 @@ again:
             goto again;
         }
 
-    printf("error, failed to find plan: %s\n", (const char*)Name.ToAscii());
+    printf("error, failed to find plan: %s\n", (const char*)Name.mb_str());
     exit(1);
     return curplan;
 }
@@ -211,14 +222,14 @@ double Boat::Hulls()
 /* values greater than 2 are a danger, less than 2 is "good" */
 double Boat::CapsizeRisk()
 {
-    return beam_ft/pow(1.1*displacement_lbs/64, 1.0/3);
+    return beam_ft/pow(1.1*DisplacementPounds()/64, 1.0/3);
 }
 
 /* values of 30-40 for cruisers, 20 or less for racers, higher for
    heavy boats */
 double Boat::ComfortFactor()
 {
-    return displacement_lbs / (.65 * (.7*lwl_ft + .3*loa_ft) * pow(beam_ft, 1.33));
+    return DisplacementPounds() / (.65 * (.7*lwl_ft + .3*loa_ft) * pow(beam_ft, 1.33));
 }
 
 double Boat::DisplacementLengthRatio()
@@ -228,8 +239,14 @@ double Boat::DisplacementLengthRatio()
 
 double Boat::DisplacementLongTons()
 {
-    return displacement_lbs / 2240.0;
+    return DisplacementPounds() / 2240.0;
 }
+
+double Boat::DisplacementPounds()
+{
+    return displacement_tons * 2000.0;
+}
+
 
 /* to calculate power required to move the boat:
 

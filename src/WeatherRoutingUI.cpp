@@ -677,7 +677,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_notebook1->AddPage( m_panel3, wxT("Plot Details"), true );
+	m_notebook1->AddPage( m_panel3, wxT("Plot Details"), false );
 	m_panel31 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer181;
 	fgSizer181 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -851,11 +851,11 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_cHullType->SetSelection( 0 );
 	fgSizer58->Add( m_cHullType, 0, wxALL, 5 );
 	
-	m_staticText58 = new wxStaticText( m_panel3111, wxID_ANY, wxT("disp lbs"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText58 = new wxStaticText( m_panel3111, wxID_ANY, wxT("disp tons"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText58->Wrap( -1 );
 	fgSizer58->Add( m_staticText58, 0, wxALL, 5 );
 	
-	m_sDisplacement = new wxSpinCtrl( m_panel3111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100000, 8000 );
+	m_sDisplacement = new wxSpinCtrl( m_panel3111, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 100,-1 ), wxSP_ARROW_KEYS, 0, 100000, 4 );
 	fgSizer58->Add( m_sDisplacement, 0, wxALL, 5 );
 	
 	m_staticText57 = new wxStaticText( m_panel3111, wxID_ANY, wxT("lwl ft"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -906,7 +906,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3111->SetSizer( fgSizer46 );
 	m_panel3111->Layout();
 	fgSizer46->Fit( m_panel3111 );
-	m_notebook1->AddPage( m_panel3111, wxT("Hull"), false );
+	m_notebook1->AddPage( m_panel3111, wxT("Hull"), true );
 	m_panel311111 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer1811111;
 	fgSizer1811111 = new wxFlexGridSizer( 0, 1, 0, 0 );

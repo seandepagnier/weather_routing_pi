@@ -99,22 +99,22 @@ void BoatPlanDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
 
     wxString des, a, andstr = _(" and ");
     if(!isnan(plan.MaxWindSpeed))
-        des += a + _("Wind Speed > ") + wxString::Format(_("%0f"), plan.MaxWindSpeed), a = andstr;
+        des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindSpeed), a = andstr;
 
     if(!isnan(plan.MinWindSpeed))
-        des += a + _("Wind Speed < ") + wxString::Format(_("%0f"), plan.MinWindSpeed), a = andstr;
+        des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindSpeed), a = andstr;
 
     if(!isnan(plan.MaxWindDirection))
-        des += a + _("Wind Speed > ") + wxString::Format(_("%0f"), plan.MaxWindDirection), a = andstr;
+        des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindDirection), a = andstr;
 
     if(!isnan(plan.MinWindDirection))
-        des += a + _("Wind Speed < ") + wxString::Format(_("%0f"), plan.MinWindDirection), a = andstr;
+        des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindDirection), a = andstr;
 
     if(!isnan(plan.MaxWaveHeight))
-        des += a + _("Wind Speed > ") + wxString::Format(_("%0f"), plan.MaxWaveHeight), a = andstr;
+        des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWaveHeight), a = andstr;
 
     if(!isnan(plan.MinWaveHeight))
-        des += a + _("Wind Speed < ") + wxString::Format(_("%0f"), plan.MinWaveHeight), a = andstr;
+        des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWaveHeight), a = andstr;
 
     des += _(" switch to ");
     des += plan.Name;

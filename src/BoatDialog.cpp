@@ -65,7 +65,7 @@ BoatDialog::BoatDialog( wxWindow *parent )
     m_lBoatPlans->InsertColumn(spETA, _("Eta"));
     RepopulatePlans();
 
-    m_sDisplacement->SetValue(m_Boat.displacement_lbs);
+    m_sDisplacement->SetValue(m_Boat.displacement_tons);
     m_sLWL->SetValue(m_Boat.lwl_ft);
     m_sLOA->SetValue(m_Boat.loa_ft);
 
@@ -335,7 +335,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
             BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
             BoatSpeedTable table;
             wxString filename = openDialog.GetPath();
-            if(table.Open(filename.ToAscii(),
+            if(table.Open(filename.mb_str(),
                           plan->wind_speed_step, plan->wind_degree_step)) {
                 plan->csvFileName = filename;
                 m_stCSVFile->SetLabel(plan->csvFileName);
@@ -376,7 +376,7 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
         } else {
             BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
                 (m_sFileCSVWindSpeedStep->GetValue(), m_sFileCSVWindDegreeStep->GetValue());
-            if(!table.Save(saveDialog.GetPath().ToAscii())) {
+            if(!table.Save(saveDialog.GetPath().mb_str())) {
                 wxMessageDialog md(this, _("Failed saving boat polar to csv"),
                                    _("OpenCPN Weather Routing Plugin"),
                                    wxICON_ERROR | wxOK );
@@ -433,17 +433,15 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
 void BoatDialog::OnEta( wxScrollEvent& event )
 {
     Compute();
-    m_lBoatPlans->SetItem(m_SelectedSailPlan, spETA, wxString::Format(_T("%.3f"),
-                                                                       m_sEta->GetValue()/1000.0));
 }
 
 void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
 {
     wxString np = _("New Plan");
-    long index = m_lBoatPlans->InsertItem(0, np);
+    m_SelectedSailPlan = m_lBoatPlans->InsertItem(0, np);
     m_Boat.Plans.push_back(new BoatPlan(np, m_Boat));
-
-    m_lBoatPlans->SetItemState(index, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    Compute();
     OnEditBoatPlan(event);
 
     m_bDeleteBoatPlan->Enable();
@@ -478,7 +476,7 @@ void BoatDialog::StoreBoatParameters()
 
     m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
 
-    m_Boat.displacement_lbs = m_sDisplacement->GetValue();
+    m_Boat.displacement_tons = m_sDisplacement->GetValue();
     m_Boat.lwl_ft = m_sLWL->GetValue();
     m_Boat.loa_ft = m_sLOA->GetValue();
     m_Boat.beam_ft = m_sBeam->GetValue();
@@ -500,8 +498,8 @@ void BoatDialog::RepopulatePlans()
         m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), m_Boat.Plans[i]->eta));
     }
 
-    m_lBoatPlans->SetColumnWidth(spNAME, wxLIST_AUTOSIZE);
-    m_lBoatPlans->SetColumnWidth(spETA, wxLIST_AUTOSIZE);
+    m_lBoatPlans->SetColumnWidth(spNAME, 250);
+    m_lBoatPlans->SetColumnWidth(spETA, 150);
 
     if(m_Boat.Plans.size() > 1)
         m_bDeleteBoatPlan->Enable();
@@ -518,10 +516,14 @@ void BoatDialog::Compute()
 {
     StoreBoatParameters();
 
-    m_Boat.Plans[m_SelectedSailPlan]->ComputeBoatSpeeds(m_Boat);
+    BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
+    plan->ComputeBoatSpeeds(m_Boat);
+    m_stCSVFile->SetLabel(plan->csvFileName);
 
     UpdateVMG();
     m_PlotWindow->Refresh();
+    m_lBoatPlans->SetItem(m_SelectedSailPlan, spETA, wxString::Format(_T("%.3f"),
+                                                                       m_sEta->GetValue()/1000.0));
 }
 
 void BoatDialog::UpdateVMG()

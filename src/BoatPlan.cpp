@@ -605,6 +605,8 @@ BoatPlan::~BoatPlan()
    heavy cruisers */
 void BoatPlan::ComputeBoatSpeeds(Boat &boat)
 {
+    csvFileName = _("<Computed>");
+
     for(int VWi = 0; VWi < num_wind_speeds; VWi++)
         for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi++) {
             double VW = wind_speeds[VWi];
@@ -723,10 +725,11 @@ BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
 
 int BoatPlan::ClosestVWi(int VW)
 {
-    for(int VWi = 0; VWi < num_wind_speeds-1; VWi++)
+    int VWi;
+    for(VWi = 0; VWi < num_wind_speeds-1; VWi++)
         if(wind_speeds[VWi] >= VW)
-            return VWi;
-    return 0;
+            break;
+    return VWi;
 }
 
 /* compute boat speed from given power level, true wind angle and true wind speed */
@@ -765,7 +768,7 @@ double BoatPlan::Speed(double W, double VW)
 
 SailingVMG BoatPlan::GetVMG(double VW)
 {
-    int VW1i = ClosestVWi(VW), VW2i = VW1i+1;
+    int VW2i = ClosestVWi(VW), VW1i = VW1i > 0 ? VW1i - 1 : 0;
     SailingVMG vmg, vmg1 = VMG[VW1i], vmg2 = VMG[VW2i];
     double VW1 = wind_speeds[VW1i], VW2 = wind_speeds[VW2i];
 

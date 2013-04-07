@@ -6722,7 +6722,7 @@
                                 <object class="notebookpage" expanded="1">
                                     <property name="bitmap"></property>
                                     <property name="label">Plot Details</property>
-                                    <property name="select">1</property>
+                                    <property name="select">0</property>
                                     <object class="wxPanel" expanded="1">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
@@ -10520,7 +10520,7 @@
                                 <object class="notebookpage" expanded="0">
                                     <property name="bitmap"></property>
                                     <property name="label">Hull</property>
-                                    <property name="select">0</property>
+                                    <property name="select">1</property>
                                     <object class="wxPanel" expanded="0">
                                         <property name="BottomDockable">1</property>
                                         <property name="LeftDockable">1</property>
@@ -10826,7 +10826,7 @@
                                                             <property name="gripper">0</property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="label">disp lbs</property>
+                                                            <property name="label">disp tons</property>
                                                             <property name="max_size"></property>
                                                             <property name="maximize_button">0</property>
                                                             <property name="maximum_size"></property>
@@ -10909,7 +10909,7 @@
                                                             <property name="gripper">0</property>
                                                             <property name="hidden">0</property>
                                                             <property name="id">wxID_ANY</property>
-                                                            <property name="initial">8000</property>
+                                                            <property name="initial">4</property>
                                                             <property name="max">100000</property>
                                                             <property name="max_size"></property>
                                                             <property name="maximize_button">0</property>
@@ -10928,7 +10928,7 @@
                                                             <property name="pos"></property>
                                                             <property name="resize">Resizable</property>
                                                             <property name="show">1</property>
-                                                            <property name="size">60,-1</property>
+                                                            <property name="size">100,-1</property>
                                                             <property name="style">wxSP_ARROW_KEYS</property>
                                                             <property name="subclass"></property>
                                                             <property name="toolbar_pane">0</property>

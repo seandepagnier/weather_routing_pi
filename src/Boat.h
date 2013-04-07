@@ -46,6 +46,7 @@ public:
     double DisplacementLengthRatio();
     double SailAreaDisplacementRatio();
     double DisplacementLongTons();
+    double DisplacementPounds();
     double HullSLRatio();
     double HullSpeed();
     double FrictionDrag(double VB);
@@ -55,6 +56,6 @@ public:
     enum HullType {MONO, CATAMARAN, TRIMARAN, PROA, SUBMARINE};
     HullType hulltype;
 
-    double displacement_lbs, lwl_ft, loa_ft, beam_ft;
+    double displacement_tons, lwl_ft, loa_ft, beam_ft;
     double frictional_drag, wake_drag;
 };
