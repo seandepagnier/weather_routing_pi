@@ -95,7 +95,7 @@ wxString Boat::OpenXML(wxString filename)
                 plan->wind_degree_step = DEGREE_STEP;
                 plan->ComputeBoatSpeeds(*this);
             } else {
-                plan->csvFileName = e->Attribute("csvFileName");
+                plan->csvFileName = wxString::FromUTF8(e->Attribute("csvFileName"));
                 BoatSpeedTable table;
                 if(table.Open(plan->csvFileName.mb_str(), plan->wind_speed_step, plan->wind_degree_step)) {
                     plan->SetSpeedsFromTable(table);
