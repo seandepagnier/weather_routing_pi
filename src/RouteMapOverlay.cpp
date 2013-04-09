@@ -1,4 +1,4 @@
-/******************************************************************************
+/***************************************************************************
  *
  * Project:  OpenCPN Weather Routing plugin
  * Author:   Sean D'Epagnier
@@ -223,7 +223,7 @@ void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
         {  0, 127,   0}, {  0, 127, 127}, {  0, 127, 255},
         {255, 255,   0},                  };
 
-    if(m_RouteThickness) {
+    if(m_IsoChronThickness) {
         Lock();
         int c = 0;
         for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
@@ -243,12 +243,13 @@ void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
         }
         Unlock();
     }
-    
-    SetColor(dc, true, m_CursorColor, m_RouteThickness);
-    RenderCourse(last_cursor_position, dc, vp);
 
-    SetColor(dc, true, m_DestinationColor, m_RouteThickness);
-    RenderCourse(last_destination_position, dc, vp);
+    if(m_RouteThickness) {
+        SetColor(dc, true, m_CursorColor, m_RouteThickness);
+        RenderCourse(last_cursor_position, dc, vp);
+        SetColor(dc, true, m_DestinationColor, m_RouteThickness);
+        RenderCourse(last_destination_position, dc, vp);
+    }
 }
 
 void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp)

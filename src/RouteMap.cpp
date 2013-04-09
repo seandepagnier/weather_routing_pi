@@ -1,4 +1,4 @@
-/******************************************************************************
+/***************************************************************************
  *
  * Project:  OpenCPN Weather Routing plugin
  * Author:   Sean D'Epagnier
@@ -184,10 +184,10 @@ void BoatOverGround(double B, double VB, double C, double VC, double &BG, double
    (y-y1) * (x2-x1) = (y2-y1) * (x-x1)
    (y-y3) * (x4-x3) = (y4-y3) * (x-x3)
 */
-/*inline*/ int TestIntersectionXY(double x1, double y1, double x2, double y2,
+inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
                                   double x3, double y3, double x4, double y4)
 {
-#if 0 /* this never gets hit due to the use of states.. so it doens't help performance */
+#if 0 /* this never gets hit due to the use of states.. so it doesn't help performance */
     /* quick test to avoid calculations if segments are far apart */
     if((x3 > x1 && x3 > x2 && x4 > x1 && x4 > x2) ||
        (x3 < x1 && x3 < x2 && x4 < x1 && x4 < x2) ||
@@ -268,7 +268,7 @@ int ComputeQuadrant(Position *p, Position *q)
 
     double diff = p->lon - q->lon;
     if(diff > 0) {
-        if(diff > 180) /* since we don't fully support crossing both 0 and 180 merdians,
+        if(diff > 180) /* since we don't fully support crossing 0 and 180 merdians in the same map
                           this never actually occurs.. but it is needed if support is extended */
             quadrant += 1;
     } else if(diff > -180)
@@ -278,7 +278,8 @@ int ComputeQuadrant(Position *p, Position *q)
 
 SkipPosition *Position::BuildSkipList()
 {
-    /* build skip list */
+    /* build skip list of positions, skipping over strings of positions in
+       the same quadrant */
     SkipPosition *skippoints = NULL;
     Position *p = this;
     int firstquadrant, lastquadrant = -1, quadrant;
@@ -321,6 +322,7 @@ SkipPosition *Position::BuildSkipList()
     return skippoints;
 }
 
+/* get data from a position for plotting */
 bool Position::GetPlotData(GribRecordSet &grib, PlotData &data, double dt)
 {
     data.WVHT = Swell(grib, lat, lon);
@@ -335,17 +337,14 @@ bool Position::GetPlotData(GribRecordSet &grib, PlotData &data, double dt)
     if(parent) {
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &data.BG, &data.VBG);
         data.VBG *= 3600 / dt;
-
         OverWater(data.C, data.VC, data.BG, data.VBG, data.B, data.VB);
-
         return true;
     }
     return false;
 }
 
 /* create a looped route by propagating from a position by computing
-   the location the boat would be in if sailed at every angle
-   relative to the true wind. */
+   the location the boat would be in if sailed at various angles */
 bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib, RouteMapOptions &options)
 {
     /* already propagated from this position, don't need to again */
@@ -388,7 +387,6 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib, RouteMapO
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
     else if(options.MaxDivertedCourse == 180)
         goto skipbearingcomputation;
-
     ll_gc_ll_reverse(lat, lon, options.EndLat, options.EndLon, &bearing, 0);
 skipbearingcomputation:
 
@@ -450,7 +448,7 @@ skipbearingcomputation:
         }
     }
 
-    if(count < 3) /* tested in normalize, but save the extra steps */
+    if(count < 3) /* would get eliminated anyway, but save the extra steps */
         return false;
 
     IsoRoute *nr = new IsoRoute(points->BuildSkipList());
@@ -702,7 +700,6 @@ bool IsoRoute::CompletelyContained(IsoRoute *r)
     do {
         if(Contains(pos, false) != 1)
             return false;
-
         pos = pos->next;
     } while(pos != r->skippoints->point);
     return true;
@@ -713,7 +710,6 @@ bool IsoRoute::CompletelyContained(IsoRoute *r)
 bool IsoRoute::ContainsRoute(IsoRoute *r)
 {
     Position *pos = r->skippoints->point;
-
     do {
         switch(Contains(pos, false)) {
         case 0: return false;
@@ -723,7 +719,7 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
         pos = pos->next;
     } while(pos != r->skippoints->point); /* avoid deadlock.. lets hope we dont do this often */
 
-    return true; /* probably good to say it is contained in this rare case */
+    return true; /* probably good to say it is contained in this unlikely case */
 }
 
 /* apply current to given route, and return if it changed at all */
@@ -759,7 +755,6 @@ bool IsoRoute::ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options)
 }
 
 enum { MINLON, MAXLON, MINLAT, MAXLAT };
-
 /* return false if longitude is possibly invalid
    could cache these bounds to avoid recomputing all the time */
 void IsoRoute::FindIsoRouteBounds(double bounds[4])
@@ -799,8 +794,8 @@ void IsoRoute::RemovePosition(SkipPosition *s, Position *p)
 
     if(s->point == p) {
 #if 0
-    /* possible optimization.. is this really useful? */
-    /* is this correct? */
+    /* possible optimization to avoid rebuilding the skip list.. is this really useful? */
+        /* warning: this is not correct yet */
         int pquadrant = s->prev->quadrant;
         int quadrant = FindQuadrant(p->prev, p->next);
         if(quadrant == pquadrant) {
@@ -858,8 +853,8 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
 
 /* given positions p and s in skip list between sp and ss, fix stuff adding removing
    or shifting skip positions to make things valid after this merge */
-/*inline*/ void FixSkipList(SkipPosition *sp, SkipPosition *ss, Position *p, Position *s, int rquadrant,
-                            SkipPosition *&spend, SkipPosition *&ssend)
+/*inline*/ void FixSkipList(SkipPosition *sp, SkipPosition *ss, Position *p, Position *s,
+                            int rquadrant, SkipPosition *&spend, SkipPosition *&ssend)
 {
     int quadrant = ComputeQuadrant(p, s);
     if(sp->point == p) {
@@ -878,7 +873,6 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
             }
             sp->prev->Remove();
         }
-
 /* DUPLICATE START */
         if(quadrant == rquadrant) {
             if(rquadrant == ss->quadrant)
@@ -903,7 +897,6 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
             remove:
               if(sp == ss)
                 printf("sp == ss.. this is bad\n");
-
                 if(ss == spend)
                     spend = ss->next;
                 if(ss == ssend)
@@ -1015,11 +1008,10 @@ bool UpdateEnd(SkipPosition *spend, SkipPosition *sr)
  */
 bool Normalize(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions)
 {
-#if 1
+#if 0
   static int ncount;
   ncount++;
 #endif
-
   bool normalizing;
 
 reset:
@@ -1053,22 +1045,7 @@ reset:
   }
 
   SkipPosition *sp = spend;
-
-  startnormalizing:
-#if 0
-  if(ncount == 1320)
- {
-   printf("n: %d\n", ncount);
-   printf("r1:\n");
-   route1->skippoints = spend;
-   route1->Print();
-   if(!normalizing) {
-     printf("r2:\n");
-     route2->Print();
-   }
- }
-#endif
-
+startnormalizing:
   do {
 
     SkipPosition *sq = sp->next;
@@ -1348,7 +1325,7 @@ reset:
             ssend = spend;
             spend = sr->next; /* after old sq we are done.. this is known */
             /* continue from here and begin to normalize */
-#if 0 /* these only needed if we could jump back in too a more optimal spot */
+#if 0 /* these only needed if we could jump back in too a more optimal spot than startnormalizing */
             /*  could in theory somehow skip to p for this round instead of starting
                 at sp->point.. but I doubt it would speed things up that much. */
             sr = sp, ss = sr->next;
@@ -1360,13 +1337,13 @@ reset:
         }
       skipmerge:        
         COMPUTE_STATE(state, s, pq);
-      skippr: ;
+      skippr:;
       } while(s != rend);
       p = q;
     } while(p != pend);
  done:
     COMPUTE_STATE(state, s,)
-  skip: ;
+ skip:;
     } while(ss != ssend);
   sp = sq;
 } while(sp != spend);
@@ -1382,16 +1359,6 @@ reset:
 /* take two routes that may overlap, and combine into a list of non-overlapping routes */
 bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions)
 {
-#if 0
-    extern int debugcnt;
-            if(debugcnt == 108) {
-                printf("here\n");
-                printf("r1:\n");
-                route1->Print();
-                printf("r2:\n");
-                route2->Print();
-            }
-#endif
     if(route1->direction == -1 && route2->direction == -1) {
         printf("cannot merge two inverted routes\n");
         exit(1);
@@ -1516,7 +1483,6 @@ Position *IsoRoute::ClosestPosition(double lat, double lon)
             }
         }
     }
-
     return minpos;
 }
 
@@ -1656,9 +1622,7 @@ RouteMap::~RouteMap()
     Clear();
 }
 
-bool RouteMap::ReduceList(IsoRouteList &merged,
-                          IsoRouteList &routelist,
-                          RouteMapOptions &options)
+bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapOptions &options)
 {
     /* once we have multiple worker threads, we can delegate a workers here
        to merge routes. */
@@ -1786,7 +1750,6 @@ bool RouteMap::Propagate()
             Unlock();
             return false;
         }
-
         update = new IsoChron(merged, GribTime, grib);
     } else
         update = NULL;
