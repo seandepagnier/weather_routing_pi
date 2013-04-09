@@ -41,15 +41,7 @@ BoatPlanDialog::BoatPlanDialog( wxWindow *parent, BoatPlan &BoatPlan, std::vecto
     : BoatPlanDialogBase(parent), m_BoatPlan(BoatPlan), m_PlanNames(PlanNames)
 {
     m_tBoatPlanName->SetValue(BoatPlan.Name);
-
-    for(std::vector<SwitchPlan>::iterator it = m_BoatPlan.SwitchPlans.begin();
-        it != m_BoatPlan.SwitchPlans.end(); it++)
-        m_lSwitchPlans->Append((*it).Name);
-
-    if(m_BoatPlan.SwitchPlans.size() == 0) {
-        m_bEditSwitchBoatPlan->Disable();
-        m_bDeleteSwitchBoatPlan->Disable();
-    }
+    PopulatePlans();
 }
 
 BoatPlanDialog::~BoatPlanDialog()
@@ -67,6 +59,7 @@ void BoatPlanDialog::OnPaintPlot(wxPaintEvent& event)
 void BoatPlanDialog::OnNewSwitchPlanRule( wxCommandEvent& event )
 {
     SwitchPlan plan;
+    plan.Name = m_PlanNames[0];
     m_BoatPlan.SwitchPlans.push_back(plan);
 
     int index = m_lSwitchPlans->Append(_(""));
@@ -95,31 +88,12 @@ void BoatPlanDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
     }
         
     SwitchPlanDialog dialog(this, plan, m_PlanNames);
-    dialog.ShowModal();
+    if(dialog.ShowModal() == wxID_OK)
+        m_BoatPlan.SwitchPlans[index] = plan;
+    else
+        m_BoatPlan.SwitchPlans.erase(m_BoatPlan.SwitchPlans.begin() + index);
 
-    wxString des, a, andstr = _(" and ");
-    if(!isnan(plan.MaxWindSpeed))
-        des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindSpeed), a = andstr;
-
-    if(!isnan(plan.MinWindSpeed))
-        des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindSpeed), a = andstr;
-
-    if(!isnan(plan.MaxWindDirection))
-        des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindDirection), a = andstr;
-
-    if(!isnan(plan.MinWindDirection))
-        des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindDirection), a = andstr;
-
-    if(!isnan(plan.MaxWaveHeight))
-        des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWaveHeight), a = andstr;
-
-    if(!isnan(plan.MinWaveHeight))
-        des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWaveHeight), a = andstr;
-
-    des += _(" switch to ");
-    des += plan.Name;
-
-    m_lSwitchPlans->Set(index, new wxString(des));
+    PopulatePlans();
 }
 
 void BoatPlanDialog::OnDeleteSwitchPlanRule( wxCommandEvent& event )
@@ -130,17 +104,12 @@ void BoatPlanDialog::OnDeleteSwitchPlanRule( wxCommandEvent& event )
 
     SwitchPlan plan = m_BoatPlan.SwitchPlans[index];
     m_BoatPlan.SwitchPlans.erase(m_BoatPlan.SwitchPlans.begin() + index);
-
-    m_lSwitchPlans->Delete(index);
-
-    if(m_BoatPlan.SwitchPlans.size() == 0) {
-        m_bEditSwitchBoatPlan->Disable();
-        m_bDeleteSwitchBoatPlan->Disable();
-    }
+    PopulatePlans();
 }
 
 void BoatPlanDialog::OnDone( wxCommandEvent& event )
 {
+    m_BoatPlan.Name = m_tBoatPlanName->GetValue();
     for(std::vector<wxString>::iterator it = m_PlanNames.begin(); it != m_PlanNames.end(); it++)
         if(*it == m_BoatPlan.Name) {
             wxMessageDialog md(this, _("Cannot add plan with same name as existing plan."),
@@ -151,3 +120,42 @@ void BoatPlanDialog::OnDone( wxCommandEvent& event )
 
     EndModal(wxID_OK);
 }
+
+void BoatPlanDialog::PopulatePlans()
+{
+    if(m_BoatPlan.SwitchPlans.size() == 0) {
+        m_bEditSwitchBoatPlan->Disable();
+        m_bDeleteSwitchBoatPlan->Disable();
+    }
+
+    m_lSwitchPlans->Clear();
+
+    for(unsigned int i=0; i<m_BoatPlan.SwitchPlans.size(); i++) {
+        SwitchPlan plan = m_BoatPlan.SwitchPlans[i];
+    
+        wxString des, a, andstr = _(" and ");
+        if(!isnan(plan.MaxWindSpeed))
+            des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindSpeed), a = andstr;
+        
+        if(!isnan(plan.MinWindSpeed))
+            des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindSpeed), a = andstr;
+
+        if(!isnan(plan.MaxWindDirection))
+            des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindDirection), a = andstr;
+        
+        if(!isnan(plan.MinWindDirection))
+            des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindDirection), a = andstr;
+        
+        if(!isnan(plan.MaxWaveHeight))
+            des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWaveHeight), a = andstr;
+
+        if(!isnan(plan.MinWaveHeight))
+            des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWaveHeight), a = andstr;
+        
+        des += _(" switch to ");
+        des += plan.Name;
+        
+        m_lSwitchPlans->Append(des);
+    }
+}
+    

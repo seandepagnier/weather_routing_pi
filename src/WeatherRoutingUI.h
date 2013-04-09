@@ -359,10 +359,12 @@ class SwitchPlanDialogBase : public wxDialog
 		wxStaticText* m_staticText107;
 		wxChoice* m_cPlans;
 		wxButton* m_bDone;
+		wxButton* m_bCancel;
 		wxButton* m_bInformation;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		
 	
@@ -408,7 +410,7 @@ class PlotDialogBase : public wxDialog
 	
 	public:
 		
-		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~PlotDialogBase();
 	
 };

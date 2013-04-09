@@ -47,6 +47,8 @@ public:
     void OnDone( wxCommandEvent& event );
 
 private:
+    void PopulatePlans();
+
     BoatPlan &m_BoatPlan;
     std::vector<wxString> &m_PlanNames;
 };

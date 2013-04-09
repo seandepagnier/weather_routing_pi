@@ -27,11 +27,16 @@ SET(PREFIX_PARENTDATA ${PREFIX_DATA}/${PARENT})
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 
+# SET(PROFILING 1)
+
 #  IF NOT DEBUGGING CFLAGS="-O2 -march=native"
 IF(NOT WIN32)
-ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
-# ADD_DEFINITIONS( "-Wall -g -fexceptions" )
-# ADD_DEFINITIONS( "-Wall -g -O2 -fexceptions" )
+ IF(PROFILING)
+  ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
+ ELSE(PROFILING)
+  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
+ # ADD_DEFINITIONS( "-Wall -g -O2 -fexceptions" )
+ ENDIF(PROFILING)
 
  IF(NOT APPLE)
   SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,-Bsymbolic")
@@ -122,6 +127,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(UNIX)
+ IF(PROFILING)
   find_library(GCOV_LIBRARY
     NAMES
     gcov
@@ -131,6 +137,7 @@ IF(UNIX)
 
   MESSAGE (STATUS "gcov : " ${GCOV_LIBRARY})
   SET(EXTRA_LIBS ${EXTRA_LIBS} ${GCOV_LIBRARY})
+ ENDIF(PROFILING)
 ENDIF(UNIX)
 
 TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${wxWidgets_LIBRARIES} ${EXTRA_LIBS} )

@@ -135,6 +135,16 @@ void WeatherRoutingDialog::OnPlot ( wxCommandEvent& event )
     plotdialog.ShowModal();
 }
 
+#ifdef __MSVC__
+void WeatherRoutingDialog::OnExport ( wxCommandEvent& event )
+{
+    wxMessageDialog mdlg(this, _("export function not supported for visual studio compiler on windows.\n"),
+                         _("Weather Routing"), wxOK | wxICON_WARNING);
+    mdlg.ShowModal();
+}
+
+#else
+
 #include "../../../include/chart1.h"
 #include "../../../include/chcanv.h"
 #include "../../../include/chartdb.h"
@@ -187,6 +197,7 @@ void WeatherRoutingDialog::OnExport ( wxCommandEvent& event )
     if( pRouteManagerDialog && pRouteManagerDialog->IsShown() )
         pRouteManagerDialog->UpdateRouteListCtrl();
 }
+#endif
 
 void WeatherRoutingDialog::OnReset ( wxCommandEvent& event )
 {

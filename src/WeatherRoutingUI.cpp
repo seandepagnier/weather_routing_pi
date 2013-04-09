@@ -1334,7 +1334,7 @@ SwitchPlanDialogBase::SwitchPlanDialogBase( wxWindow* parent, wxWindowID id, con
 	fgSizer55->Add( sbSizer15, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer56;
-	fgSizer56 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer56 = new wxFlexGridSizer( 2, 0, 0, 0 );
 	fgSizer56->SetFlexibleDirection( wxBOTH );
 	fgSizer56->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -1347,8 +1347,14 @@ SwitchPlanDialogBase::SwitchPlanDialogBase( wxWindow* parent, wxWindowID id, con
 	m_cPlans->SetSelection( 0 );
 	fgSizer56->Add( m_cPlans, 0, wxALL, 5 );
 	
+	
+	fgSizer56->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	m_bDone = new wxButton( this, wxID_ANY, wxT("Done"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer56->Add( m_bDone, 0, wxALL, 5 );
+	
+	m_bCancel = new wxButton( this, wxID_ANY, wxT("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer56->Add( m_bCancel, 0, wxALL, 5 );
 	
 	m_bInformation = new wxButton( this, wxID_ANY, wxT("Information"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer56->Add( m_bInformation, 0, wxALL, 5 );
@@ -1365,6 +1371,7 @@ SwitchPlanDialogBase::SwitchPlanDialogBase( wxWindow* parent, wxWindowID id, con
 	
 	// Connect Events
 	m_bDone->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnDone ), NULL, this );
+	m_bCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnCancel ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnInformation ), NULL, this );
 }
 
@@ -1372,6 +1379,7 @@ SwitchPlanDialogBase::~SwitchPlanDialogBase()
 {
 	// Disconnect Events
 	m_bDone->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnDone ), NULL, this );
+	m_bCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnCancel ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SwitchPlanDialogBase::OnInformation ), NULL, this );
 	
 }

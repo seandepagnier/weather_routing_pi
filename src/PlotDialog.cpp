@@ -26,7 +26,6 @@
  *
  */
 
-
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 
@@ -151,7 +150,6 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
 
     wxChoice *cVariable[3] = {m_cVariable1, m_cVariable2, m_cVariable3};
     wxColour colors[3] = {wxColour(255, 0, 0), wxColour(0, 255, 0), wxColour(0, 0, 255)};
-
     for(int i=0; i<3; i++) {
         dc.SetPen(wxPen(colors[i], 3));
 
@@ -169,5 +167,18 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
                 dc.DrawLine(lx, ly, x, y);
             lx = x, ly = y;
         }
+    }
+
+    dc.SetTextForeground(wxColour(0, 0, 0));
+    const double steps = 10;
+    for(double x=1/steps; x<1-1/steps; x+=1/steps) {
+        wxString time = wxString::Format
+            (_T("%.0f"), ((x - position)/scale + position) * (m_maxtime - m_mintime) + m_mintime);
+        wxSize s = dc.GetTextExtent(time);
+        dc.DrawText(time, x*w-s.x/2, 0);
+
+        wxString value = wxString::Format(_T("%.1f"), (1-x)*(m_maxvalue - m_minvalue) + m_minvalue);
+        s = dc.GetTextExtent(value);
+        dc.DrawText(value, 0, x*h - s.y/2);
     }
 }

@@ -39,6 +39,7 @@ public:
     ~SwitchPlanDialog();
 
     void OnDone( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event ) { EndModal(wxID_CANCEL); }
     void OnInformation( wxCommandEvent& event );
 
     SwitchPlan &plan;
