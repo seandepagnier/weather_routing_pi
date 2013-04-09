@@ -32,21 +32,17 @@
 #include <math.h>
 #include <time.h>
 
-#include "WeatherRoutingSettingsDialog.h"
+#include "SettingsDialog.h"
 #include "weather_routing_pi.h"
 
 #include "Utilities.h"
 
-WeatherRoutingSettingsDialog::WeatherRoutingSettingsDialog( wxWindow *parent )
-    : WeatherRoutingSettingsDialogBase(parent)
+SettingsDialog::SettingsDialog( wxWindow *parent )
+    : SettingsDialogBase(parent)
 {
 }
 
-WeatherRoutingSettingsDialog::~WeatherRoutingSettingsDialog( )
-{
-}
-
-void WeatherRoutingSettingsDialog::LoadSettings()
+void SettingsDialog::LoadSettings()
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -74,6 +70,10 @@ void WeatherRoutingSettingsDialog::LoadSettings()
     bool AlternatesForAll = m_cbAlternatesForAll->GetValue();
     pConf->Read( _T("AlternatesForAll"), &AlternatesForAll, AlternatesForAll);
     m_cbAlternatesForAll->SetValue(AlternatesForAll);
+
+    bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
+    pConf->Read( _T("SquaresAtSailChanges"), &SquaresAtSailChanges, SquaresAtSailChanges);
+    m_cbSquaresAtSailChanges->SetValue(SquaresAtSailChanges);
     
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "SettingsDialogX" ), &p.x, p.x);
@@ -81,7 +81,7 @@ void WeatherRoutingSettingsDialog::LoadSettings()
     SetPosition(p);
 }
 
-void WeatherRoutingSettingsDialog::SaveSettings( )
+void SettingsDialog::SaveSettings( )
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -103,6 +103,9 @@ void WeatherRoutingSettingsDialog::SaveSettings( )
 
     bool AlternatesForAll = m_cbAlternatesForAll->GetValue();
     pConf->Write( _T("AlternatesForAll"), AlternatesForAll);
+
+    bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
+    pConf->Write( _T("SquaresAtSailChanges"), SquaresAtSailChanges);
 
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "SettingsDialogX" ), p.x);

@@ -71,10 +71,10 @@ SET(SRC_WEATHER_ROUTING
             src/weather_routing_pi.cpp
             src/WeatherRoutingDialog.h 
             src/WeatherRoutingDialog.cpp
-            src/WeatherRoutingConfigurationDialog.h 
-            src/WeatherRoutingConfigurationDialog.cpp
-            src/WeatherRoutingSettingsDialog.h 
-            src/WeatherRoutingSettingsDialog.cpp
+            src/ConfigurationDialog.h 
+            src/ConfigurationDialog.cpp
+            src/SettingsDialog.h 
+            src/SettingsDialog.cpp
             src/PlotDialog.h
             src/PlotDialog.cpp
             src/BoatDialog.h
@@ -83,6 +83,8 @@ SET(SRC_WEATHER_ROUTING
             src/BoatPlanDialog.cpp
             src/SwitchPlanDialog.h
             src/SwitchPlanDialog.cpp
+            src/StatisticsDialog.h 
+            src/StatisticsDialog.cpp
             src/BoatPlan.h 
             src/BoatPlan.cpp
             src/Boat.h 

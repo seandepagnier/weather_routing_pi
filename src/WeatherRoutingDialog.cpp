@@ -35,6 +35,7 @@
 #include "Utilities.h"
 #include "Boat.h"
 #include "BoatDialog.h"
+#include "StatisticsDialog.h"
 #include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
 #include "WeatherRoutingDialog.h"
@@ -108,7 +109,7 @@ void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
     UpdateEnd();
 }
 
-int debugcnt, debuglimit = -1, debugsize = 18;
+int debugcnt, debuglimit = 107, debugsize = 5;
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
     if(m_RouteMapOverlay.Running()) {
@@ -218,12 +219,18 @@ void WeatherRoutingDialog::OnInformation ( wxCommandEvent& event )
     }
 }
 
+void WeatherRoutingDialog::OnStatistics( wxCommandEvent& event )
+{
+    StatisticsDialog dlg(this, m_RouteMapOverlay, m_RunTime);
+    dlg.ShowModal();
+}
+
 void WeatherRoutingDialog::OnConfiguration( wxCommandEvent& event )
 {
-    m_ConfigurationDialog.LoadConfiguration();
+    m_ConfigurationDialog.Load();
     if(m_ConfigurationDialog.ShowModal() == wxID_OK) {
         ReconfigureRouteMap();
-        m_ConfigurationDialog.SaveConfiguration();
+        m_ConfigurationDialog.Save();
     }
 }
 
@@ -268,13 +275,12 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
     }
 
     static int cycles; /* don't refresh all the time */
-    if(++cycles > 40 && m_RouteMapOverlay.Updated()) {
+    if(++cycles > 10 && m_RouteMapOverlay.Updated()) {
         cycles = 0;
 
         m_RunTime += wxDateTime::Now() - m_StartTime;
         m_StartTime = wxDateTime::Now();
 
-        UpdateStatistics();
         GetParent()->Refresh();
     }
 
@@ -313,23 +319,6 @@ void WeatherRoutingDialog::Stop()
     m_bCompute->SetLabel(_( "&Start" ));
     m_bReset->Enable();
     m_RunTime += wxDateTime::Now() - m_StartTime;
-    UpdateStatistics();
-}
-
-void WeatherRoutingDialog::UpdateStatistics()
-{
-    m_stState->SetLabel(m_RouteMapOverlay.Running() ? _("Running") : _("Stopped"));
-    m_stRunTime->SetLabel(m_RunTime.Format());
-    
-    int isochrons, routes, invroutes, skippositions, positions;
-    m_RouteMapOverlay.GetStatistics(isochrons, routes, invroutes, skippositions, positions);
-    m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
-    m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
-    m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
-    m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
-    m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
-
-    Refresh();
 }
 
 void WeatherRoutingDialog::Reset()
@@ -351,7 +340,6 @@ void WeatherRoutingDialog::Reset()
     m_RouteMapOverlay.Reset(time);
 
     m_RunTime = wxTimeSpan(0);
-    UpdateStatistics();
     GetParent()->Refresh();
 }
 
@@ -379,5 +367,6 @@ void WeatherRoutingDialog::SetRouteMapOverlaySettings()
         m_SettingsDialog.m_sRouteThickness->GetValue(),
         m_SettingsDialog.m_sIsoChronThickness->GetValue(),
         m_SettingsDialog.m_sAlternateRouteThickness->GetValue(),
-        m_SettingsDialog.m_cbAlternatesForAll->GetValue());
+        m_SettingsDialog.m_cbAlternatesForAll->GetValue(),
+        m_SettingsDialog.m_cbSquaresAtSailChanges->GetValue());
 }

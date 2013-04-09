@@ -55,20 +55,6 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxStaticText* m_stStartTime;
 		wxStaticText* m_staticText51;
 		wxStaticText* m_staticText61;
-		wxStaticText* m_staticText47;
-		wxStaticText* m_stState;
-		wxStaticText* m_staticText511;
-		wxStaticText* m_stRunTime;
-		wxStaticText* m_staticText53;
-		wxStaticText* m_stIsoChrons;
-		wxStaticText* m_staticText55;
-		wxStaticText* m_stRoutes;
-		wxStaticText* m_staticText57;
-		wxStaticText* m_stInvRoutes;
-		wxStaticText* m_staticText90;
-		wxStaticText* m_stSkipPositions;
-		wxStaticText* m_staticText49;
-		wxStaticText* m_stPositions;
 		wxButton* m_bCompute;
 		wxButton* m_bReset;
 		wxButton* m_bConfiguration;
@@ -77,6 +63,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxButton* m_bPlot;
 		wxButton* m_bExport;
 		wxButton* m_bInformation;
+		wxButton* m_bStatistics;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdateEnd( wxCommandEvent& event ) { event.Skip(); }
@@ -88,6 +75,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -102,9 +90,9 @@ class WeatherRoutingDialogBase : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class WeatherRoutingConfigurationDialogBase
+/// Class ConfigurationDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class WeatherRoutingConfigurationDialogBase : public wxDialog 
+class ConfigurationDialogBase : public wxDialog 
 {
 	private:
 	
@@ -146,15 +134,15 @@ class WeatherRoutingConfigurationDialogBase : public wxDialog
 	
 	public:
 		
-		WeatherRoutingConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
-		~WeatherRoutingConfigurationDialogBase();
+		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~ConfigurationDialogBase();
 	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class WeatherRoutingSettingsDialogBase
+/// Class SettingsDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class WeatherRoutingSettingsDialogBase : public wxDialog 
+class SettingsDialogBase : public wxDialog 
 {
 	private:
 	
@@ -175,9 +163,10 @@ class WeatherRoutingSettingsDialogBase : public wxDialog
 		wxSpinCtrl* m_sIsoChronThickness;
 		wxSpinCtrl* m_sAlternateRouteThickness;
 		wxCheckBox* m_cbAlternatesForAll;
+		wxCheckBox* m_cbSquaresAtSailChanges;
 		
-		WeatherRoutingSettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
-		~WeatherRoutingSettingsDialogBase();
+		SettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
+		~SettingsDialogBase();
 	
 };
 
@@ -432,6 +421,38 @@ class InformationDialog : public wxDialog
 		
 		InformationDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Information"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,400 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~InformationDialog();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class StatisticsDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class StatisticsDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText47;
+		wxStaticText* m_stState;
+		wxStaticText* m_staticText511;
+		wxStaticText* m_stRunTime;
+		wxStaticText* m_staticText53;
+		wxStaticText* m_stIsoChrons;
+		wxStaticText* m_staticText55;
+		wxStaticText* m_stRoutes;
+		wxStaticText* m_staticText57;
+		wxStaticText* m_stInvRoutes;
+		wxStaticText* m_staticText90;
+		wxStaticText* m_stSkipPositions;
+		wxStaticText* m_staticText49;
+		wxStaticText* m_stPositions;
+		wxStdDialogButtonSizer* m_sdbSizer5;
+		wxButton* m_sdbSizer5OK;
+	
+	public:
+		
+		StatisticsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Statistics"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~StatisticsDialogBase();
 	
 };
 

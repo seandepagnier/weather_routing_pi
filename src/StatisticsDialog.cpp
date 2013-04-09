@@ -21,29 +21,36 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.             *
+ *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
+ *
  */
 
-#ifndef _WEATHER_ROUTING_SETTINGS_H_
-#define _WEATHER_ROUTING_SETTINGS_H_
+#include <wx/wx.h>
 
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
-#include <wx/treectrl.h>
-#include <wx/fileconf.h>
+#include "StatisticsDialog.h"
 
-#include "WeatherRoutingUI.h"
+#include "Utilities.h"
+#include "Boat.h"
+#include "RouteMapOverlay.h"
 
-class WeatherRoutingSettingsDialog : public WeatherRoutingSettingsDialogBase
+StatisticsDialog::StatisticsDialog( wxWindow *parent, RouteMapOverlay &routemapoverlay, wxTimeSpan RunTime )
+    : StatisticsDialogBase(parent)
 {
-public:
-    WeatherRoutingSettingsDialog( wxWindow *parent );
-    ~WeatherRoutingSettingsDialog( );
+    m_stState->SetLabel(routemapoverlay.Running() ? _("Running") : _("Stopped"));
+    m_stRunTime->SetLabel(RunTime.Format());
+    
+    int isochrons, routes, invroutes, skippositions, positions;
+    routemapoverlay.GetStatistics(isochrons, routes, invroutes, skippositions, positions);
+    m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
+    m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
+    m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
+    m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
+    m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
 
-    void LoadSettings();
-    void SaveSettings();
-
-protected:
-};
-
-#endif
+    Fit();
+}

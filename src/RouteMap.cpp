@@ -174,15 +174,18 @@ void BoatOverGround(double B, double VB, double C, double VC, double &BG, double
    if no intersection return 0, otherwise, 1 if the
    second line crosses from right to left, or -1 for left to right
 
-   If the math breaks down and for contrived cases, -2 or 2 is returned
-   to specify if the first or second segment is the problem
+   In the case that an end point basically lies on a segment, then
+   -2: first point first seg
+   -3: second point first seg
+   2: first point second seg
+   3: second point second seg
 
    Truth equations to calculate intersection (x, y)
    (y-y1) * (x2-x1) = (y2-y1) * (x-x1)
    (y-y3) * (x4-x3) = (y4-y3) * (x-x3)
 */
-inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
-                              double x3, double y3, double x4, double y4)
+/*inline*/ int TestIntersectionXY(double x1, double y1, double x2, double y2,
+                                  double x3, double y3, double x4, double y4)
 {
 #if 0 /* this never gets hit due to the use of states.. so it doens't help performance */
     /* quick test to avoid calculations if segments are far apart */
@@ -204,7 +207,7 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 #define EPS 2e-10
 #define EPS2 2e-5
     if(fabs(denom) < EPS) { /* parallel or really close to parallel */
-        if(fabs((y1 + by*ax*x3) - (y3 + ay*bx*x1)) > EPS2)
+        if(fabs((y1*ax - ay*x1)*bx - (y3*bx - by*x3)*ax) > EPS2)
             return 0; /* different intercepts, no intersection */
 
         /* we already know from initial test we are overlapping,
@@ -212,8 +215,14 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
            which direction the intersection occurs */
         if(!ax && !ay) /* first segment is a zero segment */
             return -2;
-        else
-            return 2;
+
+        /* can invalidate a point on either segment for overlapping parallel,
+           we will always choose second segment */
+        double dx = x2 - x3, dy = y2 - y3;
+        double da = ax*ax + bx*bx, db = cx*cx + cy*cy, dc = dx*dx + dy*dy;
+        if(db <= da && dc <= da) /* point 3 is between 1 and 2 */
+            return 2; 
+        return 3;
     }
 
     double recip = 1 / denom;
@@ -227,9 +236,10 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 
     /* too close to call.. floating point loses bits with arithmetic so
        in this case we must avoid potential false guesses */
-    if(na < EPS2 || na > 1 - EPS2 ||
-       nb < EPS2 || nb > 1 - EPS2)
-        return 2;
+    if(na < EPS2)     return -2;
+    if(na > 1 - EPS2) return -3;
+    if(nb < EPS2)     return 2;
+    if(nb > 1 - EPS2) return 3;
 
     return denom < 0 ? -1 : 1;
 }
@@ -640,7 +650,7 @@ int IsoRoute::IntersectionCount(Position *pos)
                         {
                             int dir = TestIntersectionXY(p1lon, p1lat, p2lon, p2lat, lon, lat, lon, 91);
                             switch(dir) {
-                            case -2: case 2: return -1;
+                            case -2: case -3: case 2: case 3: return -1;
                             case 1: case -1: goto intersects;
                             }
                         } break;
@@ -752,7 +762,7 @@ enum { MINLON, MAXLON, MINLAT, MAXLAT };
 
 /* return false if longitude is possibly invalid
    could cache these bounds to avoid recomputing all the time */
-bool IsoRoute::FindIsoRouteBounds(double bounds[4])
+void IsoRoute::FindIsoRouteBounds(double bounds[4])
 {
     SkipPosition *maxlat = skippoints;
     Position *p = skippoints->point;
@@ -772,13 +782,6 @@ bool IsoRoute::FindIsoRouteBounds(double bounds[4])
         s = s->next;
     }
     skippoints = maxlat; /* set to max lat for merging to keep outside */
-    
-#if 0
-    /* cross date line? */
-    if(bounds[MAXLON] - bounds[MINLON] > 180)
-        return false; /* possibly invalid for longitude */
-#endif
-    return true;
 }
 
 /* remove and delete a position given it's last skip position,
@@ -1230,9 +1233,19 @@ reset:
         case -2:
           route1->skippoints = spend;
           route2->skippoints = ssend;
+          route1->RemovePosition(sp, p);
+          goto reset;
+        case -3:
+          route1->skippoints = spend;
+          route2->skippoints = ssend;
           route1->RemovePosition(sq, q);
           goto reset;
         case 2:
+          route1->skippoints = spend;
+          route2->skippoints = ssend;
+          route2->RemovePosition(sr, r);
+          goto reset;
+        case 3:
           route1->skippoints = spend;
           route2->skippoints = ssend;
           route2->RemovePosition(ss, s);
@@ -1256,10 +1269,6 @@ reset:
 
           SwapSegments(p, q, r, s); /* update position list */
           SwapSkipSegments(sp, sq, sr, ss); /* update skip lists */
-
-          if(ncount == 1320) {
-            printf("here\n");
-          }
 
           /* now update skip list properly */
           if(sp->quadrant != sr->quadrant) {
@@ -1373,6 +1382,16 @@ reset:
 /* take two routes that may overlap, and combine into a list of non-overlapping routes */
 bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions)
 {
+#if 0
+    extern int debugcnt;
+            if(debugcnt == 108) {
+                printf("here\n");
+                printf("r1:\n");
+                route1->Print();
+                printf("r2:\n");
+                route2->Print();
+            }
+#endif
     if(route1->direction == -1 && route2->direction == -1) {
         printf("cannot merge two inverted routes\n");
         exit(1);
@@ -1380,12 +1399,11 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
 
     /* quick test to make sure we could possibly intersect with bounds */
     double bounds1[4], bounds2[4];
-    bool r1bv = route1->FindIsoRouteBounds(bounds1);
-    bool r2bv = route2->FindIsoRouteBounds(bounds2);
+    route1->FindIsoRouteBounds(bounds1);
+    route2->FindIsoRouteBounds(bounds2);
     if(bounds1[MINLAT] > bounds2[MAXLAT] || bounds1[MAXLAT] < bounds2[MINLAT])
         return false;
-    if(/*r1bv && r2bv &&*/
-       (bounds1[MINLON] > bounds2[MAXLON] || bounds1[MAXLON] < bounds2[MINLON]))
+    if(bounds1[MINLON] > bounds2[MAXLON] || bounds1[MAXLON] < bounds2[MINLON])
         return false;
 
     /* make sure we start on the outside */
@@ -1660,7 +1678,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged,
             extern int debugcnt, debuglimit;
             if(
 #if 0
-              (origin.size() <= 50 || debugcnt++ < debuglimit) &&
+              (origin.size() <= 4 || debugcnt++ < debuglimit) &&
 #endif
               Merge(rl, r1, r2, 0, options.InvertedRegions)) {
 #if 1 /* TODO: find fastest method */

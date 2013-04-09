@@ -25,69 +25,17 @@
  ***************************************************************************
  */
 
-#ifndef _WEATHER_ROUTING_H_
-#define _WEATHER_ROUTING_H_
-
-
-#include <wx/treectrl.h>
-#include <wx/fileconf.h>
+#ifndef _WEATHER_ROUTING_STATISTICS_H_
+#define _WEATHER_ROUTING_STATISTICS_H_
 
 #include "WeatherRoutingUI.h"
-#include "ConfigurationDialog.h"
-#include "SettingsDialog.h"
 
-class weather_routing_pi;
-class BoatDialog;
-class GribUIDialog;
+class RouteMapOverlay;
 
-class WeatherRoutingDialog : public WeatherRoutingDialogBase
+class StatisticsDialog : public StatisticsDialogBase
 {
 public:
-    WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon );
-    ~WeatherRoutingDialog( );
-
-    void Reset();
-
-    void RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp);
-    RouteMapOverlay m_RouteMapOverlay;
-
-private:
-    void OnUpdateEnd( wxCommandEvent& event );
-    void OnCompute( wxCommandEvent& event );
-    void OnReset( wxCommandEvent& event );
-    void OnSettings( wxCommandEvent& event );
-    void OnConfiguration( wxCommandEvent& event );
-    void OnBoat( wxCommandEvent& event );
-    void OnPlot( wxCommandEvent& event );
-    void OnExport( wxCommandEvent& event );
-    void OnInformation( wxCommandEvent& event );
-    void OnStatistics( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event );
-    void OnComputationTimer( wxTimerEvent & );
-
-    void UpdateStatistics();
-
-    void UpdateEnd();
-    void Start();
-    void Stop();
-    void ReconfigureRouteMap();
-    void SetRouteMapOverlaySettings();
-
-    //    Data
-    weather_routing_pi   *pPlugIn;
-
-    bool m_bComputing;
-
-    bool m_bShowBoatDialog;
-    BoatDialog *m_pBoatDialog;
-
-    ConfigurationDialog m_ConfigurationDialog;
-    SettingsDialog m_SettingsDialog;
-
-    wxTimer m_tCompute;
-
-    wxTimeSpan m_RunTime;
-    wxDateTime m_StartTime;
+    StatisticsDialog( wxWindow *parent, RouteMapOverlay &routemapoverlay, wxTimeSpan RunTime );
 };
 
 #endif

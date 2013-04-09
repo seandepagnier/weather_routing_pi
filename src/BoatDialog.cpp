@@ -60,6 +60,7 @@ BoatDialog::BoatDialog( wxWindow *parent )
         m_Boat.Plans.push_back(new BoatPlan(_("Initial Plan"), m_Boat));
         m_Boat.Plans[0]->ComputeBoatSpeeds(m_Boat);
     }
+    m_SelectedSailPlan = 0;
 
     m_lBoatPlans->InsertColumn(spNAME, _("Name"));
     m_lBoatPlans->InsertColumn(spETA, _("Eta"));
@@ -438,12 +439,11 @@ void BoatDialog::OnEta( wxScrollEvent& event )
 void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
 {
     wxString np = _("New Plan");
-    m_SelectedSailPlan = m_lBoatPlans->InsertItem(0, np);
+    m_SelectedSailPlan = m_lBoatPlans->InsertItem(m_lBoatPlans->GetItemCount(), np);
     m_Boat.Plans.push_back(new BoatPlan(np, m_Boat));
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     Compute();
     OnEditBoatPlan(event);
-
     m_bDeleteBoatPlan->Enable();
 }
 
@@ -456,6 +456,7 @@ void BoatDialog::OnEditBoatPlan( wxCommandEvent& event )
 
     BoatPlanDialog dialog(this, *m_Boat.Plans[m_SelectedSailPlan], PlanNames);
     dialog.ShowModal();
+    RepopulatePlans();
 }
 
 void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
@@ -494,12 +495,13 @@ void BoatDialog::RepopulatePlans()
         info.SetId(i);
         info.SetData(i);
         long idx = m_lBoatPlans->InsertItem(info);
-        m_lBoatPlans->SetItem(idx, spNAME, m_Boat.Plans[i]->Name);
-        m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), m_Boat.Plans[i]->eta));
+        BoatPlan *plan = m_Boat.Plans[i];
+        m_lBoatPlans->SetItem(idx, spNAME, plan->Name);
+        m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), plan->eta));
     }
 
-    m_lBoatPlans->SetColumnWidth(spNAME, 250);
-    m_lBoatPlans->SetColumnWidth(spETA, 150);
+    m_lBoatPlans->SetColumnWidth(spNAME, 150);
+    m_lBoatPlans->SetColumnWidth(spETA, 60);
 
     if(m_Boat.Plans.size() > 1)
         m_bDeleteBoatPlan->Enable();

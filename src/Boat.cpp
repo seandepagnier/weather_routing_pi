@@ -44,7 +44,7 @@ Boat::~Boat()
 
 double AttributeDouble(TiXmlElement *e, const char *name, double def)
 {
-    const char *attr = e->Attribute("displacement_tons");
+    const char *attr = e->Attribute(name);
     if(!attr)
         return def;
     char *end;

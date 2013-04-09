@@ -56,7 +56,8 @@ public:
 
     void SetSettings(wxColor CursorColor, wxColor DestinationColor,
                      int IsoRouteThickness, int IsoChronThickness,
-                     int AlternateRouteThickness, bool AlternatesForAll);
+                     int AlternateRouteThickness, bool AlternatesForAll,
+                     bool SquaresAtSailChanges);
 
     bool Updated();
     void UpdateDestination();
@@ -87,5 +88,5 @@ private:
 
     wxColour m_CursorColor, m_DestinationColor;
     int m_RouteThickness, m_IsoChronThickness, m_AlternateRouteThickness;
-    bool m_bAlternatesForAll;
+    bool m_bAlternatesForAll, m_bSquaresAtSailChanges;
 };

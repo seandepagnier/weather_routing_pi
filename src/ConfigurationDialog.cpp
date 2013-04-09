@@ -35,20 +35,20 @@
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
-#include "WeatherRoutingConfigurationDialog.h"
+#include "ConfigurationDialog.h"
 #include "weather_routing_pi.h"
 
-WeatherRoutingConfigurationDialog::WeatherRoutingConfigurationDialog( wxWindow *parent )
-    : WeatherRoutingConfigurationDialogBase(parent)
+ConfigurationDialog::ConfigurationDialog( wxWindow *parent )
+    : ConfigurationDialogBase(parent)
 {
-    LoadConfiguration();
+    Load();
 }
 
-WeatherRoutingConfigurationDialog::~WeatherRoutingConfigurationDialog( )
+ConfigurationDialog::~ConfigurationDialog( )
 {
 }
 
-void WeatherRoutingConfigurationDialog::LoadConfiguration()
+void ConfigurationDialog::Load()
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -111,7 +111,7 @@ void WeatherRoutingConfigurationDialog::LoadConfiguration()
     SetPosition(p);
 }
 
-void WeatherRoutingConfigurationDialog::SaveConfiguration( )
+void ConfigurationDialog::Save( )
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -139,7 +139,7 @@ void WeatherRoutingConfigurationDialog::SaveConfiguration( )
     pConf->Write ( _T ( "ConfigurationDialogY" ), p.y);
 }
 
-void WeatherRoutingConfigurationDialog::UpdateOptions(RouteMapOptions &options)
+void ConfigurationDialog::UpdateOptions(RouteMapOptions &options)
 {
     options.dt = m_sTimeStep->GetValue();
 
@@ -170,7 +170,7 @@ void WeatherRoutingConfigurationDialog::UpdateOptions(RouteMapOptions &options)
     options.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
 }
 
-void WeatherRoutingConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
+void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
 {
     int s = m_lDegreeSteps->GetSelection();
     if(s == -1)
@@ -182,7 +182,7 @@ void WeatherRoutingConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
     m_tDegreeStep->Clear();
 }
 
-void WeatherRoutingConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& event )
+void ConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& event )
 {
     int s = m_lDegreeSteps->GetSelection();
     if(s == -1)
@@ -192,7 +192,7 @@ void WeatherRoutingConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& even
     m_lDegreeSteps->SetSelection(s);
 }
 
-void WeatherRoutingConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
+void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 {
     double value, v;
     m_tDegreeStep->GetValue().ToDouble(&value);
@@ -209,7 +209,7 @@ void WeatherRoutingConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& e
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
 }
 
-void WeatherRoutingConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
+void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
 {
     m_lDegreeSteps->Clear();
 }

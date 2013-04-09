@@ -260,8 +260,16 @@ void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &v
 
     /* draw lines to this route */
     Position *p;
-    for(p = pos; p && p->parent; p = p->parent)
+    int sailplan = pos->sailplan;
+    for(p = pos; p && p->parent; p = p->parent) {
         DrawLine(p, p->parent, dc, vp);
+        if(m_bSquaresAtSailChanges && p->sailplan != sailplan) {
+            wxPoint r;
+            GetCanvasPixLL(&vp, &r, p->lat, p->lon);
+            dc.DrawRectangle(r.x-5, r.y-5, 10, 10);
+            sailplan = p->sailplan;
+        }
+    }
 
     /* render boat on optimal course at current grib time */
     wxDateTime time;
@@ -368,7 +376,8 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
 
 void RouteMapOverlay::SetSettings(wxColor CursorColor, wxColor DestinationColor,
                                   int RouteThickness, int IsoChronThickness,
-                                  int AlternateRouteThickness, bool AlternatesForAll)
+                                  int AlternateRouteThickness, bool AlternatesForAll,
+                                  bool SquaresAtSailChanges)
                                   
 {
     m_CursorColor = CursorColor;
@@ -377,6 +386,7 @@ void RouteMapOverlay::SetSettings(wxColor CursorColor, wxColor DestinationColor,
     m_IsoChronThickness = IsoChronThickness;
     m_AlternateRouteThickness = AlternateRouteThickness;
     m_bAlternatesForAll = AlternatesForAll;
+    m_bSquaresAtSailChanges = SquaresAtSailChanges;
 }
 
 void RouteMapOverlay::Clear()

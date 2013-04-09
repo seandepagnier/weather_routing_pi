@@ -25,8 +25,8 @@
  ***************************************************************************
  */
 
-#ifndef _WEATHER_ROUTING_CONFIGURATION_H_
-#define _WEATHER_ROUTING_CONFIGURATION_H_
+#ifndef _WEATHER_ROUTING_SETTINGS_H_
+#define _WEATHER_ROUTING_SETTINGS_H_
 
 
 #include <wx/treectrl.h>
@@ -34,21 +34,15 @@
 
 #include "WeatherRoutingUI.h"
 
-class WeatherRoutingConfigurationDialog : public WeatherRoutingConfigurationDialogBase
+class SettingsDialog : public SettingsDialogBase
 {
 public:
-    WeatherRoutingConfigurationDialog( wxWindow *parent );
-    ~WeatherRoutingConfigurationDialog( );
+    SettingsDialog( wxWindow *parent );
 
-    void LoadConfiguration();
-    void SaveConfiguration();
-    void UpdateOptions(RouteMapOptions &options);
+    void LoadSettings();
+    void SaveSettings();
 
 protected:
-    void OnAddDegreeStep( wxCommandEvent& event );
-    void OnRemoveDegreeStep( wxCommandEvent& event );
-    void OnGenerateDegreeSteps( wxCommandEvent& event );
-    void OnClearDegreeSteps( wxCommandEvent& event );
 };
 
 #endif

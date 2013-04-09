@@ -100,7 +100,7 @@ public:
     bool ContainsRoute(IsoRoute *r);
 
     bool ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options);
-    bool FindIsoRouteBounds(double bounds[4]);
+    void FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon);
     bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, RouteMapOptions &options);
