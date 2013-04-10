@@ -108,18 +108,12 @@ void WeatherRoutingDialog::OnUpdateEnd( wxCommandEvent& event )
     UpdateEnd();
 }
 
-int debugcnt, debuglimit = 107, debugsize = 3;
+int debugcnt, debuglimit = 1, debugsize = 2;
 void WeatherRoutingDialog::OnCompute ( wxCommandEvent& event )
 {
-    if(m_RouteMapOverlay.Running()) {
+    if(m_RouteMapOverlay.Running())
         Stop();
-#if 0
-    debugcnt = 0;
-    debuglimit++;
-    Start();
-#endif
-
-    } else
+    else
         Start();
 }
 

@@ -35,7 +35,7 @@ IF(NOT WIN32)
   ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
  ELSE(PROFILING)
   ADD_DEFINITIONS( "-Wall -g -fexceptions" )
- # ADD_DEFINITIONS( "-Wall -g -O2 -fexceptions" )
+# ADD_DEFINITIONS( "-Wall -g -O2 -fexceptions" )
  ENDIF(PROFILING)
 
  IF(NOT APPLE)

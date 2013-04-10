@@ -79,5 +79,5 @@ double average_longitude(double lon1, double lon2)
     double rlon1 = deg2rad(lon1), rlon2 = deg2rad(lon2);
     double x1 = cos(rlon1), x2 = cos(rlon2);
     double y1 = sin(rlon1), y2 = sin(rlon2);
-    return rad2deg(atan2((y1+y2)/2, (x2+x2)/2));
+    return rad2deg(atan2((y1+y2)/2, (x1+x2)/2));
 }

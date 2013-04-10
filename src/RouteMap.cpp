@@ -414,7 +414,7 @@ skipbearingcomputation:
         /* avoid propagating from positions which go in a direction too much
            diverted from the correct course.  */
         if(fabs(heading_resolve(B - bearing)) > options.MaxDivertedCourse) {
-#if 0
+#if 1
             if(first_backtrackavoid && parent)
                 goto first_backtrack;
 #endif
@@ -446,7 +446,7 @@ skipbearingcomputation:
 
         bool hitland;
         /* test to avoid extra computations related to backtracking */
-#if 0
+#if 1
         if(prev != next && parent) {
             d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
             d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
@@ -504,19 +504,10 @@ double Position::Distance(Position *p)
     return DistGreatCircle(lat, lon, p->lat, p->lon);
 }
 
-#include "../../../include/chcanv.h"
 #include "../../../include/gshhs.h"
 bool Position::CrossesLand(double dlat, double dlon)
 {
-    static GshhsReader *reader;
-    static Projection proj;
-    if(reader == NULL)
-        reader = new GshhsReader(&proj);
-
-    QLineF trajectWorld(positive_degrees(lon), lat,
-                        positive_degrees(dlon), dlat);
-
-    return reader->crossing2(trajectWorld);
+    return gshhsCrossesLand(lat, lon, dlat, dlon);
 }
 
 SkipPosition::SkipPosition(Position *p, int q)
@@ -1047,10 +1038,6 @@ bool UpdateEnd(SkipPosition *spend, SkipPosition *sr)
  */
 bool Normalize(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions)
 {
-#if 0
-  static int ncount;
-  ncount++;
-#endif
   bool normalizing;
 
 reset:
@@ -1073,13 +1060,15 @@ reset:
       return true;
     }
 
+#if 0
     if(ssend->point->lat > spend->point->lat) { // this is never hit, should remove
         IsoRoute *t = route1;
         route1 = route2;
         route2 = t;
-        printf("attempting to correct\n");
         goto reset;
     }
+#endif
+
     normalizing = false;
   }
 
@@ -1407,12 +1396,11 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
     double bounds1[4], bounds2[4];
     route1->FindIsoRouteBounds(bounds1);
     route2->FindIsoRouteBounds(bounds2);
-    if(bounds1[MINLAT] > bounds2[MAXLAT] || bounds1[MAXLAT] < bounds2[MINLAT])
-        return false;
-    if(bounds1[MINLON] > bounds2[MAXLON] || bounds1[MAXLON] < bounds2[MINLON])
+    if(bounds1[MINLAT] > bounds2[MAXLAT] || bounds1[MAXLAT] < bounds2[MINLAT] ||
+       bounds1[MINLON] > bounds2[MAXLON] || bounds1[MAXLON] < bounds2[MINLON])
         return false;
 
-    /* make sure we start on the outside */
+    /* make sure route1 is on the outside */
     if(route2->skippoints->point->lat > route1->skippoints->point->lat) {
         IsoRoute *t = route1;
         route1 = route2;
