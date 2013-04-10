@@ -504,7 +504,7 @@ double Position::Distance(Position *p)
     return DistGreatCircle(lat, lon, p->lat, p->lon);
 }
 
-#include "../../../include/gshhs.h"
+extern bool gshhsCrossesLand(double lat1, double lon1, double lat2, double lon2);
 bool Position::CrossesLand(double dlat, double dlon)
 {
     return gshhsCrossesLand(lat, lon, dlat, dlon);
@@ -706,7 +706,6 @@ int IsoRoute::IntersectionCount(Position *pos)
 int IsoRoute::Contains(Position *pos, bool test_children)
 {
     int numintsct = IntersectionCount(pos);
-
     if(numintsct == -1)
         return -1;
 
@@ -927,11 +926,11 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
             remove:
               if(sp == ss)
                 printf("sp == ss.. this is bad\n");
-                if(ss == spend)
-                    spend = ss->next;
-                if(ss == ssend)
-                    ssend = ss->next;
-                ss->Remove();
+              if(ss == spend)
+                  spend = ss->next;
+              if(ss == ssend)
+                  ssend = ss->next;
+              ss->Remove();
             }
         } else {
             if(rquadrant == ss->quadrant)
@@ -1060,8 +1059,8 @@ reset:
       return true;
     }
 
-#if 0
-    if(ssend->point->lat > spend->point->lat) { // this is never hit, should remove
+#if 0 /* don't think I need this */
+    if(ssend->point->lat > spend->point->lat) {
         IsoRoute *t = route1;
         route1 = route2;
         route2 = t;
