@@ -185,7 +185,7 @@ void BoatOverGround(double B, double VB, double C, double VC, double &BG, double
    (y-y3) * (x4-x3) = (y4-y3) * (x-x3)
 */
 inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
-                                  double x3, double y3, double x4, double y4)
+                              double x3, double y3, double x4, double y4)
 {
 #if 0 /* this never gets hit due to the use of states.. so it doesn't help performance */
     /* quick test to avoid calculations if segments are far apart */
@@ -343,6 +343,14 @@ bool Position::GetPlotData(GribRecordSet &grib, PlotData &data, double dt)
     return false;
 }
 
+inline double TestDirection(double x1, double y1, double x2, double y2, double x3, double y3)
+{
+    double ax = x2 - x1, ay = y2 - y1;
+    double bx = x2 - x3, by = y2 - y3;
+    double denom = ay * bx - ax * by;
+    return denom;
+}
+
 /* create a looped route by propagating from a position by computing
    the location the boat would be in if sailed at various angles */
 bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib, RouteMapOptions &options)
@@ -390,7 +398,10 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib, RouteMapO
     ll_gc_ll_reverse(lat, lon, options.EndLat, options.EndLon, &bearing, 0);
 skipbearingcomputation:
 
+    bool first_backtrackavoid = true;
     double timeseconds = options.dt;
+    double d0, d1, d2;
+    double dist;
     for(std::list<double>::iterator it = options.DegreeSteps.begin();
         it != options.DegreeSteps.end(); it++) {
         double H = *it;
@@ -402,8 +413,13 @@ skipbearingcomputation:
 
         /* avoid propagating from positions which go in a direction too much
            diverted from the correct course.  */
-        if(fabs(heading_resolve(B - bearing)) > options.MaxDivertedCourse)
+        if(fabs(heading_resolve(B - bearing)) > options.MaxDivertedCourse) {
+#if 0
+            if(first_backtrackavoid && parent)
+                goto first_backtrack;
+#endif
             continue;
+        }
 
         VB = options.boat.Plans[newsailplan]->Speed(H, VW);
 
@@ -423,16 +439,39 @@ skipbearingcomputation:
         }
 
         /* distance over ground */
-        double dist = VBG * timeseconds / 3600.0;
+        dist = VBG * timeseconds / 3600.0;
 
         double dlat, dlon;
         ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
-        
-        bool hitland = options.DetectLand ? CrossesLand(dlat, dlon) : false;
+
+        bool hitland;
+        /* test to avoid extra computations related to backtracking */
+#if 0
+        if(prev != next && parent) {
+            d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
+            d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
+            d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
+
+            if((d1 > 0 && d2 > 0) || (d0 < 0 && (d1 > 0 || d2 > 0))) {
+                if(first_backtrackavoid) {
+                first_backtrack:
+                    /* use a position between here and parent instead */
+                    const double lp = .95;
+                    dlat = lp*lat + (1-lp)*parent->lat;
+                    dlon = lp*lon + (1-lp)*parent->lon;
+                    first_backtrackavoid = false;
+                    goto skiplandtest;
+                }
+                continue;
+            }
+        }
+#endif        
+        hitland = options.DetectLand ? CrossesLand(dlat, dlon) : false;
         if(!hitland && dist) {
             if(options.positive_longitudes && dlon < 0)
                 dlon += 360;
 
+        skiplandtest:
             Position *rp = new Position(dlat, dlon, newsailplan, this);
 
             if(points) {
@@ -1639,10 +1678,10 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
             routelist.pop_front();
             IsoRouteList rl;
 
-            extern int debugcnt, debuglimit;
+            extern int debugsize, debugcnt, debuglimit;
             if(
 #if 0
-              (origin.size() <= 4 || debugcnt++ < debuglimit) &&
+              (origin.size() < debugsize || debugcnt++ < debuglimit) &&
 #endif
               Merge(rl, r1, r2, 0, options.InvertedRegions)) {
 #if 1 /* TODO: find fastest method */

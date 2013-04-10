@@ -1,7 +1,6 @@
 /***************************************************************************
  *
- * Project:  OpenCPN
- * Purpose:  Weather Routing Plugin
+ * Project:  OpenCPN Weather Routing plugin
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************

@@ -192,20 +192,26 @@ wxString Boat::SaveXML(wxString filename)
 
 int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell)
 {
-    BoatPlan &boatplan = *Plans[curplan];
+    for(int rounds = 0; rounds < 10; rounds++) {
+        BoatPlan &boatplan = *Plans[curplan];
+        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell);
+        if(Name.empty())
+            return curplan;
 
-again:
-    wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell);
-    if(Name.empty())
-        return curplan;
-    for(unsigned int i=0; i<Plans.size(); i++)
-        if(Name == Plans[i]->Name) {
-            curplan = i;
-            goto again;
+        unsigned int i;
+        for(i=0; i<Plans.size(); i++)
+            if(Name == Plans[i]->Name) {
+                curplan = i;
+                break;
+            }
+
+        if(i == Plans.size()) {
+            printf("error, failed to find plan: %s\n", (const char*)Name.mb_str());
+            break;
         }
+    }
 
-    printf("error, failed to find plan: %s\n", (const char*)Name.mb_str());
-    exit(1);
+
     return curplan;
 }
 
