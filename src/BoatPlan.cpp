@@ -626,9 +626,12 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat)
    closer to +- 90.  Basically we are trying every two tack angles and combining
    to determine if alternating between these two courses is actually faster than
    the current strategy for the given course, and if so, use it.
+
+   TODO: Make this this work for asymmetrical polars correctly
 */
 void BoatPlan::OptimizeTackingSpeed()
 {
+    CalculateVMG();
     for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
         for(int Wi = 0; Wi <= DEGREE_COUNT; Wi++) {
             int at = Wi, bt, ct;

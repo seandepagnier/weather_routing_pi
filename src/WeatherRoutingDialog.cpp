@@ -69,7 +69,6 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, d
     /* periodically check for updates from computation thread */
     m_tCompute.Connect(wxEVT_TIMER, wxTimerEventHandler
                        ( WeatherRoutingDialog::OnComputationTimer ), NULL, this);
-    m_tCompute.Start(100);
 }
 
 WeatherRoutingDialog::~WeatherRoutingDialog( )
@@ -277,8 +276,10 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
         GetParent()->Refresh();
     }
 
-    if(!m_RouteMapOverlay.Finished())
+    if(!m_RouteMapOverlay.Finished()) {
+        m_tCompute.Start(100, true);
         return;
+    }
 
     if( m_RouteMapOverlay.ReachedDestination()) {
         wxMessageDialog mdlg(this, _("Computation completed, destination reached\n"),
@@ -303,6 +304,7 @@ void WeatherRoutingDialog::Start()
     m_bCompute->SetLabel(_( "&Stop" ));
     m_bReset->Disable();
     m_StartTime = wxDateTime::Now();
+    m_tCompute.Start(100, true);
 }
 
 void WeatherRoutingDialog::Stop()
