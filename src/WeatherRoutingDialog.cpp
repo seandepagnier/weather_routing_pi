@@ -267,7 +267,7 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
     }
 
     static int cycles; /* don't refresh all the time */
-    if(++cycles > 10 && m_RouteMapOverlay.Updated()) {
+    if(++cycles > 25 && m_RouteMapOverlay.Updated()) {
         cycles = 0;
 
         m_RunTime += wxDateTime::Now() - m_StartTime;

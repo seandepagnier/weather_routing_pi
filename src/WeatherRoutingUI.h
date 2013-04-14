@@ -345,6 +345,8 @@ class SwitchPlanDialogBase : public wxDialog
 		wxCheckBox* m_cbMinWaveHeight;
 		wxSpinCtrl* m_sMinWaveHeight;
 		wxStaticText* m_staticText106;
+		wxCheckBox* m_cbDayTime;
+		wxCheckBox* m_cbNightTime;
 		wxStaticText* m_staticText107;
 		wxChoice* m_cPlans;
 		wxButton* m_bDone;

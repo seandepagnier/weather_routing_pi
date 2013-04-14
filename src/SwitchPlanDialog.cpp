@@ -55,6 +55,9 @@ SwitchPlanDialog::SwitchPlanDialog( wxWindow *parent, SwitchPlan &p, std::vector
     if(!isnan(plan.MinWaveHeight))
         m_cbMinWaveHeight->SetValue(true), m_sMinWaveHeight->SetValue(plan.MinWaveHeight);
 
+    m_cbDayTime->SetValue(plan.DayTime);
+    m_cbNightTime->SetValue(plan.NightTime);
+
     for(std::vector<wxString>::iterator it = plans.begin(); it != plans.end(); it++)
         m_cPlans->Append(*it);
 
@@ -104,12 +107,21 @@ void SwitchPlanDialog::OnDone( wxCommandEvent& event )
         return;
     }
 
+    if(!m_cbDayTime->GetValue() || !m_cbNightTime->GetValue()) {
+        wxMessageDialog md(this, _("Cannot make a rule if neither daytime nor nighttime is specified."),
+                           _("Switch Plan"), wxICON_INFORMATION | wxOK );
+        md.ShowModal();
+        return;
+    }
+
     plan.MaxWindSpeed = m_cbMaxWindSpeed->GetValue() ? m_sMaxWindSpeed->GetValue() : NAN;
     plan.MinWindSpeed = m_cbMinWindSpeed->GetValue() ? m_sMinWindSpeed->GetValue() : NAN;
     plan.MaxWindDirection = m_cbMaxWindDirection->GetValue() ? m_sMaxWindDirection->GetValue() : NAN;
     plan.MinWindDirection = m_cbMinWindDirection->GetValue() ? m_sMinWindDirection->GetValue() : NAN;
     plan.MaxWaveHeight = m_cbMaxWaveHeight->GetValue() ? m_sMaxWaveHeight->GetValue() : NAN;
     plan.MinWaveHeight = m_cbMinWaveHeight->GetValue() ? m_sMinWaveHeight->GetValue() : NAN;
+    plan.DayTime = m_cbDayTime->GetValue();
+    plan.NightTime = m_cbNightTime->GetValue();
 
     plan.Name = m_cPlans->GetString(m_cPlans->GetSelection());
 

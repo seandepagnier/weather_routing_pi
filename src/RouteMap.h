@@ -53,7 +53,8 @@ public:
     SkipPosition *BuildSkipList();
 
     bool GetPlotData(GribRecordSet &grib, PlotData &data, double dt);
-    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, RouteMapOptions &options);
+    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, wxDateTime &gribtime,
+                   RouteMapOptions &options);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
 
@@ -103,7 +104,8 @@ public:
     void FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon);
-    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, RouteMapOptions &options);
+    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, wxDateTime &gribtime,
+                   RouteMapOptions &options);
 
     int SkipCount();
     int Count();
@@ -124,7 +126,8 @@ public:
     IsoChron(IsoRouteList r, wxDateTime t, GribRecordSet *g);
     ~IsoChron();
 
-    void PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib, RouteMapOptions &options);
+    void PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib, wxDateTime &gribtime,
+                           RouteMapOptions &options);
     bool Contains(double lat, double lon);
   
     IsoRouteList routes;

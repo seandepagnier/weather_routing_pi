@@ -39,7 +39,8 @@ public:
 
     std::vector<BoatPlan*> Plans;
 
-    int TrySwitchBoatPlan(int curplan, double VW, double H, double Swell);
+    int TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
+                          wxDateTime &gribtime, double lat, double lon, int &daytime);
     double Hulls();
     double CapsizeRisk();
     double ComfortFactor();

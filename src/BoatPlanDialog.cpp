@@ -150,6 +150,12 @@ void BoatPlanDialog::PopulatePlans()
 
         if(!isnan(plan.MinWaveHeight))
             des += a + _("Wave Height < ") + wxString::Format(_("%.0f"), plan.MinWaveHeight), a = andstr;
+
+        if(!plan.DayTime) {
+            des += a + _("Night Time");
+        } else if(!plan.NightTime) {
+            des += a + _("Day Time");
+        }
         
         des += _(" switch to ");
         des += plan.Name;

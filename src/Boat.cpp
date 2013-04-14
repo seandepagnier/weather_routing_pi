@@ -112,6 +112,10 @@ wxString Boat::OpenXML(wxString filename)
                     switchplan.MinWindDirection = strtod(f->Attribute("MinWindDirection"), 0);
                     switchplan.MaxWaveHeight = strtod(f->Attribute("MaxWaveHeight"), 0);
                     switchplan.MinWaveHeight = strtod(f->Attribute("MinWaveHeight"), 0);
+                    if(f->QueryBoolAttribute("DayTime", &switchplan.DayTime) != TIXML_SUCCESS)
+                        switchplan.DayTime = true;
+                    if(f->QueryBoolAttribute("NightTime", &switchplan.NightTime) != TIXML_SUCCESS)
+                        switchplan.NightTime = true;
                     switchplan.Name = wxString::FromUTF8(f->Attribute("Name"));
                     plan->SwitchPlans.push_back(switchplan);
                 }
@@ -190,11 +194,13 @@ wxString Boat::SaveXML(wxString filename)
     return wxString();
 }
 
-int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell)
+int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
+                            wxDateTime &gribtime, double lat, double lon, int &daytime)
 {
     for(int rounds = 0; rounds < 10; rounds++) {
         BoatPlan &boatplan = *Plans[curplan];
-        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell);
+        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell,
+                                                   gribtime, lat, lon, daytime);
         if(Name.empty())
             return curplan;
 

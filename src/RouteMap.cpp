@@ -353,7 +353,8 @@ inline double TestDirection(double x1, double y1, double x2, double y2, double x
 
 /* create a looped route by propagating from a position by computing
    the location the boat would be in if sailed at various angles */
-bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib, RouteMapOptions &options)
+bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib,
+                         wxDateTime &gribtime, RouteMapOptions &options)
 {
     /* already propagated from this position, don't need to again */
     if(propagated)
@@ -390,6 +391,8 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib, RouteMapO
     double W, VW;
     OverWater(C, VC, WG, VWG, W, VW);
 
+    int daytime = -1; /* unknown */
+
     double bearing = 0, parentbearing = NAN;
     if(parent && options.TackingTime)
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
@@ -407,7 +410,8 @@ skipbearingcomputation:
         double H = *it;
         double B, VB;
 
-        int newsailplan = options.boat.TrySwitchBoatPlan(sailplan, VW, H, S);
+        int newsailplan = options.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
+                                                         gribtime, lat, lon, daytime);
 
         B = W + H; /* rotated relative to wind */
 
@@ -444,6 +448,10 @@ skipbearingcomputation:
         double dlat, dlon;
         ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
 
+        double nrdlon = dlon;
+        if(options.positive_longitudes && dlon < 0)
+            dlon += 360;
+
         bool hitland;
         /* test to avoid extra computations related to backtracking */
 #if 1
@@ -466,11 +474,8 @@ skipbearingcomputation:
             }
         }
 #endif        
-        hitland = options.DetectLand ? CrossesLand(dlat, dlon) : false;
+        hitland = options.DetectLand ? CrossesLand(dlat, nrdlon) : false;
         if(!hitland && dist) {
-            if(options.positive_longitudes && dlon < 0)
-                dlon += 360;
-
         skiplandtest:
             Position *rp = new Position(dlat, dlon, newsailplan, this);
 
@@ -1512,13 +1517,14 @@ Position *IsoRoute::ClosestPosition(double lat, double lon)
     return minpos;
 }
 
-bool IsoRoute::Propagate(IsoRouteList &routelist, GribRecordSet &grib, RouteMapOptions &options)
+bool IsoRoute::Propagate(IsoRouteList &routelist, GribRecordSet &grib,
+                         wxDateTime &gribtime, RouteMapOptions &options)
 {
     Position *p = skippoints->point;
     bool ret = false;
     if(p)
         do {
-            if(p->Propagate(routelist, grib, options))
+            if(p->Propagate(routelist, grib, gribtime, options))
                 ret = true;
             p = p->next;
         } while(p != skippoints->point);
@@ -1580,20 +1586,21 @@ IsoChron::~IsoChron()
     delete m_Grib;
 }
 
-void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib, RouteMapOptions &options)
+void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib,
+                                 wxDateTime &gribtime, RouteMapOptions &options)
 {
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         bool propagated = false;
 
         /* build up a list of iso regions for each point
            in the current iso */
-        if((*it)->Propagate(routelist, grib, options))
+        if((*it)->Propagate(routelist, grib, gribtime, options))
             propagated = true;
 
         IsoRoute *x = new IsoRoute(*it);
         for(IsoRouteList::iterator cit = (*it)->children.begin();
             cit != (*it)->children.end(); cit++)
-            if((*cit)->Propagate(routelist, grib, options)) {
+            if((*cit)->Propagate(routelist, grib, gribtime, options)) {
                 x->children.push_back(new IsoRoute(*cit, x)); /* copy child */
                 propagated = true;
             }
@@ -1748,7 +1755,7 @@ bool RouteMap::Propagate()
             grib->m_GribRecordPtrArray[i] = NULL;
     }
 
-    wxDateTime GribTime = m_NewGribTime;
+    wxDateTime gribtime = m_NewGribTime;
 
     RouteMapOptions options = m_Options;
 
@@ -1756,7 +1763,7 @@ bool RouteMap::Propagate()
     Unlock();
 
     if(origin.size())
-        origin.back()->PropagateIntoList(routelist, *grib, options);
+        origin.back()->PropagateIntoList(routelist, *grib, gribtime, options);
     else {
         Position *np = new Position(options.StartLat, options.StartLon);
         np->prev = np->next = np;
@@ -1765,7 +1772,7 @@ bool RouteMap::Propagate()
 
     Lock();
     m_NewGrib = NULL;
-    m_NewGribTime = GribTime + wxTimeSpan(0, 0, options.dt);
+    m_NewGribTime = gribtime + wxTimeSpan(0, 0, options.dt);
     m_bNeedsGrib = true;
     Unlock();
 
@@ -1776,7 +1783,7 @@ bool RouteMap::Propagate()
             Unlock();
             return false;
         }
-        update = new IsoChron(merged, GribTime, grib);
+        update = new IsoChron(merged, gribtime, grib);
     } else
         update = NULL;
 

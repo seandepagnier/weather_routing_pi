@@ -1278,6 +1278,14 @@ SwitchPlanDialogBase::SwitchPlanDialogBase( wxWindow* parent, wxWindowID id, con
 	m_staticText106->Wrap( -1 );
 	fgSizer52->Add( m_staticText106, 0, wxALL, 5 );
 	
+	m_cbDayTime = new wxCheckBox( this, wxID_ANY, wxT("Day Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbDayTime->SetValue(true); 
+	fgSizer52->Add( m_cbDayTime, 0, wxALL, 5 );
+	
+	m_cbNightTime = new wxCheckBox( this, wxID_ANY, wxT("Night Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbNightTime->SetValue(true); 
+	fgSizer52->Add( m_cbNightTime, 0, wxALL, 5 );
+	
 	
 	sbSizer15->Add( fgSizer52, 1, wxEXPAND, 5 );
 	

@@ -572,7 +572,25 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
     }
 }
 
-wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell)
+/* this is not actually all that accurate (no oblate earth, refraction etc...
+   but it's at least simple, could fix and optimize to only compute if
+   there are possible plans which need this */
+static bool ComputeDayTime(wxDateTime &gribtime, double lat, double lon, int &daytime)
+
+{
+    if(daytime != -1)
+        return daytime;
+
+    double yearpos = 2*M_PI*(gribtime.GetDay()-186)/365.24;
+    double gha = 2*M_PI*(lon/15 - gribtime.GetHour() - gribtime.GetMinute()/60)/24;
+    double suninc = 90*cos(deg2rad(lat))*sin(gha) + 23.45*cos(yearpos);    
+
+    return (daytime = (suninc > 0)); /* sun above horizon */
+}
+
+wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
+                                     wxDateTime &gribtime, double lat, double lon, int &daytime)
+
 {
     H = abs(heading_resolve(H)); /* make this work for both tacks */
 
@@ -584,7 +602,10 @@ wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell)
         if(!isnan(p.MinWindDirection) && p.MinWindDirection >=  H) continue;
         if(!isnan(p.MaxWaveHeight) && p.MaxWaveHeight <=  H) continue;
         if(!isnan(p.MinWaveHeight) && p.MinWaveHeight >=  H) continue;
-
+        if(!p.DayTime) {
+            if(ComputeDayTime(gribtime, lat, lon, daytime)) continue;
+        } else
+            if(!ComputeDayTime(gribtime, lat, lon, daytime)) continue;
         return p.Name;
     }
     return _("");

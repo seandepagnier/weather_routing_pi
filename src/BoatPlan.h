@@ -91,6 +91,8 @@ public:
     double MaxWindDirection, MinWindDirection;
     double MaxWaveHeight, MinWaveHeight;
 
+    bool DayTime, NightTime;
+
     wxString Name;
 };
 
@@ -104,7 +106,8 @@ public:
     static double DirectionApparentWind(double VA, double VB, double W, double VW);
     void BoatSteadyState(double W, double VW, double &B, double &VB, double &A, double &VA,
                          Boat &boat);
-    wxString TrySwitchBoatPlan(double VW, double H, double Swell);
+    wxString TrySwitchBoatPlan(double VW, double H, double Swell,
+                               wxDateTime &gribtime, double lat, double lon, int &daytime);
 
     BoatPlan(wxString PlanName, Boat &boat);
     ~BoatPlan();

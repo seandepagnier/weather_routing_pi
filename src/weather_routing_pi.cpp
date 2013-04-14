@@ -200,8 +200,10 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             (v[_T("Day")].AsInt(), (wxDateTime::Month)v[_T("Month")].AsInt(), v[_T("Year")].AsInt(),
              v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
 
-        if(m_pWeather_RoutingDialog)
+        if(m_pWeather_RoutingDialog) {
             m_pWeather_RoutingDialog->m_RouteMapOverlay.m_GribTimelineTime = time;
+            RequestRefresh(m_parent_window);
+        }
     }
     if(message_id == _T("GRIB_TIMELINE_RECORD"))
     {
