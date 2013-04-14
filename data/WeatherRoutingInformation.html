@@ -34,7 +34,9 @@ the course of the optimal route.
 <p>
 The Supported Options Include:
 <ul>
-  <li><b>Degree Step</b> Difference in degrees between courses to attempt.</li>
+  <li><b>Degree Step</b> Difference in degrees between courses to attempt.  Less than 3 degrees
+    between steps usually takes a long time to calculate and it is usually better to use a shorter
+    time step instead.</li>
   <li><b>Time Step</b> Time in seconds to sail before attempting course change.</li>
   <li><b>Max Diverted Course</b> Maximum course error from heading toward target destination to attempt.
   If set to 180, the map will expand in all directions, and can be used to find multiple destinations
@@ -50,10 +52,10 @@ The Supported Options Include:
         full step</li>
   <li><b>Detect Land</b> Use coastline data to avoid sailing through land</li>
   <li><b>Inverted Regons</b> This is relatively rare, but in some cases it may be
-    possible to reach a destination further away sooner than a closer one.  In
-    cases where there are multiple routes to reach this further destination which
-    travel on different sides of a region that cannot yet be reached, an inversion
-    occurs.  The program must work inwards on this inverted region to reach a
+    possible to reach a destination further away in two or more different paths
+    which go on either side of a closer position.   This can happen routing around
+    islands, or occasionally when routing on either side of a high pressure system.
+    The program must work inwards on this inverted region to reach a
     possible goal, if disabled these areas will be ignored.</li>
   <li><b>Anchoring</b>  In some cases, it may be preferable to anchor (assuming it
     isn't too deep) rather than navigate if going against a swift current as you

@@ -445,15 +445,15 @@ skipbearingcomputation:
         /* distance over ground */
         dist = VBG * timeseconds / 3600.0;
 
-        double dlat, dlon;
+        double dlat, dlon, nrdlon;
         ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
 
-        double nrdlon = dlon;
+        nrdlon = dlon;
         if(options.positive_longitudes && dlon < 0)
             dlon += 360;
 
-        bool hitland;
         /* test to avoid extra computations related to backtracking */
+        bool hitland;
 #if 1
         if(prev != next && parent) {
             d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
@@ -473,7 +473,7 @@ skipbearingcomputation:
                 continue;
             }
         }
-#endif        
+#endif
         hitland = options.DetectLand ? CrossesLand(dlat, nrdlon) : false;
         if(!hitland && dist) {
         skiplandtest:
@@ -1311,7 +1311,7 @@ startnormalizing:
                     } else if((*it)->Count() < 16) {
                       printf("too small to be a useful child: %d\n", (*it)->Count());
                       delete *it;
-                    } else if(!route1->CompletelyContained(*it)) {
+                    } else if(!(route1->skippoints=spend, route1->CompletelyContained(*it))) {
                       printf("not correct to be child: %d\n", (*it)->Count());
                       delete *it;
                     } else { /* different direction contained.. it is a child */
