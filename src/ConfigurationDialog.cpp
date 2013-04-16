@@ -143,7 +143,7 @@ void ConfigurationDialog::UpdateOptions(RouteMapOptions &options)
     options.dt = m_sTimeStep->GetValue();
 
     if(m_lDegreeSteps->GetCount() < 4) {
-        wxMessageDialog mdlg(this, _("Warning: less than 4 degree steps specified\n"),
+        wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
                              wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
         mdlg.ShowModal();
     }

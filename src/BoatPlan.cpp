@@ -608,7 +608,7 @@ wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
             if(!ComputeDayTime(gribtime, lat, lon, daytime)) continue;
         return p.Name;
     }
-    return _("");
+    return wxString();
 }
 
 BoatPlan::BoatPlan(wxString PlanName, Boat &boat)

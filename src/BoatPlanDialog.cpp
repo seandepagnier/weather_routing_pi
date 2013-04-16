@@ -24,6 +24,7 @@
  ***************************************************************************
  *
  */
+
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 
@@ -61,7 +62,7 @@ void BoatPlanDialog::OnNewSwitchPlanRule( wxCommandEvent& event )
     plan.Name = m_PlanNames[0];
     m_BoatPlan.SwitchPlans.push_back(plan);
 
-    int index = m_lSwitchPlans->Append(_(""));
+    int index = m_lSwitchPlans->Append(wxString());
     m_lSwitchPlans->SetSelection(index, true);
 
     m_bEditSwitchBoatPlan->Enable();
