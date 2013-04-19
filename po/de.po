@@ -1,0 +1,353 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: weather_routing_pi 3.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2013-04-16 13:44+1200\n"
+"PO-Revision-Date: 2013-04-18 09:58+0100\n"
+"Last-Translator: CarCode <carcode@me.com>\n"
+"Language-Team: CarCode <carcode@me.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.5.5\n"
+
+#: src/BoatPlan.cpp:629
+msgid "<Computed>"
+msgstr "<Berechnet>"
+
+#: src/weather_routing_pi.cpp:89
+msgid "Weather_Routing"
+msgstr "Wetter_Routenplanung"
+
+#: src/weather_routing_pi.cpp:94
+msgid "Start Weather Route"
+msgstr "Start Wetter-Route"
+
+#: src/weather_routing_pi.cpp:97
+msgid "End Weather Route"
+msgstr "Beende Wetter-Route"
+
+#: src/weather_routing_pi.cpp:150
+msgid "WeatherRouting"
+msgstr "Wetter-Routenplanung"
+
+#: src/weather_routing_pi.cpp:155
+msgid "Weather Routing PlugIn by Sean d'Epagnier"
+msgstr "Wetter-Routenplanung PlugIn von Sean d'Epagnier"
+
+#: src/weather_routing_pi.cpp:160
+msgid ""
+"Weather Routing PlugIn for OpenCPN\n"
+"\n"
+"Provides Weather routing features include:\n"
+"  automatic routing subject to various constraints:\n"
+"          islands or inverted regions (places we can't go in a boat)\n"
+"          optimal speed based on wind and currents\n"
+"          boat speed calculation\n"
+"          sail/power \n"
+"          \n"
+"          , great circle route, constrained routes, optimal routing. \n"
+"p"
+msgstr ""
+"Wetter-Routenplanung PlugIn für OpenCPN\n"
+"\n"
+"Wetter-Routenplanung Funktionen umfassen:\n"
+"  automatische Routenplanung vorbehaltlich verschiedener Hemmnisse:\n"
+"          Inseln oder Landbereiche (wo ein Boot nicht hin kann).\n"
+"          Optimale Geschwindigkeit aufgrund Wind und Strömung\n"
+"          Berechnung Bootsgeschwindigkeit\n"
+"          Segel/Motor \n"
+"          \n"
+"          , Großkreis-Routenplanung, erzwungene Routen, optimale Routen. \n"
+"p"
+
+#: src/PlotDialog.cpp:60 src/BoatDialog.cpp:91 src/BoatDialog.cpp:92
+#: src/BoatDialog.cpp:93 src/BoatDialog.cpp:94 src/BoatDialog.cpp:95
+#: src/BoatDialog.cpp:96
+msgid "N/A"
+msgstr "N/A"
+
+#: src/WeatherRoutingDialog.cpp:134
+msgid "export function not supported for visual studio compiler on windows.\n"
+msgstr ""
+"Export-Funktion wird nicht für Windows Visual Studio Compiler unterstützt.\n"
+
+#: src/WeatherRoutingDialog.cpp:135 src/WeatherRoutingDialog.cpp:159
+#: src/WeatherRoutingDialog.cpp:262 src/WeatherRoutingDialog.cpp:286
+#: src/WeatherRoutingDialog.cpp:292 src/ConfigurationDialog.cpp:147
+#: src/ConfigurationDialog.cpp:201
+msgid "Weather Routing"
+msgstr "Wetter-Routenplanung"
+
+#: src/WeatherRoutingDialog.cpp:158
+msgid "Empty Route, nothing to export\n"
+msgstr "Leere Route, nichts zum Exportieren\n"
+
+#: src/WeatherRoutingDialog.cpp:165
+msgid "Weather Route"
+msgstr "Wetter-Route"
+
+#: src/WeatherRoutingDialog.cpp:169
+msgid "Weather Route Point"
+msgstr "Wetter-Routenpunkt"
+
+#: src/WeatherRoutingDialog.cpp:204
+msgid "plugins/weather_routing/data/WeatherRoutingInformation.html"
+msgstr "plugins/weather_routing/data/WeatherRoutingInformation.html"
+
+#: src/WeatherRoutingDialog.cpp:208
+msgid "Failed to load file:\n"
+msgstr "Fehler bei Laden Datei:\n"
+
+#: src/WeatherRoutingDialog.cpp:209
+msgid "OpenCPN Alert"
+msgstr "OpenCPN Alarm"
+
+#: src/WeatherRoutingDialog.cpp:261
+msgid "Failed to obtain grib for timestep\n"
+msgstr "Fehler bei Erhalt Grib für Zeitschritt\n"
+
+#: src/WeatherRoutingDialog.cpp:285
+msgid "Computation completed, destination reached\n"
+msgstr "Berechnungen beendet, Ziel erreicht.\n"
+
+#: src/WeatherRoutingDialog.cpp:289
+msgid "Grib Data Failed to contain required information\n"
+msgstr "Grib Datenfehler, erhalten nicht geforderte Information\n"
+
+#: src/WeatherRoutingDialog.cpp:290
+msgid "Computation completed, destination not reached.\n"
+msgstr "Berechnungen beendet, Ziel nicht erreicht.\n"
+
+#: src/WeatherRoutingDialog.cpp:304
+msgid "&Stop"
+msgstr "&Stop"
+
+#: src/WeatherRoutingDialog.cpp:314
+msgid "&Start"
+msgstr "&Start"
+
+#: src/StatisticsDialog.cpp:43
+msgid "Running"
+msgstr "Laufend"
+
+#: src/StatisticsDialog.cpp:43
+msgid "Stopped"
+msgstr "Gestoppt"
+
+#: src/BoatDialog.cpp:59
+msgid "Initial Plan"
+msgstr "Startplan"
+
+#: src/BoatDialog.cpp:64
+msgid "Name"
+msgstr "Name"
+
+#: src/BoatDialog.cpp:65
+msgid "Eta"
+msgstr "Eta"
+
+#: src/BoatDialog.cpp:316 src/BoatDialog.cpp:362
+msgid "Select Polar"
+msgstr "Wähle Polar"
+
+#: src/BoatDialog.cpp:316 src/BoatDialog.cpp:362
+msgid "/home/sean/qtVlm/polar"
+msgstr "/home/sean/qtVlm/polar"
+
+#: src/BoatDialog.cpp:322
+msgid "xml"
+msgstr "xml"
+
+#: src/BoatDialog.cpp:322
+msgid "XML"
+msgstr "XML"
+
+#: src/BoatDialog.cpp:329 src/BoatDialog.cpp:347 src/BoatDialog.cpp:372
+#: src/BoatDialog.cpp:381
+msgid "OpenCPN Weather Routing Plugin"
+msgstr "OpenCPN Wetter-Routenplanung Plugin"
+
+#: src/BoatDialog.cpp:346
+msgid "Failed reading csv: "
+msgstr "Fehler beim Lesen csv: "
+
+#: src/BoatDialog.cpp:366
+msgid "obs"
+msgstr "obs"
+
+#: src/BoatDialog.cpp:366
+msgid "OBS"
+msgstr "OBS"
+
+#: src/BoatDialog.cpp:380
+msgid "Failed saving boat polar to csv"
+msgstr "Fehler b. Speichern Boot-Polar zu csv "
+
+#: src/BoatDialog.cpp:413
+msgid ""
+"Drag is both frictional and wave based\n"
+"This can be computed based on boat values above then modified manually.\n"
+"With proper settings hull speed will be achieved, but also break into "
+"planing mode possible.\n"
+"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
+"This also takes into account the different harmonics of wakes before hull "
+"speed is reached, so resulting boat polar may appear bumpy.\n"
+msgstr ""
+"Widerstand basiert sowohl auf Reibung und auf Wellen\n"
+"Das kann mit höheren Bootswerten berechnet und dann manuell angepaßt "
+"werden.\n"
+"Mit richtigen Einstellungen wird Rumpfgeschw. erreicht, aber es ist auch ein "
+"Planungsmodus möglich.\n"
+"Ein Wert 0 bedeutet kein Sog, 100 ist die größte Verdrängung.\n"
+"Damit werden auch die verschiedenen Harmonischen des Sogs berücksichtigt, "
+"bevor die Rumpfgeschw. erreicht ist. So kann das resultierende Boots-Polar "
+"holperig erscheinen.\n"
+
+#: src/BoatDialog.cpp:420
+msgid "Drag Computation"
+msgstr "Widerstands-Berechnung"
+
+#: src/BoatDialog.cpp:440
+msgid "New Plan"
+msgstr "Neuer Plan"
+
+#: src/BoatPlanDialog.cpp:82
+msgid "Cannot edit switch plan since there is no other plan to switch to."
+msgstr ""
+"Kann Wechsel-Plan nicht editieren, da kein anderer Plan zum Wechseln da ist."
+
+#: src/BoatPlanDialog.cpp:83
+msgid "Sail Plans"
+msgstr "Segel-Pläne"
+
+#: src/BoatPlanDialog.cpp:114
+msgid "Cannot add plan with same name as existing plan."
+msgstr "Plan kann nicht mit existierendem Namen hinzugefügt werden."
+
+#: src/BoatPlanDialog.cpp:115
+msgid "Sail Plan"
+msgstr "Segel-Plan"
+
+#: src/BoatPlanDialog.cpp:135
+msgid " and "
+msgstr " und "
+
+#: src/BoatPlanDialog.cpp:137
+msgid "Wind Speed > "
+msgstr "Wind-Geschw. > "
+
+#: src/BoatPlanDialog.cpp:137 src/BoatPlanDialog.cpp:140
+#: src/BoatPlanDialog.cpp:143 src/BoatPlanDialog.cpp:146
+#: src/BoatPlanDialog.cpp:149 src/BoatPlanDialog.cpp:152
+#, c-format
+msgid "%.0f"
+msgstr "%.0f"
+
+#: src/BoatPlanDialog.cpp:140
+msgid "Wind Speed < "
+msgstr "Wind-Geschw. < "
+
+#: src/BoatPlanDialog.cpp:143
+msgid "Wind Direction > "
+msgstr "Wind-Richtung > "
+
+#: src/BoatPlanDialog.cpp:146
+msgid "Wind Direction < "
+msgstr "Wind-Richtung < "
+
+#: src/BoatPlanDialog.cpp:149
+msgid "Wave Height > "
+msgstr "Wellenhöhe > "
+
+#: src/BoatPlanDialog.cpp:152
+msgid "Wave Height < "
+msgstr "Wellenhöhe < "
+
+#: src/BoatPlanDialog.cpp:155
+msgid "Night Time"
+msgstr "Bei Nacht"
+
+#: src/BoatPlanDialog.cpp:157
+msgid "Day Time"
+msgstr "Bei Tag"
+
+#: src/BoatPlanDialog.cpp:160
+msgid " switch to "
+msgstr " wechsle zu "
+
+#: src/SwitchPlanDialog.cpp:66
+msgid "Failed to find plan name to switch to in list"
+msgstr "Kann Plan-Namen in der Wechsel-Liste nicht finden"
+
+#: src/SwitchPlanDialog.cpp:67 src/SwitchPlanDialog.cpp:82
+#: src/SwitchPlanDialog.cpp:89 src/SwitchPlanDialog.cpp:96
+#: src/SwitchPlanDialog.cpp:105 src/SwitchPlanDialog.cpp:112
+#: src/SwitchPlanDialog.cpp:139
+msgid "Switch Plan"
+msgstr "Wechsle Plan"
+
+#: src/SwitchPlanDialog.cpp:81
+msgid "Cannot have min and max wind speed"
+msgstr "Kann min. + max. Windgeschw. nicht verarbeiten"
+
+#: src/SwitchPlanDialog.cpp:88
+msgid "Cannot have min and max wind direction"
+msgstr "Kann min. + max. Windrichtung nicht verarbeiten"
+
+#: src/SwitchPlanDialog.cpp:95
+msgid "Cannot have min and max wave height"
+msgstr "Kann min. + max. Wellenhöhe nicht verarbeiten"
+
+#: src/SwitchPlanDialog.cpp:104
+msgid "Cannot make a rule from no options specified."
+msgstr "Kann keine Regel ohne Angabe Optionen machen."
+
+#: src/SwitchPlanDialog.cpp:111
+msgid "Cannot make a rule if neither daytime nor nighttime is specified."
+msgstr "Kann keine Regel ohne Angabe Bei-Tag oder Bei-Nacht machen."
+
+#: src/SwitchPlanDialog.cpp:133
+msgid ""
+"Specify conditions where we should change to a different plan.\n"
+"If conditions change dramatically, then the program will look at the plan we "
+"just changed to and see if it needs to change again, so there is only need "
+"to specify rules for the next closest plan."
+msgstr ""
+"Bedingungen angeben, wo zu anderem Plan gewechselt werden soll.\n"
+"Wenn sich Bedingungen stark ändern, prüft Programm den aktuell gewechselten "
+"Plan, ob nochmals gewechselt werden muß. Somit müssen nur die Regeln für den "
+"nächstliegenden Plan angegeben werden."
+
+#: src/Boat.cpp:61
+msgid "Failed to load file"
+msgstr "Fehler bei Laden Datei"
+
+#: src/Boat.cpp:65
+msgid "Failed to read xml file (no OCPWeatherRoutingBoat node)"
+msgstr "Fehler bei Lesen xml Datei (kein OCPWeatherRoutingBoat Node)"
+
+#: src/Boat.cpp:103
+msgid "Failed to open file: "
+msgstr "Fehler bei Öffnen Datei: "
+
+#: src/Boat.cpp:193
+msgid "Failed saving file: "
+msgstr "Fehler bei Speichern Datei: "
+
+#: src/ConfigurationDialog.cpp:120
+msgid ";"
+msgstr ";"
+
+#: src/ConfigurationDialog.cpp:146
+msgid "Warning: less than 4 different degree steps specified\n"
+msgstr "Warnung: weniger als 4 verschiedene Grad Schritte angegeben\n"
+
+#: src/ConfigurationDialog.cpp:200
+msgid "Invalid step size, nothing will be done."
+msgstr "Ungültige Schritt-Größe, es erfolgt nichts."
