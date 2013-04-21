@@ -10,6 +10,7 @@
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
+#include <wx/intl.h>
 #include <wx/string.h>
 #include <wx/stattext.h>
 #include <wx/gdicmn.h>
@@ -84,7 +85,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxTextCtrl* m_tEndLat;
 		wxTextCtrl* m_tEndLon;
 		
-		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxRESIZE_BORDER ); 
+		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxRESIZE_BORDER ); 
 		~WeatherRoutingDialogBase();
 	
 };
@@ -134,7 +135,7 @@ class ConfigurationDialogBase : public wxDialog
 	
 	public:
 		
-		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationDialogBase();
 	
 };
@@ -165,7 +166,7 @@ class SettingsDialogBase : public wxDialog
 		wxCheckBox* m_cbAlternatesForAll;
 		wxCheckBox* m_cbSquaresAtSailChanges;
 		
-		SettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
+		SettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
 		~SettingsDialogBase();
 	
 };
@@ -282,7 +283,7 @@ class BoatDialogBase : public wxDialog
 	
 	public:
 		
-		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BoatDialogBase();
 	
 };
@@ -314,7 +315,7 @@ class BoatPlanDialogBase : public wxDialog
 	
 	public:
 		
-		BoatPlanDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Sail Plan"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,300 ), long style = wxCAPTION|wxRESIZE_BORDER ); 
+		BoatPlanDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sail Plan"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,300 ), long style = wxCAPTION|wxRESIZE_BORDER ); 
 		~BoatPlanDialogBase();
 	
 };
@@ -361,7 +362,7 @@ class SwitchPlanDialogBase : public wxDialog
 	
 	public:
 		
-		SwitchPlanDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Switch Sail Plan Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
+		SwitchPlanDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Switch Sail Plan Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
 		~SwitchPlanDialogBase();
 	
 };
@@ -401,7 +402,7 @@ class PlotDialogBase : public wxDialog
 	
 	public:
 		
-		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~PlotDialogBase();
 	
 };
@@ -421,7 +422,7 @@ class InformationDialog : public wxDialog
 	public:
 		wxHtmlWindow* m_htmlInformation;
 		
-		InformationDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Information"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,400 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		InformationDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Information"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,400 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~InformationDialog();
 	
 };
@@ -453,7 +454,7 @@ class StatisticsDialogBase : public wxDialog
 	
 	public:
 		
-		StatisticsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Weather Routing Statistics"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		StatisticsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Statistics"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~StatisticsDialogBase();
 	
 };

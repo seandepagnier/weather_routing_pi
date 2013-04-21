@@ -28,8 +28,6 @@
 #include <math.h>
 
 #include "Utilities.h"
-
-/* some basic convenience functions */
 double deg2rad(double degrees)
 {
   return M_PI * degrees / 180.0;
