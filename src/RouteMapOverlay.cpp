@@ -340,6 +340,7 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
     if(!pos)
         return plotdatalist;
 
+    RouteMapOptions options = GetOptions();
     Lock();
     IsoChronList::iterator it = origin.begin(), itp;
 
@@ -354,17 +355,15 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
 
     for(p = pos; p->parent && it != origin.begin(); p = p->parent) {
         GribRecordSet *grib = (*it)->m_Grib;
-        if(grib) {
-            PlotData data;
-            itp = it, itp--;
-            /* this omits the starting position */
-            double dt = ((*it)->time - (*itp)->time).GetSeconds().ToDouble();
-            data.time = (*it)->time;
-            data.lat = p->lat, data.lon = p->lon;
-            if(p->GetPlotData(*grib, data, dt))
-                plotdatalist.push_front(data);
-        }
-        
+
+        PlotData data;
+        itp = it, itp--;
+        /* this omits the starting position */
+        double dt = ((*it)->time - (*itp)->time).GetSeconds().ToDouble();
+        data.time = (*it)->time;
+        data.lat = p->lat, data.lon = p->lon;
+        if(p->GetPlotData(grib, (*it)->time, dt, options, data))
+            plotdatalist.push_front(data);
         it--;
     }
 

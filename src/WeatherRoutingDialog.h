@@ -49,6 +49,7 @@ public:
 
     void RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp);
     RouteMapOverlay m_RouteMapOverlay;
+    ConfigurationDialog m_ConfigurationDialog;
 
 private:
     void OnUpdateEnd( wxCommandEvent& event );
@@ -67,6 +68,10 @@ private:
     void UpdateStatistics();
 
     void UpdateEnd();
+
+    void SetStartDateTime(wxDateTime datetime);
+    void SyncToGribTime( wxCommandEvent& event );
+
     void Start();
     void Stop();
     void ReconfigureRouteMap();
@@ -80,7 +85,6 @@ private:
     bool m_bShowBoatDialog;
     BoatDialog *m_pBoatDialog;
 
-    ConfigurationDialog m_ConfigurationDialog;
     SettingsDialog m_SettingsDialog;
 
     wxTimer m_tCompute;

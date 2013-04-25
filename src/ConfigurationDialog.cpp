@@ -88,9 +88,25 @@ void ConfigurationDialog::Load()
     pConf->Read( _T("SubSteps"), &substeps, 90);
     m_sSubSteps->SetValue(substeps);
 
+    bool usegrib;
+    pConf->Read( _T("UseGrib"), &usegrib, false);
+    m_cbUseGrib->SetValue(usegrib);
+
+    bool useclimatology;
+    pConf->Read( _T("UseClimatology"), &useclimatology, false);
+    m_cbUseClimatology->SetValue(useclimatology);
+
+    bool allowdatadeficient;
+    pConf->Read( _T("AllowDataDeficient"), &allowdatadeficient, false);
+    m_cbAllowDataDeficient->SetValue(allowdatadeficient);
+
     bool detectland;
     pConf->Read( _T("DetectLand"), &detectland, true);
     m_cbDetectLand->SetValue(detectland);
+
+    bool currents;
+    pConf->Read( _T("Currents"), &currents, true);
+    m_cbCurrents->SetValue(currents);
 
     bool invertedregions;
     pConf->Read( _T("InvertedRegions"), &invertedregions, false);
@@ -99,10 +115,6 @@ void ConfigurationDialog::Load()
     bool anchoring;
     pConf->Read( _T("Anchoring"), &anchoring, false);
     m_cbAnchoring->SetValue(anchoring);
-
-    bool allowdatadeficient;
-    pConf->Read( _T("AllowDataDeficient"), &allowdatadeficient, false);
-    m_cbAllowDataDeficient->SetValue(allowdatadeficient);
 
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "ConfigurationDialogX" ), &p.x, p.x);
@@ -128,10 +140,14 @@ void ConfigurationDialog::Save( )
     pConf->Write( _T("TackingTime"), m_sTackingTime->GetValue());
     pConf->Write( _T("SubSteps"), m_sSubSteps->GetValue());
 
+    pConf->Write( _T("UseGrib"), m_cbUseGrib->GetValue());
+    pConf->Write( _T("UseClimatology"), m_cbUseClimatology->GetValue());
+    pConf->Write( _T("AllowDataDeficient"), m_cbAllowDataDeficient->GetValue());
+
     pConf->Write( _T("DetectLand"), m_cbDetectLand->GetValue());
+    pConf->Write( _T("Currents"), m_cbCurrents->GetValue());
     pConf->Write( _T("InvertedRegions"), m_cbInvertedRegions->GetValue());
     pConf->Write( _T("Anchoring"), m_cbAnchoring->GetValue());
-    pConf->Write( _T("AllowDataDeficient"), m_cbAllowDataDeficient->GetValue());
 
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "ConfigurationDialogX" ), p.x);
@@ -164,8 +180,10 @@ void ConfigurationDialog::UpdateOptions(RouteMapOptions &options)
     options.SubSteps = m_sSubSteps->GetValue();
 
     options.DetectLand = m_cbDetectLand->GetValue();
+    options.Currents = m_cbCurrents->GetValue();
     options.InvertedRegions = m_cbInvertedRegions->GetValue();
     options.Anchoring = m_cbAnchoring->GetValue();
+
     options.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
 }
 

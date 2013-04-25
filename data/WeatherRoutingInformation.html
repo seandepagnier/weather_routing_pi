@@ -16,11 +16,14 @@ to any given location within the map.
   <h3><u>Usage</u></h3>
 
 <p>Integration with the grib plugin (version 2.1 or later) allows for
-knowledge of weather conditions.  Eventually the climatology plugin will
-also provide a source of data for longer voyages.
+knowledge of weather conditions.  The climatology plugin can also
+provide a source of data for longer voyages.  In the case where data
+is valid from both sources, grib will be choosen.  If wind
+and current data are both available from climatology, and only wind
+from grib, then the grib wind is used with the climatology current.
 
 <p>The grib time selected on the timeline at the time the computation is
-started is syncronized.  From there, the grib timeline data is accessed
+started can be syncronized.  From there, the grib timeline data is accessed
 as the computation proceeds.  Once a computation is completed, the
 course and position of the boat as it sails can be viewed during grib
 playback.

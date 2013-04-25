@@ -202,6 +202,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 
         if(m_pWeather_RoutingDialog) {
             m_pWeather_RoutingDialog->m_RouteMapOverlay.m_GribTimelineTime = time;
+            m_pWeather_RoutingDialog->m_ConfigurationDialog.m_cbUseGrib->Enable();
             RequestRefresh(m_parent_window);
         }
     }
@@ -224,6 +225,36 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             RouteMapOverlay.SetNewGrib(gptr);
         }
     }
+    if(message_id == _T("CLIMATOLOGY"))
+    {
+        if(!m_pWeather_RoutingDialog)
+            return; /* not ready */
+
+        wxJSONReader r;
+        wxJSONValue v;
+        r.Parse(message_body, &v);
+
+        int major = v[_T("ClimatologyVersionMajor")].AsInt();
+        int minor = v[_T("ClimatologyVersionMinor")].AsInt();
+        if( major != 0 || minor != 1) {
+            wxMessageDialog mdlg(m_pWeather_RoutingDialog,
+                                 _("Climatology plugin version not correct, no climatology data\n"),
+                                 _("Weather Routing"), wxOK | wxICON_WARNING);
+            mdlg.ShowModal();
+            return;
+        }
+
+        wxString sptr = v[_T("ClimatologyDataPtr")].AsString();
+        wxCharBuffer bptr = sptr.To8BitData();
+        const char* ptr = bptr.data();
+        bool (*cptr)(int, wxDateTime &, double, double, double &, double &);
+        sscanf(ptr, "%p", &cptr);
+
+            RouteMapOverlay &RouteMapOverlay = m_pWeather_RoutingDialog->m_RouteMapOverlay;
+            /* should probably check to make sure the time is correct */
+            RouteMapOverlay.SetClimatologyFunction(cptr);
+            m_pWeather_RoutingDialog->m_ConfigurationDialog.m_cbUseClimatology->Enable(cptr);
+    }
 }
 
 void weather_routing_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
@@ -244,9 +275,9 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
         wxPoint p = m_pWeather_RoutingDialog->GetPosition();
         m_pWeather_RoutingDialog->Move(0,0);        // workaround for gtk autocentre dialog behavior
         m_pWeather_RoutingDialog->Move(p);
-        m_pWeather_RoutingDialog->Reset();
 
         SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
+        SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
         m_pWeather_RoutingDialog->Reset();
     }
 

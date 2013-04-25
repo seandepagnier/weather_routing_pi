@@ -78,9 +78,12 @@
 
 #include "georef.h"
 
-static double Swell(GribRecordSet &grib, double lat, double lon)
+static double Swell(GribRecordSet *grib, double lat, double lon)
 {
-    GribRecord *grh = grib.m_GribRecordPtrArray[Idx_HTSIGW];
+    if(!grib)
+        return 0;
+
+    GribRecord *grh = grib->m_GribRecordPtrArray[Idx_HTSIGW];
     if(!grh)
         return 0;
 
@@ -90,11 +93,14 @@ static double Swell(GribRecordSet &grib, double lat, double lon)
     return height;
 }
 
-static bool Wind(GribRecordSet &grib, double &winddirground, double &windspeedground,
-                 double lat, double lon)
+static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
+                            double &WG, double &VWG)
 {
-    GribRecord *grx = grib.m_GribRecordPtrArray[Idx_WIND_VX];
-    GribRecord *gry = grib.m_GribRecordPtrArray[Idx_WIND_VY];
+    if(!grib)
+        return false;
+
+    GribRecord *grx = grib->m_GribRecordPtrArray[Idx_WIND_VX];
+    GribRecord *gry = grib->m_GribRecordPtrArray[Idx_WIND_VY];
 
     if(!grx || !gry)
         return false;
@@ -105,17 +111,41 @@ static bool Wind(GribRecordSet &grib, double &winddirground, double &windspeedgr
     if(vx == GRIB_NOTDEF || vy == GRIB_NOTDEF)
         return false;
 
-    windspeedground = hypot(vy, vx) * 3.6 / 1.852;
-    winddirground = positive_degrees(rad2deg(atan2(-vx, -vy)));
+    WG = positive_degrees(rad2deg(atan2(-vx, -vy)));
+    VWG = hypot(vy, vx) * 3.6 / 1.852;
     return true;
 }
 
-static bool Current(GribRecordSet &grib,
-                    double &currentspeed, double &currentdir,
-                    double lat, double lon)
+enum {WIND, CURRENT};
+static bool (*ClimatologyData1)(int setting, wxDateTime &, double, double, double &, double &);
+static bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &);
+
+static bool Wind(GribRecordSet *grib, wxDateTime &time,
+                 bool AllowDataDeficient, Position *p,
+                 double &WG, double &VWG)
 {
-    GribRecord *grx = grib.m_GribRecordPtrArray[Idx_SEACURRENT_VX];
-    GribRecord *gry = grib.m_GribRecordPtrArray[Idx_SEACURRENT_VY];
+    do {
+        if(GribWind(grib, p->lat, p->lon, WG, VWG))
+            return true;
+
+        if(ClimatologyData && ClimatologyData(WIND, time, p->lat, p->lon, WG, VWG)) {
+            WG = heading_resolve(WG + 180); /* direction comming from */
+            return true;
+        }
+
+        p = p->parent; /* should we use parent's time here ? */
+    } while(AllowDataDeficient && p);
+    return false;
+}
+
+static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
+                               double &C, double &VC)
+{
+    if(!grib)
+        return false;
+
+    GribRecord *grx = grib->m_GribRecordPtrArray[Idx_SEACURRENT_VX];
+    GribRecord *gry = grib->m_GribRecordPtrArray[Idx_SEACURRENT_VY];
 
     if(!grx || !gry)
         return false;
@@ -126,24 +156,36 @@ static bool Current(GribRecordSet &grib,
     if(vx == GRIB_NOTDEF || vy == GRIB_NOTDEF)
         return false;
 
-    currentspeed = hypot(vy, vx) * 3.6 / 1.852;
-    currentdir = positive_degrees(rad2deg(atan2(-vx, -vy)));
+    C = positive_degrees(rad2deg(atan2(-vx, -vy)));
+    VC = hypot(vy, vx) * 3.6 / 1.852;
     return true;
 }
+
+static bool Current(GribRecordSet *grib, wxDateTime &time, double lat, double lon,
+                    double &C, double &VC)
+{
+    if(GribCurrent(grib, lat, lon, C, VC))
+        return true;
+
+    if(ClimatologyData && ClimatologyData(CURRENT, time, lat, lon, C, VC))
+        return true;
+
+    return false;
+}                    
 
 /* Sometimes localized currents can be strong enough to create
    a breeze which can be sailed off even if there is no wind.
    The wind data is calculated from the ground not the sea,
    it is then converted to speed over water which the boat can feel.
 
-   WG  - Wind direction over ground
-   VWG - Velocity of wind over ground
    C   - Sea Current Direction over ground
    VC  - Velocity of Current
+   WG  - Wind direction over ground
+   VWG - Velocity of wind over ground
    WA  - Angle of wind relative to true north
    VW - velocity of wind over water
 */
-void OverWater(double C, double VC, double WG, double VWG, double &WA, double &VW)
+static void OverWater(double C, double VC, double WG, double VWG, double &WA, double &VW)
 {
     double Cx = VC * cos(deg2rad(C));
     double Cy = VC * sin(deg2rad(C));
@@ -159,7 +201,7 @@ void OverWater(double C, double VC, double WG, double VWG, double &WA, double &V
    BGV - boat speed over ground (gps velocity)
 */
 
-void BoatOverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
+static void BoatOverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
 {
     double Cx = VC * cos(deg2rad(C));
     double Cy = VC * sin(deg2rad(C));
@@ -323,13 +365,14 @@ SkipPosition *Position::BuildSkipList()
 }
 
 /* get data from a position for plotting */
-bool Position::GetPlotData(GribRecordSet &grib, PlotData &data, double dt)
+bool Position::GetPlotData(GribRecordSet *grib, wxDateTime &time, double dt,
+                           RouteMapOptions &options, PlotData &data)
 {
     data.WVHT = Swell(grib, lat, lon);
-    if(!Wind(grib, data.WG, data.VWG, lat, lon))
+    if(!Wind(grib, time, options.AllowDataDeficient, this, data.WG, data.VWG))
         return false;
 
-    if(!Current(grib, data.VC, data.C, lat, lon))
+    if(!Current(grib, time, lat, lon, data.C, data.VC))
         data.C = data.VC = 0;
 
     OverWater(data.C, data.VC, data.WG, data.VWG, data.W, data.VW);
@@ -353,8 +396,8 @@ inline double TestDirection(double x1, double y1, double x2, double y2, double x
 
 /* create a looped route by propagating from a position by computing
    the location the boat would be in if sailed at various angles */
-bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib,
-                         wxDateTime &gribtime, RouteMapOptions &options)
+bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
+                         wxDateTime &time, RouteMapOptions &options)
 {
     /* already propagated from this position, don't need to again */
     if(propagated)
@@ -374,22 +417,19 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet &grib,
         return false;
 
     double WG, VWG;
-    Position *p = this; /* get wind from parent position if not available */
-    while(!Wind(grib, WG, VWG, p->lat, p->lon)) {
-        p = p->parent; /* should we use parent's time here ? */
-        if(!options.AllowDataDeficient || !p)
-            return false;
-    }
+    if(!Wind(grib, time, options.AllowDataDeficient, this, WG, VWG))
+        return false;
 
     if(VWG > options.MaxWindKnots)
         return false;
 
     double C, VC;
-    if(!Current(grib, VC, C, lat, lon))
-        C = VC = 0;
-
     double W, VW;
-    OverWater(C, VC, WG, VWG, W, VW);
+    if(!options.Currents || !Current(grib, time, lat, lon, C, VC)) {
+        C = VC = 0;
+        W = WG, VW = VWG;
+    } else
+        OverWater(C, VC, WG, VWG, W, VW);
 
     int daytime = -1; /* unknown */
 
@@ -411,7 +451,7 @@ skipbearingcomputation:
         double B, VB;
 
         int newsailplan = options.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
-                                                         gribtime, lat, lon, daytime);
+                                                         time, lat, lon, daytime);
 
         B = W + H; /* rotated relative to wind */
 
@@ -757,7 +797,7 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
 }
 
 /* apply current to given route, and return if it changed at all */
-bool IsoRoute::ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options)
+bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapOptions &options)
 {
     if(!skippoints)
         return false;
@@ -767,7 +807,7 @@ bool IsoRoute::ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options)
     double timeseconds = options.dt;
     do {
         double C, VC;
-        if(Current(grib, VC, C, p->lat, p->lon)) {
+        if(options.Currents && Current(grib, time, p->lat, p->lon, C, VC)) {
             /* drift distance over ground */
             double dist = VC * timeseconds / 3600.0;
             if(dist)
@@ -1517,14 +1557,14 @@ Position *IsoRoute::ClosestPosition(double lat, double lon)
     return minpos;
 }
 
-bool IsoRoute::Propagate(IsoRouteList &routelist, GribRecordSet &grib,
-                         wxDateTime &gribtime, RouteMapOptions &options)
+bool IsoRoute::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
+                         wxDateTime &time, RouteMapOptions &options)
 {
     Position *p = skippoints->point;
     bool ret = false;
     if(p)
         do {
-            if(p->Propagate(routelist, grib, gribtime, options))
+            if(p->Propagate(routelist, grib, time, options))
                 ret = true;
             p = p->next;
         } while(p != skippoints->point);
@@ -1579,28 +1619,29 @@ IsoChron::~IsoChron()
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
         delete *it;
 
-    /* done with grib, so free memory and request next one */
-    for(int i=0; i<Idx_COUNT; i++)
-        delete m_Grib->m_GribRecordPtrArray[i];
-
-    delete m_Grib;
+    /* done with grib */
+    if(m_Grib) {
+        for(int i=0; i<Idx_COUNT; i++)
+            delete m_Grib->m_GribRecordPtrArray[i];
+        delete m_Grib;
+    }
 }
 
-void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib,
-                                 wxDateTime &gribtime, RouteMapOptions &options)
+void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
+                                 wxDateTime &time, RouteMapOptions &options)
 {
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         bool propagated = false;
 
         /* build up a list of iso regions for each point
            in the current iso */
-        if((*it)->Propagate(routelist, grib, gribtime, options))
+        if((*it)->Propagate(routelist, grib, time, options))
             propagated = true;
 
         IsoRoute *x = new IsoRoute(*it);
         for(IsoRouteList::iterator cit = (*it)->children.begin();
             cit != (*it)->children.end(); cit++)
-            if((*cit)->Propagate(routelist, grib, gribtime, options)) {
+            if((*cit)->Propagate(routelist, grib, time, options)) {
                 x->children.push_back(new IsoRoute(*cit, x)); /* copy child */
                 propagated = true;
             }
@@ -1615,12 +1656,12 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib,
                 for(IsoRouteList::iterator cit = x->children.begin();
                     cit != x->children.end(); cit++)
                     y->children.push_back(new IsoRoute(*cit, y)); /* copy child */
-                if(x->ApplyCurrents(grib, options))
+                if(x->ApplyCurrents(grib, time, options))
                     routelist.push_back(y);
                 else
                     delete y; /* I guess we didn't need it after all */
             } else
-                x->ApplyCurrents(grib, options);
+                x->ApplyCurrents(grib, time, options);
 
             routelist.push_back(x);
         } else
@@ -1736,34 +1777,38 @@ bool RouteMap::Propagate()
         return false;
     }
 
-    if((!m_NewGrib ||
+    if(m_Options.UseGrib &&
+       (!m_NewGrib ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
+       !m_Options.UseClimatology &&
        !m_Options.AllowDataDeficient) {
+        m_bFinished = true;
         m_bGribFailed = true;
         Unlock();
         return false;
     }
 
     /* copy the grib record set */
-    GribRecordSet *grib = new GribRecordSet;
-    grib->m_Reference_Time = m_NewGrib->m_Reference_Time;
-    for(int i=0; i<Idx_COUNT; i++) {
-        if(m_NewGrib->m_GribRecordPtrArray[i])
-            grib->m_GribRecordPtrArray[i] = new GribRecord(*m_NewGrib->m_GribRecordPtrArray[i]);
-        else
-            grib->m_GribRecordPtrArray[i] = NULL;
+    GribRecordSet *grib = NULL;
+    if(m_NewGrib) {
+        grib = new GribRecordSet;
+        grib->m_Reference_Time = m_NewGrib->m_Reference_Time;
+        for(int i=0; i<Idx_COUNT; i++) {
+            if(m_NewGrib->m_GribRecordPtrArray[i])
+                grib->m_GribRecordPtrArray[i] = new GribRecord(*m_NewGrib->m_GribRecordPtrArray[i]);
+            else
+                grib->m_GribRecordPtrArray[i] = NULL;
+        }
     }
 
-    wxDateTime gribtime = m_NewGribTime;
-
+    wxDateTime time = m_NewTime;
     RouteMapOptions options = m_Options;
-
     IsoRouteList routelist;
     Unlock();
 
     if(origin.size())
-        origin.back()->PropagateIntoList(routelist, *grib, gribtime, options);
+        origin.back()->PropagateIntoList(routelist, grib, time, options);
     else {
         Position *np = new Position(options.StartLat, options.StartLon);
         np->prev = np->next = np;
@@ -1772,8 +1817,8 @@ bool RouteMap::Propagate()
 
     Lock();
     m_NewGrib = NULL;
-    m_NewGribTime = gribtime + wxTimeSpan(0, 0, options.dt);
-    m_bNeedsGrib = true;
+    m_NewTime = time + wxTimeSpan(0, 0, options.dt);
+    m_bNeedsGrib = options.UseGrib;
     Unlock();
 
     IsoChron* update;
@@ -1783,7 +1828,7 @@ bool RouteMap::Propagate()
             Unlock();
             return false;
         }
-        update = new IsoChron(merged, gribtime, grib);
+        update = new IsoChron(merged, time, grib);
     } else
         update = NULL;
 
@@ -1828,14 +1873,22 @@ void RouteMap::Reset(wxDateTime time)
     Clear();
 
     m_NewGrib = NULL;
-    m_NewGribTime = time;
-    m_bNeedsGrib = true;
+    m_NewTime = time;
+    m_bNeedsGrib = m_Options.UseGrib;
+
+    ClimatologyData = m_Options.UseClimatology ? ClimatologyData1 : NULL;
 
     m_bReachedDestination = false;
     m_bGribFailed = false;
     m_bFinished = false;
 
     Unlock();
+}
+
+void RouteMap::SetClimatologyFunction(bool (*d)(int, wxDateTime &, double, double, double &, double &))
+{
+    ClimatologyData1 = d;
+    if(!d) ClimatologyData = NULL;
 }
 
 void RouteMap::GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions)

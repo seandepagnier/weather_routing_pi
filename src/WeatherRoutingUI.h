@@ -18,9 +18,11 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/textctrl.h>
+#include <wx/datectrl.h>
+#include <wx/dateevt.h>
 #include <wx/sizer.h>
-#include <wx/statbox.h>
 #include <wx/button.h>
+#include <wx/statbox.h>
 #include <wx/dialog.h>
 #include <wx/listbox.h>
 #include <wx/spinctrl.h>
@@ -51,9 +53,9 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxStaticText* m_staticText5;
 		wxStaticText* m_staticText6;
 		wxStaticText* m_staticText28;
-		wxStaticText* m_stStartDate;
 		wxStaticText* m_staticText30;
-		wxStaticText* m_stStartTime;
+		wxTextCtrl* m_tStartHour;
+		wxButton* m_bSyncToGribTime;
 		wxStaticText* m_staticText51;
 		wxStaticText* m_staticText61;
 		wxButton* m_bCompute;
@@ -67,6 +69,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxButton* m_bInformation;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void SyncToGribTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateEnd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
@@ -82,6 +85,7 @@ class WeatherRoutingDialogBase : public wxDialog
 	public:
 		wxTextCtrl* m_tStartLat;
 		wxTextCtrl* m_tStartLon;
+		wxDatePickerCtrl* m_dpStartDate;
 		wxTextCtrl* m_tEndLat;
 		wxTextCtrl* m_tEndLon;
 		
@@ -118,10 +122,10 @@ class ConfigurationDialogBase : public wxDialog
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText25;
 		wxSpinCtrl* m_sSubSteps;
+		wxCheckBox* m_cbAllowDataDeficient;
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
-		wxCheckBox* m_cbAllowDataDeficient;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
@@ -134,6 +138,9 @@ class ConfigurationDialogBase : public wxDialog
 		
 	
 	public:
+		wxCheckBox* m_cbUseGrib;
+		wxCheckBox* m_cbUseClimatology;
+		wxCheckBox* m_cbCurrents;
 		
 		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationDialogBase();

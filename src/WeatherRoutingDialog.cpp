@@ -255,8 +255,8 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
 
     /* get a new grib for the route map if needed */
     if(m_RouteMapOverlay.NeedsGrib()) {
-        m_RouteMapOverlay.RequestGrib(m_RouteMapOverlay.NewGribTime());
-
+        m_RouteMapOverlay.RequestGrib(m_RouteMapOverlay.NewTime());
+#if 0
         if(!m_RouteMapOverlay.HasGrib()) {
             wxMessageDialog mdlg(this, _("Failed to obtain grib for timestep\n"),
                                  _("Weather Routing"), wxOK);
@@ -264,6 +264,7 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
             Stop();
             return;
         }
+#endif
     }
 
     static int cycles; /* don't refresh all the time */
@@ -286,14 +287,32 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
                              _("Weather Routing"), wxOK);
         mdlg.ShowModal();
     } else {
-        wxString gribfailmsg = _("Grib Data Failed to contain required information\n");
+        wxString addmsg;
+        if(m_RouteMapOverlay.GribFailed())
+            addmsg += _("Grib Data Failed to contain required information\n");
+
+        RouteMapOptions options = m_RouteMapOverlay.GetOptions();
+        if(!options.UseGrib && !options.UseClimatology)
+            addmsg += _("No Data source configured!\n");
+
         wxMessageDialog mdlg(this, _("Computation completed, destination not reached.\n")
-                             + (m_RouteMapOverlay.GribFailed() ? gribfailmsg : _T("")),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
+                             + addmsg, _("Weather Routing"), wxOK | wxICON_WARNING);
         mdlg.ShowModal();
     }
 
     Stop();
+}
+
+void WeatherRoutingDialog::SetStartDateTime(wxDateTime datetime)
+{
+    m_dpStartDate->SetValue(datetime);
+    m_tStartHour->SetValue(wxString::Format(_T("%.3f"), datetime.GetHour()
+                                            +datetime.GetMinute() / 60.0));
+}
+
+void WeatherRoutingDialog::SyncToGribTime( wxCommandEvent& event )
+{
+    SetStartDateTime(m_RouteMapOverlay.m_GribTimelineTime);
 }
 
 void WeatherRoutingDialog::Start()
@@ -322,17 +341,28 @@ void WeatherRoutingDialog::Reset()
         return;
 
     RouteMapOptions options = m_RouteMapOverlay.GetOptions();
+
+    options.UseGrib =
+        m_ConfigurationDialog.m_cbUseGrib->IsEnabled() &&
+        m_ConfigurationDialog.m_cbUseGrib->GetValue();
+
+    options.UseClimatology =
+        m_ConfigurationDialog.m_cbUseClimatology->IsEnabled() &&
+        m_ConfigurationDialog.m_cbUseClimatology->GetValue();
+
     m_tStartLat->GetValue().ToDouble(&options.StartLat);
     m_tStartLon->GetValue().ToDouble(&options.StartLon);
     options.boat = m_pBoatDialog->m_Boat;
     m_RouteMapOverlay.SetOptions(options);
 
-    wxDateTime time = m_RouteMapOverlay.m_GribTimelineTime;
-
-    m_stStartDate->SetLabel(time.FormatISODate());
-    m_stStartTime->SetLabel(time.FormatISOTime());
-    
+    wxDateTime time = m_dpStartDate->GetValue();
+    double hour;
+    m_tStartHour->GetValue().ToDouble(&hour);
+    time.SetHour((int)hour);
+    time.SetMinute((int)(60*hour)%60);
     m_RouteMapOverlay.Reset(time);
+
+    SetStartDateTime(m_RouteMapOverlay.NewTime());
 
     m_RunTime = wxTimeSpan(0);
     GetParent()->Refresh();

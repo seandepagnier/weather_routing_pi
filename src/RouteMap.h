@@ -52,8 +52,9 @@ public:
 
     SkipPosition *BuildSkipList();
 
-    bool GetPlotData(GribRecordSet &grib, PlotData &data, double dt);
-    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, wxDateTime &gribtime,
+    bool GetPlotData(GribRecordSet *grib, wxDateTime &time, double dt,
+                     RouteMapOptions &options, PlotData &data);
+    bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, wxDateTime &time,
                    RouteMapOptions &options);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
@@ -100,12 +101,12 @@ public:
     bool CompletelyContained(IsoRoute *r);
     bool ContainsRoute(IsoRoute *r);
 
-    bool ApplyCurrents(GribRecordSet &grib, RouteMapOptions &options);
+    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapOptions &options);
     void FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon);
-    bool Propagate(IsoRouteList &routelist, GribRecordSet &Grib, wxDateTime &gribtime,
-                   RouteMapOptions &options);
+    bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib,
+                   wxDateTime &time, RouteMapOptions &options);
 
     int SkipCount();
     int Count();
@@ -126,8 +127,8 @@ public:
     IsoChron(IsoRouteList r, wxDateTime t, GribRecordSet *g);
     ~IsoChron();
 
-    void PropagateIntoList(IsoRouteList &routelist, GribRecordSet &grib, wxDateTime &gribtime,
-                           RouteMapOptions &options);
+    void PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
+                           wxDateTime &time, RouteMapOptions &options);
     bool Contains(double lat, double lon);
   
     IsoRouteList routes;
@@ -149,9 +150,12 @@ struct RouteMapOptions {
     
     double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
     double MaxLatitude, TackingTime;
-    
     int SubSteps;
-    bool DetectLand, InvertedRegions, Anchoring, AllowDataDeficient;
+
+    bool UseGrib, UseClimatology;
+    bool AllowDataDeficient;
+
+    bool DetectLand, Currents, InvertedRegions, Anchoring;
 
     Boat boat;
 
@@ -179,7 +183,8 @@ public:
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
     void SetNewGrib(GribRecordSet *grib) { Lock(); m_bNeedsGrib = !(m_NewGrib = grib); Unlock(); }
-    wxDateTime NewGribTime() { Lock(); wxDateTime time =  m_NewGribTime; Unlock(); return time; }
+    void SetClimatologyFunction(bool (*)(int, wxDateTime &, double, double, double &, double &));
+    wxDateTime NewTime() { Lock(); wxDateTime time =  m_NewTime; Unlock(); return time; }
     bool HasGrib() { return m_NewGrib; }
 
     void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.UpdateLongitudes(); Unlock(); }
@@ -206,5 +211,5 @@ private:
     RouteMapOptions m_Options;
     bool m_bFinished, m_bReachedDestination, m_bGribFailed;
 
-    wxDateTime m_NewGribTime;
+    wxDateTime m_NewTime;
 };
