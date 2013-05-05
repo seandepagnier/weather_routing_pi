@@ -103,8 +103,6 @@ int weather_routing_pi::Init(void)
       return (WANTS_OVERLAY_CALLBACK |
               WANTS_OPENGL_OVERLAY_CALLBACK |
               WANTS_TOOLBAR_CALLBACK    |
-              INSTALLS_TOOLBAR_TOOL     |
-              INSTALLS_CONTEXTMENU_ITEMS |
               WANTS_CONFIG              |
               WANTS_CURSOR_LATLON       |
               WANTS_NMEA_EVENTS         |
