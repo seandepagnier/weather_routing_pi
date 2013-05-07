@@ -21,6 +21,11 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	wxStaticBoxSizer* sbSizer3;
 	sbSizer3 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Start") ), wxVERTICAL );
 	
+	wxFlexGridSizer* fgSizer60;
+	fgSizer60 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer60->SetFlexibleDirection( wxBOTH );
+	fgSizer60->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	wxFlexGridSizer* fgSizer6;
 	fgSizer6 = new wxFlexGridSizer( 0, 4, 0, 0 );
 	fgSizer6->SetFlexibleDirection( wxBOTH );
@@ -55,10 +60,24 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	fgSizer6->Add( m_tStartHour, 0, wxALL, 5 );
 	
 	
-	sbSizer3->Add( fgSizer6, 1, wxEXPAND, 5 );
+	fgSizer60->Add( fgSizer6, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer59;
+	fgSizer59 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer59->SetFlexibleDirection( wxBOTH );
+	fgSizer59->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_bSyncBoatPosition = new wxButton( this, wxID_ANY, _("Sync To Boat Position"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer59->Add( m_bSyncBoatPosition, 0, wxLEFT|wxRIGHT, 5 );
 	
 	m_bSyncToGribTime = new wxButton( this, wxID_ANY, _("Sync To Grib Time"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer3->Add( m_bSyncToGribTime, 0, 0, 5 );
+	fgSizer59->Add( m_bSyncToGribTime, 0, wxLEFT|wxRIGHT, 5 );
+	
+	
+	fgSizer60->Add( fgSizer59, 1, wxEXPAND, 5 );
+	
+	
+	sbSizer3->Add( fgSizer60, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer17->Add( sbSizer3, 1, wxEXPAND, 5 );
@@ -134,6 +153,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	m_bSyncBoatPosition->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::SyncToBoatPosition ), NULL, this );
 	m_bSyncToGribTime->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::SyncToGribTime ), NULL, this );
 	m_tEndLat->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( WeatherRoutingDialogBase::OnUpdateEnd ), NULL, this );
 	m_tEndLon->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( WeatherRoutingDialogBase::OnUpdateEnd ), NULL, this );
@@ -151,6 +171,7 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 WeatherRoutingDialogBase::~WeatherRoutingDialogBase()
 {
 	// Disconnect Events
+	m_bSyncBoatPosition->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::SyncToBoatPosition ), NULL, this );
 	m_bSyncToGribTime->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingDialogBase::SyncToGribTime ), NULL, this );
 	m_tEndLat->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( WeatherRoutingDialogBase::OnUpdateEnd ), NULL, this );
 	m_tEndLon->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( WeatherRoutingDialogBase::OnUpdateEnd ), NULL, this );

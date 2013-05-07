@@ -264,8 +264,7 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
     if(!m_pWeather_RoutingDialog) {
-        m_pWeather_RoutingDialog = new WeatherRoutingDialog(m_parent_window,
-                                                          m_boat_lat, m_boat_lon);
+        m_pWeather_RoutingDialog = new WeatherRoutingDialog(m_parent_window, *this);
         wxPoint p = m_pWeather_RoutingDialog->GetPosition();
         m_pWeather_RoutingDialog->Move(0,0);        // workaround for gtk autocentre dialog behavior
         m_pWeather_RoutingDialog->Move(p);

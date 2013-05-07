@@ -40,8 +40,9 @@
 #include "WeatherRoutingDialog.h"
 #include "PlotDialog.h"
 
-WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon )
-    : WeatherRoutingDialogBase(parent), m_ConfigurationDialog(this), m_SettingsDialog(this)
+WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, weather_routing_pi &plugin )
+    : WeatherRoutingDialogBase(parent), m_ConfigurationDialog(this), m_SettingsDialog(this),
+      Plugin(plugin)
 {
     m_ConfigurationDialog.Hide();
 
@@ -53,10 +54,14 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, double boat_lat, d
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
-    m_tStartLat->SetValue(pConf->Read( _T("StartLat"), wxString::Format(_T("%.5f"), boat_lat)));
-    m_tStartLon->SetValue(pConf->Read( _T("StartLon"), wxString::Format(_T("%.5f"), boat_lon)));
-    m_tEndLat->SetValue(pConf->Read( _T("EndLat"), wxString::Format(_T("%.5f"), boat_lat+1)));
-    m_tEndLon->SetValue(pConf->Read( _T("EndLon"), wxString::Format(_T("%.5f"), boat_lon+1)));
+    m_tStartLat->SetValue
+        (pConf->Read( _T("StartLat"), wxString::Format(_T("%.5f"), Plugin.m_boat_lat)));
+    m_tStartLon->SetValue
+        (pConf->Read( _T("StartLon"), wxString::Format(_T("%.5f"), Plugin.m_boat_lon)));
+    m_tEndLat->SetValue
+        (pConf->Read( _T("EndLat"), wxString::Format(_T("%.5f"), Plugin.m_boat_lat+1)));
+    m_tEndLon->SetValue
+        (pConf->Read( _T("EndLon"), wxString::Format(_T("%.5f"), Plugin.m_boat_lon+1)));
 
      wxPoint p = GetPosition();
     pConf->Read ( _T ( "DialogX" ), &p.x, p.x);
@@ -333,6 +338,12 @@ void WeatherRoutingDialog::SetStartDateTime(wxDateTime datetime)
     m_dpStartDate->SetValue(datetime);
     m_tStartHour->SetValue(wxString::Format(_T("%.3f"), datetime.GetHour()
                                             +datetime.GetMinute() / 60.0));
+}
+
+void WeatherRoutingDialog::SyncToBoatPosition( wxCommandEvent& event )
+{
+    m_tStartLat->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lat));
+    m_tStartLon->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lon));
 }
 
 void WeatherRoutingDialog::SyncToGribTime( wxCommandEvent& event )

@@ -55,6 +55,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxStaticText* m_staticText28;
 		wxStaticText* m_staticText30;
 		wxTextCtrl* m_tStartHour;
+		wxButton* m_bSyncBoatPosition;
 		wxButton* m_bSyncToGribTime;
 		wxStaticText* m_staticText51;
 		wxStaticText* m_staticText61;
@@ -69,6 +70,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxButton* m_bInformation;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void SyncToBoatPosition( wxCommandEvent& event ) { event.Skip(); }
 		virtual void SyncToGribTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateEnd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }

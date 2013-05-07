@@ -42,7 +42,7 @@ class GribUIDialog;
 class WeatherRoutingDialog : public WeatherRoutingDialogBase
 {
 public:
-    WeatherRoutingDialog( wxWindow *parent, double boat_lat, double boat_lon );
+    WeatherRoutingDialog( wxWindow *parent, weather_routing_pi &plugin );
     ~WeatherRoutingDialog( );
 
     void Reset();
@@ -70,6 +70,7 @@ private:
     void UpdateEnd();
 
     void SetStartDateTime(wxDateTime datetime);
+    void SyncToBoatPosition( wxCommandEvent& event );
     void SyncToGribTime( wxCommandEvent& event );
 
     void Start();
@@ -78,7 +79,7 @@ private:
     void SetRouteMapOverlaySettings();
 
     //    Data
-    weather_routing_pi   *pPlugIn;
+    weather_routing_pi   &Plugin;
 
     bool m_bComputing;
 
