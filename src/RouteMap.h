@@ -52,7 +52,7 @@ public:
 
     SkipPosition *BuildSkipList();
 
-    bool GetPlotData(GribRecordSet *grib, wxDateTime &time, double dt,
+    bool GetPlotData(GribRecordSet *grib, double dt,
                      RouteMapOptions &options, PlotData &data);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, wxDateTime &time,
                    RouteMapOptions &options);
@@ -184,7 +184,10 @@ public:
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
     void SetNewGrib(GribRecordSet *grib) { Lock(); m_bNeedsGrib = !(m_NewGrib = grib); Unlock(); }
     void SetClimatologyFunction(bool (*)(int, wxDateTime &, double, double, double &, double &));
+    bool HasClimatology();
     wxDateTime NewTime() { Lock(); wxDateTime time =  m_NewTime; Unlock(); return time; }
+    wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
+        Unlock(); return time; }
     bool HasGrib() { return m_NewGrib; }
 
     void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.UpdateLongitudes(); Unlock(); }

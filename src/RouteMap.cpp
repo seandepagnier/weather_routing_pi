@@ -365,14 +365,14 @@ SkipPosition *Position::BuildSkipList()
 }
 
 /* get data from a position for plotting */
-bool Position::GetPlotData(GribRecordSet *grib, wxDateTime &time, double dt,
+bool Position::GetPlotData(GribRecordSet *grib, double dt,
                            RouteMapOptions &options, PlotData &data)
 {
     data.WVHT = Swell(grib, lat, lon);
-    if(!Wind(grib, time, options.AllowDataDeficient, this, data.WG, data.VWG))
+    if(!Wind(grib, data.time, options.AllowDataDeficient, this, data.WG, data.VWG))
         return false;
 
-    if(!Current(grib, time, lat, lon, data.C, data.VC))
+    if(!Current(grib, data.time, lat, lon, data.C, data.VC))
         data.C = data.VC = 0;
 
     OverWater(data.C, data.VC, data.WG, data.VWG, data.W, data.VW);
@@ -1889,6 +1889,11 @@ void RouteMap::SetClimatologyFunction(bool (*d)(int, wxDateTime &, double, doubl
 {
     ClimatologyData1 = d;
     if(!d) ClimatologyData = NULL;
+}
+
+bool RouteMap::HasClimatology()
+{
+    return ClimatologyData;
 }
 
 void RouteMap::GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions)

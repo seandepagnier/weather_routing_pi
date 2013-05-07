@@ -157,14 +157,10 @@ wxString weather_routing_pi::GetLongDescription()
 {
     return _("Weather Routing PlugIn for OpenCPN\n\n\
 Provides Weather routing features include:\n\
-  automatic routing subject to various constraints:\n\
-          islands or inverted regions (places we can't go in a boat)\n\
+  automatic routing subject to various constraints.\n\
           optimal speed based on wind and currents\n\
           boat speed calculation\n\
-          sail/power \n\
-          \n\
-          , great circle route, constrained routes, optimal routing. \n\
-p");
+");
 }
 
 void weather_routing_pi::SetDefaults(void)

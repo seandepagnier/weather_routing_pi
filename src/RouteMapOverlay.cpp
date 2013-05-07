@@ -331,6 +331,7 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
     wxString out;
     w.Write(v, out);
     SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+    m_bNeedsGrib = false;
 }
 
 std::list<PlotData> RouteMapOverlay::GetPlotData()
@@ -350,19 +351,21 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
         if(++it == origin.end())
             return plotdatalist;
 
-    if(it != origin.begin())
-        it--;
+//    if(it != origin.begin())
+    //      it--;
 
-    for(p = pos; p->parent && it != origin.begin(); p = p->parent) {
+    for(p = pos; p && it != origin.begin(); p = p->parent) {
         GribRecordSet *grib = (*it)->m_Grib;
 
         PlotData data;
-        itp = it, itp--;
+        if((itp = it) != origin.begin())
+            itp--;
+
         /* this omits the starting position */
         double dt = ((*it)->time - (*itp)->time).GetSeconds().ToDouble();
         data.time = (*it)->time;
         data.lat = p->lat, data.lon = p->lon;
-        if(p->GetPlotData(grib, (*it)->time, dt, options, data))
+        if(p->GetPlotData(grib, dt, options, data))
             plotdatalist.push_front(data);
         it--;
     }

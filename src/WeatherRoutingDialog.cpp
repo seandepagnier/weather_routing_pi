@@ -128,12 +128,36 @@ void WeatherRoutingDialog::OnPlot ( wxCommandEvent& event )
     plotdialog.ShowModal();
 }
 
-#ifdef __MSVC__
+#if 1
 void WeatherRoutingDialog::OnExport ( wxCommandEvent& event )
 {
-    wxMessageDialog mdlg(this, _("export function not supported for visual studio compiler on windows.\n"),
-                         _("Weather Routing"), wxOK | wxICON_WARNING);
-    mdlg.ShowModal();
+    std::list<PlotData> plotdata = m_RouteMapOverlay.GetPlotData();
+
+    if(plotdata.size() == 0) {
+        wxMessageDialog mdlg(this, _("Empty Route, nothing to export\n"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+        return;
+    }
+
+    PlugIn_Track* newTrack = new PlugIn_Track;
+    newTrack->m_NameString = _("Weather Route");
+
+    RouteMapOptions options = m_RouteMapOverlay.GetOptions();
+    PlugIn_Waypoint* newPoint = new PlugIn_Waypoint
+        (options.StartLat, options.StartLon, _T("circle"), _("Weather Route Start"));
+    newPoint->m_CreateTime = m_RouteMapOverlay.StartTime();
+    newTrack->pWaypointList->Append(newPoint);
+
+    for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
+        newPoint = new PlugIn_Waypoint
+            ((*it).lat, (*it).lon, _T("circle"), _("Weather Route Point"));
+
+        newPoint->m_CreateTime = (*it).time;
+        newTrack->pWaypointList->Append(newPoint);
+    }
+
+    AddPlugInTrack(newTrack);
 }
 
 #else
@@ -257,8 +281,9 @@ void WeatherRoutingDialog::OnComputationTimer( wxTimerEvent & )
     if(m_RouteMapOverlay.NeedsGrib()) {
         m_RouteMapOverlay.RequestGrib(m_RouteMapOverlay.NewTime());
 #if 0
-        if(!m_RouteMapOverlay.HasGrib()) {
-            wxMessageDialog mdlg(this, _("Failed to obtain grib for timestep\n"),
+        if(!m_RouteMapOverlay.HasGrib() && !m_RouteMapOverlay.HasClimatology()) {
+            wxMessageDialog mdlg(this, _("Failed to obtain grib for timestep,\
+and no climatology data to fall back on\n"),
                                  _("Weather Routing"), wxOK);
             mdlg.ShowModal();
             Stop();
