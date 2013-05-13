@@ -78,15 +78,14 @@ private:
     void ReconfigureRouteMap();
     void SetRouteMapOverlaySettings();
 
-    //    Data
+    SettingsDialog m_SettingsDialog;
+
     weather_routing_pi   &Plugin;
 
     bool m_bComputing;
 
     bool m_bShowBoatDialog;
     BoatDialog *m_pBoatDialog;
-
-    SettingsDialog m_SettingsDialog;
 
     wxTimer m_tCompute;
 

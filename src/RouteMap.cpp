@@ -70,6 +70,7 @@
 
 #include <wx/wx.h>
 
+#include "../../../include/ocpn_plugin.h"
 #include "../../grib_pi/src/GribRecordSet.h"
 
 #include "Utilities.h"
@@ -549,10 +550,9 @@ double Position::Distance(Position *p)
     return DistGreatCircle(lat, lon, p->lat, p->lon);
 }
 
-extern bool gshhsCrossesLand(double lat1, double lon1, double lat2, double lon2);
 bool Position::CrossesLand(double dlat, double dlon)
 {
-    return gshhsCrossesLand(lat, lon, dlat, dlon);
+    return PlugIn_GSHHS_CrossesLand(lat, lon, dlat, dlon);
 }
 
 SkipPosition::SkipPosition(Position *p, int q)
@@ -1713,7 +1713,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
             routelist.pop_front();
             IsoRouteList rl;
 
-            extern int debugsize, debugcnt, debuglimit;
+//            extern int debugsize, debugcnt, debuglimit;
             if(
 #if 0
               (origin.size() < debugsize || debugcnt++ < debuglimit) &&
