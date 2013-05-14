@@ -104,6 +104,22 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	m_tEndLon = new wxTextCtrl( this, wxID_ANY, _("175"), wxDefaultPosition, wxSize( 100,-1 ), 0 );
 	fgSizer61->Add( m_tEndLon, 0, wxALL, 5 );
 	
+	m_staticText92 = new wxStaticText( this, wxID_ANY, _("Date"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText92->Wrap( -1 );
+	fgSizer61->Add( m_staticText92, 0, wxALL, 5 );
+	
+	m_stEndDate = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stEndDate->Wrap( -1 );
+	fgSizer61->Add( m_stEndDate, 0, wxALL, 5 );
+	
+	m_staticText94 = new wxStaticText( this, wxID_ANY, _("Hour"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText94->Wrap( -1 );
+	fgSizer61->Add( m_staticText94, 0, wxALL, 5 );
+	
+	m_stEndHour = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stEndHour->Wrap( -1 );
+	fgSizer61->Add( m_stEndHour, 0, wxALL, 5 );
+	
 	
 	sbSizer5->Add( fgSizer61, 1, wxEXPAND, 5 );
 	
@@ -255,13 +271,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer1->SetFlexibleDirection( wxVERTICAL );
 	fgSizer1->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
 	
-	m_staticText22 = new wxStaticText( this, wxID_ANY, _("Time Step"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText22->Wrap( -1 );
-	fgSizer1->Add( m_staticText22, 0, wxALL, 5 );
-	
-	m_sTimeStep = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 100000, 3600 );
-	fgSizer1->Add( m_sTimeStep, 0, wxALL, 5 );
-	
 	m_staticText20 = new wxStaticText( this, wxID_ANY, _("Max Diverted Course"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText20->Wrap( -1 );
 	fgSizer1->Add( m_staticText20, 0, wxALL, 5 );
@@ -313,6 +322,41 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer57 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer57->SetFlexibleDirection( wxBOTH );
 	fgSizer57->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer16;
+	sbSizer16 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Time Step") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer61;
+	fgSizer61 = new wxFlexGridSizer( 0, 6, 0, 0 );
+	fgSizer61->SetFlexibleDirection( wxBOTH );
+	fgSizer61->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_sTimeStepHours = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 0, 100, 1 );
+	fgSizer61->Add( m_sTimeStepHours, 0, wxALL, 5 );
+	
+	m_staticText96 = new wxStaticText( this, wxID_ANY, _("h"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText96->Wrap( -1 );
+	fgSizer61->Add( m_staticText96, 0, wxALL, 5 );
+	
+	m_sTimeStepMinutes = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 0, 60, 0 );
+	fgSizer61->Add( m_sTimeStepMinutes, 0, wxALL, 5 );
+	
+	m_staticText97 = new wxStaticText( this, wxID_ANY, _("m"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText97->Wrap( -1 );
+	fgSizer61->Add( m_staticText97, 0, wxALL, 5 );
+	
+	m_sTimeStepSeconds = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 0, 60, 0 );
+	fgSizer61->Add( m_sTimeStepSeconds, 0, wxALL, 5 );
+	
+	m_staticText98 = new wxStaticText( this, wxID_ANY, _("s"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText98->Wrap( -1 );
+	fgSizer61->Add( m_staticText98, 0, wxALL, 5 );
+	
+	
+	sbSizer16->Add( fgSizer61, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer57->Add( sbSizer16, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer15;
 	sbSizer15 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Data Source") ), wxVERTICAL );

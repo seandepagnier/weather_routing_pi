@@ -545,6 +545,31 @@ skipbearingcomputation:
     return true;
 }
 
+wxDateTime RouteMap::EndDate()
+{
+    IsoChronList::iterator it = origin.end();
+    if(it == origin.begin())
+        return wxDateTime();
+    it--;
+
+    double dista;
+    wxDateTime timea = (*it)->time;
+    Position *a = (*it)->ClosestPosition(m_Options.EndLat, m_Options.EndLon, &dista);
+    if(!a || it == origin.begin())
+        return wxDateTime();
+
+    it--;
+    double distb;
+    wxDateTime timeb = (*it)->time;
+    Position *b = (*it)->ClosestPosition(m_Options.EndLat, m_Options.EndLon, &distb);
+    if(!b)
+        return wxDateTime();
+
+    double seconds = (timea - timeb).GetSeconds().ToLong();
+    wxTimeSpan span_after_b = wxTimeSpan::Seconds(seconds * distb / (dista + distb));
+    return timeb + span_after_b;
+}
+
 double Position::Distance(Position *p)
 {
     return DistGreatCircle(lat, lon, p->lat, p->lon);
@@ -1529,14 +1554,14 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
     return false;
 }
 
-Position *IsoRoute::ClosestPosition(double lat, double lon)
+Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
 {
     Position pos(lat, lon), *minpos = NULL;
-    double mindist = 0;
+    double mindist = INFINITY;
     Position *p = skippoints->point;
     do {
         double dist = pos.Distance(p);
-        if(dist < mindist || mindist == 0) {
+        if(dist < mindist) {
             minpos = p;
             mindist = dist;
         }
@@ -1545,15 +1570,15 @@ Position *IsoRoute::ClosestPosition(double lat, double lon)
 
     /* now try children */
     for(IsoRouteList::iterator it = children.begin(); it != children.end();  it++) {
-        p = (*it)->ClosestPosition(lat, lon);
-        if(p) {
-            double dist = pos.Distance(p);
-            if(dist < mindist || mindist == 0) {
-                minpos = p;
-                mindist = dist;
-            }
+        double dist;
+        p = (*it)->ClosestPosition(lat, lon, &dist);
+        if(p && dist < mindist) {
+            minpos = p;
+            mindist = dist;
         }
     }
+    if(dist)
+        *dist = mindist;
     return minpos;
 }
 
@@ -1677,6 +1702,23 @@ bool IsoChron::Contains(double lat, double lon)
             return true;
 
     return false;
+}
+
+Position* IsoChron::ClosestPosition(double lat, double lon, double *dist)
+{
+    Position *minpos = NULL;
+    double mindist = INFINITY;
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
+        double dist;
+        Position *pos = (*it)->ClosestPosition(lat, lon, &dist);
+        if(pos && dist < mindist) {
+            minpos = pos;
+            mindist = dist;
+        }
+    }
+    if(dist)
+        *dist = mindist;
+    return minpos;
 }
 
 void RouteMapOptions::UpdateLongitudes()
@@ -1846,24 +1888,23 @@ bool RouteMap::Propagate()
     return true;
 }
 
-Position *RouteMap::ClosestPosition(double lat, double lon)
+Position *RouteMap::ClosestPosition(double lat, double lon, double *dist)
 {
-    Position p(lat, lon), *minpos = NULL;
-    double mindist = 0;
+    Position *minpos = NULL;
+    double mindist = INFINITY;
     Lock();
     for(IsoChronList::iterator it = origin.begin(); it != origin.end(); ++it) {
-        for(IsoRouteList::iterator rit = (*it)->routes.begin(); rit != (*it)->routes.end(); ++rit) {
-            Position *pos = (*rit)->ClosestPosition(lat, lon);
-            if(pos) {
-                double dist = p.Distance(pos);
-                if(dist < mindist || mindist == 0) {
-                    minpos = pos;
-                    mindist = dist;
-                }
-            }
+        double dist;
+        Position *pos = (*it)->ClosestPosition(lat, lon, &dist);
+        if(pos && dist < mindist) {
+            minpos = pos;
+            mindist = dist;
         }
     }
     Unlock();
+
+    if(dist)
+        *dist = mindist;
     return minpos;
 }
 

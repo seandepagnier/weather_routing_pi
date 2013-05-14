@@ -54,16 +54,13 @@ void ConfigurationDialog::Load()
 
     wxString degreesteps;
     m_lDegreeSteps->Clear();
-    pConf->Read( _T("DegreeSteps"), &degreesteps, _T("40;60;90;120;150;210;240;270;300;320;"));
+    pConf->Read( _T("DegreeSteps"), &degreesteps, _T("\
+40;50;60;70;80;90;105;120;135;150;165;195;210;225;240;255;270;280;290;300;310;320;"));
     while(degreesteps.size()) {
         m_lDegreeSteps->Append(degreesteps.BeforeFirst(';'));
         degreesteps = degreesteps.AfterFirst(';');
     }
  
-    int timespan;
-    pConf->Read( _T("TimeSpan"), &timespan, 1000);
-    m_sTimeStep->SetValue(timespan);
-
     int maxdivertedcourse;
     pConf->Read( _T("MaxDivertedCourse"), &maxdivertedcourse, 100);
     m_sMaxDivertedCourse->SetValue(maxdivertedcourse);
@@ -116,6 +113,18 @@ void ConfigurationDialog::Load()
     pConf->Read( _T("Anchoring"), &anchoring, false);
     m_cbAnchoring->SetValue(anchoring);
 
+    int timestephours;
+    pConf->Read( _T("TimeStepHours"), &timestephours, 1);
+    m_sTimeStepHours->SetValue(timestephours);
+
+    int timestepminutes;
+    pConf->Read( _T("TimeStepMinutes"), &timestepminutes, 0);
+    m_sTimeStepMinutes->SetValue(timestepminutes);
+
+    int timestepseconds;
+    pConf->Read( _T("TimeStepSeconds"), &timestepseconds, 0);
+    m_sTimeStepSeconds->SetValue(timestepseconds);
+
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "ConfigurationDialogX" ), &p.x, p.x);
     pConf->Read ( _T ( "ConfigurationDialogY" ), &p.y, p.y);
@@ -132,7 +141,6 @@ void ConfigurationDialog::Save( )
         degreesteps += m_lDegreeSteps->GetString(i) + _(";");
     pConf->Write( _T("DegreeSteps"), degreesteps);
 
-    pConf->Write( _T("TimeSpan"), m_sTimeStep->GetValue());
     pConf->Write( _T("MaxDivertedCourse"), m_sMaxDivertedCourse->GetValue());
     pConf->Write( _T("MaxWindKnots"), m_sMaxWindKnots->GetValue());
     pConf->Write( _T("MaxSwellMeters"), m_sMaxSwellMeters->GetValue());
@@ -149,6 +157,10 @@ void ConfigurationDialog::Save( )
     pConf->Write( _T("InvertedRegions"), m_cbInvertedRegions->GetValue());
     pConf->Write( _T("Anchoring"), m_cbAnchoring->GetValue());
 
+    pConf->Write( _T("TimeStepHours"), m_sTimeStepHours->GetValue());
+    pConf->Write( _T("TimeStepMinutes"), m_sTimeStepMinutes->GetValue());
+    pConf->Write( _T("TimeStepSeconds"), m_sTimeStepSeconds->GetValue());
+
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "ConfigurationDialogX" ), p.x);
     pConf->Write ( _T ( "ConfigurationDialogY" ), p.y);
@@ -156,7 +168,9 @@ void ConfigurationDialog::Save( )
 
 void ConfigurationDialog::UpdateOptions(RouteMapOptions &options)
 {
-    options.dt = m_sTimeStep->GetValue();
+    options.dt = 60*(60*m_sTimeStepHours->GetValue()
+                     + m_sTimeStepMinutes->GetValue())
+        + m_sTimeStepSeconds->GetValue();
 
     if(m_lDegreeSteps->GetCount() < 4) {
         wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),

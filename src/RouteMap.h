@@ -104,7 +104,7 @@ public:
     bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapOptions &options);
     void FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(SkipPosition *s, Position *p);
-    Position *ClosestPosition(double lat, double lon);
+    Position *ClosestPosition(double lat, double lon, double *dist=0);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib,
                    wxDateTime &time, RouteMapOptions &options);
 
@@ -130,6 +130,7 @@ public:
     void PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
                            wxDateTime &time, RouteMapOptions &options);
     bool Contains(double lat, double lon);
+    Position* ClosestPosition(double lat, double lon, double *dist=0);
   
     IsoRouteList routes;
     wxDateTime time;
@@ -189,17 +190,16 @@ public:
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
     bool HasGrib() { return m_NewGrib; }
-
     void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.UpdateLongitudes(); Unlock(); }
     RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
-
     bool Propagate();
+    wxDateTime EndDate();
 
 protected:
     virtual void Clear();
     bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapOptions &options);
-    Position *ClosestPosition(double lat, double lon);
+    Position *ClosestPosition(double lat, double lon, double *dist=0);
 
     /* protect any member variables with mutexes if needed */
     virtual void Lock() = 0;

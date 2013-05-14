@@ -59,6 +59,10 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxButton* m_bSyncToGribTime;
 		wxStaticText* m_staticText51;
 		wxStaticText* m_staticText61;
+		wxStaticText* m_staticText92;
+		wxStaticText* m_stEndDate;
+		wxStaticText* m_staticText94;
+		wxStaticText* m_stEndHour;
 		wxButton* m_bCompute;
 		wxButton* m_bReset;
 		wxButton* m_bStatistics;
@@ -110,8 +114,6 @@ class ConfigurationDialogBase : public wxDialog
 		wxButton* m_bRemoveDegreeStep;
 		wxButton* m_bGenerateDegreeSteps;
 		wxButton* m_bClearDegreeSteps;
-		wxStaticText* m_staticText22;
-		wxSpinCtrl* m_sTimeStep;
 		wxStaticText* m_staticText20;
 		wxSpinCtrl* m_sMaxDivertedCourse;
 		wxStaticText* m_staticText23;
@@ -124,6 +126,12 @@ class ConfigurationDialogBase : public wxDialog
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText25;
 		wxSpinCtrl* m_sSubSteps;
+		wxSpinCtrl* m_sTimeStepHours;
+		wxStaticText* m_staticText96;
+		wxSpinCtrl* m_sTimeStepMinutes;
+		wxStaticText* m_staticText97;
+		wxSpinCtrl* m_sTimeStepSeconds;
+		wxStaticText* m_staticText98;
 		wxCheckBox* m_cbAllowDataDeficient;
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
