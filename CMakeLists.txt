@@ -85,6 +85,10 @@ SET(SRC_WEATHER_ROUTING
             src/SwitchPlanDialog.cpp
             src/StatisticsDialog.h 
             src/StatisticsDialog.cpp
+            src/BatchDialog.h
+            src/BatchDialog.cpp
+            src/RouteDialog.h
+            src/RouteDialog.cpp
             src/BoatPlan.h 
             src/BoatPlan.cpp
             src/Boat.h 

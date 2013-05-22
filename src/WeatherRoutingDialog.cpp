@@ -34,6 +34,8 @@
 #include "Utilities.h"
 #include "Boat.h"
 #include "BoatDialog.h"
+#include "BatchDialog.h"
+#include "RouteDialog.h"
 #include "StatisticsDialog.h"
 #include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
@@ -50,6 +52,8 @@ WeatherRoutingDialog::WeatherRoutingDialog( wxWindow *parent, weather_routing_pi
     m_SettingsDialog.Hide();
 
     m_pBoatDialog = new BoatDialog(this);
+    m_pBatchDialog = new BatchDialog(this);
+    m_pRouteDialog = new RouteDialog(this);
 
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -162,6 +166,16 @@ void WeatherRoutingDialog::OnExport ( wxCommandEvent& event )
     }
 
     AddPlugInTrack(newTrack);
+}
+
+void WeatherRoutingDialog::OnBatch ( wxCommandEvent& event )
+{
+    m_pBatchDialog->Show(!m_pBatchDialog->IsShown());
+}
+
+void WeatherRoutingDialog::OnRoutes ( wxCommandEvent& event )
+{
+    m_pRouteDialog->Show(!m_pRouteDialog->IsShown());
 }
 
 void WeatherRoutingDialog::OnReset ( wxCommandEvent& event )

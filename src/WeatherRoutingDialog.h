@@ -37,6 +37,8 @@
 
 class weather_routing_pi;
 class BoatDialog;
+class BatchDialog;
+class RouteDialog;
 class GribUIDialog;
 
 class WeatherRoutingDialog : public WeatherRoutingDialogBase
@@ -60,6 +62,8 @@ private:
     void OnBoat( wxCommandEvent& event );
     void OnPlot( wxCommandEvent& event );
     void OnExport( wxCommandEvent& event );
+    void OnBatch ( wxCommandEvent& event );
+    void OnRoutes ( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnStatistics( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
@@ -84,8 +88,9 @@ private:
 
     bool m_bComputing;
 
-    bool m_bShowBoatDialog;
     BoatDialog *m_pBoatDialog;
+    BatchDialog *m_pBatchDialog;
+    RouteDialog *m_pRouteDialog;
 
     wxTimer m_tCompute;
 

@@ -439,7 +439,12 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
     else if(options.MaxDivertedCourse == 180)
         goto skipbearingcomputation;
-    ll_gc_ll_reverse(lat, lon, options.EndLat, options.EndLon, &bearing, 0);
+//    ll_gc_ll_reverse(lat, lon, options.EndLat, options.EndLon, &bearing, 0);
+    ll_gc_ll_reverse(options.StartLat, options.StartLon, lat, lon, &bearing, 0);
+    if(fabs(heading_resolve(options.StartEndBearing - bearing)) > options.MaxDivertedCourse) {
+        return false;
+    }
+
 skipbearingcomputation:
 
     bool first_backtrackavoid = true;
@@ -456,6 +461,7 @@ skipbearingcomputation:
 
         B = W + H; /* rotated relative to wind */
 
+#if 0
         /* avoid propagating from positions which go in a direction too much
            diverted from the correct course.  */
         if(fabs(heading_resolve(B - bearing)) > options.MaxDivertedCourse) {
@@ -465,6 +471,7 @@ skipbearingcomputation:
 #endif
             continue;
         }
+#endif
 
         VB = options.boat.Plans[newsailplan]->Speed(H, VW);
 
@@ -1721,12 +1728,14 @@ Position* IsoChron::ClosestPosition(double lat, double lon, double *dist)
     return minpos;
 }
 
-void RouteMapOptions::UpdateLongitudes()
+void RouteMapOptions::Update()
 {
     if((positive_longitudes = fabs(average_longitude(StartLon, EndLon)) > 90)) {
         StartLon = positive_degrees(StartLon);
         EndLon = positive_degrees(EndLon);
     }
+
+    ll_gc_ll_reverse(StartLat, StartLon, EndLat, EndLon, &StartEndBearing, 0);
 }
 
 RouteMap::RouteMap()

@@ -141,11 +141,13 @@ typedef std::list<IsoChron*> IsoChronList;
 
 struct RouteMapOptions {
     RouteMapOptions () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
-    void UpdateLongitudes();
+    void Update();
 
     double StartLat, StartLon;
     double EndLat, EndLon;
     double dt; /* time in seconds between propagations */
+
+    double StartEndBearing; /* calculated from start and end */
 
     std::list<double> DegreeSteps;
     
@@ -190,7 +192,7 @@ public:
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
     bool HasGrib() { return m_NewGrib; }
-    void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.UpdateLongitudes(); Unlock(); }
+    void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.Update(); Unlock(); }
     RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
     bool Propagate();

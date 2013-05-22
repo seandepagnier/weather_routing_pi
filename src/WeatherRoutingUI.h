@@ -38,6 +38,7 @@
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/html/htmlwin.h>
+#include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -72,6 +73,8 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxButton* m_bPlot;
 		wxButton* m_bExport;
 		wxButton* m_bInformation;
+		wxButton* m_bBatch;
+		wxButton* m_bRoutes;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void SyncToBoatPosition( wxCommandEvent& event ) { event.Skip(); }
@@ -86,6 +89,8 @@ class WeatherRoutingDialogBase : public wxDialog
 		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnBatch( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRoutes( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -473,6 +478,79 @@ class StatisticsDialogBase : public wxDialog
 		
 		StatisticsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Statistics"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~StatisticsDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class BatchDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class BatchDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText107;
+		wxSpinCtrl* m_sNRoutes;
+		wxStaticText* m_staticText108;
+		wxStaticText* m_staticText109;
+		wxSpinCtrl* m_sRouteSpacing;
+		wxStaticText* m_staticText110;
+		wxListCtrl* m_lBatchRoutes;
+		wxButton* m_bStart;
+		wxButton* m_bClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnStart( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		BatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~BatchDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class RouteDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class RouteDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxCheckListBox* m_clSources;
+		wxButton* m_bAddUpdate;
+		wxButton* m_button38;
+		wxStaticText* m_staticText98;
+		wxTextCtrl* m_textCtrl8;
+		wxStaticText* m_staticText99;
+		wxTextCtrl* m_textCtrl9;
+		wxStaticText* m_staticText100;
+		wxTextCtrl* m_textCtrl10;
+		wxButton* m_bLoad;
+		wxButton* m_bSave;
+		wxListBox* m_lDestinations;
+		wxChoice* m_cDestinations;
+		wxButton* m_bAdd;
+		wxButton* m_bRemove;
+		wxButton* m_bReciprocate;
+		wxButton* m_bGenerate;
+		wxButton* m_bClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnLoad( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemove( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGenerate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		RouteDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Routes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~RouteDialogBase();
 	
 };
 
