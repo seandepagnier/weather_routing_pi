@@ -166,6 +166,8 @@ void WeatherRoutingDialog::OnExport ( wxCommandEvent& event )
     }
 
     AddPlugInTrack(newTrack);
+
+    GetParent()->Refresh();
 }
 
 void WeatherRoutingDialog::OnBatch ( wxCommandEvent& event )
@@ -219,6 +221,7 @@ void WeatherRoutingDialog::OnSettings( wxCommandEvent& event )
     if(m_SettingsDialog.ShowModal() == wxID_OK) {
         m_SettingsDialog.SaveSettings();
         SetRouteMapOverlaySettings();
+        m_RouteMapOverlay.m_UpdateOverlay = true;
         GetParent()->Refresh();
     }
 }

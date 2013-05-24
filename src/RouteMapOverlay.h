@@ -72,6 +72,8 @@ public:
 
     wxDateTime m_GribTimelineTime;
 
+    bool m_UpdateOverlay;
+
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent, ocpnDC &dc, PlugIn_ViewPort &vp);
     virtual bool TestAbort() { return m_Thread->TestDestroy(); }
@@ -89,4 +91,6 @@ private:
     wxColour m_CursorColor, m_DestinationColor;
     int m_RouteThickness, m_IsoChronThickness, m_AlternateRouteThickness;
     bool m_bAlternatesForAll, m_bSquaresAtSailChanges;
+
+    int m_overlaylist;
 };
