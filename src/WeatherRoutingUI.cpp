@@ -85,6 +85,11 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	wxStaticBoxSizer* sbSizer5;
 	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("End") ), wxVERTICAL );
 	
+	wxFlexGridSizer* fgSizer71;
+	fgSizer71 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer71->SetFlexibleDirection( wxBOTH );
+	fgSizer71->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	wxFlexGridSizer* fgSizer61;
 	fgSizer61 = new wxFlexGridSizer( 0, 4, 0, 0 );
 	fgSizer61->SetFlexibleDirection( wxBOTH );
@@ -121,7 +126,14 @@ WeatherRoutingDialogBase::WeatherRoutingDialogBase( wxWindow* parent, wxWindowID
 	fgSizer61->Add( m_stEndHour, 0, wxALL, 5 );
 	
 	
-	sbSizer5->Add( fgSizer61, 1, wxEXPAND, 5 );
+	fgSizer71->Add( fgSizer61, 1, wxEXPAND, 5 );
+	
+	m_stEndStats = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stEndStats->Wrap( -1 );
+	fgSizer71->Add( m_stEndStats, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sbSizer5->Add( fgSizer71, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer17->Add( sbSizer5, 1, wxEXPAND, 5 );

@@ -53,6 +53,7 @@ public:
     void RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
     std::list<PlotData> GetPlotData();
+    void RouteInfo(double &distance, double &avgspeed, double &percentage_upwind);
 
     void SetSettings(wxColor CursorColor, wxColor DestinationColor,
                      int IsoRouteThickness, int IsoChronThickness,
@@ -85,7 +86,7 @@ private:
     void DrawLine(Position *p1, Position *p2,
                   ocpnDC &dc, PlugIn_ViewPort &vp);
 
-    Position *last_cursor_position, *last_destination_position;
+    Position *last_cursor_position, *destination_position, *last_destination_position;
     bool m_bUpdated;
 
     wxColour m_CursorColor, m_DestinationColor;

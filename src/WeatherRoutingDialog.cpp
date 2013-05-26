@@ -151,14 +151,14 @@ void WeatherRoutingDialog::OnExport ( wxCommandEvent& event )
     PlugIn_Track* newTrack = new PlugIn_Track;
     newTrack->m_NameString = _("Weather Route");
 
-    RouteMapOptions options = m_RouteMapOverlay.GetOptions();
-    PlugIn_Waypoint* newPoint = new PlugIn_Waypoint
-        (options.StartLat, options.StartLon, _T("circle"), _("Weather Route Start"));
-    newPoint->m_CreateTime = m_RouteMapOverlay.StartTime();
-    newTrack->pWaypointList->Append(newPoint);
+//    RouteMapOptions options = m_RouteMapOverlay.GetOptions();
+//    PlugIn_Waypoint* newPoint = new PlugIn_Waypoint
+//        (options.StartLat, options.StartLon, _T("circle"), _("Weather Route Start"));
+//    newPoint->m_CreateTime = m_RouteMapOverlay.StartTime();
+//    newTrack->pWaypointList->Append(newPoint);
 
     for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
-        newPoint = new PlugIn_Waypoint
+        PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
             ((*it).lat, (*it).lon, _T("circle"), _("Weather Route Point"));
 
         newPoint->m_CreateTime = (*it).time;
@@ -279,8 +279,22 @@ and no climatology data to fall back on\n"),
 
         wxDateTime enddate = m_RouteMapOverlay.EndDate();
         if(enddate.IsValid()) {
-            m_stEndDate->SetLabel(enddate.Format(_T("%d/%m/%Y")));
+            m_stEndDate->SetLabel(enddate.FormatDate());//(_T("%d/%m/%Y")));
             m_stEndHour->SetLabel(enddate.Format(_T("%H")));
+
+            wxTimeSpan span = enddate - m_RouteMapOverlay.StartTime();
+            int days = span.GetDays();
+            span -= wxTimeSpan::Days(days);
+            int hours = span.GetHours();
+            span -= wxTimeSpan::Hours(hours);
+            double minutes = (double)span.GetSeconds().ToLong()/60.0;
+
+            double distance, avgspeed, percentage_upwind;
+            m_RouteMapOverlay.RouteInfo(distance, avgspeed, percentage_upwind);
+            m_stEndStats->SetLabel(wxString::Format(_T("%dd %02d:%05.2f "),
+                                                    days, hours, minutes) +
+                                   wxString::Format(_T("%.0f nm, %.1f avg knts, %.0f%% upwind"),
+                                                    distance, avgspeed, percentage_upwind));
         }
     } else {
         wxString addmsg;
@@ -344,6 +358,7 @@ void WeatherRoutingDialog::Reset()
 
     m_stEndDate->SetLabel(_T(""));
     m_stEndHour->SetLabel(_T(""));
+    m_stEndStats->SetLabel(_T(""));
 
     RouteMapOptions options = m_RouteMapOverlay.GetOptions();
 

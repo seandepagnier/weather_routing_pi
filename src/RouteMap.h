@@ -95,8 +95,8 @@ public:
     void Print(); /* for debugging */
     void PrintSkip();
 
-    int IntersectionCount(Position *pos);
-    int Contains(Position *pos, bool test_children);
+    int IntersectionCount(Position &pos);
+    int Contains(Position &pos, bool test_children);
 
     bool CompletelyContained(IsoRoute *r);
     bool ContainsRoute(IsoRoute *r);
@@ -129,6 +129,7 @@ public:
 
     void PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
                            wxDateTime &time, RouteMapOptions &options);
+    bool Contains(Position &p);
     bool Contains(double lat, double lon);
     Position* ClosestPosition(double lat, double lon, double *dist=0);
   
@@ -201,7 +202,7 @@ public:
 protected:
     virtual void Clear();
     bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapOptions &options);
-    Position *ClosestPosition(double lat, double lon, double *dist=0);
+    Position *ClosestPosition(double lat, double lon, double *dist=0, bool before_last=false);
 
     /* protect any member variables with mutexes if needed */
     virtual void Lock() = 0;

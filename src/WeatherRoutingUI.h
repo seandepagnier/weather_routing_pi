@@ -99,6 +99,7 @@ class WeatherRoutingDialogBase : public wxDialog
 		wxDatePickerCtrl* m_dpStartDate;
 		wxTextCtrl* m_tEndLat;
 		wxTextCtrl* m_tEndLon;
+		wxStaticText* m_stEndStats;
 		
 		WeatherRoutingDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxRESIZE_BORDER ); 
 		~WeatherRoutingDialogBase();

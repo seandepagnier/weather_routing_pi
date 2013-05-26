@@ -55,14 +55,16 @@ void *RouteMapOverlayThread::Entry()
 
 RouteMapOverlay::RouteMapOverlay()
     : m_GribTimelineTime(wxDateTime::Now()),
-      m_Thread(NULL),
-      last_cursor_position(NULL), last_destination_position(NULL),
-      m_UpdateOverlay(true), m_bUpdated(false)
+      m_UpdateOverlay(true), m_Thread(NULL),
+      last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
+      m_bUpdated(false)
 {
 }
 
 RouteMapOverlay::~RouteMapOverlay()
 {
+    delete destination_position;
+
     if(m_Thread)
         Stop();
 }
@@ -414,31 +416,42 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
 
     RouteMapOptions options = GetOptions();
     Lock();
-    IsoChronList::iterator it = origin.begin(), itp;
+    IsoChronList::iterator it = origin.begin(), itn;
 
     /* get route iso for this position */
-    Position *p;
-    for(p=pos->parent; p; p=p->parent)
+    Position *p, *l;
+    p=pos->parent;
+    if(last_destination_position == destination_position)
+        p=p->parent;
+    for(; p; p=p->parent)
         if(++it == origin.end())
             return plotdatalist;
 
-//    if(it != origin.begin())
-    //      it--;
+    itn = it;
 
-    for(p = pos; p && it != origin.begin(); p = p->parent) {
+    l = pos;
+    for(p = pos; p; p = p->parent) {
         GribRecordSet *grib = (*it)->m_Grib;
 
         PlotData data;
-        if((itp = it) != origin.begin())
-            itp--;
-
         /* this omits the starting position */
-        double dt = ((*it)->time - (*itp)->time).GetSeconds().ToDouble();
+        double dt;
+        if(p == destination_position)
+            dt = 0;
+        else
+            dt = ((itn==it?EndDate():(*itn)->time) - (*it)->time).GetSeconds().ToDouble();
         data.time = (*it)->time;
         data.lat = p->lat, data.lon = p->lon;
-        if(p->GetPlotData(grib, dt, options, data))
+        if(l->GetPlotData(grib, dt, options, data))
             plotdatalist.push_front(data);
-        it--;
+
+        l = p;
+        itn = it;
+
+        if(it == origin.begin())
+            break;
+        if(p != destination_position)
+            it--;
     }
 
     m_NewGrib = NULL;
@@ -446,6 +459,45 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
 
     Unlock();
     return plotdatalist;
+}
+
+void RouteMapOverlay::RouteInfo(double &distance, double &avgspeed, double &percentage_upwind)
+{
+    std::list<PlotData> plotdata = GetPlotData();
+    distance = 0;
+    double avgspeedtotal = 0, totalW = 0, count = 0;
+#if 0
+    wxDateTime ltime;
+#else
+    double lat0, lon0;
+#endif
+    for(std::list<PlotData>::iterator it=plotdata.begin(); it!=plotdata.end(); it++)
+    {
+        if(it != plotdata.begin()) {
+#if 0
+            double elapsed = (it->time - ltime).GetSeconds().ToDouble()/3600.0;
+            distance += elapsed + it->VBG;
+#else
+            double dist;
+            DistanceBearingMercator_Plugin(lat0, lon0, it->lat, it->lon, 0, &dist);
+            distance += dist;
+#endif
+        }
+
+#if 0
+        ltime = it->time;
+#else
+        lat0 = it->lat;
+        lon0 = it->lon;
+#endif        
+
+        avgspeedtotal += it->VBG;
+        if(fabs(it->B - it->W) < 90)
+            totalW++;
+        count++;
+    }
+    avgspeed = avgspeedtotal / count;
+    percentage_upwind = 100.0 * totalW / count;
 }
 
 void RouteMapOverlay::SetSettings(wxColor CursorColor, wxColor DestinationColor,
@@ -491,7 +543,19 @@ bool RouteMapOverlay::Updated()
 void RouteMapOverlay::UpdateDestination()
 {
     RouteMapOptions options = GetOptions();
-    last_destination_position = ClosestPosition(options.EndLat, options.EndLon);
+
+    bool done = ReachedDestination();
+    Position *endp = ClosestPosition(options.EndLat, options.EndLon, 0, done);
+    if(endp) {
+        if(done) {
+            delete destination_position;
+            destination_position = new Position(options.EndLat, options.EndLon, endp->sailplan, endp);
+            last_destination_position = destination_position;
+        } else
+            last_destination_position = endp;
+    } else
+        last_destination_position = NULL;
+
     m_bUpdated = true;
     m_UpdateOverlay = true;
 }

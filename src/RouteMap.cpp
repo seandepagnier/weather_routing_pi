@@ -380,10 +380,14 @@ bool Position::GetPlotData(GribRecordSet *grib, double dt,
 
     if(parent) {
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &data.BG, &data.VBG);
-        data.VBG *= 3600 / dt;
+        if(dt == 0)
+            data.VBG = 0;
+        else
+            data.VBG *= 3600 / dt;
         OverWater(data.C, data.VC, data.BG, data.VBG, data.B, data.VB);
         return true;
     }
+
     return false;
 }
 
@@ -719,10 +723,10 @@ void IsoRoute::PrintSkip()
 
 /* how many times do we cross this route going from this point to infinity,
    return -1 if inconclusive */
-int IsoRoute::IntersectionCount(Position *pos)
+int IsoRoute::IntersectionCount(Position &pos)
 {
     int numintsct = 0;
-    double lat = pos->lat, lon = pos->lon;
+    double lat = pos.lat, lon = pos.lon;
 
     SkipPosition *s1 = skippoints;
     do {
@@ -780,7 +784,7 @@ int IsoRoute::IntersectionCount(Position *pos)
 
 /* determine if a route contains a position
    0 for outside, 1 for inside, -1 for inconclusive (on border or really close) */
-int IsoRoute::Contains(Position *pos, bool test_children)
+int IsoRoute::Contains(Position &pos, bool test_children)
 {
     int numintsct = IntersectionCount(pos);
     if(numintsct == -1)
@@ -804,7 +808,7 @@ bool IsoRoute::CompletelyContained(IsoRoute *r)
 {
     Position *pos = r->skippoints->point;
     do {
-        if(Contains(pos, false) != 1)
+        if(Contains(*pos, false) != 1)
             return false;
         pos = pos->next;
     } while(pos != r->skippoints->point);
@@ -817,7 +821,7 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
 {
     Position *pos = r->skippoints->point;
     do {
-        switch(Contains(pos, false)) {
+        switch(Contains(*pos, false)) {
         case 0: return false;
         case 1: return true;
         }
@@ -1701,14 +1705,18 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
     }
 }
 
+bool IsoChron::Contains(Position &p)
+{
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+        if((*it)->Contains(p, true))
+            return true;
+    return false;
+}
+
 bool IsoChron::Contains(double lat, double lon)
 {
     Position p(lat, lon);
-    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
-        if((*it)->Contains(&p, true))
-            return true;
-
-    return false;
+    return Contains(p);
 }
 
 Position* IsoChron::ClosestPosition(double lat, double lon, double *dist)
@@ -1897,15 +1905,24 @@ bool RouteMap::Propagate()
     return true;
 }
 
-Position *RouteMap::ClosestPosition(double lat, double lon, double *dist)
+Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool before_last)
 {
+    if(!origin.size())
+        return NULL;
+
     Position *minpos = NULL;
     double mindist = INFINITY;
     Lock();
+
+    IsoChronList::iterator last = origin.end();
+    last--;
+
     for(IsoChronList::iterator it = origin.begin(); it != origin.end(); ++it) {
         double dist;
         Position *pos = (*it)->ClosestPosition(lat, lon, &dist);
-        if(pos && dist < mindist) {
+
+        if(pos && dist < mindist &&
+           !(before_last && it == last)) {
             minpos = pos;
             mindist = dist;
         }
