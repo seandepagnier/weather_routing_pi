@@ -81,10 +81,6 @@ void ConfigurationDialog::Load()
     pConf->Read( _T("TackingTime"), &tackingtime, 0);
     m_sTackingTime->SetValue(tackingtime);
 
-    int substeps;
-    pConf->Read( _T("SubSteps"), &substeps, 90);
-    m_sSubSteps->SetValue(substeps);
-
     bool usegrib;
     pConf->Read( _T("UseGrib"), &usegrib, false);
     m_cbUseGrib->SetValue(usegrib);
@@ -146,7 +142,6 @@ void ConfigurationDialog::Save( )
     pConf->Write( _T("MaxSwellMeters"), m_sMaxSwellMeters->GetValue());
     pConf->Write( _T("MaxLatitude"), m_sMaxLatitude->GetValue());
     pConf->Write( _T("TackingTime"), m_sTackingTime->GetValue());
-    pConf->Write( _T("SubSteps"), m_sSubSteps->GetValue());
 
     pConf->Write( _T("UseGrib"), m_cbUseGrib->GetValue());
     pConf->Write( _T("UseClimatology"), m_cbUseClimatology->GetValue());
@@ -191,7 +186,7 @@ void ConfigurationDialog::UpdateOptions(RouteMapOptions &options)
     options.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
     options.MaxLatitude = m_sMaxLatitude->GetValue();
     options.TackingTime = m_sTackingTime->GetValue();
-    options.SubSteps = m_sSubSteps->GetValue();
+
 
     options.DetectLand = m_cbDetectLand->GetValue();
     options.Currents = m_cbCurrents->GetValue();
@@ -243,4 +238,9 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
 {
     m_lDegreeSteps->Clear();
+}
+
+void Configuration::OnEditBoat ( wxCommandEvent& event )
+{
+    m_pBoatDialog->Show(!m_pBoatDialog->IsShown());
 }

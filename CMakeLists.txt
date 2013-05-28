@@ -69,10 +69,10 @@ FIND_PACKAGE(Gettext REQUIRED)
 SET(SRC_WEATHER_ROUTING
             src/weather_routing_pi.h
             src/weather_routing_pi.cpp
-            src/WeatherRoutingDialog.h 
-            src/WeatherRoutingDialog.cpp
-            src/ConfigurationDialog.h 
-            src/ConfigurationDialog.cpp
+            src/WeatherRouting.h 
+            src/WeatherRouting.cpp
+            src/Configuration.h 
+            src/Configuration.cpp
             src/SettingsDialog.h 
             src/SettingsDialog.cpp
             src/PlotDialog.h
@@ -85,10 +85,10 @@ SET(SRC_WEATHER_ROUTING
             src/SwitchPlanDialog.cpp
             src/StatisticsDialog.h 
             src/StatisticsDialog.cpp
-            src/BatchDialog.h
-            src/BatchDialog.cpp
-            src/RouteDialog.h
-            src/RouteDialog.cpp
+            src/ConfigurationBatchDialog.h
+            src/ConfigurationBatchDialog.cpp
+            src/AboutDialog.h
+            src/AboutDialog.cpp
             src/BoatPlan.h 
             src/BoatPlan.cpp
             src/Boat.h 

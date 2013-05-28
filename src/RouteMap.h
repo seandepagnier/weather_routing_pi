@@ -154,7 +154,6 @@ struct RouteMapOptions {
     
     double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
     double MaxLatitude, TackingTime;
-    int SubSteps;
 
     bool UseGrib, UseClimatology;
     bool AllowDataDeficient;

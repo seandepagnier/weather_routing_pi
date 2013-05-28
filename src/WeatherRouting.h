@@ -39,13 +39,12 @@ class weather_routing_pi;
 class BoatDialog;
 class BatchDialog;
 class RouteDialog;
-class GribUIDialog;
 
-class WeatherRoutingDialog : public WeatherRoutingDialogBase
+class WeatherRouting : public WeatherRoutingBase
 {
 public:
-    WeatherRoutingDialog( wxWindow *parent, weather_routing_pi &plugin );
-    ~WeatherRoutingDialog( );
+    WeatherRouting( wxWindow *parent, weather_routing_pi &plugin );
+    ~WeatherRouting( );
 
     void Reset();
 
@@ -55,18 +54,20 @@ public:
 
 private:
     void OnUpdateEnd( wxCommandEvent& event );
-    void OnCompute( wxCommandEvent& event );
-    void OnReset( wxCommandEvent& event );
-    void OnSettings( wxCommandEvent& event );
-    void OnConfiguration( wxCommandEvent& event );
-    void OnBoat( wxCommandEvent& event );
-    void OnPlot( wxCommandEvent& event );
-    void OnExport( wxCommandEvent& event );
-    void OnBatch ( wxCommandEvent& event );
-    void OnRoutes ( wxCommandEvent& event );
-    void OnInformation( wxCommandEvent& event );
-    void OnStatistics( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event );
+
+    void OnCompute( wxCommandEvent& event ) { event.Skip(); }
+    void OnOpen( wxCommandEvent& event ) { event.Skip(); }
+    void OnSave( wxCommandEvent& event ) { event.Skip(); }
+    void OnExport( wxCommandEvent& event ) { event.Skip(); }
+    void OnClose( wxCommandEvent& event ) { event.Skip(); }
+    void OnFilter( wxCommandEvent& event ) { event.Skip(); }
+    void OnDisplaySettings( wxCommandEvent& event ) { event.Skip(); }
+    void OnConfiguration( wxCommandEvent& event ) { event.Skip(); }
+    void OnPlot( wxCommandEvent& event ) { event.Skip(); }
+    void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
+    void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+    void OnAbout( wxCommandEvent& event ) { event.Skip(); }
+
     void OnComputationTimer( wxTimerEvent & );
 
     void UpdateStatistics();
@@ -89,7 +90,6 @@ private:
     bool m_bComputing;
 
     BoatDialog *m_pBoatDialog;
-    BatchDialog *m_pBatchDialog;
     RouteDialog *m_pRouteDialog;
 
     wxTimer m_tCompute;
