@@ -54,8 +54,7 @@ void *RouteMapOverlayThread::Entry()
 }
 
 RouteMapOverlay::RouteMapOverlay()
-    : m_GribTimelineTime(wxDateTime::Now()),
-      m_UpdateOverlay(true), m_Thread(NULL),
+    : m_UpdateOverlay(true), m_Thread(NULL),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
       m_bUpdated(false)
 {
@@ -143,13 +142,7 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, ocpnDC &dc, P
     } while(p != s->point);
     if(!dc.GetDC())
         glEnd();
-#if 0
-    do {
-        SetColor(dc, false, wxColour(255, 0, 0), m_IsoChronThickness);
-        DrawLine(s->point, s->next->point, dc, vp);
-        s = s->next;
-    } while(s != r->skippoints);
-#endif
+
     /* now render any children */
     wxColour cyan(0, 255, 255);
     for(IsoRouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
@@ -177,18 +170,18 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
     }
 }
 
-void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::Render(wxDateTime time, ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     /* render start and end */
-    RouteMapOptions options = GetOptions();
+    RouteMapConfiguration configuration = GetConfiguration();
     wxPoint r;
-    GetCanvasPixLL(&vp, &r, options.StartLat, options.StartLon);
+    GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
     SetColor(dc, true, *wxBLUE, 3);
     dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
     dc.DrawLine(r.x, r.y-10, r.x-10, r.y+7);
     dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
 
-    GetCanvasPixLL(&vp, &r, options.EndLat, options.EndLon);
+    GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
     SetColor(dc, true, *wxRED, 3);
     dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
     dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
@@ -200,12 +193,6 @@ void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
         m_UpdateOverlay = true;
 
     double scale = vp.view_scale_ppm/s_scale;
-#if 0
-    if(scale != s_scale) {
-        m_UpdateOverlay = true;
-        s_scale = scale;
-    }
-#endif
     
     wxPoint point;
     GetCanvasPixLL(&vp, &point, s_clat, s_clon);
@@ -291,10 +278,6 @@ void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
         Lock();
         int c = 0;
         for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
-#if 0
-            if(*i != origin.back())
-                continue;
-#endif
             Unlock();
             wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
 
@@ -314,13 +297,14 @@ void RouteMapOverlay::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 
     if(m_RouteThickness) {
         SetColor(dc, true, m_CursorColor, m_RouteThickness);
-        RenderCourse(last_cursor_position, dc, vp);
+        RenderCourse(last_cursor_position, time, dc, vp);
         SetColor(dc, true, m_DestinationColor, m_RouteThickness);
-        RenderCourse(last_destination_position, dc, vp);
+        RenderCourse(last_destination_position, time, dc, vp);
     }
 }
 
-void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time,
+                                   ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     if(!pos)
         return;
@@ -344,8 +328,7 @@ void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &v
     if(!dc.GetDC())
         glEnd();
 
-    /* render boat on optimal course at current grib time */
-    wxDateTime time;
+    /* render boat on optimal course at time */
     IsoChronList::iterator it = origin.begin();
 
     /* get route iso for this position */
@@ -356,7 +339,6 @@ void RouteMapOverlay::RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &v
     if(it != origin.begin())
         it--;
 
-    time = m_GribTimelineTime;
     for(p = pos; p->parent; p = p->parent) {
         wxDateTime ittime = (*it)->time;
         wxPoint r;
@@ -414,7 +396,7 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
     if(!pos)
         return plotdatalist;
 
-    RouteMapOptions options = GetOptions();
+    RouteMapConfiguration configuration = GetConfiguration();
     Lock();
     IsoChronList::iterator it = origin.begin(), itn;
 
@@ -442,7 +424,7 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
             dt = ((itn==it?EndDate():(*itn)->time) - (*it)->time).GetSeconds().ToDouble();
         data.time = (*it)->time;
         data.lat = p->lat, data.lon = p->lon;
-        if(l->GetPlotData(grib, dt, options, data))
+        if(l->GetPlotData(grib, dt, configuration, data))
             plotdatalist.push_front(data);
 
         l = p;
@@ -466,30 +448,17 @@ void RouteMapOverlay::RouteInfo(double &distance, double &avgspeed, double &perc
     std::list<PlotData> plotdata = GetPlotData();
     distance = 0;
     double avgspeedtotal = 0, totalW = 0, count = 0;
-#if 0
-    wxDateTime ltime;
-#else
     double lat0, lon0;
-#endif
     for(std::list<PlotData>::iterator it=plotdata.begin(); it!=plotdata.end(); it++)
     {
         if(it != plotdata.begin()) {
-#if 0
-            double elapsed = (it->time - ltime).GetSeconds().ToDouble()/3600.0;
-            distance += elapsed + it->VBG;
-#else
             double dist;
             DistanceBearingMercator_Plugin(lat0, lon0, it->lat, it->lon, 0, &dist);
             distance += dist;
-#endif
         }
 
-#if 0
-        ltime = it->time;
-#else
         lat0 = it->lat;
         lon0 = it->lon;
-#endif        
 
         avgspeedtotal += it->VBG;
         if(fabs(it->B - it->W) < 90)
@@ -542,14 +511,17 @@ bool RouteMapOverlay::Updated()
 
 void RouteMapOverlay::UpdateDestination()
 {
-    RouteMapOptions options = GetOptions();
+    RouteMapConfiguration configuration = GetConfiguration();
 
     bool done = ReachedDestination();
-    Position *endp = ClosestPosition(options.EndLat, options.EndLon, 0, done);
+    Position *endp = ClosestPosition(configuration.EndLat, configuration.EndLon, 0, done);
     if(endp) {
         if(done) {
             delete destination_position;
-            destination_position = new Position(options.EndLat, options.EndLon, endp->sailplan, endp);
+            destination_position = new Position(configuration.EndLat,
+                                                configuration.EndLon,
+                                                endp->sailplan, endp->tacks,
+                                                endp);
             last_destination_position = destination_position;
         } else
             last_destination_position = endp;

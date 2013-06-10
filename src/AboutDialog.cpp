@@ -20,34 +20,28 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.             *
+ *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
+ *
  */
 
-#ifndef _WEATHER_ROUTING_CONFIGURATION_H_
-#define _WEATHER_ROUTING_CONFIGURATION_H_
+#include <wx/wx.h>
 
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
-#include <wx/treectrl.h>
-#include <wx/fileconf.h>
+#include "AboutDialog.h"
+#include "weather_routing_pi.h"
 
-#include "WeatherRoutingUI.h"
+#include "Utilities.h"
 
-class ConfigurationDialog : public ConfigurationDialogBase
+AboutDialog::AboutDialog( wxWindow *parent )
+    : AboutDialogBase(parent)
 {
-public:
-    ConfigurationDialog( wxWindow *parent );
-    ~ConfigurationDialog( );
+}
 
-    void Load();
-    void Save();
-    void UpdateOptions(RouteMapOptions &options);
-
-protected:
-    void OnAddDegreeStep( wxCommandEvent& event );
-    void OnRemoveDegreeStep( wxCommandEvent& event );
-    void OnGenerateDegreeSteps( wxCommandEvent& event );
-    void OnClearDegreeSteps( wxCommandEvent& event );
-};
-
-#endif
+void AboutDialog::OnDonate( wxCommandEvent& event )
+{
+      wxLaunchDefaultBrowser(_T("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=sean%40depagnier%2ecom&lc=US&item_name=weather_routing&no_note=0&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest"));
+}

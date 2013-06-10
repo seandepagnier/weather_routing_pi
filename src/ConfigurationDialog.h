@@ -24,35 +24,44 @@
  ***************************************************************************
  */
 
-#ifndef _BATCH_DIALOG_H_
-#define _BATCH_DIALOG_H_
+#ifndef _WEATHER_ROUTING_CONFIGURATION_DIALOG_H_
+#define _WEATHER_ROUTING_CONFIGURATION_DIALOG_H_
 
+
+#include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
 
 class weather_routing_pi;
 
-class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
+class ConfigurationDialog : public ConfigurationDialogBase
 {
 public:
+    ConfigurationDialog(wxWindow *parent, weather_routing_pi &plugin);
+    ~ConfigurationDialog();
 
-    ConfigurationBatchDialog( wxWindow *parent);
-    ~ConfigurationBatchDialog();
+    wxDateTime m_GribTimelineTime;
 
 protected:
-    void OnRemoveSource( wxCommandEvent& event );
-    void OnAddDestination( wxCommandEvent& event );
-    void OnRemoveDestination( wxCommandEvent& event );
-    void OnClearDestinations( wxCommandEvent& event );
-    void OnReciprocateDestinations( wxCommandEvent& event );
-    void OnAdd( wxCommandEvent& event );
-    void OnEdit( wxCommandEvent& event );
-    void OnRemove( wxCommandEvent& event );
-    void OnReset( wxCommandEvent& event );
-    void OnInformation( wxCommandEvent& event );
-    void OnCancel( wxCommandEvent& event );
-    void OnDone( wxCommandEvent& event );
+    void OnBoatPosition( wxCommandEvent& event );
+    void OnGribTime( wxCommandEvent& event );
+    void OnCurrentTime( wxCommandEvent& event );
+    void OnEditBoat( wxCommandEvent& event );
+    void OnAddDegreeStep( wxCommandEvent& event );
+    void OnRemoveDegreeStep( wxCommandEvent& event );
+    void OnClearDegreeSteps( wxCommandEvent& event );
+    void OnGenerateDegreeSteps( wxCommandEvent& event );
+
+    void ReadConfiguration(RouteMapConfiguration &o);
+    RouteMapConfiguration Configuration();
+
+private:
+    enum ConfigurationItem {START, END, START_TIME, TIME_STEP};
+
+    void SetStartDateTime(wxDateTime datetime);
+
+    weather_routing_pi   &Plugin;
 };
 
 #endif

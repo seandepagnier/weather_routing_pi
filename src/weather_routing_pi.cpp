@@ -32,7 +32,7 @@
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
-#include "WeatherRoutingDialog.h"
+#include "WeatherRouting.h"
 #include "weather_routing_pi.h"
 
 // the class factories, used to create and destroy instances of the PlugIn
@@ -83,7 +83,7 @@ int weather_routing_pi::Init(void)
       // Get a pointer to the opencpn display canvas, to use as a parent for the WEATHER_ROUTING dialog
       m_parent_window = GetOCPNCanvasWindow();
 
-      m_pWeather_RoutingDialog = NULL;
+      m_pWeather_Routing = NULL;
 
       m_leftclick_tool_id  = InsertPlugInTool(_T(""), _img_WeatherRouting, _img_WeatherRouting, wxITEM_CHECK,
                                               _("Weather_Routing"), _T(""), NULL,
@@ -112,9 +112,9 @@ int weather_routing_pi::Init(void)
 
 bool weather_routing_pi::DeInit(void)
 {
-    if(m_pWeather_RoutingDialog)
-        m_pWeather_RoutingDialog->Close();
-    delete m_pWeather_RoutingDialog;
+    if(m_pWeather_Routing)
+        m_pWeather_Routing->Close();
+    delete m_pWeather_Routing;
     return true;
 }
 
@@ -174,7 +174,7 @@ int weather_routing_pi::GetToolbarToolCount(void)
 
 void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 {
-    if(m_pWeather_RoutingDialog && m_pWeather_RoutingDialog->m_RouteMapOverlay.SetCursorLatLon(lat, lon))
+    if(m_pWeather_Routing && m_pWeather_Routing->CurrentRouteMap()->SetCursorLatLon(lat, lon))
         RequestRefresh(m_parent_window);
 
     m_cursor_lat = lat;
@@ -194,9 +194,9 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             (v[_T("Day")].AsInt(), (wxDateTime::Month)v[_T("Month")].AsInt(), v[_T("Year")].AsInt(),
              v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
 
-        if(m_pWeather_RoutingDialog) {
-            m_pWeather_RoutingDialog->m_RouteMapOverlay.m_GribTimelineTime = time;
-            m_pWeather_RoutingDialog->m_ConfigurationDialog.m_cbUseGrib->Enable();
+        if(m_pWeather_Routing) {
+            m_pWeather_Routing->m_ConfigurationDialog.m_GribTimelineTime = time;
+            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseGrib->Enable();
             RequestRefresh(m_parent_window);
         }
     }
@@ -213,15 +213,15 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         GribRecordSet *gptr;
         sscanf(ptr, "%p", &gptr);
 
-        if(m_pWeather_RoutingDialog) {
-            RouteMapOverlay &RouteMapOverlay = m_pWeather_RoutingDialog->m_RouteMapOverlay;
-            /* should probably check to make sure the time is correct */
-            RouteMapOverlay.SetNewGrib(gptr);
+        if(m_pWeather_Routing) {
+            RouteMapOverlay *routemapoverlay = m_pWeather_Routing->m_RouteMapOverlayNeedingGrib;
+            if(routemapoverlay)
+                routemapoverlay->SetNewGrib(gptr);
         }
     }
     if(message_id == _T("CLIMATOLOGY"))
     {
-        if(!m_pWeather_RoutingDialog)
+        if(!m_pWeather_Routing)
             return; /* not ready */
 
         wxJSONReader r;
@@ -230,8 +230,8 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 
         int major = v[_T("ClimatologyVersionMajor")].AsInt();
         int minor = v[_T("ClimatologyVersionMinor")].AsInt();
-        if( major != 0 || minor != 1) {
-            wxMessageDialog mdlg(m_pWeather_RoutingDialog,
+        if( major != 0 || (minor != 1 && minor != 2)) {
+            wxMessageDialog mdlg(m_pWeather_Routing,
                                  _("Climatology plugin version not correct, no climatology data\n"),
                                  _("Weather Routing"), wxOK | wxICON_WARNING);
             mdlg.ShowModal();
@@ -244,10 +244,10 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         bool (*cptr)(int, wxDateTime &, double, double, double &, double &);
         sscanf(ptr, "%p", &cptr);
 
-            RouteMapOverlay &RouteMapOverlay = m_pWeather_RoutingDialog->m_RouteMapOverlay;
+            RouteMapOverlay &RouteMapOverlay = m_pWeather_Routing->m_RouteMapOverlay;
             /* should probably check to make sure the time is correct */
             RouteMapOverlay.SetClimatologyFunction(cptr);
-            m_pWeather_RoutingDialog->m_ConfigurationDialog.m_cbUseClimatology->Enable(cptr);
+            m_pWeather_Routing->m_Configuration.m_cbUseClimatology->Enable(cptr);
     }
 }
 
@@ -263,19 +263,19 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
-    if(!m_pWeather_RoutingDialog) {
-        m_pWeather_RoutingDialog = new WeatherRoutingDialog(m_parent_window, *this);
-        wxPoint p = m_pWeather_RoutingDialog->GetPosition();
-        m_pWeather_RoutingDialog->Move(0,0);        // workaround for gtk autocentre dialog behavior
-        m_pWeather_RoutingDialog->Move(p);
+    if(!m_pWeather_Routing) {
+        m_pWeather_Routing = new WeatherRouting(m_parent_window, *this);
+        wxPoint p = m_pWeather_Routing->GetPosition();
+        m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
+        m_pWeather_Routing->Move(p);
 
         SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
         SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
-        m_pWeather_RoutingDialog->Reset();
+        m_pWeather_Routing->Reset();
     }
 
-    bool show = !m_pWeather_RoutingDialog->IsShown();
-    m_pWeather_RoutingDialog->Show(show);
+    bool show = !m_pWeather_Routing->IsShown();
+    m_pWeather_Routing->Show(show);
 
     SetCanvasContextMenuItemViz(m_startroute_menu_id, show);
     SetCanvasContextMenuItemViz(m_endroute_menu_id, show);
@@ -283,27 +283,27 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
 
 void weather_routing_pi::OnContextMenuItemCallback(int id)
 {
-    if(!m_pWeather_RoutingDialog)
+    if(!m_pWeather_Routing)
         return;
 
     if(id == m_startroute_menu_id) {
-        m_pWeather_RoutingDialog->m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
-        m_pWeather_RoutingDialog->m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
+        m_pWeather_Routing->m_Configuration.m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
+        m_pWeather_Routing->m_Configuration.m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
     } else
     if(id == m_endroute_menu_id) {
-        m_pWeather_RoutingDialog->m_tEndLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
-        m_pWeather_RoutingDialog->m_tEndLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
+        m_pWeather_Routing->m_Configuration.m_tEndLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
+        m_pWeather_Routing->m_Configuration.m_tEndLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
     } else
         return;
 
-    m_pWeather_RoutingDialog->Reset();
+    m_pWeather_Routing->Reset();
 }
 
 bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 {
-    if(m_pWeather_RoutingDialog && m_pWeather_RoutingDialog->IsShown()) {
+    if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
         ocpnDC odc(dc);
-        m_pWeather_RoutingDialog->RenderRouteMap(odc, *vp);
+        m_pWeather_Routing->RenderRouteMap(odc, *vp);
         return true;
     }
     return false;
@@ -311,9 +311,9 @@ bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
-    if(m_pWeather_RoutingDialog && m_pWeather_RoutingDialog->IsShown()) {
+    if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
         ocpnDC odc;
-        m_pWeather_RoutingDialog->RenderRouteMap(odc, *vp);
+        m_pWeather_Routing->RenderRouteMap(odc, *vp);
         return true;
     }
     return false;
@@ -343,5 +343,5 @@ bool weather_routing_pi::SaveConfig(void)
 
 void weather_routing_pi::SetColorScheme(PI_ColorScheme cs)
 {
-      DimeWindow(m_pWeather_RoutingDialog);
+      DimeWindow(m_pWeather_Routing);
 }

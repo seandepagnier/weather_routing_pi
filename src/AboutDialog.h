@@ -24,35 +24,21 @@
  ***************************************************************************
  */
 
-#ifndef _BATCH_DIALOG_H_
-#define _BATCH_DIALOG_H_
+#ifndef _WEATHER_ROUTING_ABOUT_H_
+#define _WEATHER_ROUTING_ABOUT_H_
 
+
+#include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
 
-class weather_routing_pi;
-
-class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
+class AboutDialog : public AboutDialogBase
 {
 public:
-
-    ConfigurationBatchDialog( wxWindow *parent);
-    ~ConfigurationBatchDialog();
-
-protected:
-    void OnRemoveSource( wxCommandEvent& event );
-    void OnAddDestination( wxCommandEvent& event );
-    void OnRemoveDestination( wxCommandEvent& event );
-    void OnClearDestinations( wxCommandEvent& event );
-    void OnReciprocateDestinations( wxCommandEvent& event );
-    void OnAdd( wxCommandEvent& event );
-    void OnEdit( wxCommandEvent& event );
-    void OnRemove( wxCommandEvent& event );
-    void OnReset( wxCommandEvent& event );
-    void OnInformation( wxCommandEvent& event );
-    void OnCancel( wxCommandEvent& event );
-    void OnDone( wxCommandEvent& event );
+    AboutDialog( wxWindow *parent );
+    void OnDonate( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event ) { EndModal(wxID_OK); }   
 };
 
 #endif

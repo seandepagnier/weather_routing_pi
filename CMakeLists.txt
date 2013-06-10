@@ -71,8 +71,8 @@ SET(SRC_WEATHER_ROUTING
             src/weather_routing_pi.cpp
             src/WeatherRouting.h 
             src/WeatherRouting.cpp
-            src/Configuration.h 
-            src/Configuration.cpp
+            src/ConfigurationDialog.h 
+            src/ConfigurationDialog.cpp
             src/SettingsDialog.h 
             src/SettingsDialog.cpp
             src/PlotDialog.h

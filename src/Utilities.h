@@ -84,3 +84,8 @@ double square(double x);
 double cube(double x);
 
 double average_longitude(double lon1, double lon2);
+
+class TiXmlElement;
+double AttributeDouble(TiXmlElement *e, const char *name, double def);
+bool AttributeBool(TiXmlElement *e, const char *name, bool def);
+bool AttributeBool(TiXmlElement *e, const char *name, bool def);

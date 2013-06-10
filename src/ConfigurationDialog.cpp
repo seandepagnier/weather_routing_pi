@@ -31,15 +31,24 @@
 #include <math.h>
 #include <time.h>
 
+#include "../../../include/tinyxml.h"
+
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
 #include "ConfigurationDialog.h"
+#include "ConfigurationBatchDialog.h"
+#include "BoatDialog.h"
 #include "weather_routing_pi.h"
 
-ConfigurationDialog::ConfigurationDialog( wxWindow *parent )
-    : ConfigurationDialogBase(parent)
+ConfigurationDialog::ConfigurationDialog( wxWindow *parent, weather_routing_pi &plugin )
+    : ConfigurationDialogBase(parent), Plugin(plugin)
 {
+    m_lConfigurations->InsertColumn(START, _("Start"));
+    m_lConfigurations->InsertColumn(END, _("End"));
+    m_lConfigurations->InsertColumn(START_TIME, _("Start Time"));
+    m_lConfigurations->InsertColumn(TIME_STEP, _T("Time Step"));
+
     Load();
 }
 
@@ -51,6 +60,15 @@ void ConfigurationDialog::Load()
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+
+    m_tStartLat->SetValue
+        (pConf->Read( _T("StartLat"), wxString::Format(_T("%.5f"), Plugin.m_boat_lat)));
+    m_tStartLon->SetValue
+        (pConf->Read( _T("StartLon"), wxString::Format(_T("%.5f"), Plugin.m_boat_lon)));
+    m_tEndLat->SetValue
+        (pConf->Read( _T("EndLat"), wxString::Format(_T("%.5f"), Plugin.m_boat_lat+1)));
+    m_tEndLon->SetValue
+        (pConf->Read( _T("EndLon"), wxString::Format(_T("%.5f"), Plugin.m_boat_lon+1)));
 
     wxString degreesteps;
     m_lDegreeSteps->Clear();
@@ -76,6 +94,10 @@ void ConfigurationDialog::Load()
     int maxlatitude;
     pConf->Read( _T("MaxLatitude"), &maxlatitude, 90);
     m_sMaxLatitude->SetValue(maxlatitude);
+
+    int maxtacks;
+    pConf->Read( _T("MaxTacks"), &maxtacks, -1);
+    m_sMaxLatitude->SetValue(maxtacks);
 
     int tackingtime;
     pConf->Read( _T("TackingTime"), &tackingtime, 0);
@@ -122,8 +144,8 @@ void ConfigurationDialog::Load()
     m_sTimeStepSeconds->SetValue(timestepseconds);
 
     wxPoint p = GetPosition();
-    pConf->Read ( _T ( "ConfigurationDialogX" ), &p.x, p.x);
-    pConf->Read ( _T ( "ConfigurationDialogY" ), &p.y, p.y);
+    pConf->Read ( _T ( "ConfigurationX" ), &p.x, p.x);
+    pConf->Read ( _T ( "ConfigurationY" ), &p.y, p.y);
     SetPosition(p);
 }
 
@@ -131,6 +153,11 @@ void ConfigurationDialog::Save( )
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+
+    pConf->Write( _T("StartLat"), m_tStartLat->GetValue());
+    pConf->Write( _T("StartLon"), m_tStartLon->GetValue());
+    pConf->Write( _T("EndLat"), m_tEndLat->GetValue());
+    pConf->Write( _T("EndLon"), m_tEndLon->GetValue());
 
     wxString degreesteps;
     for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++)
@@ -141,6 +168,7 @@ void ConfigurationDialog::Save( )
     pConf->Write( _T("MaxWindKnots"), m_sMaxWindKnots->GetValue());
     pConf->Write( _T("MaxSwellMeters"), m_sMaxSwellMeters->GetValue());
     pConf->Write( _T("MaxLatitude"), m_sMaxLatitude->GetValue());
+    pConf->Write( _T("MaxTacks"), m_sMaxTacks->GetValue());
     pConf->Write( _T("TackingTime"), m_sTackingTime->GetValue());
 
     pConf->Write( _T("UseGrib"), m_cbUseGrib->GetValue());
@@ -157,43 +185,30 @@ void ConfigurationDialog::Save( )
     pConf->Write( _T("TimeStepSeconds"), m_sTimeStepSeconds->GetValue());
 
     wxPoint p = GetPosition();
-    pConf->Write ( _T ( "ConfigurationDialogX" ), p.x);
-    pConf->Write ( _T ( "ConfigurationDialogY" ), p.y);
+    pConf->Write ( _T ( "ConfigurationX" ), p.x);
+    pConf->Write ( _T ( "ConfigurationY" ), p.y);
 }
 
-void ConfigurationDialog::UpdateOptions(RouteMapOptions &options)
+void ConfigurationDialog::OnBoatPosition( wxCommandEvent& event )
 {
-    options.dt = 60*(60*m_sTimeStepHours->GetValue()
-                     + m_sTimeStepMinutes->GetValue())
-        + m_sTimeStepSeconds->GetValue();
+    m_tStartLat->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lat));
+    m_tStartLon->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lon));
+}
 
-    if(m_lDegreeSteps->GetCount() < 4) {
-        wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
-                             wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
-        mdlg.ShowModal();
-    }
+void ConfigurationDialog::OnGribTime( wxCommandEvent& event )
+{
+    SetStartDateTime(m_GribTimelineTime);
+}
 
-    options.DegreeSteps.clear();
-    for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++) {
-        double step;
-        m_lDegreeSteps->GetString(i).ToDouble(&step);
-        options.DegreeSteps.push_back(positive_degrees(step));
-    }
-    options.DegreeSteps.sort();
+void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
+{
+    SetStartDateTime(wxDateTime::Now());
+}
 
-    options.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
-    options.MaxWindKnots= m_sMaxWindKnots->GetValue();
-    options.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
-    options.MaxLatitude = m_sMaxLatitude->GetValue();
-    options.TackingTime = m_sTackingTime->GetValue();
-
-
-    options.DetectLand = m_cbDetectLand->GetValue();
-    options.Currents = m_cbCurrents->GetValue();
-    options.InvertedRegions = m_cbInvertedRegions->GetValue();
-    options.Anchoring = m_cbAnchoring->GetValue();
-
-    options.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
+void ConfigurationDialog::OnEditBoat ( wxCommandEvent& event )
+{
+    BoatDialog boatdlg(this);
+    boatdlg.ShowModal();
 }
 
 void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
@@ -218,29 +233,116 @@ void ConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& event )
     m_lDegreeSteps->SetSelection(s);
 }
 
+void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
+{
+    m_lDegreeSteps->Clear();
+}
+
 void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 {
-    double value, v;
-    m_tDegreeStep->GetValue().ToDouble(&value);
+    double from, to, by;
+    m_tFromDegrees->GetValue().ToDouble(&from);
+    m_tToDegrees->GetValue().ToDouble(&to);
+    m_tByDegrees->GetValue().ToDouble(&by);
 
-    if(value <= 0 || value > 180) {
-        wxMessageDialog mdlg(this, _("Invalid step size, nothing will be done."),
+    if(from < 0 || from >= 180 || to <= 0 || to > 180 || from >= to || by <= 0 || by >= 180) {
+        wxMessageDialog mdlg(this, _("Invalid settings, nothing will be done."),
                              wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
         mdlg.ShowModal();
         return;
     }
 
     m_lDegreeSteps->Clear();
-    for(v = value; v < 360; v+=value)
+    for(double v = from; v <= to; v+=by) {
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
+        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), -v));
+    }
 }
 
-void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
+void ConfigurationDialog::AddConfiguration(RouteMapConfiguration &o)
 {
-    m_lDegreeSteps->Clear();
+    wxListItem item;
+
+    item.SetId(0);
+    item.SetData(new RouteMapConfiguration(o));
+    long idx = m_lConfigurations->InsertItem(item);
+    m_lConfigurations->SetItem(idx, START, wxString::Format(_T("%.1f, %.1f"), o.StartLat, o.StartLon));
+    m_lConfigurations->SetItem(idx, END, wxString::Format(_T("%.1f, %.1f"), o.EndLat, o.EndLon));
+    m_lConfigurations->SetItem(idx, START_TIME, o.StartTime.FormatDate()
+                               + _T(" ") + o.StartTime.FormatTime());
+    m_lConfigurations->SetItem(idx, TIME_STEP, wxString::Format(_T("%.1f"), o.dt));
 }
 
-void Configuration::OnEditBoat ( wxCommandEvent& event )
+RouteMapConfiguration ConfigurationDialog::ReadConfiguration()
 {
-    m_pBoatDialog->Show(!m_pBoatDialog->IsShown());
+    RouteMapConfiguration configuration;
+
+    configuration.Name = m_tName->GetValue();
+
+    m_tStartLat->GetValue().ToDouble(&configuration.StartLat);
+    m_tStartLon->GetValue().ToDouble(&configuration.StartLon);
+
+    configuration.StartTime = m_dpStartDate->GetValue();
+    double hour;
+    m_tStartHour->GetValue().ToDouble(&hour);
+    configuration.StartTime.SetHour((int)hour);
+    configuration.StartTime.SetMinute((int)(60*hour)%60);
+
+    configuration.boatFileName = m_fpBoat->GetPath();
+
+    configuration.dt = 60*(60*m_sTimeStepHours->GetValue()
+                     + m_sTimeStepMinutes->GetValue())
+        + m_sTimeStepSeconds->GetValue();
+    if(configuration.dt == 0) {
+        wxMessageDialog mdlg(this, _("Zero Time Step invalid"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+    }
+
+    m_tEndLat->GetValue().ToDouble(&configuration.EndLat);
+    m_tEndLon->GetValue().ToDouble(&configuration.EndLon);
+
+    if(m_lDegreeSteps->GetCount() < 4) {
+        wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
+                             wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
+        mdlg.ShowModal();
+    }
+
+    configuration.DegreeSteps.clear();
+    for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++) {
+        double step;
+        m_lDegreeSteps->GetString(i).ToDouble(&step);
+        configuration.DegreeSteps.push_back(positive_degrees(step));
+    }
+    configuration.DegreeSteps.sort();
+
+    configuration.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
+    configuration.MaxWindKnots= m_sMaxWindKnots->GetValue();
+    configuration.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
+    configuration.MaxLatitude = m_sMaxLatitude->GetValue();
+    configuration.MaxTacks = m_sMaxTacks->GetValue();
+    configuration.TackingTime = m_sTackingTime->GetValue();
+
+    configuration.DetectLand = m_cbDetectLand->GetValue();
+    configuration.Currents = m_cbCurrents->GetValue();
+    configuration.InvertedRegions = m_cbInvertedRegions->GetValue();
+    configuration.Anchoring = m_cbAnchoring->GetValue();
+
+    configuration.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
+
+    configuration.UseGrib = m_cbUseGrib->IsEnabled() && m_cbUseGrib->GetValue();
+    configuration.UseClimatology = m_cbUseClimatology->IsEnabled() && m_cbUseClimatology->GetValue();
+//    configuration.boat = m_pBoatDialog->m_Boat;
+
+//    m_RouteMapOverlay.SetConfiguration(configuration);
+//    m_RouteMapOverlay.Reset(time);
+
+    return configuration;
+}
+
+void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
+{
+    m_dpStartDate->SetValue(datetime);
+    m_tStartHour->SetValue(wxString::Format(_T("%.3f"), datetime.GetHour()
+                                            +datetime.GetMinute() / 60.0));
 }

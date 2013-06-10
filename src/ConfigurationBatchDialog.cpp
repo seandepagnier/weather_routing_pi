@@ -32,10 +32,10 @@
 #include <math.h>
 #include <time.h>
 
-#include "BatchDialog.h"
+#include "ConfigurationBatchDialog.h"
 
-BatchDialog::BatchDialog( wxWindow *parent )
-    : BatchDialogBase(parent)
+ConfigurationBatchDialog::ConfigurationBatchDialog( wxWindow *parent )
+    : ConfigurationBatchDialogBase(parent)
 {
     wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
 #ifdef __WXMSW__
@@ -51,6 +51,71 @@ BatchDialog::BatchDialog( wxWindow *parent )
     wxString batch_path = stdPath + wxFileName::GetPathSeparator() + _T("batchs.xml");
 }
 
-BatchDialog::~BatchDialog()
+ConfigurationBatchDialog::~ConfigurationBatchDialog()
 {
+}
+
+void ConfigurationBatchDialog::OnRemoveSource( wxCommandEvent& event )
+{
+    int index = m_lSources->GetSelection();
+    if (index < 0) return;
+
+    m_lSources->Delete(index);
+}
+
+void ConfigurationBatchDialog::OnAddDestination( wxCommandEvent& event )
+{
+    wxString name = m_cDestination->GetStringSelection();
+    if(name.size() > 0)
+        m_lDestinations->Append(name);
+}
+
+void ConfigurationBatchDialog::OnRemoveDestination( wxCommandEvent& event )
+{
+    int index = m_lDestinations->GetSelection();
+    if (index < 0) return;
+
+    m_lDestinations->Delete(index);
+}
+
+void ConfigurationBatchDialog::OnClearDestinations( wxCommandEvent& event )
+{
+    m_lDestinations->Clear();
+}
+
+void ConfigurationBatchDialog::OnReciprocateDestinations( wxCommandEvent& event )
+{
+}
+
+void ConfigurationBatchDialog::OnAdd( wxCommandEvent& event )
+{
+}
+
+void ConfigurationBatchDialog::OnEdit( wxCommandEvent& event )
+{
+}
+
+void ConfigurationBatchDialog::OnRemove( wxCommandEvent& event )
+{
+}
+
+void ConfigurationBatchDialog::OnReset( wxCommandEvent& event )
+{
+}
+
+void ConfigurationBatchDialog::OnInformation( wxCommandEvent& event )
+{
+    wxMessageDialog mdlg(this, _("Zero Time Step invalid"),
+                         _("Weather Routing"), wxOK | wxICON_WARNING);
+    mdlg.ShowModal();
+}
+
+void ConfigurationBatchDialog::OnCancel( wxCommandEvent& event )
+{
+    EndModal(wxID_CANCEL);
+}
+
+void ConfigurationBatchDialog::OnDone( wxCommandEvent& event )
+{
+    EndModal(wxID_OK);
 }

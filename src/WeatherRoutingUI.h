@@ -25,24 +25,23 @@
 #include <wx/icon.h>
 #include <wx/menu.h>
 #include <wx/frame.h>
-#include <wx/statbox.h>
 #include <wx/textctrl.h>
+#include <wx/statbox.h>
 #include <wx/stattext.h>
 #include <wx/datectrl.h>
 #include <wx/dateevt.h>
-#include <wx/filepicker.h>
 #include <wx/spinctrl.h>
+#include <wx/filepicker.h>
 #include <wx/listbox.h>
 #include <wx/checkbox.h>
-#include <wx/clrpicker.h>
 #include <wx/dialog.h>
+#include <wx/clrpicker.h>
 #include <wx/scrolwin.h>
 #include <wx/choice.h>
 #include <wx/panel.h>
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/html/htmlwin.h>
-#include <wx/checklst.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -64,16 +63,24 @@ class WeatherRoutingBase : public wxFrame
 		wxMenu* m_mHelp;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnConfiguration( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDisplaySettings( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnNew( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnBatch( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConfiguration( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeleteAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
 		
@@ -81,21 +88,20 @@ class WeatherRoutingBase : public wxFrame
 	public:
 		wxGauge* m_gProgress;
 		
-		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
 	
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class ConfigurationBase
+/// Class ConfigurationDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class ConfigurationBase : public wxFrame 
+class ConfigurationDialogBase : public wxDialog 
 {
 	private:
 	
 	protected:
-		wxListCtrl* m_lConfigurations;
 		wxTextCtrl* m_tName;
 		wxStaticText* m_staticText5;
 		wxStaticText* m_staticText6;
@@ -107,14 +113,17 @@ class ConfigurationBase : public wxFrame
 		wxButton* m_bCurrentTime;
 		wxStaticText* m_staticText51;
 		wxStaticText* m_staticText61;
+		wxSpinCtrl* m_sTimeStepHours;
+		wxStaticText* m_staticText110;
+		wxSpinCtrl* m_sTimeStepMinutes;
+		wxStaticText* m_staticText111;
+		wxSpinCtrl* m_sTimeStepSeconds;
+		wxStaticText* m_staticText112;
 		wxFilePickerCtrl* m_fpBoat;
 		wxButton* m_bEditBoat;
 		wxStaticText* m_staticText20;
 		wxSpinCtrl* m_sMaxDivertedCourse;
 		wxStaticText* m_staticText1181;
-		wxStaticText* m_staticText24;
-		wxSpinCtrl* m_sTackingTime;
-		wxStaticText* m_staticText1191;
 		wxStaticText* m_staticText23;
 		wxSpinCtrl* m_sMaxWindKnots;
 		wxStaticText* m_staticText128;
@@ -124,47 +133,44 @@ class ConfigurationBase : public wxFrame
 		wxStaticText* m_staticText26;
 		wxSpinCtrl* m_sMaxLatitude;
 		wxStaticText* m_staticText131;
-		wxListBox* m_lSteps;
+		wxStaticText* m_staticText1131;
+		wxSpinCtrl* m_sMaxTacks;
+		wxStaticText* m_staticText1141;
+		wxStaticText* m_staticText24;
+		wxSpinCtrl* m_sTackingTime;
+		wxStaticText* m_staticText1191;
+		wxListBox* m_lDegreeSteps;
 		wxTextCtrl* m_tDegreeStep;
 		wxButton* m_bAddDegreeStep;
 		wxButton* m_bRemoveDegreeStep;
 		wxButton* m_bClearDegreeSteps;
 		wxStaticText* m_staticText113;
-		wxTextCtrl* m_textCtrl13;
+		wxTextCtrl* m_tFromDegrees;
 		wxStaticText* m_staticText114;
 		wxStaticText* m_staticText115;
-		wxTextCtrl* m_textCtrl14;
+		wxTextCtrl* m_tToDegrees;
 		wxStaticText* m_staticText116;
 		wxStaticText* m_staticText117;
-		wxTextCtrl* m_textCtrl15;
+		wxTextCtrl* m_tByDegrees;
 		wxStaticText* m_staticText118;
 		wxButton* m_bGenerateDegreeSteps;
 		wxCheckBox* m_cbAllowDataDeficient;
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
-		wxButton* m_bUpdate;
-		wxMenuBar* m_menubar4;
-		wxMenu* m_mFile;
-		wxMenu* m_mConfiguration;
+		wxStdDialogButtonSizer* m_sdbSizer5;
+		wxButton* m_sdbSizer5OK;
+		wxButton* m_sdbSizer5Cancel;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void BoatPosition( wxCommandEvent& event ) { event.Skip(); }
-		virtual void GribTime( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnBoatPosition( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGribTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdateEnd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClearDegreeSteps( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerateDegreeSteps( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnBatch( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -177,9 +183,8 @@ class ConfigurationBase : public wxFrame
 		wxCheckBox* m_cbUseClimatology;
 		wxCheckBox* m_cbCurrents;
 		
-		ConfigurationBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		
-		~ConfigurationBase();
+		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~ConfigurationDialogBase();
 	
 };
 
@@ -197,6 +202,8 @@ class SettingsDialogBase : public wxDialog
 		wxStaticText* m_staticText70;
 		wxStaticText* m_staticText71;
 		wxCheckBox* m_cbFilterbyClimatology;
+		wxStaticText* m_staticText115;
+		wxSpinCtrl* m_sConcurrentThreads;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
@@ -550,13 +557,13 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxTextCtrl* m_tStartSpacingHours;
 		wxStaticText* m_staticText126;
 		wxPanel* m_panel12;
-		wxCheckListBox* m_clSources;
+		wxListBox* m_lSources;
 		wxButton* m_bRemoveSource;
-		wxChoice* m_cDestinations;
+		wxChoice* m_cDestination;
 		wxListBox* m_lDestinations;
 		wxButton* m_bAddDestination;
 		wxButton* m_bRemoveDestination;
-		wxButton* m_bClearEnd;
+		wxButton* m_bClearDestinations;
 		wxButton* m_bReciprocateDestinations;
 		wxButton* m_bOpen;
 		wxButton* m_bSave;
@@ -565,7 +572,6 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxButton* m_bAdd;
 		wxButton* m_bEdit;
 		wxButton* m_bRemove;
-		wxButton* m_bReset;
 		wxButton* m_bInformation;
 		wxButton* m_bReset;
 		wxButton* m_bCancel;
@@ -575,12 +581,13 @@ class ConfigurationBatchDialogBase : public wxDialog
 		virtual void OnRemoveSource( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddDestination( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveDestination( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClearDestinations( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReciprocateDestinations( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEdit( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemove( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
 		

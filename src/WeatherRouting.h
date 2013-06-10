@@ -34,11 +34,9 @@
 #include "WeatherRoutingUI.h"
 #include "ConfigurationDialog.h"
 #include "SettingsDialog.h"
+#include "StatisticsDialog.h"
 
 class weather_routing_pi;
-class BoatDialog;
-class BatchDialog;
-class RouteDialog;
 
 class WeatherRouting : public WeatherRoutingBase
 {
@@ -49,48 +47,50 @@ public:
     void Reset();
 
     void RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp);
-    RouteMapOverlay m_RouteMapOverlay;
     ConfigurationDialog m_ConfigurationDialog;
 
-private:
-    void OnUpdateEnd( wxCommandEvent& event );
+    RouteMapOverlay *CurrentRouteMap(), *m_RouteMapOverlayNeedingGrib;
 
-    void OnCompute( wxCommandEvent& event ) { event.Skip(); }
-    void OnOpen( wxCommandEvent& event ) { event.Skip(); }
-    void OnSave( wxCommandEvent& event ) { event.Skip(); }
-    void OnExport( wxCommandEvent& event ) { event.Skip(); }
-    void OnClose( wxCommandEvent& event ) { event.Skip(); }
-    void OnFilter( wxCommandEvent& event ) { event.Skip(); }
-    void OnDisplaySettings( wxCommandEvent& event ) { event.Skip(); }
-    void OnConfiguration( wxCommandEvent& event ) { event.Skip(); }
-    void OnPlot( wxCommandEvent& event ) { event.Skip(); }
-    void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
-    void OnInformation( wxCommandEvent& event ) { event.Skip(); }
-    void OnAbout( wxCommandEvent& event ) { event.Skip(); }
+    std::list<RouteMapOverlay*> m_RunningRouteMaps, m_WaitingRouteMaps;
+
+private:
+    void OnConfiguration();
+    void OnConfiguration( wxMouseEvent& event ) { OnConfiguration(); }
+    void OnWeatherRouteSelected( wxListEvent& event );
+    void OnCompute( wxCommandEvent& event );
+    void OnOpen( wxCommandEvent& event );
+    void OnSave( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event );
+    void OnNew( wxCommandEvent& event );
+    void OnBatch( wxCommandEvent& event );
+    void OnConfiguration( wxCommandEvent& event ) { OnConfiguration(); }
+    void OnExport( wxCommandEvent& event );
+    void OnDelete( wxCommandEvent& event );
+    void OnFilter( wxCommandEvent& event );
+    void OnReset( wxCommandEvent& event );
+    void OnExportAll( wxCommandEvent& event );
+    void OnDeleteAll( wxCommandEvent& event );
+    void OnSettings( wxCommandEvent& event );
+    void OnStatistics( wxCommandEvent& event );
+    void OnPlot( wxCommandEvent& event );
+    void OnInformation( wxCommandEvent& event );
+    void OnAbout( wxCommandEvent& event );
 
     void OnComputationTimer( wxTimerEvent & );
 
-    void UpdateStatistics();
+//    void UpdateStatistics();
 
-    void UpdateEnd();
-
-    void SetStartDateTime(wxDateTime datetime);
-    void SyncToBoatPosition( wxCommandEvent& event );
-    void SyncToGribTime( wxCommandEvent& event );
+    RouteMap *SelectedRouteMap();
+    void Export(const RouteMap &routemap);
 
     void Start();
     void Stop();
-    void ReconfigureRouteMap();
     void SetRouteMapOverlaySettings();
 
     SettingsDialog m_SettingsDialog;
-
-    weather_routing_pi   &Plugin;
+    StatisticsDialog m_StatisticsDialog;
 
     bool m_bComputing;
-
-    BoatDialog *m_pBoatDialog;
-    RouteDialog *m_pRouteDialog;
 
     wxTimer m_tCompute;
 

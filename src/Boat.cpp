@@ -42,18 +42,6 @@ Boat::~Boat()
 {
 }
 
-double AttributeDouble(TiXmlElement *e, const char *name, double def)
-{
-    const char *attr = e->Attribute(name);
-    if(!attr)
-        return def;
-    char *end;
-    double d = strtod(attr, &end);
-    if(end == attr)
-        return def;
-    return d;
-}
-
 wxString Boat::OpenXML(wxString filename)
 {
     TiXmlDocument doc;
@@ -138,7 +126,7 @@ wxString Boat::SaveXML(wxString filename)
     char version[24];
     sprintf(version, "%d.%d", PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR);
     root->SetAttribute("version", version);
-    root->SetAttribute("creator", "Weather Routing by Sean DEpagnier");
+    root->SetAttribute("creator", "Opencpn Weather Routing plugin");
 
     TiXmlElement *boatcharacteristics = new TiXmlElement( "BoatCharacteristics" );
     boatcharacteristics->SetAttribute("displacement_tons", displacement_tons);

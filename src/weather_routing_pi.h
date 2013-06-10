@@ -28,7 +28,7 @@
 #define _WEATHER_ROUTINGPI_H_
 
 #define     PLUGIN_VERSION_MAJOR    0
-#define     PLUGIN_VERSION_MINOR    7
+#define     PLUGIN_VERSION_MINOR    8
 
 #define     MY_API_VERSION_MAJOR    1
 #define     MY_API_VERSION_MINOR    8
@@ -54,9 +54,8 @@
 
 #define WEATHER_ROUTING_TOOL_POSITION    -1          // Request default positioning of toolbar tool
 
-class WeatherRoutingDialog;
+class WeatherRouting;
 
-class GribUIDialog;
 class weather_routing_pi : public opencpn_plugin_18
 {
 public:
@@ -101,7 +100,7 @@ private:
       wxFileConfig     *m_pconfig;
       wxWindow         *m_parent_window;
 
-      WeatherRoutingDialog     *m_pWeather_RoutingDialog;
+      WeatherRouting     *m_pWeather_Routing;
       wxDateTime m_GribTime;
 
       int              m_display_width, m_display_height;

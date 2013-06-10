@@ -49,8 +49,8 @@ public:
 
     bool SetCursorLatLon(double lat, double lon);
     void RenderIsoRoute(IsoRoute *r, wxColour &color, ocpnDC &dc, PlugIn_ViewPort &vp);
-    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
-    void RenderCourse(Position *pos, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void Render(wxDateTime time, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void RenderCourse(Position *pos, wxDateTime time, ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
     std::list<PlotData> GetPlotData();
     void RouteInfo(double &distance, double &avgspeed, double &percentage_upwind);
@@ -70,8 +70,6 @@ public:
 
     void Start();
     void Stop();
-
-    wxDateTime m_GribTimelineTime;
 
     bool m_UpdateOverlay;
 

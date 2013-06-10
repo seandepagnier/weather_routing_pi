@@ -28,7 +28,7 @@
 
 #include <list>
 
-struct RouteMapOptions;
+struct RouteMapConfiguration;
 class IsoRoute;
 class GribRecordSet;
 
@@ -47,20 +47,21 @@ class SkipPosition;
 class Position
 {
 public:
-    Position(double latitude, double longitude, int sp=0, Position *p=NULL);
+    Position(double latitude, double longitude, int sp=0, int t=0, Position *p=NULL);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
 
     bool GetPlotData(GribRecordSet *grib, double dt,
-                     RouteMapOptions &options, PlotData &data);
+                     RouteMapConfiguration &configuration, PlotData &data);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, wxDateTime &time,
-                   RouteMapOptions &options);
+                   RouteMapConfiguration &configuration);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
 
     double lat, lon;
     int sailplan; /* which sail plan in the boat we are using */
+    int tacks; /* how many times we have tacked to get to this position */
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */
 
@@ -101,12 +102,12 @@ public:
     bool CompletelyContained(IsoRoute *r);
     bool ContainsRoute(IsoRoute *r);
 
-    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapOptions &options);
+    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration);
     void FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon, double *dist=0);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib,
-                   wxDateTime &time, RouteMapOptions &options);
+                   wxDateTime &time, RouteMapConfiguration &configuration);
 
     int SkipCount();
     int Count();
@@ -128,7 +129,7 @@ public:
     ~IsoChron();
 
     void PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
-                           wxDateTime &time, RouteMapOptions &options);
+                           wxDateTime &time, RouteMapConfiguration &configuration);
     bool Contains(Position &p);
     bool Contains(double lat, double lon);
     Position* ClosestPosition(double lat, double lon, double *dist=0);
@@ -140,28 +141,33 @@ public:
 
 typedef std::list<IsoChron*> IsoChronList;
 
-struct RouteMapOptions {
-    RouteMapOptions () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
+struct RouteMapConfiguration {
+    RouteMapConfiguration () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
     void Update();
 
+    wxString Name;
+
     double StartLat, StartLon;
-    double EndLat, EndLon;
+    wxDateTime StartTime;
     double dt; /* time in seconds between propagations */
 
-    double StartEndBearing; /* calculated from start and end */
+    double EndLat, EndLon;
 
-    std::list<double> DegreeSteps;
+    Boat boat;
+    wxString boatFileName;
     
     double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
-    double MaxLatitude, TackingTime;
+    double MaxLatitude, MaxTacks, TackingTime;
 
     bool UseGrib, UseClimatology;
     bool AllowDataDeficient;
-
     bool DetectLand, Currents, InvertedRegions, Anchoring;
 
-    Boat boat;
+    std::list<double> DegreeSteps;
 
+
+/* computed values */
+    double StartEndBearing; /* calculated from start and end */
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,
     this means the map cannot cross both 0 and 180 longitude.
     To fully support this requires a lot more logic and would probably slow the algorithm
@@ -192,15 +198,15 @@ public:
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
     bool HasGrib() { return m_NewGrib; }
-    void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.Update(); Unlock(); }
-    RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
+    void SetConfiguration(RouteMapConfiguration &o) { Lock(); m_Configuration = o; m_Configuration.Update(); Unlock(); }
+    RouteMapConfiguration GetConfiguration() { Lock(); RouteMapConfiguration o = m_Configuration; Unlock(); return o; }
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
     bool Propagate();
     wxDateTime EndDate();
 
 protected:
     virtual void Clear();
-    bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapOptions &options);
+    bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration);
     Position *ClosestPosition(double lat, double lon, double *dist=0, bool before_last=false);
 
     /* protect any member variables with mutexes if needed */
@@ -213,7 +219,7 @@ protected:
     GribRecordSet *m_NewGrib;
 
 private:
-    RouteMapOptions m_Options;
+    RouteMapConfiguration m_Configuration;
     bool m_bFinished, m_bReachedDestination, m_bGribFailed;
 
     wxDateTime m_NewTime;

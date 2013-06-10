@@ -230,15 +230,6 @@ static void BoatOverGround(double B, double VB, double C, double VC, double &BG,
 inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
                               double x3, double y3, double x4, double y4)
 {
-#if 0 /* this never gets hit due to the use of states.. so it doesn't help performance */
-    /* quick test to avoid calculations if segments are far apart */
-    if((x3 > x1 && x3 > x2 && x4 > x1 && x4 > x2) ||
-       (x3 < x1 && x3 < x2 && x4 < x1 && x4 < x2) ||
-       (y3 > y1 && y3 > y2 && y4 > y1 && y4 > y2) ||
-       (y3 < y1 && y3 < y2 && y4 < y1 && y4 < y2))
-        return 0;
-#endif
-
     double ax = x2 - x1, ay = y2 - y1;
     double bx = x3 - x4, by = y3 - y4;
     double cx = x1 - x3, cy = y1 - y3;
@@ -288,16 +279,16 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 }
 
 #define EPSILON (2e-10)
-Position::Position(double latitude, double longitude, int sp, Position *p)
-    : lat(latitude), lon(longitude), sailplan(sp), parent(p), propagated(false)
+Position::Position(double latitude, double longitude, int sp, int t, Position *p)
+    : lat(latitude), lon(longitude), sailplan(sp), tacks(t), parent(p), propagated(false)
 {
     lat -= fmod(lat, EPSILON);
     lon -= fmod(lon, EPSILON);
 }
 
 Position::Position(Position *p)
-    : lat(p->lat), lon(p->lon), sailplan(p->sailplan), parent(p->parent),
-      propagated(p->propagated)
+    : lat(p->lat), lon(p->lon), sailplan(p->sailplan), tacks(p->tacks),
+      parent(p->parent), propagated(p->propagated)
 {
 }
 
@@ -311,8 +302,9 @@ int ComputeQuadrant(Position *p, Position *q)
 
     double diff = p->lon - q->lon;
     if(diff > 0) {
-        if(diff > 180) /* since we don't fully support crossing 0 and 180 merdians in the same map
-                          this never actually occurs.. but it is needed if support is extended */
+        if(diff > 180) /* since we don't fully support crossing 0 and 180 merdians
+                          in the same map this never actually occurs..
+                          but this is needed if support is extended */
             quadrant += 1;
     } else if(diff > -180)
         quadrant += 1;
@@ -367,10 +359,10 @@ SkipPosition *Position::BuildSkipList()
 
 /* get data from a position for plotting */
 bool Position::GetPlotData(GribRecordSet *grib, double dt,
-                           RouteMapOptions &options, PlotData &data)
+                           RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(grib, lat, lon);
-    if(!Wind(grib, data.time, options.AllowDataDeficient, this, data.WG, data.VWG))
+    if(!Wind(grib, data.time, configuration.AllowDataDeficient, this, data.WG, data.VWG))
         return false;
 
     if(!Current(grib, data.time, lat, lon, data.C, data.VC))
@@ -402,7 +394,7 @@ inline double TestDirection(double x1, double y1, double x2, double y2, double x
 /* create a looped route by propagating from a position by computing
    the location the boat would be in if sailed at various angles */
 bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
-                         wxDateTime &time, RouteMapOptions &options)
+                         wxDateTime &time, RouteMapConfiguration &configuration)
 {
     /* already propagated from this position, don't need to again */
     if(propagated)
@@ -415,22 +407,22 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     int count = 0;
 
     double S = Swell(grib, lat, lon);
-    if(S > options.MaxSwellMeters)
+    if(S > configuration.MaxSwellMeters)
         return false;
 
-    if(fabs(lat) > options.MaxLatitude)
+    if(fabs(lat) > configuration.MaxLatitude)
         return false;
 
     double WG, VWG;
-    if(!Wind(grib, time, options.AllowDataDeficient, this, WG, VWG))
+    if(!Wind(grib, time, configuration.AllowDataDeficient, this, WG, VWG))
         return false;
 
-    if(VWG > options.MaxWindKnots)
+    if(VWG > configuration.MaxWindKnots)
         return false;
 
     double C, VC;
     double W, VW;
-    if(!options.Currents || !Current(grib, time, lat, lon, C, VC)) {
+    if(!configuration.Currents || !Current(grib, time, lat, lon, C, VC)) {
         C = VC = 0;
         W = WG, VW = VWG;
     } else
@@ -439,28 +431,28 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     int daytime = -1; /* unknown */
 
     double bearing = 0, parentbearing = NAN;
-    if(parent && options.TackingTime)
+    if(parent && (configuration.TackingTime || configuration.MaxTacks>=0))
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
-    else if(options.MaxDivertedCourse == 180)
+    else if(configuration.MaxDivertedCourse == 180)
         goto skipbearingcomputation;
-//    ll_gc_ll_reverse(lat, lon, options.EndLat, options.EndLon, &bearing, 0);
-    ll_gc_ll_reverse(options.StartLat, options.StartLon, lat, lon, &bearing, 0);
-    if(fabs(heading_resolve(options.StartEndBearing - bearing)) > options.MaxDivertedCourse) {
+//    ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, 0);
+    ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, lat, lon, &bearing, 0);
+    if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse) {
         return false;
     }
 
 skipbearingcomputation:
 
     bool first_backtrackavoid = true;
-    double timeseconds = options.dt;
+    double timeseconds = configuration.dt;
     double d0, d1, d2;
     double dist;
-    for(std::list<double>::iterator it = options.DegreeSteps.begin();
-        it != options.DegreeSteps.end(); it++) {
+    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
+        it != configuration.DegreeSteps.end(); it++) {
         double H = *it;
         double B, VB;
 
-        int newsailplan = options.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
+        int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
                                                          time, lat, lon, daytime);
 
         B = W + H; /* rotated relative to wind */
@@ -468,7 +460,7 @@ skipbearingcomputation:
 #if 0
         /* avoid propagating from positions which go in a direction too much
            diverted from the correct course.  */
-        if(fabs(heading_resolve(B - bearing)) > options.MaxDivertedCourse) {
+        if(fabs(heading_resolve(B - bearing)) > configuration.MaxDivertedCourse) {
 #if 1
             if(first_backtrackavoid && parent)
                 goto first_backtrack;
@@ -477,7 +469,7 @@ skipbearingcomputation:
         }
 #endif
 
-        VB = options.boat.Plans[newsailplan]->Speed(H, VW);
+        VB = configuration.boat.Plans[newsailplan]->Speed(H, VW);
 
         /* failed to determine speed.. I guess we can always drift? */
         if(isnan(B) || isnan(VB))
@@ -488,10 +480,16 @@ skipbearingcomputation:
         BoatOverGround(B, VB, C, VC, BG, VBG);
 
         /* did we tack? apply penalty */
+        double tacked = false;
         if(!isnan(parentbearing)) {
             double hrpb = heading_resolve(parentbearing), hrb = heading_resolve(bearing);
-            if(hrpb*hrb < 0 && fabs(hrpb - hrb) < 180)
-                timeseconds -= options.TackingTime;
+            if(hrpb*hrb < 0 && fabs(hrpb - hrb) < 180) {
+                timeseconds -= configuration.TackingTime;
+
+                if(configuration.MaxTacks >= 0 && tacks >= configuration.MaxTacks)
+                    continue;
+                tacked = true;
+            }
         }
 
         /* distance over ground */
@@ -501,7 +499,7 @@ skipbearingcomputation:
         ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
 
         nrdlon = dlon;
-        if(options.positive_longitudes && dlon < 0)
+        if(configuration.positive_longitudes && dlon < 0)
             dlon += 360;
 
         /* test to avoid extra computations related to backtracking */
@@ -526,10 +524,10 @@ skipbearingcomputation:
             }
         }
 #endif
-        hitland = options.DetectLand ? CrossesLand(dlat, nrdlon) : false;
+        hitland = configuration.DetectLand ? CrossesLand(dlat, nrdlon) : false;
         if(!hitland && dist) {
         skiplandtest:
-            Position *rp = new Position(dlat, dlon, newsailplan, this);
+            Position *rp = new Position(dlat, dlon, newsailplan, tacks + tacked, this);
 
             if(points) {
                 rp->prev=points->prev;
@@ -551,7 +549,7 @@ skipbearingcomputation:
 #if 1
     routelist.push_back(nr);
 #else
-    Normalize(routelist, nr, nr, 0, options.InvertedRegions);
+    Normalize(routelist, nr, nr, 0, configuration.InvertedRegions);
 #endif
     return true;
 }
@@ -565,14 +563,14 @@ wxDateTime RouteMap::EndDate()
 
     double dista;
     wxDateTime timea = (*it)->time;
-    Position *a = (*it)->ClosestPosition(m_Options.EndLat, m_Options.EndLon, &dista);
+    Position *a = (*it)->ClosestPosition(m_Configuration.EndLat, m_Configuration.EndLon, &dista);
     if(!a || it == origin.begin())
         return wxDateTime();
 
     it--;
     double distb;
     wxDateTime timeb = (*it)->time;
-    Position *b = (*it)->ClosestPosition(m_Options.EndLat, m_Options.EndLon, &distb);
+    Position *b = (*it)->ClosestPosition(m_Configuration.EndLat, m_Configuration.EndLon, &distb);
     if(!b)
         return wxDateTime();
 
@@ -833,17 +831,17 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
 }
 
 /* apply current to given route, and return if it changed at all */
-bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapOptions &options)
+bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration)
 {
     if(!skippoints)
         return false;
 
     bool ret = false;
     Position *p = skippoints->point;
-    double timeseconds = options.dt;
+    double timeseconds = configuration.dt;
     do {
         double C, VC;
-        if(options.Currents && Current(grib, time, p->lat, p->lon, C, VC)) {
+        if(configuration.Currents && Current(grib, time, p->lat, p->lon, C, VC)) {
             /* drift distance over ground */
             double dist = VC * timeseconds / 3600.0;
             if(dist)
@@ -926,6 +924,7 @@ void IsoRoute::RemovePosition(SkipPosition *s, Position *p)
             s->quadrant = quadrant;
         }
 #else
+        /* rebuild skip list */
         Position *points = skippoints->point;
         if(p == points)
             points = points->next;
@@ -1139,15 +1138,6 @@ reset:
         rl.push_back(route1);
       return true;
     }
-
-#if 0 /* don't think I need this */
-    if(ssend->point->lat > spend->point->lat) {
-        IsoRoute *t = route1;
-        route1 = route2;
-        route2 = t;
-        goto reset;
-    }
-#endif
 
     normalizing = false;
   }
@@ -1594,13 +1584,13 @@ Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
 }
 
 bool IsoRoute::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
-                         wxDateTime &time, RouteMapOptions &options)
+                         wxDateTime &time, RouteMapConfiguration &configuration)
 {
     Position *p = skippoints->point;
     bool ret = false;
     if(p)
         do {
-            if(p->Propagate(routelist, grib, time, options))
+            if(p->Propagate(routelist, grib, time, configuration))
                 ret = true;
             p = p->next;
         } while(p != skippoints->point);
@@ -1664,20 +1654,20 @@ IsoChron::~IsoChron()
 }
 
 void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
-                                 wxDateTime &time, RouteMapOptions &options)
+                                 wxDateTime &time, RouteMapConfiguration &configuration)
 {
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         bool propagated = false;
 
         /* build up a list of iso regions for each point
            in the current iso */
-        if((*it)->Propagate(routelist, grib, time, options))
+        if((*it)->Propagate(routelist, grib, time, configuration))
             propagated = true;
 
         IsoRoute *x = new IsoRoute(*it);
         for(IsoRouteList::iterator cit = (*it)->children.begin();
             cit != (*it)->children.end(); cit++)
-            if((*cit)->Propagate(routelist, grib, time, options)) {
+            if((*cit)->Propagate(routelist, grib, time, configuration)) {
                 x->children.push_back(new IsoRoute(*cit, x)); /* copy child */
                 propagated = true;
             }
@@ -1687,17 +1677,17 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
            (it's a dead end) but update it to drift with the current */
         if(propagated) {
             IsoRoute *y = NULL;
-            if(options.Anchoring) {
+            if(configuration.Anchoring) {
                 y = new IsoRoute(x);
                 for(IsoRouteList::iterator cit = x->children.begin();
                     cit != x->children.end(); cit++)
                     y->children.push_back(new IsoRoute(*cit, y)); /* copy child */
-                if(x->ApplyCurrents(grib, time, options))
+                if(x->ApplyCurrents(grib, time, configuration))
                     routelist.push_back(y);
                 else
                     delete y; /* I guess we didn't need it after all */
             } else
-                x->ApplyCurrents(grib, time, options);
+                x->ApplyCurrents(grib, time, configuration);
 
             routelist.push_back(x);
         } else
@@ -1736,7 +1726,7 @@ Position* IsoChron::ClosestPosition(double lat, double lon, double *dist)
     return minpos;
 }
 
-void RouteMapOptions::Update()
+void RouteMapConfiguration::Update()
 {
     if((positive_longitudes = fabs(average_longitude(StartLon, EndLon)) > 90)) {
         StartLon = positive_degrees(StartLon);
@@ -1755,7 +1745,7 @@ RouteMap::~RouteMap()
     Clear();
 }
 
-bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapOptions &options)
+bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration)
 {
     /* once we have multiple worker threads, we can delegate a workers here
        to merge routes. */
@@ -1777,7 +1767,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
 #if 0
               (origin.size() < debugsize || debugcnt++ < debuglimit) &&
 #endif
-              Merge(rl, r1, r2, 0, options.InvertedRegions)) {
+              Merge(rl, r1, r2, 0, configuration.InvertedRegions)) {
 #if 1 /* TODO: find fastest method */
 # if 1
               routelist.splice(routelist.end(), rl);
@@ -1794,7 +1784,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
                         r2 = rl.front();
                         rl.pop_front();
                         IsoRouteList rl2;
-                        if(Merge(rl2, r1, r2, 0, options.InvertedRegions)) {
+                        if(Merge(rl2, r1, r2, 0, configuration.InvertedRegions)) {
                             rl.splice(rl.end(), rl2);
                             goto remerge2;
                         } else
@@ -1836,12 +1826,12 @@ bool RouteMap::Propagate()
         return false;
     }
 
-    if(m_Options.UseGrib &&
+    if(m_Configuration.UseGrib &&
        (!m_NewGrib ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       !m_Options.UseClimatology &&
-       !m_Options.AllowDataDeficient) {
+       !m_Configuration.UseClimatology &&
+       !m_Configuration.AllowDataDeficient) {
         m_bFinished = true;
         m_bGribFailed = true;
         Unlock();
@@ -1862,28 +1852,28 @@ bool RouteMap::Propagate()
     }
 
     wxDateTime time = m_NewTime;
-    RouteMapOptions options = m_Options;
+    RouteMapConfiguration configuration = m_Configuration;
     IsoRouteList routelist;
     Unlock();
 
     if(origin.size())
-        origin.back()->PropagateIntoList(routelist, grib, time, options);
+        origin.back()->PropagateIntoList(routelist, grib, time, configuration);
     else {
-        Position *np = new Position(options.StartLat, options.StartLon);
+        Position *np = new Position(configuration.StartLat, configuration.StartLon);
         np->prev = np->next = np;
         routelist.push_back(new IsoRoute(np->BuildSkipList()));
     }
 
     Lock();
     m_NewGrib = NULL;
-    m_NewTime = time + wxTimeSpan(0, 0, options.dt);
-    m_bNeedsGrib = options.UseGrib;
+    m_NewTime = time + wxTimeSpan(0, 0, configuration.dt);
+    m_bNeedsGrib = configuration.UseGrib;
     Unlock();
 
     IsoChron* update;
     if(routelist.size()) {
         IsoRouteList merged;
-        if(!ReduceList(merged, routelist, options)) {
+        if(!ReduceList(merged, routelist, configuration)) {
             Unlock();
             return false;
         }
@@ -1894,7 +1884,7 @@ bool RouteMap::Propagate()
     Lock();
     if(update) {
         origin.push_back(update);
-        if(update->Contains(m_Options.EndLat, m_Options.EndLon)) {
+        if(update->Contains(m_Configuration.EndLat, m_Configuration.EndLon)) {
             m_bFinished = true;
             m_bReachedDestination = true;
         }
@@ -1941,9 +1931,9 @@ void RouteMap::Reset(wxDateTime time)
 
     m_NewGrib = NULL;
     m_NewTime = time;
-    m_bNeedsGrib = m_Options.UseGrib;
+    m_bNeedsGrib = m_Configuration.UseGrib;
 
-    ClimatologyData = m_Options.UseClimatology ? ClimatologyData1 : NULL;
+    ClimatologyData = m_Configuration.UseClimatology ? ClimatologyData1 : NULL;
 
     m_bReachedDestination = false;
     m_bGribFailed = false;

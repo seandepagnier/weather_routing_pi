@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "../../../include/tinyxml.h"
+
 #include "Utilities.h"
 double deg2rad(double degrees)
 {
@@ -78,4 +80,33 @@ double average_longitude(double lon1, double lon2)
     double x1 = cos(rlon1), x2 = cos(rlon2);
     double y1 = sin(rlon1), y2 = sin(rlon2);
     return rad2deg(atan2((y1+y2)/2, (x1+x2)/2));
+}
+
+double AttributeDouble(TiXmlElement *e, const char *name, double def)
+{
+    const char *attr = e->Attribute(name);
+    if(!attr)
+        return def;
+    char *end;
+    double d = strtod(attr, &end);
+    if(end == attr)
+        return def;
+    return d;
+}
+
+int AttributeInt(TiXmlElement *e, const char *name, int def)
+{
+    const char *attr = e->Attribute(name);
+    if(!attr)
+        return def;
+    char *end;
+    long d = strtol(attr, &end, 10);
+    if(end == attr)
+        return def;
+    return d;
+}
+
+bool AttributeBool(TiXmlElement *e, const char *name, bool def)
+{
+    return AttributeInt(e, name, def);
 }
