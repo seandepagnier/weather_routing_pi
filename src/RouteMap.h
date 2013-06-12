@@ -165,6 +165,7 @@ struct RouteMapConfiguration {
 
     std::list<double> DegreeSteps;
 
+    bool (*Climatology())(int setting, wxDateTime &, double, double, double &, double &);
 
 /* computed values */
     double StartEndBearing; /* calculated from start and end */
@@ -192,17 +193,16 @@ public:
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
     void SetNewGrib(GribRecordSet *grib) { Lock(); m_bNeedsGrib = !(m_NewGrib = grib); Unlock(); }
-    void SetClimatologyFunction(bool (*)(int, wxDateTime &, double, double, double &, double &));
-    bool HasClimatology();
     wxDateTime NewTime() { Lock(); wxDateTime time =  m_NewTime; Unlock(); return time; }
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
-    bool HasGrib() { return m_NewGrib; }
     void SetConfiguration(RouteMapConfiguration &o) { Lock(); m_Configuration = o; m_Configuration.Update(); Unlock(); }
     RouteMapConfiguration GetConfiguration() { Lock(); RouteMapConfiguration o = m_Configuration; Unlock(); return o; }
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
     bool Propagate();
     wxDateTime EndDate();
+
+    static bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &);
 
 protected:
     virtual void Clear();

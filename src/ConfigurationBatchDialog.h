@@ -31,13 +31,14 @@
 
 #include "WeatherRoutingUI.h"
 
+class RouteMapConfiguration;
 class weather_routing_pi;
 
 class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
 {
 public:
 
-    ConfigurationBatchDialog( wxWindow *parent);
+    ConfigurationBatchDialog( wxWindow *parent, RouteMapConfiguration configuration);
     ~ConfigurationBatchDialog();
 
 protected:

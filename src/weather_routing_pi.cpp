@@ -174,7 +174,8 @@ int weather_routing_pi::GetToolbarToolCount(void)
 
 void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 {
-    if(m_pWeather_Routing && m_pWeather_Routing->CurrentRouteMap()->SetCursorLatLon(lat, lon))
+    if(m_pWeather_Routing && m_pWeather_Routing->CurrentRouteMap() &&
+       m_pWeather_Routing->CurrentRouteMap()->SetCursorLatLon(lat, lon))
         RequestRefresh(m_parent_window);
 
     m_cursor_lat = lat;
@@ -232,7 +233,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         int minor = v[_T("ClimatologyVersionMinor")].AsInt();
         if( major != 0 || (minor != 1 && minor != 2)) {
             wxMessageDialog mdlg(m_pWeather_Routing,
-                                 _("Climatology plugin version not correct, no climatology data\n"),
+                                 _("Climatology plugin version not supported, no climatology data\n"),
                                  _("Weather Routing"), wxOK | wxICON_WARNING);
             mdlg.ShowModal();
             return;
@@ -244,10 +245,9 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         bool (*cptr)(int, wxDateTime &, double, double, double &, double &);
         sscanf(ptr, "%p", &cptr);
 
-            RouteMapOverlay &RouteMapOverlay = m_pWeather_Routing->m_RouteMapOverlay;
-            /* should probably check to make sure the time is correct */
-            RouteMapOverlay.SetClimatologyFunction(cptr);
-            m_pWeather_Routing->m_Configuration.m_cbUseClimatology->Enable(cptr);
+        RouteMap::ClimatologyData = cptr;
+        if(m_pWeather_Routing)
+            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseClimatology->Enable(cptr);
     }
 }
 
@@ -287,12 +287,16 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
         return;
 
     if(id == m_startroute_menu_id) {
-        m_pWeather_Routing->m_Configuration.m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
-        m_pWeather_Routing->m_Configuration.m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
+        m_pWeather_Routing->m_ConfigurationDialog
+            .m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
+        m_pWeather_Routing->m_ConfigurationDialog
+            .m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
     } else
     if(id == m_endroute_menu_id) {
-        m_pWeather_Routing->m_Configuration.m_tEndLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
-        m_pWeather_Routing->m_Configuration.m_tEndLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
+        m_pWeather_Routing->m_ConfigurationDialog
+            .m_tEndLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
+        m_pWeather_Routing->m_ConfigurationDialog
+            .m_tEndLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
     } else
         return;
 

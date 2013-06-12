@@ -203,7 +203,6 @@ class SettingsDialogBase : public wxDialog
 		wxStaticText* m_staticText71;
 		wxCheckBox* m_cbFilterbyClimatology;
 		wxStaticText* m_staticText115;
-		wxSpinCtrl* m_sConcurrentThreads;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
@@ -216,6 +215,7 @@ class SettingsDialogBase : public wxDialog
 		wxSpinCtrl* m_sAlternateRouteThickness;
 		wxCheckBox* m_cbAlternatesForAll;
 		wxCheckBox* m_cbSquaresAtSailChanges;
+		wxSpinCtrl* m_sConcurrentThreads;
 		
 		SettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
 		~SettingsDialogBase();

@@ -44,18 +44,13 @@
 ConfigurationDialog::ConfigurationDialog( wxWindow *parent, weather_routing_pi &plugin )
     : ConfigurationDialogBase(parent), Plugin(plugin)
 {
-    m_lConfigurations->InsertColumn(START, _("Start"));
-    m_lConfigurations->InsertColumn(END, _("End"));
-    m_lConfigurations->InsertColumn(START_TIME, _("Start Time"));
-    m_lConfigurations->InsertColumn(TIME_STEP, _T("Time Step"));
-
-    Load();
 }
 
 ConfigurationDialog::~ConfigurationDialog( )
 {
 }
 
+#if 0
 void ConfigurationDialog::Load()
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
@@ -188,6 +183,7 @@ void ConfigurationDialog::Save( )
     pConf->Write ( _T ( "ConfigurationX" ), p.x);
     pConf->Write ( _T ( "ConfigurationY" ), p.y);
 }
+#endif
 
 void ConfigurationDialog::OnBoatPosition( wxCommandEvent& event )
 {
@@ -259,21 +255,56 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
     }
 }
 
-void ConfigurationDialog::AddConfiguration(RouteMapConfiguration &o)
+void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
 {
-    wxListItem item;
+    m_tName->SetValue(configuration.Name);
 
-    item.SetId(0);
-    item.SetData(new RouteMapConfiguration(o));
-    long idx = m_lConfigurations->InsertItem(item);
-    m_lConfigurations->SetItem(idx, START, wxString::Format(_T("%.1f, %.1f"), o.StartLat, o.StartLon));
-    m_lConfigurations->SetItem(idx, END, wxString::Format(_T("%.1f, %.1f"), o.EndLat, o.EndLon));
-    m_lConfigurations->SetItem(idx, START_TIME, o.StartTime.FormatDate()
-                               + _T(" ") + o.StartTime.FormatTime());
-    m_lConfigurations->SetItem(idx, TIME_STEP, wxString::Format(_T("%.1f"), o.dt));
+    m_tStartLat->SetValue(wxString::Format(_T("%.4f"), &configuration.StartLat));
+    m_tStartLon->SetValue(wxString::Format(_T("%.4f"), &configuration.StartLon));
+
+    m_dpStartDate->SetValue(configuration.StartTime);
+    m_tStartHour->SetValue(wxString::Format(_T("%.2f"),
+                                            configuration.StartTime.GetHour()
+                                            + (double)configuration.StartTime.GetMinute()/60.0));
+
+    m_fpBoat->SetPath(configuration.boatFileName);
+
+    int dt = configuration.dt;
+    int hours = dt / 3600;
+    m_sTimeStepHours->SetValue(wxString::Format(_T("%d"), hours));
+    dt -= hours * 3600;
+    int minutes = dt / 60;
+    m_sTimeStepMinutes->SetValue(wxString::Format(_T("%d"), minutes));
+    dt -= minutes * 60;
+    m_sTimeStepSeconds->SetValue(wxString::Format(_T("%d"), dt));
+
+    m_tEndLat->SetValue(wxString::Format(_T("%.4f"), &configuration.EndLat));
+    m_tEndLon->SetValue(wxString::Format(_T("%.4f"), &configuration.EndLon));
+
+    m_lDegreeSteps->Clear();
+    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
+        it != configuration.DegreeSteps.end(); it++)
+        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), *it));
+
+    m_sMaxDivertedCourse->SetValue(configuration.MaxDivertedCourse);
+    m_sMaxWindKnots->SetValue(configuration.MaxWindKnots);
+    m_sMaxSwellMeters->SetValue(configuration.MaxSwellMeters);
+    m_sMaxLatitude->SetValue(configuration.MaxLatitude);
+    m_sMaxTacks->SetValue(configuration.MaxTacks);
+    m_sTackingTime->SetValue(configuration.TackingTime);
+
+    m_cbDetectLand->SetValue(configuration.DetectLand);
+    m_cbCurrents->SetValue(configuration.Currents);
+    m_cbInvertedRegions->SetValue(configuration.InvertedRegions);
+    m_cbAnchoring->SetValue(configuration.Anchoring);
+
+    m_cbAllowDataDeficient->SetValue(configuration.AllowDataDeficient);
+
+    m_cbUseGrib->SetValue(configuration.UseGrib);
+    m_cbUseClimatology->SetValue(configuration.UseClimatology);
 }
 
-RouteMapConfiguration ConfigurationDialog::ReadConfiguration()
+RouteMapConfiguration ConfigurationDialog::Configuration()
 {
     RouteMapConfiguration configuration;
 
@@ -317,7 +348,7 @@ RouteMapConfiguration ConfigurationDialog::ReadConfiguration()
     configuration.DegreeSteps.sort();
 
     configuration.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
-    configuration.MaxWindKnots= m_sMaxWindKnots->GetValue();
+    configuration.MaxWindKnots = m_sMaxWindKnots->GetValue();
     configuration.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
     configuration.MaxLatitude = m_sMaxLatitude->GetValue();
     configuration.MaxTacks = m_sMaxTacks->GetValue();
@@ -330,13 +361,12 @@ RouteMapConfiguration ConfigurationDialog::ReadConfiguration()
 
     configuration.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
 
-    configuration.UseGrib = m_cbUseGrib->IsEnabled() && m_cbUseGrib->GetValue();
-    configuration.UseClimatology = m_cbUseClimatology->IsEnabled() && m_cbUseClimatology->GetValue();
+    configuration.UseGrib = m_cbUseGrib->GetValue();
+    configuration.UseClimatology = m_cbUseClimatology->GetValue();
 //    configuration.boat = m_pBoatDialog->m_Boat;
 
 //    m_RouteMapOverlay.SetConfiguration(configuration);
 //    m_RouteMapOverlay.Reset(time);
-
     return configuration;
 }
 

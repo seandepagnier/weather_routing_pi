@@ -30,6 +30,7 @@ class PlugIn_ViewPort;
 
 class ocpnDC;
 class RouteMapOverlay;
+class SettingsDialog;
 
 class RouteMapOverlayThread : public wxThread
 {
@@ -48,17 +49,14 @@ public:
     ~RouteMapOverlay();
 
     bool SetCursorLatLon(double lat, double lon);
-    void RenderIsoRoute(IsoRoute *r, wxColour &color, ocpnDC &dc, PlugIn_ViewPort &vp);
-    void Render(wxDateTime time, ocpnDC &dc, PlugIn_ViewPort &vp);
-    void RenderCourse(Position *pos, wxDateTime time, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronThickness,
+                        ocpnDC &dc, PlugIn_ViewPort &vp);
+    void Render(wxDateTime time, SettingsDialog &settingsdialog, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void RenderCourse(Position *pos, wxDateTime time, bool SquaresAtSailChanges,
+                      ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
     std::list<PlotData> GetPlotData();
     void RouteInfo(double &distance, double &avgspeed, double &percentage_upwind);
-
-    void SetSettings(wxColor CursorColor, wxColor DestinationColor,
-                     int IsoRouteThickness, int IsoChronThickness,
-                     int AlternateRouteThickness, bool AlternatesForAll,
-                     bool SquaresAtSailChanges);
 
     bool Updated();
     void UpdateDestination();
@@ -74,7 +72,8 @@ public:
     bool m_UpdateOverlay;
 
 private:
-    void RenderAlternateRoute(IsoRoute *r, bool each_parent, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void RenderAlternateRoute(IsoRoute *r, bool each_parent, int AlternateRouteThickness,
+                              ocpnDC &dc, PlugIn_ViewPort &vp);
     virtual bool TestAbort() { return m_Thread->TestDestroy(); }
 
     RouteMapOverlayThread *m_Thread;
@@ -87,9 +86,10 @@ private:
     Position *last_cursor_position, *destination_position, *last_destination_position;
     bool m_bUpdated;
 
-    wxColour m_CursorColor, m_DestinationColor;
-    int m_RouteThickness, m_IsoChronThickness, m_AlternateRouteThickness;
-    bool m_bAlternatesForAll, m_bSquaresAtSailChanges;
-
     int m_overlaylist;
+    double m_scale, m_clat, m_clon;
+    wxPoint m_point;
+    bool m_scale_changed;
+    double m_lastscale;
+    wxPoint m_lastpoint;
 };

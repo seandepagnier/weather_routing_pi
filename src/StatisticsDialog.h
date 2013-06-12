@@ -34,7 +34,9 @@ class RouteMapOverlay;
 class StatisticsDialog : public StatisticsDialogBase
 {
 public:
-    StatisticsDialog( wxWindow *parent, RouteMapOverlay &routemapoverlay, wxTimeSpan RunTime );
+    StatisticsDialog( wxWindow *parent );
+    void SetRouteMapOverlay(RouteMapOverlay *routemapoverlay);
+    void SetRunTime(wxTimeSpan RunTime);
 };
 
 #endif

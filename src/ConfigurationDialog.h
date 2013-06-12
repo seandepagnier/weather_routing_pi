@@ -41,6 +41,9 @@ public:
     ConfigurationDialog(wxWindow *parent, weather_routing_pi &plugin);
     ~ConfigurationDialog();
 
+    void SetConfiguration(RouteMapConfiguration configuration);
+    RouteMapConfiguration Configuration();
+
     wxDateTime m_GribTimelineTime;
 
 protected:
@@ -52,9 +55,6 @@ protected:
     void OnRemoveDegreeStep( wxCommandEvent& event );
     void OnClearDegreeSteps( wxCommandEvent& event );
     void OnGenerateDegreeSteps( wxCommandEvent& event );
-
-    void ReadConfiguration(RouteMapConfiguration &o);
-    RouteMapConfiguration Configuration();
 
 private:
     enum ConfigurationItem {START, END, START_TIME, TIME_STEP};

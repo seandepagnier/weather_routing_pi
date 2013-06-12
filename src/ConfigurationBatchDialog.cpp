@@ -33,8 +33,10 @@
 #include <time.h>
 
 #include "ConfigurationBatchDialog.h"
+#include "Boat.h"
+#include "RouteMap.h"
 
-ConfigurationBatchDialog::ConfigurationBatchDialog( wxWindow *parent )
+ConfigurationBatchDialog::ConfigurationBatchDialog(wxWindow *parent, RouteMapConfiguration configuration)
     : ConfigurationBatchDialogBase(parent)
 {
     wxStandardPathsBase& std_path = wxStandardPathsBase::Get();

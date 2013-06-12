@@ -37,19 +37,36 @@
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 
-StatisticsDialog::StatisticsDialog( wxWindow *parent, RouteMapOverlay &routemapoverlay, wxTimeSpan RunTime )
+StatisticsDialog::StatisticsDialog(wxWindow *parent)
     : StatisticsDialogBase(parent)
 {
-    m_stState->SetLabel(routemapoverlay.Running() ? _("Running") : _("Stopped"));
-    m_stRunTime->SetLabel(RunTime.Format());
-    
-    int isochrons, routes, invroutes, skippositions, positions;
-    routemapoverlay.GetStatistics(isochrons, routes, invroutes, skippositions, positions);
-    m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
-    m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
-    m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
-    m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
-    m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
+}
+
+void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
+{
+    if(routemapoverlay) {
+        m_stState->SetLabel(routemapoverlay->Running() ? _("Running") : _("Stopped"));
+        
+        int isochrons, routes, invroutes, skippositions, positions;
+        routemapoverlay->GetStatistics(isochrons, routes, invroutes, skippositions, positions);
+        m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
+        m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
+        m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
+        m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
+        m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
+    } else {
+        m_stState->SetLabel(_("No Route Selected"));
+        m_stIsoChrons->SetLabel(_T(""));
+        m_stRoutes->SetLabel(_T(""));
+        m_stInvRoutes->SetLabel(_T(""));
+        m_stSkipPositions->SetLabel(_T(""));
+        m_stPositions->SetLabel(_T(""));
+    }
 
     Fit();
+}
+
+void StatisticsDialog::SetRunTime(wxTimeSpan RunTime)
+{
+    m_stRunTime->SetLabel(RunTime.Format());
 }

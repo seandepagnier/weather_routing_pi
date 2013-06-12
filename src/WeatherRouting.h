@@ -49,7 +49,7 @@ public:
     void RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp);
     ConfigurationDialog m_ConfigurationDialog;
 
-    RouteMapOverlay *CurrentRouteMap(), *m_RouteMapOverlayNeedingGrib;
+    RouteMapOverlay *CurrentRouteMap(bool messagedialog = false), *m_RouteMapOverlayNeedingGrib;
 
     std::list<RouteMapOverlay*> m_RunningRouteMaps, m_WaitingRouteMaps;
 
@@ -78,14 +78,13 @@ private:
 
     void OnComputationTimer( wxTimerEvent & );
 
-//    void UpdateStatistics();
+    void AddConfiguration(RouteMapConfiguration configuration);
 
     RouteMap *SelectedRouteMap();
-    void Export(const RouteMap &routemap);
+    void Export(RouteMapOverlay &routemapoverlay);
 
     void Start();
     void Stop();
-    void SetRouteMapOverlaySettings();
 
     SettingsDialog m_SettingsDialog;
     StatisticsDialog m_StatisticsDialog;
@@ -94,6 +93,7 @@ private:
 
     wxTimer m_tCompute;
 
+    bool m_bRunning;
     wxTimeSpan m_RunTime;
     wxDateTime m_StartTime;
 };

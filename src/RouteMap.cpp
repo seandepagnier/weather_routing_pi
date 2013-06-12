@@ -118,10 +118,10 @@ static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
 }
 
 enum {WIND, CURRENT};
-static bool (*ClimatologyData1)(int setting, wxDateTime &, double, double, double &, double &);
-static bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &);
 
-static bool Wind(GribRecordSet *grib, wxDateTime &time,
+static bool Wind(GribRecordSet *grib,
+                 bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &),
+                 wxDateTime &time,
                  bool AllowDataDeficient, Position *p,
                  double &WG, double &VWG)
 {
@@ -162,7 +162,9 @@ static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
     return true;
 }
 
-static bool Current(GribRecordSet *grib, wxDateTime &time, double lat, double lon,
+static bool Current(GribRecordSet *grib,
+                    bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &),
+                    wxDateTime &time, double lat, double lon,
                     double &C, double &VC)
 {
     if(GribCurrent(grib, lat, lon, C, VC))
@@ -362,10 +364,11 @@ bool Position::GetPlotData(GribRecordSet *grib, double dt,
                            RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(grib, lat, lon);
-    if(!Wind(grib, data.time, configuration.AllowDataDeficient, this, data.WG, data.VWG))
+    if(!Wind(grib, configuration.Climatology(), data.time,
+             configuration.AllowDataDeficient, this, data.WG, data.VWG))
         return false;
 
-    if(!Current(grib, data.time, lat, lon, data.C, data.VC))
+    if(!Current(grib, configuration.Climatology(), data.time, lat, lon, data.C, data.VC))
         data.C = data.VC = 0;
 
     OverWater(data.C, data.VC, data.WG, data.VWG, data.W, data.VW);
@@ -414,7 +417,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         return false;
 
     double WG, VWG;
-    if(!Wind(grib, time, configuration.AllowDataDeficient, this, WG, VWG))
+    if(!Wind(grib, configuration.Climatology(), time, configuration.AllowDataDeficient, this, WG, VWG))
         return false;
 
     if(VWG > configuration.MaxWindKnots)
@@ -422,7 +425,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     double C, VC;
     double W, VW;
-    if(!configuration.Currents || !Current(grib, time, lat, lon, C, VC)) {
+    if(!configuration.Currents || !Current(grib, configuration.Climatology(), time, lat, lon, C, VC)) {
         C = VC = 0;
         W = WG, VW = VWG;
     } else
@@ -512,7 +515,7 @@ skipbearingcomputation:
 
             if((d1 > 0 && d2 > 0) || (d0 < 0 && (d1 > 0 || d2 > 0))) {
                 if(first_backtrackavoid) {
-                first_backtrack:
+//                first_backtrack:
                     /* use a position between here and parent instead */
                     const double lp = .95;
                     dlat = lp*lat + (1-lp)*parent->lat;
@@ -841,7 +844,8 @@ bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfi
     double timeseconds = configuration.dt;
     do {
         double C, VC;
-        if(configuration.Currents && Current(grib, time, p->lat, p->lon, C, VC)) {
+        if(configuration.Currents && Current(grib, configuration.Climatology(),
+                                             time, p->lat, p->lon, C, VC)) {
             /* drift distance over ground */
             double dist = VC * timeseconds / 3600.0;
             if(dist)
@@ -1736,6 +1740,15 @@ void RouteMapConfiguration::Update()
     ll_gc_ll_reverse(StartLat, StartLon, EndLat, EndLon, &StartEndBearing, 0);
 }
 
+bool (*RouteMapConfiguration::Climatology())
+(int setting, wxDateTime &, double, double, double &, double &)
+{
+    return UseClimatology ? RouteMap::ClimatologyData : NULL;
+}
+
+bool (*RouteMap::ClimatologyData)
+(int setting, wxDateTime &, double, double, double &, double &) = NULL;
+
 RouteMap::RouteMap()
 {
 }
@@ -1933,24 +1946,11 @@ void RouteMap::Reset(wxDateTime time)
     m_NewTime = time;
     m_bNeedsGrib = m_Configuration.UseGrib;
 
-    ClimatologyData = m_Configuration.UseClimatology ? ClimatologyData1 : NULL;
-
     m_bReachedDestination = false;
     m_bGribFailed = false;
     m_bFinished = false;
 
     Unlock();
-}
-
-void RouteMap::SetClimatologyFunction(bool (*d)(int, wxDateTime &, double, double, double &, double &))
-{
-    ClimatologyData1 = d;
-    if(!d) ClimatologyData = NULL;
-}
-
-bool RouteMap::HasClimatology()
-{
-    return ClimatologyData;
 }
 
 void RouteMap::GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions)
