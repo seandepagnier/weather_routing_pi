@@ -40,9 +40,10 @@
 #include "ConfigurationBatchDialog.h"
 #include "BoatDialog.h"
 #include "weather_routing_pi.h"
+#include "WeatherRouting.h"
 
-ConfigurationDialog::ConfigurationDialog( wxWindow *parent, weather_routing_pi &plugin )
-    : ConfigurationDialogBase(parent), Plugin(plugin)
+ConfigurationDialog::ConfigurationDialog(WeatherRouting *weatherrouting, weather_routing_pi &plugin)
+    : ConfigurationDialogBase(weatherrouting), m_WeatherRouting(weatherrouting), Plugin(plugin)
 {
 }
 
@@ -189,22 +190,26 @@ void ConfigurationDialog::OnBoatPosition( wxCommandEvent& event )
 {
     m_tStartLat->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lat));
     m_tStartLon->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lon));
+    Update();
 }
 
 void ConfigurationDialog::OnGribTime( wxCommandEvent& event )
 {
     SetStartDateTime(m_GribTimelineTime);
+    Update();
 }
 
 void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
 {
     SetStartDateTime(wxDateTime::Now());
+    Update();
 }
 
 void ConfigurationDialog::OnEditBoat ( wxCommandEvent& event )
 {
-    BoatDialog boatdlg(this);
+    BoatDialog boatdlg(this, m_fpBoat->GetPath());
     boatdlg.ShowModal();
+    Update();
 }
 
 void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
@@ -217,6 +222,7 @@ void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
     m_tDegreeStep->GetValue().ToDouble(&step);
     m_lDegreeSteps->Insert(wxString::Format(_T("%f"), step), s);
     m_tDegreeStep->Clear();
+    Update();
 }
 
 void ConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& event )
@@ -227,11 +233,13 @@ void ConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& event )
 
     m_lDegreeSteps->Delete(s);
     m_lDegreeSteps->SetSelection(s);
+    Update();
 }
 
 void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
 {
     m_lDegreeSteps->Clear();
+    Update();
 }
 
 void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
@@ -253,6 +261,7 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), -v));
     }
+    Update();
 }
 
 void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
@@ -375,4 +384,9 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
     m_dpStartDate->SetValue(datetime);
     m_tStartHour->SetValue(wxString::Format(_T("%.3f"), datetime.GetHour()
                                             +datetime.GetMinute() / 60.0));
+}
+
+void ConfigurationDialog::Update()
+{
+    m_WeatherRouting->UpdateCurrentItem(Configuration());
 }

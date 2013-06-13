@@ -75,7 +75,7 @@ static const char *eye[]={
 "....................",
 "...................."};
 
-enum {VISIBLE, NAME, START, END, TIME, DISTANCE};
+enum {VISIBLE=0, NAME, START, END, TIME, DISTANCE};
 
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(this, plugin),
@@ -104,6 +104,44 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     m_lWeatherRoutes->InsertColumn(TIME, _("Time"));
     m_lWeatherRoutes->InsertColumn(DISTANCE, _("Distance"));
 
+    m_default_configuration_path = weather_routing_pi::StandardPath()
+        + _("WeatherRoutingConfiguration.xml");
+    if(!OpenXML(m_default_configuration_path, false)) {
+        RouteMapConfiguration defconf;
+        defconf.Name = _("Untitled");
+        defconf.StartLat = 0, defconf.StartLon = 0;
+        defconf.StartTime = wxDateTime::Now();
+        defconf.dt = 3600;
+        defconf.EndLat = 0, defconf.EndLon = 0;
+
+        defconf.boatFileName = weather_routing_pi::StandardPath() + _("Boat.xml");
+
+        defconf.MaxDivertedCourse = 180;
+        defconf.MaxWindKnots = 100;
+        defconf.MaxSwellMeters = 20;
+        defconf.MaxLatitude = 90;
+        defconf.MaxTacks = -1;
+        defconf.TackingTime = 0;
+
+        defconf.UseGrib = defconf.UseClimatology = true;
+        defconf.AllowDataDeficient = false;
+        defconf.DetectLand = true;
+        defconf.Currents = false;
+        defconf.InvertedRegions = false;
+        defconf.Anchoring = false;
+        
+        double defsteps[] = {45, -45, 50, -50, 60, -60, 70, -70, 80, -80,
+                             90, -90, 100, -100, 120, -120, 150, -150};
+        for(unsigned int i=0; i<(sizeof defsteps) / (sizeof *defsteps); i++)
+            defconf.DegreeSteps.push_back(defsteps[i]);
+
+        AddConfiguration(defconf);
+
+        m_lWeatherRoutes->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+        m_ConfigurationDialog.SetConfiguration(CurrentRouteMap()->GetConfiguration());
+        m_ConfigurationDialog.Show();
+    }
+
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "DialogX" ), &p.x, p.x);
     pConf->Read ( _T ( "DialogY" ), &p.y, p.y);
@@ -122,9 +160,11 @@ WeatherRouting::~WeatherRouting( )
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "DialogX" ), p.x);
     pConf->Write ( _T ( "DialogY" ), p.y);
+
+    SaveXML(m_default_configuration_path);
 }
 
-void WeatherRouting::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
+void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     RouteMapOverlay *routemapoverlay = CurrentRouteMap();
     if(!routemapoverlay)
@@ -147,7 +187,8 @@ void WeatherRouting::RenderRouteMap(ocpnDC &dc, PlugIn_ViewPort &vp)
 
 void WeatherRouting::OnConfiguration()
 {
-    m_ConfigurationDialog.Show();
+    if(CurrentRouteMap(true))
+        m_ConfigurationDialog.Show();
 }
 
 void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
@@ -156,7 +197,8 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
     if(CurrentRouteMap()) {
         m_ConfigurationDialog.SetConfiguration(CurrentRouteMap()->GetConfiguration());
         m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
-    }
+    } else
+        m_ConfigurationDialog.Hide();
 }
 
 int debugcnt, debuglimit = 1, debugsize = 2;
@@ -177,56 +219,8 @@ void WeatherRouting::OnOpen( wxCommandEvent& event )
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
-    if( openDialog.ShowModal() != wxID_OK )
-        return;
-
-    wxFileName filename = openDialog.GetPath();
-    TiXmlDocument doc;
-    if(!doc.LoadFile(filename.GetPath().mb_str()))
-        FAIL(_("Failed to load file."));
-    else {
-        TiXmlHandle root( doc.RootElement() );
-        if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingConfiguration"))
-            FAIL(_("Invalid xml file"));
-
-        for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
-            if(!strcmp(e->Value(), "Configuration")) {
-                RouteMapConfiguration configuration;
-                configuration.Name = wxString::FromUTF8(e->Attribute("Name"));
-                configuration.StartLat = AttributeDouble(e, "StartLat", 0);
-                configuration.StartLon = AttributeDouble(e, "StartLon", 0);
-                configuration.EndLat = AttributeDouble(e, "EndLat", 0);
-                configuration.EndLon = AttributeDouble(e, "EndLon", 0);
-                configuration.dt = AttributeDouble(e, "dt", 0);
-                
-                configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
-                
-                configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 180);
-                configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
-                configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
-                configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
-                configuration.MaxTacks = AttributeDouble(e, "MaxTacks", -1);
-                configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
-                
-                configuration.UseGrib = AttributeBool(e, "UseGrib", true);
-                configuration.UseClimatology = AttributeBool(e, "UseClimatology", true);
-                configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
-                configuration.DetectLand = AttributeBool(e, "DetectLand", true);
-                configuration.Currents = AttributeBool(e, "Currents", true);
-                configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
-                configuration.Anchoring = AttributeBool(e, "Anchoring", false);
-                
-                AddConfiguration(configuration);
-            } else
-                FAIL(_("Unrecognized xml node"));
-        }
-    }
-
-    return;
-failed:
-
-    wxMessageDialog mdlg(this, error, _("Weather Routing"), wxOK | wxICON_ERROR);
-    mdlg.ShowModal();
+    if( openDialog.ShowModal() == wxID_OK )
+        OpenXML(openDialog.GetPath());
 }
 
 void WeatherRouting::OnSave( wxCommandEvent& event )
@@ -237,62 +231,8 @@ void WeatherRouting::OnSave( wxCommandEvent& event )
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_SAVE  );
 
-    if( saveDialog.ShowModal() != wxID_OK )
-        return;
-
-    wxString filename = saveDialog.GetPath();
-
-    TiXmlDocument doc;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
-    doc.LinkEndChild( decl );
-
-    TiXmlElement * root = new TiXmlElement( "OCPNWeatherRoutingConfiguration" );
-    doc.LinkEndChild( root );
-
-    char version[24];
-    sprintf(version, "%d.%d", PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR);
-    root->SetAttribute("version", version);
-    root->SetAttribute("creator", "Opencpn Weather Routing plugin");
-
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
-        TiXmlElement *c = new TiXmlElement( "configuration" );
-
-        RouteMapConfiguration configuration =
-            reinterpret_cast<RouteMap*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)))
-            ->GetConfiguration();
-
-        c->SetAttribute("Name", configuration.Name.mb_str());
-        c->SetAttribute("StartLat", configuration.StartLat);
-        c->SetAttribute("StartLon", configuration.StartLon);
-        c->SetAttribute("EndLat", configuration.EndLat);
-        c->SetAttribute("EndLon", configuration.EndLon);
-        c->SetAttribute("dt", configuration.dt);
-
-        c->SetAttribute("Boat", configuration.boatFileName.ToUTF8());
-
-        c->SetAttribute("MaxDivertedCourse", configuration.MaxDivertedCourse);
-        c->SetAttribute("MaxWindKnots", configuration.MaxWindKnots);
-        c->SetAttribute("MaxSwellMeters", configuration.MaxSwellMeters);
-        c->SetAttribute("MaxLatitude", configuration.MaxLatitude);
-        c->SetAttribute("MaxTacks", configuration.MaxTacks);
-        c->SetAttribute("TackingTime", configuration.TackingTime);
-
-        c->SetAttribute("UseGrib", configuration.UseGrib);
-        c->SetAttribute("UseClimatology", configuration.UseClimatology);
-        c->SetAttribute("AllowDataDeficient", configuration.AllowDataDeficient);
-        c->SetAttribute("DetectLand", configuration.DetectLand);
-        c->SetAttribute("Currents", configuration.Currents);
-        c->SetAttribute("InvertedRegions", configuration.InvertedRegions);
-        c->SetAttribute("Anchoring", configuration.Anchoring);
-        
-        root->LinkEndChild(c);
-    }
-
-    if(!doc.SaveFile(filename.mb_str())) {
-        wxMessageDialog mdlg(this, _("Failed to save xml file: ") + filename,
-                             _("Weather Routing"), wxOK | wxICON_ERROR);
-        mdlg.ShowModal();
-    }
+    if( saveDialog.ShowModal() == wxID_OK )
+        SaveXML(saveDialog.GetPath());
 }
 
 void WeatherRouting::OnClose( wxCommandEvent& event )
@@ -517,22 +457,155 @@ and no climatology data to fall back on\n"),
     Stop();
 }
 
+bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
+{
+    TiXmlDocument doc;
+    wxString error;
+    if(!doc.LoadFile(filename.mb_str()))
+        FAIL(_("Failed to load file."));
+    else {
+        TiXmlHandle root( doc.RootElement() );
+        if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingConfiguration"))
+            FAIL(_("Invalid xml file"));
+
+        for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
+            if(!strcmp(e->Value(), "Configuration")) {
+                RouteMapConfiguration configuration;
+                configuration.Name = wxString::FromUTF8(e->Attribute("Name"));
+                configuration.StartLat = AttributeDouble(e, "StartLat", 0);
+                configuration.StartLon = AttributeDouble(e, "StartLon", 0);
+                configuration.EndLat = AttributeDouble(e, "EndLat", 0);
+                configuration.EndLon = AttributeDouble(e, "EndLon", 0);
+                configuration.dt = AttributeDouble(e, "dt", 0);
+                
+                configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
+                
+                configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 180);
+                configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
+                configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
+                configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
+                configuration.MaxTacks = AttributeDouble(e, "MaxTacks", -1);
+                configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
+                
+                configuration.UseGrib = AttributeBool(e, "UseGrib", true);
+                configuration.UseClimatology = AttributeBool(e, "UseClimatology", true);
+                configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
+                configuration.DetectLand = AttributeBool(e, "DetectLand", true);
+                configuration.Currents = AttributeBool(e, "Currents", true);
+                configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
+                configuration.Anchoring = AttributeBool(e, "Anchoring", false);
+                
+                AddConfiguration(configuration);
+            } else
+                FAIL(_("Unrecognized xml node"));
+        }
+    }
+
+    return true;
+failed:
+
+    if(reportfailure) {
+        wxMessageDialog mdlg(this, error, _("Weather Routing"), wxOK | wxICON_ERROR);
+        mdlg.ShowModal();
+    }
+    return false;
+}
+
+void WeatherRouting::SaveXML(wxString filename)
+{
+    TiXmlDocument doc;
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
+    doc.LinkEndChild( decl );
+
+    TiXmlElement * root = new TiXmlElement( "OCPNWeatherRoutingConfiguration" );
+    doc.LinkEndChild( root );
+
+    char version[24];
+    sprintf(version, "%d.%d", PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR);
+    root->SetAttribute("version", version);
+    root->SetAttribute("creator", "Opencpn Weather Routing plugin");
+
+    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+        TiXmlElement *c = new TiXmlElement( "configuration" );
+
+        RouteMapConfiguration configuration =
+            reinterpret_cast<RouteMap*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)))
+            ->GetConfiguration();
+
+        c->SetAttribute("Name", configuration.Name.mb_str());
+        c->SetAttribute("StartLat", configuration.StartLat);
+        c->SetAttribute("StartLon", configuration.StartLon);
+        c->SetAttribute("EndLat", configuration.EndLat);
+        c->SetAttribute("EndLon", configuration.EndLon);
+        c->SetAttribute("dt", configuration.dt);
+
+        c->SetAttribute("Boat", configuration.boatFileName.ToUTF8());
+
+        c->SetAttribute("MaxDivertedCourse", configuration.MaxDivertedCourse);
+        c->SetAttribute("MaxWindKnots", configuration.MaxWindKnots);
+        c->SetAttribute("MaxSwellMeters", configuration.MaxSwellMeters);
+        c->SetAttribute("MaxLatitude", configuration.MaxLatitude);
+        c->SetAttribute("MaxTacks", configuration.MaxTacks);
+        c->SetAttribute("TackingTime", configuration.TackingTime);
+
+        c->SetAttribute("UseGrib", configuration.UseGrib);
+        c->SetAttribute("UseClimatology", configuration.UseClimatology);
+        c->SetAttribute("AllowDataDeficient", configuration.AllowDataDeficient);
+        c->SetAttribute("DetectLand", configuration.DetectLand);
+        c->SetAttribute("Currents", configuration.Currents);
+        c->SetAttribute("InvertedRegions", configuration.InvertedRegions);
+        c->SetAttribute("Anchoring", configuration.Anchoring);
+        
+        root->LinkEndChild(c);
+    }
+
+    if(!doc.SaveFile(filename.mb_str())) {
+        wxMessageDialog mdlg(this, _("Failed to save xml file: ") + filename,
+                             _("Weather Routing"), wxOK | wxICON_ERROR);
+        mdlg.ShowModal();
+    }
+}
+
 void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
 {
     RouteMapOverlay *routemapoverlay = new RouteMapOverlay;
     routemapoverlay->SetConfiguration(configuration);
 
     wxListItem item;
+    int count = m_lWeatherRoutes->GetItemCount();
+    item.SetId(count);
     item.SetData(routemapoverlay);
-    long idx = m_lWeatherRoutes->InsertItem(item);
-    m_lWeatherRoutes->SetItem(idx, NAME, configuration.Name);
-    m_lWeatherRoutes->SetItem(idx, START, wxString::Format(_T("%.2f, %.2f : "),
+
+    long index = m_lWeatherRoutes->InsertItem(item);
+    UpdateItem(index);
+}
+
+void WeatherRouting::UpdateItem(long index)
+{
+    RouteMapOverlay *routemapoverlay = reinterpret_cast<RouteMapOverlay*>
+        (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+    RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+
+    m_lWeatherRoutes->SetItemImage(index, 0);
+    m_lWeatherRoutes->SetItem(index, NAME, configuration.Name);
+    m_lWeatherRoutes->SetItem(index, START, wxString::Format(_T("%.2f, %.2f : "),
                                                            configuration.StartLat,
                                                            configuration.StartLon)
                               + configuration.StartTime.Format());
-    m_lWeatherRoutes->SetItem(idx, END, wxString::Format(_T("%.2f, %.2f"),
+    m_lWeatherRoutes->SetItem(index, END, wxString::Format(_T("%.2f, %.2f"),
                                                            configuration.EndLat,
                                                            configuration.EndLon));
+}
+
+void WeatherRouting::UpdateCurrentItem(RouteMapConfiguration configuration)
+{
+    if(CurrentRouteMap())
+        CurrentRouteMap()->SetConfiguration(configuration);
+
+    long index = m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    if (index < 0) return;
+
+    UpdateItem(index);
 }
 
 RouteMapOverlay *WeatherRouting::CurrentRouteMap(bool messagedialog)

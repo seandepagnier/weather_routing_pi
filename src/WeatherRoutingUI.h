@@ -163,9 +163,13 @@ class ConfigurationDialogBase : public wxDialog
 		wxButton* m_sdbSizer5Cancel;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBoatPosition( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxDateEvent& event ) { event.Skip(); }
 		virtual void OnGribTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveDegreeStep( wxCommandEvent& event ) { event.Skip(); }
@@ -250,7 +254,10 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText212;
 		wxStaticText* m_stBoatKnots;
 		wxStaticText* m_staticText232;
-		wxButton* m_bClose;
+		wxButton* m_bOpen;
+		wxButton* m_bSaveAs;
+		wxButton* m_bSave;
+		wxButton* m_bCancel;
 		wxPanel* m_panel31;
 		wxStaticText* m_staticText93;
 		wxStaticText* m_stCSVFile;
@@ -260,8 +267,8 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText37;
 		wxSpinCtrl* m_sFileCSVWindDegreeStep;
 		wxStaticText* m_staticText38;
-		wxButton* m_bOpen;
-		wxButton* m_bSave;
+		wxButton* m_bOpenCSV;
+		wxButton* m_bSaveCSV;
 		wxPanel* m_panel311;
 		wxStaticText* m_staticText3511;
 		wxStaticText* m_stBestCourseUpWindPortTack;
@@ -315,9 +322,12 @@ class BoatDialogBase : public wxDialog
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOpenCSV( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetOptimalTackingSpeed( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }

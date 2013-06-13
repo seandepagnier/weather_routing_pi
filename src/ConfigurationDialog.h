@@ -33,12 +33,13 @@
 
 #include "WeatherRoutingUI.h"
 
+class WeatherRouting;
 class weather_routing_pi;
 
 class ConfigurationDialog : public ConfigurationDialogBase
 {
 public:
-    ConfigurationDialog(wxWindow *parent, weather_routing_pi &plugin);
+    ConfigurationDialog(WeatherRouting *weatherrouting, weather_routing_pi &plugin);
     ~ConfigurationDialog();
 
     void SetConfiguration(RouteMapConfiguration configuration);
@@ -47,9 +48,13 @@ public:
     wxDateTime m_GribTimelineTime;
 
 protected:
+    void OnUpdate( wxCommandEvent& event ) { Update(); }
     void OnBoatPosition( wxCommandEvent& event );
+    void OnUpdate( wxDateEvent& event ) { Update(); }
     void OnGribTime( wxCommandEvent& event );
     void OnCurrentTime( wxCommandEvent& event );
+    void OnUpdate( wxSpinEvent& event ) { Update(); }
+    void OnUpdate( wxFileDirPickerEvent& event ) { Update(); }
     void OnEditBoat( wxCommandEvent& event );
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );
@@ -60,7 +65,9 @@ private:
     enum ConfigurationItem {START, END, START_TIME, TIME_STEP};
 
     void SetStartDateTime(wxDateTime datetime);
+    void Update();
 
+    WeatherRouting *m_WeatherRouting;
     weather_routing_pi   &Plugin;
 };
 

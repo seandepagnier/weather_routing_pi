@@ -90,6 +90,7 @@ public:
       void OnContextMenuItemCallback(int id);
 
       void SetColorScheme(PI_ColorScheme cs);
+      static wxString StandardPath();
 
       double m_boat_lat, m_boat_lon;
 

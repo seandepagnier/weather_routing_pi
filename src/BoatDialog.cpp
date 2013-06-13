@@ -26,12 +26,12 @@
  */
 
 #include <wx/wx.h>
-#include <wx/stdpaths.h>
 
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 
+#include "weather_routing_pi.h"
 #include "Utilities.h"
 #include "Boat.h"
 #include "BoatDialog.h"
@@ -39,22 +39,10 @@
 
 enum {spNAME, spETA};
 
-BoatDialog::BoatDialog( wxWindow *parent )
-    : BoatDialogBase(parent), m_PlotScale(0)
+BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
+    : BoatDialogBase(parent), m_boatpath(boatpath), m_PlotScale(0)
 {
-    wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
-#ifdef __WXMSW__
-    wxString stdPath  = std_path.GetConfigDir();
-#endif
-#ifdef __WXGTK__
-    wxString stdPath  = std_path.GetUserDataDir();
-#endif
-#ifdef __WXOSX__
-    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
-#endif
-
-    m_default_boat_path = stdPath + wxFileName::GetPathSeparator() + _T("boat.xml");
-    wxString error = m_Boat.OpenXML(m_default_boat_path);
+    wxString error = m_Boat.OpenXML(m_boatpath);
     if(!error.empty()) {
         m_Boat.Plans.push_back(new BoatPlan(_("Initial Plan"), m_Boat));
         m_Boat.Plans[0]->ComputeBoatSpeeds(m_Boat);
@@ -82,7 +70,7 @@ BoatDialog::BoatDialog( wxWindow *parent )
 
 BoatDialog::~BoatDialog()
 {
-    m_Boat.SaveXML(m_default_boat_path);
+    m_Boat.SaveXML(m_boatpath);
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -115,7 +103,6 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
     case 0: /* Boat */
     {
 #endif
-
         double B = rad2posdeg(atan2(x, -y));
         double W = -B, VW = m_sWindSpeed->GetValue();
 
@@ -313,42 +300,20 @@ void BoatDialog::OnUpdateWindSpeed( wxSpinEvent& event )
 void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
     wxFileDialog openDialog
-        ( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
+        ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
           wxT ( "XML Weather Routing files (*.xml, *.cvs)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
         wxFileName filename = openDialog.GetPath();
-        bool binary = filename.GetExt() == _("xml") || filename.GetExt() == _("XML");
-
-        if(binary) {
-            wxString error = m_Boat.OpenXML(openDialog.GetPath());
-            if(error.empty())
-                RepopulatePlans();
-            else {
-                wxMessageDialog md(this, error, _("OpenCPN Weather Routing Plugin"),
-                                   wxICON_ERROR | wxOK );
-                md.ShowModal();
-                return;
-            }
-        } else {
-            BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
-            BoatSpeedTable table;
-            wxString filename = openDialog.GetPath();
-            if(table.Open(filename.mb_str(),
-                          plan->wind_speed_step, plan->wind_degree_step)) {
-                plan->csvFileName = filename;
-                m_stCSVFile->SetLabel(plan->csvFileName);
-                m_sFileCSVWindSpeedStep->SetValue(plan->wind_speed_step);
-                m_sFileCSVWindDegreeStep->SetValue(plan->wind_degree_step);
-                plan->SetSpeedsFromTable(table);
-            } else {
-                wxMessageDialog md(this, _("Failed reading csv: ") + filename,
-                                   _("OpenCPN Weather Routing Plugin"),
-                                   wxICON_ERROR | wxOK );
-                md.ShowModal();
-                return;
-            }
+        wxString error = m_Boat.OpenXML(openDialog.GetPath());
+        if(error.empty())
+            RepopulatePlans();
+        else {
+            wxMessageDialog md(this, error, _("OpenCPN Weather Routing Plugin"),
+                               wxICON_ERROR | wxOK );
+            md.ShowModal();
+            return;
         }
 
         UpdateStats();
@@ -357,31 +322,83 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
     }
 }
 
+void BoatDialog::OnOpenCSV ( wxCommandEvent& event )
+{
+    wxFileDialog openDialog
+        ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+          wxT ( "XML Weather Routing files (*.cvs)|*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxFD_OPEN  );
+
+    if( openDialog.ShowModal() == wxID_OK ) {
+        BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
+        BoatSpeedTable table;
+        wxString filename = openDialog.GetPath();
+        if(table.Open(filename.mb_str(),
+                      plan->wind_speed_step, plan->wind_degree_step)) {
+            plan->csvFileName = filename;
+            m_stCSVFile->SetLabel(plan->csvFileName);
+            m_sFileCSVWindSpeedStep->SetValue(plan->wind_speed_step);
+            m_sFileCSVWindDegreeStep->SetValue(plan->wind_degree_step);
+            plan->SetSpeedsFromTable(table);
+        } else {
+            wxMessageDialog md(this, _("Failed reading csv: ") + filename,
+                               _("OpenCPN Weather Routing Plugin"),
+                               wxICON_ERROR | wxOK );
+            md.ShowModal();
+            return;
+        }
+        
+        UpdateStats();
+        UpdateVMG();
+        m_PlotWindow->Refresh();
+    }
+}
+
+void BoatDialog::Save()
+{
+    wxString error = m_Boat.SaveXML(m_boatpath);
+    if(error.empty())
+        EndModal(wxID_OK);
+    else {
+        wxMessageDialog md(this, error, _("OpenCPN Weather Routing Plugin"),
+                           wxICON_ERROR | wxOK );
+        md.ShowModal();
+    }
+}
+
+void BoatDialog::OnSaveAs ( wxCommandEvent& event )
+{
+    wxFileDialog saveDialog( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+                             wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ), wxFD_SAVE  );
+    if( saveDialog.ShowModal() == wxID_OK ) {
+        m_boatpath = saveDialog.GetPath();
+        Save();
+    }
+}
+
 void BoatDialog::OnSave ( wxCommandEvent& event )
 {
-    wxFileDialog saveDialog( this, _( "Select Polar" ), _("/home/sean/qtVlm/polar"), wxT ( "" ),
-                             wxT ( "Boat Polar files (*.obs, *.cvs)|*.OBS;*.obs;*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
+    Save();
+}
+
+void BoatDialog::OnCancel ( wxCommandEvent& event )
+{
+    EndModal(wxID_CANCEL);
+}
+
+void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
+{
+    wxFileDialog saveDialog( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+                             wxT ( "Boat Polar files (*.cvs)|*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
     if( saveDialog.ShowModal() == wxID_OK ) {
         wxFileName filename = saveDialog.GetPath();
-        bool binary = filename.GetExt() == _("obs") || filename.GetExt() == _("OBS");
-
-        if(binary) {
-            wxString error = m_Boat.SaveXML(saveDialog.GetPath());
-            if(!error.empty()) {
-                wxMessageDialog md(this, error,
-                                   _("OpenCPN Weather Routing Plugin"),
-                                   wxICON_ERROR | wxOK );
-                md.ShowModal();
-            }
-        } else {
-            BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
-                (m_sFileCSVWindSpeedStep->GetValue(), m_sFileCSVWindDegreeStep->GetValue());
-            if(!table.Save(saveDialog.GetPath().mb_str())) {
-                wxMessageDialog md(this, _("Failed saving boat polar to csv"),
-                                   _("OpenCPN Weather Routing Plugin"),
-                                   wxICON_ERROR | wxOK );
-                md.ShowModal();
-            }
+        BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
+            (m_sFileCSVWindSpeedStep->GetValue(), m_sFileCSVWindDegreeStep->GetValue());
+        if(!table.Save(saveDialog.GetPath().mb_str())) {
+            wxMessageDialog md(this, _("Failed saving boat polar to csv"),
+                               _("OpenCPN Weather Routing Plugin"),
+                               wxICON_ERROR | wxOK );
+            md.ShowModal();
         }
     }
 }

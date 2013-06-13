@@ -25,7 +25,7 @@
  */
 
 #include <wx/wx.h>
-
+#include <wx/stdpaths.h>
 #include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
@@ -34,8 +34,6 @@
 #include "RouteMapOverlay.h"
 #include "WeatherRouting.h"
 #include "weather_routing_pi.h"
-
-// the class factories, used to create and destroy instances of the PlugIn
 
 extern "C" DECL_EXP opencpn_plugin* create_pi(void *ppimgr)
 {
@@ -115,6 +113,7 @@ bool weather_routing_pi::DeInit(void)
     if(m_pWeather_Routing)
         m_pWeather_Routing->Close();
     delete m_pWeather_Routing;
+    m_pWeather_Routing = NULL;
     return true;
 }
 
@@ -286,17 +285,20 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
     if(!m_pWeather_Routing)
         return;
 
-    if(id == m_startroute_menu_id) {
-        m_pWeather_Routing->m_ConfigurationDialog
-            .m_tStartLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
-        m_pWeather_Routing->m_ConfigurationDialog
-            .m_tStartLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
-    } else
-    if(id == m_endroute_menu_id) {
-        m_pWeather_Routing->m_ConfigurationDialog
-            .m_tEndLat->SetValue(wxString::Format(_T("%f"), m_cursor_lat));
-        m_pWeather_Routing->m_ConfigurationDialog
-            .m_tEndLon->SetValue(wxString::Format(_T("%f"), m_cursor_lon));
+    if(id == m_startroute_menu_id || id == m_endroute_menu_id) {
+        RouteMapOverlay *routemapoverlay = m_pWeather_Routing->CurrentRouteMap(true);
+        if(routemapoverlay) {
+            RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+            if(id == m_startroute_menu_id) {
+                configuration.StartLat = m_cursor_lat;
+                configuration.StartLon = m_cursor_lon;
+            } else {
+                configuration.EndLat = m_cursor_lat;
+                configuration.EndLon = m_cursor_lon;
+            }
+            routemapoverlay->SetConfiguration(configuration);
+            m_pWeather_Routing->m_ConfigurationDialog.SetConfiguration(configuration);
+        }
     } else
         return;
 
@@ -307,7 +309,7 @@ bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
         ocpnDC odc(dc);
-        m_pWeather_Routing->RenderRouteMap(odc, *vp);
+        m_pWeather_Routing->Render(odc, *vp);
         return true;
     }
     return false;
@@ -317,7 +319,7 @@ bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort 
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
         ocpnDC odc;
-        m_pWeather_Routing->RenderRouteMap(odc, *vp);
+        m_pWeather_Routing->Render(odc, *vp);
         return true;
     }
     return false;
@@ -348,4 +350,20 @@ bool weather_routing_pi::SaveConfig(void)
 void weather_routing_pi::SetColorScheme(PI_ColorScheme cs)
 {
       DimeWindow(m_pWeather_Routing);
+}
+
+wxString weather_routing_pi::StandardPath()
+{
+    wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
+#ifdef __WXMSW__
+    wxString stdPath  = std_path.GetConfigDir();
+#endif
+#ifdef __WXGTK__
+    wxString stdPath  = std_path.GetUserDataDir();
+#endif
+#ifdef __WXOSX__
+    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
+#endif
+
+    return stdPath + wxFileName::GetPathSeparator();
 }

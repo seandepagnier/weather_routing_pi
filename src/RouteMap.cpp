@@ -1942,6 +1942,8 @@ void RouteMap::Reset(wxDateTime time)
     Lock();
     Clear();
 
+    m_Configuration.boat.OpenXML(m_Configuration.boatFileName);
+
     m_NewGrib = NULL;
     m_NewTime = time;
     m_bNeedsGrib = m_Configuration.UseGrib;
