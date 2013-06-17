@@ -1937,7 +1937,7 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
     return minpos;
 }
 
-void RouteMap::Reset(wxDateTime time)
+void RouteMap::Reset()
 {
     Lock();
     Clear();
@@ -1945,7 +1945,7 @@ void RouteMap::Reset(wxDateTime time)
     m_Configuration.boat.OpenXML(m_Configuration.boatFileName);
 
     m_NewGrib = NULL;
-    m_NewTime = time;
+    m_NewTime = m_Configuration.StartTime;
     m_bNeedsGrib = m_Configuration.UseGrib;
 
     m_bReachedDestination = false;

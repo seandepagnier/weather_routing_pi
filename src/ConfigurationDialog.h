@@ -43,6 +43,8 @@ public:
     ~ConfigurationDialog();
 
     void SetConfiguration(RouteMapConfiguration configuration);
+    void Update();
+
     RouteMapConfiguration Configuration();
 
     wxDateTime m_GribTimelineTime;
@@ -65,7 +67,6 @@ private:
     enum ConfigurationItem {START, END, START_TIME, TIME_STEP};
 
     void SetStartDateTime(wxDateTime datetime);
-    void Update();
 
     WeatherRouting *m_WeatherRouting;
     weather_routing_pi   &Plugin;

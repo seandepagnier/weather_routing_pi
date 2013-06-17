@@ -298,6 +298,7 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
             }
             routemapoverlay->SetConfiguration(configuration);
             m_pWeather_Routing->m_ConfigurationDialog.SetConfiguration(configuration);
+            m_pWeather_Routing->m_ConfigurationDialog.Update();
         }
     } else
         return;

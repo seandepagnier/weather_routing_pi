@@ -205,7 +205,6 @@ int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
         }
     }
 
-
     return curplan;
 }
 

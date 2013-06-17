@@ -268,8 +268,8 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
 {
     m_tName->SetValue(configuration.Name);
 
-    m_tStartLat->SetValue(wxString::Format(_T("%.4f"), &configuration.StartLat));
-    m_tStartLon->SetValue(wxString::Format(_T("%.4f"), &configuration.StartLon));
+    m_tStartLat->SetValue(wxString::Format(_T("%.5f"), configuration.StartLat));
+    m_tStartLon->SetValue(wxString::Format(_T("%.5f"), configuration.StartLon));
 
     m_dpStartDate->SetValue(configuration.StartTime);
     m_tStartHour->SetValue(wxString::Format(_T("%.2f"),
@@ -287,8 +287,8 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
     dt -= minutes * 60;
     m_sTimeStepSeconds->SetValue(wxString::Format(_T("%d"), dt));
 
-    m_tEndLat->SetValue(wxString::Format(_T("%.4f"), &configuration.EndLat));
-    m_tEndLon->SetValue(wxString::Format(_T("%.4f"), &configuration.EndLon));
+    m_tEndLat->SetValue(wxString::Format(_T("%.5f"), configuration.EndLat));
+    m_tEndLon->SetValue(wxString::Format(_T("%.5f"), configuration.EndLon));
 
     m_lDegreeSteps->Clear();
     for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
@@ -311,6 +311,8 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
 
     m_cbUseGrib->SetValue(configuration.UseGrib);
     m_cbUseClimatology->SetValue(configuration.UseClimatology);
+
+//    Update();
 }
 
 RouteMapConfiguration ConfigurationDialog::Configuration()
@@ -372,18 +374,21 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
 
     configuration.UseGrib = m_cbUseGrib->GetValue();
     configuration.UseClimatology = m_cbUseClimatology->GetValue();
-//    configuration.boat = m_pBoatDialog->m_Boat;
 
-//    m_RouteMapOverlay.SetConfiguration(configuration);
-//    m_RouteMapOverlay.Reset(time);
     return configuration;
 }
 
 void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 {
-    m_dpStartDate->SetValue(datetime);
-    m_tStartHour->SetValue(wxString::Format(_T("%.3f"), datetime.GetHour()
-                                            +datetime.GetMinute() / 60.0));
+    if(datetime.IsValid()) {
+        m_dpStartDate->SetValue(datetime);
+        m_tStartHour->SetValue(wxString::Format(_T("%.3f"), datetime.GetHour()
+                                                +datetime.GetMinute() / 60.0));
+    } else {
+        wxMessageDialog mdlg(this, _("Invalid Date Time."),
+                             wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
+        mdlg.ShowModal();
+    }
 }
 
 void ConfigurationDialog::Update()

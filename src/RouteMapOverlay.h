@@ -51,7 +51,8 @@ public:
     bool SetCursorLatLon(double lat, double lon);
     void RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronThickness,
                         ocpnDC &dc, PlugIn_ViewPort &vp);
-    void Render(wxDateTime time, SettingsDialog &settingsdialog, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void Render(wxDateTime time, SettingsDialog &settingsdialog,
+                ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute);
     void RenderCourse(Position *pos, wxDateTime time, bool SquaresAtSailChanges,
                       ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
@@ -68,8 +69,10 @@ public:
 
     void Start();
     void Stop();
+    void DeleteThread();
 
     bool m_UpdateOverlay;
+    bool m_bEndRouteVisible;
 
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent, int AlternateRouteThickness,

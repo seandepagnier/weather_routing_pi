@@ -75,7 +75,7 @@ void SettingsDialog::LoadSettings()
     m_cbSquaresAtSailChanges->SetValue(SquaresAtSailChanges);
 
     int ConcurrentThreads = m_sConcurrentThreads->GetValue();
-    pConf->Read( _T("RouteThickness"), &ConcurrentThreads, ConcurrentThreads);
+    pConf->Read( _T("ConcurrentThreads"), &ConcurrentThreads, ConcurrentThreads);
     m_sConcurrentThreads->SetValue(ConcurrentThreads);
     
     wxPoint p = GetPosition();

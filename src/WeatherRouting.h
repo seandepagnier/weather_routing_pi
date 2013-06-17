@@ -58,6 +58,7 @@ private:
     void OnConfiguration();
     void OnConfiguration( wxMouseEvent& event ) { OnConfiguration(); }
     void OnWeatherRouteSelected( wxListEvent& event );
+    void OnWeatherRoutesListLeftDown(wxMouseEvent &event);
     void OnCompute( wxCommandEvent& event );
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
@@ -83,6 +84,7 @@ private:
     void SaveXML(wxString filename);
 
     void AddConfiguration(RouteMapConfiguration configuration);
+    void UpdateRouteMap(RouteMapOverlay *routemapoverlay);
     void UpdateItem(long index);
 
     RouteMap *SelectedRouteMap();
@@ -90,6 +92,9 @@ private:
 
     void Start();
     void Stop();
+
+    void DeleteRouteMap(RouteMapOverlay *routemapoverlay);
+    RouteMapConfiguration DefaultConfiguration();
 
     SettingsDialog m_SettingsDialog;
     StatisticsDialog m_StatisticsDialog;
@@ -103,6 +108,9 @@ private:
     wxDateTime m_StartTime;
 
     wxString m_default_configuration_path;
+
+    int m_RoutesToRun;
+    bool m_bSkipUpdateCurrentItem;
 };
 
 #endif

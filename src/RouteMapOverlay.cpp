@@ -43,20 +43,22 @@ RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
 
 void *RouteMapOverlayThread::Entry()
 {
-    while(!TestDestroy())
+    while(!TestDestroy() && !m_RouteMapOverlay.Finished())
         if(!m_RouteMapOverlay.Propagate())
             wxThread::Sleep(150);
         else {
             m_RouteMapOverlay.UpdateDestination();
             wxThread::Sleep(50);
         }
+
+    m_RouteMapOverlay.DeleteThread();
     return 0;
 }
 
 RouteMapOverlay::RouteMapOverlay()
-    : m_UpdateOverlay(true), m_Thread(NULL),
+    : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_scale(1), m_scale_changed(false)
+      m_bUpdated(false), m_overlaylist(0), m_scale(1), m_scale_changed(false)
 {
 }
 
@@ -81,7 +83,12 @@ void RouteMapOverlay::Start()
 void RouteMapOverlay::Stop()
 {
     m_Thread->Delete();
-    delete m_Thread;
+    DeleteThread();
+}
+
+void RouteMapOverlay::DeleteThread()
+{
+//    delete m_Thread;
     m_Thread = NULL;
 }
 
@@ -172,10 +179,11 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent, int Al
 }
 
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
-                             ocpnDC &dc, PlugIn_ViewPort &vp)
+                             ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute)
 {
-    /* render start and end */
+    if(!justendroute) {
     RouteMapConfiguration configuration = GetConfiguration();
+
     wxPoint r;
     GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
     SetColor(dc, true, *wxBLUE, 3);
@@ -290,6 +298,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         if(!dc.GetDC())
             glEndList();
     }
+    }
     
     int RouteThickness = settingsdialog.m_sRouteThickness->GetValue();
     if(RouteThickness) {
@@ -297,8 +306,10 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             DestinationColor = settingsdialog.m_cpDestinationRoute->GetColour();
         bool SquaresAtSailChanges = settingsdialog.m_cbSquaresAtSailChanges->GetValue();
 
-        SetColor(dc, true, CursorColor, RouteThickness);
-        RenderCourse(last_cursor_position, time, SquaresAtSailChanges, dc, vp);
+        if(!justendroute) {
+            SetColor(dc, true, CursorColor, RouteThickness);
+            RenderCourse(last_cursor_position, time, SquaresAtSailChanges, dc, vp);
+        }
         SetColor(dc, true, DestinationColor, RouteThickness);
         RenderCourse(last_destination_position, time, SquaresAtSailChanges, dc, vp);
     }
@@ -419,11 +430,13 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
 
         PlotData data;
         /* this omits the starting position */
-        double dt;
-        if(p == destination_position)
-            dt = 0;
-        else
-            dt = ((itn==it?EndDate():(*itn)->time) - (*it)->time).GetSeconds().ToDouble();
+        double dt = 0;
+        if(p != destination_position) {
+            wxDateTime enddate = itn==it ? EndDate() : (*itn)->time;
+            wxDateTime startdate = (*it)->time;
+            if(startdate.IsValid() && enddate.IsValid())
+                dt = (enddate - startdate).GetSeconds().ToDouble();
+        }
         data.time = (*it)->time;
         data.lat = p->lat, data.lon = p->lon;
         if(l->GetPlotData(grib, dt, configuration, data))
@@ -467,6 +480,8 @@ void RouteMapOverlay::RouteInfo(double &distance, double &avgspeed, double &perc
             totalW++;
         count++;
     }
+    if(distance == 0)
+        distance = NAN;
     avgspeed = avgspeedtotal / count;
     percentage_upwind = 100.0 * totalW / count;
 }

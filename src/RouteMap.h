@@ -149,9 +149,9 @@ struct RouteMapConfiguration {
 
     double StartLat, StartLon;
     wxDateTime StartTime;
-    double dt; /* time in seconds between propagations */
-
     double EndLat, EndLon;
+
+    double dt; /* time in seconds between propagations */
 
     Boat boat;
     wxString boatFileName;
@@ -175,6 +175,8 @@ struct RouteMapConfiguration {
     by about 8%.  Is it even useful?  */
 };
 
+bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
+
 class RouteMap
 {
 public:
@@ -183,7 +185,7 @@ public:
     RouteMap();
     virtual ~RouteMap();
 
-    void Reset(wxDateTime time);
+    void Reset();
 
 #define LOCKING_ACCESSOR(name, flag) bool name() { Lock(); bool ret = flag; Unlock(); return ret; }
     LOCKING_ACCESSOR(Finished, m_bFinished)
@@ -196,7 +198,10 @@ public:
     wxDateTime NewTime() { Lock(); wxDateTime time =  m_NewTime; Unlock(); return time; }
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
-    void SetConfiguration(RouteMapConfiguration &o) { Lock(); m_Configuration = o; m_Configuration.Update(); Unlock(); }
+    void SetConfiguration(RouteMapConfiguration &o) { Lock();
+        m_Configuration = o; m_Configuration.Update();
+        m_bFinished = false;
+        Unlock(); }
     RouteMapConfiguration GetConfiguration() { Lock(); RouteMapConfiguration o = m_Configuration; Unlock(); return o; }
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
     bool Propagate();

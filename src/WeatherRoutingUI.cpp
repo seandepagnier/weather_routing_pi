@@ -145,6 +145,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	// Connect Events
 	m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnConfiguration ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
 	m_bCompute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingBase::OnCompute ), NULL, this );
@@ -171,6 +172,7 @@ WeatherRoutingBase::~WeatherRoutingBase()
 {
 	// Disconnect Events
 	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnConfiguration ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
 	m_bCompute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingBase::OnCompute ), NULL, this );
@@ -347,7 +349,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer921->SetFlexibleDirection( wxBOTH );
 	fgSizer921->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_sTimeStepHours = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 0 );
+	m_sTimeStepHours = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10, 1 );
 	fgSizer921->Add( m_sTimeStepHours, 0, wxALL, 5 );
 	
 	m_staticText110 = new wxStaticText( this, wxID_ANY, _("h"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -516,7 +518,17 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer22->SetFlexibleDirection( wxBOTH );
 	fgSizer22->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_lDegreeSteps = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+	m_lDegreeSteps = new wxListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	m_lDegreeSteps->Append( _("-45") );
+	m_lDegreeSteps->Append( _("45") );
+	m_lDegreeSteps->Append( _("-60") );
+	m_lDegreeSteps->Append( _("60") );
+	m_lDegreeSteps->Append( _("-90") );
+	m_lDegreeSteps->Append( _("90") );
+	m_lDegreeSteps->Append( _("-120") );
+	m_lDegreeSteps->Append( _("120") );
+	m_lDegreeSteps->Append( _("-150") );
+	m_lDegreeSteps->Append( _("150") );
 	m_lDegreeSteps->SetMinSize( wxSize( 60,-1 ) );
 	
 	fgSizer22->Add( m_lDegreeSteps, 0, wxALL|wxEXPAND, 5 );
@@ -570,7 +582,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText115->Wrap( -1 );
 	fgSizer107->Add( m_staticText115, 0, wxALL, 5 );
 	
-	m_tToDegrees = new wxTextCtrl( this, wxID_ANY, _("150"), wxDefaultPosition, wxSize( 40,-1 ), 0 );
+	m_tToDegrees = new wxTextCtrl( this, wxID_ANY, _("170"), wxDefaultPosition, wxSize( 40,-1 ), 0 );
 	fgSizer107->Add( m_tToDegrees, 0, wxALL, 5 );
 	
 	m_staticText116 = new wxStaticText( this, wxID_ANY, _("Degrees"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -874,7 +886,7 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_staticText115->Wrap( -1 );
 	fgSizer93->Add( m_staticText115, 0, wxALL, 5 );
 	
-	m_sConcurrentThreads = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 64, 2 );
+	m_sConcurrentThreads = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 64, 1 );
 	fgSizer93->Add( m_sConcurrentThreads, 0, wxALL, 5 );
 	
 	
