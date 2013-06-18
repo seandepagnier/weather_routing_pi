@@ -2407,8 +2407,8 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_staticText124->Wrap( -1 );
 	fgSizer77->Add( m_staticText124, 0, wxALL, 5 );
 	
-	m_StartSpacingDays = new wxTextCtrl( m_panel8, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), 0 );
-	fgSizer77->Add( m_StartSpacingDays, 0, wxALL, 5 );
+	m_tStartSpacingDays = new wxTextCtrl( m_panel8, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 40,-1 ), 0 );
+	fgSizer77->Add( m_tStartSpacingDays, 0, wxALL, 5 );
 	
 	m_staticText125 = new wxStaticText( m_panel8, wxID_ANY, _("day(s)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText125->Wrap( -1 );
@@ -2428,7 +2428,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel8->SetSizer( fgSizer77 );
 	m_panel8->Layout();
 	fgSizer77->Fit( m_panel8 );
-	m_notebook3->AddPage( m_panel8, _("Start Time"), false );
+	m_notebook3->AddPage( m_panel8, _("Start Time"), true );
 	m_panel12 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer62;
 	fgSizer62 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -2575,12 +2575,13 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel9 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer81;
 	fgSizer81 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer81->AddGrowableCol( 0 );
 	fgSizer81->AddGrowableRow( 0 );
 	fgSizer81->SetFlexibleDirection( wxBOTH );
 	fgSizer81->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_listBox4 = new wxListBox( m_panel9, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-	fgSizer81->Add( m_listBox4, 0, wxALL|wxEXPAND, 5 );
+	m_lBoats = new wxListBox( m_panel9, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+	fgSizer81->Add( m_lBoats, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer82;
 	fgSizer82 = new wxFlexGridSizer( 0, 4, 0, 0 );
@@ -2589,9 +2590,6 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	
 	m_bAdd = new wxButton( m_panel9, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_bAdd, 0, wxALL, 5 );
-	
-	m_bEdit = new wxButton( m_panel9, wxID_ANY, _("Edit"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer82->Add( m_bEdit, 0, wxALL, 5 );
 	
 	m_bRemove = new wxButton( m_panel9, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_bRemove, 0, wxALL, 5 );
@@ -2603,7 +2601,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel9->SetSizer( fgSizer81 );
 	m_panel9->Layout();
 	fgSizer81->Fit( m_panel9 );
-	m_notebook3->AddPage( m_panel9, _("Boats"), true );
+	m_notebook3->AddPage( m_panel9, _("Boats"), false );
 	
 	fgSizer76->Add( m_notebook3, 1, wxEXPAND | wxALL, 5 );
 	
@@ -2621,8 +2619,8 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_bCancel = new wxButton( this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer78->Add( m_bCancel, 0, wxALL, 5 );
 	
-	m_bDone = new wxButton( this, wxID_ANY, _("Done"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer78->Add( m_bDone, 0, wxALL, 5 );
+	m_bGenerate = new wxButton( this, wxID_ANY, _("Generate"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer78->Add( m_bGenerate, 0, wxALL, 5 );
 	
 	
 	fgSizer76->Add( fgSizer78, 1, wxEXPAND, 5 );
@@ -2640,13 +2638,12 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_bRemoveDestination->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveDestination ), NULL, this );
 	m_bClearDestinations->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnClearDestinations ), NULL, this );
 	m_bReciprocateDestinations->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReciprocateDestinations ), NULL, this );
-	m_bAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAdd ), NULL, this );
-	m_bEdit->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnEdit ), NULL, this );
-	m_bRemove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemove ), NULL, this );
+	m_bAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
+	m_bRemove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnInformation ), NULL, this );
 	m_bReset->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReset ), NULL, this );
 	m_bCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnCancel ), NULL, this );
-	m_bDone->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDone ), NULL, this );
+	m_bGenerate->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnGenerate ), NULL, this );
 }
 
 ConfigurationBatchDialogBase::~ConfigurationBatchDialogBase()
@@ -2657,12 +2654,11 @@ ConfigurationBatchDialogBase::~ConfigurationBatchDialogBase()
 	m_bRemoveDestination->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveDestination ), NULL, this );
 	m_bClearDestinations->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnClearDestinations ), NULL, this );
 	m_bReciprocateDestinations->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReciprocateDestinations ), NULL, this );
-	m_bAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAdd ), NULL, this );
-	m_bEdit->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnEdit ), NULL, this );
-	m_bRemove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemove ), NULL, this );
+	m_bAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
+	m_bRemove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnInformation ), NULL, this );
 	m_bReset->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReset ), NULL, this );
 	m_bCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnCancel ), NULL, this );
-	m_bDone->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDone ), NULL, this );
+	m_bGenerate->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnGenerate ), NULL, this );
 	
 }

@@ -32,29 +32,15 @@
 #include <math.h>
 #include <time.h>
 
+#include "weather_routing_pi.h"
 #include "ConfigurationBatchDialog.h"
 #include "Boat.h"
 #include "RouteMap.h"
 
 ConfigurationBatchDialog::ConfigurationBatchDialog(wxWindow *parent, RouteMapConfiguration configuration)
-    : ConfigurationBatchDialogBase(parent)
+    : ConfigurationBatchDialogBase(parent), m_boatFileName(configuration.boatFileName)
 {
-    wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
-#ifdef __WXMSW__
-    wxString stdPath  = std_path.GetConfigDir();
-#endif
-#ifdef __WXGTK__
-    wxString stdPath  = std_path.GetUserDataDir();
-#endif
-#ifdef __WXOSX__
-    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
-#endif
-
-    wxString batch_path = stdPath + wxFileName::GetPathSeparator() + _T("batchs.xml");
-}
-
-ConfigurationBatchDialog::~ConfigurationBatchDialog()
-{
+    Reset();
 }
 
 void ConfigurationBatchDialog::OnRemoveSource( wxCommandEvent& event )
@@ -89,25 +75,32 @@ void ConfigurationBatchDialog::OnReciprocateDestinations( wxCommandEvent& event 
 {
 }
 
-void ConfigurationBatchDialog::OnAdd( wxCommandEvent& event )
+void ConfigurationBatchDialog::OnAddBoat( wxCommandEvent& event )
 {
+    wxFileDialog openDialog
+        ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+          wxT ( "XML Weather Routing files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
+          wxFD_OPEN  );
+
+    if(openDialog.ShowModal() == wxID_OK)
+        m_lBoats->Append(openDialog.GetPath());
 }
 
-void ConfigurationBatchDialog::OnEdit( wxCommandEvent& event )
+void ConfigurationBatchDialog::OnRemoveBoat( wxCommandEvent& event )
 {
-}
-
-void ConfigurationBatchDialog::OnRemove( wxCommandEvent& event )
-{
+    int index = m_lBoats->GetSelection();
+    if(index >= 0)
+        m_lBoats->Delete(index);
 }
 
 void ConfigurationBatchDialog::OnReset( wxCommandEvent& event )
 {
+    Reset();
 }
 
 void ConfigurationBatchDialog::OnInformation( wxCommandEvent& event )
 {
-    wxMessageDialog mdlg(this, _("Zero Time Step invalid"),
+    wxMessageDialog mdlg(this, _("Batch mode  iterates over the current route map configuration\n"),
                          _("Weather Routing"), wxOK | wxICON_WARNING);
     mdlg.ShowModal();
 }
@@ -120,4 +113,15 @@ void ConfigurationBatchDialog::OnCancel( wxCommandEvent& event )
 void ConfigurationBatchDialog::OnDone( wxCommandEvent& event )
 {
     EndModal(wxID_OK);
+}
+
+void ConfigurationBatchDialog::Reset()
+{
+    m_tStartDays->SetValue(_T("0"));
+    m_tStartHours->SetValue(_T("0"));
+    m_tStartSpacingDays->SetValue(_T("1"));
+    m_tStartSpacingHours->SetValue(_T("0"));
+
+    m_lBoats->Clear();
+    m_lBoats->Append(m_boatFileName);
 }

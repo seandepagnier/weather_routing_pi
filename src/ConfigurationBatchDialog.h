@@ -37,9 +37,7 @@ class weather_routing_pi;
 class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
 {
 public:
-
     ConfigurationBatchDialog( wxWindow *parent, RouteMapConfiguration configuration);
-    ~ConfigurationBatchDialog();
 
 protected:
     void OnRemoveSource( wxCommandEvent& event );
@@ -47,13 +45,16 @@ protected:
     void OnRemoveDestination( wxCommandEvent& event );
     void OnClearDestinations( wxCommandEvent& event );
     void OnReciprocateDestinations( wxCommandEvent& event );
-    void OnAdd( wxCommandEvent& event );
-    void OnEdit( wxCommandEvent& event );
-    void OnRemove( wxCommandEvent& event );
+    void OnAddBoat( wxCommandEvent& event );
+    void OnRemoveBoat( wxCommandEvent& event );
     void OnReset( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
     void OnDone( wxCommandEvent& event );
+
+    void Reset();
+
+    wxString m_boatFileName;
 };
 
 #endif

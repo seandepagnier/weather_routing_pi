@@ -321,12 +321,35 @@ void WeatherRouting::OnNew( wxCommandEvent& event )
 
 void WeatherRouting::OnBatch( wxCommandEvent& event )
 {
-    if(CurrentRouteMap(true)) {
-        wxMessageDialog mdlg(this, _T("This function is Unimplemented"), _("OpenCPN Alert"), wxOK);
-        mdlg.ShowModal();
+    RouteMapOverlay *routemapoverlay = CurrentRouteMap(true);
+    if(routemapoverlay) {
+        RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+        ConfigurationBatchDialog dlg(this, configuration);
+        if(dlg.ShowModal() == wxID_OK) {
+            wxTimeSpan StartSpan, StartSpacingSpan;
+            double days, hours;
 
-        ConfigurationBatchDialog dlg(this, CurrentRouteMap()->GetConfiguration());
-        dlg.ShowModal();
+            dlg.m_tStartDays->GetValue().ToDouble(&days);
+            StartSpan = wxTimeSpan::Days(days);
+
+            dlg.m_tStartHours->GetValue().ToDouble(&hours);
+            StartSpan += wxTimeSpan::Hours(hours);
+
+            dlg.m_tStartSpacingDays->GetValue().ToDouble(&days);
+            StartSpacingSpan = wxTimeSpan::Days(days);
+
+            dlg.m_tStartSpacingHours->GetValue().ToDouble(&hours);
+            StartSpacingSpan += wxTimeSpan::Hours(hours);
+
+            wxDateTime EndTime = configuration.StartTime+StartSpan;
+            for(; configuration.StartTime <= EndTime; configuration.StartTime += StartSpacingSpan) {
+                for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
+                    configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
+                    AddConfiguration(configuration);
+                }
+            }
+            DeleteRouteMap(routemapoverlay);
+        }
     }
 }
 

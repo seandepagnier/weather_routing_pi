@@ -594,14 +594,10 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText108;
 		wxStaticText* m_stStartDateTime;
 		wxStaticText* m_staticText121;
-		wxTextCtrl* m_tStartDays;
 		wxStaticText* m_staticText122;
-		wxTextCtrl* m_tStartHours;
 		wxStaticText* m_staticText123;
 		wxStaticText* m_staticText124;
-		wxTextCtrl* m_StartSpacingDays;
 		wxStaticText* m_staticText125;
-		wxTextCtrl* m_tStartSpacingHours;
 		wxStaticText* m_staticText126;
 		wxPanel* m_panel12;
 		wxListBox* m_lSources;
@@ -615,14 +611,12 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxButton* m_bOpen;
 		wxButton* m_bSave;
 		wxPanel* m_panel9;
-		wxListBox* m_listBox4;
 		wxButton* m_bAdd;
-		wxButton* m_bEdit;
 		wxButton* m_bRemove;
 		wxButton* m_bInformation;
 		wxButton* m_bReset;
 		wxButton* m_bCancel;
-		wxButton* m_bDone;
+		wxButton* m_bGenerate;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnRemoveSource( wxCommandEvent& event ) { event.Skip(); }
@@ -630,16 +624,20 @@ class ConfigurationBatchDialogBase : public wxDialog
 		virtual void OnRemoveDestination( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClearDestinations( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReciprocateDestinations( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAdd( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEdit( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRemove( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGenerate( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
+		wxTextCtrl* m_tStartDays;
+		wxTextCtrl* m_tStartHours;
+		wxTextCtrl* m_tStartSpacingDays;
+		wxTextCtrl* m_tStartSpacingHours;
+		wxListBox* m_lBoats;
 		
 		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationBatchDialogBase();
