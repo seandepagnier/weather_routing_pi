@@ -187,8 +187,8 @@ int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
 {
     for(int rounds = 0; rounds < 10; rounds++) {
         BoatPlan &boatplan = *Plans[curplan];
-        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell,
-                                                   gribtime, lat, lon, daytime);
+        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell, gribtime,
+                                                   lat, lon, daytime);
         if(Name.empty())
             return curplan;
 

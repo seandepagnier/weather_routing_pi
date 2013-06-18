@@ -112,8 +112,10 @@ bool weather_routing_pi::DeInit(void)
 {
     if(m_pWeather_Routing)
         m_pWeather_Routing->Close();
-    delete m_pWeather_Routing;
-    m_pWeather_Routing = NULL;
+    WeatherRouting *wr = m_pWeather_Routing;
+    m_pWeather_Routing = NULL; /* needed first as destructor may call event loop */
+    delete wr;
+
     return true;
 }
 

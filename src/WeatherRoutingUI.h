@@ -17,9 +17,9 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/string.h>
-#include <wx/sizer.h>
 #include <wx/button.h>
 #include <wx/gauge.h>
+#include <wx/sizer.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -65,6 +65,7 @@ class WeatherRoutingBase : public wxFrame
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnConfiguration( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }

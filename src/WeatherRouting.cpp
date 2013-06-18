@@ -77,6 +77,30 @@ static const char *eye[]={
 
 enum {VISIBLE=0, NAME, START, END, TIME, DISTANCE, AVGSPEED, STATE};
 
+static int sortcol, sortorder = 1;
+// sort callback. Sort by body.
+#if wxCHECK_VERSION(2, 9, 0)
+int wxCALLBACK SortWeatherRoutes(long item1, long item2, wxIntPtr list)
+#else
+int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
+#endif            
+{
+    wxListCtrl *lc = (wxListCtrl*)list;
+
+    wxListItem it1, it2;
+
+    it1.SetId(lc->FindItem(-1, item1));
+    it1.SetColumn(sortcol);
+    
+    it2.SetId(lc->FindItem(-1, item2));
+    it2.SetColumn(sortcol);
+    
+    lc->GetItem(it1);
+    lc->GetItem(it2);
+    
+    return sortorder * it1.GetText().Cmp(it2.GetText());
+}
+
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(this, plugin),
       m_SettingsDialog(this), m_StatisticsDialog(this),
@@ -124,7 +148,6 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     pConf->Read ( _T ( "DialogWidth" ), &s.x, s.x);
     pConf->Read ( _T ( "DialogHeight" ), &s.y, s.y);
     SetSize(s);
-
 
     /* periodically check for updates from computation thread */
     m_tCompute.Connect(wxEVT_TIMER, wxTimerEventHandler
@@ -180,6 +203,13 @@ void WeatherRouting::OnConfiguration()
 {
     if(CurrentRouteMap(true))
         m_ConfigurationDialog.Show();
+}
+
+void WeatherRouting::OnWeatherRouteSort( wxListEvent& event )
+{
+    sortcol = event.GetColumn();
+    sortorder = -sortorder;
+    m_lWeatherRoutes->SortItems(SortWeatherRoutes, (long)m_lWeatherRoutes);
 }
 
 void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
@@ -324,6 +354,8 @@ void WeatherRouting::OnFilter( wxCommandEvent& event )
 void WeatherRouting::OnReset ( wxCommandEvent& event )
 {
     Reset();
+    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
+        UpdateItem(i);
 }
 
 void WeatherRouting::OnExportAll( wxCommandEvent& event )
@@ -666,9 +698,9 @@ void WeatherRouting::UpdateItem(long index)
     routemapoverlay->RouteInfo(distance, avgspeed, percentage_upwind);
 
     m_lWeatherRoutes->SetItem(index, DISTANCE, isnan(distance) ? _T("N/A") :
-                              wxString::Format(_T("%.0f nm"), distance));
+                              wxString::Format(_T("%2.f nm"), distance));
     m_lWeatherRoutes->SetItem(index, AVGSPEED, isnan(avgspeed) ? _T("N/A") :
-                              wxString::Format(_T("%.1f knots"), avgspeed));
+                              wxString::Format(_T("%.2f knots"), avgspeed));
 #if 0
     m_lWeatherRoutes->SetItem(index, PERCENTAGE_UPWIND, isnan(percentage_upwind) ? _T("N/A") :
                               wxString::Format(_T("%.0f%%"), percentage_upwind));
@@ -702,8 +734,14 @@ void WeatherRouting::UpdateCurrentItem(RouteMapConfiguration configuration)
     if(m_bSkipUpdateCurrentItem)
         return;
 
-    if(CurrentRouteMap())
+    if(CurrentRouteMap()) {
+        for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
+            it != m_RunningRouteMaps.end(); it++)
+            if(*it == CurrentRouteMap())
+                (*it)->Stop();
+
         CurrentRouteMap()->SetConfiguration(configuration);
+    }
 
     long index = m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if (index < 0) return;
@@ -757,13 +795,15 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
 
 void WeatherRouting::Start()
 {
-    Reset();
+    m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
 
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
         RouteMapOverlay *routemapoverlay =
             reinterpret_cast<RouteMapOverlay*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
-        if(!routemapoverlay->Finished())
+        if(!routemapoverlay->Finished()) {
+            routemapoverlay->Reset();
             m_WaitingRouteMaps.push_back(routemapoverlay);
+        }
     }
     m_RoutesToRun = m_WaitingRouteMaps.size();
     m_gProgress->SetRange(m_RoutesToRun);
@@ -778,8 +818,10 @@ void WeatherRouting::Start()
 void WeatherRouting::Stop()
 {
     for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
-        it != m_RunningRouteMaps.end(); it++)
+        it != m_RunningRouteMaps.end(); it++) {
         (*it)->Stop();
+        UpdateRouteMap(*it);
+    }
 
     m_RunningRouteMaps.clear();
     m_WaitingRouteMaps.clear();
@@ -802,7 +844,6 @@ void WeatherRouting::Reset()
         routemap->Reset();
     }
 
-    m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
     GetParent()->Refresh();
 }
 

@@ -57,6 +57,7 @@ public:
 private:
     void OnConfiguration();
     void OnConfiguration( wxMouseEvent& event ) { OnConfiguration(); }
+    void OnWeatherRouteSort( wxListEvent& event );
     void OnWeatherRouteSelected( wxListEvent& event );
     void OnWeatherRoutesListLeftDown(wxMouseEvent &event);
     void OnCompute( wxCommandEvent& event );
