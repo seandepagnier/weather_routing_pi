@@ -45,6 +45,8 @@ private:
 class RouteMapOverlay : public RouteMap
 {
 public:
+    enum RouteInfoType {DISTANCE, AVGSPEED, PERCENTAGE_UPWIND, PORT_STARBOARD, AVGWIND, AVGWAVE};
+
     RouteMapOverlay();
     ~RouteMapOverlay();
 
@@ -57,6 +59,7 @@ public:
                       ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
     std::list<PlotData> GetPlotData();
+    double RouteInfo(enum RouteInfoType type);
     void RouteInfo(double &distance, double &avgspeed, double &percentage_upwind);
 
     bool Updated();

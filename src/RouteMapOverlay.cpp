@@ -458,32 +458,61 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
     return plotdatalist;
 }
 
-void RouteMapOverlay::RouteInfo(double &distance, double &avgspeed, double &percentage_upwind)
+double RouteMapOverlay::RouteInfo(enum RouteInfoType type)
 {
     std::list<PlotData> plotdata = GetPlotData();
-    distance = 0;
-    double avgspeedtotal = 0, totalW = 0, count = 0;
-    double lat0, lon0;
+    double total = 0, count = 0, lat0, lon0;
     for(std::list<PlotData>::iterator it=plotdata.begin(); it!=plotdata.end(); it++)
     {
-        if(it != plotdata.begin()) {
-            double dist;
-            DistanceBearingMercator_Plugin(lat0, lon0, it->lat, it->lon, 0, &dist);
-            distance += dist;
+        switch(type) {
+        case DISTANCE:
+        {
+            if(it != plotdata.begin()) {
+                double dist;
+                DistanceBearingMercator_Plugin(lat0, lon0, it->lat, it->lon, 0, &dist);
+                total += dist;
+            }
+            lat0 = it->lat;
+            lon0 = it->lon;
+        } break;
+        case AVGSPEED:
+            total += it->VBG;
+            break;
+        case PERCENTAGE_UPWIND:
+            if(fabs(it->B - it->W) < 90)
+                total++;
+            break;
+        case PORT_STARBOARD:
+            if(it->B - it->W > 0)
+                total++;
+            break;
+        case AVGWIND:
+            total += it->VW;
+            break;
+        case AVGWAVE:
+            total += it->WVHT;
+            break;
         }
 
-        lat0 = it->lat;
-        lon0 = it->lon;
-
-        avgspeedtotal += it->VBG;
-        if(fabs(it->B - it->W) < 90)
-            totalW++;
         count++;
     }
-    if(distance == 0)
-        distance = NAN;
-    avgspeed = avgspeedtotal / count;
-    percentage_upwind = 100.0 * totalW / count;
+
+
+    switch(type) {
+    case DISTANCE:
+        if(total == 0)
+            total = NAN;
+        return total;
+    case PERCENTAGE_UPWIND:
+    case PORT_STARBOARD:
+        total *= 100.0;
+    case AVGSPEED:
+    case AVGWIND:
+    case AVGWAVE:
+        total /= count;
+        break;
+    }
+    return total;
 }
 
 void RouteMapOverlay::Clear()

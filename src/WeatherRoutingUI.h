@@ -522,10 +522,14 @@ class StatisticsDialogBase : public wxDialog
 	private:
 	
 	protected:
-		wxStaticText* m_staticText47;
-		wxStaticText* m_stState;
 		wxStaticText* m_staticText511;
 		wxStaticText* m_stRunTime;
+		wxStaticText* m_staticText116;
+		wxStaticText* m_staticText125;
+		wxStaticText* m_staticText121;
+		wxStaticText* m_staticText123;
+		wxStaticText* m_staticText47;
+		wxStaticText* m_stState;
 		wxStaticText* m_staticText53;
 		wxStaticText* m_stIsoChrons;
 		wxStaticText* m_staticText55;
@@ -540,9 +544,40 @@ class StatisticsDialogBase : public wxDialog
 		wxButton* m_sdbSizer5OK;
 	
 	public:
+		wxStaticText* m_stPercentageUpwind;
+		wxStaticText* m_stPortStarboard;
+		wxStaticText* m_stAverageWindKnots;
+		wxStaticText* m_stAverageWaveHeight;
 		
 		StatisticsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Statistics"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~StatisticsDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class FilterRoutesDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class FilterRoutesDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxChoice* m_cCategory;
+		wxTextCtrl* m_tFilter;
+		wxButton* m_button48;
+		wxButton* m_bDone;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCategory( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFilterText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnResetAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		FilterRoutesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Filter Routes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~FilterRoutesDialogBase();
 	
 };
 

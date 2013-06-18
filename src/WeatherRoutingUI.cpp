@@ -2153,13 +2153,67 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 	fgSizer55->SetFlexibleDirection( wxBOTH );
 	fgSizer55->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxStaticBoxSizer* sbSizer27;
+	sbSizer27 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Overall") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer94;
+	fgSizer94 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer94->SetFlexibleDirection( wxBOTH );
+	fgSizer94->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText511 = new wxStaticText( this, wxID_ANY, _("Run Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText511->Wrap( -1 );
+	fgSizer94->Add( m_staticText511, 0, wxALL, 5 );
+	
+	m_stRunTime = new wxStaticText( this, wxID_ANY, _("0000"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stRunTime->Wrap( -1 );
+	fgSizer94->Add( m_stRunTime, 0, wxALL, 5 );
+	
+	
+	sbSizer27->Add( fgSizer94, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer55->Add( sbSizer27, 1, wxEXPAND, 5 );
+	
 	wxStaticBoxSizer* sbSizer10;
-	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Statistics") ), wxVERTICAL );
+	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Current Route") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer29;
 	fgSizer29 = new wxFlexGridSizer( 0, 4, 0, 0 );
 	fgSizer29->SetFlexibleDirection( wxBOTH );
 	fgSizer29->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText116 = new wxStaticText( this, wxID_ANY, _("Percentage Upwind"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText116->Wrap( -1 );
+	fgSizer29->Add( m_staticText116, 0, wxALL, 5 );
+	
+	m_stPercentageUpwind = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stPercentageUpwind->Wrap( -1 );
+	fgSizer29->Add( m_stPercentageUpwind, 0, wxALL, 5 );
+	
+	m_staticText125 = new wxStaticText( this, wxID_ANY, _("Port/Starboard"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText125->Wrap( -1 );
+	fgSizer29->Add( m_staticText125, 0, wxALL, 5 );
+	
+	m_stPortStarboard = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stPortStarboard->Wrap( -1 );
+	fgSizer29->Add( m_stPortStarboard, 0, wxALL, 5 );
+	
+	m_staticText121 = new wxStaticText( this, wxID_ANY, _("Average Wind Knots"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText121->Wrap( -1 );
+	fgSizer29->Add( m_staticText121, 0, wxALL, 5 );
+	
+	m_stAverageWindKnots = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stAverageWindKnots->Wrap( -1 );
+	fgSizer29->Add( m_stAverageWindKnots, 0, wxALL, 5 );
+	
+	m_staticText123 = new wxStaticText( this, wxID_ANY, _("Average Wave (M)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText123->Wrap( -1 );
+	fgSizer29->Add( m_staticText123, 0, wxALL, 5 );
+	
+	m_stAverageWaveHeight = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stAverageWaveHeight->Wrap( -1 );
+	fgSizer29->Add( m_stAverageWaveHeight, 0, wxALL, 5 );
 	
 	m_staticText47 = new wxStaticText( this, wxID_ANY, _("State"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText47->Wrap( -1 );
@@ -2169,14 +2223,6 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 	m_stState->Wrap( -1 );
 	fgSizer29->Add( m_stState, 0, wxALL, 5 );
 	
-	m_staticText511 = new wxStaticText( this, wxID_ANY, _("Run Time"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText511->Wrap( -1 );
-	fgSizer29->Add( m_staticText511, 0, wxALL, 5 );
-	
-	m_stRunTime = new wxStaticText( this, wxID_ANY, _("0000"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_stRunTime->Wrap( -1 );
-	fgSizer29->Add( m_stRunTime, 0, wxALL, 5 );
-	
 	m_staticText53 = new wxStaticText( this, wxID_ANY, _("Iso Chrons"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText53->Wrap( -1 );
 	fgSizer29->Add( m_staticText53, 0, wxALL, 5 );
@@ -2184,12 +2230,6 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 	m_stIsoChrons = new wxStaticText( this, wxID_ANY, _("0000"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_stIsoChrons->Wrap( -1 );
 	fgSizer29->Add( m_stIsoChrons, 0, wxALL, 5 );
-	
-	
-	fgSizer29->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer29->Add( 0, 0, 1, wxEXPAND, 5 );
 	
 	m_staticText55 = new wxStaticText( this, wxID_ANY, _("Routes"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText55->Wrap( -1 );
@@ -2246,6 +2286,73 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 
 StatisticsDialogBase::~StatisticsDialogBase()
 {
+}
+
+FilterRoutesDialogBase::FilterRoutesDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer95;
+	fgSizer95 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer95->SetFlexibleDirection( wxBOTH );
+	fgSizer95->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer29;
+	sbSizer29 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Category") ), wxVERTICAL );
+	
+	wxArrayString m_cCategoryChoices;
+	m_cCategory = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cCategoryChoices, 0 );
+	m_cCategory->SetSelection( 0 );
+	sbSizer29->Add( m_cCategory, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer95->Add( sbSizer29, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer28;
+	sbSizer28 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Filter") ), wxVERTICAL );
+	
+	m_tFilter = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer28->Add( m_tFilter, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer95->Add( sbSizer28, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer99;
+	fgSizer99 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer99->SetFlexibleDirection( wxBOTH );
+	fgSizer99->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_button48 = new wxButton( this, wxID_ANY, _("Reset All"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer99->Add( m_button48, 0, wxALL, 5 );
+	
+	m_bDone = new wxButton( this, wxID_ANY, _("Done"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer99->Add( m_bDone, 0, wxALL, 5 );
+	
+	
+	fgSizer95->Add( fgSizer99, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer95 );
+	this->Layout();
+	fgSizer95->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_cCategory->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( FilterRoutesDialogBase::OnCategory ), NULL, this );
+	m_tFilter->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( FilterRoutesDialogBase::OnFilterText ), NULL, this );
+	m_button48->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterRoutesDialogBase::OnResetAll ), NULL, this );
+	m_bDone->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterRoutesDialogBase::OnDone ), NULL, this );
+}
+
+FilterRoutesDialogBase::~FilterRoutesDialogBase()
+{
+	// Disconnect Events
+	m_cCategory->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( FilterRoutesDialogBase::OnCategory ), NULL, this );
+	m_tFilter->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( FilterRoutesDialogBase::OnFilterText ), NULL, this );
+	m_button48->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterRoutesDialogBase::OnResetAll ), NULL, this );
+	m_bDone->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterRoutesDialogBase::OnDone ), NULL, this );
+	
 }
 
 ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )

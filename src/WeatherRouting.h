@@ -35,8 +35,20 @@
 #include "ConfigurationDialog.h"
 #include "SettingsDialog.h"
 #include "StatisticsDialog.h"
+#include "FilterRoutesDialog.h"
 
 class weather_routing_pi;
+
+class WeatherRoute
+{
+public:
+    WeatherRoute(RouteMapOverlay *overlay) : routemapoverlay(overlay) {}
+    void Update();
+
+    bool Filtered;
+    wxString Name, BoatFilename, Start, StartTime, End, Time, Distance, AvgSpeed, State;
+    RouteMapOverlay *routemapoverlay;
+};
 
 class WeatherRouting : public WeatherRoutingBase
 {
@@ -52,7 +64,9 @@ public:
     void UpdateCurrentItem(RouteMapConfiguration configuration);
     RouteMapOverlay *CurrentRouteMap(bool messagedialog = false), *m_RouteMapOverlayNeedingGrib;
 
+    void RebuildList();
     std::list<RouteMapOverlay*> m_RunningRouteMaps, m_WaitingRouteMaps;
+    std::list<WeatherRoute*> m_WeatherRoutes;
 
 private:
     void OnConfiguration();
@@ -99,6 +113,7 @@ private:
 
     SettingsDialog m_SettingsDialog;
     StatisticsDialog m_StatisticsDialog;
+    FilterRoutesDialog m_FilterRoutesDialog;
 
     bool m_bComputing;
 
