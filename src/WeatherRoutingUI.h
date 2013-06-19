@@ -600,6 +600,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText126;
 		wxPanel* m_panel12;
+		wxStaticText* m_staticText1241;
 		wxListBox* m_lSources;
 		wxButton* m_bRemoveSource;
 		wxChoice* m_cDestination;

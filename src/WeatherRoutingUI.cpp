@@ -2428,13 +2428,17 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel8->SetSizer( fgSizer77 );
 	m_panel8->Layout();
 	fgSizer77->Fit( m_panel8 );
-	m_notebook3->AddPage( m_panel8, _("Start Time"), true );
+	m_notebook3->AddPage( m_panel8, _("Start Time"), false );
 	m_panel12 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer62;
 	fgSizer62 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer62->AddGrowableCol( 0 );
 	fgSizer62->SetFlexibleDirection( wxBOTH );
 	fgSizer62->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText1241 = new wxStaticText( m_panel12, wxID_ANY, _("This tab is not implemented"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1241->Wrap( -1 );
+	fgSizer62->Add( m_staticText1241, 0, wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer63;
 	fgSizer63 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -2571,7 +2575,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel12->SetSizer( fgSizer62 );
 	m_panel12->Layout();
 	fgSizer62->Fit( m_panel12 );
-	m_notebook3->AddPage( m_panel12, _("Routes"), false );
+	m_notebook3->AddPage( m_panel12, _("Routes"), true );
 	m_panel9 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer81;
 	fgSizer81 = new wxFlexGridSizer( 0, 1, 0, 0 );
