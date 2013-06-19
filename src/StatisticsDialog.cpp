@@ -47,7 +47,7 @@ void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
     if(routemapoverlay) {
 
         m_stPercentageUpwind->SetLabel
-            (wxString::Format(_T("%2.f nm"), routemapoverlay->RouteInfo
+            (wxString::Format(_T("%2.f"), routemapoverlay->RouteInfo
                               (RouteMapOverlay::PERCENTAGE_UPWIND)));
 
         double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);

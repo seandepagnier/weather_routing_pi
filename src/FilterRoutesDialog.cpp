@@ -40,7 +40,7 @@
 #include "WeatherRouting.h"
 #include "FilterRoutesDialog.h"
 
-wxString FilterNames[] = {_("Name"), _("BoatFileName"), _("Start"), _("Start Time"), _("End")};
+wxString FilterNames[] = {_("Name"), _("BoatFileName"), _("Start"), _("Start Time"), _("End"), _("State")};
 
 FilterRoutesDialog::FilterRoutesDialog(WeatherRouting *weatherrouting)
     : FilterRoutesDialogBase(weatherrouting), m_WeatherRouting(weatherrouting)
@@ -52,6 +52,7 @@ FilterRoutesDialog::FilterRoutesDialog(WeatherRouting *weatherrouting)
 
 void FilterRoutesDialog::OnCategory( wxCommandEvent& event )
 {
+
     m_tFilter->SetValue(m_Filters[m_cCategory->GetSelection()]);
 }
 
@@ -76,7 +77,8 @@ void FilterRoutesDialog::OnDone( wxCommandEvent& event )
 void FilterRoutesDialog::ApplyFilters()
 {
     for(std::list<WeatherRoute*>::iterator it = m_WeatherRouting->m_WeatherRoutes.begin();
-        it != m_WeatherRouting->m_WeatherRoutes.end(); it++)
+        it != m_WeatherRouting->m_WeatherRoutes.end(); it++) {
+        (*it)->Filtered = 0;
         for(int f = 0; f < NUM_FILTERS; f++) {
             wxString value;
             switch(f) {
@@ -88,8 +90,10 @@ void FilterRoutesDialog::ApplyFilters()
             case STATE: value = (*it)->State; break;
             }
 
-            (*it)->Filtered = value.Matches(m_Filters[f]);
+            if(!value.Matches(_T("*") + m_Filters[f] + _T("*")))
+                (*it)->Filtered = 1;
         }
+    }
 
     m_WeatherRouting->RebuildList();
 }

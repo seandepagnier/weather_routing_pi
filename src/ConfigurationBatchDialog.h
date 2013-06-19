@@ -38,6 +38,7 @@ class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
 {
 public:
     ConfigurationBatchDialog( wxWindow *parent, RouteMapConfiguration configuration);
+    ~ConfigurationBatchDialog() {}
 
 protected:
     void OnRemoveSource( wxCommandEvent& event );
@@ -50,7 +51,7 @@ protected:
     void OnReset( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
-    void OnDone( wxCommandEvent& event );
+    void OnGenerate( wxCommandEvent& event );
 
     void Reset();
 

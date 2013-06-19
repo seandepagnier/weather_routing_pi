@@ -110,7 +110,7 @@ void ConfigurationBatchDialog::OnCancel( wxCommandEvent& event )
     EndModal(wxID_CANCEL);
 }
 
-void ConfigurationBatchDialog::OnDone( wxCommandEvent& event )
+void ConfigurationBatchDialog::OnGenerate( wxCommandEvent& event )
 {
     EndModal(wxID_OK);
 }

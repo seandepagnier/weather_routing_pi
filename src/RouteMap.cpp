@@ -1851,6 +1851,31 @@ bool RouteMap::Propagate()
         return false;
     }
 
+    if((!m_NewGrib ||
+        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
+       m_Configuration.UseClimatology && ClimatologyData &&
+       !m_Configuration.AllowDataDeficient) {
+        double WG, VWG;
+        wxDateTime time = wxDateTime::Now();
+        /* replace when climatology supports detecting if data is loaded
+           without querying */
+        if(!ClimatologyData(WIND, time, 0, 0, WG, VWG)) {
+            m_bFinished = true;
+            m_bClimatologyFailed = true;
+            Unlock();
+            return false;
+        }
+    }
+
+
+    if(!m_Configuration.UseGrib && !m_Configuration.UseClimatology) {
+        m_bFinished = true;
+        m_bNoData = true;
+        Unlock();
+        return false;
+    }
+
     /* copy the grib record set */
     GribRecordSet *grib = NULL;
     if(m_NewGrib) {
@@ -1950,6 +1975,8 @@ void RouteMap::Reset()
 
     m_bReachedDestination = false;
     m_bGribFailed = false;
+    m_bClimatologyFailed = false;
+    m_bNoData = false;
     m_bFinished = false;
 
     Unlock();

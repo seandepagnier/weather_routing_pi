@@ -42,8 +42,9 @@ class weather_routing_pi;
 class WeatherRoute
 {
 public:
-    WeatherRoute(RouteMapOverlay *overlay) : routemapoverlay(overlay) {}
-    void Update();
+    WeatherRoute();
+    ~WeatherRoute();
+    void Update(bool stateonly=false);
 
     bool Filtered;
     wxString Name, BoatFilename, Start, StartTime, End, Time, Distance, AvgSpeed, State;
@@ -62,6 +63,7 @@ public:
     ConfigurationDialog m_ConfigurationDialog;
 
     void UpdateCurrentItem(RouteMapConfiguration configuration);
+    void UpdateStates();
     RouteMapOverlay *CurrentRouteMap(bool messagedialog = false), *m_RouteMapOverlayNeedingGrib;
 
     void RebuildList();

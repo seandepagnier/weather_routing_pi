@@ -191,6 +191,8 @@ public:
     LOCKING_ACCESSOR(Finished, m_bFinished)
     LOCKING_ACCESSOR(ReachedDestination, m_bReachedDestination)
     LOCKING_ACCESSOR(GribFailed, m_bGribFailed)
+    LOCKING_ACCESSOR(ClimatologyFailed, m_bClimatologyFailed)
+    LOCKING_ACCESSOR(NoData, m_bNoData)
 
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
@@ -225,7 +227,7 @@ protected:
 
 private:
     RouteMapConfiguration m_Configuration;
-    bool m_bFinished, m_bReachedDestination, m_bGribFailed;
+    bool m_bFinished, m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bNoData;
 
     wxDateTime m_NewTime;
 };
