@@ -34,6 +34,7 @@
 
 #include "weather_routing_pi.h"
 #include "ConfigurationBatchDialog.h"
+#include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
 

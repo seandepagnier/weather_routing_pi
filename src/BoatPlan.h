@@ -100,7 +100,6 @@ class Boat;
 
 class BoatPlan
 {
-
 public:
     static double VelocityApparentWind(double VB, double W, double VW);
     static double DirectionApparentWind(double VA, double VB, double W, double VW);
