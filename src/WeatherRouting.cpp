@@ -466,20 +466,17 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
 {
     bool update = false;
     for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
-        it != m_RunningRouteMaps.end(); it++) {
+        it != m_RunningRouteMaps.end(); ) {
         RouteMapOverlay *routemapoverlay = *it;
         if(!routemapoverlay->Running()) {
             UpdateRouteMap(routemapoverlay);
-
-            std::list<RouteMapOverlay*>::iterator prev = it;
-            prev--;
-            m_RunningRouteMaps.erase(it);
-            it = prev;
+            it = m_RunningRouteMaps.erase(it);
 
             m_gProgress->SetValue(m_RoutesToRun - m_WaitingRouteMaps.size() - m_RunningRouteMaps.size());
             update = true;
             continue;
-        }
+        } else
+            it++;
 
         /* get a new grib for the route map if needed */
         if(routemapoverlay->NeedsGrib()) {
