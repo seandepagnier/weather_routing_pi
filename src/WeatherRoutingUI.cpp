@@ -136,6 +136,8 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
+	this->Connect( wxEVT_IDLE, wxIdleEventHandler( WeatherRoutingBase::OnIdle ) );
 	m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnConfiguration ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSort ), NULL, this );
@@ -164,6 +166,8 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 WeatherRoutingBase::~WeatherRoutingBase()
 {
 	// Disconnect Events
+	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
+	this->Disconnect( wxEVT_IDLE, wxIdleEventHandler( WeatherRoutingBase::OnIdle ) );
 	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnConfiguration ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSort ), NULL, this );
@@ -2183,7 +2187,7 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 	fgSizer29->SetFlexibleDirection( wxBOTH );
 	fgSizer29->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText116 = new wxStaticText( this, wxID_ANY, _("Percentage Upwind"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText116 = new wxStaticText( this, wxID_ANY, _("Upwind"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText116->Wrap( -1 );
 	fgSizer29->Add( m_staticText116, 0, wxALL, 5 );
 	
@@ -2199,7 +2203,7 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 	m_stPortStarboard->Wrap( -1 );
 	fgSizer29->Add( m_stPortStarboard, 0, wxALL, 5 );
 	
-	m_staticText121 = new wxStaticText( this, wxID_ANY, _("Average Wind Knots"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText121 = new wxStaticText( this, wxID_ANY, _("Average Wind"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText121->Wrap( -1 );
 	fgSizer29->Add( m_staticText121, 0, wxALL, 5 );
 	
@@ -2364,8 +2368,8 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	fgSizer76->SetFlexibleDirection( wxBOTH );
 	fgSizer76->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_notebook3 = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-	m_panel8 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_notebookConfigurations = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panel8 = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer77;
 	fgSizer77 = new wxFlexGridSizer( 0, 3, 0, 0 );
 	fgSizer77->SetFlexibleDirection( wxBOTH );
@@ -2428,27 +2432,16 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel8->SetSizer( fgSizer77 );
 	m_panel8->Layout();
 	fgSizer77->Fit( m_panel8 );
-	m_notebook3->AddPage( m_panel8, _("Start Time"), false );
-	m_panel12 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_notebookConfigurations->AddPage( m_panel8, _("Start Time"), false );
+	m_pRoutes = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer62;
 	fgSizer62 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer62->AddGrowableCol( 0 );
 	fgSizer62->SetFlexibleDirection( wxBOTH );
 	fgSizer62->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText1241 = new wxStaticText( m_panel12, wxID_ANY, _("This tab is not implemented"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1241->Wrap( -1 );
-	fgSizer62->Add( m_staticText1241, 0, wxALL, 5 );
-	
-	wxFlexGridSizer* fgSizer63;
-	fgSizer63 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer63->AddGrowableCol( 0 );
-	fgSizer63->AddGrowableRow( 0 );
-	fgSizer63->SetFlexibleDirection( wxBOTH );
-	fgSizer63->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
 	wxStaticBoxSizer* sbSizer11;
-	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( m_panel12, wxID_ANY, _("Sources") ), wxVERTICAL );
+	sbSizer11 = new wxStaticBoxSizer( new wxStaticBox( m_pRoutes, wxID_ANY, _("Sources") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer64;
 	fgSizer64 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -2465,15 +2458,15 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	fgSizer66->SetFlexibleDirection( wxBOTH );
 	fgSizer66->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_lSources = new wxListBox( m_panel12, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
+	m_lSources = new wxListBox( m_pRoutes, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
 	fgSizer66->Add( m_lSources, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer67;
-	fgSizer67 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer67 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer67->SetFlexibleDirection( wxBOTH );
 	fgSizer67->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_bRemoveSource = new wxButton( m_panel12, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bRemoveSource = new wxButton( m_pRoutes, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer67->Add( m_bRemoveSource, 0, wxALL, 5 );
 	
 	
@@ -2483,64 +2476,19 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	fgSizer64->Add( fgSizer66, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer19;
-	sbSizer19 = new wxStaticBoxSizer( new wxStaticBox( m_panel12, wxID_ANY, _("Destinations") ), wxVERTICAL );
+	sbSizer19 = new wxStaticBoxSizer( new wxStaticBox( m_pRoutes, wxID_ANY, _("Destinations") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer72;
 	fgSizer72 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer72->AddGrowableCol( 0 );
+	fgSizer72->AddGrowableRow( 0 );
 	fgSizer72->SetFlexibleDirection( wxBOTH );
 	fgSizer72->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxFlexGridSizer* fgSizer73;
-	fgSizer73 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer73->AddGrowableCol( 0 );
-	fgSizer73->SetFlexibleDirection( wxBOTH );
-	fgSizer73->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	m_lDestinations = new wxListBox( m_pRoutes, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, wxLB_MULTIPLE ); 
+	m_lDestinations->SetMinSize( wxSize( 100,-1 ) );
 	
-	wxArrayString m_cDestinationChoices;
-	m_cDestination = new wxChoice( m_panel12, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cDestinationChoices, 0 );
-	m_cDestination->SetSelection( 0 );
-	fgSizer73->Add( m_cDestination, 0, wxALL|wxEXPAND, 5 );
-	
-	m_lDestinations = new wxListBox( m_panel12, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 ); 
-	fgSizer73->Add( m_lDestinations, 0, wxALL|wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer115;
-	fgSizer115 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer115->SetFlexibleDirection( wxBOTH );
-	fgSizer115->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_bAddDestination = new wxButton( m_panel12, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer115->Add( m_bAddDestination, 0, wxALL, 5 );
-	
-	m_bRemoveDestination = new wxButton( m_panel12, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer115->Add( m_bRemoveDestination, 0, wxALL, 5 );
-	
-	m_bClearDestinations = new wxButton( m_panel12, wxID_ANY, _("Clear"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer115->Add( m_bClearDestinations, 0, wxALL, 5 );
-	
-	m_bReciprocateDestinations = new wxButton( m_panel12, wxID_ANY, _("Reciprocate"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer115->Add( m_bReciprocateDestinations, 0, wxALL, 5 );
-	
-	
-	fgSizer73->Add( fgSizer115, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer72->Add( fgSizer73, 1, wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer74;
-	fgSizer74 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer74->SetFlexibleDirection( wxBOTH );
-	fgSizer74->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticBoxSizer* sbSizer191;
-	sbSizer191 = new wxStaticBoxSizer( new wxStaticBox( m_panel12, wxID_ANY, _("Routes") ), wxVERTICAL );
-	
-	
-	fgSizer74->Add( sbSizer191, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer72->Add( fgSizer74, 1, wxEXPAND, 5 );
+	fgSizer72->Add( m_lDestinations, 0, wxALL|wxEXPAND, 5 );
 	
 	
 	sbSizer19->Add( fgSizer72, 1, wxEXPAND, 5 );
@@ -2552,31 +2500,36 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	sbSizer11->Add( fgSizer64, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer63->Add( sbSizer11, 1, wxEXPAND, 5 );
+	fgSizer62->Add( sbSizer11, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer97;
+	fgSizer97 = new wxFlexGridSizer( 0, 4, 0, 0 );
+	fgSizer97->SetFlexibleDirection( wxBOTH );
+	fgSizer97->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText1241 = new wxStaticText( m_pRoutes, wxID_ANY, _("Within"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1241->Wrap( -1 );
+	fgSizer97->Add( m_staticText1241, 0, wxALL, 5 );
+	
+	m_tMiles = new wxTextCtrl( m_pRoutes, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer97->Add( m_tMiles, 0, wxALL, 5 );
+	
+	m_staticText1251 = new wxStaticText( m_pRoutes, wxID_ANY, _("Nautical Miles"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1251->Wrap( -1 );
+	fgSizer97->Add( m_staticText1251, 0, wxALL, 5 );
+	
+	m_bConnect = new wxButton( m_pRoutes, wxID_ANY, _("Connect"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer97->Add( m_bConnect, 0, wxALL, 5 );
 	
 	
-	fgSizer62->Add( fgSizer63, 1, wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer65;
-	fgSizer65 = new wxFlexGridSizer( 1, 0, 0, 0 );
-	fgSizer65->SetFlexibleDirection( wxBOTH );
-	fgSizer65->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_bOpen = new wxButton( m_panel12, wxID_ANY, _("Open"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer65->Add( m_bOpen, 0, wxALL, 5 );
-	
-	m_bSave = new wxButton( m_panel12, wxID_ANY, _("Save"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer65->Add( m_bSave, 0, wxALL, 5 );
+	fgSizer62->Add( fgSizer97, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer62->Add( fgSizer65, 1, wxEXPAND, 5 );
-	
-	
-	m_panel12->SetSizer( fgSizer62 );
-	m_panel12->Layout();
-	fgSizer62->Fit( m_panel12 );
-	m_notebook3->AddPage( m_panel12, _("Routes"), true );
-	m_panel9 = new wxPanel( m_notebook3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_pRoutes->SetSizer( fgSizer62 );
+	m_pRoutes->Layout();
+	fgSizer62->Fit( m_pRoutes );
+	m_notebookConfigurations->AddPage( m_pRoutes, _("Routes"), true );
+	m_panel9 = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer81;
 	fgSizer81 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer81->AddGrowableCol( 0 );
@@ -2592,11 +2545,11 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	fgSizer82->SetFlexibleDirection( wxBOTH );
 	fgSizer82->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_bAdd = new wxButton( m_panel9, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer82->Add( m_bAdd, 0, wxALL, 5 );
+	m_bAddBoat = new wxButton( m_panel9, wxID_ANY, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer82->Add( m_bAddBoat, 0, wxALL, 5 );
 	
-	m_bRemove = new wxButton( m_panel9, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer82->Add( m_bRemove, 0, wxALL, 5 );
+	m_bRemoveBoat = new wxButton( m_panel9, wxID_ANY, _("Remove"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer82->Add( m_bRemoveBoat, 0, wxALL, 5 );
 	
 	
 	fgSizer81->Add( fgSizer82, 1, wxEXPAND, 5 );
@@ -2605,9 +2558,9 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel9->SetSizer( fgSizer81 );
 	m_panel9->Layout();
 	fgSizer81->Fit( m_panel9 );
-	m_notebook3->AddPage( m_panel9, _("Boats"), false );
+	m_notebookConfigurations->AddPage( m_panel9, _("Boats"), false );
 	
-	fgSizer76->Add( m_notebook3, 1, wxEXPAND | wxALL, 5 );
+	fgSizer76->Add( m_notebookConfigurations, 1, wxEXPAND | wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer78;
 	fgSizer78 = new wxFlexGridSizer( 1, 0, 0, 0 );
@@ -2637,13 +2590,12 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	m_lSources->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnSources ), NULL, this );
 	m_bRemoveSource->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveSource ), NULL, this );
-	m_bAddDestination->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddDestination ), NULL, this );
-	m_bRemoveDestination->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveDestination ), NULL, this );
-	m_bClearDestinations->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnClearDestinations ), NULL, this );
-	m_bReciprocateDestinations->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReciprocateDestinations ), NULL, this );
-	m_bAdd->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
-	m_bRemove->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
+	m_lDestinations->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDestinations ), NULL, this );
+	m_bConnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnConnect ), NULL, this );
+	m_bAddBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
+	m_bRemoveBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnInformation ), NULL, this );
 	m_bReset->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReset ), NULL, this );
 	m_bCancel->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnCancel ), NULL, this );
@@ -2653,13 +2605,12 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 ConfigurationBatchDialogBase::~ConfigurationBatchDialogBase()
 {
 	// Disconnect Events
+	m_lSources->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnSources ), NULL, this );
 	m_bRemoveSource->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveSource ), NULL, this );
-	m_bAddDestination->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddDestination ), NULL, this );
-	m_bRemoveDestination->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveDestination ), NULL, this );
-	m_bClearDestinations->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnClearDestinations ), NULL, this );
-	m_bReciprocateDestinations->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReciprocateDestinations ), NULL, this );
-	m_bAdd->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
-	m_bRemove->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
+	m_lDestinations->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDestinations ), NULL, this );
+	m_bConnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnConnect ), NULL, this );
+	m_bAddBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
+	m_bRemoveBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnInformation ), NULL, this );
 	m_bReset->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReset ), NULL, this );
 	m_bCancel->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnCancel ), NULL, this );

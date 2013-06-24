@@ -37,7 +37,6 @@
 #include "Boat.h"
 #include "RouteMap.h"
 #include "ConfigurationDialog.h"
-#include "ConfigurationBatchDialog.h"
 #include "BoatDialog.h"
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
@@ -45,99 +44,8 @@
 ConfigurationDialog::ConfigurationDialog(WeatherRouting *weatherrouting, weather_routing_pi &plugin)
     : ConfigurationDialogBase(weatherrouting), m_WeatherRouting(weatherrouting), Plugin(plugin)
 {
-}
-
-ConfigurationDialog::~ConfigurationDialog( )
-{
-}
-
-#if 0
-void ConfigurationDialog::Load()
-{
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
-
-    m_tStartLat->SetValue
-        (pConf->Read( _T("StartLat"), wxString::Format(_T("%.5f"), Plugin.m_boat_lat)));
-    m_tStartLon->SetValue
-        (pConf->Read( _T("StartLon"), wxString::Format(_T("%.5f"), Plugin.m_boat_lon)));
-    m_tEndLat->SetValue
-        (pConf->Read( _T("EndLat"), wxString::Format(_T("%.5f"), Plugin.m_boat_lat+1)));
-    m_tEndLon->SetValue
-        (pConf->Read( _T("EndLon"), wxString::Format(_T("%.5f"), Plugin.m_boat_lon+1)));
-
-    wxString degreesteps;
-    m_lDegreeSteps->Clear();
-    pConf->Read( _T("DegreeSteps"), &degreesteps, _T("\
-40;50;60;70;80;90;105;120;135;150;165;195;210;225;240;255;270;280;290;300;310;320;"));
-    while(degreesteps.size()) {
-        m_lDegreeSteps->Append(degreesteps.BeforeFirst(';'));
-        degreesteps = degreesteps.AfterFirst(';');
-    }
- 
-    int maxdivertedcourse;
-    pConf->Read( _T("MaxDivertedCourse"), &maxdivertedcourse, 100);
-    m_sMaxDivertedCourse->SetValue(maxdivertedcourse);
-
-    int maxwindknots;
-    pConf->Read( _T("MaxWindKnots"), &maxwindknots, 100);
-    m_sMaxWindKnots->SetValue(maxwindknots);
-
-    int maxswellmeters;
-    pConf->Read( _T("MaxSwellMeters"), &maxswellmeters, 20);
-    m_sMaxSwellMeters->SetValue(maxswellmeters);
-
-    int maxlatitude;
-    pConf->Read( _T("MaxLatitude"), &maxlatitude, 90);
-    m_sMaxLatitude->SetValue(maxlatitude);
-
-    int maxtacks;
-    pConf->Read( _T("MaxTacks"), &maxtacks, -1);
-    m_sMaxLatitude->SetValue(maxtacks);
-
-    int tackingtime;
-    pConf->Read( _T("TackingTime"), &tackingtime, 0);
-    m_sTackingTime->SetValue(tackingtime);
-
-    bool usegrib;
-    pConf->Read( _T("UseGrib"), &usegrib, false);
-    m_cbUseGrib->SetValue(usegrib);
-
-    bool useclimatology;
-    pConf->Read( _T("UseClimatology"), &useclimatology, false);
-    m_cbUseClimatology->SetValue(useclimatology);
-
-    bool allowdatadeficient;
-    pConf->Read( _T("AllowDataDeficient"), &allowdatadeficient, false);
-    m_cbAllowDataDeficient->SetValue(allowdatadeficient);
-
-    bool detectland;
-    pConf->Read( _T("DetectLand"), &detectland, true);
-    m_cbDetectLand->SetValue(detectland);
-
-    bool currents;
-    pConf->Read( _T("Currents"), &currents, true);
-    m_cbCurrents->SetValue(currents);
-
-    bool invertedregions;
-    pConf->Read( _T("InvertedRegions"), &invertedregions, false);
-    m_cbInvertedRegions->SetValue(invertedregions);
-
-    bool anchoring;
-    pConf->Read( _T("Anchoring"), &anchoring, false);
-    m_cbAnchoring->SetValue(anchoring);
-
-    int timestephours;
-    pConf->Read( _T("TimeStepHours"), &timestephours, 1);
-    m_sTimeStepHours->SetValue(timestephours);
-
-    int timestepminutes;
-    pConf->Read( _T("TimeStepMinutes"), &timestepminutes, 0);
-    m_sTimeStepMinutes->SetValue(timestepminutes);
-
-    int timestepseconds;
-    pConf->Read( _T("TimeStepSeconds"), &timestepseconds, 0);
-    m_sTimeStepSeconds->SetValue(timestepseconds);
 
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "ConfigurationX" ), &p.x, p.x);
@@ -145,46 +53,15 @@ void ConfigurationDialog::Load()
     SetPosition(p);
 }
 
-void ConfigurationDialog::Save( )
+ConfigurationDialog::~ConfigurationDialog( )
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
-
-    pConf->Write( _T("StartLat"), m_tStartLat->GetValue());
-    pConf->Write( _T("StartLon"), m_tStartLon->GetValue());
-    pConf->Write( _T("EndLat"), m_tEndLat->GetValue());
-    pConf->Write( _T("EndLon"), m_tEndLon->GetValue());
-
-    wxString degreesteps;
-    for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++)
-        degreesteps += m_lDegreeSteps->GetString(i) + _(";");
-    pConf->Write( _T("DegreeSteps"), degreesteps);
-
-    pConf->Write( _T("MaxDivertedCourse"), m_sMaxDivertedCourse->GetValue());
-    pConf->Write( _T("MaxWindKnots"), m_sMaxWindKnots->GetValue());
-    pConf->Write( _T("MaxSwellMeters"), m_sMaxSwellMeters->GetValue());
-    pConf->Write( _T("MaxLatitude"), m_sMaxLatitude->GetValue());
-    pConf->Write( _T("MaxTacks"), m_sMaxTacks->GetValue());
-    pConf->Write( _T("TackingTime"), m_sTackingTime->GetValue());
-
-    pConf->Write( _T("UseGrib"), m_cbUseGrib->GetValue());
-    pConf->Write( _T("UseClimatology"), m_cbUseClimatology->GetValue());
-    pConf->Write( _T("AllowDataDeficient"), m_cbAllowDataDeficient->GetValue());
-
-    pConf->Write( _T("DetectLand"), m_cbDetectLand->GetValue());
-    pConf->Write( _T("Currents"), m_cbCurrents->GetValue());
-    pConf->Write( _T("InvertedRegions"), m_cbInvertedRegions->GetValue());
-    pConf->Write( _T("Anchoring"), m_cbAnchoring->GetValue());
-
-    pConf->Write( _T("TimeStepHours"), m_sTimeStepHours->GetValue());
-    pConf->Write( _T("TimeStepMinutes"), m_sTimeStepMinutes->GetValue());
-    pConf->Write( _T("TimeStepSeconds"), m_sTimeStepSeconds->GetValue());
 
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "ConfigurationX" ), p.x);
     pConf->Write ( _T ( "ConfigurationY" ), p.y);
 }
-#endif
 
 void ConfigurationDialog::OnBoatPosition( wxCommandEvent& event )
 {

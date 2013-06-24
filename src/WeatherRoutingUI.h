@@ -63,6 +63,8 @@ class WeatherRoutingBase : public wxFrame
 		wxMenu* m_mHelp;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnIdle( wxIdleEvent& event ) { event.Skip(); }
 		virtual void OnConfiguration( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
@@ -589,7 +591,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 	private:
 	
 	protected:
-		wxNotebook* m_notebook3;
+		wxNotebook* m_notebookConfigurations;
 		wxPanel* m_panel8;
 		wxStaticText* m_staticText108;
 		wxStaticText* m_stStartDateTime;
@@ -599,32 +601,27 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText124;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText126;
-		wxPanel* m_panel12;
-		wxStaticText* m_staticText1241;
+		wxPanel* m_pRoutes;
 		wxListBox* m_lSources;
 		wxButton* m_bRemoveSource;
-		wxChoice* m_cDestination;
 		wxListBox* m_lDestinations;
-		wxButton* m_bAddDestination;
-		wxButton* m_bRemoveDestination;
-		wxButton* m_bClearDestinations;
-		wxButton* m_bReciprocateDestinations;
-		wxButton* m_bOpen;
-		wxButton* m_bSave;
+		wxStaticText* m_staticText1241;
+		wxTextCtrl* m_tMiles;
+		wxStaticText* m_staticText1251;
+		wxButton* m_bConnect;
 		wxPanel* m_panel9;
-		wxButton* m_bAdd;
-		wxButton* m_bRemove;
+		wxButton* m_bAddBoat;
+		wxButton* m_bRemoveBoat;
 		wxButton* m_bInformation;
 		wxButton* m_bReset;
 		wxButton* m_bCancel;
 		wxButton* m_bGenerate;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnSources( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveSource( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAddDestination( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRemoveDestination( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClearDestinations( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnReciprocateDestinations( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDestinations( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnConnect( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }

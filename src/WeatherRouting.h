@@ -33,6 +33,7 @@
 
 #include "WeatherRoutingUI.h"
 #include "ConfigurationDialog.h"
+#include "ConfigurationBatchDialog.h"
 #include "SettingsDialog.h"
 #include "StatisticsDialog.h"
 #include "FilterRoutesDialog.h"
@@ -54,13 +55,14 @@ public:
 class WeatherRouting : public WeatherRoutingBase
 {
 public:
-    WeatherRouting( wxWindow *parent, weather_routing_pi &plugin );
-    ~WeatherRouting( );
+    WeatherRouting(wxWindow *parent, weather_routing_pi &plugin, int batchposition_menu_id);
+    ~WeatherRouting();
 
     void Reset();
 
     void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
     ConfigurationDialog m_ConfigurationDialog;
+    ConfigurationBatchDialog m_ConfigurationBatchDialog;
 
     void UpdateCurrentItem(RouteMapConfiguration configuration);
     void UpdateStates();
@@ -70,7 +72,12 @@ public:
     std::list<RouteMapOverlay*> m_RunningRouteMaps, m_WaitingRouteMaps;
     std::list<WeatherRoute*> m_WeatherRoutes;
 
+    void GenerateBatch();
+    bool Show(bool show);
+
 private:
+    void OnClose( wxCloseEvent& event );
+    void OnIdle( wxIdleEvent& event );
     void OnConfiguration();
     void OnConfiguration( wxMouseEvent& event ) { OnConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );
@@ -129,6 +136,13 @@ private:
 
     int m_RoutesToRun;
     bool m_bSkipUpdateCurrentItem;
+
+    int m_batchposition_menu_id;
+
+    bool m_bShowConfiguration, m_bShowConfigurationBatch;
+    bool m_bShowSettings, m_bShowStatistics, m_bShowFilter;
+
+    weather_routing_pi &m_weather_routing_pi;
 };
 
 #endif

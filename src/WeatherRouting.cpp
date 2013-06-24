@@ -39,7 +39,6 @@
 #include "Utilities.h"
 #include "Boat.h"
 #include "BoatDialog.h"
-#include "ConfigurationBatchDialog.h"
 #include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
@@ -106,12 +105,18 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
     return sortorder * it1.GetText().Cmp(it2.GetText());
 }
 
-WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
+WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin, int batchposition_menu_id)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(this, plugin),
+      m_ConfigurationBatchDialog(this),
       m_SettingsDialog(this), m_StatisticsDialog(this), m_FilterRoutesDialog(this),
-      m_bRunning(false), m_bSkipUpdateCurrentItem(false)
+      m_bRunning(false), m_bSkipUpdateCurrentItem(false),
+      m_batchposition_menu_id(batchposition_menu_id),
+      m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
+      m_bShowSettings(false), m_bShowStatistics(false), m_bShowFilter(false),
+      m_weather_routing_pi(plugin)
 {
     m_ConfigurationDialog.Hide();
+    m_ConfigurationBatchDialog.Hide();
 
     m_SettingsDialog.LoadSettings();
 
@@ -204,8 +209,21 @@ void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
     if(routemapoverlay)
         routemapoverlay->Render(time, m_SettingsDialog, dc, vp, false);
 
+    m_ConfigurationBatchDialog.Render(dc, vp);
+
     if(!dc.GetDC())
         glPopAttrib();
+}
+
+void WeatherRouting::OnClose( wxCloseEvent& event )
+{
+    Show(false);
+}
+
+void WeatherRouting::OnIdle( wxIdleEvent& event )
+{
+    SetCanvasContextMenuItemViz(m_batchposition_menu_id,
+                                m_ConfigurationBatchDialog.IsShown());
 }
 
 void WeatherRouting::OnConfiguration()
@@ -328,42 +346,66 @@ void WeatherRouting::OnNew( wxCommandEvent& event )
 
 void WeatherRouting::OnBatch( wxCommandEvent& event )
 {
+    m_ConfigurationBatchDialog.Show();
+}
+
+void WeatherRouting::GenerateBatch()
+{
     RouteMapOverlay *routemapoverlay = CurrentRouteMap(true);
     if(routemapoverlay) {
         RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
-        ConfigurationBatchDialog dlg(this, configuration);
-        if(dlg.ShowModal() == wxID_OK) {
-            wxString Name = configuration.Name;
-            int count = 0;
+        ConfigurationBatchDialog &dlg = m_ConfigurationBatchDialog;
 
-            wxTimeSpan StartSpan, StartSpacingSpan;
-            double days, hours;
+        wxString Name = configuration.Name;
+        int count = 0;
 
-            dlg.m_tStartDays->GetValue().ToDouble(&days);
-            StartSpan = wxTimeSpan::Days(days);
+        wxTimeSpan StartSpan, StartSpacingSpan;
+        double days, hours;
 
-            dlg.m_tStartHours->GetValue().ToDouble(&hours);
-            StartSpan += wxTimeSpan::Hours(hours);
+        dlg.m_tStartDays->GetValue().ToDouble(&days);
+        StartSpan = wxTimeSpan::Days(days);
 
-            dlg.m_tStartSpacingDays->GetValue().ToDouble(&days);
-            StartSpacingSpan = wxTimeSpan::Days(days);
-
-            dlg.m_tStartSpacingHours->GetValue().ToDouble(&hours);
-            StartSpacingSpan += wxTimeSpan::Hours(hours);
-
-            wxDateTime EndTime = configuration.StartTime+StartSpan;
-            for(; configuration.StartTime <= EndTime; configuration.StartTime += StartSpacingSpan) {
-                for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
-                    configuration.Name = Name + wxString::Format(_T("-%d"), ++count);
-                    configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
-                    AddConfiguration(configuration);
-                }
+        dlg.m_tStartHours->GetValue().ToDouble(&hours);
+        StartSpan += wxTimeSpan::Hours(hours);
+        
+        dlg.m_tStartSpacingDays->GetValue().ToDouble(&days);
+        StartSpacingSpan = wxTimeSpan::Days(days);
+        
+        dlg.m_tStartSpacingHours->GetValue().ToDouble(&hours);
+        StartSpacingSpan += wxTimeSpan::Hours(hours);
+        
+        wxDateTime EndTime = configuration.StartTime+StartSpan;
+        for(; configuration.StartTime <= EndTime; configuration.StartTime += StartSpacingSpan) {
+            for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
+                configuration.Name = Name + wxString::Format(_T("-%d"), ++count);
+                configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
+                AddConfiguration(configuration);
             }
-            DeleteRouteMap(routemapoverlay);
         }
+        DeleteRouteMap(routemapoverlay);
     }
 }
 
+bool WeatherRouting::Show(bool show)
+{
+    m_weather_routing_pi.ShowMenuItems(show);
+
+    if(show) {
+        m_bShowConfiguration = m_ConfigurationDialog.IsShown();
+        m_bShowConfigurationBatch = m_ConfigurationBatchDialog.IsShown();
+        m_bShowSettings = m_SettingsDialog.IsShown();
+        m_bShowStatistics = m_StatisticsDialog.IsShown();
+        m_bShowFilter = m_FilterRoutesDialog.IsShown();
+    } else {
+        m_ConfigurationDialog.Show(m_bShowConfiguration);
+        m_ConfigurationBatchDialog.Show(m_bShowConfigurationBatch);
+        m_SettingsDialog.Show(m_bShowSettings);
+        m_StatisticsDialog.Show(m_bShowStatistics);
+        m_FilterRoutesDialog.Show(m_bShowFilter);
+    }
+
+    return WeatherRoutingBase::Show(show);
+}
 void WeatherRouting::OnExport ( wxCommandEvent& event )
 {
     if(CurrentRouteMap(true))

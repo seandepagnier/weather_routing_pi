@@ -32,16 +32,92 @@
 #include <math.h>
 #include <time.h>
 
-#include "weather_routing_pi.h"
-#include "ConfigurationBatchDialog.h"
 #include "Utilities.h"
 #include "Boat.h"
-#include "RouteMap.h"
+#include "BoatDialog.h"
+#include "RouteMapOverlay.h"
+#include "weather_routing_pi.h"
+#include "WeatherRouting.h"
+#include "ConfigurationBatchDialog.h"
 
-ConfigurationBatchDialog::ConfigurationBatchDialog(wxWindow *parent, RouteMapConfiguration configuration)
-    : ConfigurationBatchDialogBase(parent), m_boatFileName(configuration.boatFileName)
+ConfigurationBatchDialog::ConfigurationBatchDialog(WeatherRouting *parent)
+    : ConfigurationBatchDialogBase(this), m_WeatherRouting(*parent)
 {
     Reset();
+}
+
+void ConfigurationBatchDialog::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
+{
+    if(!IsShown() ||
+       m_notebookConfigurations->GetCurrentPage() != m_pRoutes)
+        return;
+
+    for(std::vector<BatchSource*>::iterator it = sources.begin();
+        it != sources.end(); it++) {
+        for(std::list<BatchSource*>::iterator it2 = (*it)->destinations.begin();
+            it2 != (*it)->destinations.end(); it2++) {
+
+            dc.SetPen(wxPen(*wxRED, 3));
+
+            wxPoint p1p, p2p;
+            GetCanvasPixLL(&vp, &p1p, (*it)->lat, (*it)->lon);
+            GetCanvasPixLL(&vp, &p2p, (*it2)->lat, (*it2)->lon);
+            dc.DrawLine(p1p.x, p1p.y, p2p.x, p2p.y);
+        }
+    }
+}
+
+void ConfigurationBatchDialog::AddSource(double lat, double lon)
+{
+    wxTextEntryDialog pd( this, _("Enter Name"), _("New Source") );
+    if(pd.ShowModal() == wxID_OK) {
+        m_lSources->Append(pd.GetValue());
+    }
+}
+
+void ConfigurationBatchDialog::RemoveSource( wxString name )
+{
+    for(std::vector<BatchSource*>::iterator it = sources.begin();
+        it != sources.end();) {
+        for(std::list<BatchSource*>::iterator it2 = (*it)->destinations.begin();
+            it2 != (*it)->destinations.end();)
+            if((*it2)->name == name)
+                it2 = (*it)->destinations.erase(it2);
+            else
+                it2++;
+
+        if((*it)->name == name)
+            it = sources.erase(it);
+        else
+            it++;
+    }
+}
+
+void ConfigurationBatchDialog::OnSources( wxCommandEvent& event )
+{
+    m_lDestinations->DeselectAll();
+
+    int index = m_lSources->GetSelection();
+    if(index < 0)
+        return;
+
+    for(int i = 0; i<m_lDestinations->GetCount(); i++)
+        for(std::list<BatchSource*>::iterator it = sources[index]->destinations.begin();
+                it != sources[index]->destinations.end(); it++)
+            if((*it)->name == m_lDestinations->GetString(i))
+                m_lDestinations->SetSelection(i);
+}
+
+void ConfigurationBatchDialog::OnDestinations( wxCommandEvent& event )
+{
+    int index = m_lSources->GetSelection();
+    if(index < 0)
+        return;
+
+    sources[index]->destinations.clear();
+    for(int i = 0; i<m_lDestinations->GetCount(); i++)
+        if(m_lDestinations->IsSelected(i))
+            sources[index]->destinations.push_back(sources[i]);
 }
 
 void ConfigurationBatchDialog::OnRemoveSource( wxCommandEvent& event )
@@ -49,31 +125,16 @@ void ConfigurationBatchDialog::OnRemoveSource( wxCommandEvent& event )
     int index = m_lSources->GetSelection();
     if (index < 0) return;
 
+    RemoveSource(m_lSources->GetString(index));
+
     m_lSources->Delete(index);
-}
-
-void ConfigurationBatchDialog::OnAddDestination( wxCommandEvent& event )
-{
-    wxString name = m_cDestination->GetStringSelection();
-    if(name.size() > 0)
-        m_lDestinations->Append(name);
-}
-
-void ConfigurationBatchDialog::OnRemoveDestination( wxCommandEvent& event )
-{
-    int index = m_lDestinations->GetSelection();
-    if (index < 0) return;
-
     m_lDestinations->Delete(index);
 }
 
-void ConfigurationBatchDialog::OnClearDestinations( wxCommandEvent& event )
+void ConfigurationBatchDialog::OnConnect( wxCommandEvent& event )
 {
-    m_lDestinations->Clear();
-}
-
-void ConfigurationBatchDialog::OnReciprocateDestinations( wxCommandEvent& event )
-{
+    double nm;
+    m_tMiles.GetValue().ToDouble(&nm);
 }
 
 void ConfigurationBatchDialog::OnAddBoat( wxCommandEvent& event )
@@ -101,19 +162,23 @@ void ConfigurationBatchDialog::OnReset( wxCommandEvent& event )
 
 void ConfigurationBatchDialog::OnInformation( wxCommandEvent& event )
 {
-    wxMessageDialog mdlg(this, _("Batch mode  iterates over the current route map configuration\n"),
+    wxMessageDialog mdlg(this, _("Batch mode iterates over the selected route map configuration\
+ to generate many configurations.\n\n\
+To add a new Position, use the right-click context menu on the main map when the batch dialog is\
+visible"),
                          _("Weather Routing"), wxOK | wxICON_WARNING);
     mdlg.ShowModal();
 }
 
 void ConfigurationBatchDialog::OnCancel( wxCommandEvent& event )
 {
-    EndModal(wxID_CANCEL);
+    Hide();
 }
 
 void ConfigurationBatchDialog::OnGenerate( wxCommandEvent& event )
 {
-    EndModal(wxID_OK);
+    m_WeatherRouting.GenerateBatch();
+    Hide();
 }
 
 void ConfigurationBatchDialog::Reset()
@@ -123,6 +188,12 @@ void ConfigurationBatchDialog::Reset()
     m_tStartSpacingDays->SetValue(_T("1"));
     m_tStartSpacingHours->SetValue(_T("0"));
 
-    m_lBoats->Clear();
-    m_lBoats->Append(m_boatFileName);
+    RouteMapOverlay *routemapoverlay = m_WeatherRouting.CurrentRouteMap(true);
+    if(routemapoverlay) {
+        RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+
+        AddSource(configuration.Start, configuration.End);
+
+        m_lBoats->Append(configuration.boatFileName);
+    }
 }

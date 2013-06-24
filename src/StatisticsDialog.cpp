@@ -47,7 +47,7 @@ void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
     if(routemapoverlay) {
 
         m_stPercentageUpwind->SetLabel
-            (wxString::Format(_T("%2.f"), routemapoverlay->RouteInfo
+            (wxString::Format(_T("%2.f%%"), routemapoverlay->RouteInfo
                               (RouteMapOverlay::PERCENTAGE_UPWIND)));
 
         double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
@@ -55,7 +55,7 @@ void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
                                                      (int)port_starboard, 100-(int)port_starboard));
 
         m_stAverageWindKnots->SetLabel
-            (wxString::Format(_T("%2.f"), routemapoverlay->RouteInfo
+            (wxString::Format(_T("%2.f knts"), routemapoverlay->RouteInfo
                               (RouteMapOverlay::AVGWIND)));
 
         m_stAverageWaveHeight->SetLabel

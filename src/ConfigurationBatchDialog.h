@@ -32,20 +32,34 @@
 #include "WeatherRoutingUI.h"
 
 struct RouteMapConfiguration;
+class WeatherRouting;
 class weather_routing_pi;
+class ocpnDC;
+
+struct BatchSource
+{
+    wxString name;
+    double lat, lon;
+
+    std::list<BatchSource*> destinations;
+};
 
 class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
 {
 public:
-    ConfigurationBatchDialog( wxWindow *parent, RouteMapConfiguration configuration);
+    ConfigurationBatchDialog(WeatherRouting *parent);
     ~ConfigurationBatchDialog() {}
 
+    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
+    void AddSource(double lat, double lon);
+
 protected:
+    void RemoveSource( wxString name );
+
+    void OnSources( wxCommandEvent& event );
+    void OnDestinations( wxCommandEvent& event );
     void OnRemoveSource( wxCommandEvent& event );
-    void OnAddDestination( wxCommandEvent& event );
-    void OnRemoveDestination( wxCommandEvent& event );
-    void OnClearDestinations( wxCommandEvent& event );
-    void OnReciprocateDestinations( wxCommandEvent& event );
+    void OnConnect( wxCommandEvent& event );
     void OnAddBoat( wxCommandEvent& event );
     void OnRemoveBoat( wxCommandEvent& event );
     void OnReset( wxCommandEvent& event );
@@ -56,6 +70,10 @@ protected:
     void Reset();
 
     wxString m_boatFileName;
+
+    WeatherRouting &m_WeatherRouting;
+
+    std::vector<BatchSource*> sources;
 };
 
 #endif

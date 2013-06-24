@@ -91,6 +91,7 @@ public:
 
       void SetColorScheme(PI_ColorScheme cs);
       static wxString StandardPath();
+      void ShowMenuItems(bool show);
 
       double m_boat_lat, m_boat_lon;
 
@@ -106,7 +107,7 @@ private:
 
       int              m_display_width, m_display_height;
       int              m_leftclick_tool_id;
-      int              m_startroute_menu_id, m_endroute_menu_id;
+      int              m_startroute_menu_id, m_endroute_menu_id, m_batchposition_menu_id;
 
       double m_cursor_lat, m_cursor_lon;
 };

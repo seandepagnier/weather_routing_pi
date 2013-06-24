@@ -94,6 +94,9 @@ int weather_routing_pi::Init(void)
       m_endroute_menu_id = AddCanvasContextMenuItem
           (new wxMenuItem(&dummy_menu, -1, _("End Weather Route")), this );
       SetCanvasContextMenuItemViz(m_endroute_menu_id, false);
+      m_batchposition_menu_id = AddCanvasContextMenuItem
+          (new wxMenuItem(&dummy_menu, -1, _("Batch Position")), this );
+      SetCanvasContextMenuItemViz(m_batchposition_menu_id, false);
 
       //    And load the configuration items
       LoadConfig();
@@ -265,7 +268,7 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
     if(!m_pWeather_Routing) {
-        m_pWeather_Routing = new WeatherRouting(m_parent_window, *this);
+        m_pWeather_Routing = new WeatherRouting(m_parent_window, *this, m_batchposition_menu_id);
         wxPoint p = m_pWeather_Routing->GetPosition();
         m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
         m_pWeather_Routing->Move(p);
@@ -275,17 +278,16 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
         m_pWeather_Routing->Reset();
     }
 
-    bool show = !m_pWeather_Routing->IsShown();
-    m_pWeather_Routing->Show(show);
-
-    SetCanvasContextMenuItemViz(m_startroute_menu_id, show);
-    SetCanvasContextMenuItemViz(m_endroute_menu_id, show);
+    m_pWeather_Routing->Show(!m_pWeather_Routing->IsShown());
 }
 
 void weather_routing_pi::OnContextMenuItemCallback(int id)
 {
     if(!m_pWeather_Routing)
         return;
+
+    if(id == m_batchposition_menu_id)
+        m_pWeather_Routing->m_ConfigurationBatchDialog.AddSource(m_cursor_lat, m_cursor_lon);
 
     if(id == m_startroute_menu_id || id == m_endroute_menu_id) {
         RouteMapOverlay *routemapoverlay = m_pWeather_Routing->CurrentRouteMap(true);
@@ -370,4 +372,12 @@ wxString weather_routing_pi::StandardPath()
 #endif
 
     return stdPath + wxFileName::GetPathSeparator();
+}
+
+void weather_routing_pi::ShowMenuItems(bool show)
+{
+    SetToolbarItemState( m_leftclick_tool_id, show );
+
+    SetCanvasContextMenuItemViz(m_startroute_menu_id, show);
+    SetCanvasContextMenuItemViz(m_endroute_menu_id, show);
 }

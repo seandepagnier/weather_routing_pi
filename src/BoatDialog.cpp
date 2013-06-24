@@ -301,7 +301,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
     wxFileDialog openDialog
         ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
-          wxT ( "XML Weather Routing files (*.xml, *.cvs)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxT ( "Boat polar files (*.xml, *.cvs)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
@@ -326,7 +326,7 @@ void BoatDialog::OnOpenCSV ( wxCommandEvent& event )
 {
     wxFileDialog openDialog
         ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
-          wxT ( "XML Weather Routing files (*.cvs)|*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxT ( "CSV files (*.cvs)|*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
