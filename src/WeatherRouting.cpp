@@ -220,7 +220,7 @@ void WeatherRouting::OnClose( wxCloseEvent& event )
     Show(false);
 }
 
-void WeatherRouting::OnIdle( wxIdleEvent& event )
+void WeatherRouting::OnIdle(wxIdleEvent &event)
 {
     SetCanvasContextMenuItemViz(m_batchposition_menu_id,
                                 m_ConfigurationBatchDialog.IsShown());
@@ -351,6 +351,7 @@ void WeatherRouting::OnBatch( wxCommandEvent& event )
 
 void WeatherRouting::GenerateBatch()
 {
+#if 0
     RouteMapOverlay *routemapoverlay = CurrentRouteMap(true);
     if(routemapoverlay) {
         RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
@@ -384,6 +385,7 @@ void WeatherRouting::GenerateBatch()
         }
         DeleteRouteMap(routemapoverlay);
     }
+#endif
 }
 
 bool WeatherRouting::Show(bool show)

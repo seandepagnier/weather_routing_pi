@@ -41,7 +41,7 @@
 #include "ConfigurationBatchDialog.h"
 
 ConfigurationBatchDialog::ConfigurationBatchDialog(WeatherRouting *parent)
-    : ConfigurationBatchDialogBase(this), m_WeatherRouting(*parent)
+    : ConfigurationBatchDialogBase(parent), m_WeatherRouting(*parent)
 {
     Reset();
 }
@@ -70,9 +70,8 @@ void ConfigurationBatchDialog::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 void ConfigurationBatchDialog::AddSource(double lat, double lon)
 {
     wxTextEntryDialog pd( this, _("Enter Name"), _("New Source") );
-    if(pd.ShowModal() == wxID_OK) {
+    if(pd.ShowModal() == wxID_OK)
         m_lSources->Append(pd.GetValue());
-    }
 }
 
 void ConfigurationBatchDialog::RemoveSource( wxString name )
@@ -101,7 +100,7 @@ void ConfigurationBatchDialog::OnSources( wxCommandEvent& event )
     if(index < 0)
         return;
 
-    for(int i = 0; i<m_lDestinations->GetCount(); i++)
+    for(unsigned int i = 0; i<m_lDestinations->GetCount(); i++)
         for(std::list<BatchSource*>::iterator it = sources[index]->destinations.begin();
                 it != sources[index]->destinations.end(); it++)
             if((*it)->name == m_lDestinations->GetString(i))
@@ -115,7 +114,7 @@ void ConfigurationBatchDialog::OnDestinations( wxCommandEvent& event )
         return;
 
     sources[index]->destinations.clear();
-    for(int i = 0; i<m_lDestinations->GetCount(); i++)
+    for(unsigned int i = 0; i<m_lDestinations->GetCount(); i++)
         if(m_lDestinations->IsSelected(i))
             sources[index]->destinations.push_back(sources[i]);
 }
@@ -134,7 +133,7 @@ void ConfigurationBatchDialog::OnRemoveSource( wxCommandEvent& event )
 void ConfigurationBatchDialog::OnConnect( wxCommandEvent& event )
 {
     double nm;
-    m_tMiles.GetValue().ToDouble(&nm);
+    m_tMiles->GetValue().ToDouble(&nm);
 }
 
 void ConfigurationBatchDialog::OnAddBoat( wxCommandEvent& event )
@@ -188,11 +187,11 @@ void ConfigurationBatchDialog::Reset()
     m_tStartSpacingDays->SetValue(_T("1"));
     m_tStartSpacingHours->SetValue(_T("0"));
 
-    RouteMapOverlay *routemapoverlay = m_WeatherRouting.CurrentRouteMap(true);
+    RouteMapOverlay *routemapoverlay = m_WeatherRouting.CurrentRouteMap();
     if(routemapoverlay) {
         RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
 
-        AddSource(configuration.Start, configuration.End);
+        AddSource(configuration.StartLat, configuration.StartLon);
 
         m_lBoats->Append(configuration.boatFileName);
     }

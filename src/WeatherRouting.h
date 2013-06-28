@@ -77,7 +77,7 @@ public:
 
 private:
     void OnClose( wxCloseEvent& event );
-    void OnIdle( wxIdleEvent& event );
+    void OnIdle(wxIdleEvent &event);
     void OnConfiguration();
     void OnConfiguration( wxMouseEvent& event ) { OnConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );

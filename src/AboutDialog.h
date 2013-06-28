@@ -27,16 +27,12 @@
 #ifndef _WEATHER_ROUTING_ABOUT_H_
 #define _WEATHER_ROUTING_ABOUT_H_
 
-
-#include <wx/treectrl.h>
-#include <wx/fileconf.h>
-
 #include "WeatherRoutingUI.h"
 
 class AboutDialog : public AboutDialogBase
 {
 public:
-    AboutDialog( wxWindow *parent );
+    AboutDialog( wxWindow *parent ) : AboutDialogBase(parent) { }
     void OnDonate( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event ) { EndModal(wxID_OK); }   
 };
