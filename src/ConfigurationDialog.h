@@ -39,7 +39,7 @@ class weather_routing_pi;
 class ConfigurationDialog : public ConfigurationDialogBase
 {
 public:
-    ConfigurationDialog(WeatherRouting *weatherrouting, weather_routing_pi &plugin);
+    ConfigurationDialog(WeatherRouting *weatherrouting);
     ~ConfigurationDialog();
 
     void SetConfiguration(RouteMapConfiguration configuration);
@@ -47,11 +47,14 @@ public:
 
     RouteMapConfiguration Configuration();
 
+    void AddSource(wxString name);
+    void RemoveSource( wxString name );
+    void ClearSources();
+
     wxDateTime m_GribTimelineTime;
 
 protected:
     void OnUpdate( wxCommandEvent& event ) { Update(); }
-    void OnBoatPosition( wxCommandEvent& event );
     void OnUpdate( wxDateEvent& event ) { Update(); }
     void OnGribTime( wxCommandEvent& event );
     void OnCurrentTime( wxCommandEvent& event );
@@ -69,7 +72,6 @@ private:
     void SetStartDateTime(wxDateTime datetime);
 
     WeatherRouting *m_WeatherRouting;
-    weather_routing_pi   &Plugin;
 };
 
 #endif

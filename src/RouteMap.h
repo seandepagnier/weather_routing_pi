@@ -141,15 +141,20 @@ public:
 
 typedef std::list<IsoChron*> IsoChronList;
 
-struct RouteMapConfiguration {
-    RouteMapConfiguration () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
-    void Update();
+struct RouteMapPosition {
+    RouteMapPosition(wxString n, double lat0, double lon0)
+    : Name(n), lat(lat0), lon(lon0) {}
 
     wxString Name;
+    double lat, lon;
+};
 
-    double StartLat, StartLon;
+struct RouteMapConfiguration {
+    RouteMapConfiguration () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
+    bool Update();
+
+    wxString Start, End;
     wxDateTime StartTime;
-    double EndLat, EndLon;
 
     double dt; /* time in seconds between propagations */
 
@@ -168,6 +173,8 @@ struct RouteMapConfiguration {
     bool (*Climatology())(int setting, wxDateTime &, double, double, double &, double &);
 
 /* computed values */
+    double StartLat, StartLon, EndLat, EndLon;
+
     double StartEndBearing; /* calculated from start and end */
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,
     this means the map cannot cross both 0 and 180 longitude.
@@ -180,16 +187,17 @@ bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2
 class RouteMap
 {
 public:
-    static void Wind(double &windspeed, double &winddir,
-                     double lat, double lon, wxDateTime time);
     RouteMap();
     virtual ~RouteMap();
+
+    static void PositionLatLon(wxString Name, double &lat, double &lon);
 
     void Reset();
 
 #define LOCKING_ACCESSOR(name, flag) bool name() { Lock(); bool ret = flag; Unlock(); return ret; }
     LOCKING_ACCESSOR(Finished, m_bFinished)
     LOCKING_ACCESSOR(ReachedDestination, m_bReachedDestination)
+    LOCKING_ACCESSOR(Valid, m_bValid)
     LOCKING_ACCESSOR(GribFailed, m_bGribFailed)
     LOCKING_ACCESSOR(ClimatologyFailed, m_bClimatologyFailed)
     LOCKING_ACCESSOR(NoData, m_bNoData)
@@ -201,7 +209,8 @@ public:
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
     void SetConfiguration(RouteMapConfiguration &o) { Lock();
-        m_Configuration = o; m_Configuration.Update();
+        m_Configuration = o;
+        m_bValid = m_Configuration.Update();
         m_bFinished = false;
         Unlock(); }
     RouteMapConfiguration GetConfiguration() { Lock(); RouteMapConfiguration o = m_Configuration; Unlock(); return o; }
@@ -210,6 +219,7 @@ public:
     wxDateTime EndDate();
 
     static bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &);
+    static std::list<RouteMapPosition> Positions;
 
 protected:
     virtual void Clear();
@@ -227,7 +237,8 @@ protected:
 
 private:
     RouteMapConfiguration m_Configuration;
-    bool m_bFinished, m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bNoData;
+    bool m_bFinished, m_bValid,
+        m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bNoData;
 
     wxDateTime m_NewTime;
 };

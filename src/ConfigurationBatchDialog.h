@@ -38,9 +38,8 @@ class ocpnDC;
 
 struct BatchSource
 {
-    wxString name;
-    double lat, lon;
-
+    BatchSource(wxString n) : Name(n) {}
+    wxString Name;
     std::list<BatchSource*> destinations;
 };
 
@@ -48,20 +47,25 @@ class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
 {
 public:
     ConfigurationBatchDialog(WeatherRouting *parent);
-    ~ConfigurationBatchDialog() {}
+    ~ConfigurationBatchDialog() { ClearSources(); }
 
     void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
-    void AddSource(double lat, double lon);
+    void AddSource(wxString name);
+    void RemoveSource( wxString name );
+    void ClearSources();
+
+    std::vector<BatchSource*> sources;
 
 protected:
-    void RemoveSource( wxString name );
-
     void OnSources( wxCommandEvent& event );
     void OnDestinations( wxCommandEvent& event );
     void OnRemoveSource( wxCommandEvent& event );
+    void OnClearSources( wxCommandEvent& event );
     void OnConnect( wxCommandEvent& event );
     void OnAddBoat( wxCommandEvent& event );
     void OnRemoveBoat( wxCommandEvent& event );
+    void OnOpen( wxCommandEvent& event );
+    void OnSave( wxCommandEvent& event );
     void OnReset( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
@@ -72,8 +76,6 @@ protected:
     wxString m_boatFileName;
 
     WeatherRouting &m_WeatherRouting;
-
-    std::vector<BatchSource*> sources;
 };
 
 #endif

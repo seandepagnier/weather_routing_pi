@@ -25,11 +25,12 @@
 #include <wx/icon.h>
 #include <wx/menu.h>
 #include <wx/frame.h>
-#include <wx/textctrl.h>
-#include <wx/statbox.h>
+#include <wx/combobox.h>
 #include <wx/stattext.h>
 #include <wx/datectrl.h>
 #include <wx/dateevt.h>
+#include <wx/textctrl.h>
+#include <wx/statbox.h>
 #include <wx/spinctrl.h>
 #include <wx/filepicker.h>
 #include <wx/listbox.h>
@@ -64,7 +65,6 @@ class WeatherRoutingBase : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnIdle( wxIdleEvent& event ) { event.Skip(); }
 		virtual void OnConfiguration( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
@@ -74,6 +74,7 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNew( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPositions( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBatch( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConfiguration( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
@@ -106,17 +107,13 @@ class ConfigurationDialogBase : public wxDialog
 	private:
 	
 	protected:
-		wxTextCtrl* m_tName;
-		wxStaticText* m_staticText5;
-		wxStaticText* m_staticText6;
-		wxButton* m_bBoatPosition;
+		wxComboBox* m_cStart;
 		wxStaticText* m_staticText28;
 		wxButton* m_bGribTime;
 		wxStaticText* m_staticText30;
 		wxTextCtrl* m_tStartHour;
 		wxButton* m_bCurrentTime;
-		wxStaticText* m_staticText51;
-		wxStaticText* m_staticText61;
+		wxComboBox* m_cEnd;
 		wxSpinCtrl* m_sTimeStepHours;
 		wxStaticText* m_staticText110;
 		wxSpinCtrl* m_sTimeStepMinutes;
@@ -168,7 +165,6 @@ class ConfigurationDialogBase : public wxDialog
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnBoatPosition( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxDateEvent& event ) { event.Skip(); }
 		virtual void OnGribTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
@@ -182,11 +178,7 @@ class ConfigurationDialogBase : public wxDialog
 		
 	
 	public:
-		wxTextCtrl* m_tStartLat;
-		wxTextCtrl* m_tStartLon;
 		wxDatePickerCtrl* m_dpStartDate;
-		wxTextCtrl* m_tEndLat;
-		wxTextCtrl* m_tEndLon;
 		wxCheckBox* m_cbUseGrib;
 		wxCheckBox* m_cbUseClimatology;
 		wxCheckBox* m_cbCurrents;
@@ -603,30 +595,29 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText126;
 		wxPanel* m_pRoutes;
 		wxListBox* m_lSources;
-		wxButton* m_bRemoveSource;
 		wxListBox* m_lDestinations;
 		wxStaticText* m_staticText1241;
 		wxTextCtrl* m_tMiles;
 		wxStaticText* m_staticText1251;
 		wxButton* m_bConnect;
+		wxButton* m_bDisconnectAll;
 		wxPanel* m_panel9;
 		wxButton* m_bAddBoat;
 		wxButton* m_bRemoveBoat;
 		wxButton* m_bInformation;
 		wxButton* m_bReset;
-		wxButton* m_bCancel;
+		wxButton* m_bClose;
 		wxButton* m_bGenerate;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnSources( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRemoveSource( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinations( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConnect( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerate( wxCommandEvent& event ) { event.Skip(); }
 		
 	
@@ -639,6 +630,34 @@ class ConfigurationBatchDialogBase : public wxDialog
 		
 		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationBatchDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class PositionsDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class PositionsDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxListCtrl* m_lPositions;
+		wxButton* m_bRemoveSource;
+		wxButton* m_bClear;
+		wxButton* m_bBoatPosition;
+		wxButton* m_bClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnRemove( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnBoatPosition( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		PositionsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Positions"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~PositionsDialogBase();
 	
 };
 

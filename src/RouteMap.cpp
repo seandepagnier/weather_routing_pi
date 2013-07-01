@@ -1730,14 +1730,33 @@ Position* IsoChron::ClosestPosition(double lat, double lon, double *dist)
     return minpos;
 }
 
-void RouteMapConfiguration::Update()
+bool RouteMapConfiguration::Update()
 {
+    bool havestart = false, haveend = false;
+    for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
+        it != RouteMap::Positions.end(); it++) {
+        if(Start == (*it).Name) {
+            StartLat = (*it).lat;
+            StartLon = (*it).lon;
+            havestart = true;
+        }
+        if(End == (*it).Name) {
+            EndLat = (*it).lat;
+            EndLon = (*it).lon;
+            haveend = true;
+        }
+    }
+
+    if(!havestart || !haveend)
+        return false;
+
     if((positive_longitudes = fabs(average_longitude(StartLon, EndLon)) > 90)) {
         StartLon = positive_degrees(StartLon);
         EndLon = positive_degrees(EndLon);
     }
 
     ll_gc_ll_reverse(StartLat, StartLon, EndLat, EndLon, &StartEndBearing, 0);
+    return true;
 }
 
 bool (*RouteMapConfiguration::Climatology())
@@ -1749,6 +1768,8 @@ bool (*RouteMapConfiguration::Climatology())
 bool (*RouteMap::ClimatologyData)
 (int setting, wxDateTime &, double, double, double &, double &) = NULL;
 
+std::list<RouteMapPosition> RouteMap::Positions;
+
 RouteMap::RouteMap()
 {
 }
@@ -1756,6 +1777,16 @@ RouteMap::RouteMap()
 RouteMap::~RouteMap()
 {
     Clear();
+}
+
+void RouteMap::PositionLatLon(wxString Name, double &lat, double &lon)
+{
+    for(std::list<RouteMapPosition>::iterator it = Positions.begin();
+        it != Positions.end(); it++)
+        if((*it).Name == Name) {
+            lat = (*it).lat;
+            lon = (*it).lon;
+        }
 }
 
 bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration)
@@ -1832,6 +1863,12 @@ bool RouteMap::Propagate()
 #endif
 
     Lock();
+    if(!m_bValid) {
+        Unlock();
+        m_bFinished = true;
+        return false;
+    }
+
     bool notready = m_bFinished || m_bNeedsGrib;
 
     if(notready) {

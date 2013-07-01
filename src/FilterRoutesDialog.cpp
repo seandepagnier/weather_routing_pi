@@ -82,7 +82,6 @@ void FilterRoutesDialog::ApplyFilters()
         for(int f = 0; f < NUM_FILTERS; f++) {
             wxString value;
             switch(f) {
-            case NAME: value = (*it)->Name; break;
             case BOATFILENAME: value = (*it)->BoatFilename; break;
             case START: value = (*it)->Start; break;
             case STARTTIME: value = (*it)->StartTime; break;

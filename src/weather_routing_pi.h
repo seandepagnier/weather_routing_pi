@@ -28,7 +28,7 @@
 #define _WEATHER_ROUTINGPI_H_
 
 #define     PLUGIN_VERSION_MAJOR    0
-#define     PLUGIN_VERSION_MINOR    8
+#define     PLUGIN_VERSION_MINOR    9
 
 #define     MY_API_VERSION_MAJOR    1
 #define     MY_API_VERSION_MINOR    8
@@ -107,7 +107,7 @@ private:
 
       int              m_display_width, m_display_height;
       int              m_leftclick_tool_id;
-      int              m_startroute_menu_id, m_endroute_menu_id, m_batchposition_menu_id;
+      int              m_position_menu_id;
 
       double m_cursor_lat, m_cursor_lon;
 };

@@ -41,8 +41,8 @@
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
 
-ConfigurationDialog::ConfigurationDialog(WeatherRouting *weatherrouting, weather_routing_pi &plugin)
-    : ConfigurationDialogBase(weatherrouting), m_WeatherRouting(weatherrouting), Plugin(plugin)
+ConfigurationDialog::ConfigurationDialog(WeatherRouting *weatherrouting)
+    : ConfigurationDialogBase(weatherrouting), m_WeatherRouting(weatherrouting)
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -61,13 +61,6 @@ ConfigurationDialog::~ConfigurationDialog( )
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "ConfigurationX" ), p.x);
     pConf->Write ( _T ( "ConfigurationY" ), p.y);
-}
-
-void ConfigurationDialog::OnBoatPosition( wxCommandEvent& event )
-{
-    m_tStartLat->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lat));
-    m_tStartLon->SetValue(wxString::Format(_T("%.5f"), Plugin.m_boat_lon));
-    Update();
 }
 
 void ConfigurationDialog::OnGribTime( wxCommandEvent& event )
@@ -143,10 +136,7 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 
 void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
 {
-    m_tName->SetValue(configuration.Name);
-
-    m_tStartLat->SetValue(wxString::Format(_T("%.5f"), configuration.StartLat));
-    m_tStartLon->SetValue(wxString::Format(_T("%.5f"), configuration.StartLon));
+    m_cStart->SetValue(configuration.Start);
 
     m_dpStartDate->SetValue(configuration.StartTime);
     m_tStartHour->SetValue(wxString::Format(_T("%.2f"),
@@ -164,8 +154,7 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
     dt -= minutes * 60;
     m_sTimeStepSeconds->SetValue(wxString::Format(_T("%d"), dt));
 
-    m_tEndLat->SetValue(wxString::Format(_T("%.5f"), configuration.EndLat));
-    m_tEndLon->SetValue(wxString::Format(_T("%.5f"), configuration.EndLon));
+    m_cEnd->SetValue(configuration.End);
 
     m_lDegreeSteps->Clear();
     for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
@@ -188,18 +177,13 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
 
     m_cbUseGrib->SetValue(configuration.UseGrib);
     m_cbUseClimatology->SetValue(configuration.UseClimatology);
-
-//    Update();
 }
 
 RouteMapConfiguration ConfigurationDialog::Configuration()
 {
     RouteMapConfiguration configuration;
 
-    configuration.Name = m_tName->GetValue();
-
-    m_tStartLat->GetValue().ToDouble(&configuration.StartLat);
-    m_tStartLon->GetValue().ToDouble(&configuration.StartLon);
+    configuration.Start = m_cStart->GetValue();
 
     configuration.StartTime = m_dpStartDate->GetValue();
     double hour;
@@ -218,8 +202,7 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
         mdlg.ShowModal();
     }
 
-    m_tEndLat->GetValue().ToDouble(&configuration.EndLat);
-    m_tEndLon->GetValue().ToDouble(&configuration.EndLon);
+    configuration.End = m_cEnd->GetValue();
 
     if(m_lDegreeSteps->GetCount() < 4) {
         wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
@@ -253,6 +236,27 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     configuration.UseClimatology = m_cbUseClimatology->GetValue();
 
     return configuration;
+}
+
+void ConfigurationDialog::AddSource(wxString name)
+{
+    m_cStart->Append(name);
+    m_cEnd->Append(name);
+}
+
+void ConfigurationDialog::RemoveSource( wxString name )
+{
+    int i = m_cStart->FindString(name, true);
+    if(i >= 0) {
+        m_cStart->Delete(i);
+        m_cEnd->Delete(i);
+    }
+}
+
+void ConfigurationDialog::ClearSources()
+{
+    m_cStart->Clear();
+    m_cEnd->Clear();
 }
 
 void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)

@@ -76,15 +76,9 @@ int weather_routing_pi::Init(void)
                                               WEATHER_ROUTING_TOOL_POSITION, 0, this);
 
       wxMenu dummy_menu;
-      m_startroute_menu_id = AddCanvasContextMenuItem
-          (new wxMenuItem(&dummy_menu, -1, _("Start Weather Route")), this );
-      SetCanvasContextMenuItemViz(m_startroute_menu_id, false);
-      m_endroute_menu_id = AddCanvasContextMenuItem
-          (new wxMenuItem(&dummy_menu, -1, _("End Weather Route")), this );
-      SetCanvasContextMenuItemViz(m_endroute_menu_id, false);
-      m_batchposition_menu_id = AddCanvasContextMenuItem
-          (new wxMenuItem(&dummy_menu, -1, _("Batch Position")), this );
-      SetCanvasContextMenuItemViz(m_batchposition_menu_id, false);
+      m_position_menu_id = AddCanvasContextMenuItem
+          (new wxMenuItem(&dummy_menu, -1, _("Weather Route Position")), this );
+      SetCanvasContextMenuItemViz(m_position_menu_id, false);
 
       //    And load the configuration items
       LoadConfig();
@@ -256,7 +250,7 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
     if(!m_pWeather_Routing) {
-        m_pWeather_Routing = new WeatherRouting(m_parent_window, *this, m_batchposition_menu_id);
+        m_pWeather_Routing = new WeatherRouting(m_parent_window, *this);
         wxPoint p = m_pWeather_Routing->GetPosition();
         m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
         m_pWeather_Routing->Move(p);
@@ -274,27 +268,8 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
     if(!m_pWeather_Routing)
         return;
 
-    if(id == m_batchposition_menu_id)
-        m_pWeather_Routing->m_ConfigurationBatchDialog.AddSource(m_cursor_lat, m_cursor_lon);
-
-    if(id == m_startroute_menu_id || id == m_endroute_menu_id) {
-        RouteMapOverlay *routemapoverlay = m_pWeather_Routing->CurrentRouteMap(true);
-        if(routemapoverlay) {
-            RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
-            if(id == m_startroute_menu_id) {
-                configuration.StartLat = m_cursor_lat;
-                configuration.StartLon = m_cursor_lon;
-            } else {
-                configuration.EndLat = m_cursor_lat;
-                configuration.EndLon = m_cursor_lon;
-            }
-            routemapoverlay->SetConfiguration(configuration);
-            m_pWeather_Routing->m_ConfigurationDialog.SetConfiguration(configuration);
-            m_pWeather_Routing->m_ConfigurationDialog.Update();
-            m_pWeather_Routing->UpdateStates();
-        }
-    } else
-        return;
+    if(id == m_position_menu_id)
+        m_pWeather_Routing->m_PositionsDialog.AddSource(m_cursor_lat, m_cursor_lon);
 
     m_pWeather_Routing->Reset();
 }
@@ -365,7 +340,5 @@ wxString weather_routing_pi::StandardPath()
 void weather_routing_pi::ShowMenuItems(bool show)
 {
     SetToolbarItemState( m_leftclick_tool_id, show );
-
-    SetCanvasContextMenuItemViz(m_startroute_menu_id, show);
-    SetCanvasContextMenuItemViz(m_endroute_menu_id, show);
+    SetCanvasContextMenuItemViz(m_position_menu_id, show);
 }

@@ -32,6 +32,7 @@
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
+#include "PositionsDialog.h"
 #include "ConfigurationDialog.h"
 #include "ConfigurationBatchDialog.h"
 #include "SettingsDialog.h"
@@ -48,19 +49,22 @@ public:
     void Update(bool stateonly=false);
 
     bool Filtered;
-    wxString Name, BoatFilename, Start, StartTime, End, Time, Distance, AvgSpeed, State;
+    wxString BoatFilename, Start, StartTime, End, Time, Distance, AvgSpeed, State;
     RouteMapOverlay *routemapoverlay;
 };
 
 class WeatherRouting : public WeatherRoutingBase
 {
 public:
-    WeatherRouting(wxWindow *parent, weather_routing_pi &plugin, int batchposition_menu_id);
+    enum {VISIBLE=0, START, STARTTIME, END, TIME, DISTANCE, AVGSPEED, STATE};
+
+    WeatherRouting(wxWindow *parent, weather_routing_pi &plugin);
     ~WeatherRouting();
 
     void Reset();
 
     void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
+    PositionsDialog m_PositionsDialog;
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
 
@@ -77,7 +81,6 @@ public:
 
 private:
     void OnClose( wxCloseEvent& event );
-    void OnIdle(wxIdleEvent &event);
     void OnConfiguration();
     void OnConfiguration( wxMouseEvent& event ) { OnConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );
@@ -88,6 +91,7 @@ private:
     void OnSave( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnNew( wxCommandEvent& event );
+    void OnPositions( wxCommandEvent& event );
     void OnBatch( wxCommandEvent& event );
     void OnConfiguration( wxCommandEvent& event ) { OnConfiguration(); }
     void OnExport( wxCommandEvent& event );
@@ -137,9 +141,7 @@ private:
     int m_RoutesToRun;
     bool m_bSkipUpdateCurrentItem;
 
-    int m_batchposition_menu_id;
-
-    bool m_bShowConfiguration, m_bShowConfigurationBatch;
+    bool m_bShowPositions, m_bShowConfiguration, m_bShowConfigurationBatch;
     bool m_bShowSettings, m_bShowStatistics, m_bShowFilter;
 
     weather_routing_pi &m_weather_routing_pi;
