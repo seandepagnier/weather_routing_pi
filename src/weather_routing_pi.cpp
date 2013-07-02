@@ -269,7 +269,7 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
         return;
 
     if(id == m_position_menu_id)
-        m_pWeather_Routing->m_PositionsDialog.AddSource(m_cursor_lat, m_cursor_lon);
+        m_pWeather_Routing->AddPosition(m_cursor_lat, m_cursor_lon);
 
     m_pWeather_Routing->Reset();
 }

@@ -51,8 +51,9 @@ void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
                               (RouteMapOverlay::PERCENTAGE_UPWIND)));
 
         double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
-        m_stPortStarboard->SetLabel(wxString::Format(_T("%02d/%02d"),
-                                                     (int)port_starboard, 100-(int)port_starboard));
+        m_stPortStarboard->SetLabel(isnan(port_starboard) ? _T("nan")
+                                    : wxString::Format(_T("%02d/%02d"),
+                                                       (int)port_starboard, 100-(int)port_starboard));
 
         m_stAverageWindKnots->SetLabel
             (wxString::Format(_T("%2.f knts"), routemapoverlay->RouteInfo

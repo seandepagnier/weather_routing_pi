@@ -198,6 +198,13 @@ void ConfigurationBatchDialog::OnConnect( wxCommandEvent& event )
     m_lSources->SetSelection(-1);
 }
 
+void ConfigurationBatchDialog::OnDisconnectAll( wxCommandEvent& event )
+{
+    for(std::vector<BatchSource*>::iterator it = sources.begin();
+        it != sources.end(); it++)
+        (*it)->destinations.clear();
+}
+
 void ConfigurationBatchDialog::OnAddBoat( wxCommandEvent& event )
 {
     wxFileDialog openDialog
@@ -223,15 +230,13 @@ void ConfigurationBatchDialog::OnReset( wxCommandEvent& event )
 
 void ConfigurationBatchDialog::OnInformation( wxCommandEvent& event )
 {
-    wxMessageDialog mdlg(this, _("Batch mode iterates over the selected route map configuration\
- to generate many configurations.\n\n\
-To add a new Position, use the right-click context menu on the main map when the batch dialog is\
-visible"),
-                         _("Weather Routing"), wxOK | wxICON_WARNING);
+    wxMessageDialog mdlg(this, _("Batch mode generates multiple configurations based on \
+the selected configuration."),
+                         _("Weather Routing"), wxOK);
     mdlg.ShowModal();
 }
 
-void ConfigurationBatchDialog::OnCancel( wxCommandEvent& event )
+void ConfigurationBatchDialog::OnClose( wxCommandEvent& event )
 {
     Hide();
 }

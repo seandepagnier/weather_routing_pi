@@ -62,13 +62,14 @@ protected:
     void OnRemoveSource( wxCommandEvent& event );
     void OnClearSources( wxCommandEvent& event );
     void OnConnect( wxCommandEvent& event );
+    void OnDisconnectAll( wxCommandEvent& event );
     void OnAddBoat( wxCommandEvent& event );
     void OnRemoveBoat( wxCommandEvent& event );
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnReset( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
-    void OnCancel( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event );
     void OnGenerate( wxCommandEvent& event );
 
     void Reset();

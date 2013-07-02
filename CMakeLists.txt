@@ -73,8 +73,6 @@ SET(SRC_WEATHER_ROUTING
             src/WeatherRouting.cpp
             src/ConfigurationDialog.h 
             src/ConfigurationDialog.cpp
-            src/PositionsDialog.h 
-            src/PositionsDialog.cpp
             src/SettingsDialog.h 
             src/SettingsDialog.cpp
             src/PlotDialog.h

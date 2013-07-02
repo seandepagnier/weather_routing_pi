@@ -17,9 +17,12 @@
 #include <wx/colour.h>
 #include <wx/settings.h>
 #include <wx/string.h>
+#include <wx/sizer.h>
+#include <wx/statbox.h>
+#include <wx/panel.h>
 #include <wx/button.h>
 #include <wx/gauge.h>
-#include <wx/sizer.h>
+#include <wx/splitter.h>
 #include <wx/bitmap.h>
 #include <wx/image.h>
 #include <wx/icon.h>
@@ -30,7 +33,6 @@
 #include <wx/datectrl.h>
 #include <wx/dateevt.h>
 #include <wx/textctrl.h>
-#include <wx/statbox.h>
 #include <wx/spinctrl.h>
 #include <wx/filepicker.h>
 #include <wx/listbox.h>
@@ -39,7 +41,6 @@
 #include <wx/clrpicker.h>
 #include <wx/scrolwin.h>
 #include <wx/choice.h>
-#include <wx/panel.h>
 #include <wx/slider.h>
 #include <wx/notebook.h>
 #include <wx/html/htmlwin.h>
@@ -55,17 +56,22 @@ class WeatherRoutingBase : public wxFrame
 	private:
 	
 	protected:
+		wxSplitterWindow* m_splitter1;
+		wxPanel* m_panel11;
+		wxListCtrl* m_lPositions;
+		wxPanel* m_panel12;
 		wxListCtrl* m_lWeatherRoutes;
 		wxButton* m_bCompute;
 		wxMenuBar* m_menubar3;
 		wxMenu* m_mFile;
-		wxMenu* m_mEdit;
+		wxMenu* m_mPosition;
+		wxMenu* m_mConfiguration;
 		wxMenu* m_mView;
 		wxMenu* m_mHelp;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnConfiguration( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnEditConfiguration( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
@@ -73,10 +79,12 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddAtBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemovePosition( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClearPositions( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNew( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPositions( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBatch( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnConfiguration( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditConfiguration( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
@@ -96,6 +104,12 @@ class WeatherRoutingBase : public wxFrame
 		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
+		
+		void m_splitter1OnIdle( wxIdleEvent& )
+		{
+			m_splitter1->SetSashPosition( 120 );
+			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( WeatherRoutingBase::m_splitter1OnIdle ), NULL, this );
+		}
 	
 };
 
@@ -474,7 +488,6 @@ class InformationDialog : public wxDialog
 	protected:
 		wxStdDialogButtonSizer* m_sdbSizer2;
 		wxButton* m_sdbSizer2OK;
-		wxButton* m_sdbSizer2Cancel;
 	
 	public:
 		wxHtmlWindow* m_htmlInformation;
@@ -613,6 +626,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 		virtual void OnSources( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinations( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConnect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDisconnectAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
@@ -630,34 +644,6 @@ class ConfigurationBatchDialogBase : public wxDialog
 		
 		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationBatchDialogBase();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class PositionsDialogBase
-///////////////////////////////////////////////////////////////////////////////
-class PositionsDialogBase : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxListCtrl* m_lPositions;
-		wxButton* m_bRemoveSource;
-		wxButton* m_bClear;
-		wxButton* m_bBoatPosition;
-		wxButton* m_bClose;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnRemove( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClear( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnBoatPosition( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		PositionsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Positions"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
-		~PositionsDialogBase();
 	
 };
 

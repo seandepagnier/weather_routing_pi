@@ -32,7 +32,6 @@
 #include <wx/fileconf.h>
 
 #include "WeatherRoutingUI.h"
-#include "PositionsDialog.h"
 #include "ConfigurationDialog.h"
 #include "ConfigurationBatchDialog.h"
 #include "SettingsDialog.h"
@@ -56,6 +55,7 @@ public:
 class WeatherRouting : public WeatherRoutingBase
 {
 public:
+    enum {POSITION_NAME=0, POSITION_LAT, POSITION_LON};
     enum {VISIBLE=0, START, STARTTIME, END, TIME, DISTANCE, AVGSPEED, STATE};
 
     WeatherRouting(wxWindow *parent, weather_routing_pi &plugin);
@@ -64,7 +64,6 @@ public:
     void Reset();
 
     void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
-    PositionsDialog m_PositionsDialog;
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
 
@@ -79,10 +78,17 @@ public:
     void GenerateBatch();
     bool Show(bool show);
 
+    void AddPosition(double lat, double lon);
+    void AddPosition(double lat, double lon, wxString name);
+
 private:
+
+    void OnAddAtBoat( wxCommandEvent& event );
+    void OnRemovePosition( wxCommandEvent& event );
+    void OnClearPositions( wxCommandEvent& event );
     void OnClose( wxCloseEvent& event );
-    void OnConfiguration();
-    void OnConfiguration( wxMouseEvent& event ) { OnConfiguration(); }
+    void OnEditConfiguration();
+    void OnEditConfiguration( wxMouseEvent& event ) { OnEditConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );
     void OnWeatherRouteSelected( wxListEvent& event );
     void OnWeatherRoutesListLeftDown(wxMouseEvent &event);
@@ -93,7 +99,7 @@ private:
     void OnNew( wxCommandEvent& event );
     void OnPositions( wxCommandEvent& event );
     void OnBatch( wxCommandEvent& event );
-    void OnConfiguration( wxCommandEvent& event ) { OnConfiguration(); }
+    void OnEditConfiguration( wxCommandEvent& event ) { OnEditConfiguration(); }
     void OnExport( wxCommandEvent& event );
     void OnDelete( wxCommandEvent& event );
     void OnFilter( wxCommandEvent& event );
@@ -141,7 +147,7 @@ private:
     int m_RoutesToRun;
     bool m_bSkipUpdateCurrentItem;
 
-    bool m_bShowPositions, m_bShowConfiguration, m_bShowConfigurationBatch;
+    bool m_bShowConfiguration, m_bShowConfigurationBatch;
     bool m_bShowSettings, m_bShowStatistics, m_bShowFilter;
 
     weather_routing_pi &m_weather_routing_pi;

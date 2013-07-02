@@ -40,7 +40,7 @@
 #include "WeatherRouting.h"
 #include "FilterRoutesDialog.h"
 
-wxString FilterNames[] = {_("Name"), _("BoatFileName"), _("Start"), _("Start Time"), _("End"), _("State")};
+wxString FilterNames[] = {_("Start"), _("Start Time"), _("End"), _("BoatFileName"), _("State")};
 
 FilterRoutesDialog::FilterRoutesDialog(WeatherRouting *weatherrouting)
     : FilterRoutesDialogBase(weatherrouting), m_WeatherRouting(weatherrouting)
@@ -82,10 +82,10 @@ void FilterRoutesDialog::ApplyFilters()
         for(int f = 0; f < NUM_FILTERS; f++) {
             wxString value;
             switch(f) {
-            case BOATFILENAME: value = (*it)->BoatFilename; break;
             case START: value = (*it)->Start; break;
             case STARTTIME: value = (*it)->StartTime; break;
             case END: value = (*it)->End; break;
+            case BOATFILENAME: value = (*it)->BoatFilename; break;
             case STATE: value = (*it)->State; break;
             }
 

@@ -32,7 +32,7 @@
 class FilterRoutesDialog : public FilterRoutesDialogBase
 {
 public:
-    enum Filters {NAME, BOATFILENAME, START, STARTTIME, END, STATE, NUM_FILTERS};
+    enum Filters {START, STARTTIME, END, BOATFILENAME, STATE, NUM_FILTERS};
 
     FilterRoutesDialog( WeatherRouting *weatherrouting );
 
