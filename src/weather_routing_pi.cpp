@@ -48,7 +48,7 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 #include "icons.h"
 
 weather_routing_pi::weather_routing_pi(void *ppimgr)
-      :opencpn_plugin_18(ppimgr)
+      :opencpn_plugin_110(ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
@@ -136,7 +136,7 @@ wxString weather_routing_pi::GetCommonName()
 
 wxString weather_routing_pi::GetShortDescription()
 {
-    return _("Weather Routing PlugIn by Sean d'Epagnier");
+    return _("Compute optimal routes based on weather and constraints.");
 }
 
 wxString weather_routing_pi::GetLongDescription()
@@ -216,8 +216,8 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         r.Parse(message_body, &v);
 
         int major = v[_T("ClimatologyVersionMajor")].AsInt();
-        int minor = v[_T("ClimatologyVersionMinor")].AsInt();
-        if( major != 0 || minor > 3) {
+//        int minor = v[_T("ClimatologyVersionMinor")].AsInt();
+        if(major > 0) {
             wxMessageDialog mdlg(m_parent_window,
                                  _("Climatology plugin version not supported, no climatology data\n"),
                                  _("Weather Routing"), wxOK | wxICON_WARNING);

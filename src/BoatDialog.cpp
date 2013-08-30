@@ -43,10 +43,6 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     : BoatDialogBase(parent), m_boatpath(boatpath), m_PlotScale(0)
 {
     wxString error = m_Boat.OpenXML(m_boatpath);
-    if(!error.empty()) {
-        m_Boat.Plans.push_back(new BoatPlan(_("Initial Plan"), m_Boat));
-        m_Boat.Plans[0]->ComputeBoatSpeeds(m_Boat);
-    }
     m_SelectedSailPlan = 0;
 
     m_lBoatPlans->InsertColumn(spNAME, _("Name"));
@@ -421,7 +417,6 @@ void BoatDialog::OnRecomputeDrag( wxCommandEvent& event )
     m_Boat.RecomputeDrag();
     m_sFrictionalDrag->SetValue(1000.0 * m_Boat.frictional_drag);
     m_sWakeDrag->SetValue(100.0 * m_Boat.wake_drag);
-
     Compute();
 }
 
@@ -449,6 +444,7 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
 
 void BoatDialog::OnEta( wxScrollEvent& event )
 {
+    StoreBoatParameters();
     Compute();
 }
 
@@ -458,6 +454,7 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
     m_SelectedSailPlan = m_lBoatPlans->InsertItem(m_lBoatPlans->GetItemCount(), np);
     m_Boat.Plans.push_back(new BoatPlan(np, m_Boat));
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    StoreBoatParameters();
     Compute();
     OnEditBoatPlan(event);
     m_bDeleteBoatPlan->Enable();
@@ -488,6 +485,10 @@ void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
 
 void BoatDialog::StoreBoatParameters()
 {
+    if(m_SelectedSailPlan < 0 ||
+       m_SelectedSailPlan >= m_Boat.Plans.size())
+        return;
+
     m_Boat.Plans[m_SelectedSailPlan]->eta = m_sEta->GetValue() / 1000.0;
     m_Boat.Plans[m_SelectedSailPlan]->luff_angle = m_sLuffAngle->GetValue();
 
@@ -532,7 +533,9 @@ void BoatDialog::RepopulatePlans()
 
 void BoatDialog::Compute()
 {
-    StoreBoatParameters();
+    if(m_SelectedSailPlan < 0 ||
+       m_SelectedSailPlan >= m_Boat.Plans.size())
+        return;
 
     BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
     plan->ComputeBoatSpeeds(m_Boat);

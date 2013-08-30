@@ -53,6 +53,13 @@ wxString Boat::OpenXML(wxString filename)
         return _("Failed to read xml file (no OCPWeatherRoutingBoat node)");
 
     bool cleared = false;
+    for(unsigned int i=0; i<Plans.size(); i++)
+        delete Plans[i];
+    Plans.clear();
+    
+    Plans.push_back(new BoatPlan(_("Initial Plan"), *this));
+    Plans[0]->ComputeBoatSpeeds(*this);
+
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
         if(!strcmp(e->Value(), "BoatCharacteristics")) {
             displacement_tons = AttributeDouble(e, "displacement_tons", 4);

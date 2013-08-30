@@ -27,7 +27,6 @@
 
 #include <wx/wx.h>
 #include <wx/imaglist.h>
-
 #include <wx/progdlg.h>
 
 #include <stdlib.h>
@@ -226,7 +225,24 @@ void WeatherRouting::AddPosition(double lat, double lon)
                     (*it).lon = lon;
                     m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
                     m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
-                }
+
+                    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+                        WeatherRoute *weatherroute =
+                            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+                        RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
+                        if(c.Start == (*it).Name) {
+                            c.StartLat = lat;
+                            c.StartLon = lon;
+                            weatherroute->routemapoverlay->SetConfiguration(c);
+                        }
+                            
+                        if(c.End == (*it).Name) {
+                            c.EndLat = lat;
+                            c.EndLon = lon;
+                            weatherroute->routemapoverlay->SetConfiguration(c);
+                        }
+                    }
+               }
                 return;
             }
         }
@@ -313,8 +329,7 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
         m_ConfigurationDialog.SetConfiguration(CurrentRouteMap()->GetConfiguration());
         m_bSkipUpdateCurrentItem = false;
         m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
-    } else
-        m_ConfigurationDialog.Hide();
+    }
 }
 
 void WeatherRouting::OnWeatherRoutesListLeftDown(wxMouseEvent &event)
@@ -641,8 +656,9 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
     if(!doc.LoadFile(filename.mb_str()))
         FAIL(_("Failed to load file."));
     else {
-        TiXmlHandle root( doc.RootElement() );
-        if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingConfiguration"))
+        TiXmlHandle root(doc.RootElement());
+
+        if(strcmp(root.Element()->Value(), "OCPNWeatherRoutingConfiguration"))
             FAIL(_("Invalid xml file"));
 
         RouteMap::Positions.clear();
@@ -650,7 +666,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
         int count = 0;
         for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement())
             count++;
-
+    
         int i=0;
         for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement(), i++) {
             if(progressdialog) {
@@ -664,12 +680,12 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                         wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
                 }
             }
-
+        
             if(!strcmp(e->Value(), "Position")) {
                 wxString name = wxString::FromUTF8(e->Attribute("Name"));
                 double lat = AttributeDouble(e, "Latitude", NAN);
                 double lon = AttributeDouble(e, "Longitude", NAN);
-
+            
                 for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
                     it != RouteMap::Positions.end(); it++) {
                     if((*it).Name == name) {
@@ -677,65 +693,65 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                         if(warnonce) {
                             warnonce = false;
                             wxMessageDialog mdlg(this, _("File contains duplicate position name, discaring\n"),
-                                     _("Weather Routing"), wxOK | wxICON_WARNING);
+                                                 _("Weather Routing"), wxOK | wxICON_WARNING);
                             mdlg.ShowModal();
                         }
-
+                    
                         goto skipadd;
                     }
                 }
                 AddPosition(lat, lon, name);
-
+            
             skipadd:;
             } else
-            if(!strcmp(e->Value(), "Configuration")) {
-                RouteMapConfiguration configuration;
-                configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
-                wxDateTime date;
-                date.ParseDate(wxString::FromUTF8(e->Attribute("StartDate")));
-                wxDateTime time;
-                time.ParseTime(wxString::FromUTF8(e->Attribute("StartTime")));
-                if(date.IsValid()) {
-                    if(time.IsValid()) {
-                        date.SetHour(time.GetHour());
-                        date.SetMinute(time.GetMinute());
-                        date.SetSecond(time.GetSecond());
+                if(!strcmp(e->Value(), "Configuration")) {
+                    RouteMapConfiguration configuration;
+                    configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
+                    wxDateTime date;
+                    date.ParseDate(wxString::FromUTF8(e->Attribute("StartDate")));
+                    wxDateTime time;
+                    time.ParseTime(wxString::FromUTF8(e->Attribute("StartTime")));
+                    if(date.IsValid()) {
+                        if(time.IsValid()) {
+                            date.SetHour(time.GetHour());
+                            date.SetMinute(time.GetMinute());
+                            date.SetSecond(time.GetSecond());
+                        }
+                        configuration.StartTime = date;
+                    } else
+                        configuration.StartTime = wxDateTime::Now();
+            
+                    configuration.End = wxString::FromUTF8(e->Attribute("End"));
+                    configuration.dt = AttributeDouble(e, "dt", 0);
+            
+                    configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
+            
+                    configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 180);
+                    configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
+                    configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
+                    configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
+                    configuration.MaxTacks = AttributeDouble(e, "MaxTacks", -1);
+                    configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
+            
+                    configuration.UseGrib = AttributeBool(e, "UseGrib", true);
+                    configuration.UseClimatology = AttributeBool(e, "UseClimatology", true);
+                    configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
+                    configuration.DetectLand = AttributeBool(e, "DetectLand", true);
+                    configuration.Currents = AttributeBool(e, "Currents", true);
+                    configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
+                    configuration.Anchoring = AttributeBool(e, "Anchoring", false);
+            
+                    wxString degreesteps = wxString::FromUTF8(e->Attribute("DegreeSteps"));
+                    while(degreesteps.size()) {
+                        double step;
+                        if(degreesteps.BeforeFirst(';').ToDouble(&step))
+                            configuration.DegreeSteps.push_back(step);
+                        degreesteps = degreesteps.AfterFirst(';');
                     }
-                    configuration.StartTime = date;
+            
+                    AddConfiguration(configuration);
                 } else
-                    configuration.StartTime = wxDateTime::Now();
-
-                configuration.End = wxString::FromUTF8(e->Attribute("End"));
-                configuration.dt = AttributeDouble(e, "dt", 0);
-                
-                configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
-                
-                configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 180);
-                configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
-                configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
-                configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
-                configuration.MaxTacks = AttributeDouble(e, "MaxTacks", -1);
-                configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
-                
-                configuration.UseGrib = AttributeBool(e, "UseGrib", true);
-                configuration.UseClimatology = AttributeBool(e, "UseClimatology", true);
-                configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
-                configuration.DetectLand = AttributeBool(e, "DetectLand", true);
-                configuration.Currents = AttributeBool(e, "Currents", true);
-                configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
-                configuration.Anchoring = AttributeBool(e, "Anchoring", false);
-
-                wxString degreesteps = wxString::FromUTF8(e->Attribute("DegreeSteps"));
-                while(degreesteps.size()) {
-                    double step;
-                    if(degreesteps.BeforeFirst(';').ToDouble(&step))
-                        configuration.DegreeSteps.push_back(step);
-                    degreesteps = degreesteps.AfterFirst(';');
-                }
- 
-                AddConfiguration(configuration);
-            } else
-                FAIL(_("Unrecognized xml node"));
+                    FAIL(_("Unrecognized xml node"));
         }
     }
     delete progressdialog;

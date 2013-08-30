@@ -31,7 +31,7 @@
 #define     PLUGIN_VERSION_MINOR    9
 
 #define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    8
+#define     MY_API_VERSION_MINOR    10
 
 #include "../../../include/ocpn_plugin.h"
 #include "../../../include/ocpndc.h"
@@ -56,7 +56,7 @@
 
 class WeatherRouting;
 
-class weather_routing_pi : public opencpn_plugin_18
+class weather_routing_pi : public opencpn_plugin_110
 {
 public:
       weather_routing_pi(void *ppimgr);
