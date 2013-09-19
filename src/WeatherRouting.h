@@ -78,6 +78,8 @@ public:
     void GenerateBatch();
     bool Show(bool show);
 
+    void UpdateDisplaySettings();
+
     void AddPosition(double lat, double lon);
     void AddPosition(double lat, double lon, wxString name);
 

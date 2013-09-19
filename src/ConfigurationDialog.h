@@ -65,6 +65,7 @@ protected:
     void OnRemoveDegreeStep( wxCommandEvent& event );
     void OnClearDegreeSteps( wxCommandEvent& event );
     void OnGenerateDegreeSteps( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event ) { Hide(); }
 
 private:
     enum ConfigurationItem {START, END, START_TIME, TIME_STEP};

@@ -160,6 +160,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
 WeatherRouting::~WeatherRouting( )
 {
+    m_SettingsDialog.SaveSettings();
+
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
@@ -209,6 +211,17 @@ void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
         glPopAttrib();
 }
 
+void WeatherRouting::UpdateDisplaySettings()
+{
+    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+        WeatherRoute *weatherroute =
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+        weatherroute->routemapoverlay->m_UpdateOverlay = true;
+    }
+
+    GetParent()->Refresh();
+}
+
 void WeatherRouting::AddPosition(double lat, double lon)
 {
     wxTextEntryDialog pd( this, _("Enter Name"), _("New Source") );
@@ -230,19 +243,26 @@ void WeatherRouting::AddPosition(double lat, double lon)
                         WeatherRoute *weatherroute =
                             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
                         RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
+                        bool update = false;
                         if(c.Start == (*it).Name) {
                             c.StartLat = lat;
                             c.StartLon = lon;
-                            weatherroute->routemapoverlay->SetConfiguration(c);
+                            update = true;
                         }
                             
                         if(c.End == (*it).Name) {
                             c.EndLat = lat;
                             c.EndLon = lon;
+                            update = true;
+                        }
+
+                        if(update) {
                             weatherroute->routemapoverlay->SetConfiguration(c);
+                            weatherroute->Update(true);
+                            UpdateItem(i);
                         }
                     }
-               }
+                }
                 return;
             }
         }
@@ -544,19 +564,7 @@ void WeatherRouting::OnDeleteAll( wxCommandEvent& event )
 
 void WeatherRouting::OnSettings( wxCommandEvent& event )
 {
-    m_SettingsDialog.LoadSettings();
-
-    if(m_SettingsDialog.ShowModal() == wxID_OK) {
-        m_SettingsDialog.SaveSettings();
-
-        for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
-            WeatherRoute *weatherroute =
-                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
-            weatherroute->routemapoverlay->m_UpdateOverlay = true;
-        }
-
-        GetParent()->Refresh();
-    }
+    m_SettingsDialog.Show();
 }
 
 void WeatherRouting::OnStatistics( wxCommandEvent& event )
@@ -582,7 +590,7 @@ void WeatherRouting::OnInformation ( wxCommandEvent& event )
         dlg.ShowModal();
     else {
         wxMessageDialog mdlg(this, _("Failed to load file:\n") + infolocation,
-                             _("OpenCPN Alert"), wxOK | wxICON_ERROR);
+                             _("Weather Routing"), wxOK | wxICON_ERROR);
         mdlg.ShowModal();
     }
 }
@@ -888,8 +896,11 @@ void WeatherRoute::Update(bool stateonly)
     } else
         Time = _("N/A");
 
+    RouteMapConfiguration c = routemapoverlay->GetConfiguration();
+
     Distance =  wxString::Format
-        (_T("%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE));
+        (_T("%.0f/%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE),
+         DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon));
     
     AvgSpeed = wxString::Format
         (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED));

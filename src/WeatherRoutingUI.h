@@ -173,9 +173,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
-		wxStdDialogButtonSizer* m_sdbSizer5;
-		wxButton* m_sdbSizer5OK;
-		wxButton* m_sdbSizer5Cancel;
+		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
@@ -189,6 +187,7 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnRemoveDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClearDegreeSteps( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerateDegreeSteps( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -219,7 +218,14 @@ class SettingsDialogBase : public wxDialog
 		wxStaticText* m_staticText115;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
-		wxButton* m_sdbSizer1Cancel;
+		wxButton* m_sdbSizer1Help;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnUpdate( wxColourPickerEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
 		wxColourPickerCtrl* m_cpCursorRoute;
@@ -267,7 +273,6 @@ class BoatDialogBase : public wxDialog
 		wxButton* m_bOpen;
 		wxButton* m_bSaveAs;
 		wxButton* m_bSave;
-		wxButton* m_bCancel;
 		wxPanel* m_panel31;
 		wxStaticText* m_staticText93;
 		wxStaticText* m_stCSVFile;
@@ -325,6 +330,7 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stComfortFactor;
 		wxStaticText* m_staticText105;
 		wxStaticText* m_stDisplacementLengthRatio;
+		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMouseEventsPlot( wxMouseEvent& event ) { event.Skip(); }
@@ -335,7 +341,6 @@ class BoatDialogBase : public wxDialog
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveAs( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCancel( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOpenCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
@@ -350,11 +355,12 @@ class BoatDialogBase : public wxDialog
 		virtual void OnNewBoatPlan( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoatPlan( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteBoatPlan( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BoatDialogBase();
 	
 };

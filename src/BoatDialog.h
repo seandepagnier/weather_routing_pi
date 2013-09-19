@@ -53,7 +53,7 @@ private:
     void Save();
     void OnSaveAs( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
-    void OnCancel( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event );
     void OnOpenCSV( wxCommandEvent& event );
     void OnSaveCSV( wxCommandEvent& event );
     void OnRecompute( wxSpinEvent& event ) { StoreBoatParameters(); Compute(); UpdateStats(); }

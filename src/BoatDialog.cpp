@@ -377,7 +377,7 @@ void BoatDialog::OnSave ( wxCommandEvent& event )
     Save();
 }
 
-void BoatDialog::OnCancel ( wxCommandEvent& event )
+void BoatDialog::OnClose ( wxCommandEvent& event )
 {
     EndModal(wxID_CANCEL);
 }
@@ -486,7 +486,7 @@ void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
 void BoatDialog::StoreBoatParameters()
 {
     if(m_SelectedSailPlan < 0 ||
-       m_SelectedSailPlan >= m_Boat.Plans.size())
+       m_SelectedSailPlan >= (int)m_Boat.Plans.size())
         return;
 
     m_Boat.Plans[m_SelectedSailPlan]->eta = m_sEta->GetValue() / 1000.0;
@@ -534,7 +534,7 @@ void BoatDialog::RepopulatePlans()
 void BoatDialog::Compute()
 {
     if(m_SelectedSailPlan < 0 ||
-       m_SelectedSailPlan >= m_Boat.Plans.size())
+       m_SelectedSailPlan >= (int)m_Boat.Plans.size())
         return;
 
     BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
