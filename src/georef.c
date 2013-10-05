@@ -38,7 +38,6 @@
 #include <ctype.h>
 
 #include "georef.h"
-#include "cutil.h"
 
 
 #ifdef __MSVC__
