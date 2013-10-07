@@ -126,7 +126,7 @@ int weather_routing_pi::GetPlugInVersionMinor()
 
 wxBitmap *weather_routing_pi::GetPlugInBitmap()
 {
-      return _img_WeatherRouting;
+    return new wxBitmap(_img_WeatherRouting->ConvertToImage().Copy());
 }
 
 wxString weather_routing_pi::GetCommonName()
