@@ -35,8 +35,8 @@
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
 #include <wx/filepicker.h>
-#include <wx/listbox.h>
 #include <wx/checkbox.h>
+#include <wx/listbox.h>
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
 #include <wx/scrolwin.h>
@@ -101,7 +101,7 @@ class WeatherRoutingBase : public wxFrame
 	public:
 		wxGauge* m_gProgress;
 		
-		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
 		
@@ -136,6 +136,10 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText112;
 		wxFilePickerCtrl* m_fpBoat;
 		wxButton* m_bEditBoat;
+		wxCheckBox* m_cbAllowDataDeficient;
+		wxCheckBox* m_cbDetectLand;
+		wxCheckBox* m_cbInvertedRegions;
+		wxCheckBox* m_cbAnchoring;
 		wxStaticText* m_staticText20;
 		wxSpinCtrl* m_sMaxDivertedCourse;
 		wxStaticText* m_staticText1181;
@@ -169,10 +173,6 @@ class ConfigurationDialogBase : public wxDialog
 		wxTextCtrl* m_tByDegrees;
 		wxStaticText* m_staticText118;
 		wxButton* m_bGenerateDegreeSteps;
-		wxCheckBox* m_cbAllowDataDeficient;
-		wxCheckBox* m_cbDetectLand;
-		wxCheckBox* m_cbInvertedRegions;
-		wxCheckBox* m_cbAnchoring;
 		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -612,6 +612,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText124;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText126;
+		wxStaticText* m_staticText1221;
 		wxPanel* m_pRoutes;
 		wxListBox* m_lSources;
 		wxListBox* m_lDestinations;

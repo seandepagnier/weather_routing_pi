@@ -22,6 +22,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	m_splitter1->Connect( wxEVT_IDLE, wxIdleEventHandler( WeatherRoutingBase::m_splitter1OnIdle ), NULL, this );
+	m_splitter1->SetMinimumPaneSize( 1 );
 	
 	m_panel11 = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxStaticBoxSizer* sbSizer30;
@@ -34,7 +35,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	fgSizer93->SetFlexibleDirection( wxBOTH );
 	fgSizer93->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_lPositions = new wxListCtrl( m_panel11, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_EDIT_LABELS|wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
+	m_lPositions = new wxListCtrl( m_panel11, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_EDIT_LABELS|wxLC_HRULES|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
 	fgSizer93->Add( m_lPositions, 0, wxALL|wxEXPAND, 5 );
 	
 	
@@ -56,8 +57,6 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
 	
 	m_lWeatherRoutes = new wxListCtrl( m_panel12, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
-	m_lWeatherRoutes->SetMinSize( wxSize( 600,-1 ) );
-	
 	fgSizer17->Add( m_lWeatherRoutes, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer116;
@@ -89,7 +88,6 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	this->SetSizer( fgSizer92 );
 	this->Layout();
-	fgSizer92->Fit( this );
 	m_menubar3 = new wxMenuBar( 0 );
 	m_mFile = new wxMenu();
 	wxMenuItem* m_mOpen;
@@ -401,6 +399,94 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	fgSizer83->Add( sbSizer24, 1, wxEXPAND, 5 );
 	
+	wxFlexGridSizer* fgSizer84;
+	fgSizer84 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer84->SetFlexibleDirection( wxBOTH );
+	fgSizer84->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer18;
+	fgSizer18 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer18->SetFlexibleDirection( wxBOTH );
+	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer57;
+	fgSizer57 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer57->SetFlexibleDirection( wxBOTH );
+	fgSizer57->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer15;
+	sbSizer15 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Data Source") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer58;
+	fgSizer58 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer58->SetFlexibleDirection( wxBOTH );
+	fgSizer58->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer59;
+	fgSizer59 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer59->SetFlexibleDirection( wxBOTH );
+	fgSizer59->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_cbUseGrib = new wxCheckBox( this, wxID_ANY, _("Grib"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbUseGrib->SetValue(true); 
+	m_cbUseGrib->Enable( false );
+	
+	fgSizer59->Add( m_cbUseGrib, 0, wxALL, 5 );
+	
+	m_cbUseClimatology = new wxCheckBox( this, wxID_ANY, _("Climatology"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbUseClimatology->Enable( false );
+	
+	fgSizer59->Add( m_cbUseClimatology, 0, wxALL, 5 );
+	
+	
+	fgSizer58->Add( fgSizer59, 1, wxEXPAND, 5 );
+	
+	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, _("Last Valid if Data Deficient"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer58->Add( m_cbAllowDataDeficient, 0, wxALL, 5 );
+	
+	
+	sbSizer15->Add( fgSizer58, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer57->Add( sbSizer15, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer28;
+	sbSizer28 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Options") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer23;
+	fgSizer23 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer23->SetFlexibleDirection( wxBOTH );
+	fgSizer23->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_cbDetectLand = new wxCheckBox( this, wxID_ANY, _("Detect Land"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbDetectLand->SetValue(true); 
+	fgSizer23->Add( m_cbDetectLand, 0, wxALL, 5 );
+	
+	m_cbCurrents = new wxCheckBox( this, wxID_ANY, _("Currents"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbCurrents->SetValue(true); 
+	fgSizer23->Add( m_cbCurrents, 0, wxALL, 5 );
+	
+	m_cbInvertedRegions = new wxCheckBox( this, wxID_ANY, _("Inverted Regions"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer23->Add( m_cbInvertedRegions, 0, wxALL, 5 );
+	
+	m_cbAnchoring = new wxCheckBox( this, wxID_ANY, _("Anchoring"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer23->Add( m_cbAnchoring, 0, wxALL, 5 );
+	
+	
+	sbSizer28->Add( fgSizer23, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer57->Add( sbSizer28, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer18->Add( fgSizer57, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer84->Add( fgSizer18, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer83->Add( fgSizer84, 1, wxEXPAND, 5 );
+	
 	
 	fgSizer95->Add( fgSizer83, 1, wxEXPAND, 5 );
 	
@@ -450,7 +536,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText129->Wrap( -1 );
 	fgSizer110->Add( m_staticText129, 0, wxALL, 5 );
 	
-	m_staticText26 = new wxStaticText( this, wxID_ANY, _("Max Latitude"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText26 = new wxStaticText( this, wxID_ANY, _("Max Latitude +-"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText26->Wrap( -1 );
 	fgSizer110->Add( m_staticText26, 0, wxALL, 5 );
 	
@@ -488,17 +574,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	
 	fgSizer112->Add( sbSizer23, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer95->Add( fgSizer112, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer62->Add( fgSizer95, 1, wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer84;
-	fgSizer84 = new wxFlexGridSizer( 0, 3, 0, 0 );
-	fgSizer84->SetFlexibleDirection( wxBOTH );
-	fgSizer84->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* sbSizer7;
 	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Degree Steps") ), wxVERTICAL );
@@ -617,90 +692,13 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	sbSizer7->Add( fgSizer105, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer84->Add( sbSizer7, 1, wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer18;
-	fgSizer18 = new wxFlexGridSizer( 0, 3, 0, 0 );
-	fgSizer18->SetFlexibleDirection( wxBOTH );
-	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxFlexGridSizer* fgSizer57;
-	fgSizer57 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer57->SetFlexibleDirection( wxBOTH );
-	fgSizer57->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticBoxSizer* sbSizer15;
-	sbSizer15 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Data Source") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer58;
-	fgSizer58 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer58->SetFlexibleDirection( wxBOTH );
-	fgSizer58->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxFlexGridSizer* fgSizer59;
-	fgSizer59 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer59->SetFlexibleDirection( wxBOTH );
-	fgSizer59->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_cbUseGrib = new wxCheckBox( this, wxID_ANY, _("Grib"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cbUseGrib->SetValue(true); 
-	m_cbUseGrib->Enable( false );
-	
-	fgSizer59->Add( m_cbUseGrib, 0, wxALL, 5 );
-	
-	m_cbUseClimatology = new wxCheckBox( this, wxID_ANY, _("Climatology"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cbUseClimatology->Enable( false );
-	
-	fgSizer59->Add( m_cbUseClimatology, 0, wxALL, 5 );
+	fgSizer112->Add( sbSizer7, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer58->Add( fgSizer59, 1, wxEXPAND, 5 );
-	
-	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, _("Last Valid if Data Deficient"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer58->Add( m_cbAllowDataDeficient, 0, wxALL, 5 );
+	fgSizer95->Add( fgSizer112, 1, wxEXPAND, 5 );
 	
 	
-	sbSizer15->Add( fgSizer58, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer57->Add( sbSizer15, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer28;
-	sbSizer28 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Options") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer23;
-	fgSizer23 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer23->SetFlexibleDirection( wxBOTH );
-	fgSizer23->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_cbDetectLand = new wxCheckBox( this, wxID_ANY, _("Detect Land"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cbDetectLand->SetValue(true); 
-	fgSizer23->Add( m_cbDetectLand, 0, wxALL, 5 );
-	
-	m_cbCurrents = new wxCheckBox( this, wxID_ANY, _("Currents"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cbCurrents->SetValue(true); 
-	fgSizer23->Add( m_cbCurrents, 0, wxALL, 5 );
-	
-	m_cbInvertedRegions = new wxCheckBox( this, wxID_ANY, _("Inverted Regions"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer23->Add( m_cbInvertedRegions, 0, wxALL, 5 );
-	
-	m_cbAnchoring = new wxCheckBox( this, wxID_ANY, _("Anchoring"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer23->Add( m_cbAnchoring, 0, wxALL, 5 );
-	
-	
-	sbSizer28->Add( fgSizer23, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer57->Add( sbSizer28, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer18->Add( fgSizer57, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer84->Add( fgSizer18, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer62->Add( fgSizer84, 1, wxEXPAND, 5 );
+	fgSizer62->Add( fgSizer95, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer92->Add( fgSizer62, 1, wxEXPAND, 5 );
@@ -727,6 +725,13 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sTimeStepSeconds->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_fpBoat->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bEditBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnEditBoat ), NULL, this );
+	m_cbUseGrib->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbUseClimatology->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbAllowDataDeficient->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbDetectLand->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbCurrents->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbInvertedRegions->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbAnchoring->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sMaxDivertedCourse->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sMaxWindKnots->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sMaxSwellMeters->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
@@ -737,13 +742,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_bRemoveDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
 	m_bClearDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );
 	m_bGenerateDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnGenerateDegreeSteps ), NULL, this );
-	m_cbUseGrib->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbUseClimatology->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbAllowDataDeficient->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbDetectLand->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbCurrents->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbInvertedRegions->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbAnchoring->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClose ), NULL, this );
 }
 
@@ -761,6 +759,13 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sTimeStepSeconds->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_fpBoat->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bEditBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnEditBoat ), NULL, this );
+	m_cbUseGrib->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbUseClimatology->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbAllowDataDeficient->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbDetectLand->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbCurrents->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbInvertedRegions->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbAnchoring->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sMaxDivertedCourse->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sMaxWindKnots->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sMaxSwellMeters->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
@@ -771,13 +776,6 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_bRemoveDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
 	m_bClearDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );
 	m_bGenerateDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnGenerateDegreeSteps ), NULL, this );
-	m_cbUseGrib->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbUseClimatology->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbAllowDataDeficient->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbDetectLand->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbCurrents->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbInvertedRegions->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbAnchoring->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClose ), NULL, this );
 	
 }
@@ -2442,11 +2440,15 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_staticText126->Wrap( -1 );
 	fgSizer77->Add( m_staticText126, 0, wxALL, 5 );
 	
+	m_staticText1221 = new wxStaticText( m_panel8, wxID_ANY, _("Apart"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1221->Wrap( -1 );
+	fgSizer77->Add( m_staticText1221, 0, wxALL, 5 );
+	
 	
 	m_panel8->SetSizer( fgSizer77 );
 	m_panel8->Layout();
 	fgSizer77->Fit( m_panel8 );
-	m_notebookConfigurations->AddPage( m_panel8, _("Start Time"), false );
+	m_notebookConfigurations->AddPage( m_panel8, _("Start Time"), true );
 	m_pRoutes = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer62;
 	fgSizer62 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -2548,7 +2550,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_pRoutes->SetSizer( fgSizer62 );
 	m_pRoutes->Layout();
 	fgSizer62->Fit( m_pRoutes );
-	m_notebookConfigurations->AddPage( m_pRoutes, _("Routes"), true );
+	m_notebookConfigurations->AddPage( m_pRoutes, _("Routes"), false );
 	m_panel9 = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer81;
 	fgSizer81 = new wxFlexGridSizer( 0, 1, 0, 0 );

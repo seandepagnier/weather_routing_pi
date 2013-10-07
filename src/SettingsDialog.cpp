@@ -137,7 +137,22 @@ void SettingsDialog::OnUpdate( )
 
 void SettingsDialog::OnHelp( wxCommandEvent& event )
 {
-    wxMessageDialog mdlg(this, _("help text goes here"),
+    wxMessageDialog mdlg(this, _("\
+Cursor Route -- optimal route closest to the cursor\n\
+Destination Route -- optimal route to the desired destination\n\
+Route Thickness -- thickness to draw Cursor and Destination Routes\n\
+Iso Chron Thickness -- thickness for isochrons on map\n\
+Alternate Routes Thickness -- thickness for alternate routes\n\
+Note: All thicknesses can be set to 0 to disable their display\n\
+Alternates for all Isochrons -- display all alternate routes not only the ones \
+which reach the last isochron\n\
+Squares At Sail Changes -- render squares along Routes whenever a sail change is made\n\
+Filter Routes by Climatology -- This currently does nothing, but I intended to \
+make weather route maps which derive data from grib and climatology clearly render which \
+data was used where \n\
+\n\
+Number of Concurrent Threads -- if there are multiple configurations, they can \
+be computed in separate threads which allows a speedup if there are multiple processors\n"),
                          _("Weather Routing"), wxOK | wxICON_INFORMATION);
     mdlg.ShowModal();
 }

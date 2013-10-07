@@ -297,7 +297,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
     wxFileDialog openDialog
         ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
-          wxT ( "Boat polar files (*.xml, *.cvs)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxT ( "Boat polar files (*.xml, *.csv)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
@@ -322,7 +322,7 @@ void BoatDialog::OnOpenCSV ( wxCommandEvent& event )
 {
     wxFileDialog openDialog
         ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
-          wxT ( "CSV files (*.cvs)|*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxT ( "CSV files (*.csv)|*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
@@ -385,7 +385,7 @@ void BoatDialog::OnClose ( wxCommandEvent& event )
 void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
 {
     wxFileDialog saveDialog( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
-                             wxT ( "Boat Polar files (*.cvs)|*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
+                             wxT ( "Boat Polar files (*.csv)|*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
     if( saveDialog.ShowModal() == wxID_OK ) {
         wxFileName filename = saveDialog.GetPath();
         BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
