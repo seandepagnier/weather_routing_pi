@@ -101,7 +101,7 @@ void SwitchPlanDialog::OnDone( wxCommandEvent& event )
     if(!m_cbMaxWindSpeed->GetValue() && !m_cbMinWindSpeed->GetValue() &&
        !m_cbMaxWindDirection->GetValue() && !m_cbMinWindDirection->GetValue() &&
        !m_cbMaxWaveHeight->GetValue() && !m_cbMinWaveHeight->GetValue()) {
-        wxMessageDialog md(this, _("Cannot make a rule from no options specified."),
+        wxMessageDialog md(this, _("Cannot make a rule from nothing specified."),
                            _("Switch Plan"), wxICON_INFORMATION | wxOK );
         md.ShowModal();
         return;

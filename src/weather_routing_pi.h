@@ -28,10 +28,10 @@
 #define _WEATHER_ROUTINGPI_H_
 
 #define     PLUGIN_VERSION_MAJOR    0
-#define     PLUGIN_VERSION_MINOR    7
+#define     PLUGIN_VERSION_MINOR    9
 
 #define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    8
+#define     MY_API_VERSION_MINOR    10
 
 #include "../../../include/ocpn_plugin.h"
 #include "../../../include/ocpndc.h"
@@ -54,10 +54,9 @@
 
 #define WEATHER_ROUTING_TOOL_POSITION    -1          // Request default positioning of toolbar tool
 
-class WeatherRoutingDialog;
+class WeatherRouting;
 
-class GribUIDialog;
-class weather_routing_pi : public opencpn_plugin_18
+class weather_routing_pi : public opencpn_plugin_110
 {
 public:
       weather_routing_pi(void *ppimgr);
@@ -91,6 +90,8 @@ public:
       void OnContextMenuItemCallback(int id);
 
       void SetColorScheme(PI_ColorScheme cs);
+      static wxString StandardPath();
+      void ShowMenuItems(bool show);
 
       double m_boat_lat, m_boat_lon;
 
@@ -101,12 +102,12 @@ private:
       wxFileConfig     *m_pconfig;
       wxWindow         *m_parent_window;
 
-      WeatherRoutingDialog     *m_pWeather_RoutingDialog;
+      WeatherRouting     *m_pWeather_Routing;
       wxDateTime m_GribTime;
 
       int              m_display_width, m_display_height;
       int              m_leftclick_tool_id;
-      int              m_startroute_menu_id, m_endroute_menu_id;
+      int              m_position_menu_id;
 
       double m_cursor_lat, m_cursor_lon;
 };

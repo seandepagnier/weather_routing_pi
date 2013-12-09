@@ -37,19 +37,54 @@
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 
-StatisticsDialog::StatisticsDialog( wxWindow *parent, RouteMapOverlay &routemapoverlay, wxTimeSpan RunTime )
+StatisticsDialog::StatisticsDialog(wxWindow *parent)
     : StatisticsDialogBase(parent)
 {
-    m_stState->SetLabel(routemapoverlay.Running() ? _("Running") : _("Stopped"));
-    m_stRunTime->SetLabel(RunTime.Format());
-    
-    int isochrons, routes, invroutes, skippositions, positions;
-    routemapoverlay.GetStatistics(isochrons, routes, invroutes, skippositions, positions);
-    m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
-    m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
-    m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
-    m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
-    m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
+}
+
+void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
+{
+    if(routemapoverlay) {
+
+        m_stPercentageUpwind->SetLabel
+            (wxString::Format(_T("%2.f%%"), routemapoverlay->RouteInfo
+                              (RouteMapOverlay::PERCENTAGE_UPWIND)));
+
+        double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
+        m_stPortStarboard->SetLabel(isnan(port_starboard) ? _T("nan")
+                                    : wxString::Format(_T("%02d/%02d"),
+                                                       (int)port_starboard, 100-(int)port_starboard));
+
+        m_stAverageWindKnots->SetLabel
+            (wxString::Format(_T("%2.f knts"), routemapoverlay->RouteInfo
+                              (RouteMapOverlay::AVGWIND)));
+
+        m_stAverageWaveHeight->SetLabel
+            (wxString::Format(_T("%2.f"), routemapoverlay->RouteInfo
+                              (RouteMapOverlay::AVGWAVE)));
+
+        m_stState->SetLabel(routemapoverlay->Running() ? _("Running") : _("Stopped"));
+       
+        int isochrons, routes, invroutes, skippositions, positions;
+        routemapoverlay->GetStatistics(isochrons, routes, invroutes, skippositions, positions);
+        m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
+        m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
+        m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
+        m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
+        m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
+    } else {
+        m_stState->SetLabel(_("No Route Selected"));
+        m_stIsoChrons->SetLabel(_T(""));
+        m_stRoutes->SetLabel(_T(""));
+        m_stInvRoutes->SetLabel(_T(""));
+        m_stSkipPositions->SetLabel(_T(""));
+        m_stPositions->SetLabel(_T(""));
+    }
 
     Fit();
+}
+
+void StatisticsDialog::SetRunTime(wxTimeSpan RunTime)
+{
+    m_stRunTime->SetLabel(RunTime.Format());
 }

@@ -20,37 +20,21 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
+ *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.             *
  ***************************************************************************
- *
  */
 
-#include <wx/wx.h>
-#include <wx/stdpaths.h>
+#ifndef _WEATHER_ROUTING_ABOUT_H_
+#define _WEATHER_ROUTING_ABOUT_H_
 
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
+#include "WeatherRoutingUI.h"
 
-#include "RouteDialog.h"
-
-RouteDialog::RouteDialog( wxWindow *parent )
-    : RouteDialogBase(parent)
+class AboutDialog : public AboutDialogBase
 {
-    wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
-#ifdef __WXMSW__
-    wxString stdPath  = std_path.GetConfigDir();
-#endif
-#ifdef __WXGTK__
-    wxString stdPath  = std_path.GetUserDataDir();
-#endif
-#ifdef __WXOSX__
-    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
-#endif
+public:
+    AboutDialog( wxWindow *parent ) : AboutDialogBase(parent) { }
+    void OnDonate( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event ) { EndModal(wxID_OK); }   
+};
 
-    wxString route_path = stdPath + wxFileName::GetPathSeparator() + _T("routes.xml");
-}
-
-RouteDialog::~RouteDialog()
-{
-}
+#endif

@@ -24,24 +24,28 @@
  ***************************************************************************
  */
 
-#ifndef _ROUTE_DIALOG_H_
-#define _ROUTE_DIALOG_H_
-
-#include <wx/fileconf.h>
+#ifndef _WEATHER_ROUTING_FILTER_ROUTES_H_
+#define _WEATHER_ROUTING_FILTER_ROUTES_H_
 
 #include "WeatherRoutingUI.h"
 
-class weather_routing_pi;
-
-class RouteDialog : public RouteDialogBase
+class FilterRoutesDialog : public FilterRoutesDialogBase
 {
 public:
+    enum Filters {START, STARTTIME, END, BOATFILENAME, STATE, NUM_FILTERS};
 
-    RouteDialog( wxWindow *parent);
-    ~RouteDialog();
+    FilterRoutesDialog( WeatherRouting *weatherrouting );
+
+    void OnCategory( wxCommandEvent& event );
+    void OnFilterText( wxCommandEvent& event );
+    void OnResetAll( wxCommandEvent& event );
+    void OnDone( wxCommandEvent& event );
 
 private:
+    void ApplyFilters();
+    wxString m_Filters[NUM_FILTERS];
 
+    WeatherRouting *m_WeatherRouting;
 };
 
 #endif

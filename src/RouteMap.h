@@ -28,7 +28,7 @@
 
 #include <list>
 
-struct RouteMapOptions;
+struct RouteMapConfiguration;
 class IsoRoute;
 class GribRecordSet;
 
@@ -47,20 +47,21 @@ class SkipPosition;
 class Position
 {
 public:
-    Position(double latitude, double longitude, int sp=0, Position *p=NULL);
+    Position(double latitude, double longitude, int sp=0, int t=0, Position *p=NULL);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
 
     bool GetPlotData(GribRecordSet *grib, double dt,
-                     RouteMapOptions &options, PlotData &data);
+                     RouteMapConfiguration &configuration, PlotData &data);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, wxDateTime &time,
-                   RouteMapOptions &options);
+                   RouteMapConfiguration &configuration);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
 
     double lat, lon;
     int sailplan; /* which sail plan in the boat we are using */
+    int tacks; /* how many times we have tacked to get to this position */
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */
 
@@ -101,12 +102,12 @@ public:
     bool CompletelyContained(IsoRoute *r);
     bool ContainsRoute(IsoRoute *r);
 
-    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapOptions &options);
+    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration);
     void FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon, double *dist=0);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib,
-                   wxDateTime &time, RouteMapOptions &options);
+                   wxDateTime &time, RouteMapConfiguration &configuration);
 
     int SkipCount();
     int Count();
@@ -128,7 +129,7 @@ public:
     ~IsoChron();
 
     void PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
-                           wxDateTime &time, RouteMapOptions &options);
+                           wxDateTime &time, RouteMapConfiguration &configuration);
     bool Contains(Position &p);
     bool Contains(double lat, double lon);
     Position* ClosestPosition(double lat, double lon, double *dist=0);
@@ -140,68 +141,89 @@ public:
 
 typedef std::list<IsoChron*> IsoChronList;
 
-struct RouteMapOptions {
-    RouteMapOptions () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
-    void Update();
+struct RouteMapPosition {
+    RouteMapPosition(wxString n, double lat0, double lon0)
+    : Name(n), lat(lat0), lon(lon0) {}
 
-    double StartLat, StartLon;
-    double EndLat, EndLon;
+    wxString Name;
+    double lat, lon;
+};
+
+struct RouteMapConfiguration {
+    RouteMapConfiguration () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
+    bool Update();
+
+    wxString Start, End;
+    wxDateTime StartTime;
+
     double dt; /* time in seconds between propagations */
 
-    double StartEndBearing; /* calculated from start and end */
-
-    std::list<double> DegreeSteps;
+    Boat boat;
+    wxString boatFileName;
     
     double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
-    double MaxLatitude, TackingTime;
-    int SubSteps;
+    double MaxLatitude, MaxTacks, TackingTime;
 
     bool UseGrib, UseClimatology;
     bool AllowDataDeficient;
-
     bool DetectLand, Currents, InvertedRegions, Anchoring;
 
-    Boat boat;
+    std::list<double> DegreeSteps;
 
+    bool (*Climatology())(int setting, wxDateTime &, double, double, double &, double &);
+
+/* computed values */
+    double StartLat, StartLon, EndLat, EndLon;
+
+    double StartEndBearing; /* calculated from start and end */
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,
     this means the map cannot cross both 0 and 180 longitude.
     To fully support this requires a lot more logic and would probably slow the algorithm
     by about 8%.  Is it even useful?  */
 };
 
+bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
+
 class RouteMap
 {
 public:
-    static void Wind(double &windspeed, double &winddir,
-                     double lat, double lon, wxDateTime time);
     RouteMap();
     virtual ~RouteMap();
 
-    void Reset(wxDateTime time);
+    static void PositionLatLon(wxString Name, double &lat, double &lon);
+
+    void Reset();
 
 #define LOCKING_ACCESSOR(name, flag) bool name() { Lock(); bool ret = flag; Unlock(); return ret; }
     LOCKING_ACCESSOR(Finished, m_bFinished)
     LOCKING_ACCESSOR(ReachedDestination, m_bReachedDestination)
+    LOCKING_ACCESSOR(Valid, m_bValid)
     LOCKING_ACCESSOR(GribFailed, m_bGribFailed)
+    LOCKING_ACCESSOR(ClimatologyFailed, m_bClimatologyFailed)
+    LOCKING_ACCESSOR(NoData, m_bNoData)
 
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
     void SetNewGrib(GribRecordSet *grib) { Lock(); m_bNeedsGrib = !(m_NewGrib = grib); Unlock(); }
-    void SetClimatologyFunction(bool (*)(int, wxDateTime &, double, double, double &, double &));
-    bool HasClimatology();
     wxDateTime NewTime() { Lock(); wxDateTime time =  m_NewTime; Unlock(); return time; }
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
-    bool HasGrib() { return m_NewGrib; }
-    void SetOptions(RouteMapOptions &o) { Lock(); m_Options = o; m_Options.Update(); Unlock(); }
-    RouteMapOptions GetOptions() { Lock(); RouteMapOptions o = m_Options; Unlock(); return o; }
+    void SetConfiguration(RouteMapConfiguration &o) { Lock();
+        m_Configuration = o;
+        m_bValid = m_Configuration.Update();
+        m_bFinished = false;
+        Unlock(); }
+    RouteMapConfiguration GetConfiguration() { Lock(); RouteMapConfiguration o = m_Configuration; Unlock(); return o; }
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
     bool Propagate();
     wxDateTime EndDate();
 
+    static bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &);
+    static std::list<RouteMapPosition> Positions;
+
 protected:
     virtual void Clear();
-    bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapOptions &options);
+    bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration);
     Position *ClosestPosition(double lat, double lon, double *dist=0, bool before_last=false);
 
     /* protect any member variables with mutexes if needed */
@@ -214,8 +236,9 @@ protected:
     GribRecordSet *m_NewGrib;
 
 private:
-    RouteMapOptions m_Options;
-    bool m_bFinished, m_bReachedDestination, m_bGribFailed;
+    RouteMapConfiguration m_Configuration;
+    bool m_bFinished, m_bValid,
+        m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bNoData;
 
     wxDateTime m_NewTime;
 };

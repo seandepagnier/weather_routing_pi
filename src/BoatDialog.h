@@ -37,13 +37,12 @@ class BoatDialog : public BoatDialogBase
 {
 public:
 
-    BoatDialog( wxWindow *parent);
+    BoatDialog(wxWindow *parent, wxString boatpath);
     ~BoatDialog();
 
     Boat m_Boat;
 
 private:
-
     void OnMouseEventsPlot( wxMouseEvent& event );
     void OnPaintPlot( wxPaintEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
@@ -51,8 +50,12 @@ private:
     void OnUpdatePlot( wxSpinEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdateWindSpeed( wxSpinEvent& event );
     void OnOpen( wxCommandEvent& event );
+    void Save();
+    void OnSaveAs( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
-    void OnClose( wxCommandEvent& event ) { Hide(); }
+    void OnCancel( wxCommandEvent& event );
+    void OnOpenCSV( wxCommandEvent& event );
+    void OnSaveCSV( wxCommandEvent& event );
     void OnRecompute( wxSpinEvent& event ) { StoreBoatParameters(); Compute(); UpdateStats(); }
     void OnOptimizeTacking( wxCommandEvent& event );
     void OnResetOptimalTackingSpeed( wxCommandEvent& event );
@@ -73,7 +76,7 @@ private:
     void UpdateVMG();
     void UpdateStats();
 
-    wxString m_default_boat_path;    
+    wxString m_boatpath;    
     double m_PlotScale;
     int m_MouseW;
 

@@ -6,11 +6,10 @@
  *
  ***************************************************************************
  *   Copyright (C) 2010 by David S. Register   *
- *   bdbcat@yahoo.com   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 3 of the License, or     *
+ *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
@@ -28,14 +27,6 @@
  *  Parts of this file were adapted from source code found in              *
  *  John F. Waers (jfwaers@csn.net) public domain program MacGPS45         *
  ***************************************************************************
-
- * $Log: georef.h,v $
- * Revision 1.13  2010/04/27 01:44:56  bdbcat
- * Build 426
- *
- * Revision 1.12  2010/03/29 02:59:02  bdbcat
- * 2.1.0 Beta Initial
- *
 
  */
 
@@ -232,6 +223,7 @@ typedef struct {
     int     print_flag;
     int     n_par;
 } lm_data_type;
+
 
 
 #endif

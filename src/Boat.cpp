@@ -26,7 +26,7 @@
 
 #include <wx/wx.h>
 
-#include "../../../include/tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 #include "weather_routing_pi.h"
 #include "Utilities.h"
@@ -42,18 +42,6 @@ Boat::~Boat()
 {
 }
 
-double AttributeDouble(TiXmlElement *e, const char *name, double def)
-{
-    const char *attr = e->Attribute(name);
-    if(!attr)
-        return def;
-    char *end;
-    double d = strtod(attr, &end);
-    if(end == attr)
-        return def;
-    return d;
-}
-
 wxString Boat::OpenXML(wxString filename)
 {
     TiXmlDocument doc;
@@ -65,6 +53,13 @@ wxString Boat::OpenXML(wxString filename)
         return _("Failed to read xml file (no OCPWeatherRoutingBoat node)");
 
     bool cleared = false;
+    for(unsigned int i=0; i<Plans.size(); i++)
+        delete Plans[i];
+    Plans.clear();
+    
+    Plans.push_back(new BoatPlan(_("Initial Plan"), *this));
+    Plans[0]->ComputeBoatSpeeds(*this);
+
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
         if(!strcmp(e->Value(), "BoatCharacteristics")) {
             displacement_tons = AttributeDouble(e, "displacement_tons", 4);
@@ -138,7 +133,7 @@ wxString Boat::SaveXML(wxString filename)
     char version[24];
     sprintf(version, "%d.%d", PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR);
     root->SetAttribute("version", version);
-    root->SetAttribute("creator", "Weather Routing by Sean DEpagnier");
+    root->SetAttribute("creator", "Opencpn Weather Routing plugin");
 
     TiXmlElement *boatcharacteristics = new TiXmlElement( "BoatCharacteristics" );
     boatcharacteristics->SetAttribute("displacement_tons", displacement_tons);
@@ -199,8 +194,8 @@ int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
 {
     for(int rounds = 0; rounds < 10; rounds++) {
         BoatPlan &boatplan = *Plans[curplan];
-        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell,
-                                                   gribtime, lat, lon, daytime);
+        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell, gribtime,
+                                                   lat, lon, daytime);
         if(Name.empty())
             return curplan;
 
@@ -216,7 +211,6 @@ int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
             break;
         }
     }
-
 
     return curplan;
 }

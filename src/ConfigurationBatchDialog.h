@@ -31,17 +31,52 @@
 
 #include "WeatherRoutingUI.h"
 
+struct RouteMapConfiguration;
+class WeatherRouting;
 class weather_routing_pi;
+class ocpnDC;
 
-class BatchDialog : public BatchDialogBase
+struct BatchSource
+{
+    BatchSource(wxString n) : Name(n) {}
+    wxString Name;
+    std::list<BatchSource*> destinations;
+};
+
+class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
 {
 public:
+    ConfigurationBatchDialog(WeatherRouting *parent);
+    ~ConfigurationBatchDialog() { ClearSources(); }
 
-    BatchDialog( wxWindow *parent);
-    ~BatchDialog();
+    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
+    void AddSource(wxString name);
+    void RemoveSource( wxString name );
+    void ClearSources();
 
-private:
+    std::vector<BatchSource*> sources;
 
+protected:
+    void OnSources( wxCommandEvent& event );
+    void OnDestinations( wxCommandEvent& event );
+    void OnRemoveSource( wxCommandEvent& event );
+    void OnClearSources( wxCommandEvent& event );
+    void OnConnect( wxCommandEvent& event );
+    void OnDisconnectAll( wxCommandEvent& event );
+    void OnAddBoat( wxCommandEvent& event );
+    void OnRemoveBoat( wxCommandEvent& event );
+    void OnOpen( wxCommandEvent& event );
+    void OnSave( wxCommandEvent& event );
+    void OnReset( wxCommandEvent& event );
+    void OnInformation( wxCommandEvent& event );
+    void OnClose( wxCommandEvent& event );
+    void OnGenerate( wxCommandEvent& event );
+
+    void Reset();
+
+    wxString m_boatFileName;
+
+    WeatherRouting &m_WeatherRouting;
 };
 
 #endif

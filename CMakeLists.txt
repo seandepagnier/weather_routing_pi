@@ -69,8 +69,8 @@ FIND_PACKAGE(Gettext REQUIRED)
 SET(SRC_WEATHER_ROUTING
             src/weather_routing_pi.h
             src/weather_routing_pi.cpp
-            src/WeatherRoutingDialog.h 
-            src/WeatherRoutingDialog.cpp
+            src/WeatherRouting.h 
+            src/WeatherRouting.cpp
             src/ConfigurationDialog.h 
             src/ConfigurationDialog.cpp
             src/SettingsDialog.h 
@@ -85,10 +85,12 @@ SET(SRC_WEATHER_ROUTING
             src/SwitchPlanDialog.cpp
             src/StatisticsDialog.h 
             src/StatisticsDialog.cpp
-            src/BatchDialog.h
-            src/BatchDialog.cpp
-            src/RouteDialog.h
-            src/RouteDialog.cpp
+            src/FilterRoutesDialog.h
+            src/FilterRoutesDialog.cpp
+            src/ConfigurationBatchDialog.h
+            src/ConfigurationBatchDialog.cpp
+            src/AboutDialog.h
+            src/AboutDialog.cpp
             src/BoatPlan.h 
             src/BoatPlan.cpp
             src/Boat.h 
@@ -103,8 +105,15 @@ SET(SRC_WEATHER_ROUTING
             src/WeatherRoutingUI.cpp
             src/icons.h 
             src/icons.cpp
-            src/georef.h
-            src/georef.c
+			
+			src/cutil/cutil.h
+			src/cutil/cutil.cpp
+			src/georef/georef.h
+            src/georef/georef.c
+			src/tinyxml/tinyxml.h
+            src/tinyxml/tinyxml.cpp
+            src/tinyxml/tinyxmlparser.cpp
+            src/tinyxml/tinyxmlerror.cpp
 
             ../grib_pi/src/GribRecord.cpp  
             ../grib_pi/src/zuFile.cpp 
@@ -113,10 +122,7 @@ SET(SRC_WEATHER_ROUTING
             ../../src/wxJSON/jsonreader.cpp
             ../../src/wxJSON/jsonwriter.cpp
 
-	    ../../../include/tinyxml.h
-            ../../../src/tinyxml.cpp
-            ../../../src/tinyxmlparser.cpp
-            ../../../src/tinyxmlerror.cpp
+
 )
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING})
 

@@ -2,7 +2,7 @@
 <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
     <title>Weather Routing Plugin for OpenCPN</title>
   </head>
-<body alink="#ff0000" bgcolor="#efe0ac" link="#0000e2" text="#000000" vlink="#bb0000">
+<body alink="#ff0000" bgcolor="#ffffff" link="#0000e2" text="#000000" vlink="#bb0000">
     <center><h1><u>Weather Routing</u></h1></center>
     <hr>
     <h3><u>Introduction</u></h3>
@@ -13,14 +13,24 @@ a certain time.  By merging the results of many calculations,
 it is possible to form a map determining the quickest route
 to any given location within the map.
 
-  <h3><u>Usage</u></h3>
+<h3><u>Quick Start</u></h3>
+Open the Weather Routing Dialog, then right click the map and Select "Weather Route Position"
+Create Positions for both Start and End.  Next From the Configuration menu (next to File) Select
+"New", and double click this configuration in the list to edit.  Enter the correct parameters,
+and if needed edit the boat.  When done, you can close this window, and click "Start"
+
+<h3><u>Warning</u></h3>
+As of July 2, 2013, the algorithm exhibits a few major flaws which can result in suboptimal
+routes.  Try increasing the time step and/or disabling currents to help mitigate these.
+
+  <h3><u>Background</u></h3>
 
 <p>Integration with the grib plugin (version 2.1 or later) allows for
 knowledge of weather conditions.  The climatology plugin can also
 provide a source of data for longer voyages.  In the case where data
-is valid from both sources, grib will be choosen.  If wind
-and current data are both available from climatology, and only wind
-from grib, then the grib wind is used with the climatology current.
+is valid from both sources, grib will be choosen.  If current data is
+available from climatology, and only wind from grib, then the grib wind
+is used with the climatology current.
 
 <p>The grib time selected on the timeline at the time the computation is
 started can be syncronized.  From there, the grib timeline data is accessed
@@ -30,9 +40,6 @@ playback.
 
 <p>The Wind, Current and wave height data is read from the grib file.
 If no Current or wave height is available, they are assumed to be 0.
-
-<p>Eventually we can provide graphs for various data parameters over
-the course of the optimal route.
 
 <p>
 The Supported Options Include:
@@ -50,9 +57,6 @@ The Supported Options Include:
   <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
   <li><b>Max Latitude</b> Do not navigate above (or below) this latitude.</li>
   <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.  This is normally irrelevant except for very close isochrons.  Setting to 0 avoids these calculations.  </li>
-  <li><b>Substeps</b> In areas where we frequently encounter land collisions, it is possible to generate
-        a more refined map in smaller time steps to find routes, then merge these substeps at each
-        full step</li>
   <li><b>Detect Land</b> Use coastline data to avoid sailing through land</li>
   <li><b>Inverted Regons</b> This is relatively rare, but in some cases it may be
     possible to reach a destination further away in two or more different paths
@@ -169,5 +173,5 @@ you might be able to actually determine how much time it would save (usually mor
 than the time spent swimming).  There is also the case of sails losing shape, and
 becoming less efficient over the course of a long upwind passage.
 
-<p>The Weather Routing plugin is written and maintained by Sean D'Epagnier
+<p><h4>The Weather Routing plugin is written and maintained by Sean D'Epagnier</h4>
 </body></html>

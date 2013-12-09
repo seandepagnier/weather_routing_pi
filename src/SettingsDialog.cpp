@@ -73,6 +73,10 @@ void SettingsDialog::LoadSettings()
     bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
     pConf->Read( _T("SquaresAtSailChanges"), &SquaresAtSailChanges, SquaresAtSailChanges);
     m_cbSquaresAtSailChanges->SetValue(SquaresAtSailChanges);
+
+    int ConcurrentThreads = m_sConcurrentThreads->GetValue();
+    pConf->Read( _T("ConcurrentThreads"), &ConcurrentThreads, ConcurrentThreads);
+    m_sConcurrentThreads->SetValue(ConcurrentThreads);
     
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "SettingsDialogX" ), &p.x, p.x);
@@ -105,6 +109,9 @@ void SettingsDialog::SaveSettings( )
 
     bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
     pConf->Write( _T("SquaresAtSailChanges"), SquaresAtSailChanges);
+
+    bool ConcurrentThreads = m_sConcurrentThreads->GetValue();
+    pConf->Write( _T("ConcurrentThreads"), ConcurrentThreads);
 
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "SettingsDialogX" ), p.x);

@@ -24,8 +24,8 @@
  ***************************************************************************
  */
 
-#ifndef _WEATHER_ROUTING_CONFIGURATION_H_
-#define _WEATHER_ROUTING_CONFIGURATION_H_
+#ifndef _WEATHER_ROUTING_CONFIGURATION_DIALOG_H_
+#define _WEATHER_ROUTING_CONFIGURATION_DIALOG_H_
 
 
 #include <wx/treectrl.h>
@@ -33,21 +33,45 @@
 
 #include "WeatherRoutingUI.h"
 
+class WeatherRouting;
+class weather_routing_pi;
+
 class ConfigurationDialog : public ConfigurationDialogBase
 {
 public:
-    ConfigurationDialog( wxWindow *parent );
-    ~ConfigurationDialog( );
+    ConfigurationDialog(WeatherRouting *weatherrouting);
+    ~ConfigurationDialog();
 
-    void Load();
-    void Save();
-    void UpdateOptions(RouteMapOptions &options);
+    void SetConfiguration(RouteMapConfiguration configuration);
+    void Update();
+
+    RouteMapConfiguration Configuration();
+
+    void AddSource(wxString name);
+    void RemoveSource( wxString name );
+    void ClearSources();
+
+    wxDateTime m_GribTimelineTime;
 
 protected:
+    void OnUpdate( wxCommandEvent& event ) { Update(); }
+    void OnUpdate( wxDateEvent& event ) { Update(); }
+    void OnGribTime( wxCommandEvent& event );
+    void OnCurrentTime( wxCommandEvent& event );
+    void OnUpdate( wxSpinEvent& event ) { Update(); }
+    void OnUpdate( wxFileDirPickerEvent& event ) { Update(); }
+    void OnEditBoat( wxCommandEvent& event );
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );
-    void OnGenerateDegreeSteps( wxCommandEvent& event );
     void OnClearDegreeSteps( wxCommandEvent& event );
+    void OnGenerateDegreeSteps( wxCommandEvent& event );
+
+private:
+    enum ConfigurationItem {START, END, START_TIME, TIME_STEP};
+
+    void SetStartDateTime(wxDateTime datetime);
+
+    WeatherRouting *m_WeatherRouting;
 };
 
 #endif

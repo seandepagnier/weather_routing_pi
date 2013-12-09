@@ -40,8 +40,6 @@ public:
 
     void LoadSettings();
     void SaveSettings();
-
-protected:
 };
 
 #endif
