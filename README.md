@@ -4,7 +4,7 @@ weather_routing_pi
 This is a plugin for the Open Source Program OpenCPN
 The plugin is authored by Sean Depagnier.
 
-I uses Gribs and Climatology Data in the form of gribs, to optimize routes with performance information about the sail boat.
+It uses Gribs and Climatology Data in the form of gribs, to optimize routes with performance information about the sail boat.
 
 weather routing plugin for opencn
 
