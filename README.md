@@ -9,5 +9,5 @@ It uses Gribs and Climatology Data in the form of gribs, to optimize routes with
 weather routing plugin for opencn
 
 ===
-These changes have been made to permite the plugin to compile successfully by MSVC++ and be run in the Windows environment.
+These changes have been made to permit the plugin to compile successfully by MSVC++ and be run in the Windows environment.
 Illegal External File References and other bugs will be fixed.
