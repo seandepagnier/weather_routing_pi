@@ -33,6 +33,12 @@ static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
 #define DEGREE_STEP 3
 #define DEGREE_COUNT (DEGREES / DEGREE_STEP)
 
+/* To correct MSVC++ compile error NAN not defined */
+#if !defined(NAN)
+static const long long lNaN = 0xfff8000000000000;
+#define NAN (*(double*)&lNaN)
+#endif
+
 struct SailingSpeed
 {
     float VB; /* speed in knots */
