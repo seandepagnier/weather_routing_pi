@@ -107,7 +107,8 @@ SET(SRC_WEATHER_ROUTING
             src/icons.cpp
             src/georef.h
             src/georef.c
-
+			src/cutil_weather_routing.h	
+			
             ../grib_pi/src/GribRecord.cpp  
             ../grib_pi/src/zuFile.cpp 
 
