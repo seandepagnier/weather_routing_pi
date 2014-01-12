@@ -182,122 +182,119 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                              ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute)
 {
     if(!justendroute) {
-    RouteMapConfiguration configuration = GetConfiguration();
+        RouteMapConfiguration configuration = GetConfiguration();
 
-    wxPoint r;
-    GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
-    SetColor(dc, true, *wxBLUE, 3);
-    dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
-    dc.DrawLine(r.x, r.y-10, r.x-10, r.y+7);
-    dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
+        wxPoint r;
+        GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
+        SetColor(dc, true, *wxBLUE, 3);
+        dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
+        dc.DrawLine(r.x, r.y-10, r.x-10, r.y+7);
+        dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
 
-    GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
-    SetColor(dc, true, *wxRED, 3);
-    dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
-    dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
+        GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
+        SetColor(dc, true, *wxRED, 3);
+        dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
+        dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
 
-    if(dc.GetDC())
-        m_UpdateOverlay = true;
+        if(dc.GetDC())
+            m_UpdateOverlay = true;
 
-    double scale = vp.view_scale_ppm/m_scale;
+        double scale = vp.view_scale_ppm/m_scale;
     
-    wxPoint point;
-    GetCanvasPixLL(&vp, &point, m_clat, m_clon);
+        wxPoint point;
+        GetCanvasPixLL(&vp, &point, m_clat, m_clon);
     
-    if(scale == m_lastscale) {
-        if(point != m_lastpoint)
-            if(m_scale_changed) {
-                m_UpdateOverlay = true;
-                m_scale_changed = false;
-            }
-    } else
-        m_scale_changed = true;
-    m_lastscale = scale;
-    m_lastpoint = point;
-        
-    if(!dc.GetDC() && !m_UpdateOverlay) {
-        glPushMatrix();
-        glTranslated(point.x - m_point.x, point.y - m_point.y, 0);
-#if 1
-        glTranslated(vp.pix_width*(1-scale)/2, vp.pix_height*(1-scale)/2, 0);
-
-        glScaled(scale, scale, 1);
-#endif
-
-        glCallList(m_overlaylist);
-        glPopMatrix();
-    } else {
-        if(!dc.GetDC()) {
-            m_UpdateOverlay = false;
-            m_clat = vp.clat, m_clon = vp.clon;
-            GetCanvasPixLL(&vp, &m_point, m_clat, m_clon);
-            m_scale = vp.view_scale_ppm;
-
-            if(!m_overlaylist)
-                m_overlaylist = glGenLists(1);
-            
-            glNewList(m_overlaylist, GL_COMPILE_AND_EXECUTE);
-        }
-
-        /* draw alternate routes first */
-        int AlternateRouteThickness = settingsdialog.m_sAlternateRouteThickness->GetValue();
-        if(AlternateRouteThickness) {
-            Lock();
-            IsoChronList::iterator it;
-            bool AlternatesForAll = settingsdialog.m_cbAlternatesForAll->GetValue();
-            if(AlternatesForAll)
-                it = origin.begin();
-            else {
-                it = origin.end();
-                it--;
-            }
-            
-            wxColour black(0, 0, 0);
-            SetColor(dc, false, black, AlternateRouteThickness);
-            if(!dc.GetDC())
-                glBegin(GL_LINES);
-            for(; it != origin.end(); ++it)
-                for(IsoRouteList::iterator rit = (*it)->routes.begin();
-                    rit != (*it)->routes.end(); ++rit) {
-                    RenderAlternateRoute(*rit, !AlternatesForAll, AlternateRouteThickness, dc, vp);
+        if(scale == m_lastscale) {
+            if(point != m_lastpoint)
+                if(m_scale_changed) {
+                    m_UpdateOverlay = true;
+                    m_scale_changed = false;
                 }
-            if(!dc.GetDC())
-                glEnd();
-            Unlock();
-        }
-
-        unsigned char routecolors[][3] = {
-                         {  0,   0, 127}, {  0,   0, 255},
-        {255, 127,   0}, {255, 127, 127},
-        {  0, 255,   0}, {  0, 255, 127},
-        {127, 255,   0}, {127, 255, 127},
-        {127, 127,   0},                  {127, 127, 255},
-        {255,   0,   0}, {255,   0, 127}, {255,   0, 255},
-        {127,   0,   0}, {127,   0, 127}, {127,   0, 255},
-        {  0, 127,   0}, {  0, 127, 127}, {  0, 127, 255},
-        {255, 255,   0},                  };
-
-        int IsoChronThickness = settingsdialog.m_sIsoChronThickness->GetValue();
-        if(IsoChronThickness) {
-            Lock();
-            int c = 0;
-            for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
-                Unlock();
-                wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
-                
-                for(IsoRouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
-                    RenderIsoRoute(*j, color, IsoChronThickness, dc, vp);
-                
-                if(++c == (sizeof routecolors) / (sizeof *routecolors))
-                    c = 0;
-                Lock();
-            }
-            Unlock();
-        }
+        } else
+            m_scale_changed = true;
+        m_lastscale = scale;
+        m_lastpoint = point;
         
-        if(!dc.GetDC())
-            glEndList();
-    }
+        if(!m_UpdateOverlay) {
+            glPushMatrix();
+            glTranslated(point.x - m_point.x, point.y - m_point.y, 0);
+            glTranslated(vp.pix_width*(1-scale)/2, vp.pix_height*(1-scale)/2, 0);
+            glScaled(scale, scale, 1);
+
+            glCallList(m_overlaylist);
+            glPopMatrix();
+        } else {
+            if(!dc.GetDC()) {
+                m_UpdateOverlay = false;
+                m_clat = vp.clat, m_clon = vp.clon;
+                GetCanvasPixLL(&vp, &m_point, m_clat, m_clon);
+                m_scale = vp.view_scale_ppm;
+
+                if(!m_overlaylist)
+                    m_overlaylist = glGenLists(1);
+            
+                glNewList(m_overlaylist, GL_COMPILE_AND_EXECUTE);
+            }
+
+            /* draw alternate routes first */
+            int AlternateRouteThickness = settingsdialog.m_sAlternateRouteThickness->GetValue();
+            if(AlternateRouteThickness) {
+                Lock();
+                IsoChronList::iterator it;
+                bool AlternatesForAll = settingsdialog.m_cbAlternatesForAll->GetValue();
+                if(AlternatesForAll)
+                    it = origin.begin();
+                else {
+                    it = origin.end();
+                    it--;
+                }
+            
+                wxColour black(0, 0, 0);
+                SetColor(dc, false, black, AlternateRouteThickness);
+                if(!dc.GetDC())
+                    glBegin(GL_LINES);
+                for(; it != origin.end(); ++it)
+                    for(IsoRouteList::iterator rit = (*it)->routes.begin();
+                        rit != (*it)->routes.end(); ++rit) {
+                        RenderAlternateRoute(*rit, !AlternatesForAll, AlternateRouteThickness, dc, vp);
+                    }
+                if(!dc.GetDC())
+                    glEnd();
+                Unlock();
+            }
+
+            unsigned char routecolors[][3] = {
+                {  0,   0, 127}, {  0,   0, 255},
+                {255, 127,   0}, {255, 127, 127},
+                {  0, 255,   0}, {  0, 255, 127},
+                {127, 255,   0}, {127, 255, 127},
+                {127, 127,   0},                  {127, 127, 255},
+                {255,   0,   0}, {255,   0, 127}, {255,   0, 255},
+                {127,   0,   0}, {127,   0, 127}, {127,   0, 255},
+                {  0, 127,   0}, {  0, 127, 127}, {  0, 127, 255},
+                {255, 255,   0},                  };
+
+            int IsoChronThickness = settingsdialog.m_sIsoChronThickness->GetValue();
+            if(IsoChronThickness) {
+                Lock();
+                int c = 0;
+                for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
+                    Unlock();
+                    wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
+                
+                    for(IsoRouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
+                        RenderIsoRoute(*j, color, IsoChronThickness, dc, vp);
+                
+                    if(++c == (sizeof routecolors) / (sizeof *routecolors))
+                        c = 0;
+                    Lock();
+                }
+                Unlock();
+            }
+        
+            if(!dc.GetDC())
+                glEndList();
+        }
     }
     
     int RouteThickness = settingsdialog.m_sRouteThickness->GetValue();

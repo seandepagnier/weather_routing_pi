@@ -7,52 +7,869 @@ msgid ""
 msgstr ""
 "Project-Id-Version: weather_routing_pi 3.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-16 13:44+1200\n"
+"POT-Creation-Date: 2014-01-12 13:14+0800\n"
 "PO-Revision-Date: 2013-04-18 09:58+0100\n"
 "Last-Translator: CarCode <carcode@me.com>\n"
 "Language-Team: CarCode <carcode@me.com>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.5.5\n"
-
-#: src/BoatPlan.cpp:629
+#
+msgid "        N/A         "
+msgstr ""
+#
+msgid " Close"
+msgstr ""
+#
+msgid " and "
+msgstr " und "
+#
+msgid " switch to "
+msgstr " wechsle zu "
+#
+#, c-format
+msgid "%.0f"
+msgstr "%.0f"
+#
+msgid "&Start"
+msgstr "&Start"
+#
+msgid "&Stop"
+msgstr "&Stop"
+#
+msgid "(-1 for unlimited)"
+msgstr ""
+#
+msgid "-120"
+msgstr ""
+#
+msgid "-150"
+msgstr ""
+#
+msgid "-45"
+msgstr ""
+#
+msgid "-60"
+msgstr ""
+#
+msgid "-90"
+msgstr ""
+#
+msgid "0"
+msgstr ""
+#
+msgid "120"
+msgstr ""
+#
+msgid "150"
+msgstr ""
+#
+msgid "170"
+msgstr ""
+#
+msgid "45"
+msgstr ""
+#
+msgid "5"
+msgstr ""
+#
+msgid "60"
+msgstr ""
+#
+msgid "90"
+msgstr ""
+#
 msgid "<Computed>"
 msgstr "<Berechnet>"
-
-#: src/weather_routing_pi.cpp:89
-msgid "Weather_Routing"
-msgstr "Wetter_Routenplanung"
-
-#: src/weather_routing_pi.cpp:94
-msgid "Start Weather Route"
-msgstr "Start Wetter-Route"
-
-#: src/weather_routing_pi.cpp:97
-msgid "End Weather Route"
-msgstr "Beende Wetter-Route"
-
-#: src/weather_routing_pi.cpp:150
-msgid "WeatherRouting"
+#
+msgid "About"
+msgstr ""
+#
+#, fuzzy
+msgid "About Weather Routing"
 msgstr "Wetter-Routenplanung"
-
-#: src/weather_routing_pi.cpp:155
-msgid "Weather Routing PlugIn by Sean d'Epagnier"
-msgstr "Wetter-Routenplanung PlugIn von Sean d'Epagnier"
-
-#: src/weather_routing_pi.cpp:160
+#
+msgid "Add"
+msgstr ""
+#
+msgid "Add At Boat"
+msgstr ""
+#
+msgid "Alternate Routes Thickness"
+msgstr ""
+#
+msgid "Alternates for all IsoChrons"
+msgstr ""
+#
+msgid "Anchoring"
+msgstr ""
+#
+msgid "Apart"
+msgstr ""
+#
+msgid "Apparent Wind"
+msgstr ""
+#
+#, fuzzy
+msgid "Apparent Wind Direction"
+msgstr "Wind-Richtung > "
+#
+msgid "Apparent Wind Velocity"
+msgstr ""
+#
+msgid "Auto Connect"
+msgstr ""
+#
+msgid "Average Speed"
+msgstr ""
+#
+msgid "Average Wave (M)"
+msgstr ""
+#
+msgid "Average Wind"
+msgstr ""
+#
+msgid "Batch"
+msgstr ""
+#
+msgid ""
+"Batch mode generates multiple configurations based on the selected "
+"configuration."
+msgstr ""
+#
+msgid "Best Course Down Wind Port Tack"
+msgstr ""
+#
+msgid "Best Course Down Wind Starboard Tack"
+msgstr ""
+#
+msgid "Best Course Up Wind Port Tack"
+msgstr ""
+#
+msgid "Best Course Up Wind Starboard Tack"
+msgstr ""
+#
+msgid "Boat"
+msgstr ""
+#
+msgid "Boat Course Ground"
+msgstr ""
+#
+msgid "Boat Course Water"
+msgstr ""
+#
+msgid "Boat Velocity Ground"
+msgstr ""
+#
+msgid "Boat Velocity Water"
+msgstr ""
+#
+msgid "Boat.xml"
+msgstr ""
+#
+msgid "BoatFileName"
+msgstr ""
+#
+msgid "Boats"
+msgstr ""
+#
+msgid "By"
+msgstr ""
+#
+msgid "CSV Settings"
+msgstr ""
+#
+msgid "Cancel"
+msgstr ""
+#
+msgid "Cannot add plan with same name as existing plan."
+msgstr "Plan kann nicht mit existierendem Namen hinzugefügt werden."
+#
+msgid "Cannot edit switch plan since there is no other plan to switch to."
+msgstr ""
+"Kann Wechsel-Plan nicht editieren, da kein anderer Plan zum Wechseln da ist."
+#
+msgid "Cannot have min and max wave height"
+msgstr "Kann min. + max. Wellenhöhe nicht verarbeiten"
+#
+msgid "Cannot have min and max wind direction"
+msgstr "Kann min. + max. Windrichtung nicht verarbeiten"
+#
+msgid "Cannot have min and max wind speed"
+msgstr "Kann min. + max. Windgeschw. nicht verarbeiten"
+#
+#, fuzzy
+msgid "Cannot make a rule from nothing specified."
+msgstr "Kann keine Regel ohne Angabe Optionen machen."
+#
+msgid "Cannot make a rule if neither daytime nor nighttime is specified."
+msgstr "Kann keine Regel ohne Angabe Bei-Tag oder Bei-Nacht machen."
+#
+msgid "Capsize Risk"
+msgstr ""
+#
+msgid "Catamaran"
+msgstr ""
+#
+msgid "Category"
+msgstr ""
+#
+msgid "Clear"
+msgstr ""
+#
+msgid "Climatology"
+msgstr ""
+#
+msgid "Climatology plugin version not supported, no climatology data\n"
+msgstr ""
+#
+msgid "Close"
+msgstr ""
+#
+msgid "Comfort Factor"
+msgstr ""
+#
+#, fuzzy
+msgid "Complete"
+msgstr "<Berechnet>"
+#
+#, fuzzy
+msgid "Computation"
+msgstr "Widerstands-Berechnung"
+#
+msgid "Compute optimal routes based on weather and constraints."
+msgstr ""
+#
+msgid "Computing..."
+msgstr ""
+#
+msgid "Conditions"
+msgstr ""
+#
+msgid "Configuration"
+msgstr ""
+#
+msgid "Configuration Batch"
+msgstr ""
+#
+msgid "Configurations"
+msgstr ""
+#
+msgid "Connect"
+msgstr ""
+#
+msgid "Constraints"
+msgstr ""
+#
+#, fuzzy
+msgid "Current Direction"
+msgstr "Wind-Richtung > "
+#
+#, fuzzy
+msgid "Current Route"
+msgstr "Wetter-Route"
+#
+msgid "Current Time"
+msgstr ""
+#
+msgid "Current Velocity"
+msgstr ""
+#
+msgid "Currents"
+msgstr ""
+#
+msgid ""
+"Cursor Route -- optimal route closest to the cursor\n"
+"Destination Route -- optimal route to the desired destination\n"
+"Route Thickness -- thickness to draw Cursor and Destination Routes\n"
+"Iso Chron Thickness -- thickness for isochrons on map\n"
+"Alternate Routes Thickness -- thickness for alternate routes\n"
+"Note: All thicknesses can be set to 0 to disable their display\n"
+"Alternates for all Isochrons -- display all alternate routes not only the "
+"ones which reach the last isochron\n"
+"Squares At Sail Changes -- render squares along Routes whenever a sail change "
+"is made\n"
+"Filter Routes by Climatology -- This currently does nothing, but I intended "
+"to make weather route maps which derive data from grib and climatology "
+"clearly render which data was used where \n"
+"\n"
+"Number of Concurrent Threads -- if there are multiple configurations, they "
+"can be computed in separate threads which allows a speedup if there are "
+"multiple processors\n"
+msgstr ""
+#
+msgid "Cursor Route Color"
+msgstr ""
+#
+msgid "Data Source"
+msgstr ""
+#
+msgid "Date"
+msgstr ""
+#
+msgid "Day Time"
+msgstr "Bei Tag"
+#
+msgid "Deg"
+msgstr ""
+#
+msgid "Degree Steps"
+msgstr ""
+#
+msgid "Degrees"
+msgstr ""
+#
+msgid "Delete"
+msgstr ""
+#
+msgid "Delete All"
+msgstr ""
+#
+msgid "Destination Route Color"
+msgstr ""
+#
+msgid "Destinations"
+msgstr ""
+#
+msgid "Detect Land"
+msgstr ""
+#
+msgid "Disconnect All"
+msgstr ""
+#
+msgid "Displacement Length Ratio"
+msgstr ""
+#
+msgid "Display"
+msgstr ""
+#
+msgid "Distance"
+msgstr ""
+#
+msgid "Donate"
+msgstr ""
+#
+msgid "Done"
+msgstr ""
+#
+msgid "Drag"
+msgstr ""
+#
+msgid "Drag Computation"
+msgstr "Widerstands-Berechnung"
+#
+msgid ""
+"Drag is both frictional and wave based\n"
+"This can be computed based on boat values above then modified manually.\n"
+"With proper settings hull speed will be achieved, but also break into planing "
+"mode possible.\n"
+"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
+"This also takes into account the different harmonics of wakes before hull "
+"speed is reached, so resulting boat polar may appear bumpy.\n"
+msgstr ""
+"Widerstand basiert sowohl auf Reibung und auf Wellen\n"
+"Das kann mit höheren Bootswerten berechnet und dann manuell angepaßt werden.\n"
+"Mit richtigen Einstellungen wird Rumpfgeschw. erreicht, aber es ist auch ein "
+"Planungsmodus möglich.\n"
+"Ein Wert 0 bedeutet kein Sog, 100 ist die größte Verdrängung.\n"
+"Damit werden auch die verschiedenen Harmonischen des Sogs berücksichtigt, "
+"bevor die Rumpfgeschw. erreicht ist. So kann das resultierende Boots-Polar "
+"holperig erscheinen.\n"
+#
+msgid "Edit"
+msgstr ""
+#
+msgid "Empty Route, nothing to export\n"
+msgstr "Leere Route, nichts zum Exportieren\n"
+#
+msgid "End"
+msgstr ""
+#
+msgid "Enter Name"
+msgstr ""
+#
+msgid "Eta"
+msgstr "Eta"
+#
+msgid "Export"
+msgstr ""
+#
+msgid "Export All"
+msgstr ""
+#
+msgid "Failed"
+msgstr ""
+#
+msgid "Failed reading csv: "
+msgstr "Fehler beim Lesen csv: "
+#
+msgid "Failed saving boat polar to csv"
+msgstr "Fehler b. Speichern Boot-Polar zu csv "
+#
+msgid "Failed saving file: "
+msgstr "Fehler bei Speichern Datei: "
+#
+msgid "Failed to find plan name to switch to in list"
+msgstr "Kann Plan-Namen in der Wechsel-Liste nicht finden"
+#
+msgid "Failed to load file"
+msgstr "Fehler bei Laden Datei"
+#
+#, fuzzy
+msgid "Failed to load file."
+msgstr "Fehler bei Laden Datei"
+#
+msgid "Failed to load file:\n"
+msgstr "Fehler bei Laden Datei:\n"
+#
+msgid "Failed to open file: "
+msgstr "Fehler bei Öffnen Datei: "
+#
+msgid "Failed to read xml file (no OCPWeatherRoutingBoat node)"
+msgstr "Fehler bei Lesen xml Datei (kein OCPWeatherRoutingBoat Node)"
+#
+#, fuzzy
+msgid "Failed to save xml file: "
+msgstr "Fehler bei Öffnen Datei: "
+#
+msgid "File"
+msgstr ""
+#
+msgid "File contains duplicate position name, discaring\n"
+msgstr ""
+#
+#, fuzzy
+msgid "FileName"
+msgstr "Name"
+#
+msgid "Filter"
+msgstr ""
+#
+#, fuzzy
+msgid "Filter Routes"
+msgstr "Wetter-Route"
+#
+msgid "Filter Routes by Climatology"
+msgstr ""
+#
+msgid "For"
+msgstr ""
+#
+msgid "Frictional"
+msgstr ""
+#
+msgid "From"
+msgstr ""
+#
+msgid "Generate"
+msgstr ""
+#
+msgid "Grib"
+msgstr ""
+#
+#, fuzzy
+msgid "Grib Time"
+msgstr "Bei Nacht"
+#
+msgid "Help"
+msgstr ""
+#
+msgid "Hour"
+msgstr ""
+#
+msgid "Hour(s)"
+msgstr ""
+#
+msgid "Hull"
+msgstr ""
+#
+msgid "Hull Speed"
+msgstr ""
+#
+msgid "Info"
+msgstr ""
+#
+msgid "Information"
+msgstr ""
+#
+msgid "Initial Plan"
+msgstr "Startplan"
+#
+msgid "InvRoutes"
+msgstr ""
+#
+msgid "Invalid Date Time."
+msgstr ""
+#
+msgid "Invalid Start/End"
+msgstr ""
+#
+#, fuzzy
+msgid "Invalid settings, nothing will be done."
+msgstr "Ungültige Schritt-Größe, es erfolgt nichts."
+#
+msgid "Invalid xml file"
+msgstr ""
+#
+msgid "Inverted Regions"
+msgstr ""
+#
+msgid "Iso Chron Thickness"
+msgstr ""
+#
+msgid "Iso Chrons"
+msgstr ""
+#
+msgid "Knots"
+msgstr ""
+#
+msgid "Last Valid if Data Deficient"
+msgstr ""
+#
+msgid "Lat"
+msgstr ""
+#
+msgid "Load"
+msgstr ""
+#
+msgid "Lon"
+msgstr ""
+#
+msgid "Max # of Tacks"
+msgstr ""
+#
+msgid "Max Diverted Course"
+msgstr ""
+#
+msgid "Max Latitude +-"
+msgstr ""
+#
+msgid "Max Point Angle"
+msgstr ""
+#
+msgid "Max Swell"
+msgstr ""
+#
+msgid "Max Wind"
+msgstr ""
+#
+msgid "Meters"
+msgstr ""
+#
+msgid "Mono"
+msgstr ""
+#
+msgid "MyLabel"
+msgstr ""
+#
+msgid "N/A"
+msgstr "N/A"
+#
+msgid "Name"
+msgstr "Name"
+#
+msgid "Nautical Miles"
+msgstr ""
+#
+msgid "New"
+msgstr ""
+#
+msgid "New Plan"
+msgstr "Neuer Plan"
+#
+msgid "New Source"
+msgstr ""
+#
+msgid "Night Time"
+msgstr "Bei Nacht"
+#
+msgid "No Data"
+msgstr ""
+#
+msgid "No Route Selected"
+msgstr ""
+#
+#, fuzzy
+msgid "No Weather Route selected"
+msgstr "Wetter-Route"
+#
+#, fuzzy
+msgid "Not Computed"
+msgstr "<Berechnet>"
+#
+msgid "Number of Concurrent threads"
+msgstr ""
+#
+msgid "Open"
+msgstr ""
+#
+msgid "OpenCPN Weather Routing Plugin"
+msgstr "OpenCPN Wetter-Routenplanung Plugin"
+#
+msgid "Optimize Tacking"
+msgstr ""
+#
+msgid "Options"
+msgstr ""
+#
+msgid "Overall"
+msgstr ""
+#
+msgid "Plot"
+msgstr ""
+#
+msgid "Plot Details"
+msgstr ""
+#
+msgid "Plot Type"
+msgstr ""
+#
+msgid "Polar"
+msgstr ""
+#
+msgid "Polar File"
+msgstr ""
+#
+msgid "Port/Starboard"
+msgstr ""
+#
+msgid "Position"
+msgstr ""
+#
+msgid "Positions"
+msgstr ""
+#
+msgid "Proa"
+msgstr ""
+#
+#, fuzzy
+msgid "Recompute"
+msgstr "<Berechnet>"
+#
+msgid "Rect"
+msgstr ""
+#
+msgid "Remove"
+msgstr ""
+#
+msgid "Reset"
+msgstr ""
+#
+msgid "Reset All"
+msgstr ""
+#
+msgid "Route Thickness"
+msgstr ""
+#
+msgid "Routes"
+msgstr ""
+#
+#, fuzzy
+msgid "Run Time"
+msgstr "Bei Tag"
+#
+msgid "Running"
+msgstr "Laufend"
+#
+msgid "Sail Plan"
+msgstr "Segel-Plan"
+#
+msgid "Sail Plans"
+msgstr "Segel-Pläne"
+#
+msgid "Save"
+msgstr ""
+#
+msgid "Save As"
+msgstr ""
+#
+msgid "Scale"
+msgstr ""
+#
+msgid "Select Configuration"
+msgstr ""
+#
+msgid "Select Polar"
+msgstr "Wähle Polar"
+#
+#, fuzzy
+msgid "Select a file"
+msgstr "Wähle Polar"
+#
+msgid "Settings"
+msgstr ""
+#
+#, fuzzy
+msgid "Sig Wave Height"
+msgstr "Wellenhöhe > "
+#
+msgid "Sig Wv Ht"
+msgstr ""
+#
+msgid "Skip Positions"
+msgstr ""
+#
+msgid "Sources"
+msgstr ""
+#
+msgid "Spaced"
+msgstr ""
+#
+msgid ""
+"Specify conditions where we should change to a different plan.\n"
+"If conditions change dramatically, then the program will look at the plan we "
+"just changed to and see if it needs to change again, so there is only need to "
+"specify rules for the next closest plan."
+msgstr ""
+"Bedingungen angeben, wo zu anderem Plan gewechselt werden soll.\n"
+"Wenn sich Bedingungen stark ändern, prüft Programm den aktuell gewechselten "
+"Plan, ob nochmals gewechselt werden muß. Somit müssen nur die Regeln für den "
+"nächstliegenden Plan angegeben werden."
+#
+msgid "Squares at Sail Changes"
+msgstr ""
+#
+#, fuzzy
+msgid "Start"
+msgstr "&Start"
+#
+#, fuzzy
+msgid "Start Time"
+msgstr "Bei Tag"
+#
+#, fuzzy
+msgid "Starting"
+msgstr "&Start"
+#
+msgid "State"
+msgstr ""
+#
+msgid "Statistics"
+msgstr ""
+#
+msgid "Stopped"
+msgstr "Gestoppt"
+#
+msgid "Submarine"
+msgstr ""
+#
+msgid "Switch Plan"
+msgstr "Wechsle Plan"
+#
+#, fuzzy
+msgid "Switch Plan Rules"
+msgstr "Wechsle Plan"
+#
+msgid "Switch Sail Plan Configuration"
+msgstr ""
+#
+#, fuzzy
+msgid "Tacking Time"
+msgstr "Bei Nacht"
+#
+msgid ""
+"The weather routing plugin for opencpn is intended to aid in planning sailing "
+"routes based on computerized weather data and boat sailing ability.\n"
+"\n"
+"This also means to educate users about weather trends, to \"discover\" new "
+"cruising routes, and to avoid adverse conditions.\n"
+"\n"
+"License: GPLv3+\n"
+"\n"
+"Source Code:\n"
+"https://github.com/seandepagnier/weather_routing_pi\n"
+"\n"
+"Author:\n"
+"Sean D'Epagnier\n"
+"\n"
+"Many thanks to all of the translators and testers."
+msgstr ""
+#
+#, fuzzy
+msgid "Then Switch to"
+msgstr " wechsle zu "
+#
+msgid "This name already exists, replace?\n"
+msgstr ""
+#
+#, fuzzy
+msgid "Time"
+msgstr "Bei Tag"
+#
+msgid "Time Step"
+msgstr ""
+#
+msgid "To"
+msgstr ""
+#
+msgid "Trimaran"
+msgstr ""
+#
+msgid "True Wind"
+msgstr ""
+#
+msgid "Unrecognized xml node"
+msgstr ""
+#
+msgid "Upwind"
+msgstr ""
+#
+msgid "VMG"
+msgstr ""
+#
+msgid "Variable"
+msgstr ""
+#
+msgid "View"
+msgstr ""
+#
+msgid "Wake"
+msgstr ""
+#
+msgid "Warning: less than 4 different degree steps specified\n"
+msgstr "Warnung: weniger als 4 verschiedene Grad Schritte angegeben\n"
+#
+#, fuzzy
+msgid "Wave Height <"
+msgstr "Wellenhöhe < "
+#
+msgid "Wave Height < "
+msgstr "Wellenhöhe < "
+#
+#, fuzzy
+msgid "Wave Height >"
+msgstr "Wellenhöhe > "
+#
+msgid "Wave Height > "
+msgstr "Wellenhöhe > "
+#
+msgid "Weather Route"
+msgstr "Wetter-Route"
+#
+msgid "Weather Route Point"
+msgstr "Wetter-Routenpunkt"
+#
+#, fuzzy
+msgid "Weather Route Position"
+msgstr "Wetter-Routenpunkt"
+#
+msgid "Weather Routing"
+msgstr "Wetter-Routenplanung"
+#
+#, fuzzy
+msgid "Weather Routing Information"
+msgstr "Wetter-Routenplanung"
+#
+#, fuzzy
 msgid ""
 "Weather Routing PlugIn for OpenCPN\n"
 "\n"
 "Provides Weather routing features include:\n"
-"  automatic routing subject to various constraints:\n"
-"          islands or inverted regions (places we can't go in a boat)\n"
+"  automatic routing subject to various constraints.\n"
 "          optimal speed based on wind and currents\n"
 "          boat speed calculation\n"
-"          sail/power \n"
-"          \n"
-"          , great circle route, constrained routes, optimal routing. \n"
-"p"
 msgstr ""
 "Wetter-Routenplanung PlugIn für OpenCPN\n"
 "\n"
@@ -65,289 +882,184 @@ msgstr ""
 "          \n"
 "          , Großkreis-Routenplanung, erzwungene Routen, optimale Routen. \n"
 "p"
-
-#: src/PlotDialog.cpp:60 src/BoatDialog.cpp:91 src/BoatDialog.cpp:92
-#: src/BoatDialog.cpp:93 src/BoatDialog.cpp:94 src/BoatDialog.cpp:95
-#: src/BoatDialog.cpp:96
-msgid "N/A"
-msgstr "N/A"
-
-#: src/WeatherRoutingDialog.cpp:134
-msgid "export function not supported for visual studio compiler on windows.\n"
-msgstr ""
-"Export-Funktion wird nicht für Windows Visual Studio Compiler unterstützt.\n"
-
-#: src/WeatherRoutingDialog.cpp:135 src/WeatherRoutingDialog.cpp:159
-#: src/WeatherRoutingDialog.cpp:262 src/WeatherRoutingDialog.cpp:286
-#: src/WeatherRoutingDialog.cpp:292 src/ConfigurationDialog.cpp:147
-#: src/ConfigurationDialog.cpp:201
-msgid "Weather Routing"
+#
+#, fuzzy
+msgid "Weather Routing Settings"
 msgstr "Wetter-Routenplanung"
-
-#: src/WeatherRoutingDialog.cpp:158
-msgid "Empty Route, nothing to export\n"
-msgstr "Leere Route, nichts zum Exportieren\n"
-
-#: src/WeatherRoutingDialog.cpp:165
-msgid "Weather Route"
-msgstr "Wetter-Route"
-
-#: src/WeatherRoutingDialog.cpp:169
-msgid "Weather Route Point"
-msgstr "Wetter-Routenpunkt"
-
-#: src/WeatherRoutingDialog.cpp:204
-msgid "plugins/weather_routing/data/WeatherRoutingInformation.html"
-msgstr "plugins/weather_routing/data/WeatherRoutingInformation.html"
-
-#: src/WeatherRoutingDialog.cpp:208
-msgid "Failed to load file:\n"
-msgstr "Fehler bei Laden Datei:\n"
-
-#: src/WeatherRoutingDialog.cpp:209
-msgid "OpenCPN Alert"
-msgstr "OpenCPN Alarm"
-
-#: src/WeatherRoutingDialog.cpp:261
-msgid "Failed to obtain grib for timestep\n"
-msgstr "Fehler bei Erhalt Grib für Zeitschritt\n"
-
-#: src/WeatherRoutingDialog.cpp:285
-msgid "Computation completed, destination reached\n"
-msgstr "Berechnungen beendet, Ziel erreicht.\n"
-
-#: src/WeatherRoutingDialog.cpp:289
-msgid "Grib Data Failed to contain required information\n"
-msgstr "Grib Datenfehler, erhalten nicht geforderte Information\n"
-
-#: src/WeatherRoutingDialog.cpp:290
-msgid "Computation completed, destination not reached.\n"
-msgstr "Berechnungen beendet, Ziel nicht erreicht.\n"
-
-#: src/WeatherRoutingDialog.cpp:304
-msgid "&Stop"
-msgstr "&Stop"
-
-#: src/WeatherRoutingDialog.cpp:314
-msgid "&Start"
-msgstr "&Start"
-
-#: src/StatisticsDialog.cpp:43
-msgid "Running"
-msgstr "Laufend"
-
-#: src/StatisticsDialog.cpp:43
-msgid "Stopped"
-msgstr "Gestoppt"
-
-#: src/BoatDialog.cpp:59
-msgid "Initial Plan"
-msgstr "Startplan"
-
-#: src/BoatDialog.cpp:64
-msgid "Name"
-msgstr "Name"
-
-#: src/BoatDialog.cpp:65
-msgid "Eta"
-msgstr "Eta"
-
-#: src/BoatDialog.cpp:316 src/BoatDialog.cpp:362
-msgid "Select Polar"
-msgstr "Wähle Polar"
-
-#: src/BoatDialog.cpp:316 src/BoatDialog.cpp:362
-msgid "/home/sean/qtVlm/polar"
-msgstr "/home/sean/qtVlm/polar"
-
-#: src/BoatDialog.cpp:322
-msgid "xml"
-msgstr "xml"
-
-#: src/BoatDialog.cpp:322
-msgid "XML"
-msgstr "XML"
-
-#: src/BoatDialog.cpp:329 src/BoatDialog.cpp:347 src/BoatDialog.cpp:372
-#: src/BoatDialog.cpp:381
-msgid "OpenCPN Weather Routing Plugin"
-msgstr "OpenCPN Wetter-Routenplanung Plugin"
-
-#: src/BoatDialog.cpp:346
-msgid "Failed reading csv: "
-msgstr "Fehler beim Lesen csv: "
-
-#: src/BoatDialog.cpp:366
-msgid "obs"
-msgstr "obs"
-
-#: src/BoatDialog.cpp:366
-msgid "OBS"
-msgstr "OBS"
-
-#: src/BoatDialog.cpp:380
-msgid "Failed saving boat polar to csv"
-msgstr "Fehler b. Speichern Boot-Polar zu csv "
-
-#: src/BoatDialog.cpp:413
-msgid ""
-"Drag is both frictional and wave based\n"
-"This can be computed based on boat values above then modified manually.\n"
-"With proper settings hull speed will be achieved, but also break into "
-"planing mode possible.\n"
-"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
-"This also takes into account the different harmonics of wakes before hull "
-"speed is reached, so resulting boat polar may appear bumpy.\n"
+#
+#, fuzzy
+msgid "Weather Routing Statistics"
+msgstr "Wetter-Routenplanung"
+#
+msgid "WeatherRouting"
+msgstr "Wetter-Routenplanung"
+#
+#, fuzzy
+msgid "WeatherRoutingConfiguration.xml"
+msgstr "Wetter-Routenplanung"
+#
+msgid "Weather_Routing"
+msgstr "Wetter_Routenplanung"
+#
+msgid "Wind Course"
 msgstr ""
-"Widerstand basiert sowohl auf Reibung und auf Wellen\n"
-"Das kann mit höheren Bootswerten berechnet und dann manuell angepaßt "
-"werden.\n"
-"Mit richtigen Einstellungen wird Rumpfgeschw. erreicht, aber es ist auch ein "
-"Planungsmodus möglich.\n"
-"Ein Wert 0 bedeutet kein Sog, 100 ist die größte Verdrängung.\n"
-"Damit werden auch die verschiedenen Harmonischen des Sogs berücksichtigt, "
-"bevor die Rumpfgeschw. erreicht ist. So kann das resultierende Boots-Polar "
-"holperig erscheinen.\n"
-
-#: src/BoatDialog.cpp:420
-msgid "Drag Computation"
-msgstr "Widerstands-Berechnung"
-
-#: src/BoatDialog.cpp:440
-msgid "New Plan"
-msgstr "Neuer Plan"
-
-#: src/BoatPlanDialog.cpp:82
-msgid "Cannot edit switch plan since there is no other plan to switch to."
+#
+msgid "Wind Course Ground"
 msgstr ""
-"Kann Wechsel-Plan nicht editieren, da kein anderer Plan zum Wechseln da ist."
-
-#: src/BoatPlanDialog.cpp:83
-msgid "Sail Plans"
-msgstr "Segel-Pläne"
-
-#: src/BoatPlanDialog.cpp:114
-msgid "Cannot add plan with same name as existing plan."
-msgstr "Plan kann nicht mit existierendem Namen hinzugefügt werden."
-
-#: src/BoatPlanDialog.cpp:115
-msgid "Sail Plan"
-msgstr "Segel-Plan"
-
-#: src/BoatPlanDialog.cpp:135
-msgid " and "
-msgstr " und "
-
-#: src/BoatPlanDialog.cpp:137
-msgid "Wind Speed > "
-msgstr "Wind-Geschw. > "
-
-#: src/BoatPlanDialog.cpp:137 src/BoatPlanDialog.cpp:140
-#: src/BoatPlanDialog.cpp:143 src/BoatPlanDialog.cpp:146
-#: src/BoatPlanDialog.cpp:149 src/BoatPlanDialog.cpp:152
-#, c-format
-msgid "%.0f"
-msgstr "%.0f"
-
-#: src/BoatPlanDialog.cpp:140
-msgid "Wind Speed < "
-msgstr "Wind-Geschw. < "
-
-#: src/BoatPlanDialog.cpp:143
-msgid "Wind Direction > "
+#
+msgid "Wind Degree Step"
+msgstr ""
+#
+#, fuzzy
+msgid "Wind Direction"
 msgstr "Wind-Richtung > "
-
-#: src/BoatPlanDialog.cpp:146
+#
+#, fuzzy
+msgid "Wind Direction <"
+msgstr "Wind-Richtung < "
+#
 msgid "Wind Direction < "
 msgstr "Wind-Richtung < "
-
-#: src/BoatPlanDialog.cpp:149
-msgid "Wave Height > "
-msgstr "Wellenhöhe > "
-
-#: src/BoatPlanDialog.cpp:152
-msgid "Wave Height < "
-msgstr "Wellenhöhe < "
-
-#: src/BoatPlanDialog.cpp:155
-msgid "Night Time"
-msgstr "Bei Nacht"
-
-#: src/BoatPlanDialog.cpp:157
-msgid "Day Time"
-msgstr "Bei Tag"
-
-#: src/BoatPlanDialog.cpp:160
-msgid " switch to "
-msgstr " wechsle zu "
-
-#: src/SwitchPlanDialog.cpp:66
-msgid "Failed to find plan name to switch to in list"
-msgstr "Kann Plan-Namen in der Wechsel-Liste nicht finden"
-
-#: src/SwitchPlanDialog.cpp:67 src/SwitchPlanDialog.cpp:82
-#: src/SwitchPlanDialog.cpp:89 src/SwitchPlanDialog.cpp:96
-#: src/SwitchPlanDialog.cpp:105 src/SwitchPlanDialog.cpp:112
-#: src/SwitchPlanDialog.cpp:139
-msgid "Switch Plan"
-msgstr "Wechsle Plan"
-
-#: src/SwitchPlanDialog.cpp:81
-msgid "Cannot have min and max wind speed"
-msgstr "Kann min. + max. Windgeschw. nicht verarbeiten"
-
-#: src/SwitchPlanDialog.cpp:88
-msgid "Cannot have min and max wind direction"
-msgstr "Kann min. + max. Windrichtung nicht verarbeiten"
-
-#: src/SwitchPlanDialog.cpp:95
-msgid "Cannot have min and max wave height"
-msgstr "Kann min. + max. Wellenhöhe nicht verarbeiten"
-
-#: src/SwitchPlanDialog.cpp:104
-msgid "Cannot make a rule from no options specified."
-msgstr "Kann keine Regel ohne Angabe Optionen machen."
-
-#: src/SwitchPlanDialog.cpp:111
-msgid "Cannot make a rule if neither daytime nor nighttime is specified."
-msgstr "Kann keine Regel ohne Angabe Bei-Tag oder Bei-Nacht machen."
-
-#: src/SwitchPlanDialog.cpp:133
-msgid ""
-"Specify conditions where we should change to a different plan.\n"
-"If conditions change dramatically, then the program will look at the plan we "
-"just changed to and see if it needs to change again, so there is only need "
-"to specify rules for the next closest plan."
+#
+#, fuzzy
+msgid "Wind Direction >"
+msgstr "Wind-Richtung > "
+#
+msgid "Wind Direction > "
+msgstr "Wind-Richtung > "
+#
+#, fuzzy
+msgid "Wind Direction Ground"
+msgstr "Wind-Richtung > "
+#
+msgid "Wind Kts"
 msgstr ""
-"Bedingungen angeben, wo zu anderem Plan gewechselt werden soll.\n"
-"Wenn sich Bedingungen stark ändern, prüft Programm den aktuell gewechselten "
-"Plan, ob nochmals gewechselt werden muß. Somit müssen nur die Regeln für den "
-"nächstliegenden Plan angegeben werden."
-
-#: src/Boat.cpp:61
-msgid "Failed to load file"
-msgstr "Fehler bei Laden Datei"
-
-#: src/Boat.cpp:65
-msgid "Failed to read xml file (no OCPWeatherRoutingBoat node)"
-msgstr "Fehler bei Lesen xml Datei (kein OCPWeatherRoutingBoat Node)"
-
-#: src/Boat.cpp:103
-msgid "Failed to open file: "
-msgstr "Fehler bei Öffnen Datei: "
-
-#: src/Boat.cpp:193
-msgid "Failed saving file: "
-msgstr "Fehler bei Speichern Datei: "
-
-#: src/ConfigurationDialog.cpp:120
-msgid ";"
-msgstr ";"
-
-#: src/ConfigurationDialog.cpp:146
-msgid "Warning: less than 4 different degree steps specified\n"
-msgstr "Warnung: weniger als 4 verschiedene Grad Schritte angegeben\n"
-
-#: src/ConfigurationDialog.cpp:200
-msgid "Invalid step size, nothing will be done."
-msgstr "Ungültige Schritt-Größe, es erfolgt nichts."
+#
+#, fuzzy
+msgid "Wind Speed <"
+msgstr "Wind-Geschw. < "
+#
+msgid "Wind Speed < "
+msgstr "Wind-Geschw. < "
+#
+#, fuzzy
+msgid "Wind Speed >"
+msgstr "Wind-Geschw. > "
+#
+msgid "Wind Speed > "
+msgstr "Wind-Geschw. > "
+#
+#, fuzzy
+msgid "Wind Speed Step"
+msgstr "Wind-Geschw. > "
+#
+msgid "Wind Velocity"
+msgstr ""
+#
+msgid "Wind Velocity Ground"
+msgstr ""
+#
+msgid "Within"
+msgstr ""
+#
+msgid "Wv Period"
+msgstr ""
+#
+msgid "Zero Time Step invalid"
+msgstr ""
+#
+msgid "beam"
+msgstr ""
+#
+msgid "day(s)"
+msgstr ""
+#
+msgid "degrees"
+msgstr ""
+#
+msgid "disp tons"
+msgstr ""
+#
+msgid "h"
+msgstr ""
+#
+msgid "hour(s)"
+msgstr ""
+#
+msgid "knots"
+msgstr ""
+#
+msgid "loa ft"
+msgstr ""
+#
+msgid "lwl ft"
+msgstr ""
+#
+msgid "m"
+msgstr ""
+#
+msgid "meters"
+msgstr ""
+#
+msgid "plugins/weather_routing/data/WeatherRoutingInformation.html"
+msgstr "plugins/weather_routing/data/WeatherRoutingInformation.html"
+#
+msgid "s"
+msgstr ""
+#
+msgid "seconds"
+msgstr ""
+#
+msgid "type"
+msgstr ""
+#
+msgid "~"
+msgstr ""
+#
+#~ msgid "/home/sean/qtVlm/polar"
+#~ msgstr "/home/sean/qtVlm/polar"
+#
+#~ msgid ";"
+#~ msgstr ";"
+#
+#~ msgid "Computation completed, destination not reached.\n"
+#~ msgstr "Berechnungen beendet, Ziel nicht erreicht.\n"
+#
+#~ msgid "Computation completed, destination reached\n"
+#~ msgstr "Berechnungen beendet, Ziel erreicht.\n"
+#
+#~ msgid "End Weather Route"
+#~ msgstr "Beende Wetter-Route"
+#
+#~ msgid "Failed to obtain grib for timestep\n"
+#~ msgstr "Fehler bei Erhalt Grib für Zeitschritt\n"
+#
+#~ msgid "Grib Data Failed to contain required information\n"
+#~ msgstr "Grib Datenfehler, erhalten nicht geforderte Information\n"
+#
+#~ msgid "OBS"
+#~ msgstr "OBS"
+#
+#~ msgid "OpenCPN Alert"
+#~ msgstr "OpenCPN Alarm"
+#
+#~ msgid "Start Weather Route"
+#~ msgstr "Start Wetter-Route"
+#
+#~ msgid "Weather Routing PlugIn by Sean d'Epagnier"
+#~ msgstr "Wetter-Routenplanung PlugIn von Sean d'Epagnier"
+#
+#~ msgid "XML"
+#~ msgstr "XML"
+#
+#~ msgid ""
+#~ "export function not supported for visual studio compiler on windows.\n"
+#~ msgstr ""
+#~ "Export-Funktion wird nicht für Windows Visual Studio Compiler "
+#~ "unterstützt.\n"
+#
+#~ msgid "obs"
+#~ msgstr "obs"
+#
+#~ msgid "xml"
+#~ msgstr "xml"

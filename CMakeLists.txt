@@ -140,7 +140,7 @@ IF(UNIX)
     NAMES
     gcov
     PATHS
-    /usr/local/lib/gcc/i686-pc-linux-gnu/4.7.0
+    /usr/lib/gcc/i686-pc-linux-gnu/4.7
     )
 
   MESSAGE (STATUS "gcov : " ${GCOV_LIBRARY})
