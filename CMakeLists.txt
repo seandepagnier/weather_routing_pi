@@ -1,9 +1,8 @@
 ##---------------------------------------------------------------------------
 ## Author:      Sean D'Epagnier 
 ## Copyright:   
-## License:     wxWidgets License
+## License:     GPLv3+
 ##---------------------------------------------------------------------------
- 
 
 # define minimum cmake version
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
@@ -58,7 +57,7 @@ IF(NOT DEFINED wxWidgets_USE_FILE)
   FIND_PACKAGE(wxWidgets REQUIRED)
 ENDIF(NOT DEFINED wxWidgets_USE_FILE)
 
-  INCLUDE(${wxWidgets_USE_FILE})
+INCLUDE(${wxWidgets_USE_FILE})
 
 FIND_PACKAGE(Gettext REQUIRED)
 

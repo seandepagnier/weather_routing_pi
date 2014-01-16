@@ -33,7 +33,7 @@ class AboutDialog : public AboutDialogBase
 {
 public:
     AboutDialog( wxWindow *parent ) : AboutDialogBase(parent) { }
-    void OnDonate( wxCommandEvent& event );
+    void OnAboutAuthor( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event ) { EndModal(wxID_OK); }   
 };
 

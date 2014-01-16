@@ -512,11 +512,11 @@ class AboutDialogBase : public wxDialog
 	
 	protected:
 		wxStaticText* m_staticText110;
-		wxButton* m_bDonate;
+		wxButton* m_bAboutAuthor;
 		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnDonate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAboutAuthor( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
