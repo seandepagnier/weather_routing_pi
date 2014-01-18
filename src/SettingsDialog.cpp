@@ -32,6 +32,7 @@
 #include <time.h>
 
 #include "SettingsDialog.h"
+#include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
@@ -111,7 +112,7 @@ void SettingsDialog::SaveSettings( )
     int AlternateRouteThickness = m_sAlternateRouteThickness->GetValue();
     pConf->Write( _T("AlternateRouteThickness"), AlternateRouteThickness);
 
-    Bool AlternatesForAll = m_cbAlternatesForAll->GetValue();
+    bool AlternatesForAll = m_cbAlternatesForAll->GetValue();
     pConf->Write( _T("AlternatesForAll"), AlternatesForAll);
 
     bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
