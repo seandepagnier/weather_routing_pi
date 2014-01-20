@@ -38,8 +38,6 @@
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
 
-#include "Utilities.h"
-
 SettingsDialog::SettingsDialog( wxWindow *parent )
     : SettingsDialogBase(parent)
 {
