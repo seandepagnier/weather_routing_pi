@@ -334,7 +334,9 @@ wxString weather_routing_pi::StandardPath()
     wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
 #endif
 
-    return stdPath + wxFileName::GetPathSeparator();
+    return stdPath + wxFileName::GetPathSeparator() +
+        _T("plugins") + wxFileName::GetPathSeparator() +
+        _T("weather_routing") +  wxFileName::GetPathSeparator();
 }
 
 void weather_routing_pi::ShowMenuItems(bool show)

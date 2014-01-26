@@ -30,8 +30,7 @@
    Starting at a given location, propagate outwards in all directions.
    the outward propagation is guarenteed a closed region, and circular linked
    lists are used. If the route comes upon a boundary or reason to stop
-   searching, then the point is tagged as propagated so that it is not
-   propagated any further.
+   searching, then the point is flagged so that it is not propagated any further.
 
    To merge regions requires virtually the same algorithm for descrambling
    (normalizing) a single region.
