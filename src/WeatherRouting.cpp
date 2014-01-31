@@ -33,7 +33,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "../../../include/tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 #include "Utilities.h"
 #include "Boat.h"
@@ -135,9 +135,10 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     m_default_configuration_path = weather_routing_pi::StandardPath()
         + _("WeatherRoutingConfiguration.xml");
     if(!OpenXML(m_default_configuration_path, false)) {
-        AddConfiguration(DefaultConfiguration());
-
-        m_lWeatherRoutes->SetItemState(0, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+        /* create directory for plugin files if it doesn't already exist */
+        wxFileName fn(m_default_configuration_path);
+        if(!fn.DirExists())
+            fn.Mkdir();
     }
 
     wxFileConfig *pConf = GetOCPNConfigObject();
@@ -156,6 +157,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     /* periodically check for updates from computation thread */
     m_tCompute.Connect(wxEVT_TIMER, wxTimerEventHandler
                        ( WeatherRouting::OnComputationTimer ), NULL, this);
+
+    SetEnableConfigurationMenu();
 }
 
 WeatherRouting::~WeatherRouting( )
@@ -198,7 +201,7 @@ void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
-        if(/*rmo != routemapoverlay && */weatherroute->routemapoverlay->m_bEndRouteVisible)
+        if(weatherroute->routemapoverlay->m_bEndRouteVisible)
             weatherroute->routemapoverlay->Render(time, m_SettingsDialog, dc, vp, true);
     }
 
@@ -275,7 +278,7 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
     RouteMap::Positions.push_back(RouteMapPosition(name, lat, lon));
 
     wxListItem item;
-    long index = m_lPositions->InsertItem(item);
+    long index = m_lPositions->InsertItem(m_lPositions->GetItemCount(), item);
     m_lPositions->SetItem(index, POSITION_NAME, name);
     m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
     
@@ -344,12 +347,16 @@ void WeatherRouting::OnWeatherRouteSort( wxListEvent& event )
 void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
 {
     GetParent()->Refresh();
+
     if(CurrentRouteMap()) {
         m_bSkipUpdateCurrentItem = true;
         m_ConfigurationDialog.SetConfiguration(CurrentRouteMap()->GetConfiguration());
         m_bSkipUpdateCurrentItem = false;
         m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
-    }
+    } else
+        m_ConfigurationDialog.Hide();
+
+    SetEnableConfigurationMenu();
 }
 
 void WeatherRouting::OnWeatherRoutesListLeftDown(wxMouseEvent &event)
@@ -421,7 +428,7 @@ void WeatherRouting::OnNew( wxCommandEvent& event )
     else
         configuration = DefaultConfiguration();
 
-#if 0
+#if 0 /* to have a unique name */
     for(int idx = 0;;idx++) {
         wxString name = configuration.Name;
         wxString n1 = name.BeforeLast('-'), n2 = name.AfterLast('-');
@@ -445,6 +452,10 @@ void WeatherRouting::OnNew( wxCommandEvent& event )
 #endif
 
     AddConfiguration(configuration);
+
+    m_lWeatherRoutes->SetItemState(m_lWeatherRoutes->GetItemCount() - 1,
+                                   wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    m_ConfigurationDialog.Show();
 }
 
 void WeatherRouting::OnBatch( wxCommandEvent& event )
@@ -529,7 +540,9 @@ void WeatherRouting::OnDelete( wxCommandEvent& event )
     WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
         (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
     DeleteRouteMap(weatherroute->routemapoverlay);
-    m_lWeatherRoutes->SetItemState(index == m_lWeatherRoutes->GetItemCount() ? index - 1 : index,
+
+    int cnt = m_lWeatherRoutes->GetItemCount();
+    m_lWeatherRoutes->SetItemState(index == cnt ? index - 1 : index,
                                    wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     GetParent()->Refresh();
 }
@@ -559,6 +572,7 @@ void WeatherRouting::OnDeleteAll( wxCommandEvent& event )
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
         DeleteRouteMap(weatherroute->routemapoverlay);
     }
+
     GetParent()->Refresh();
 }
 
@@ -658,8 +672,13 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
 {
     TiXmlDocument doc;
     wxString error;
+
+    wxFileName fn(filename);
+
+    SetTitle(_("Weather Routing") + wxString(_T(" - ")) + fn.GetFullName());
+
     wxProgressDialog *progressdialog = NULL;
-//    wxDateTime start = wxDateTime::Now();
+    wxDateTime start = wxDateTime::Now();
 
     if(!doc.LoadFile(filename.mb_str()))
         FAIL(_("Failed to load file."));
@@ -681,8 +700,9 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 if(!progressdialog->Update(i))
                     return true;
             } else {
-//                wxDateTime now = wxDateTime::Now();
-                if(1/*(now-start).GetMilliseconds() > 1000 && i < count/2*/) {
+                wxDateTime now = wxDateTime::Now();
+                /* if it's going to take more than a second, show a progress dialog */
+                if((now-start).GetMilliseconds() > 500 && i < count/2) {
                     progressdialog = new wxProgressDialog(
                         _("Load"), _("Weather Routing"), count, this,
                         wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
@@ -844,6 +864,19 @@ void WeatherRouting::SaveXML(wxString filename)
     }
 }
 
+void WeatherRouting::SetEnableConfigurationMenu()
+{
+    bool current = CurrentRouteMap();
+    m_mBatch->Enable(current);
+    m_mEdit->Enable(current);
+    m_mDelete->Enable(current);
+    m_mExport->Enable(current);
+
+    bool cnt = m_lWeatherRoutes->GetItemCount();
+    m_mDeleteAll->Enable(cnt);
+    m_mExportAll->Enable(cnt);
+}
+
 void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
 {
     WeatherRoute *weatherroute = new WeatherRoute;
@@ -857,6 +890,9 @@ void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
     wxListItem item;
     item.SetData(weatherroute);
     UpdateItem(m_lWeatherRoutes->InsertItem(item));
+
+    m_mDeleteAll->Enable();
+    m_mExportAll->Enable();
 }
 
 void WeatherRouting::UpdateRouteMap(RouteMapOverlay *routemapoverlay)
@@ -865,6 +901,7 @@ void WeatherRouting::UpdateRouteMap(RouteMapOverlay *routemapoverlay)
         WeatherRoute *weatherroute =
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
         if(weatherroute->routemapoverlay == routemapoverlay) {
+            weatherroute->Update();
             UpdateItem(i);
             return;
         }
@@ -1060,8 +1097,16 @@ void WeatherRouting::Start()
         if(!routemapoverlay->Finished() ||
            routemapoverlay->GribFailed() ||
            routemapoverlay->ClimatologyFailed()) {
-            routemapoverlay->Reset();
-            m_WaitingRouteMaps.push_back(routemapoverlay);
+            wxString error = routemapoverlay->Reset();
+            if(error.empty())
+                m_WaitingRouteMaps.push_back(routemapoverlay);
+            else {
+                wxMessageDialog mdlg(this, error,
+                                     _("Weather Routing"), wxOK | wxICON_ERROR);
+                mdlg.ShowModal();
+                m_WaitingRouteMaps.clear();
+                return;
+            }
         }
     }
     m_RoutesToRun = m_WaitingRouteMaps.size();
@@ -1136,16 +1181,30 @@ void WeatherRouting::DeleteRouteMap(RouteMapOverlay *routemapoverlay)
             m_WeatherRoutes.erase(it);
             break;
         }
+
+    SetEnableConfigurationMenu();
 }
 
 RouteMapConfiguration WeatherRouting::DefaultConfiguration()
 {
     RouteMapConfiguration configuration;
 
-    configuration.StartLat = 0, configuration.StartLon = 0;
+    if(RouteMap::Positions.size() >= 1) {
+        RouteMapPosition &p = *RouteMap::Positions.begin();
+        configuration.Start = p.Name;
+        configuration.StartLat = p.lat, configuration.StartLon = p.lon;
+    } else
+        configuration.StartLat = 0, configuration.StartLon = 0;
+
     configuration.StartTime = wxDateTime::Now();
     configuration.dt = 3600;
-    configuration.EndLat = 0, configuration.EndLon = 0;
+
+    if(RouteMap::Positions.size() >= 2) {
+        RouteMapPosition &p = *(++RouteMap::Positions.begin());
+        configuration.End = p.Name;
+        configuration.EndLat = p.lat, configuration.EndLon = p.lon;
+    } else
+        configuration.EndLat = 0, configuration.EndLon = 0;
     
     configuration.boatFileName = weather_routing_pi::StandardPath() + _("Boat.xml");
     

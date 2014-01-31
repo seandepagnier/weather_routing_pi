@@ -20,7 +20,7 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.             *
+ *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
  */
 
@@ -71,9 +71,10 @@ int weather_routing_pi::Init(void)
 
       m_pWeather_Routing = NULL;
 
-      m_leftclick_tool_id  = InsertPlugInTool(_T(""), _img_WeatherRouting, _img_WeatherRouting, wxITEM_CHECK,
-                                              _("Weather_Routing"), _T(""), NULL,
-                                              WEATHER_ROUTING_TOOL_POSITION, 0, this);
+      m_leftclick_tool_id  = InsertPlugInTool
+          (_T(""), _img_WeatherRouting, _img_WeatherRouting, wxITEM_CHECK,
+           _("Weather_Routing"), _T(""), NULL,
+           WEATHER_ROUTING_TOOL_POSITION, 0, this);
 
       wxMenu dummy_menu;
       m_position_menu_id = AddCanvasContextMenuItem
@@ -141,11 +142,10 @@ wxString weather_routing_pi::GetShortDescription()
 
 wxString weather_routing_pi::GetLongDescription()
 {
-    return _("Weather Routing PlugIn for OpenCPN\n\n\
-Provides Weather routing features include:\n\
-  automatic routing subject to various constraints.\n\
-          optimal speed based on wind and currents\n\
-          boat speed calculation\n\
+    return _("\
+Weather Routing features include:\n\
+  optimal routing subject to various constraints based on weather data\n\
+  automatic boat polar computation\n\
 ");
 }
 

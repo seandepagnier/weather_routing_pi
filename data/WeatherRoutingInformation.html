@@ -10,63 +10,64 @@
 <p>The Weather Routing Plugin is designed to
 compute iteratively positions the boat could possibly make at
 a certain time.  By merging the results of many calculations,
-it is possible to form a map determining the quickest route
+it is possible to form a map determining the best route
 to any given location within the map.
 
 <h3><u>Quick Start</u></h3>
-Open the Weather Routing Dialog, then right click the map and Select "Weather Route Position"
-Create Positions for both Start and End.  Next From the Configuration menu (next to File) Select
-"New", and double click this configuration in the list to edit.  Enter the correct parameters,
-and if needed edit the boat.  When done, you can close this window, and click "Start"
+First, load the grib file used for routing using the grib plugin.  Next, open the Weather Routing plugin from the main toolbar and right click the map and Select "Weather Route Position" at the starting location.  Repeat this step for the destination.  Now, from the Configuration menu (next to File) Select "New".  Be sure to edit the boat to configure your vessel correctly.  Finally, when ready, click "Start" to compute the weather route.
 
 <h3><u>Warning</u></h3>
-As of July 2, 2013, the algorithm exhibits a few major flaws which can result in suboptimal
+As of July 2, 2013, the algorithm exhibits a few flaws which can result in suboptimal
 routes.  Try increasing the time step and/or disabling currents to help mitigate these.
 
   <h3><u>Background</u></h3>
 
 <p>Integration with the grib plugin (version 2.1 or later) allows for
 knowledge of weather conditions.  The climatology plugin can also
-provide a source of data for longer voyages.  In the case where data
-is valid from both sources, grib will be choosen.  If current data is
-available from climatology, and only wind from grib, then the grib wind
-is used with the climatology current.
+provide a source of data for longer voyages, but be warned that using
+the climatology data, especially in variable wind areas is unlikely
+to give useful results.  Using climatology for currents is more useful
+and can be used with grib wind data when current data is not available.
+<br>
+For example, in the case where data is valid from both sources,
+grib will always be choosen.  If current data is available from climatology,
+and only wind from grib, then the grib wind is used with the climatology current.
 
 <p>The grib time selected on the timeline at the time the computation is
 started can be syncronized.  From there, the grib timeline data is accessed
 as the computation proceeds.  Once a computation is completed, the
-course and position of the boat as it sails can be viewed during grib
-playback.
+course and position of the boat as it sails along the computed route
+can be viewed during grib playback.
 
-<p>The Wind, Current and wave height data is read from the grib file.
-If no Current or wave height is available, they are assumed to be 0.
+<p>Wind data is required; if no Current or wave height is available, they are assumed to be zero.
 
 <p>
 The Supported Options Include:
 <ul>
-  <li><b>Degree Step</b> Difference in degrees between courses to attempt.  Less than 3 degrees
-    between steps usually takes a long time to calculate and it is usually better to use a shorter
-    time step instead.</li>
-  <li><b>Time Step</b> Time in seconds to sail before attempting course change.</li>
+  <li><b>Degree Step</b> Difference in degrees between courses to attempt relative to true wind.
+    Less than 3 degrees between steps usually takes a long time to calculate and it is usually
+    better to use a shorter time step instead.</li>
+  <li><b>Time Step</b> Time to sail before considering a course or sail change.</li>
   <li><b>Max Diverted Course</b> Maximum course error from heading toward target destination to attempt.
   If set to 180, the map will expand in all directions, and can be used to find multiple destinations
-  from a given source.  If set less than 180, computation time is reduced (as it tends to take a very long
-  time as the map expands), but possible courses which take directions on a bearing too far from the closest great circle route (even if just for 1 iteration) will be lost, and therefore the optimal route may not be achieved.
-    finding routes</li>
+  from a given source.  If set less than 180, computation time can be greatly reduced
+    (as it tends to take a very long time as the map expands), but not all possible courses will be considered and therefore the optimal route may not be found.</li>
   <li><b>Max Wind Knots</b> Do not navigate in areas with more wind than this value.</li>
   <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
-  <li><b>Max Latitude</b> Do not navigate above (or below) this latitude.</li>
-  <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.  This is normally irrelevant except for very close isochrons.  Setting to 0 avoids these calculations.  </li>
-  <li><b>Detect Land</b> Use coastline data to avoid sailing through land</li>
-  <li><b>Inverted Regons</b> This is relatively rare, but in some cases it may be
-    possible to reach a destination further away in two or more different paths
-    which go on either side of a closer position.   This can happen routing around
-    islands, or occasionally when routing on either side of a high pressure system.
-    The program must work inwards on this inverted region to reach a
-    possible goal, if disabled these areas will be ignored.</li>
+  <li><b>Max Latitude</b> Do not navigate above (or below in the southern hemisphere) this latitude.</li>
+  <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.  This is normally irrelevant for ocean passages, but could be useful for routes in tight quarters  Setting to 0 avoids extra calculations. </li>
+  <li><b>Detect Land</b> Use GSHHS coastline data to avoid sailing through land</li>
+  <li><b>Inverted Regions</b> This is relatively rare, but in some cases it may be
+    possible to reach some location from two different routes (imagine either side of an island)
+    which is further away from the destination before the destination can be reached.  At this
+    point, the algorithm must invert and work inwards on this inverted region (rather than outwards)
+    to possibly reach the destination.  This case can occur when routing around islands,
+    or occasionally when routing near a high pressure system. If disabled this will be ignored
+    and extra computations are avoided.</li>
   <li><b>Anchoring</b>  In some cases, it may be preferable to anchor (assuming it
-    isn't too deep) rather than navigate if going against a swift current as you
-    may actually reach the destination sooner if holding still until the current abades.</li>
+    isn't too deep) rather than continue to navigate if there is a contrary current which
+    is swifter than the boat can travel.  This allows the route to reach the destination sooner
+    by sitting in place until the current abades.</li>
   <li><b>Allow Data Deficient</b> Continue to navigate on last valid wind data
     even if there is no more valid wind data in the area/time.</li>
 </ul>
@@ -74,11 +75,14 @@ The Supported Options Include:
 <H3>Boat</H3>
 
 <p>
-The boat dialog displays the polar plot of the boat's speed vs true wind direction as well as showing other details.  Two file types are supported.  CSV (same as qtVlm) and binary which is specific to this plugin.   The binary contains much more data.
+The boat dialog displays the polar plot of the boat's speed vs true wind direction as well as showing other details.  Two file types are supported.  CSV (same as qtVlm) and binary which is specific to this plugin.   The binary contains much more data (various sail plans etc..)
 
 <p>
-The VMG tab shows the best courses for up and down wind on each tack.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If this option is chosen, then the boat will assume the ability to sail in these angles (it is assumed you can tack periodically to maintain this course)  If tacking is not optimized, then weather routing will naturally tack only at the isochrons, resulting in overlapping alternate routes, and potentially less optimal course (but will specifically display where to tack)  It also may take significantly longer to compute courses if there are rugged coastlines.  For this reason optiming tacking is recommended.
+The VMG tab shows the best courses for up and down wind on each tack.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If this option is chosen, then the boat will assume the ability to sail in these angles (you must then tack periodically to maintain this course)  If tacking is not optimized, then weather routing will tack only at the isochrons, resulting in overlapping alternate routes, and potentially slightly less optimal course (but will specifically display where to tack)  It also may take significantly longer to compute courses in areas with rugged coastlines.  For this reason optiming tacking is recommended.
 
+<p>Most users, should measure their boat performance (speed at each wind speed and direction relative to true wind) and load a CSV polar file of these records instead of computing them automatically.  In the future, the computations could be greatly improved with more parameters to yield more accurate results.
+
+<p>
 The boat configuration allows one to enter the parameters used to specify the performance of a boat.
 Currently supported polar files are csv (same format as qtVlm) and binary files in this format
 (specific only to this plugin)  These files specify sailing speed at each wind speed and wind direction.
@@ -107,7 +111,7 @@ VB(inf) =  sin (-)  /---
 <p>
 This computation is very useful for the standard rig, but doesn't really apply correctly in many cases.  It also doesn't really factor in a huge range of variables as there is only one constant.
 
-<p>I have augmented the sailboat transform to also take into account two types of drag in the hoppe that it may come closer to resembling the sailing characteristics of more vessels.  This way hull speed is properly taken into account, and for boats with planing ability, also you may get the right result if the correct values are used.
+<p>I have augmented the sailboat transform to also take into account two types of drag in the hope that it may come closer to resembling the sailing characteristics of more vessels.  This way hull speed is properly taken into account, and for boats with planing ability, also you may get the right result if the correct values are used.
 
 <p>The Frictional drag reduces the maximum speed based on the square of its speed.  The Wake drag component uses a complex math formula to compute the energy lost creating a wake:
 <pre>
@@ -133,45 +137,40 @@ This computation is very useful for the standard rig, but doesn't really apply c
     drag is zero as well, but the first hump occurs from .32 to .4, and
     therefore causes more drag than right at .4.
 
-    This works for the full range from displacement to planing mode.
+    In theory, this equation is correct for wave drag for all speeds, from displacement to planing mode.
 </pre>
-
-<p>For many users, it may be best to enter measured values for the boat in csv format rather
-than attempt to compute. Eventually it may even be possible to use the plugin to obtain
-the polar values from gps during passage (given enough wind states).  It may also be eventually
-supported to overlay the obtained data with the transform calculation to better optimize the
-coefficents used to calculate it.
 
 <p>The basic polar describing boat speed at various wind settings fails on many fronts.
 First of all, various sail combinations become impractical in certain sea states,
 even if the actual wind speed is the same.  The boat also does not sail the same
 speed in these cases, so the actual boat speed may widely vary with identical wind
-speed/direction values in different conditions.   Secondly, the wind is 3 dimensional,
-and near land often has a strong vertical component.  Thirdly, there may be certain
-areas conditions, or times when the user may selectively want to essentially use
-a different polar diagram (sail plan, navigating in fog or near ice, night vs day,
-autopilot vs wind vane)  Fourthly, the actual speed of the boat may change due
-to various parameters besides currents, wind, and sea state for various reasons
-(more on this below)  Fifthly.. wait I have like 10 of these I'll stop now.
+speed/direction values in different sea states.   Secondly, the wind is 3 dimensional,
+and near land often has a noticable vertical component not accounted for.
+Thirdly, there may be certain areas conditions, or times when the user may
+selectively want to use a different polar diagram
+(sail plan, navigating in fog or near ice, night vs day, autopilot vs wind vane)
+Fourthly, the actual speed of the boat may change due to various parameters besides
+currents, wind, and sea state. (more on this below)  There are many more reasons as well.
 
 <p>There is also extension for the possibility of other sources of propulsion
-besides wind power (namely PV-solar electric) which  may be
-used in conjunction with sails.  This form of power falls into the category of weather
-routing as it is dependent on solar radiation.  Finally, it may be possible to store
-some of this radiation, (during day with sun and wind) or in the case of anchoring in
-an adverse tidal flow with a hydro generator in the form of chemical energy to be used
-later (at night or when the tide is right) in an electric drive to reach the final destination
-at a sooner possible time than any other method employed.
-(all of this is mostly still unimplemented, but there is some c++)
+besides wind power (namely PV-solar electric, and/or human power both which I use for
+navigation when wind is unavailable) These are normally used in conjunction with sails.
+This form of power falls into the category of weather routing as it is dependent on solar radiation
+for photovoltaics, and temperature (sculling a yacht in tropical heat has less range than
+in cooler weather).  It may be possible to consider storing generated electrical power
+(one possible case would be charging batteries with a hydro tow generator sailing in strong winds,
+this energy is then to be used the next day when the calm sets in) in an electric drive it is possible
+to reach the final destination at a sooner time than without this consideration.
+(all of this is mostly still unimplemented)
 
 <p>It is also possible to factor slow changing, but important changes to the boat's
 passage-making ability over the course of the voyage.  One example is bottom growth,
 and the rate it might grow given the sailing course and various parameters.  This
 would enable you to gauge how essential it is to actually paint a bottom, or if
-you don't mind (as I have done) to dive and scrape mid-ocean every week or two,
-you might be able to actually determine how much time it would save (usually more
-than the time spent swimming).  There is also the case of sails losing shape, and
-becoming less efficient over the course of a long upwind passage.
+you don't mind (as I have done many times) to clean your bottom in the middle
+of the ocean, you could calculate how much time it would save (hopefully more
+than the time spent scraping the growth off).  There is also the case of sails losing shape, and
+becoming less efficient over the course of a long passage.
 
 <p><h4>The Weather Routing plugin is written and maintained by Sean D'Epagnier</h4>
 </body></html>

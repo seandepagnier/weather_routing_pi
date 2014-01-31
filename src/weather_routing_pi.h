@@ -28,7 +28,7 @@
 #define _WEATHER_ROUTINGPI_H_
 
 #define     PLUGIN_VERSION_MAJOR    0
-#define     PLUGIN_VERSION_MINOR    9
+#define     PLUGIN_VERSION_MINOR    10
 
 #define     MY_API_VERSION_MAJOR    1
 #define     MY_API_VERSION_MINOR    10
@@ -47,8 +47,8 @@
 #undef MAX
 #endif
 
-#include "../../../include/wx/jsonreader.h"
-#include "../../../include/wx/jsonwriter.h"
+#include "wxJSON/jsonreader.h"
+#include "wxJSON/jsonwriter.h"
 
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition

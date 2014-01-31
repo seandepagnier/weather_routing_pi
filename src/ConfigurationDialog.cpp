@@ -31,7 +31,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "../../../include/tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 #include "Utilities.h"
 #include "Boat.h"
@@ -79,6 +79,8 @@ void ConfigurationDialog::OnEditBoat ( wxCommandEvent& event )
 {
     BoatDialog boatdlg(this, m_fpBoat->GetPath());
     boatdlg.ShowModal();
+     m_fpBoat->SetPath(boatdlg.m_boatpath);
+
     Update();
 }
 

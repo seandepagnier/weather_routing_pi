@@ -110,14 +110,14 @@ SET(SRC_WEATHER_ROUTING
             ../grib_pi/src/GribRecord.cpp  
             ../grib_pi/src/zuFile.cpp 
 
-            ../../src/wxJSON/jsonval.cpp
-            ../../src/wxJSON/jsonreader.cpp
-            ../../src/wxJSON/jsonwriter.cpp
+            src/wxJSON/jsonval.cpp
+            src/wxJSON/jsonreader.cpp
+            src/wxJSON/jsonwriter.cpp
 
-	    ../../../include/tinyxml.h
-            ../../../src/tinyxml.cpp
-            ../../../src/tinyxmlparser.cpp
-            ../../../src/tinyxmlerror.cpp
+	    src/tinyxml/tinyxml.h
+            src/tinyxml/tinyxml.cpp
+            src/tinyxml/tinyxmlparser.cpp
+            src/tinyxml/tinyxmlerror.cpp
 )
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING})
 

@@ -119,6 +119,8 @@ private:
     bool OpenXML(wxString filename, bool reportfailure = true);
     void SaveXML(wxString filename);
 
+    void SetEnableConfigurationMenu();
+
     void AddConfiguration(RouteMapConfiguration configuration);
     void UpdateRouteMap(RouteMapOverlay *routemapoverlay);
     void UpdateItem(long index);

@@ -42,7 +42,7 @@ enum {spNAME, spETA};
 BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     : BoatDialogBase(parent), m_boatpath(boatpath), m_PlotScale(0)
 {
-    wxString error = m_Boat.OpenXML(m_boatpath);
+    m_Boat.OpenXML(m_boatpath);
     m_SelectedSailPlan = 0;
 
     m_lBoatPlans->InsertColumn(spNAME, _("Name"));

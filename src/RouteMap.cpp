@@ -1998,12 +1998,12 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
     return minpos;
 }
 
-void RouteMap::Reset()
+wxString RouteMap::Reset()
 {
     Lock();
     Clear();
 
-    m_Configuration.boat.OpenXML(m_Configuration.boatFileName);
+    wxString boaterror = m_Configuration.boat.OpenXML(m_Configuration.boatFileName);
 
     m_NewGrib = NULL;
     m_NewTime = m_Configuration.StartTime;
@@ -2016,6 +2016,8 @@ void RouteMap::Reset()
     m_bFinished = false;
 
     Unlock();
+
+    return boaterror;
 }
 
 void RouteMap::GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions)

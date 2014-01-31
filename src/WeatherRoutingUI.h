@@ -66,6 +66,11 @@ class WeatherRoutingBase : public wxFrame
 		wxMenu* m_mFile;
 		wxMenu* m_mPosition;
 		wxMenu* m_mConfiguration;
+		wxMenuItem* m_mBatch;
+		wxMenuItem* m_mEdit;
+		wxMenuItem* m_mDelete;
+		wxMenuItem* m_mExport;
+		wxMenuItem* m_mExportAll;
 		wxMenu* m_mView;
 		wxMenu* m_mHelp;
 		
@@ -85,12 +90,12 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnNew( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBatch( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditConfiguration( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeleteAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDeleteAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
@@ -100,8 +105,9 @@ class WeatherRoutingBase : public wxFrame
 	
 	public:
 		wxGauge* m_gProgress;
+		wxMenuItem* m_mDeleteAll;
 		
-		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
 		

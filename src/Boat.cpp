@@ -26,7 +26,7 @@
 
 #include <wx/wx.h>
 
-#include "../../../include/tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 #include "weather_routing_pi.h"
 #include "Utilities.h"
@@ -44,14 +44,6 @@ Boat::~Boat()
 
 wxString Boat::OpenXML(wxString filename)
 {
-    TiXmlDocument doc;
-    if(!doc.LoadFile( filename.mb_str() ))
-        return _("Failed to load file");
-
-    TiXmlHandle root( doc.RootElement() );
-    if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingBoat"))
-        return _("Failed to read xml file (no OCPWeatherRoutingBoat node)");
-
     bool cleared = false;
     for(unsigned int i=0; i<Plans.size(); i++)
         delete Plans[i];
@@ -59,6 +51,14 @@ wxString Boat::OpenXML(wxString filename)
     
     Plans.push_back(new BoatPlan(_("Initial Plan"), *this));
     Plans[0]->ComputeBoatSpeeds(*this);
+
+    TiXmlDocument doc;
+    if(!doc.LoadFile( filename.mb_str() ))
+        return _("Failed to load file: ") + filename;
+
+    TiXmlHandle root( doc.RootElement() );
+    if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingBoat"))
+        return _("Invalid xml file (no OCPWeatherRoutingBoat node): " + filename);
 
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
         if(!strcmp(e->Value(), "BoatCharacteristics")) {
@@ -119,7 +119,7 @@ wxString Boat::OpenXML(wxString filename)
             Plans.push_back(plan);
         }
     }
-    return wxString();
+    return _T("");
 }
 
 wxString Boat::SaveXML(wxString filename)
