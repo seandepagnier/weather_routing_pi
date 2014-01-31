@@ -90,24 +90,27 @@ private:
     void OnClearPositions( wxCommandEvent& event );
     void OnClose( wxCloseEvent& event );
     void OnEditConfiguration();
-    void OnEditConfiguration( wxMouseEvent& event ) { OnEditConfiguration(); }
-    void OnWeatherRouteSort( wxListEvent& event );
-    void OnWeatherRouteSelected( wxListEvent& event );
-    void OnWeatherRoutesListLeftDown(wxMouseEvent &event);
-    void OnCompute( wxCommandEvent& event );
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnNew( wxCommandEvent& event );
+    void OnEditConfiguration( wxMouseEvent& event ) { OnEditConfiguration(); }
+    void OnWeatherRouteSort( wxListEvent& event );
+    void OnWeatherRouteSelected( wxListEvent& event );
+    void OnWeatherRoutesListLeftDown(wxMouseEvent &event);
+    void UpdateComputeState();
+    void OnCompute( wxCommandEvent& event );
+    void OnComputeAll( wxCommandEvent& event );
+    void OnResetAll( wxCommandEvent& event );
     void OnPositions( wxCommandEvent& event );
     void OnBatch( wxCommandEvent& event );
     void OnEditConfiguration( wxCommandEvent& event ) { OnEditConfiguration(); }
-    void OnExport( wxCommandEvent& event );
+    void OnGoTo( wxCommandEvent& event );
     void OnDelete( wxCommandEvent& event );
-    void OnFilter( wxCommandEvent& event );
-    void OnReset( wxCommandEvent& event );
-    void OnExportAll( wxCommandEvent& event );
     void OnDeleteAll( wxCommandEvent& event );
+    void OnFilter( wxCommandEvent& event );
+    void OnExport( wxCommandEvent& event );
+    void OnExportAll( wxCommandEvent& event );
     void OnSettings( wxCommandEvent& event );
     void OnStatistics( wxCommandEvent& event );
     void OnPlot( wxCommandEvent& event );
@@ -128,7 +131,8 @@ private:
     RouteMap *SelectedRouteMap();
     void Export(RouteMapOverlay &routemapoverlay);
 
-    void Start();
+    void Start(RouteMapOverlay *routemapoverlay);
+    void StartAll();
     void Stop();
 
     void DeleteRouteMap(RouteMapOverlay *routemapoverlay);
