@@ -52,7 +52,7 @@ void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
 
         double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
         m_stPortStarboard->SetLabel(isnan(port_starboard) ? _T("nan")
-                                    : wxString::Format(_T("%02d/%02d"),
+                                    : wxString::Format(_T("%d/%d"),
                                                        (int)port_starboard, 100-(int)port_starboard));
 
         m_stAverageWindKnots->SetLabel

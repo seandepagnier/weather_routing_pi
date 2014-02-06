@@ -28,8 +28,8 @@
 
 #include "../../../include/ocpn_plugin.h"
 #include "../../../include/ocpndc.h"
-#include "../../../include/wx/jsonreader.h"
-#include "../../../include/wx/jsonwriter.h"
+#include "wxJSON/jsonreader.h"
+#include "wxJSON/jsonwriter.h"
 
 #include "Utilities.h"
 #include "Boat.h"

@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "../../../include/tinyxml.h"
+#include "tinyxml/tinyxml.h"
 
 #include "Utilities.h"
 double deg2rad(double degrees)

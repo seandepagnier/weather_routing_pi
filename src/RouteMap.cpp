@@ -30,8 +30,7 @@
    Starting at a given location, propagate outwards in all directions.
    the outward propagation is guarenteed a closed region, and circular linked
    lists are used. If the route comes upon a boundary or reason to stop
-   searching, then the point is tagged as propagated so that it is not
-   propagated any further.
+   searching, then the point is flagged so that it is not propagated any further.
 
    To merge regions requires virtually the same algorithm for descrambling
    (normalizing) a single region.
@@ -1999,12 +1998,12 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
     return minpos;
 }
 
-void RouteMap::Reset()
+wxString RouteMap::Reset()
 {
     Lock();
     Clear();
 
-    m_Configuration.boat.OpenXML(m_Configuration.boatFileName);
+    wxString boaterror = m_Configuration.boat.OpenXML(m_Configuration.boatFileName);
 
     m_NewGrib = NULL;
     m_NewTime = m_Configuration.StartTime;
@@ -2017,6 +2016,8 @@ void RouteMap::Reset()
     m_bFinished = false;
 
     Unlock();
+
+    return boaterror;
 }
 
 void RouteMap::GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions)

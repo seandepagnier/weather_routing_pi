@@ -192,7 +192,7 @@ public:
 
     static void PositionLatLon(wxString Name, double &lat, double &lon);
 
-    void Reset();
+    wxString Reset();
 
 #define LOCKING_ACCESSOR(name, flag) bool name() { Lock(); bool ret = flag; Unlock(); return ret; }
     LOCKING_ACCESSOR(Finished, m_bFinished)

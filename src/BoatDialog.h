@@ -41,6 +41,7 @@ public:
     ~BoatDialog();
 
     Boat m_Boat;
+    wxString m_boatpath;
 
 private:
     void OnMouseEventsPlot( wxMouseEvent& event );
@@ -76,7 +77,6 @@ private:
     void UpdateVMG();
     void UpdateStats();
 
-    wxString m_boatpath;    
     double m_PlotScale;
     int m_MouseW;
 
