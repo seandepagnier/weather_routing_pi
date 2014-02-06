@@ -69,6 +69,10 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
     if(!fgets(line, sizeof line, f))
         goto failed; /* error here too */
     token = strtok_r(line, ";", &saveptr);
+
+    /* chomp invisible bytes */
+    while(*token < 0) token++;
+
     if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
         goto failed; /* unrecognized format */
     

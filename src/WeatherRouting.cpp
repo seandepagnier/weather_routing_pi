@@ -375,7 +375,7 @@ void WeatherRouting::OnWeatherRoutesListLeftDown(wxMouseEvent &event)
 }
 
 int debugcnt, debuglimit = 1, debugsize = 2;
-void WeatherRouting::OnCompute ( wxCommandEvent& event )
+void WeatherRouting::OnCompute( wxCommandEvent& event )
 {
     if(m_bRunning)
         Stop();

@@ -295,14 +295,23 @@ void BoatDialog::OnUpdateWindSpeed( wxSpinEvent& event )
 
 void BoatDialog::OnOpen ( wxCommandEvent& event )
 {
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+
+    wxString path;
+    pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
+
     wxFileDialog openDialog
-        ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+        ( this, _( "Select Polar" ), path, wxT ( "" ),
           wxT ( "Boat polar files (*.xml, *.csv)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
-        wxFileName filename = openDialog.GetPath();
-        wxString error = m_Boat.OpenXML(openDialog.GetPath());
+        wxString filename = openDialog.GetPath();
+        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+        pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
+
+        wxString error = m_Boat.OpenXML(filename);
         if(error.empty())
             RepopulatePlans();
         else {
@@ -320,15 +329,24 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
 
 void BoatDialog::OnOpenCSV ( wxCommandEvent& event )
 {
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+
+    wxString path;
+    pConf->Read ( _T ( "CSVPath" ), &path, weather_routing_pi::StandardPath());
+
     wxFileDialog openDialog
-        ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+        ( this, _( "Select Polar" ), path, wxT ( "" ),
           wxT ( "CSV files (*.csv)|*.CSV;*.csv|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
+        wxString filename = openDialog.GetPath();
+        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+        pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
+
         BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
         BoatSpeedTable table;
-        wxString filename = openDialog.GetPath();
         if(table.Open(filename.mb_str(),
                       plan->wind_speed_step, plan->wind_degree_step)) {
             plan->csvFileName = filename;
@@ -364,10 +382,20 @@ void BoatDialog::Save()
 
 void BoatDialog::OnSaveAs ( wxCommandEvent& event )
 {
-    wxFileDialog saveDialog( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+
+    wxString path;
+    pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
+
+    wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
                              wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ), wxFD_SAVE  );
     if( saveDialog.ShowModal() == wxID_OK ) {
-        m_boatpath = saveDialog.GetPath();
+        wxString filename = saveDialog.GetPath();
+        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+        pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
+
+        m_boatpath = filename;
         Save();
     }
 }
@@ -384,10 +412,20 @@ void BoatDialog::OnClose ( wxCommandEvent& event )
 
 void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
 {
-    wxFileDialog saveDialog( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+
+    wxString path;
+    pConf->Read ( _T ( "CSVPath" ), &path, weather_routing_pi::StandardPath());
+
+    wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
                              wxT ( "Boat Polar files (*.csv)|*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
+
     if( saveDialog.ShowModal() == wxID_OK ) {
-        wxFileName filename = saveDialog.GetPath();
+        wxString filename = saveDialog.GetPath();
+        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+        pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
+
         BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
             (m_sFileCSVWindSpeedStep->GetValue(), m_sFileCSVWindDegreeStep->GetValue());
         if(!table.Save(saveDialog.GetPath().mb_str())) {

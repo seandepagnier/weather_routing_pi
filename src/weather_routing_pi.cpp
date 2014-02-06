@@ -261,6 +261,9 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
     }
 
     m_pWeather_Routing->Show(!m_pWeather_Routing->IsShown());
+
+    //  m_parent_window->Lower();
+//    m_pWeather_Routing->SetFocus();
 }
 
 void weather_routing_pi::OnContextMenuItemCallback(int id)
