@@ -71,9 +71,9 @@ BoatDialog::~BoatDialog()
 {
     m_Boat.SaveXML(m_boatpath);
 
-    wxString filename = openDialog.GetPath();
+    wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-    pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
+    pConf->Write ( _T ( "CSVPath" ), m_fpCSVPath->GetPath() );
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -508,6 +508,9 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
     StoreBoatParameters();
     Compute();
     m_bDeleteBoatPlan->Enable();
+
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
     wxString path;
     pConf->Read ( _T ( "CSVPath" ), &path, weather_routing_pi::StandardPath());
