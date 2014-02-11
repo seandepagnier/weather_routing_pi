@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -55,8 +55,9 @@ private:
     void OnSaveAs( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
-    void OnOpenCSV( wxCommandEvent& event );
+    void LoadCSV( wxCommandEvent& event );
     void OnSaveCSV( wxCommandEvent& event );
+    void OnPolarCSVFile( wxFileDirPickerEvent& event );
     void OnRecompute( wxSpinEvent& event ) { StoreBoatParameters(); Compute(); UpdateStats(); }
     void OnOptimizeTacking( wxCommandEvent& event );
     void OnResetOptimalTackingSpeed( wxCommandEvent& event );
@@ -65,15 +66,21 @@ private:
     void OnRecomputeDrag( wxCommandEvent& event );
     void OnDragInfo( wxCommandEvent& event );
     void OnSailPlanSelected( wxListEvent& event );
+    void OnPolarMode( wxCommandEvent& event );
     void OnEta( wxScrollEvent& event );
     void OnNewBoatPlan( wxCommandEvent& event );
-    void OnEditBoatPlan( wxCommandEvent& event );
     void OnDeleteBoatPlan( wxCommandEvent& event );
 
     void StoreBoatParameters();
     void RepopulatePlans();
     void Compute();
     void UpdateTrackingControls();
+
+    void OnNewSwitchPlanRule( wxCommandEvent& event );
+    void OnEditSwitchPlanRule( wxCommandEvent& event );
+    void OnDeleteSwitchPlanRule( wxCommandEvent& event );
+    void PopulatePlans();
+
     void UpdateVMG();
     void UpdateStats();
 

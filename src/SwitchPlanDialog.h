@@ -34,7 +34,7 @@ class SwitchPlanDialog : public SwitchPlanDialogBase
 {
 public:
 
-    SwitchPlanDialog( wxWindow *parent, SwitchPlan &p, std::vector<wxString> plans );
+    SwitchPlanDialog( wxWindow *parent, SwitchPlan &p, std::vector<BoatPlan*> plans );
     ~SwitchPlanDialog();
 
     void OnDone( wxCommandEvent& event );

@@ -6,8 +6,6 @@ src/BoatDialog.cpp
 src/BoatDialog.h
 src/BoatPlan.cpp
 src/BoatPlan.h
-src/BoatPlanDialog.cpp
-src/BoatPlanDialog.h
 src/ChargeSource.h
 src/ConfigurationBatchDialog.cpp
 src/ConfigurationBatchDialog.h

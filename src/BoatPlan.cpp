@@ -796,7 +796,7 @@ double BoatPlan::Speed(double W, double VW)
 
 SailingVMG BoatPlan::GetVMG(double VW)
 {
-    int VW2i = ClosestVWi(VW), VW1i = VW2i > 0 ? VW2i - 1 : 0;
+    int VW2i = ClosestVWi(VW), VW1i = VW2i > 1 ? VW2i - 1 : 1;
     SailingVMG vmg, vmg1 = VMG[VW1i], vmg2 = VMG[VW2i];
     double VW1 = wind_speeds[VW1i], VW2 = wind_speeds[VW2i];
 

@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,8 +34,8 @@
 #include "weather_routing_pi.h"
 #include "Utilities.h"
 #include "Boat.h"
+#include "SwitchPlanDialog.h"
 #include "BoatDialog.h"
-#include "BoatPlanDialog.h"
 
 enum {spNAME, spETA};
 
@@ -61,12 +61,19 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan]->eta * 1000.0);
 
     UpdateStats();
-    UpdateVMG();    
+    UpdateVMG();
+
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 }
 
 BoatDialog::~BoatDialog()
 {
     m_Boat.SaveXML(m_boatpath);
+
+    wxString filename = openDialog.GetPath();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+    pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -220,7 +227,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
         wxString str = wxString::Format(_T("%.0f"), B);
         int sw, sh;
         dc.GetTextExtent(str, &sw, &sh);
-        dc.DrawText(str, w/2 + x - sw/2, h/2 - y - sh/2);
+        dc.DrawText(str, w/2 + .9*x - sw/2, h/2 - .9*y - sh/2);
     }
 
     /* vmg */
@@ -327,45 +334,28 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
     }
 }
 
-void BoatDialog::OnOpenCSV ( wxCommandEvent& event )
+void BoatDialog::LoadCSV()
 {
-    wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+    wxString filename = m_fpCSVPath->GetPath();
 
-    wxString path;
-    pConf->Read ( _T ( "CSVPath" ), &path, weather_routing_pi::StandardPath());
-
-    wxFileDialog openDialog
-        ( this, _( "Select Polar" ), path, wxT ( "" ),
-          wxT ( "CSV files (*.csv)|*.CSV;*.csv|All files (*.*)|*.*" ),
-          wxFD_OPEN  );
-
-    if( openDialog.ShowModal() == wxID_OK ) {
-        wxString filename = openDialog.GetPath();
-        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-        pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
-
-        BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
-        BoatSpeedTable table;
-        if(table.Open(filename.mb_str(),
-                      plan->wind_speed_step, plan->wind_degree_step)) {
-            plan->csvFileName = filename;
-            m_stCSVFile->SetLabel(plan->csvFileName);
-            m_sFileCSVWindSpeedStep->SetValue(plan->wind_speed_step);
-            m_sFileCSVWindDegreeStep->SetValue(plan->wind_degree_step);
-            plan->SetSpeedsFromTable(table);
-        } else {
-            wxMessageDialog md(this, _("Failed reading csv: ") + filename,
-                               _("OpenCPN Weather Routing Plugin"),
-                               wxICON_ERROR | wxOK );
-            md.ShowModal();
-            return;
-        }
-        
-        UpdateStats();
-        UpdateVMG();
-        m_PlotWindow->Refresh();
+    BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
+    BoatSpeedTable table;
+    if(table.Open(filename.mb_str(),
+                  plan->wind_speed_step, plan->wind_degree_step)) {
+        plan->csvFileName = filename;
+        plan->SetSpeedsFromTable(table);
+        RepopulatePlans();
+    } else {
+        wxMessageDialog md(this, _("Failed reading csv: ") + filename,
+                           _("OpenCPN Weather Routing Plugin"),
+                           wxICON_ERROR | wxOK );
+        md.ShowModal();
+        return;
     }
+    
+    UpdateStats();
+    UpdateVMG();
+    m_PlotWindow->Refresh();
 }
 
 void BoatDialog::Save()
@@ -427,7 +417,7 @@ void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
         pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
 
         BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
-            (m_sFileCSVWindSpeedStep->GetValue(), m_sFileCSVWindDegreeStep->GetValue());
+            (3, 3);
         if(!table.Save(saveDialog.GetPath().mb_str())) {
             wxMessageDialog md(this, _("Failed saving boat polar to csv"),
                                _("OpenCPN Weather Routing Plugin"),
@@ -435,6 +425,11 @@ void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
             md.ShowModal();
         }
     }
+}
+
+void BoatDialog::OnPolarCSVFile( wxFileDirPickerEvent& event )
+{
+    LoadCSV();
 }
 
 void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
@@ -477,7 +472,25 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
     m_SelectedSailPlan = event.GetIndex();
     m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan]->eta * 1000.0);
     m_sLuffAngle->SetValue(m_Boat.Plans[m_SelectedSailPlan]->luff_angle);
+
+    bool c = m_Boat.Plans[m_SelectedSailPlan]->computed;
+    m_sbComputation->ShowItems(c);
+    m_sbCSV->ShowItems(!c);
+    m_pPolarConfig->Fit();
+    Fit();
+
     m_PlotWindow->Refresh();
+}
+
+void BoatDialog::OnPolarMode( wxCommandEvent& event )
+{
+    bool c = m_rbComputed->GetValue();
+
+    m_Boat.Plans[m_SelectedSailPlan]->computed = c;
+    m_sbComputation->ShowItems(c);
+    m_sbCSV->ShowItems(!c);
+    m_pPolarConfig->Fit();
+    Fit();
 }
 
 void BoatDialog::OnEta( wxScrollEvent& event )
@@ -494,20 +507,11 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     StoreBoatParameters();
     Compute();
-    OnEditBoatPlan(event);
     m_bDeleteBoatPlan->Enable();
-}
 
-void BoatDialog::OnEditBoatPlan( wxCommandEvent& event )
-{
-    std::vector<wxString> PlanNames;
-    for(unsigned int i=0; i<m_Boat.Plans.size(); i++)
-        if(i != (unsigned int)m_SelectedSailPlan)
-            PlanNames.push_back(m_Boat.Plans[i]->Name);
-
-    BoatPlanDialog dialog(this, *m_Boat.Plans[m_SelectedSailPlan], PlanNames);
-    dialog.ShowModal();
-    RepopulatePlans();
+    wxString path;
+    pConf->Read ( _T ( "CSVPath" ), &path, weather_routing_pi::StandardPath());
+    m_fpCSVPath->SetPath(path);
 }
 
 void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
@@ -564,9 +568,12 @@ void BoatDialog::RepopulatePlans()
         m_bDeleteBoatPlan->Disable();
 
     BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
-    m_stCSVFile->SetLabel(plan->csvFileName);
-    m_sFileCSVWindSpeedStep->SetValue(plan->wind_speed_step);
-    m_sFileCSVWindDegreeStep->SetValue(plan->wind_degree_step);
+
+    m_fpCSVPath->SetPath(plan->csvFileName);
+    m_stWindSpeedStep->SetLabel
+        (wxString::Format(_T("%d"), plan->wind_speed_step));
+    m_stWindDegreeStep->SetLabel
+        (wxString::Format(_T("%d"), plan->wind_degree_step));
 }
 
 void BoatDialog::Compute()
@@ -577,7 +584,6 @@ void BoatDialog::Compute()
 
     BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
     plan->ComputeBoatSpeeds(m_Boat);
-    m_stCSVFile->SetLabel(plan->csvFileName);
 
     UpdateVMG();
     m_PlotWindow->Refresh();
@@ -600,6 +606,107 @@ void BoatDialog::UpdateVMG()
         (wxString::Format(_T("%d"), vmg.StarboardTackDownWind));
 }
 
+void BoatDialog::OnNewSwitchPlanRule( wxCommandEvent& event )
+{
+    SwitchPlan plan;
+    
+    plan.Name = m_Boat.Plans[0]->Name;
+
+    m_Boat.Plans[m_SelectedSailPlan]->SwitchPlans.push_back(plan);
+
+    int index = m_lSwitchPlans->Append(wxString());
+    m_lSwitchPlans->SetSelection(index, true);
+
+    m_bEditSwitchBoatPlan->Enable();
+    m_bDeleteSwitchBoatPlan->Enable();
+
+    OnEditSwitchPlanRule(event);
+}
+
+void BoatDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
+{
+    int index = m_lSwitchPlans->GetSelection();
+    if(index < 0)
+        return;
+
+    BoatPlan *boatplan = m_Boat.Plans[m_SelectedSailPlan];
+    SwitchPlan plan = boatplan->SwitchPlans[index];
+
+    if(m_Boat.Plans.size() < 1) {
+        wxMessageDialog md(this, _("Cannot edit switch plan since there is no other plan to switch to."),
+                           _("Sail Plans"),
+                           wxICON_ERROR | wxOK );
+        md.ShowModal();
+        return;
+    }
+
+    SwitchPlanDialog dialog(this, plan, m_Boat.Plans);
+    if(dialog.ShowModal() == wxID_OK)
+        boatplan->SwitchPlans[index] = plan;
+    else
+        boatplan->SwitchPlans.erase(boatplan->SwitchPlans.begin() + index);
+
+    PopulatePlans();
+}
+
+void BoatDialog::OnDeleteSwitchPlanRule( wxCommandEvent& event )
+{
+    int index = m_lSwitchPlans->GetSelection();
+    if(index < 0)
+        return;
+
+    BoatPlan *boatplan = m_Boat.Plans[m_SelectedSailPlan];
+    SwitchPlan plan = boatplan->SwitchPlans[index];
+    boatplan->SwitchPlans.erase(boatplan->SwitchPlans.begin() + index);
+    PopulatePlans();
+}
+
+void BoatDialog::PopulatePlans()
+{
+    BoatPlan *boatplan = m_Boat.Plans[m_SelectedSailPlan];
+
+    if(boatplan->SwitchPlans.size() == 0) {
+        m_bEditSwitchBoatPlan->Disable();
+        m_bDeleteSwitchBoatPlan->Disable();
+    }
+
+    m_lSwitchPlans->Clear();
+
+    for(unsigned int i=0; i<boatplan->SwitchPlans.size(); i++) {
+        SwitchPlan plan = boatplan->SwitchPlans[i];
+    
+        wxString des, a, andstr = _(" and ");
+        if(!isnan(plan.MaxWindSpeed))
+            des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindSpeed), a = andstr;
+        
+        if(!isnan(plan.MinWindSpeed))
+            des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindSpeed), a = andstr;
+
+        if(!isnan(plan.MaxWindDirection))
+            des += a + _("Wind Direction > ") + wxString::Format(_("%.0f"), plan.MaxWindDirection), a = andstr;
+        
+        if(!isnan(plan.MinWindDirection))
+            des += a + _("Wind Direction < ") + wxString::Format(_("%.0f"), plan.MinWindDirection), a = andstr;
+        
+        if(!isnan(plan.MaxWaveHeight))
+            des += a + _("Wave Height > ") + wxString::Format(_("%.0f"), plan.MaxWaveHeight), a = andstr;
+
+        if(!isnan(plan.MinWaveHeight))
+            des += a + _("Wave Height < ") + wxString::Format(_("%.0f"), plan.MinWaveHeight), a = andstr;
+
+        if(!plan.DayTime) {
+            des += a + _("Night Time");
+        } else if(!plan.NightTime) {
+            des += a + _("Day Time");
+        }
+        
+        des += _(" switch to ");
+        des += plan.Name;
+        
+        m_lSwitchPlans->Append(des);
+    }
+}
+    
 void BoatDialog::UpdateStats()
 {
     m_stHullSpeed->SetLabel(wxString::Format(_T("%.3f"), m_Boat.HullSpeed()));
@@ -607,3 +714,4 @@ void BoatDialog::UpdateStats()
     m_stComfortFactor->SetLabel(wxString::Format(_T("%.3f"), m_Boat.ComfortFactor()));
     m_stDisplacementLengthRatio->SetLabel(wxString::Format(_T("%.3f"), m_Boat.DisplacementLengthRatio()));
 }
+
