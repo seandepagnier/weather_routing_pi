@@ -52,6 +52,9 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
+
+      m_tCursorLatLon.Connect(wxEVT_TIMER, wxTimerEventHandler
+                              ( weather_routing_pi::OnCursorLatLonTimer ), NULL, this);
 }
 
 weather_routing_pi::~weather_routing_pi(void)
@@ -160,9 +163,8 @@ int weather_routing_pi::GetToolbarToolCount(void)
 
 void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 {
-    if(m_pWeather_Routing && m_pWeather_Routing->CurrentRouteMap() &&
-       m_pWeather_Routing->CurrentRouteMap()->SetCursorLatLon(lat, lon))
-        RequestRefresh(m_parent_window);
+    if(m_pWeather_Routing && m_pWeather_Routing->CurrentRouteMap() && !m_tCursorLatLon.IsRunning())
+        m_tCursorLatLon.Start(50, true);
 
     m_cursor_lat = lat;
     m_cursor_lon = lon;
@@ -261,9 +263,6 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
     }
 
     m_pWeather_Routing->Show(!m_pWeather_Routing->IsShown());
-
-    //  m_parent_window->Lower();
-//    m_pWeather_Routing->SetFocus();
 }
 
 void weather_routing_pi::OnContextMenuItemCallback(int id)
@@ -295,6 +294,13 @@ bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort 
         return true;
     }
     return false;
+}
+
+void weather_routing_pi::OnCursorLatLonTimer( wxTimerEvent & )
+{
+    RouteMapOverlay *crm = m_pWeather_Routing->CurrentRouteMap();
+    if(crm && crm->SetCursorLatLon(m_cursor_lat, m_cursor_lon))
+        RequestRefresh(m_parent_window);
 }
 
 bool weather_routing_pi::LoadConfig(void)

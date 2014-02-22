@@ -226,7 +226,6 @@ class SettingsDialogBase : public wxDialog
 		wxStaticText* m_staticText75;
 		wxStaticText* m_staticText70;
 		wxStaticText* m_staticText71;
-		wxCheckBox* m_cbFilterbyClimatology;
 		wxStaticText* m_staticText115;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;

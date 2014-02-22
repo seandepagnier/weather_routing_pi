@@ -444,10 +444,11 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
         m_bSkipUpdateCurrentItem = true;
         m_ConfigurationDialog.SetConfiguration(CurrentRouteMap()->GetConfiguration());
         m_bSkipUpdateCurrentItem = false;
-        m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
     } else
         m_ConfigurationDialog.Hide();
 
+    if(m_StatisticsDialog.IsShown())
+        m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
     SetEnableConfigurationMenu();
 }
 
@@ -497,7 +498,6 @@ void WeatherRouting::OnCompute( wxCommandEvent& event )
         UpdateComputeState();
     }
 }
-
 
 void WeatherRouting::OnComputeAll ( wxCommandEvent& event )
 {
@@ -629,17 +629,19 @@ bool WeatherRouting::Show(bool show)
     m_weather_routing_pi.ShowMenuItems(show);
 
     if(show) {
+        m_ConfigurationDialog.Show(m_bShowConfiguration);
+        m_ConfigurationBatchDialog.Show(m_bShowConfigurationBatch);
+        m_SettingsDialog.Show(m_bShowSettings);
+        if(m_bShowStatistics)
+            m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
+        m_StatisticsDialog.Show(m_bShowStatistics);
+        m_FilterRoutesDialog.Show(m_bShowFilter);
+    } else {
         m_bShowConfiguration = m_ConfigurationDialog.IsShown();
         m_bShowConfigurationBatch = m_ConfigurationBatchDialog.IsShown();
         m_bShowSettings = m_SettingsDialog.IsShown();
         m_bShowStatistics = m_StatisticsDialog.IsShown();
         m_bShowFilter = m_FilterRoutesDialog.IsShown();
-    } else {
-        m_ConfigurationDialog.Show(m_bShowConfiguration);
-        m_ConfigurationBatchDialog.Show(m_bShowConfigurationBatch);
-        m_SettingsDialog.Show(m_bShowSettings);
-        m_StatisticsDialog.Show(m_bShowStatistics);
-        m_FilterRoutesDialog.Show(m_bShowFilter);
     }
 
     return WeatherRoutingBase::Show(show);
@@ -676,6 +678,7 @@ void WeatherRouting::OnSettings( wxCommandEvent& event )
 
 void WeatherRouting::OnStatistics( wxCommandEvent& event )
 {
+    m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
     m_StatisticsDialog.Show();
 }
 
@@ -746,6 +749,9 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
     if(++cycles > 25 && CurrentRouteMap() && CurrentRouteMap()->Updated()) {
         cycles = 0;
         m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
+        if(m_StatisticsDialog.IsShown())
+            m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
+
         m_StartTime = wxDateTime::Now();
         GetParent()->Refresh();
     }
@@ -754,7 +760,9 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         UpdateStates();
 
     if(m_RunningRouteMaps.size()) {
-        m_tCompute.Start(1, true);
+        /* todo, instead of respawning the funky timer here,
+           maybe we can do it from the thread instead to eliminate the delay */
+        m_tCompute.Start(25, true);
         return;
     }
 
@@ -794,8 +802,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     return true;
             } else {
                 wxDateTime now = wxDateTime::Now();
-                /* if it's going to take more than a second, show a progress dialog */
-                if((now-start).GetMilliseconds() > 500 && i < count/2) {
+                /* if it's going to take more than a half second, show a progress dialog */
+                if((now-start).GetMilliseconds() > 250 && i < count/2) {
                     progressdialog = new wxProgressDialog(
                         _("Load"), _("Weather Routing"), count, this,
                         wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);

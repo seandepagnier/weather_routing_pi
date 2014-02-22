@@ -45,10 +45,11 @@ void *RouteMapOverlayThread::Entry()
 {
     while(!TestDestroy() && !m_RouteMapOverlay.Finished())
         if(!m_RouteMapOverlay.Propagate())
-            wxThread::Sleep(150);
-        else {
-            m_RouteMapOverlay.UpdateDestination();
             wxThread::Sleep(50);
+        else {
+            m_RouteMapOverlay.UpdateCursorPosition();
+            m_RouteMapOverlay.UpdateDestination();
+            wxThread::Sleep(5);
         }
 
     m_RouteMapOverlay.DeleteThread();
@@ -58,7 +59,7 @@ void *RouteMapOverlayThread::Entry()
 RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_overlaylist(0), m_scale(1), m_scale_changed(false)
+      m_bUpdated(false), m_overlaylist(0)
 {
 }
 
@@ -196,44 +197,34 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
         dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
 
-        if(dc.GetDC())
-            m_UpdateOverlay = true;
-
-        double scale = vp.view_scale_ppm/m_scale;
-    
-        wxPoint point;
-        GetCanvasPixLL(&vp, &point, m_clat, m_clon);
-    
-        if(scale == m_lastscale) {
-            if(point != m_lastpoint)
-                if(m_scale_changed) {
-                    m_UpdateOverlay = true;
-                    m_scale_changed = false;
-                }
-        } else
-            m_scale_changed = true;
-        m_lastscale = scale;
-        m_lastpoint = point;
-        
-        if(!m_UpdateOverlay) {
+        if(!dc.GetDC()) {
             glPushMatrix();
-            glTranslated(point.x - m_point.x, point.y - m_point.y, 0);
-            glTranslated(vp.pix_width*(1-scale)/2, vp.pix_height*(1-scale)/2, 0);
-            glScaled(scale, scale, 1);
 
+            wxPoint point;
+            GetCanvasPixLL(&vp, &point, 0, 0);
+            glTranslatef(point.x, point.y, 0);
+            glScalef(vp.view_scale_ppm, vp.view_scale_ppm, 1);
+            glRotated(vp.rotation*180/M_PI, 0, 0, 1);
+        }
+
+        if(!dc.GetDC() && !m_UpdateOverlay) {
             glCallList(m_overlaylist);
+
             glPopMatrix();
         } else {
+            PlugIn_ViewPort nvp = vp;
+
             if(!dc.GetDC()) {
                 m_UpdateOverlay = false;
-                m_clat = vp.clat, m_clon = vp.clon;
-                GetCanvasPixLL(&vp, &m_point, m_clat, m_clon);
-                m_scale = vp.view_scale_ppm;
 
                 if(!m_overlaylist)
                     m_overlaylist = glGenLists(1);
             
                 glNewList(m_overlaylist, GL_COMPILE_AND_EXECUTE);
+
+                nvp.clat = nvp.clon = 0;
+                nvp.view_scale_ppm = 1;
+                nvp.rotation = nvp.skew = 0;
             }
 
             /* draw alternate routes first */
@@ -256,7 +247,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 for(; it != origin.end(); ++it)
                     for(IsoRouteList::iterator rit = (*it)->routes.begin();
                         rit != (*it)->routes.end(); ++rit) {
-                        RenderAlternateRoute(*rit, !AlternatesForAll, AlternateRouteThickness, dc, vp);
+                        RenderAlternateRoute(*rit, !AlternatesForAll, AlternateRouteThickness, dc, nvp);
                     }
                 if(!dc.GetDC())
                     glEnd();
@@ -283,7 +274,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                     wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
                 
                     for(IsoRouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
-                        RenderIsoRoute(*j, color, IsoChronThickness, dc, vp);
+                        RenderIsoRoute(*j, color, IsoChronThickness, dc, nvp);
                 
                     if(++c == (sizeof routecolors) / (sizeof *routecolors))
                         c = 0;
@@ -292,8 +283,10 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 Unlock();
             }
         
-            if(!dc.GetDC())
+            if(!dc.GetDC()) {
                 glEndList();
+                glPopMatrix();
+            }
         }
     }
     
@@ -520,14 +513,19 @@ void RouteMapOverlay::Clear()
     m_UpdateOverlay = true;
 }
 
+void RouteMapOverlay::UpdateCursorPosition()
+{
+    last_cursor_position = ClosestPosition(last_cursor_lat, last_cursor_lon);
+}
+
 bool RouteMapOverlay::SetCursorLatLon(double lat, double lon)
 {
-    Position *p = ClosestPosition(lat, lon);
-    if(p == last_cursor_position)
-        return false;
-    
-    last_cursor_position = p;
-    return true;
+    Position *p = last_cursor_position;
+    last_cursor_lat = lat;
+    last_cursor_lon = lon;
+
+    UpdateCursorPosition();
+    return p != last_cursor_position;
 }
 
 bool RouteMapOverlay::Updated()

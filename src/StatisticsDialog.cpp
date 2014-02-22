@@ -40,12 +40,12 @@
 StatisticsDialog::StatisticsDialog(wxWindow *parent)
     : StatisticsDialogBase(parent)
 {
+    SetRouteMapOverlay(NULL);
 }
 
 void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
 {
     if(routemapoverlay) {
-
         m_stPercentageUpwind->SetLabel
             (wxString::Format(_T("%2.f%%"), routemapoverlay->RouteInfo
                               (RouteMapOverlay::PERCENTAGE_UPWIND)));
@@ -73,7 +73,12 @@ void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
         m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
         m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
     } else {
-        m_stState->SetLabel(_("No Route Selected"));
+        m_stPercentageUpwind->SetLabel(_T(""));
+        m_stPortStarboard->SetLabel(_T(""));
+        m_stAverageWindKnots->SetLabel(_T(""));
+        m_stAverageWaveHeight->SetLabel(_T(""));
+
+        m_stState->SetLabel(_("No Route"));
         m_stIsoChrons->SetLabel(_T(""));
         m_stRoutes->SetLabel(_T(""));
         m_stInvRoutes->SetLabel(_T(""));

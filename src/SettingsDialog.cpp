@@ -76,10 +76,6 @@ void SettingsDialog::LoadSettings()
     pConf->Read( _T("SquaresAtSailChanges"), &SquaresAtSailChanges, SquaresAtSailChanges);
     m_cbSquaresAtSailChanges->SetValue(SquaresAtSailChanges);
 
-    bool FilterbyClimatology = m_cbFilterbyClimatology->GetValue();
-    pConf->Read( _T("FilterbyClimatology"), &FilterbyClimatology, FilterbyClimatology);
-    m_cbFilterbyClimatology->SetValue(FilterbyClimatology);
-
     int ConcurrentThreads = m_sConcurrentThreads->GetValue();
     pConf->Read( _T("ConcurrentThreads"), &ConcurrentThreads, ConcurrentThreads);
     m_sConcurrentThreads->SetValue(ConcurrentThreads);
@@ -116,10 +112,7 @@ void SettingsDialog::SaveSettings( )
     bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
     pConf->Write( _T("SquaresAtSailChanges"), SquaresAtSailChanges);
 
-    bool FilterbyClimatology = m_cbFilterbyClimatology->GetValue();
-    pConf->Write( _T("FilterbyClimatology"), FilterbyClimatology);
-
-    bool ConcurrentThreads = m_sConcurrentThreads->GetValue();
+    int ConcurrentThreads = m_sConcurrentThreads->GetValue();
     pConf->Write( _T("ConcurrentThreads"), ConcurrentThreads);
 
     wxPoint p = GetPosition();

@@ -58,7 +58,7 @@
 
 class WeatherRouting;
 
-class weather_routing_pi : public opencpn_plugin_110
+class weather_routing_pi : public wxEvtHandler, public opencpn_plugin_110
 {
 public:
       weather_routing_pi(void *ppimgr);
@@ -84,6 +84,7 @@ public:
       int GetToolbarToolCount(void);
 
       void SetCursorLatLon(double lat, double lon);
+
       void SetPluginMessage(wxString &message_id, wxString &message_body);
       void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
       void ShowPreferencesDialog( wxWindow* parent );
@@ -98,6 +99,8 @@ public:
       double m_boat_lat, m_boat_lon;
 
 private:
+      void OnCursorLatLonTimer( wxTimerEvent & );
+
       bool LoadConfig(void);
       bool SaveConfig(void);
 
@@ -111,6 +114,7 @@ private:
       int              m_leftclick_tool_id;
       int              m_position_menu_id;
 
+      wxTimer m_tCursorLatLon;
       double m_cursor_lat, m_cursor_lon;
 };
 

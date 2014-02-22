@@ -1560,19 +1560,57 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
     return false;
 }
 
+double SimpleDistance(Position *a, Position *b)
+{
+    double dlat = a->lat - b->lat, dlon = a->lon - b->lon;
+    return dlat*dlat + dlon*dlon;
+}
+
+/* find closest position in the routemap */
 Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
 {
     Position pos(lat, lon), *minpos = NULL;
+
+    /* first find closest skip position */
+    SkipPosition *s = skippoints, *minskippos = NULL;
     double mindist = INFINITY;
-    Position *p = skippoints->point;
+    bool dotest = true;
     do {
-        double dist = pos.Distance(p);
+        if(dotest) {
+//            double dist = pos.Distance(s->point);
+            double dist = SimpleDistance(&pos, s->point);
+            if(dist < mindist) {
+                minskippos = s;
+                mindist = dist;
+            }
+        }
+        dotest = ComputeQuadrant(&pos, s->point) != s->quadrant;
+
+        s = s->next;
+    } while(s != skippoints);
+
+    /* from here, try positions before or after the skip position,
+       depending on quadrant, we can eliminate some of these quickly */
+    Position *p = minskippos->prev->point->next, *e = minskippos->next->point;
+
+    if(ComputeQuadrant(&pos, minskippos->point) == minskippos->quadrant)
+        e = minskippos->point;
+    else
+    if(ComputeQuadrant(&pos, minskippos->prev->point) == minskippos->prev->quadrant)
+        p = minskippos->point->next;
+
+    minpos = minskippos->point;
+    while(p != e) {
+//        double dist = pos.Distance(p);
+        double dist = SimpleDistance(&pos, p);
         if(dist < mindist) {
             minpos = p;
             mindist = dist;
         }
         p = p->next;
-    } while(p != skippoints->point);
+    }
+
+    mindist = pos.Distance(minpos);
 
     /* now try children */
     for(IsoRouteList::iterator it = children.begin(); it != children.end();  it++) {

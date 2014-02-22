@@ -236,9 +236,10 @@ protected:
     GribRecordSet *m_NewGrib;
 
 private:
+
     RouteMapConfiguration m_Configuration;
-    bool m_bFinished, m_bValid,
-        m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bNoData;
+    bool m_bFinished, m_bValid;
+    bool m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bNoData;
 
     wxDateTime m_NewTime;
 };

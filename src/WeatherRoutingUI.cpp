@@ -853,9 +853,6 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_cbSquaresAtSailChanges->SetValue(true); 
 	fgSizer82->Add( m_cbSquaresAtSailChanges, 0, wxALL, 5 );
 	
-	m_cbFilterbyClimatology = new wxCheckBox( this, wxID_ANY, _("Filter Routes by Climatology"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer82->Add( m_cbFilterbyClimatology, 0, wxALL, 5 );
-	
 	
 	fgSizer18->Add( fgSizer82, 1, wxEXPAND, 5 );
 	
@@ -910,7 +907,6 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_sAlternateRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbAlternatesForAll->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbSquaresAtSailChanges->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_cbFilterbyClimatology->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_sdbSizer1Help->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
 }
 
@@ -924,7 +920,6 @@ SettingsDialogBase::~SettingsDialogBase()
 	m_sAlternateRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbAlternatesForAll->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbSquaresAtSailChanges->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_cbFilterbyClimatology->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_sdbSizer1Help->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
 	
 }
