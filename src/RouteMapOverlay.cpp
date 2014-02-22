@@ -163,8 +163,9 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent, int Al
 {
     Position *pos = r->skippoints->point;
     do {
-        for(Position *p = pos; p && p->parent; p = p->parent) {
+        for(Position *p = pos; p && !p->drawn && p->parent; p = p->parent) {
             DrawLine(p, p->parent, dc, vp);
+            p->drawn = true;
             if(!each_parent)
                 break;
         }
@@ -232,6 +233,19 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             if(AlternateRouteThickness) {
                 Lock();
                 IsoChronList::iterator it;
+
+                /* reset drawn flag for all positions
+                   this is used to avoid duplicating alternate route segments */
+                for(it = origin.begin(); it != origin.end(); ++it)
+                    for(IsoRouteList::iterator rit = (*it)->routes.begin();
+                        rit != (*it)->routes.end(); ++rit) {
+                        Position *pos = (*rit)->skippoints->point;
+                        do {
+                            pos->drawn = false;
+                            pos = pos->next;
+                        } while(pos != (*rit)->skippoints->point);
+                    }
+
                 bool AlternatesForAll = settingsdialog.m_cbAlternatesForAll->GetValue();
                 if(AlternatesForAll)
                     it = origin.begin();

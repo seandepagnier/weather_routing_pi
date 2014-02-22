@@ -66,6 +66,7 @@ public:
     Position *prev, *next; /* doubly linked circular list of positions */
 
     bool propagated;
+    bool drawn;
 };
 
 /* circular skip list of positions which point to where we
