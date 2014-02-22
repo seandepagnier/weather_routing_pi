@@ -86,7 +86,8 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnAddAtBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnNewPosition( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemovePosition( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClearPositions( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNew( wxCommandEvent& event ) { event.Skip(); }
@@ -112,7 +113,7 @@ class WeatherRoutingBase : public wxFrame
 		wxGauge* m_gProgress;
 		wxMenuItem* m_mDeleteAll;
 		
-		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
 		
@@ -341,7 +342,7 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stDisplacementLengthRatio;
 		wxButton* m_bOpen;
 		wxButton* m_bSaveAs;
-		wxButton* m_bSave;
+		wxButton* m_bSaveandClose;
 		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class

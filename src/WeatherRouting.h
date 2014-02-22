@@ -85,7 +85,9 @@ public:
 
 private:
 
-    void OnAddAtBoat( wxCommandEvent& event );
+    void OnNewPosition( wxCommandEvent& event );
+    void OnUpdateBoat( wxCommandEvent& event );
+//    void OnListLabelEdit( wxListEvent& event );
     void OnRemovePosition( wxCommandEvent& event );
     void OnClearPositions( wxCommandEvent& event );
     void OnClose( wxCloseEvent& event );
@@ -123,6 +125,8 @@ private:
     void SaveXML(wxString filename);
 
     void SetEnableConfigurationMenu();
+
+    void UpdateConfigurations();
 
     void AddConfiguration(RouteMapConfiguration configuration);
     void UpdateRouteMap(RouteMapOverlay *routemapoverlay);

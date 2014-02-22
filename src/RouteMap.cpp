@@ -437,11 +437,13 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
     else if(configuration.MaxDivertedCourse == 180)
         goto skipbearingcomputation;
+
+/* this way is nicer, but until we fix bugs... */
 //    ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, 0);
+
     ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, lat, lon, &bearing, 0);
-    if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse) {
+    if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse)
         return false;
-    }
 
 skipbearingcomputation:
 

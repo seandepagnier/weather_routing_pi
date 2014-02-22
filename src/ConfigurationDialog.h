@@ -42,6 +42,7 @@ public:
     ConfigurationDialog(WeatherRouting *weatherrouting);
     ~ConfigurationDialog();
 
+    void EditBoat( );
     void SetConfiguration(RouteMapConfiguration configuration);
     void Update();
 
@@ -60,7 +61,7 @@ protected:
     void OnCurrentTime( wxCommandEvent& event );
     void OnUpdate( wxSpinEvent& event ) { Update(); }
     void OnUpdate( wxFileDirPickerEvent& event ) { Update(); }
-    void OnEditBoat( wxCommandEvent& event );
+    void OnEditBoat( wxCommandEvent& event ) { EditBoat(); }
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );
     void OnClearDegreeSteps( wxCommandEvent& event );

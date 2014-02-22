@@ -57,7 +57,7 @@ wxString Boat::OpenXML(wxString filename)
         return _("Failed to load file: ") + filename;
 
     TiXmlHandle root( doc.RootElement() );
-    if(strcmp(doc.RootElement()->Value(), "OCPNWeatherRoutingBoat"))
+    if(strcmp(doc.RootElement()->Value(), "OpenCPNWeatherRoutingBoat"))
         return _("Invalid xml file (no OCPWeatherRoutingBoat node): " + filename);
 
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
@@ -127,7 +127,7 @@ wxString Boat::SaveXML(wxString filename)
     TiXmlDocument doc;
     TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
     doc.LinkEndChild( decl );
-    TiXmlElement * root = new TiXmlElement( "OCPNWeatherRoutingBoat" );
+    TiXmlElement * root = new TiXmlElement( "OpenCPNWeatherRoutingBoat" );
 
     doc.LinkEndChild( root );
     char version[24];

@@ -63,6 +63,15 @@ ConfigurationDialog::~ConfigurationDialog( )
     pConf->Write ( _T ( "ConfigurationY" ), p.y);
 }
 
+void ConfigurationDialog::EditBoat( )
+{
+    BoatDialog boatdlg(this, m_fpBoat->GetPath());
+    boatdlg.ShowModal();
+    m_fpBoat->SetPath(boatdlg.m_boatpath);
+
+    Update();
+}
+
 void ConfigurationDialog::OnGribTime( wxCommandEvent& event )
 {
     SetStartDateTime(m_GribTimelineTime);
@@ -72,15 +81,6 @@ void ConfigurationDialog::OnGribTime( wxCommandEvent& event )
 void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
 {
     SetStartDateTime(wxDateTime::Now());
-    Update();
-}
-
-void ConfigurationDialog::OnEditBoat ( wxCommandEvent& event )
-{
-    BoatDialog boatdlg(this, m_fpBoat->GetPath());
-    boatdlg.ShowModal();
-     m_fpBoat->SetPath(boatdlg.m_boatpath);
-
     Update();
 }
 
