@@ -24,7 +24,7 @@
 #include <wx/debug.h>
 #include <wx/arrimpl.cpp>
 
-#include <wx/jsonval.h>
+#include "jsonval.h"
 
 
 WX_DEFINE_OBJARRAY( wxJSONInternalArray );

@@ -26,8 +26,8 @@
 
 #include <wx/wx.h>
 
-#include "../../../include/ocpn_plugin.h"
-#include "../../../include/ocpndc.h"
+#include "ocpn_plugin.h"
+#include "ocpndc.h"
 #include "wxJSON/jsonreader.h"
 #include "wxJSON/jsonwriter.h"
 

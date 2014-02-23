@@ -69,8 +69,8 @@
 
 #include <wx/wx.h>
 
-#include "../../../include/ocpn_plugin.h"
-#include "../../grib_pi/src/GribRecordSet.h"
+#include "ocpn_plugin.h"
+#include "GribRecordSet.h"
 
 #include "Utilities.h"
 #include "Boat.h"
