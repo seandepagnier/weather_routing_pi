@@ -695,7 +695,7 @@ void WeatherRouting::OnInformation ( wxCommandEvent& event )
 {
     InformationDialog dlg(GetParent());
     wxString infolocation = *GetpSharedDataLocation()
-        + _("plugins/weather_routing/data/WeatherRoutingInformation.html");
+        + _("plugins/weather_routing_pi/data/WeatherRoutingInformation.html");
     if(dlg.m_htmlInformation->LoadFile(infolocation))
         dlg.ShowModal();
     else {

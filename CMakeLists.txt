@@ -17,50 +17,27 @@ SET(VERSION_MINOR "10")
 
 INCLUDE("cmake/PluginConfigure.cmake")
 
-# For convenience we define the sources as a variable. You can add 
-# header files and cpp/c files and CMake will sort them out
-
-
 SET(SRC_WEATHER_ROUTING
-            src/weather_routing_pi.h
             src/weather_routing_pi.cpp
-            src/WeatherRouting.h 
             src/WeatherRouting.cpp
-            src/ConfigurationDialog.h 
             src/ConfigurationDialog.cpp
-            src/SettingsDialog.h 
             src/SettingsDialog.cpp
-            src/PlotDialog.h
             src/PlotDialog.cpp
-            src/BoatDialog.h
             src/BoatDialog.cpp
-            src/SwitchPlanDialog.h
             src/SwitchPlanDialog.cpp
-            src/StatisticsDialog.h 
             src/StatisticsDialog.cpp
-            src/FilterRoutesDialog.h
             src/FilterRoutesDialog.cpp
-            src/ConfigurationBatchDialog.h
             src/ConfigurationBatchDialog.cpp
-            src/AboutDialog.h
             src/AboutDialog.cpp
-            src/BoatPlan.h 
             src/BoatPlan.cpp
-            src/Boat.h 
             src/Boat.cpp
-            src/RouteMap.h 
             src/RouteMap.cpp
-            src/RouteMapOverlay.h 
             src/RouteMapOverlay.cpp
             src/Utilities.cpp
-            src/Utilities.h
-            src/WeatherRoutingUI.h
             src/WeatherRoutingUI.cpp
 
-            src/icons.h 
             src/icons.cpp
 
-            src/georef.h
             src/georef.c
 
             src/GribRecord.cpp  
@@ -70,7 +47,6 @@ SET(SRC_WEATHER_ROUTING
             src/wxJSON/jsonreader.cpp
             src/wxJSON/jsonwriter.cpp
 
-	    src/tinyxml/tinyxml.h
             src/tinyxml/tinyxml.cpp
             src/tinyxml/tinyxmlparser.cpp
             src/tinyxml/tinyxmlerror.cpp
