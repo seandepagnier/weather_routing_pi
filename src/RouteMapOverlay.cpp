@@ -201,8 +201,10 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         if(!dc.GetDC()) {
             glPushMatrix();
 
+            /* center display list on start lat/lon */
+
             wxPoint point;
-            GetCanvasPixLL(&vp, &point, 0, 0);
+            GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
             glTranslatef(point.x, point.y, 0);
             glScalef(vp.view_scale_ppm, vp.view_scale_ppm, 1);
             glRotated(vp.rotation*180/M_PI, 0, 0, 1);
@@ -210,8 +212,8 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
         if(!dc.GetDC() && !m_UpdateOverlay) {
             glCallList(m_overlaylist);
-
             glPopMatrix();
+
         } else {
             PlugIn_ViewPort nvp = vp;
 
@@ -223,7 +225,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             
                 glNewList(m_overlaylist, GL_COMPILE_AND_EXECUTE);
 
-                nvp.clat = nvp.clon = 0;
+                nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
                 nvp.view_scale_ppm = 1;
                 nvp.rotation = nvp.skew = 0;
             }

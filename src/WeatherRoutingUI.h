@@ -296,6 +296,7 @@ class BoatDialogBase : public wxDialog
 		wxButton* m_bDragInfo;
 		wxStaticText* m_staticText91;
 		wxSpinCtrl* m_sLuffAngle;
+		wxCheckBox* m_cbWingWingRunning;
 		wxStaticText* m_staticText100;
 		wxChoice* m_cHullType;
 		wxStaticText* m_staticText58;

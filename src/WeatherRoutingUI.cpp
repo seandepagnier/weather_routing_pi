@@ -1235,6 +1235,9 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sLuffAngle = new wxSpinCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 0, 180, 15 );
 	fgSizer541->Add( m_sLuffAngle, 0, wxALL, 5 );
 	
+	m_cbWingWingRunning = new wxCheckBox( m_pPolarConfig, wxID_ANY, _("Wing and Wing Running"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer541->Add( m_cbWingWingRunning, 0, wxALL, 5 );
+	
 	
 	fgSizer49->Add( fgSizer541, 1, wxEXPAND, 5 );
 	
