@@ -293,7 +293,8 @@ Position::Position(Position *p)
 {
 }
 
-int ComputeQuadrant(Position *p, Position *q)
+/* sufficient for routemap uses only.. is this faster than below? if not, remove it */
+static int ComputeQuadrantFast(Position *p, Position *q)
 {
     int quadrant;
     if(q->lat < p->lat)
@@ -302,13 +303,28 @@ int ComputeQuadrant(Position *p, Position *q)
         quadrant = 2;
 
     double diff = p->lon - q->lon;
-    if(diff > 0) {
-        if(diff > 180) /* since we don't fully support crossing 0 and 180 merdians
-                          in the same map this never actually occurs..
-                          but this is needed if support is extended */
-            quadrant += 1;
-    } else if(diff > -180)
-        quadrant += 1;
+    if(diff < 0)
+        quadrant++;
+
+    return quadrant;
+}
+
+/* works for all ranges */
+static int ComputeQuadrant(Position *p, Position *q)
+{
+    int quadrant;
+    if(q->lat < p->lat)
+        quadrant = 0;
+    else
+        quadrant = 2;
+
+    double diff = p->lon - q->lon;
+    while(diff < -180) diff += 360;
+    while(diff >= 180) diff -= 360;
+    
+    if(diff < 0)
+        quadrant++;
+
     return quadrant;
 }
 
@@ -321,7 +337,7 @@ SkipPosition *Position::BuildSkipList()
     int firstquadrant, lastquadrant = -1, quadrant;
     do {
         Position *q = p->next;
-        quadrant = ComputeQuadrant(p, q);
+        quadrant = ComputeQuadrantFast(p, q);
 
         if(lastquadrant == -1)
             firstquadrant = lastquadrant = quadrant;
@@ -473,7 +489,7 @@ skipbearingcomputation:
         }
 #endif
 
-        VB = configuration.boat.Plans[newsailplan]->Speed(H, VW);
+        VB = configuration.boat.Plans[newsailplan].Speed(H, VW);
 
         /* failed to determine speed.. I guess we can always drift? */
         if(isnan(B) || isnan(VB))
@@ -970,7 +986,7 @@ inline void InsertSkipPosition(SkipPosition *sp, SkipPosition *sn, Position *p, 
 /*inline*/ void FixSkipList(SkipPosition *sp, SkipPosition *ss, Position *p, Position *s,
                             int rquadrant, SkipPosition *&spend, SkipPosition *&ssend)
 {
-    int quadrant = ComputeQuadrant(p, s);
+    int quadrant = ComputeQuadrantFast(p, s);
     if(sp->point == p) {
         sp->quadrant = quadrant; /* reuse p with this quadrant */
 
@@ -1560,63 +1576,56 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
     return false;
 }
 
-double SimpleDistance(Position *a, Position *b)
+/* much faster than "a->Distance(b);" */
+static double SimpleDistance(Position *a, Position *b)
 {
-    double dlat = a->lat - b->lat, dlon = a->lon - b->lon;
+    double dlat = a->lat - b->lat, dlon = fabs(a->lon - b->lon);
+    while(dlon > 180) dlon -= 360;
     return dlat*dlat + dlon*dlon;
 }
 
 /* find closest position in the routemap */
 Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
 {
-    Position pos(lat, lon), *minpos = NULL;
+    double mindist = INFINITY;
 
     /* first find closest skip position */
-    SkipPosition *s = skippoints, *minskippos = NULL;
-    double mindist = INFINITY;
-    bool dotest = true;
+    SkipPosition *s = skippoints;
+    Position pos(lat, lon), *minpos = s->point;
+    int lq = -1;
     do {
+        int q1 = ComputeQuadrant(&pos, s->point);
+
+        bool dotest = true;
+        if(q1 == s->quadrant)
+            dotest = false;
+        /* tangent, maybe we can avoid testing in rabbit cases */
+        else if(lq == s->quadrant && q1 != (lq^3) && q1 == s->prev->quadrant)
+            dotest = false;
+        lq = q1;
+
         if(dotest) {
-//            double dist = pos.Distance(s->point);
-            double dist = SimpleDistance(&pos, s->point);
-            if(dist < mindist) {
-                minskippos = s;
-                mindist = dist;
-            }
+            Position *p = s->point, *e = s->next->point;
+            do {
+                double dist = SimpleDistance(&pos, p);
+                if(dist < mindist) {
+                    minpos = p;
+                    mindist = dist;
+                }
+                p = p->next;
+            } while(p != e);
         }
-        dotest = ComputeQuadrant(&pos, s->point) != s->quadrant;
 
         s = s->next;
     } while(s != skippoints);
-
-    /* from here, try positions before or after the skip position,
-       depending on quadrant, we can eliminate some of these quickly */
-    Position *p = minskippos->prev->point->next, *e = minskippos->next->point;
-
-    if(ComputeQuadrant(&pos, minskippos->point) == minskippos->quadrant)
-        e = minskippos->point;
-    else
-    if(ComputeQuadrant(&pos, minskippos->prev->point) == minskippos->prev->quadrant)
-        p = minskippos->point->next;
-
-    minpos = minskippos->point;
-    while(p != e) {
-//        double dist = pos.Distance(p);
-        double dist = SimpleDistance(&pos, p);
-        if(dist < mindist) {
-            minpos = p;
-            mindist = dist;
-        }
-        p = p->next;
-    }
 
     mindist = pos.Distance(minpos);
 
     /* now try children */
     for(IsoRouteList::iterator it = children.begin(); it != children.end();  it++) {
         double dist;
-        p = (*it)->ClosestPosition(lat, lon, &dist);
-        if(p && dist < mindist) {
+        Position *p = (*it)->ClosestPosition(lat, lon, &dist);
+        if(/*p &&*/ dist < mindist) {
             minpos = p;
             mindist = dist;
         }
@@ -2019,14 +2028,14 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
     Lock();
 
     IsoChronList::iterator last = origin.end();
-    last--;
+    if(before_last)
+        last--;
 
-    for(IsoChronList::iterator it = origin.begin(); it != origin.end(); ++it) {
+    for(IsoChronList::iterator it = origin.begin(); it != last; ++it) {
         double dist;
         Position *pos = (*it)->ClosestPosition(lat, lon, &dist);
-
-        if(pos && dist < mindist &&
-           !(before_last && it == last)) {
+        
+        if(pos && dist < mindist) {
             minpos = pos;
             mindist = dist;
         }

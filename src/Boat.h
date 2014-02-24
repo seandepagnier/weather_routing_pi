@@ -35,9 +35,9 @@ public:
     wxString OpenXML(wxString filename);
     wxString SaveXML(wxString filename);
 
-    BoatPlan &Plan(int plan) { return *Plans[plan]; }
+    BoatPlan &Plan(int plan) { return Plans[plan]; }
 
-    std::vector<BoatPlan*> Plans;
+    std::vector<BoatPlan> Plans;
 
     int TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
                           wxDateTime &gribtime, double lat, double lon, int &daytime);

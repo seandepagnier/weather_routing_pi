@@ -173,8 +173,7 @@ struct RouteMapConfiguration {
 
     bool (*Climatology())(int setting, wxDateTime &, double, double, double &, double &);
 
-/* computed values */
-    double StartLat, StartLon, EndLat, EndLon;
+    double StartLat, StartLon, EndLat, EndLon; /* computed values */
 
     double StartEndBearing; /* calculated from start and end */
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,

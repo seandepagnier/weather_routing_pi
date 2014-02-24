@@ -36,11 +36,16 @@ class WeatherRouting;
 class weather_routing_pi;
 class ocpnDC;
 
-struct BatchSource
+struct BatchDestination
 {
-    BatchSource(wxString n) : Name(n) {}
+    BatchDestination(wxString n) : Name(n) {}
     wxString Name;
-    std::list<BatchSource*> destinations;
+};
+
+struct BatchSource : public BatchDestination
+{
+    BatchSource(wxString n) : BatchDestination(n) {}
+    std::list<BatchDestination*> destinations;
 };
 
 class ConfigurationBatchDialog : public ConfigurationBatchDialogBase
@@ -53,6 +58,8 @@ public:
     void AddSource(wxString name);
     void RemoveSource( wxString name );
     void ClearSources();
+
+    void Reset();
 
     std::vector<BatchSource*> sources;
 
@@ -71,8 +78,6 @@ protected:
     void OnInformation( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnGenerate( wxCommandEvent& event );
-
-    void Reset();
 
     wxString m_boatFileName;
 

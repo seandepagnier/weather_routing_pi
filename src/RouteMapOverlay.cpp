@@ -58,6 +58,7 @@ void *RouteMapOverlayThread::Entry()
 
 RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
+      last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
       m_bUpdated(false), m_overlaylist(0)
 {
@@ -127,10 +128,8 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
     if(dc.GetDC())
         dc.DrawLine(p1p.x, p1p.y, p2p.x, p2p.y);
     else {
-//        glBegin(GL_LINES);
         glVertex2i(p1p.x, p1p.y);
         glVertex2i(p2p.x, p2p.y);
-//        glEnd();
     }
 }
 
@@ -198,6 +197,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
         dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
 
+        static const double NORM_FACTOR = 16;
         if(!dc.GetDC()) {
             glPushMatrix();
 
@@ -206,7 +206,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             wxPoint point;
             GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
             glTranslatef(point.x, point.y, 0);
-            glScalef(vp.view_scale_ppm, vp.view_scale_ppm, 1);
+            glScalef(vp.view_scale_ppm / NORM_FACTOR, vp.view_scale_ppm / NORM_FACTOR, 1);
             glRotated(vp.rotation*180/M_PI, 0, 0, 1);
         }
 
@@ -226,7 +226,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 glNewList(m_overlaylist, GL_COMPILE_AND_EXECUTE);
 
                 nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
-                nvp.view_scale_ppm = 1;
+                nvp.view_scale_ppm = NORM_FACTOR;
                 nvp.rotation = nvp.skew = 0;
             }
 
@@ -262,9 +262,9 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                     glBegin(GL_LINES);
                 for(; it != origin.end(); ++it)
                     for(IsoRouteList::iterator rit = (*it)->routes.begin();
-                        rit != (*it)->routes.end(); ++rit) {
+                        rit != (*it)->routes.end(); ++rit)
                         RenderAlternateRoute(*rit, !AlternatesForAll, AlternateRouteThickness, dc, nvp);
-                    }
+
                 if(!dc.GetDC())
                     glEnd();
                 Unlock();

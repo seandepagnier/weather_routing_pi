@@ -71,7 +71,7 @@ void ConfigurationBatchDialog::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
         dc.DrawText((*it)->Name, p1.x, p1.y);
         dc.DrawCircle(p1.x, p1.y, 5);
 
-        for(std::list<BatchSource*>::iterator it2 = (*it)->destinations.begin();
+        for(std::list<BatchDestination*>::iterator it2 = (*it)->destinations.begin();
             it2 != (*it)->destinations.end(); it2++) {
 
             RouteMap::PositionLatLon((*it2)->Name, lat, lon);
@@ -99,7 +99,7 @@ void ConfigurationBatchDialog::RemoveSource( wxString name )
 {
     for(std::vector<BatchSource*>::iterator it = sources.begin();
         it != sources.end();) {
-        for(std::list<BatchSource*>::iterator it2 = (*it)->destinations.begin();
+        for(std::list<BatchDestination*>::iterator it2 = (*it)->destinations.begin();
             it2 != (*it)->destinations.end();)
             if((*it2)->Name == name)
                 it2 = (*it)->destinations.erase(it2);
@@ -131,7 +131,7 @@ void ConfigurationBatchDialog::OnSources( wxCommandEvent& event )
         return;
 
     for(unsigned int i = 0; i<m_lDestinations->GetCount(); i++)
-        for(std::list<BatchSource*>::iterator it = sources[index]->destinations.begin();
+        for(std::list<BatchDestination*>::iterator it = sources[index]->destinations.begin();
                 it != sources[index]->destinations.end(); it++)
             if((*it)->Name == m_lDestinations->GetString(i))
                 m_lDestinations->SetSelection(i);

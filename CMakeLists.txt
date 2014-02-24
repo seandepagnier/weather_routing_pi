@@ -9,7 +9,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
 
 PROJECT(weather_routing_pi)
 SET(PACKAGE_NAME weather_routing_pi)
-SET(PLUGIN_SOURCE_DIR .)
+SET(CPACK_PACKAGE_CONTACT "Sean D'Epagnier ")
+
 MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
 SET(VERSION_MAJOR "0")
@@ -48,6 +49,7 @@ SET(SRC_WEATHER_ROUTING
             src/wxJSON/jsonwriter.cpp
 
             src/tinyxml/tinyxml.cpp
+            src/tinyxml/tinystr.cpp
             src/tinyxml/tinyxmlparser.cpp
             src/tinyxml/tinyxmlerror.cpp
 )

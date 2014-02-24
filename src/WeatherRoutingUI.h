@@ -596,7 +596,6 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText124;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText126;
-		wxStaticText* m_staticText1221;
 		wxPanel* m_pRoutes;
 		wxListBox* m_lSources;
 		wxListBox* m_lDestinations;
@@ -610,8 +609,8 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxButton* m_bRemoveBoat;
 		wxButton* m_bInformation;
 		wxButton* m_bReset;
-		wxButton* m_bClose;
 		wxButton* m_bGenerate;
+		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnSources( wxCommandEvent& event ) { event.Skip(); }
@@ -622,8 +621,8 @@ class ConfigurationBatchDialogBase : public wxDialog
 		virtual void OnRemoveBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:

@@ -449,6 +449,10 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
 
     if(m_StatisticsDialog.IsShown())
         m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
+
+    if(m_ConfigurationBatchDialog.IsShown())
+        m_ConfigurationBatchDialog.Reset();
+
     SetEnableConfigurationMenu();
 }
 
@@ -578,50 +582,56 @@ void WeatherRouting::OnNew( wxCommandEvent& event )
 
 void WeatherRouting::OnBatch( wxCommandEvent& event )
 {
+    m_ConfigurationBatchDialog.Reset();
     m_ConfigurationBatchDialog.Show();
 }
 
 void WeatherRouting::GenerateBatch()
 {
     RouteMapOverlay *routemapoverlay = CurrentRouteMap(true);
-    if(routemapoverlay) {
-        RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
-        ConfigurationBatchDialog &dlg = m_ConfigurationBatchDialog;
+    if(!routemapoverlay) {
+        wxMessageDialog mdlg(this, _("Must select a configuration to generate from"),
+                             _("Weather Routing"), wxOK | wxICON_ERROR);
+        mdlg.ShowModal();
+        return;
+    }
 
-        wxTimeSpan StartSpan, StartSpacingSpan;
-        double days, hours;
+    RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+    ConfigurationBatchDialog &dlg = m_ConfigurationBatchDialog;
 
-        dlg.m_tStartDays->GetValue().ToDouble(&days);
-        StartSpan = wxTimeSpan::Days(days);
+    wxTimeSpan StartSpan, StartSpacingSpan;
+    double days, hours;
 
-        dlg.m_tStartHours->GetValue().ToDouble(&hours);
-        StartSpan += wxTimeSpan::Hours(hours);
+    dlg.m_tStartDays->GetValue().ToDouble(&days);
+    StartSpan = wxTimeSpan::Days(days);
+
+    dlg.m_tStartHours->GetValue().ToDouble(&hours);
+    StartSpan += wxTimeSpan::Hours(hours);
         
-        dlg.m_tStartSpacingDays->GetValue().ToDouble(&days);
-        StartSpacingSpan = wxTimeSpan::Days(days);
+    dlg.m_tStartSpacingDays->GetValue().ToDouble(&days);
+    StartSpacingSpan = wxTimeSpan::Days(days);
         
-        dlg.m_tStartSpacingHours->GetValue().ToDouble(&hours);
-        StartSpacingSpan += wxTimeSpan::Hours(hours);
+    dlg.m_tStartSpacingHours->GetValue().ToDouble(&hours);
+    StartSpacingSpan += wxTimeSpan::Hours(hours);
         
-        wxDateTime EndTime = configuration.StartTime+StartSpan;
-        for(; configuration.StartTime <= EndTime; configuration.StartTime += StartSpacingSpan) {
-            for(std::vector<BatchSource*>::iterator it = dlg.sources.begin();
-                it != dlg.sources.end(); it++) {
-                configuration.Start = (*it)->Name;
+    wxDateTime EndTime = configuration.StartTime+StartSpan;
+    for(; configuration.StartTime <= EndTime; configuration.StartTime += StartSpacingSpan) {
+        for(std::vector<BatchSource*>::iterator it = dlg.sources.begin();
+            it != dlg.sources.end(); it++) {
+            configuration.Start = (*it)->Name;
 
-                for(std::list<BatchSource*>::iterator it2 = (*it)->destinations.begin();
-                    it2 != (*it)->destinations.end(); it2++) {
-                    configuration.End = (*it2)->Name;
+            for(std::list<BatchDestination*>::iterator it2 = (*it)->destinations.begin();
+                it2 != (*it)->destinations.end(); it2++) {
+                configuration.End = (*it2)->Name;
 
-                    for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
-                        configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
-                        AddConfiguration(configuration);
-                    }
+                for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
+                    configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
+                    AddConfiguration(configuration);
                 }
             }
         }
-        DeleteRouteMap(routemapoverlay);
     }
+    DeleteRouteMap(routemapoverlay);
 }
 
 bool WeatherRouting::Show(bool show)
@@ -1288,8 +1298,10 @@ void WeatherRouting::DeleteRouteMap(RouteMapOverlay *routemapoverlay)
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
-        if(weatherroute->routemapoverlay == routemapoverlay)
+        if(weatherroute->routemapoverlay == routemapoverlay) {
             m_lWeatherRoutes->DeleteItem(i);
+            break;
+        }
     }
 
     for(std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();

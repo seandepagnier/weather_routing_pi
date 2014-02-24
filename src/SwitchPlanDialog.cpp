@@ -35,7 +35,7 @@
 #include "SwitchPlanDialog.h"
 
 SwitchPlanDialog::SwitchPlanDialog( wxWindow *parent, SwitchPlan &p,
-                                    std::vector<BoatPlan*> plans )
+                                    const std::vector<BoatPlan> &plans )
     : SwitchPlanDialogBase(parent), plan(p)
 {
     if(!isnan(plan.MaxWindSpeed))
@@ -65,8 +65,8 @@ SwitchPlanDialog::SwitchPlanDialog( wxWindow *parent, SwitchPlan &p,
     m_cbDayTime->SetValue(plan.DayTime);
     m_cbNightTime->SetValue(plan.NightTime);
 
-    for(std::vector<BoatPlan*>::iterator it = plans.begin(); it != plans.end(); it++)
-        m_cPlans->Append((*it)->Name);
+    for(std::vector<BoatPlan>::const_iterator it = plans.begin(); it != plans.end(); it++)
+        m_cPlans->Append((*it).Name);
 
     int index = m_cPlans->FindString(plan.Name);
     if(index == wxNOT_FOUND) {

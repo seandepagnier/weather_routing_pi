@@ -58,7 +58,7 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
 
     m_SelectedSailPlan = 0;
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan]->eta * 1000.0);
+    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan].eta * 1000.0);
 
     UpdateStats();
     UpdateVMG();
@@ -109,7 +109,7 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
         double B = rad2posdeg(atan2(x, -y));
         double W = -B, VW = m_sWindSpeed->GetValue();
 
-        double VB = m_Boat.Plans[m_SelectedSailPlan]->Speed(B, VW);
+        double VB = m_Boat.Plans[m_SelectedSailPlan].Speed(B, VW);
 
         m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));
         m_stBoatKnots->SetLabel(wxString::Format(_T("%.1f"), VB));
@@ -195,7 +195,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     int W, i;
     /* plot scale */
     for(W = 0, i=0; W<DEGREES; W += DEGREE_STEP, i++) {
-        double VB = m_Boat.Plans[m_SelectedSailPlan]->Speed(W, VW);
+        double VB = m_Boat.Plans[m_SelectedSailPlan].Speed(W, VW);
         if(VB > maxVB)
             maxVB = VB;
     }
@@ -235,7 +235,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
 
     double s = maxVB*m_PlotScale;
-    SailingVMG vmg = m_Boat.Plans[m_SelectedSailPlan]->GetVMG(VW);
+    SailingVMG vmg = m_Boat.Plans[m_SelectedSailPlan].GetVMG(VW);
 
     W = vmg.PortTackUpWind;
     px = s*sin(deg2rad(W));
@@ -263,7 +263,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     int lx, ly;
     for(W = 0; W<=DEGREES; W += DEGREE_STEP) {
 //        SailingSpeed speed = m_Boat.Plans[m_SelectedSailPlan]->speed[VW][(W%DEGREES)];
-        double VB = m_Boat.Plans[m_SelectedSailPlan]->Speed(W, VW);
+        double VB = m_Boat.Plans[m_SelectedSailPlan].Speed(W, VW);
 
         dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
 
@@ -338,12 +338,12 @@ void BoatDialog::LoadCSV()
 {
     wxString filename = m_fpCSVPath->GetPath();
 
-    BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
+    BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
     BoatSpeedTable table;
     if(table.Open(filename.mb_str(),
-                  plan->wind_speed_step, plan->wind_degree_step)) {
-        plan->csvFileName = filename;
-        plan->SetSpeedsFromTable(table);
+                  plan.wind_speed_step, plan.wind_degree_step)) {
+        plan.csvFileName = filename;
+        plan.SetSpeedsFromTable(table);
         RepopulatePlans();
     } else {
         wxMessageDialog md(this, _("Failed reading csv: ") + filename,
@@ -416,7 +416,7 @@ void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
         pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
         pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
 
-        BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan]->CreateTable
+        BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan].CreateTable
             (3, 3);
         if(!table.Save(saveDialog.GetPath().mb_str())) {
             wxMessageDialog md(this, _("Failed saving boat polar to csv"),
@@ -434,13 +434,13 @@ void BoatDialog::OnPolarCSVFile( wxFileDirPickerEvent& event )
 
 void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
 {
-    m_Boat.Plans[m_SelectedSailPlan]->OptimizeTackingSpeed();
+    m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();
     m_PlotWindow->Refresh();
 }
 
 void BoatDialog::OnResetOptimalTackingSpeed( wxCommandEvent& event )
 {
-    m_Boat.Plans[m_SelectedSailPlan]->ResetOptimalTackingSpeed();
+    m_Boat.Plans[m_SelectedSailPlan].ResetOptimalTackingSpeed();
     m_PlotWindow->Refresh();
 }
 
@@ -470,10 +470,10 @@ so resulting boat polar may appear bumpy.\n"),
 void BoatDialog::OnSailPlanSelected( wxListEvent& event )
 {
     m_SelectedSailPlan = event.GetIndex();
-    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan]->eta * 1000.0);
-    m_sLuffAngle->SetValue(m_Boat.Plans[m_SelectedSailPlan]->luff_angle);
+    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan].eta * 1000.0);
+    m_sLuffAngle->SetValue(m_Boat.Plans[m_SelectedSailPlan].luff_angle);
 
-    bool c = m_Boat.Plans[m_SelectedSailPlan]->computed;
+    bool c = m_Boat.Plans[m_SelectedSailPlan].computed;
     m_sbComputation->ShowItems(c);
     m_sbCSV->ShowItems(!c);
     m_pPolarConfig->Fit();
@@ -486,7 +486,7 @@ void BoatDialog::OnPolarMode( wxCommandEvent& event )
 {
     bool c = m_rbComputed->GetValue();
 
-    m_Boat.Plans[m_SelectedSailPlan]->computed = c;
+    m_Boat.Plans[m_SelectedSailPlan].computed = c;
     m_sbComputation->ShowItems(c);
     m_sbCSV->ShowItems(!c);
     m_pPolarConfig->Fit();
@@ -503,7 +503,7 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
 {
     wxString np = _("New Plan");
     m_SelectedSailPlan = m_lBoatPlans->InsertItem(m_lBoatPlans->GetItemCount(), np);
-    m_Boat.Plans.push_back(new BoatPlan(np, m_Boat));
+    m_Boat.Plans.push_back(BoatPlan(np, m_Boat));
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     StoreBoatParameters();
     Compute();
@@ -520,8 +520,6 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
 void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
 {
     m_lBoatPlans->DeleteItem(m_SelectedSailPlan);
-    delete m_Boat.Plans[m_SelectedSailPlan];
-
     m_Boat.Plans.erase(m_Boat.Plans.begin() + m_SelectedSailPlan);
 
     if(m_Boat.Plans.size() < 2)
@@ -534,8 +532,8 @@ void BoatDialog::StoreBoatParameters()
        m_SelectedSailPlan >= (int)m_Boat.Plans.size())
         return;
 
-    m_Boat.Plans[m_SelectedSailPlan]->eta = m_sEta->GetValue() / 1000.0;
-    m_Boat.Plans[m_SelectedSailPlan]->luff_angle = m_sLuffAngle->GetValue();
+    m_Boat.Plans[m_SelectedSailPlan].eta = m_sEta->GetValue() / 1000.0;
+    m_Boat.Plans[m_SelectedSailPlan].luff_angle = m_sLuffAngle->GetValue();
 
     m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
 
@@ -557,9 +555,9 @@ void BoatDialog::RepopulatePlans()
         info.SetId(i);
         info.SetData(i);
         long idx = m_lBoatPlans->InsertItem(info);
-        BoatPlan *plan = m_Boat.Plans[i];
-        m_lBoatPlans->SetItem(idx, spNAME, plan->Name);
-        m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), plan->eta));
+        BoatPlan &plan = m_Boat.Plans[i];
+        m_lBoatPlans->SetItem(idx, spNAME, plan.Name);
+        m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), plan.eta));
     }
 
     m_lBoatPlans->SetColumnWidth(spNAME, 150);
@@ -570,13 +568,13 @@ void BoatDialog::RepopulatePlans()
     else
         m_bDeleteBoatPlan->Disable();
 
-    BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
 
-    m_fpCSVPath->SetPath(plan->csvFileName);
+    m_fpCSVPath->SetPath(plan.csvFileName);
     m_stWindSpeedStep->SetLabel
-        (wxString::Format(_T("%d"), plan->wind_speed_step));
+        (wxString::Format(_T("%d"), plan.wind_speed_step));
     m_stWindDegreeStep->SetLabel
-        (wxString::Format(_T("%d"), plan->wind_degree_step));
+        (wxString::Format(_T("%d"), plan.wind_degree_step));
 }
 
 void BoatDialog::Compute()
@@ -585,8 +583,8 @@ void BoatDialog::Compute()
        m_SelectedSailPlan >= (int)m_Boat.Plans.size())
         return;
 
-    BoatPlan *plan = m_Boat.Plans[m_SelectedSailPlan];
-    plan->ComputeBoatSpeeds(m_Boat);
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    plan.ComputeBoatSpeeds(m_Boat);
 
     UpdateVMG();
     m_PlotWindow->Refresh();
@@ -597,7 +595,7 @@ void BoatDialog::Compute()
 void BoatDialog::UpdateVMG()
 {
     int VW = m_sWindSpeed->GetValue();
-    SailingVMG vmg = m_Boat.Plans[m_SelectedSailPlan]->GetVMG(VW);
+    SailingVMG vmg = m_Boat.Plans[m_SelectedSailPlan].GetVMG(VW);
 
     m_stBestCourseUpWindPortTack->SetLabel
         (wxString::Format(_T("%d"), vmg.PortTackUpWind));
@@ -613,9 +611,9 @@ void BoatDialog::OnNewSwitchPlanRule( wxCommandEvent& event )
 {
     SwitchPlan plan;
     
-    plan.Name = m_Boat.Plans[0]->Name;
+    plan.Name = m_Boat.Plans[0].Name;
 
-    m_Boat.Plans[m_SelectedSailPlan]->SwitchPlans.push_back(plan);
+    m_Boat.Plans[m_SelectedSailPlan].SwitchPlans.push_back(plan);
 
     int index = m_lSwitchPlans->Append(wxString());
     m_lSwitchPlans->SetSelection(index, true);
@@ -632,8 +630,8 @@ void BoatDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
     if(index < 0)
         return;
 
-    BoatPlan *boatplan = m_Boat.Plans[m_SelectedSailPlan];
-    SwitchPlan plan = boatplan->SwitchPlans[index];
+    BoatPlan &boatplan = m_Boat.Plans[m_SelectedSailPlan];
+    SwitchPlan plan = boatplan.SwitchPlans[index];
 
     if(m_Boat.Plans.size() < 1) {
         wxMessageDialog md(this, _("Cannot edit switch plan since there is no other plan to switch to."),
@@ -645,9 +643,9 @@ void BoatDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
 
     SwitchPlanDialog dialog(this, plan, m_Boat.Plans);
     if(dialog.ShowModal() == wxID_OK)
-        boatplan->SwitchPlans[index] = plan;
+        boatplan.SwitchPlans[index] = plan;
     else
-        boatplan->SwitchPlans.erase(boatplan->SwitchPlans.begin() + index);
+        boatplan.SwitchPlans.erase(boatplan.SwitchPlans.begin() + index);
 
     PopulatePlans();
 }
@@ -658,25 +656,25 @@ void BoatDialog::OnDeleteSwitchPlanRule( wxCommandEvent& event )
     if(index < 0)
         return;
 
-    BoatPlan *boatplan = m_Boat.Plans[m_SelectedSailPlan];
-    SwitchPlan plan = boatplan->SwitchPlans[index];
-    boatplan->SwitchPlans.erase(boatplan->SwitchPlans.begin() + index);
+    BoatPlan &boatplan = m_Boat.Plans[m_SelectedSailPlan];
+    SwitchPlan plan = boatplan.SwitchPlans[index];
+    boatplan.SwitchPlans.erase(boatplan.SwitchPlans.begin() + index);
     PopulatePlans();
 }
 
 void BoatDialog::PopulatePlans()
 {
-    BoatPlan *boatplan = m_Boat.Plans[m_SelectedSailPlan];
+    BoatPlan &boatplan = m_Boat.Plans[m_SelectedSailPlan];
 
-    if(boatplan->SwitchPlans.size() == 0) {
+    if(boatplan.SwitchPlans.size() == 0) {
         m_bEditSwitchBoatPlan->Disable();
         m_bDeleteSwitchBoatPlan->Disable();
     }
 
     m_lSwitchPlans->Clear();
 
-    for(unsigned int i=0; i<boatplan->SwitchPlans.size(); i++) {
-        SwitchPlan plan = boatplan->SwitchPlans[i];
+    for(unsigned int i=0; i<boatplan.SwitchPlans.size(); i++) {
+        SwitchPlan plan = boatplan.SwitchPlans[i];
     
         wxString des, a, andstr = _(" and ");
         if(!isnan(plan.MaxWindSpeed))
