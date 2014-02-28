@@ -105,10 +105,10 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(this),
       m_ConfigurationBatchDialog(this), m_SettingsDialog(this),
-      m_StatisticsDialog(this), m_FilterRoutesDialog(this),
+      m_StatisticsDialog(this), m_ReportDialog(this), m_FilterRoutesDialog(this),
       m_bRunning(false), m_bSkipUpdateCurrentItem(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
-      m_bShowSettings(false), m_bShowStatistics(false),
+      m_bShowSettings(false), m_bShowStatistics(false), m_bShowReport(false),
       m_bShowFilter(false), m_weather_routing_pi(plugin)
 {
     m_SettingsDialog.LoadSettings();
@@ -450,6 +450,9 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
     if(m_StatisticsDialog.IsShown())
         m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
 
+    if(m_ReportDialog.IsShown())
+        m_ReportDialog.SetRouteMapOverlay(CurrentRouteMap());
+
     if(m_ConfigurationBatchDialog.IsShown())
         m_ConfigurationBatchDialog.Reset();
 
@@ -645,12 +648,16 @@ bool WeatherRouting::Show(bool show)
         if(m_bShowStatistics)
             m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
         m_StatisticsDialog.Show(m_bShowStatistics);
+        if(m_bShowReport)
+            m_ReportDialog.SetRouteMapOverlay(CurrentRouteMap());
+        m_StatisticsDialog.Show(m_bShowStatistics);
         m_FilterRoutesDialog.Show(m_bShowFilter);
     } else {
         m_bShowConfiguration = m_ConfigurationDialog.IsShown();
         m_bShowConfigurationBatch = m_ConfigurationBatchDialog.IsShown();
         m_bShowSettings = m_SettingsDialog.IsShown();
         m_bShowStatistics = m_StatisticsDialog.IsShown();
+        m_bShowReport = m_ReportDialog.IsShown();
         m_bShowFilter = m_FilterRoutesDialog.IsShown();
     }
 
@@ -690,6 +697,12 @@ void WeatherRouting::OnStatistics( wxCommandEvent& event )
 {
     m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
     m_StatisticsDialog.Show();
+}
+
+void WeatherRouting::OnReport( wxCommandEvent& event )
+{
+    m_ReportDialog.SetRouteMapOverlay(CurrentRouteMap());
+    m_ReportDialog.Show();
 }
 
 void WeatherRouting::OnPlot ( wxCommandEvent& event )
@@ -733,6 +746,13 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
 
             m_gProgress->SetValue(m_RoutesToRun - m_WaitingRouteMaps.size() - m_RunningRouteMaps.size());
             update = true;
+
+            /* update report if needed */
+            if(m_ReportDialog.IsShown()) {
+                if(routemapoverlay == CurrentRouteMap())
+                    m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
+            }
+
             continue;
         } else
             it++;

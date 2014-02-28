@@ -36,6 +36,7 @@
 #include "ConfigurationBatchDialog.h"
 #include "SettingsDialog.h"
 #include "StatisticsDialog.h"
+#include "ReportDialog.h"
 #include "FilterRoutesDialog.h"
 
 class weather_routing_pi;
@@ -115,6 +116,7 @@ private:
     void OnExportAll( wxCommandEvent& event );
     void OnSettings( wxCommandEvent& event );
     void OnStatistics( wxCommandEvent& event );
+    void OnReport( wxCommandEvent& event );
     void OnPlot( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
@@ -144,6 +146,7 @@ private:
 
     SettingsDialog m_SettingsDialog;
     StatisticsDialog m_StatisticsDialog;
+    ReportDialog m_ReportDialog;
     FilterRoutesDialog m_FilterRoutesDialog;
 
     bool m_bComputing;
@@ -160,7 +163,7 @@ private:
     bool m_bSkipUpdateCurrentItem;
 
     bool m_bShowConfiguration, m_bShowConfigurationBatch;
-    bool m_bShowSettings, m_bShowStatistics, m_bShowFilter;
+    bool m_bShowSettings, m_bShowStatistics, m_bShowReport, m_bShowFilter;
 
     weather_routing_pi &m_weather_routing_pi;
 };

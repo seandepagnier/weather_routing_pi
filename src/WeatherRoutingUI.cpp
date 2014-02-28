@@ -179,6 +179,10 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	m_mStatistics = new wxMenuItem( m_mView, wxID_ANY, wxString( _("S&tatistics") ) + wxT('\t') + wxT("Ctrl+T"), wxEmptyString, wxITEM_NORMAL );
 	m_mView->Append( m_mStatistics );
 	
+	wxMenuItem* m_mReport;
+	m_mReport = new wxMenuItem( m_mView, wxID_ANY, wxString( _("Report") ) , wxEmptyString, wxITEM_NORMAL );
+	m_mView->Append( m_mReport );
+	
 	wxMenuItem* m_mPlot;
 	m_mPlot = new wxMenuItem( m_mView, wxID_ANY, wxString( _("&Plot") ) + wxT('\t') + wxT("Ctrl+P"), wxEmptyString, wxITEM_NORMAL );
 	m_mView->Append( m_mPlot );
@@ -229,6 +233,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	this->Connect( m_mFilter->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnFilter ) );
 	this->Connect( m_mSettings->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnSettings ) );
 	this->Connect( m_mStatistics->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnStatistics ) );
+	this->Connect( m_mReport->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnReport ) );
 	this->Connect( m_mPlot->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnPlot ) );
 	this->Connect( m_mInformation->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
 	this->Connect( m_mAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
@@ -264,6 +269,7 @@ WeatherRoutingBase::~WeatherRoutingBase()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnFilter ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnSettings ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnStatistics ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnReport ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnPlot ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
@@ -2253,6 +2259,105 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 
 StatisticsDialogBase::~StatisticsDialogBase()
 {
+}
+
+ReportDialogBase::ReportDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer90;
+	fgSizer90 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer90->SetFlexibleDirection( wxBOTH );
+	fgSizer90->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer32;
+	sbSizer32 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Route") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer91;
+	fgSizer91 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer91->SetFlexibleDirection( wxBOTH );
+	fgSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer92;
+	fgSizer92 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer92->SetFlexibleDirection( wxBOTH );
+	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText120 = new wxStaticText( this, wxID_ANY, _("Start"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText120->Wrap( -1 );
+	fgSizer92->Add( m_staticText120, 0, wxALL, 5 );
+	
+	m_stStart = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stStart->Wrap( -1 );
+	fgSizer92->Add( m_stStart, 0, wxALL, 5 );
+	
+	m_staticText122 = new wxStaticText( this, wxID_ANY, _("End"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText122->Wrap( -1 );
+	fgSizer92->Add( m_staticText122, 0, wxALL, 5 );
+	
+	m_stEnd = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_stEnd->Wrap( -1 );
+	fgSizer92->Add( m_stEnd, 0, wxALL, 5 );
+	
+	m_cbAllRoutes = new wxCheckBox( this, wxID_ANY, _("Report All Routes"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer92->Add( m_cbAllRoutes, 0, wxALL, 5 );
+	
+	
+	fgSizer91->Add( fgSizer92, 1, wxEXPAND, 5 );
+	
+	m_tRouteReport = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	fgSizer91->Add( m_tRouteReport, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sbSizer32->Add( fgSizer91, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer90->Add( sbSizer32, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer31;
+	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Current Configuration") ), wxVERTICAL );
+	
+	m_tConfigurationReport = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
+	sbSizer31->Add( m_tConfigurationReport, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer90->Add( sbSizer31, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer93;
+	fgSizer93 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer93->AddGrowableCol( 1 );
+	fgSizer93->SetFlexibleDirection( wxBOTH );
+	fgSizer93->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_bInformation = new wxButton( this, wxID_ANY, _("Information"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer93->Add( m_bInformation, 0, wxALL, 5 );
+	
+	m_bClose = new wxButton( this, wxID_ANY, _("&Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer93->Add( m_bClose, 0, wxALIGN_RIGHT|wxALL, 5 );
+	
+	
+	fgSizer90->Add( fgSizer93, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer90 );
+	this->Layout();
+	fgSizer90->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_cbAllRoutes->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ReportDialogBase::OnReportAllRoutes ), NULL, this );
+	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnInformation ), NULL, this );
+	m_bClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnClose ), NULL, this );
+}
+
+ReportDialogBase::~ReportDialogBase()
+{
+	// Disconnect Events
+	m_cbAllRoutes->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ReportDialogBase::OnReportAllRoutes ), NULL, this );
+	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnInformation ), NULL, this );
+	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnClose ), NULL, this );
+	
 }
 
 FilterRoutesDialogBase::FilterRoutesDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )

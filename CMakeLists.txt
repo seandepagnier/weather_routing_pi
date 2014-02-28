@@ -27,6 +27,7 @@ SET(SRC_WEATHER_ROUTING
             src/BoatDialog.cpp
             src/SwitchPlanDialog.cpp
             src/StatisticsDialog.cpp
+            src/ReportDialog.cpp
             src/FilterRoutesDialog.cpp
             src/ConfigurationBatchDialog.cpp
             src/AboutDialog.cpp

@@ -104,6 +104,7 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnReport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
@@ -208,7 +209,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxCheckBox* m_cbUseClimatology;
 		wxCheckBox* m_cbCurrents;
 		
-		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationDialogBase();
 	
 };
@@ -464,7 +465,7 @@ class PlotDialogBase : public wxDialog
 	
 	public:
 		
-		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Route Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~PlotDialogBase();
 	
 };
@@ -553,6 +554,37 @@ class StatisticsDialogBase : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Class ReportDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class ReportDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText120;
+		wxStaticText* m_stStart;
+		wxStaticText* m_staticText122;
+		wxStaticText* m_stEnd;
+		wxCheckBox* m_cbAllRoutes;
+		wxTextCtrl* m_tRouteReport;
+		wxTextCtrl* m_tConfigurationReport;
+		wxButton* m_bInformation;
+		wxButton* m_bClose;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnReportAllRoutes( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		ReportDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Route Report"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~ReportDialogBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
 /// Class FilterRoutesDialogBase
 ///////////////////////////////////////////////////////////////////////////////
 class FilterRoutesDialogBase : public wxDialog 
@@ -633,7 +665,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxTextCtrl* m_tStartSpacingHours;
 		wxListBox* m_lBoats;
 		
-		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationBatchDialogBase();
 	
 };
