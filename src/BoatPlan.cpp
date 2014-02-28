@@ -280,7 +280,14 @@ double BoatPlan::VelocityBoat(double A, double VA)
     if(eta <= 0) /* not ideal but prevent nans */
         return 0;
 
-    return sin(A/2) * sqrt(VA / eta);
+    double val = sin(A/2) * sqrt(VA / eta);
+
+    /* for wing on wing, increase speed when wind is behind
+       reaching 50% speed increase when dead downwind */
+    if(wing_wing_running && A > deg2rad(90))
+        val += val*sin(A - deg2rad(90))/2;
+
+    return val;
 }
 
 /* Now that we can convert the wind speed in gribs correctly

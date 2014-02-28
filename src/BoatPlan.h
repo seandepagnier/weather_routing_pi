@@ -118,6 +118,7 @@ public:
 
     /* if computed */
     double eta, luff_angle;
+    bool wing_wing_running;
 
     /* if not computed (csv table) */
     wxString csvFileName;

@@ -1603,6 +1603,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_bRecomputeDrag->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecomputeDrag ), NULL, this );
 	m_bDragInfo->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDragInfo ), NULL, this );
 	m_sLuffAngle->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_cbWingWingRunning->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
 	m_cHullType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
 	m_sDisplacement->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
 	m_sLWL->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
@@ -1661,6 +1662,7 @@ BoatDialogBase::~BoatDialogBase()
 	m_bRecomputeDrag->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecomputeDrag ), NULL, this );
 	m_bDragInfo->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDragInfo ), NULL, this );
 	m_sLuffAngle->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
+	m_cbWingWingRunning->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
 	m_cHullType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
 	m_sDisplacement->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatistics ), NULL, this );
 	m_sLWL->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
@@ -2393,7 +2395,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel8->SetSizer( fgSizer77 );
 	m_panel8->Layout();
 	fgSizer77->Fit( m_panel8 );
-	m_notebookConfigurations->AddPage( m_panel8, _("Start Time"), false );
+	m_notebookConfigurations->AddPage( m_panel8, _("Start Time"), true );
 	m_pRoutes = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer62;
 	fgSizer62 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -2495,7 +2497,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_pRoutes->SetSizer( fgSizer62 );
 	m_pRoutes->Layout();
 	fgSizer62->Fit( m_pRoutes );
-	m_notebookConfigurations->AddPage( m_pRoutes, _("Routes"), true );
+	m_notebookConfigurations->AddPage( m_pRoutes, _("Routes"), false );
 	m_panel9 = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer81;
 	fgSizer81 = new wxFlexGridSizer( 0, 1, 0, 0 );

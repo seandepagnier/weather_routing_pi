@@ -58,7 +58,9 @@ private:
     void LoadCSV( );
     void OnSaveCSV( wxCommandEvent& event );
     void OnPolarCSVFile( wxFileDirPickerEvent& event );
-    void OnRecompute( wxSpinEvent& event ) { StoreBoatParameters(); Compute(); UpdateStats(); }
+    void OnRecompute( );
+    void OnRecompute( wxSpinEvent& event ) { OnRecompute(); }
+    void OnRecompute( wxCommandEvent& event ) { OnRecompute(); }
     void OnOptimizeTacking( wxCommandEvent& event );
     void OnResetOptimalTackingSpeed( wxCommandEvent& event );
     void OnUpdateStatistics( wxCommandEvent& event ) { StoreBoatParameters(); UpdateStats(); }

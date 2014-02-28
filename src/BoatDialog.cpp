@@ -432,6 +432,13 @@ void BoatDialog::OnPolarCSVFile( wxFileDirPickerEvent& event )
     LoadCSV();
 }
 
+void BoatDialog::OnRecompute()
+{
+    StoreBoatParameters();
+    Compute();
+    UpdateStats();
+}
+
 void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
 {
     m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();
@@ -532,8 +539,10 @@ void BoatDialog::StoreBoatParameters()
        m_SelectedSailPlan >= (int)m_Boat.Plans.size())
         return;
 
-    m_Boat.Plans[m_SelectedSailPlan].eta = m_sEta->GetValue() / 1000.0;
-    m_Boat.Plans[m_SelectedSailPlan].luff_angle = m_sLuffAngle->GetValue();
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    plan.eta = m_sEta->GetValue() / 1000.0;
+    plan.luff_angle = m_sLuffAngle->GetValue();
+    plan.wing_wing_running = m_cbWingWingRunning->GetValue();
 
     m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
 

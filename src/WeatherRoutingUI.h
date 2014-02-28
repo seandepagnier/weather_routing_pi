@@ -359,6 +359,7 @@ class BoatDialogBase : public wxDialog
 		virtual void OnRecompute( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRecompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateStatistics( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
