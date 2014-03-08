@@ -78,8 +78,7 @@ class WeatherRoutingBase : public wxFrame
 		wxMenu* m_mHelp;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnEditConfiguration( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnEditConfigurationClick( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
@@ -190,11 +189,11 @@ class ConfigurationDialogBase : public wxDialog
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxDateEvent& event ) { event.Skip(); }
+		virtual void OnUpdateDate( wxDateEvent& event ) { event.Skip(); }
 		virtual void OnGribTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxFileDirPickerEvent& event ) { event.Skip(); }
+		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdateFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveDegreeStep( wxCommandEvent& event ) { event.Skip(); }
@@ -233,8 +232,8 @@ class SettingsDialogBase : public wxDialog
 		wxButton* m_sdbSizer1Help;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnUpdate( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdateColor( wxColourPickerEvent& event ) { event.Skip(); }
+		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
 		
@@ -357,12 +356,12 @@ class BoatDialogBase : public wxDialog
 		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnPolarMode( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEta( wxScrollEvent& event ) { event.Skip(); }
-		virtual void OnRecompute( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnRecomputeSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdateStatistics( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdateStatisticsSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarCSVFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }

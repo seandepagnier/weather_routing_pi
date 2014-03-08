@@ -65,6 +65,10 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
 
     char line[1024];
     
+
+// todo fix, must have strtok_r
+#define strtok_r(a, b, c) strtok(a, b)
+
     char *token, *saveptr;
     if(!fgets(line, sizeof line, f))
         goto failed; /* error here too */

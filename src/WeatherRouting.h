@@ -91,13 +91,12 @@ private:
 //    void OnListLabelEdit( wxListEvent& event );
     void OnRemovePosition( wxCommandEvent& event );
     void OnClearPositions( wxCommandEvent& event );
-    void OnClose( wxCloseEvent& event );
     void OnEditConfiguration();
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
     void OnNew( wxCommandEvent& event );
-    void OnEditConfiguration( wxMouseEvent& event ) { OnEditConfiguration(); }
+    void OnEditConfigurationClick( wxMouseEvent& event ) { OnEditConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );
     void OnWeatherRouteSelected( wxListEvent& event );
     void OnWeatherRoutesListLeftDown(wxMouseEvent &event);

@@ -43,7 +43,7 @@ SET(SRC_WEATHER_ROUTING
             src/georef.c
 
             src/GribRecord.cpp  
-            src/zuFile.cpp 
+#            src/zuFile.cpp 
 
             src/wxJSON/jsonval.cpp
             src/wxJSON/jsonreader.cpp
@@ -56,10 +56,10 @@ SET(SRC_WEATHER_ROUTING
 )
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING})
 
-IF(NOT UNIX)
-    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
-    INCLUDE_DIRECTORIES(src/bzip2)
-ENDIF(NOT UNIX)
+#IF(NOT UNIX)
+#    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
+#    INCLUDE_DIRECTORIES(src/bzip2)
+#ENDIF(NOT UNIX)
 
 INCLUDE("cmake/PluginInstall.cmake")
 INCLUDE("cmake/PluginLocalization.cmake")

@@ -372,11 +372,6 @@ void WeatherRouting::OnClearPositions( wxCommandEvent& event )
     m_lPositions->DeleteAllItems();
 }
 
-void WeatherRouting::OnClose( wxCloseEvent& event )
-{
-    Show(false);
-}
-
 void WeatherRouting::OnEditConfiguration()
 {
     RouteMapOverlay *routemapoverlay = CurrentRouteMap(true);

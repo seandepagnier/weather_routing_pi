@@ -25,9 +25,9 @@ Elément de base d'un fichier GRIB
 #define GRIBRECORD_H
 
 #include <iostream>
-#include <cmath>
+//#include <cmath>
 
-#include "zuFile.h"
+//#include "zuFile.h"
 
 #define DEBUG_INFO    false
 #define DEBUG_ERROR   true
@@ -131,7 +131,7 @@ class GribCode
 class GribRecord
 {
     public:
-        GribRecord(ZUFILE* file, int id_);
+//        GribRecord(ZUFILE* file, int id_);
         GribRecord(const GribRecord &rec);
         GribRecord(const GribRecord &rec1, const GribRecord &rec2, double d);
         static GribRecord *MagnitudeRecord(const GribRecord &rec1, const GribRecord &rec2);
@@ -276,7 +276,7 @@ class GribRecord
         zuint  nbBitsInPack;
         double  *data;
         // SECTION 5: END SECTION (ES)
-
+#if 0
         //---------------------------------------------
         // Data Access
         //---------------------------------------------
@@ -296,7 +296,7 @@ class GribRecord
         zuint  readInt2(ZUFILE* file);
         zuint  readInt3(ZUFILE* file);
         double readFloat4(ZUFILE* file);
-
+#endif
         zuint  readPackedBits(zuchar *buf, zuint first, zuint nbBits);
         zuint  makeInt3(zuchar a, zuchar b, zuchar c);
         zuint  makeInt2(zuchar b, zuchar c);

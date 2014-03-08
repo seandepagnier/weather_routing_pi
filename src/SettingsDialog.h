@@ -41,8 +41,8 @@ public:
     void LoadSettings();
     void SaveSettings();
 
-    void OnUpdate( wxColourPickerEvent& event ) { OnUpdate(); }
-    void OnUpdate( wxSpinEvent& event ) { OnUpdate(); }
+    void OnUpdateColor( wxColourPickerEvent& event ) { OnUpdate(); }
+    void OnUpdateSpin( wxSpinEvent& event ) { OnUpdate(); }
     void OnUpdate( wxCommandEvent& event ) { OnUpdate(); }
     void OnUpdate( );
     void OnHelp( wxCommandEvent& event );

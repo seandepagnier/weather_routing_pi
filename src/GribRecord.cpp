@@ -161,6 +161,7 @@ void GribRecord::print()
 //-------------------------------------------------------------------------------
 // Lecture depuis un fichier
 //-------------------------------------------------------------------------------
+#if 0
 GribRecord::GribRecord(ZUFILE* file, int id_)
 {
     id = id_;
@@ -232,7 +233,7 @@ GribRecord::GribRecord(ZUFILE* file, int id_)
 		setDataType(dataType);
 	}
 }
-
+#endif
 //-------------------------------------------------------------------------------
 // Constructeur de recopie
 //-------------------------------------------------------------------------------
@@ -368,6 +369,7 @@ void  GribRecord::multiplyAllData(double k)
 //----------------------------------------------
 // SECTION 0: THE INDICATOR SECTION (IS)
 //----------------------------------------------
+#if 0
 bool GribRecord::readGribSection0_IS(ZUFILE* file, bool b_skip_initial_GRIB) {
     char strgrib[4];
     fileOffset0 = zu_tell(file);
@@ -905,7 +907,7 @@ zuint GribRecord::periodSeconds(zuchar unit,zuchar P1,zuchar P2,zuchar range) {
     }
     return res*dur;
 }
-
+#endif
 
 //===============================================================================================
 double GribRecord::getInterpolatedValue(double px, double py, bool numericalInterpolation) const

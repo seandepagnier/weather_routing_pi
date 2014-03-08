@@ -56,11 +56,11 @@ public:
 
 protected:
     void OnUpdate( wxCommandEvent& event ) { Update(); }
-    void OnUpdate( wxDateEvent& event ) { Update(); }
+    void OnUpdateDate( wxDateEvent& event ) { Update(); }
     void OnGribTime( wxCommandEvent& event );
     void OnCurrentTime( wxCommandEvent& event );
-    void OnUpdate( wxSpinEvent& event ) { Update(); }
-    void OnUpdate( wxFileDirPickerEvent& event ) { Update(); }
+    void OnUpdateSpin( wxSpinEvent& event ) { Update(); }
+    void OnUpdateFile( wxFileDirPickerEvent& event ) { Update(); }
     void OnEditBoat( wxCommandEvent& event ) { EditBoat(); }
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );

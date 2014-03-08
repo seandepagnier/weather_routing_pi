@@ -59,12 +59,12 @@ private:
     void OnSaveCSV( wxCommandEvent& event );
     void OnPolarCSVFile( wxFileDirPickerEvent& event );
     void OnRecompute( );
-    void OnRecompute( wxSpinEvent& event ) { OnRecompute(); }
+    void OnRecomputeSpin( wxSpinEvent& event ) { OnRecompute(); }
     void OnRecompute( wxCommandEvent& event ) { OnRecompute(); }
     void OnOptimizeTacking( wxCommandEvent& event );
     void OnResetOptimalTackingSpeed( wxCommandEvent& event );
     void OnUpdateStatistics( wxCommandEvent& event ) { StoreBoatParameters(); UpdateStats(); }
-    void OnUpdateStatistics( wxSpinEvent& event ) { StoreBoatParameters(); UpdateStats(); }
+    void OnUpdateStatisticsSpin( wxSpinEvent& event ) { StoreBoatParameters(); UpdateStats(); }
     void OnRecomputeDrag( wxCommandEvent& event );
     void OnDragInfo( wxCommandEvent& event );
     void OnSailPlanSelected( wxListEvent& event );
