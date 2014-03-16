@@ -1961,18 +1961,7 @@ bool RouteMap::Propagate()
         return false;
     }
 
-    /* copy the grib record set */
-    GribRecordSet *grib = NULL;
-    if(m_NewGrib) {
-        grib = new GribRecordSet;
-        grib->m_Reference_Time = m_NewGrib->m_Reference_Time;
-        for(int i=0; i<Idx_COUNT; i++) {
-            if(m_NewGrib->m_GribRecordPtrArray[i])
-                grib->m_GribRecordPtrArray[i] = new GribRecord(*m_NewGrib->m_GribRecordPtrArray[i]);
-            else
-                grib->m_GribRecordPtrArray[i] = NULL;
-        }
-    }
+    GribRecordSet *grib = m_NewGrib;
 
     wxDateTime time = m_NewTime;
     RouteMapConfiguration configuration = m_Configuration;
@@ -2067,6 +2056,26 @@ wxString RouteMap::Reset()
     Unlock();
 
     return boaterror;
+}
+
+void RouteMap::SetNewGrib(GribRecordSet *grib)
+{
+    Lock();
+    m_bNeedsGrib = !grib;
+
+    /* copy the grib record set */
+    if(grib) {
+        m_NewGrib = new GribRecordSet;
+        m_NewGrib->m_Reference_Time = grib->m_Reference_Time;
+        for(int i=0; i<Idx_COUNT; i++) {
+            if(grib->m_GribRecordPtrArray[i])
+                m_NewGrib->m_GribRecordPtrArray[i] = new GribRecord
+                    (*grib->m_GribRecordPtrArray[i]);
+            else
+                m_NewGrib->m_GribRecordPtrArray[i] = NULL;
+        }
+    }
+    Unlock();
 }
 
 void RouteMap::GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions)

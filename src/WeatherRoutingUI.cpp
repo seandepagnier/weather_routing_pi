@@ -1139,7 +1139,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_notebook1->AddPage( m_panel3, _("Plot"), false );
+	m_notebook1->AddPage( m_panel3, _("Plot"), true );
 	m_pPolarConfig = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* m_fgConfig;
 	m_fgConfig = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1518,7 +1518,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel5->SetSizer( fgSizer52 );
 	m_panel5->Layout();
 	fgSizer52->Fit( m_panel5 );
-	m_notebook1->AddPage( m_panel5, _("Statistics"), true );
+	m_notebook1->AddPage( m_panel5, _("Statistics"), false );
 	
 	fgSizer12->Add( m_notebook1, 1, wxEXPAND | wxALL, 5 );
 	

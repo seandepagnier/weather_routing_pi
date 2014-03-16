@@ -57,6 +57,10 @@ inline double round(double n) { return n < 0.0 ? ceil(n - 0.5) : floor(n + 0.5);
 #define strtok_r strtok_s
 #endif
 
+#ifdef __MINGW32__
+char *strtok_r(char *str, const char *delim, char **save);
+#endif
+
 
 /* min must have correct paren to make predence correct */
 #ifdef MIN

@@ -68,7 +68,11 @@ public:
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
 
-    void UpdateCurrentItem(RouteMapConfiguration configuration);
+    void SetConfigurationRoute(RouteMapConfiguration configuration,
+                               WeatherRoute *weatherroute);
+    void SetConfigurationCurrentRoute(RouteMapConfiguration configuration);
+    void UpdateBoatFilename(RouteMapConfiguration configuration);
+
     void UpdateStates();
     RouteMapOverlay *CurrentRouteMap(bool messagedialog = false), *m_RouteMapOverlayNeedingGrib;
 
@@ -121,6 +125,7 @@ private:
     void OnAbout( wxCommandEvent& event );
 
     void OnComputationTimer( wxTimerEvent & );
+    void OnHideConfigurationTimer( wxTimerEvent & );
 
     bool OpenXML(wxString filename, bool reportfailure = true);
     void SaveXML(wxString filename);
@@ -150,7 +155,7 @@ private:
 
     bool m_bComputing;
 
-    wxTimer m_tCompute;
+    wxTimer m_tCompute, m_tHideConfiguration;
 
     bool m_bRunning;
     wxTimeSpan m_RunTime;

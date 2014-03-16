@@ -268,6 +268,7 @@ void ConfigurationBatchDialog::Reset()
                         (*it)->destinations.push_back(*it2);
         }
 
+        m_lBoats->Clear();
         m_lBoats->Append(configuration.boatFileName);
     }
 }

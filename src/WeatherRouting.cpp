@@ -162,7 +162,14 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     m_tCompute.Connect(wxEVT_TIMER, wxTimerEventHandler
                        ( WeatherRouting::OnComputationTimer ), NULL, this);
 
+    m_tHideConfiguration.Connect(wxEVT_TIMER, wxTimerEventHandler
+                       ( WeatherRouting::OnHideConfigurationTimer ), NULL, this);
+
     SetEnableConfigurationMenu();
+
+    /* initialize crossing land routine from main thread as it is
+       not re-entrant */
+    PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
 }
 
 WeatherRouting::~WeatherRouting( )
@@ -310,7 +317,7 @@ void WeatherRouting::OnUpdateBoat( wxCommandEvent& event )
     AddPosition(lat, lon, _("Boat"));
 }
 
-#if 0 /* wx widgets is a shit toolkit that can only allow users
+#if 0 /* wx widgets is shit, can only allow users
          to edit the first column, so this doesn't work */
 void WeatherRouting::OnListLabelEdit( wxListEvent& event )
 {
@@ -435,18 +442,21 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
 {
     GetParent()->Refresh();
 
-    if(CurrentRouteMap()) {
+    RouteMapOverlay *routemapoverlay = CurrentRouteMap();
+
+    if(routemapoverlay) {
+        m_tHideConfiguration.Stop();
         m_bSkipUpdateCurrentItem = true;
-        m_ConfigurationDialog.SetConfiguration(CurrentRouteMap()->GetConfiguration());
+        m_ConfigurationDialog.SetConfiguration(routemapoverlay->GetConfiguration());
         m_bSkipUpdateCurrentItem = false;
     } else
-        m_ConfigurationDialog.Hide();
+        m_tHideConfiguration.Start(25, true);
 
     if(m_StatisticsDialog.IsShown())
-        m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
+        m_StatisticsDialog.SetRouteMapOverlay(routemapoverlay);
 
     if(m_ReportDialog.IsShown())
-        m_ReportDialog.SetRouteMapOverlay(CurrentRouteMap());
+        m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
 
     if(m_ConfigurationBatchDialog.IsShown())
         m_ConfigurationBatchDialog.Reset();
@@ -503,6 +513,8 @@ void WeatherRouting::OnCompute( wxCommandEvent& event )
 
 void WeatherRouting::OnComputeAll ( wxCommandEvent& event )
 {
+    /* todo: make this work when already running to start routes not computed,
+       and not waiting */
     if(!m_bRunning) {
         StartAll();
         UpdateComputeState();
@@ -792,6 +804,11 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
     }
 
     Stop();
+}
+
+void WeatherRouting::OnHideConfigurationTimer( wxTimerEvent & )
+{
+    m_ConfigurationDialog.Hide();
 }
 
 bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
@@ -1144,26 +1161,53 @@ void WeatherRouting::UpdateItem(long index)
     m_lWeatherRoutes->SetColumnWidth(STATE, wxLIST_AUTOSIZE);
 }
 
-void WeatherRouting::UpdateCurrentItem(RouteMapConfiguration configuration)
+void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
+                                           WeatherRoute *weatherroute)
 {
     if(m_bSkipUpdateCurrentItem)
         return;
 
-    if(CurrentRouteMap()) {
-        for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
-            it != m_RunningRouteMaps.end(); it++)
-            if(*it == CurrentRouteMap())
-                (*it)->Stop();
+    RouteMapOverlay *rmo = weatherroute->routemapoverlay;
+    for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
+        it != m_RunningRouteMaps.end(); it++)
+        if(*it == rmo)
+            (*it)->Stop();
 
-        CurrentRouteMap()->SetConfiguration(configuration);
+    rmo->SetConfiguration(configuration);
+
+    weatherroute->Update();
+
+    for(long index = 0; index<m_lWeatherRoutes->GetItemCount(); index++) {
+        WeatherRoute *wr = reinterpret_cast<WeatherRoute*>
+            (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+        if(weatherroute == wr) {
+            UpdateItem(index);
+            break;
+        }
     }
+}
 
+void WeatherRouting::SetConfigurationCurrentRoute(RouteMapConfiguration configuration)
+{
     long index = m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if (index < 0) return;
 
-    reinterpret_cast<WeatherRoute*>
-        (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)))->Update();
-    UpdateItem(index);
+    WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
+        (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+
+    SetConfigurationRoute(configuration, weatherroute);
+}
+
+void WeatherRouting::UpdateBoatFilename(RouteMapConfiguration configuration)
+{
+    for(long index = 0; index<m_lWeatherRoutes->GetItemCount(); index++) {
+        WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
+            (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+
+        RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
+        if(c.boatFileName == configuration.boatFileName)
+            SetConfigurationRoute(c, weatherroute);
+    }
 }
 
 void WeatherRouting::UpdateStates()

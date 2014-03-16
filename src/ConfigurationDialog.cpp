@@ -66,10 +66,14 @@ ConfigurationDialog::~ConfigurationDialog( )
 void ConfigurationDialog::EditBoat( )
 {
     BoatDialog boatdlg(this, m_fpBoat->GetPath());
-    boatdlg.ShowModal();
+    int updated = boatdlg.ShowModal();
     m_fpBoat->SetPath(boatdlg.m_boatpath);
 
-    Update();
+    if(updated == wxID_OK) {
+        /* update any configurations that use this boat */
+        m_WeatherRouting->UpdateBoatFilename(Configuration());
+        Update();
+    }
 }
 
 void ConfigurationDialog::OnGribTime( wxCommandEvent& event )
@@ -276,5 +280,5 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 
 void ConfigurationDialog::Update()
 {
-    m_WeatherRouting->UpdateCurrentItem(Configuration());
+    m_WeatherRouting->SetConfigurationCurrentRoute(Configuration());
 }

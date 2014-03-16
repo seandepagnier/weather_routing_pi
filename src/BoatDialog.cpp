@@ -69,11 +69,6 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
 
 BoatDialog::~BoatDialog()
 {
-    m_Boat.SaveXML(m_boatpath);
-
-    wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-    pConf->Write ( _T ( "CSVPath" ), m_fpCSVPath->GetPath() );
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -379,20 +374,18 @@ void BoatDialog::OnSaveAs ( wxCommandEvent& event )
     pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
 
     wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
-                             wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ), wxFD_SAVE  );
+                             wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
+                             wxFD_SAVE | wxFD_OVERWRITE_PROMPT );
+
     if( saveDialog.ShowModal() == wxID_OK ) {
-        wxString filename = saveDialog.GetPath();
+        wxString filename = wxFileDialog::AppendExtension(saveDialog.GetPath(), _T("*.xml"));
+
         pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
         pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
 
         m_boatpath = filename;
         Save();
     }
-}
-
-void BoatDialog::OnSave ( wxCommandEvent& event )
-{
-    Save();
 }
 
 void BoatDialog::OnClose ( wxCommandEvent& event )
@@ -479,6 +472,7 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
     m_SelectedSailPlan = event.GetIndex();
     m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan].eta * 1000.0);
     m_sLuffAngle->SetValue(m_Boat.Plans[m_SelectedSailPlan].luff_angle);
+    m_cbWingWingRunning->SetValue(m_Boat.Plans[m_SelectedSailPlan].wing_wing_running);
 
     bool c = m_Boat.Plans[m_SelectedSailPlan].computed;
     m_sbComputation->ShowItems(c);
@@ -558,6 +552,11 @@ void BoatDialog::StoreBoatParameters()
 void BoatDialog::RepopulatePlans()
 {
     m_lBoatPlans->DeleteAllItems();
+
+    if(m_Boat.Plans.size() == 0) {
+        m_Boat.Plans.push_back(BoatPlan(_("Initial Plan"), m_Boat));
+        m_Boat.Plans[0].ComputeBoatSpeeds(m_Boat);
+    }
 
     for(unsigned int i=0; i<m_Boat.Plans.size(); i++) {
         wxListItem info;

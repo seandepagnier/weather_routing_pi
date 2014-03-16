@@ -114,10 +114,10 @@ wxString Boat::OpenXML(wxString filename)
         }
     }
 
-    if(!cleared) {
-        Plans.push_back(BoatPlan(_("Initial Plan"), *this));
-        Plans[0].ComputeBoatSpeeds(*this);
-    }
+//    if(!cleared) {
+//        Plans.push_back(BoatPlan(_("Initial Plan"), *this));
+//        Plans[0].ComputeBoatSpeeds(*this);
+//    }
 
     return _T("");
 }

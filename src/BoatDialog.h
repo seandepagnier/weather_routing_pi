@@ -53,7 +53,7 @@ private:
     void OnOpen( wxCommandEvent& event );
     void Save();
     void OnSaveAs( wxCommandEvent& event );
-    void OnSave( wxCommandEvent& event );
+    void OnSave( wxCommandEvent& event ) { Save(); }
     void OnClose( wxCommandEvent& event );
     void LoadCSV( );
     void OnSaveCSV( wxCommandEvent& event );
