@@ -168,7 +168,7 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
 }
 
 
-class TiXmlParsingData
+class DECL_EXP TiXmlParsingData
 {
 	friend class TiXmlDocument;
   public:
