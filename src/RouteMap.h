@@ -162,8 +162,8 @@ struct RouteMapConfiguration {
     Boat boat;
     wxString boatFileName;
     
-    double MaxDivertedCourse, MaxWindKnots, MaxSwellMeters;
-    double MaxLatitude, MaxTacks, TackingTime;
+    double MaxDivertedCourse, MaxSearchAngle, MaxWindKnots, MaxSwellMeters;
+    double MaxLatitude, MaxTacks, TackingTime, MaxUpwindPercentage;
 
     bool UseGrib, UseClimatology;
     bool AllowDataDeficient;

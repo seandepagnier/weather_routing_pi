@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Apr 30 2013)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -506,79 +506,119 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	wxStaticBoxSizer* sbSizer23;
 	sbSizer23 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Constraints") ), wxVERTICAL );
 	
+	m_notebook4 = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panel11 = new wxPanel( m_notebook4, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer110;
 	fgSizer110 = new wxFlexGridSizer( 0, 3, 0, 0 );
 	fgSizer110->SetFlexibleDirection( wxBOTH );
 	fgSizer110->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText20 = new wxStaticText( this, wxID_ANY, _("Max Diverted Course"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText20 = new wxStaticText( m_panel11, wxID_ANY, _("Max Diverted Course"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText20->Wrap( -1 );
 	fgSizer110->Add( m_staticText20, 0, wxALL, 5 );
 	
-	m_sMaxDivertedCourse = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 180 );
+	m_sMaxDivertedCourse = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 180 );
 	fgSizer110->Add( m_sMaxDivertedCourse, 0, wxALL, 5 );
 	
-	m_staticText1181 = new wxStaticText( this, wxID_ANY, _("degrees"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1181 = new wxStaticText( m_panel11, wxID_ANY, _("degrees"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1181->Wrap( -1 );
 	fgSizer110->Add( m_staticText1181, 0, wxALL, 5 );
 	
-	m_staticText23 = new wxStaticText( this, wxID_ANY, _("Max Wind"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText124 = new wxStaticText( m_panel11, wxID_ANY, _("Max Search Angle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText124->Wrap( -1 );
+	fgSizer110->Add( m_staticText124, 0, wxALL, 5 );
+	
+	m_sMaxSearchAngle = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 180 );
+	fgSizer110->Add( m_sMaxSearchAngle, 0, wxALL, 5 );
+	
+	m_staticText125 = new wxStaticText( m_panel11, wxID_ANY, _("degrees"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText125->Wrap( -1 );
+	fgSizer110->Add( m_staticText125, 0, wxALL, 5 );
+	
+	m_staticText23 = new wxStaticText( m_panel11, wxID_ANY, _("Max Wind"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText23->Wrap( -1 );
 	fgSizer110->Add( m_staticText23, 0, wxALL, 5 );
 	
-	m_sMaxWindKnots = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 200, 60 );
+	m_sMaxWindKnots = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 200, 60 );
 	fgSizer110->Add( m_sMaxWindKnots, 0, wxALL, 5 );
 	
-	m_staticText128 = new wxStaticText( this, wxID_ANY, _("knots"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText128 = new wxStaticText( m_panel11, wxID_ANY, _("knots"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText128->Wrap( -1 );
 	fgSizer110->Add( m_staticText128, 0, wxALL, 5 );
 	
-	m_staticText27 = new wxStaticText( this, wxID_ANY, _("Max Swell"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText27 = new wxStaticText( m_panel11, wxID_ANY, _("Max Swell"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText27->Wrap( -1 );
 	fgSizer110->Add( m_staticText27, 0, wxALL, 5 );
 	
-	m_sMaxSwellMeters = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 20 );
+	m_sMaxSwellMeters = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 20 );
 	fgSizer110->Add( m_sMaxSwellMeters, 0, wxALL, 5 );
 	
-	m_staticText129 = new wxStaticText( this, wxID_ANY, _("meters"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText129 = new wxStaticText( m_panel11, wxID_ANY, _("meters"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText129->Wrap( -1 );
 	fgSizer110->Add( m_staticText129, 0, wxALL, 5 );
 	
-	m_staticText26 = new wxStaticText( this, wxID_ANY, _("Max Latitude +-"), wxDefaultPosition, wxDefaultSize, 0 );
+	
+	m_panel11->SetSizer( fgSizer110 );
+	m_panel11->Layout();
+	fgSizer110->Fit( m_panel11 );
+	m_notebook4->AddPage( m_panel11, _("Common"), true );
+	m_panel12 = new wxPanel( m_notebook4, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer951;
+	fgSizer951 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer951->SetFlexibleDirection( wxBOTH );
+	fgSizer951->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText26 = new wxStaticText( m_panel12, wxID_ANY, _("Max Latitude +-"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText26->Wrap( -1 );
-	fgSizer110->Add( m_staticText26, 0, wxALL, 5 );
+	fgSizer951->Add( m_staticText26, 0, wxALL, 5 );
 	
-	m_sMaxLatitude = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 90, 90 );
-	fgSizer110->Add( m_sMaxLatitude, 0, wxALL, 5 );
+	m_sMaxLatitude = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 90, 90 );
+	fgSizer951->Add( m_sMaxLatitude, 0, wxALL, 5 );
 	
-	m_staticText131 = new wxStaticText( this, wxID_ANY, _("degrees"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText131 = new wxStaticText( m_panel12, wxID_ANY, _("degrees"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText131->Wrap( -1 );
-	fgSizer110->Add( m_staticText131, 0, wxALL, 5 );
+	fgSizer951->Add( m_staticText131, 0, wxALL, 5 );
 	
-	m_staticText1131 = new wxStaticText( this, wxID_ANY, _("Max # of Tacks"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1131 = new wxStaticText( m_panel12, wxID_ANY, _("Max # of Tacks"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1131->Wrap( -1 );
-	fgSizer110->Add( m_staticText1131, 0, wxALL, 5 );
+	fgSizer951->Add( m_staticText1131, 0, wxALL, 5 );
 	
-	m_sMaxTacks = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, -1, 10000, -1 );
-	fgSizer110->Add( m_sMaxTacks, 0, wxALL, 5 );
+	m_sMaxTacks = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, -1, 10000, -1 );
+	fgSizer951->Add( m_sMaxTacks, 0, wxALL, 5 );
 	
-	m_staticText1141 = new wxStaticText( this, wxID_ANY, _("(-1 for unlimited)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1141 = new wxStaticText( m_panel12, wxID_ANY, _("(-1 for unlimited)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1141->Wrap( -1 );
-	fgSizer110->Add( m_staticText1141, 0, wxALL, 5 );
+	fgSizer951->Add( m_staticText1141, 0, wxALL, 5 );
 	
-	m_staticText24 = new wxStaticText( this, wxID_ANY, _("Tacking Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText24 = new wxStaticText( m_panel12, wxID_ANY, _("Tacking Time"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText24->Wrap( -1 );
-	fgSizer110->Add( m_staticText24, 0, wxALL, 5 );
+	fgSizer951->Add( m_staticText24, 0, wxALL, 5 );
 	
-	m_sTackingTime = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 10 );
-	fgSizer110->Add( m_sTackingTime, 0, wxALL, 5 );
+	m_sTackingTime = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 10 );
+	fgSizer951->Add( m_sTackingTime, 0, wxALL, 5 );
 	
-	m_staticText1191 = new wxStaticText( this, wxID_ANY, _("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1191 = new wxStaticText( m_panel12, wxID_ANY, _("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1191->Wrap( -1 );
-	fgSizer110->Add( m_staticText1191, 0, wxALL, 5 );
+	fgSizer951->Add( m_staticText1191, 0, wxALL, 5 );
+	
+	m_staticText126 = new wxStaticText( m_panel12, wxID_ANY, _("Max Upwind"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText126->Wrap( -1 );
+	fgSizer951->Add( m_staticText126, 0, wxALL, 5 );
+	
+	m_sMaxUpwindPercentage = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 100 );
+	fgSizer951->Add( m_sMaxUpwindPercentage, 0, wxALL, 5 );
+	
+	m_staticText127 = new wxStaticText( m_panel12, wxID_ANY, _("percentage"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText127->Wrap( -1 );
+	fgSizer951->Add( m_staticText127, 0, wxALL, 5 );
 	
 	
-	sbSizer23->Add( fgSizer110, 1, wxEXPAND, 5 );
+	m_panel12->SetSizer( fgSizer951 );
+	m_panel12->Layout();
+	fgSizer951->Fit( m_panel12 );
+	m_notebook4->AddPage( m_panel12, _("Additional"), false );
+	
+	sbSizer23->Add( m_notebook4, 1, wxEXPAND | wxALL, 5 );
 	
 	
 	fgSizer112->Add( sbSizer23, 1, wxEXPAND, 5 );
@@ -2034,38 +2074,6 @@ PlotDialogBase::~PlotDialogBase()
 	m_cVariable2->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
 	m_cVariable3->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
 	
-}
-
-InformationDialog::InformationDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-	
-	wxFlexGridSizer* fgSizer15;
-	fgSizer15 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer15->AddGrowableCol( 0 );
-	fgSizer15->AddGrowableRow( 0 );
-	fgSizer15->SetFlexibleDirection( wxBOTH );
-	fgSizer15->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_htmlInformation = new wxHtmlWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_AUTO );
-	fgSizer15->Add( m_htmlInformation, 0, wxALL|wxEXPAND, 5 );
-	
-	m_sdbSizer2 = new wxStdDialogButtonSizer();
-	m_sdbSizer2OK = new wxButton( this, wxID_OK );
-	m_sdbSizer2->AddButton( m_sdbSizer2OK );
-	m_sdbSizer2->Realize();
-	
-	fgSizer15->Add( m_sdbSizer2, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( fgSizer15 );
-	this->Layout();
-	
-	this->Centre( wxBOTH );
-}
-
-InformationDialog::~InformationDialog()
-{
 }
 
 AboutDialogBase::AboutDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )

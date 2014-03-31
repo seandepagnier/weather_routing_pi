@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Apr 30 2013)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -36,6 +36,7 @@
 #include <wx/spinctrl.h>
 #include <wx/filepicker.h>
 #include <wx/checkbox.h>
+#include <wx/notebook.h>
 #include <wx/listbox.h>
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
@@ -43,8 +44,6 @@
 #include <wx/choice.h>
 #include <wx/radiobut.h>
 #include <wx/slider.h>
-#include <wx/notebook.h>
-#include <wx/html/htmlwin.h>
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -152,15 +151,21 @@ class ConfigurationDialogBase : public wxDialog
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
+		wxNotebook* m_notebook4;
+		wxPanel* m_panel11;
 		wxStaticText* m_staticText20;
 		wxSpinCtrl* m_sMaxDivertedCourse;
 		wxStaticText* m_staticText1181;
+		wxStaticText* m_staticText124;
+		wxSpinCtrl* m_sMaxSearchAngle;
+		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText23;
 		wxSpinCtrl* m_sMaxWindKnots;
 		wxStaticText* m_staticText128;
 		wxStaticText* m_staticText27;
 		wxSpinCtrl* m_sMaxSwellMeters;
 		wxStaticText* m_staticText129;
+		wxPanel* m_panel12;
 		wxStaticText* m_staticText26;
 		wxSpinCtrl* m_sMaxLatitude;
 		wxStaticText* m_staticText131;
@@ -170,6 +175,9 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText24;
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText1191;
+		wxStaticText* m_staticText126;
+		wxSpinCtrl* m_sMaxUpwindPercentage;
+		wxStaticText* m_staticText127;
 		wxListBox* m_lDegreeSteps;
 		wxTextCtrl* m_tDegreeStep;
 		wxButton* m_bAddDegreeStep;
@@ -466,25 +474,6 @@ class PlotDialogBase : public wxDialog
 		
 		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Route Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~PlotDialogBase();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class InformationDialog
-///////////////////////////////////////////////////////////////////////////////
-class InformationDialog : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxStdDialogButtonSizer* m_sdbSizer2;
-		wxButton* m_sdbSizer2OK;
-	
-	public:
-		wxHtmlWindow* m_htmlInformation;
-		
-		InformationDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Information"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,400 ), long style = wxDEFAULT_DIALOG_STYLE ); 
-		~InformationDialog();
 	
 };
 

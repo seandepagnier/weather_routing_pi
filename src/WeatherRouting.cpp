@@ -723,16 +723,9 @@ void WeatherRouting::OnPlot ( wxCommandEvent& event )
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
 {
-    InformationDialog dlg(GetParent());
     wxString infolocation = *GetpSharedDataLocation()
         + _("plugins/weather_routing_pi/data/WeatherRoutingInformation.html");
-    if(dlg.m_htmlInformation->LoadFile(infolocation))
-        dlg.ShowModal();
-    else {
-        wxMessageDialog mdlg(this, _("Failed to load file:\n") + infolocation,
-                             _("Weather Routing"), wxOK | wxICON_ERROR);
-        mdlg.ShowModal();
-    }
+    wxLaunchDefaultBrowser(_T("file://") + infolocation);
 }
 
 void WeatherRouting::OnAbout ( wxCommandEvent& event )
@@ -977,11 +970,14 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("Boat", configuration.boatFileName.ToUTF8());
 
         c->SetAttribute("MaxDivertedCourse", configuration.MaxDivertedCourse);
+        c->SetAttribute("MaxSearchAngle", configuration.MaxSearchAngle);
         c->SetAttribute("MaxWindKnots", configuration.MaxWindKnots);
         c->SetAttribute("MaxSwellMeters", configuration.MaxSwellMeters);
+
         c->SetAttribute("MaxLatitude", configuration.MaxLatitude);
         c->SetAttribute("MaxTacks", configuration.MaxTacks);
         c->SetAttribute("TackingTime", configuration.TackingTime);
+        c->SetAttribute("MaxUpwindPercentage", configuration.MaxUpwindPercentage);
 
         c->SetAttribute("UseGrib", configuration.UseGrib);
         c->SetAttribute("UseClimatology", configuration.UseClimatology);
@@ -1398,11 +1394,14 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.boatFileName = weather_routing_pi::StandardPath() + _T("Boat.xml");
     
     configuration.MaxDivertedCourse = 180;
+    configuration.MaxSearchAngle = 180;
     configuration.MaxWindKnots = 100;
     configuration.MaxSwellMeters = 20;
+
     configuration.MaxLatitude = 90;
     configuration.MaxTacks = -1;
     configuration.TackingTime = 0;
+    configuration.MaxUpwindPercentage = 100;
     
     configuration.UseGrib = configuration.UseClimatology = true;
     configuration.AllowDataDeficient = false;

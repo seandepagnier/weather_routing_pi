@@ -168,11 +168,14 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), *it));
 
     m_sMaxDivertedCourse->SetValue(configuration.MaxDivertedCourse);
+    m_sMaxSearchAngle->SetValue(configuration.MaxSearchAngle);
     m_sMaxWindKnots->SetValue(configuration.MaxWindKnots);
     m_sMaxSwellMeters->SetValue(configuration.MaxSwellMeters);
+
     m_sMaxLatitude->SetValue(configuration.MaxLatitude);
     m_sMaxTacks->SetValue(configuration.MaxTacks);
     m_sTackingTime->SetValue(configuration.TackingTime);
+    m_sMaxUpwindPercentage->SetValue(configuration.MaxUpwindPercentage);
 
     m_cbDetectLand->SetValue(configuration.DetectLand);
     m_cbCurrents->SetValue(configuration.Currents);
@@ -225,11 +228,14 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     configuration.DegreeSteps.sort();
 
     configuration.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
+    configuration.MaxSearchAngle = m_sMaxSearchAngle->GetValue();
     configuration.MaxWindKnots = m_sMaxWindKnots->GetValue();
     configuration.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
+
     configuration.MaxLatitude = m_sMaxLatitude->GetValue();
     configuration.MaxTacks = m_sMaxTacks->GetValue();
     configuration.TackingTime = m_sTackingTime->GetValue();
+    configuration.MaxUpwindPercentage = m_sMaxUpwindPercentage->GetValue();
 
     configuration.DetectLand = m_cbDetectLand->GetValue();
     configuration.Currents = m_cbCurrents->GetValue();
