@@ -891,12 +891,22 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
             
                     configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 180);
+                    configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 180);
                     configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
                     configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
+
                     configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
                     configuration.MaxTacks = AttributeDouble(e, "MaxTacks", -1);
                     configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
-            
+                    configuration.MaxUpwindPercentage = AttributeDouble(e, "MaxUpwindPercentage", 100);
+
+                    configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
+                    configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 3);
+                    configuration.CycloneDays = AttributeInt(e, "CycloneDays", 0);
+                    configuration.CycloneWindSpeed = AttributeInt(e, "CycloneWindSpeed", 50);
+                    configuration.CycloneClimatologyStartYear = AttributeInt
+                        (e, "CycloneClimatologyStartYear", 1985);
+                    
                     configuration.UseGrib = AttributeBool(e, "UseGrib", true);
                     configuration.UseClimatology = AttributeBool(e, "UseClimatology", true);
                     configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
@@ -978,6 +988,12 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("MaxTacks", configuration.MaxTacks);
         c->SetAttribute("TackingTime", configuration.TackingTime);
         c->SetAttribute("MaxUpwindPercentage", configuration.MaxUpwindPercentage);
+
+        c->SetAttribute("AvoidCycloneTracks", configuration.AvoidCycloneTracks);
+        c->SetAttribute("CycloneMonths", configuration.CycloneMonths);
+        c->SetAttribute("CycloneDays", configuration.CycloneDays);
+        c->SetAttribute("CycloneWindSpeed", configuration.CycloneWindSpeed);
+        c->SetAttribute("CycloneClimatologyStartYear", configuration.CycloneClimatologyStartYear);
 
         c->SetAttribute("UseGrib", configuration.UseGrib);
         c->SetAttribute("UseClimatology", configuration.UseClimatology);
@@ -1403,6 +1419,12 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.TackingTime = 0;
     configuration.MaxUpwindPercentage = 100;
     
+    configuration.AvoidCycloneTracks = false;
+    configuration.CycloneMonths = 3;
+    configuration.CycloneDays = 0;
+    configuration.CycloneWindSpeed = 50;
+    configuration.CycloneClimatologyStartYear = 1985;
+
     configuration.UseGrib = configuration.UseClimatology = true;
     configuration.AllowDataDeficient = false;
     configuration.DetectLand = true;

@@ -91,5 +91,5 @@ double average_longitude(double lon1, double lon2);
 
 class TiXmlElement;
 double AttributeDouble(TiXmlElement *e, const char *name, double def);
-bool AttributeBool(TiXmlElement *e, const char *name, bool def);
+int AttributeInt(TiXmlElement *e, const char *name, int def);
 bool AttributeBool(TiXmlElement *e, const char *name, bool def);

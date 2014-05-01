@@ -561,7 +561,8 @@ void RouteMapOverlay::UpdateDestination()
         if(done) {
             delete destination_position;
             destination_position = new Position(configuration.EndLat, configuration.EndLon,
-                                                endp->sailplan, endp->tacks, endp);
+                                                endp->sailplan, endp->tacks,
+                                                endp->upwind, endp->propagations, endp);
             last_destination_position = destination_position;
         } else
             last_destination_position = endp;

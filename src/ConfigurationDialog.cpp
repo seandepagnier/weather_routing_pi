@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -86,6 +86,14 @@ void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
 {
     SetStartDateTime(wxDateTime::Now());
     Update();
+}
+
+void ConfigurationDialog::OnAvoidCyclones( wxCommandEvent& event )
+{
+    m_sCycloneMonths->Enable(event.IsChecked());
+    m_sCycloneDays->Enable(event.IsChecked());
+    m_sCycloneWindSpeed->Enable(event.IsChecked());
+    m_sCycloneClimatologyStartYear->Enable(event.IsChecked());
 }
 
 void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )

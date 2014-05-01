@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -47,21 +47,24 @@ class SkipPosition;
 class Position
 {
 public:
-    Position(double latitude, double longitude, int sp=0, int t=0, Position *p=NULL);
+    Position(double latitude, double longitude, int sp=0, int t=0, int u=0, int pr=0, Position *p=NULL);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
 
     bool GetPlotData(GribRecordSet *grib, double dt,
                      RouteMapConfiguration &configuration, PlotData &data);
-    bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, wxDateTime &time,
+    bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, const wxDateTime &time,
                    RouteMapConfiguration &configuration);
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
 
     double lat, lon;
+
     int sailplan; /* which sail plan in the boat we are using */
     int tacks; /* how many times we have tacked to get to this position */
+    int upwind, propagations; /* propagation counts */
+
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */
 
@@ -165,13 +168,16 @@ struct RouteMapConfiguration {
     double MaxDivertedCourse, MaxSearchAngle, MaxWindKnots, MaxSwellMeters;
     double MaxLatitude, MaxTacks, TackingTime, MaxUpwindPercentage;
 
+    bool AvoidCycloneTracks;
+    int CycloneMonths, CycloneDays, CycloneWindSpeed, CycloneClimatologyStartYear;
+
     bool UseGrib, UseClimatology;
     bool AllowDataDeficient;
     bool DetectLand, Currents, InvertedRegions, Anchoring;
 
     std::list<double> DegreeSteps;
 
-    bool (*Climatology())(int setting, wxDateTime &, double, double, double &, double &);
+    bool (*Climatology())(int setting, const wxDateTime &, double, double, double &, double &);
 
     double StartLat, StartLon, EndLat, EndLon; /* computed values */
 
@@ -208,17 +214,24 @@ public:
     wxDateTime NewTime() { Lock(); wxDateTime time =  m_NewTime; Unlock(); return time; }
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
+
     void SetConfiguration(RouteMapConfiguration &o) { Lock();
         m_Configuration = o;
         m_bValid = m_Configuration.Update();
         m_bFinished = false;
         Unlock(); }
-    RouteMapConfiguration GetConfiguration() { Lock(); RouteMapConfiguration o = m_Configuration; Unlock(); return o; }
+    RouteMapConfiguration GetConfiguration() {
+        Lock(); RouteMapConfiguration o = m_Configuration; Unlock(); return o; }
+
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
     bool Propagate();
     wxDateTime EndDate();
 
-    static bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &);
+    static bool (*ClimatologyData)(int setting, const wxDateTime &, double, double, double &, double &);
+    static int (*ClimatologyCycloneTrackCrossings)(double lat1, double lon1, double lat2, double lon2,
+                                                   const wxDateTime &date, int dayrange, int min_windspeed,
+                                                   const wxDateTime &cyclonedata_startdate);
+
     static std::list<RouteMapPosition> Positions;
 
 protected:

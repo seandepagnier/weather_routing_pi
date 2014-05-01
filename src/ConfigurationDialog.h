@@ -62,6 +62,7 @@ protected:
     void OnUpdateSpin( wxSpinEvent& event ) { Update(); }
     void OnUpdateFile( wxFileDirPickerEvent& event ) { Update(); }
     void OnEditBoat( wxCommandEvent& event ) { EditBoat(); }
+    void OnAvoidCyclones( wxCommandEvent& event );
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );
     void OnClearDegreeSteps( wxCommandEvent& event );

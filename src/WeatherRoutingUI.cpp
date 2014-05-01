@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 30 2013)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -617,6 +617,90 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_panel12->Layout();
 	fgSizer951->Fit( m_panel12 );
 	m_notebook4->AddPage( m_panel12, _("Additional"), false );
+	m_pCyclones = new wxPanel( m_notebook4, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_pCyclones->Enable( false );
+	
+	wxFlexGridSizer* fgSizer941;
+	fgSizer941 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer941->SetFlexibleDirection( wxBOTH );
+	fgSizer941->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_cAvoidCycloneTracks = new wxCheckBox( m_pCyclones, wxID_ANY, _("Avoid crossing cyclone tracks"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer941->Add( m_cAvoidCycloneTracks, 0, wxALL, 5 );
+	
+	wxFlexGridSizer* fgSizer952;
+	fgSizer952 = new wxFlexGridSizer( 0, 5, 0, 0 );
+	fgSizer952->SetFlexibleDirection( wxBOTH );
+	fgSizer952->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText1281 = new wxStaticText( m_pCyclones, wxID_ANY, _("within"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1281->Wrap( -1 );
+	fgSizer952->Add( m_staticText1281, 0, wxALL, 5 );
+	
+	m_sCycloneMonths = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 6, 3 );
+	m_sCycloneMonths->Enable( false );
+	
+	fgSizer952->Add( m_sCycloneMonths, 0, wxALL, 5 );
+	
+	m_staticText1291 = new wxStaticText( m_pCyclones, wxID_ANY, _("Months"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1291->Wrap( -1 );
+	fgSizer952->Add( m_staticText1291, 0, wxALL, 5 );
+	
+	m_sCycloneDays = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 183, 0 );
+	m_sCycloneDays->Enable( false );
+	
+	fgSizer952->Add( m_sCycloneDays, 0, wxALL, 5 );
+	
+	m_staticText130 = new wxStaticText( m_pCyclones, wxID_ANY, _("Days"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText130->Wrap( -1 );
+	fgSizer952->Add( m_staticText130, 0, wxALL, 5 );
+	
+	
+	fgSizer941->Add( fgSizer952, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer96;
+	fgSizer96 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer96->SetFlexibleDirection( wxBOTH );
+	fgSizer96->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText1311 = new wxStaticText( m_pCyclones, wxID_ANY, _("With at least windspeed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1311->Wrap( -1 );
+	fgSizer96->Add( m_staticText1311, 0, wxALL, 5 );
+	
+	m_sCycloneWindSpeed = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 300, 50 );
+	m_sCycloneWindSpeed->Enable( false );
+	
+	fgSizer96->Add( m_sCycloneWindSpeed, 0, wxALL, 5 );
+	
+	m_staticText132 = new wxStaticText( m_pCyclones, wxID_ANY, _("knots"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText132->Wrap( -1 );
+	fgSizer96->Add( m_staticText132, 0, wxALL, 5 );
+	
+	
+	fgSizer941->Add( fgSizer96, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer97;
+	fgSizer97 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer97->SetFlexibleDirection( wxBOTH );
+	fgSizer97->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText133 = new wxStaticText( m_pCyclones, wxID_ANY, _("Climatology starting cyclone year"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText133->Wrap( -1 );
+	fgSizer97->Add( m_staticText133, 0, wxALL, 5 );
+	
+	m_sCycloneClimatologyStartYear = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1900, 3000, 1985 );
+	m_sCycloneClimatologyStartYear->Enable( false );
+	
+	fgSizer97->Add( m_sCycloneClimatologyStartYear, 0, wxALL, 5 );
+	
+	
+	fgSizer941->Add( fgSizer97, 1, wxEXPAND, 5 );
+	
+	
+	m_pCyclones->SetSizer( fgSizer941 );
+	m_pCyclones->Layout();
+	fgSizer941->Fit( m_pCyclones );
+	m_notebook4->AddPage( m_pCyclones, _("Cyclones"), false );
 	
 	sbSizer23->Add( m_notebook4, 1, wxEXPAND | wxALL, 5 );
 	
@@ -783,6 +867,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sMaxLatitude->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxTacks->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_cAvoidCycloneTracks->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
 	m_bAddDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
 	m_bRemoveDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
 	m_bClearDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );
@@ -817,6 +902,7 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sMaxLatitude->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxTacks->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_cAvoidCycloneTracks->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
 	m_bAddDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
 	m_bRemoveDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
 	m_bClearDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );

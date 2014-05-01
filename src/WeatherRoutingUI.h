@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Apr 30 2013)
+// C++ code generated with wxFormBuilder (version Oct  8 2012)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -178,6 +178,17 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText126;
 		wxSpinCtrl* m_sMaxUpwindPercentage;
 		wxStaticText* m_staticText127;
+		wxCheckBox* m_cAvoidCycloneTracks;
+		wxStaticText* m_staticText1281;
+		wxSpinCtrl* m_sCycloneMonths;
+		wxStaticText* m_staticText1291;
+		wxSpinCtrl* m_sCycloneDays;
+		wxStaticText* m_staticText130;
+		wxStaticText* m_staticText1311;
+		wxSpinCtrl* m_sCycloneWindSpeed;
+		wxStaticText* m_staticText132;
+		wxStaticText* m_staticText133;
+		wxSpinCtrl* m_sCycloneClimatologyStartYear;
 		wxListBox* m_lDegreeSteps;
 		wxTextCtrl* m_tDegreeStep;
 		wxButton* m_bAddDegreeStep;
@@ -203,6 +214,7 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdateFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClearDegreeSteps( wxCommandEvent& event ) { event.Skip(); }
@@ -215,6 +227,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxCheckBox* m_cbUseGrib;
 		wxCheckBox* m_cbUseClimatology;
 		wxCheckBox* m_cbCurrents;
+		wxPanel* m_pCyclones;
 		
 		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationDialogBase();

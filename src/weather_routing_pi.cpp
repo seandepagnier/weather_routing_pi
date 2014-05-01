@@ -228,14 +228,16 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         }
 
         wxString sptr = v[_T("ClimatologyDataPtr")].AsString();
-        wxCharBuffer bptr = sptr.To8BitData();
-        const char* ptr = bptr.data();
-        bool (*cptr)(int, wxDateTime &, double, double, double &, double &);
-        sscanf(ptr, "%p", &cptr);
+        sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyData);
 
-        RouteMap::ClimatologyData = cptr;
-        if(m_pWeather_Routing)
-            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseClimatology->Enable(cptr);
+        sptr = v[_T("ClimatologyCycloneTrackCrossingsPtr")].AsString();
+        sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyCycloneTrackCrossings);
+
+        if(m_pWeather_Routing) {
+            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseClimatology->Enable(RouteMap::ClimatologyData);
+            m_pWeather_Routing->m_ConfigurationDialog.m_pCyclones->Enable
+                (RouteMap::ClimatologyCycloneTrackCrossings);
+        }
     }
 }
 

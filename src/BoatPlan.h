@@ -106,7 +106,7 @@ public:
     void BoatSteadyState(double W, double VW, double &B, double &VB, double &A, double &VA,
                          Boat &boat);
     wxString TrySwitchBoatPlan(double VW, double H, double Swell,
-                               wxDateTime &gribtime, double lat, double lon, int &daytime);
+                               const wxDateTime &gribtime, double lat, double lon, int &daytime);
 
     BoatPlan(wxString PlanName, Boat &boat);
     ~BoatPlan();

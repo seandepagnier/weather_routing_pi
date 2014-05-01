@@ -586,7 +586,7 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
 /* this is not actually all that accurate (no oblate earth, refraction etc...
    but it's at least simple, could fix and optimize to only compute if
    there are possible plans which need this */
-static bool ComputeDayTime(wxDateTime &gribtime, double lat, double lon, int &daytime)
+static bool ComputeDayTime(const wxDateTime &gribtime, double lat, double lon, int &daytime)
 
 {
     if(daytime != -1)
@@ -600,7 +600,7 @@ static bool ComputeDayTime(wxDateTime &gribtime, double lat, double lon, int &da
 }
 
 wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
-                                     wxDateTime &gribtime, double lat, double lon, int &daytime)
+                                     const wxDateTime &gribtime, double lat, double lon, int &daytime)
 
 {
     H = abs(heading_resolve(H)); /* make this work for both tacks */

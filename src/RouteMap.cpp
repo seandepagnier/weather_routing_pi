@@ -119,8 +119,8 @@ static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
 enum {WIND, CURRENT};
 
 static bool Wind(GribRecordSet *grib,
-                 bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &),
-                 wxDateTime &time,
+                 bool (*ClimatologyData)(int setting, const wxDateTime &, double, double, double &, double &),
+                 const wxDateTime &time,
                  bool AllowDataDeficient, Position *p,
                  double &WG, double &VWG)
 {
@@ -162,8 +162,8 @@ static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
 }
 
 static bool Current(GribRecordSet *grib,
-                    bool (*ClimatologyData)(int setting, wxDateTime &, double, double, double &, double &),
-                    wxDateTime &time, double lat, double lon,
+                    bool (*ClimatologyData)(int setting, const wxDateTime &, double, double, double &, double &),
+                    const wxDateTime &time, double lat, double lon,
                     double &C, double &VC)
 {
     if(GribCurrent(grib, lat, lon, C, VC))
@@ -280,8 +280,10 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 }
 
 #define EPSILON (2e-10)
-Position::Position(double latitude, double longitude, int sp, int t, Position *p)
-    : lat(latitude), lon(longitude), sailplan(sp), tacks(t), parent(p), propagated(false)
+Position::Position(double latitude, double longitude, int sp, int t, int u, int pr, Position *p)
+    : lat(latitude), lon(longitude), sailplan(sp), tacks(t),
+      upwind(u), propagations(pr),
+      parent(p), propagated(false)
 {
     lat -= fmod(lat, EPSILON);
     lon -= fmod(lon, EPSILON);
@@ -289,6 +291,7 @@ Position::Position(double latitude, double longitude, int sp, int t, Position *p
 
 Position::Position(Position *p)
     : lat(p->lat), lon(p->lon), sailplan(p->sailplan), tacks(p->tacks),
+      upwind(p->upwind), propagations(p->propagations),
       parent(p->parent), propagated(p->propagated)
 {
 }
@@ -412,7 +415,7 @@ inline double TestDirection(double x1, double y1, double x2, double y2, double x
 /* create a looped route by propagating from a position by computing
    the location the boat would be in if sailed at various angles */
 bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
-                         wxDateTime &time, RouteMapConfiguration &configuration)
+                         const wxDateTime &time, RouteMapConfiguration &configuration)
 {
     /* already propagated from this position, don't need to again */
     if(propagated)
@@ -448,48 +451,61 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     int daytime = -1; /* unknown */
 
-    double bearing = 0, parentbearing = NAN;
+    /* compute parent bearing if needed for tacking determination,
+       the tack should probably be stored as a flag in the position class instead */
+    double parentbearing = NAN;
     if(parent && (configuration.TackingTime || configuration.MaxTacks>=0))
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
-    else if(configuration.MaxDivertedCourse == 180)
-        goto skipbearingcomputation;
 
-/* this way is nicer, but until we fix bugs... */
-//    ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, 0);
+    if(configuration.MaxDivertedCourse < 180) {
+        double bearing;
+        ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, lat, lon, &bearing, 0);
+        if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse)
+            return false;
+    }
 
-    ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, lat, lon, &bearing, 0);
-    if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse)
-        return false;
-
-skipbearingcomputation:
+    double bearing = NAN;
+    if(configuration.MaxSearchAngle < 180)
+        ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, 0);
 
     bool first_backtrackavoid = true;
     double timeseconds = configuration.dt;
     double d0, d1, d2;
     double dist;
+
+    bool tacked = false;
+    int cur_upwind = 0;
     for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
         it != configuration.DegreeSteps.end(); it++) {
         double H = *it;
         double B, VB;
 
         int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
-                                                         time, lat, lon, daytime);
+                                                               time, lat, lon, daytime);
 
-        B = W + H; /* rotated relative to wind */
+        B = W + H; /* rotated relative to true wind */
 
-#if 0
-        /* avoid propagating from positions which go in a direction too much
-           diverted from the correct course.  */
-        if(fabs(heading_resolve(B - bearing)) > configuration.MaxDivertedCourse) {
-#if 1
+        /* avoid propagating from positions which go in a direction outside of
+           the search angle from the correct course.  */
+        if(!isnan(bearing) && fabs(heading_resolve(B - bearing)) > configuration.MaxSearchAngle) {
             if(first_backtrackavoid && parent)
                 goto first_backtrack;
-#endif
             continue;
         }
-#endif
 
         VB = configuration.boat.Plans[newsailplan].Speed(H, VW);
+
+        /* perform upwind percentage calculation relative to apparent wind */
+        if(configuration.MaxUpwindPercentage < 100) {
+            double VA = BoatPlan::VelocityApparentWind(VB, deg2rad(H), VW);
+            double A = rad2deg(BoatPlan::DirectionApparentWind(VA, VB, deg2rad(H), VW));
+
+            if(fabs(A) < 90) { /* use 90 degrees.. maybe we can allow the user to set this */
+                if(100.0 * (upwind + 1) / (propagations + 1) > configuration.MaxUpwindPercentage)
+                    continue;
+                cur_upwind = 1;
+            }
+        }
 
         /* failed to determine speed.. I guess we can always drift? */
         if(isnan(B) || isnan(VB))
@@ -500,9 +516,8 @@ skipbearingcomputation:
         BoatOverGround(B, VB, C, VC, BG, VBG);
 
         /* did we tack? apply penalty */
-        double tacked = false;
         if(!isnan(parentbearing)) {
-            double hrpb = heading_resolve(parentbearing), hrb = heading_resolve(bearing);
+            double hrpb = heading_resolve(parentbearing), hrb = B;
             if(hrpb*hrb < 0 && fabs(hrpb - hrb) < 180) {
                 timeseconds -= configuration.TackingTime;
 
@@ -523,8 +538,6 @@ skipbearingcomputation:
             dlon += 360;
 
         /* test to avoid extra computations related to backtracking */
-        bool hitland;
-#if 1
         if(prev != next && parent) {
             d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
             d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
@@ -532,23 +545,36 @@ skipbearingcomputation:
 
             if((d1 > 0 && d2 > 0) || (d0 < 0 && (d1 > 0 || d2 > 0))) {
                 if(first_backtrackavoid) {
-//                first_backtrack:
+                first_backtrack:
                     /* use a position between here and parent instead */
                     const double lp = .95;
                     dlat = lp*lat + (1-lp)*parent->lat;
                     dlon = lp*lon + (1-lp)*parent->lon;
                     first_backtrackavoid = false;
-                    goto skiplandtest;
+                    goto addposition;
                 }
                 continue;
             }
         }
-#endif
-        hitland = configuration.DetectLand ? CrossesLand(dlat, nrdlon) : false;
-        if(!hitland && dist) {
-        skiplandtest:
-            Position *rp = new Position(dlat, dlon, newsailplan, tacks + tacked, this);
 
+        /* landfall test */
+        if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
+            continue;
+
+        /* crosses cyclone track(s)? */
+        if(configuration.AvoidCycloneTracks) {
+            int crossings = RouteMap::ClimatologyCycloneTrackCrossings
+                (lat, lon, dlat, dlon, time, configuration.CycloneMonths*30 +
+                 configuration.CycloneDays, configuration.CycloneWindSpeed,
+                 wxDateTime(0, 0, configuration.CycloneClimatologyStartYear));
+            if(crossings > 0)
+                continue;
+        }
+
+        if(dist) {
+           addposition:
+            Position *rp = new Position(dlat, dlon, newsailplan, tacks + tacked,
+                                        upwind + cur_upwind, propagations + 1, this);
             if(points) {
                 rp->prev=points->prev;
                 rp->next=points;
@@ -1808,13 +1834,16 @@ bool RouteMapConfiguration::Update()
 }
 
 bool (*RouteMapConfiguration::Climatology())
-(int setting, wxDateTime &, double, double, double &, double &)
+(int setting, const wxDateTime &, double, double, double &, double &)
 {
     return UseClimatology ? RouteMap::ClimatologyData : NULL;
 }
 
 bool (*RouteMap::ClimatologyData)
-(int setting, wxDateTime &, double, double, double &, double &) = NULL;
+(int setting, const wxDateTime &, double, double, double &, double &) = NULL;
+int (*RouteMap::ClimatologyCycloneTrackCrossings)(double, double, double, double,
+                                                  const wxDateTime &, int, int,
+                                                  const wxDateTime &) = NULL;
 
 std::list<RouteMapPosition> RouteMap::Positions;
 
@@ -1951,6 +1980,16 @@ bool RouteMap::Propagate()
             Unlock();
             return false;
         }
+    }
+
+    /* test for cyclone data if needed */
+    if(m_Configuration.AvoidCycloneTracks &&
+       (!ClimatologyCycloneTrackCrossings ||
+        ClimatologyCycloneTrackCrossings(0, 0, 0, 0, wxDateTime(), 0, 0, wxDateTime())==-1)) {
+        m_bFinished = true;
+        m_bClimatologyFailed = true;
+        Unlock();
+        return false;
     }
 
 

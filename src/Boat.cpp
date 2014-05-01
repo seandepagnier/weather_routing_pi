@@ -192,7 +192,7 @@ wxString Boat::SaveXML(wxString filename)
 }
 
 int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
-                            wxDateTime &gribtime, double lat, double lon, int &daytime)
+                            const wxDateTime &gribtime, double lat, double lon, int &daytime)
 {
     for(int rounds = 0; rounds < 10; rounds++) {
         BoatPlan &boatplan = Plans[curplan];
