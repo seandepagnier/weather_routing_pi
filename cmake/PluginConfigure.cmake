@@ -1,3 +1,9 @@
+##---------------------------------------------------------------------------
+## Author:      Sean D'Epagnier
+## Copyright:   
+## License:     GPLv3+
+##---------------------------------------------------------------------------
+
 SET(PLUGIN_SOURCE_DIR .)
 
 # This should be 2.8.0 to have FindGTK2 module
@@ -6,6 +12,8 @@ IF (COMMAND cmake_policy)
   CMAKE_POLICY(SET CMP0005 OLD)
   CMAKE_POLICY(SET CMP0011 OLD)
 ENDIF (COMMAND cmake_policy)
+
+MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
 configure_file(cmake/version.h.in ${CMAKE_SOURCE_DIR}/src/version.h)
 SET(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}" )
@@ -22,8 +30,8 @@ IF(NOT MSVC)
  IF(PROFILING)
   ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
  ELSE(PROFILING)
-  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
-# ADD_DEFINITIONS( "-Wall -g -O2 -fexceptions" )
+#  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
+ ADD_DEFINITIONS( "-Wall -g -O2 -fexceptions" )
  ENDIF(PROFILING)
 
  IF(NOT APPLE)

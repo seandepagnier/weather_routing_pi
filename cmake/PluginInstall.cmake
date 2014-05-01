@@ -1,3 +1,9 @@
+##---------------------------------------------------------------------------
+## Author:      Sean D'Epagnier
+## Copyright:   
+## License:     GPLv3+
+##---------------------------------------------------------------------------
+
 IF(NOT APPLE)
   TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${wxWidgets_LIBRARIES} ${EXTRA_LIBS} )
 ENDIF(NOT APPLE)
@@ -6,24 +12,23 @@ IF(WIN32)
   SET(PARENT "opencpn")
 
   IF(MSVC)
-    TARGET_LINK_LIBRARIES(${PACKAGE_NAME}
+#    TARGET_LINK_LIBRARIES(${PACKAGE_NAME}
 #	gdiplus.lib
-	glu32.lib)
+#	glu32.lib)
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${OPENGL_LIBRARIES})
+
     SET(OPENCPN_IMPORT_LIB "${PARENT}.lib")
   ENDIF(MSVC)
 
   IF(MINGW)
 # assuming wxwidgets is compiled with unicode, this is needed for mingw headers
     ADD_DEFINITIONS( " -DUNICODE" )
-    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${OPENGL_LIBRARIES} )
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${OPENGL_LIBRARIES})
     SET(OPENCPN_IMPORT_LIB "${PARENT}.dll")
+    SET( CMAKE_SHARED_LINKER_FLAGS "-L../buildwin" )
   ENDIF(MINGW)
 
-  SET( CMAKE_SHARED_LINKER_FLAGS "-L../buildwin" )
-  MESSAGE (STATUS "import lib: ${OPENCPN_IMPORT_LIB}")
-
   TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${OPENCPN_IMPORT_LIB} )
-  ADD_DEPENDENCIES(${PACKAGE_NAME} ${PARENT})
 ENDIF(WIN32)
 
 IF(UNIX)
