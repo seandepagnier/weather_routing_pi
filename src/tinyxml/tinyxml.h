@@ -33,6 +33,10 @@ distribution.
 #ifndef __WXMSW__
 #undef  DECL_EXP
 #define DECL_EXP       __attribute__((visibility("hidden")))
+#else
+# ifndef DECL_EXP  // make DECL_EXP empty
+# define DECL_EXP
+# endif
 #endif
 
 #ifdef _MSC_VER
