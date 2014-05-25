@@ -36,13 +36,13 @@
 #include <wx/spinctrl.h>
 #include <wx/filepicker.h>
 #include <wx/checkbox.h>
+#include <wx/radiobut.h>
 #include <wx/notebook.h>
 #include <wx/listbox.h>
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
 #include <wx/scrolwin.h>
 #include <wx/choice.h>
-#include <wx/radiobut.h>
 #include <wx/slider.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -77,6 +77,7 @@ class WeatherRoutingBase : public wxFrame
 		wxMenu* m_mHelp;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnEditConfigurationClick( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
@@ -151,6 +152,8 @@ class ConfigurationDialogBase : public wxDialog
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
+		wxRadioButton* m_rbNewton;
+		wxRadioButton* m_rbRuttaKunge;
 		wxNotebook* m_notebook4;
 		wxPanel* m_panel11;
 		wxStaticText* m_staticText20;

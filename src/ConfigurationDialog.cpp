@@ -94,6 +94,7 @@ void ConfigurationDialog::OnAvoidCyclones( wxCommandEvent& event )
     m_sCycloneDays->Enable(event.IsChecked());
     m_sCycloneWindSpeed->Enable(event.IsChecked());
     m_sCycloneClimatologyStartYear->Enable(event.IsChecked());
+    Update();
 }
 
 void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
@@ -175,6 +176,8 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
         it != configuration.DegreeSteps.end(); it++)
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), *it));
 
+    m_rbRuttaKunge->SetValue(configuration.Integrator == RouteMapConfiguration::RUTTA_KUNGE);
+
     m_sMaxDivertedCourse->SetValue(configuration.MaxDivertedCourse);
     m_sMaxSearchAngle->SetValue(configuration.MaxSearchAngle);
     m_sMaxWindKnots->SetValue(configuration.MaxWindKnots);
@@ -184,6 +187,12 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
     m_sMaxTacks->SetValue(configuration.MaxTacks);
     m_sTackingTime->SetValue(configuration.TackingTime);
     m_sMaxUpwindPercentage->SetValue(configuration.MaxUpwindPercentage);
+
+    m_cAvoidCycloneTracks->SetValue(configuration.AvoidCycloneTracks);
+    m_sCycloneMonths->SetValue(configuration.CycloneMonths);
+    m_sCycloneDays->SetValue(configuration.CycloneDays);
+    m_sCycloneWindSpeed->SetValue(configuration.CycloneWindSpeed);
+    m_sCycloneClimatologyStartYear->SetValue(configuration.CycloneClimatologyStartYear);
 
     m_cbDetectLand->SetValue(configuration.DetectLand);
     m_cbCurrents->SetValue(configuration.Currents);
@@ -235,6 +244,9 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     }
     configuration.DegreeSteps.sort();
 
+    configuration.Integrator = m_rbRuttaKunge->GetValue() ?
+        RouteMapConfiguration::RUTTA_KUNGE : RouteMapConfiguration::NEWTON;
+
     configuration.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
     configuration.MaxSearchAngle = m_sMaxSearchAngle->GetValue();
     configuration.MaxWindKnots = m_sMaxWindKnots->GetValue();
@@ -244,6 +256,12 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     configuration.MaxTacks = m_sMaxTacks->GetValue();
     configuration.TackingTime = m_sTackingTime->GetValue();
     configuration.MaxUpwindPercentage = m_sMaxUpwindPercentage->GetValue();
+
+    configuration.AvoidCycloneTracks = m_cAvoidCycloneTracks->GetValue();
+    configuration.CycloneMonths = m_sCycloneMonths->GetValue();
+    configuration.CycloneDays = m_sCycloneDays->GetValue();
+    configuration.CycloneWindSpeed = m_sCycloneWindSpeed->GetValue();
+    configuration.CycloneClimatologyStartYear = m_sCycloneClimatologyStartYear->GetValue();
 
     configuration.DetectLand = m_cbDetectLand->GetValue();
     configuration.Currents = m_cbCurrents->GetValue();

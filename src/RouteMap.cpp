@@ -457,12 +457,14 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     if(parent && (configuration.TackingTime || configuration.MaxTacks>=0))
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
 
+#if 0
     if(configuration.MaxDivertedCourse < 180) {
         double bearing;
         ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, lat, lon, &bearing, 0);
         if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse)
             return false;
     }
+#endif
 
     double bearing = NAN;
     if(configuration.MaxSearchAngle < 180)
@@ -482,14 +484,13 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
         int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
                                                                time, lat, lon, daytime);
-
         B = W + H; /* rotated relative to true wind */
 
         /* avoid propagating from positions which go in a direction outside of
            the search angle from the correct course.  */
         if(!isnan(bearing) && fabs(heading_resolve(B - bearing)) > configuration.MaxSearchAngle) {
-            if(first_backtrackavoid && parent)
-                goto first_backtrack;
+//            if(first_backtrackavoid && parent)
+//                goto first_backtrack;
             continue;
         }
 
@@ -536,7 +537,16 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         nrdlon = dlon;
         if(configuration.positive_longitudes && dlon < 0)
             dlon += 360;
+#if 1
+        if(configuration.MaxDivertedCourse < 180) {
+            double bearing;
+            ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, dlat, dlon, &bearing, 0);
+            if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse)
+                continue;
+        }
+#endif
 
+#if 0
         /* test to avoid extra computations related to backtracking */
         if(prev != next && parent) {
             d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
@@ -556,7 +566,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                 continue;
             }
         }
-
+#endif
         /* landfall test */
         if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
             continue;

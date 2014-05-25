@@ -774,9 +774,13 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         m_RunningRouteMaps.push_back(routemapoverlay);
         update = true;
     }
+
+    if(update)
+        UpdateStates();
         
     static int cycles; /* don't refresh all the time */
-    if(++cycles > 25 && CurrentRouteMap() && CurrentRouteMap()->Updated()) {
+    if((++cycles > 25 || !m_RunningRouteMaps.size())
+       && CurrentRouteMap() && CurrentRouteMap()->Updated()) {
         cycles = 0;
         m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
         if(m_StatisticsDialog.IsShown())
@@ -785,9 +789,6 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         m_StartTime = wxDateTime::Now();
         GetParent()->Refresh();
     }
-
-    if(update)
-        UpdateStates();
 
     if(m_RunningRouteMaps.size()) {
         /* todo, instead of respawning the funky timer here,
@@ -890,6 +891,9 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
             
                     configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
             
+                    configuration.Integrator = (RouteMapConfiguration::IntegratorType)
+                        AttributeInt(e, "Integrator", 0);
+
                     configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 180);
                     configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 180);
                     configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
@@ -978,6 +982,8 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("dt", configuration.dt);
 
         c->SetAttribute("Boat", configuration.boatFileName.ToUTF8());
+
+        c->SetAttribute("Integrator", configuration.Integrator);
 
         c->SetAttribute("MaxDivertedCourse", configuration.MaxDivertedCourse);
         c->SetAttribute("MaxSearchAngle", configuration.MaxSearchAngle);
@@ -1409,6 +1415,8 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     
     configuration.boatFileName = weather_routing_pi::StandardPath() + _T("Boat.xml");
     
+    configuration.Integrator = RouteMapConfiguration::NEWTON;
+
     configuration.MaxDivertedCourse = 180;
     configuration.MaxSearchAngle = 180;
     configuration.MaxWindKnots = 100;

@@ -503,7 +503,6 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type)
         count++;
     }
 
-
     switch(type) {
     case DISTANCE:
         if(total == 0)

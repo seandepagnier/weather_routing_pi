@@ -95,6 +95,7 @@ private:
 //    void OnListLabelEdit( wxListEvent& event );
     void OnRemovePosition( wxCommandEvent& event );
     void OnClearPositions( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& event ) { Hide(); }
     void OnEditConfiguration();
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );

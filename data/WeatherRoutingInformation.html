@@ -48,14 +48,20 @@ The Supported Options Include:
     Less than 3 degrees between steps usually takes a long time to calculate and it is usually
     better to use a shorter time step instead.</li>
   <li><b>Time Step</b> Time to sail before considering a course or sail change.</li>
-  <li><b>Max Diverted Course</b> Maximum course error from heading toward target destination to attempt.
+  <li><b>Integrator</b> Newton's method is default and fastest, but doesn't take into account changes
+    in boat speed along each step.  Rutta Kunge is much more accurate but slower.</li>
+  <li><b>Max Diverted Course</b> Maximum course error in heading from start toward target destination to attempt.
   If set to 180, the map will expand in all directions, and can be used to find multiple destinations
   from a given source.  If set less than 180, computation time can be greatly reduced
     (as it tends to take a very long time as the map expands), but not all possible courses will be considered and therefore the optimal route may not be found.</li>
+  <li><b>Max Search Angle</b> Like Max Diverted Course, except the heading error is based at the current position on the graph rather than the start position.</li>
   <li><b>Max Wind Knots</b> Do not navigate in areas with more wind than this value.</li>
   <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
   <li><b>Max Latitude</b> Do not navigate above (or below in the southern hemisphere) this latitude.</li>
   <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.  This is normally irrelevant for ocean passages, but could be useful for routes in tight quarters  Setting to 0 avoids extra calculations. </li>
+  <li><b>Max Upwind Percentage</b> Limits the total sailing course to a given percentage of the time when
+    the apparent wind is forward of the beam.</li>
+  <li><b>Avoid Cyclone Tracks</b> Uses climatology cyclone tracks to avoid routings which cross historic cyclones with given parameters</li>
   <li><b>Detect Land</b> Use GSHHS coastline data to avoid sailing through land.  It is recommended to upgrade to the high resolution background map <a href="http://opencpn.org/ocpn/chart_sources">available here</a></li>
   <li><b>Inverted Regions</b> This is relatively rare, but in some cases it may be
     possible to reach some location from two different routes (imagine either side of an island)

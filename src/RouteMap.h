@@ -165,6 +165,9 @@ struct RouteMapConfiguration {
     Boat boat;
     wxString boatFileName;
     
+    enum IntegratorType { NEWTON, RUTTA_KUNGE };
+    IntegratorType Integrator;
+
     double MaxDivertedCourse, MaxSearchAngle, MaxWindKnots, MaxSwellMeters;
     double MaxLatitude, MaxTacks, TackingTime, MaxUpwindPercentage;
 
