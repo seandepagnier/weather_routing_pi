@@ -445,6 +445,8 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
     RouteMapOverlay *routemapoverlay = CurrentRouteMap();
 
     if(routemapoverlay) {
+        routemapoverlay->SetCursorLatLon(m_weather_routing_pi.m_cursor_lat,
+                                         m_weather_routing_pi.m_cursor_lon);
         m_tHideConfiguration.Stop();
         m_bSkipUpdateCurrentItem = true;
         m_ConfigurationDialog.SetConfiguration(routemapoverlay->GetConfiguration());

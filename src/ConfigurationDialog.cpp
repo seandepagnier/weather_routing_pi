@@ -176,7 +176,8 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
         it != configuration.DegreeSteps.end(); it++)
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), *it));
 
-    m_rbRuttaKunge->SetValue(configuration.Integrator == RouteMapConfiguration::RUTTA_KUNGE);
+    m_rbNewton->SetValue(configuration.Integrator == RouteMapConfiguration::NEWTON);
+    m_rbRungeKutta->SetValue(configuration.Integrator == RouteMapConfiguration::RUNGE_KUTTA);
 
     m_sMaxDivertedCourse->SetValue(configuration.MaxDivertedCourse);
     m_sMaxSearchAngle->SetValue(configuration.MaxSearchAngle);
@@ -244,8 +245,8 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     }
     configuration.DegreeSteps.sort();
 
-    configuration.Integrator = m_rbRuttaKunge->GetValue() ?
-        RouteMapConfiguration::RUTTA_KUNGE : RouteMapConfiguration::NEWTON;
+    configuration.Integrator = m_rbRungeKutta->GetValue() ?
+        RouteMapConfiguration::RUNGE_KUTTA : RouteMapConfiguration::NEWTON;
 
     configuration.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
     configuration.MaxSearchAngle = m_sMaxSearchAngle->GetValue();

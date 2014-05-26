@@ -96,6 +96,7 @@ public:
       void ShowMenuItems(bool show);
 
       double m_boat_lat, m_boat_lon;
+      double m_cursor_lat, m_cursor_lon;
 
 private:
       void OnCursorLatLonTimer( wxTimerEvent & );
@@ -114,7 +115,6 @@ private:
       int              m_position_menu_id;
 
       wxTimer m_tCursorLatLon;
-      double m_cursor_lat, m_cursor_lon;
 };
 
 #endif

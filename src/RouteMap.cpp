@@ -205,6 +205,11 @@ static void OverWater(double C, double VC, double WG, double VWG, double &WA, do
 
 static void BoatOverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
 {
+    if(VC == 0) { // short-cut if no currents
+        BG = B, VBG = VB;
+        return;
+    }
+
     double Cx = VC * cos(deg2rad(C));
     double Cy = VC * sin(deg2rad(C));
     double BGx = VB * cos(deg2rad(B)) + Cx;
@@ -404,6 +409,43 @@ bool Position::GetPlotData(GribRecordSet *grib, double dt,
     return false;
 }
 
+bool rk_step(double lat, double lon, double timeseconds, double BG, double dist, double H,
+             RouteMapConfiguration &configuration, GribRecordSet *grib,
+             const wxDateTime &time, int newsailplan,
+             double &k1_BG, double &k1_dist)
+{
+    double k1_lat, k1_lon;
+    ll_gc_ll(lat, lon, BG, dist, &k1_lat, &k1_lon);
+
+    double k1_WG, k1_VWG;
+    Position k1(k1_lat, k1_lon);
+    if(!Wind(grib, configuration.Climatology(), time,
+             configuration.AllowDataDeficient, &k1, k1_WG, k1_VWG))
+        return false;
+    
+    double k1_C, k1_VC;
+    double k1_W, k1_VW;
+    if(!configuration.Currents || !Current(grib, configuration.Climatology(),
+                                           time, k1_lat, k1_lon, k1_C, k1_VC)) {
+        k1_C = k1_VC = 0;
+        k1_W = k1_WG, k1_VW = k1_VWG;
+    } else
+        OverWater(k1_C, k1_VC, k1_WG, k1_VWG, k1_W, k1_VW);
+
+    double k1_B = k1_W + H; /* rotated relative to true wind */
+    double k1_VB = configuration.boat.Plans[newsailplan].Speed(H, k1_VW);
+
+    if(isnan(k1_B) || isnan(k1_VB))
+        return false;
+
+    /* compound boatspeed with current */
+    double k1_VBG;
+    BoatOverGround(k1_B, k1_VB, k1_C, k1_VC, k1_BG, k1_VBG);
+
+    k1_dist = k1_VBG * timeseconds / 3600.0;
+    return true;
+}
+
 inline double TestDirection(double x1, double y1, double x2, double y2, double x3, double y3)
 {
     double ax = x2 - x1, ay = y2 - y1;
@@ -508,9 +550,9 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             }
         }
 
-        /* failed to determine speed.. I guess we can always drift? */
+        /* failed to determine speed.. */
         if(isnan(B) || isnan(VB))
-            B = VB = 0;
+            return false; //B = VB = 0;
 
         /* compound boatspeed with current */
         double BG, VBG;
@@ -532,7 +574,34 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         dist = VBG * timeseconds / 3600.0;
 
         double dlat, dlon, nrdlon;
-        ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
+        if(configuration.Integrator == RouteMapConfiguration::RUNGE_KUTTA) {
+            double k2_dist, k2_BG, k3_dist, k3_BG, k4_dist, k4_BG;
+#if 0
+            if(!rk_step(lat, lon, timeseconds,    BG,    dist/2, H,
+                        configuration, grib, time, newsailplan, k2_BG, k2_dist) ||
+               !rk_step(lat, lon, timeseconds, k2_BG, k2_dist/2, H,
+                        configuration, grib, time, newsailplan, k3_BG, k3_dist) ||
+               !rk_step(lat, lon, timeseconds, k3_BG, k3_dist,   H,
+                        configuration, grib, time, newsailplan, k4_BG, k4_dist))
+                continue;
+            ll_gc_ll(lat,  lon,     BG,    dist/6, &dlat, &dlon);
+            ll_gc_ll(dlat, dlon, k2_BG, k2_dist/3, &dlat, &dlon);
+            ll_gc_ll(dlat, dlon, k3_BG, k3_dist/3, &dlat, &dlon);
+            ll_gc_ll(dlat, dlon, k4_BG, k4_dist/6, &dlat, &dlon);
+#else
+            if(!rk_step(lat, lon, timeseconds, BG,    dist/2, H,
+                        configuration, grib, time, newsailplan, k2_BG, k2_dist) ||
+               !rk_step(lat, lon, timeseconds, BG, k2_dist/2, H + k2_BG - BG,
+                        configuration, grib, time, newsailplan, k3_BG, k3_dist) ||
+               !rk_step(lat, lon, timeseconds, BG, k3_dist,   H + k3_BG - BG,
+                        configuration, grib, time, newsailplan, k4_BG, k4_dist))
+                continue;
+
+            ll_gc_ll(lat, lon, BG, dist/6 + k2_dist/3 + k3_dist/3 + k4_dist/6, &dlat, &dlon);
+#endif
+            
+        } else /* newtons method */
+            ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
 
         nrdlon = dlon;
         if(configuration.positive_longitudes && dlon < 0)
@@ -546,7 +615,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         }
 #endif
 
-#if 0
+#if 1
         /* test to avoid extra computations related to backtracking */
         if(prev != next && parent) {
             d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
@@ -605,6 +674,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 #if 1
     routelist.push_back(nr);
 #else
+    bool Normalize(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions);
     Normalize(routelist, nr, nr, 0, configuration.InvertedRegions);
 #endif
     return true;

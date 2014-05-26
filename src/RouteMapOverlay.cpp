@@ -223,7 +223,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 if(!m_overlaylist)
                     m_overlaylist = glGenLists(1);
             
-                glNewList(m_overlaylist, GL_COMPILE_AND_EXECUTE);
+                glNewList(m_overlaylist, GL_COMPILE);
 
                 nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
                 nvp.view_scale_ppm = NORM_FACTOR;
@@ -301,6 +301,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         
             if(!dc.GetDC()) {
                 glEndList();
+                glCallList(m_overlaylist);
                 glPopMatrix();
             }
         }

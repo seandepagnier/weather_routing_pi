@@ -153,7 +153,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
 		wxRadioButton* m_rbNewton;
-		wxRadioButton* m_rbRuttaKunge;
+		wxRadioButton* m_rbRungeKutta;
 		wxNotebook* m_notebook4;
 		wxPanel* m_panel11;
 		wxStaticText* m_staticText20;
