@@ -428,10 +428,28 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	fgSizer59->Add( m_cbUseGrib, 0, wxALL, 5 );
 	
-	m_cbUseClimatology = new wxCheckBox( this, wxID_ANY, _("Climatology"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cbUseClimatology->Enable( false );
+	wxStaticBoxSizer* sbSizer34;
+	sbSizer34 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Climatology") ), wxVERTICAL );
 	
-	fgSizer59->Add( m_cbUseClimatology, 0, wxALL, 5 );
+	wxFlexGridSizer* fgSizer961;
+	fgSizer961 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer961->AddGrowableCol( 1 );
+	fgSizer961->SetFlexibleDirection( wxBOTH );
+	fgSizer961->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxString m_cClimatologyTypeChoices[] = { _("Disable"), _("Cumulative Map"), _("Cumulative - Calms"), _("Most Likely"), _("Average") };
+	int m_cClimatologyTypeNChoices = sizeof( m_cClimatologyTypeChoices ) / sizeof( wxString );
+	m_cClimatologyType = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cClimatologyTypeNChoices, m_cClimatologyTypeChoices, 0 );
+	m_cClimatologyType->SetSelection( 1 );
+	m_cClimatologyType->Enable( false );
+	
+	fgSizer961->Add( m_cClimatologyType, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sbSizer34->Add( fgSizer961, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer59->Add( sbSizer34, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer58->Add( fgSizer59, 1, wxEXPAND, 5 );
@@ -853,7 +871,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_fpBoat->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ConfigurationDialogBase::OnUpdateFile ), NULL, this );
 	m_bEditBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnEditBoat ), NULL, this );
 	m_cbUseGrib->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbUseClimatology->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cClimatologyType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbAllowDataDeficient->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbDetectLand->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbCurrents->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
@@ -896,7 +914,7 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_fpBoat->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ConfigurationDialogBase::OnUpdateFile ), NULL, this );
 	m_bEditBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnEditBoat ), NULL, this );
 	m_cbUseGrib->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_cbUseClimatology->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cClimatologyType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbAllowDataDeficient->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbDetectLand->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbCurrents->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );

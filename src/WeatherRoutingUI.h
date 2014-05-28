@@ -36,13 +36,13 @@
 #include <wx/spinctrl.h>
 #include <wx/filepicker.h>
 #include <wx/checkbox.h>
+#include <wx/choice.h>
 #include <wx/radiobut.h>
 #include <wx/notebook.h>
 #include <wx/listbox.h>
 #include <wx/dialog.h>
 #include <wx/clrpicker.h>
 #include <wx/scrolwin.h>
-#include <wx/choice.h>
 #include <wx/slider.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -228,7 +228,7 @@ class ConfigurationDialogBase : public wxDialog
 	public:
 		wxDatePickerCtrl* m_dpStartDate;
 		wxCheckBox* m_cbUseGrib;
-		wxCheckBox* m_cbUseClimatology;
+		wxChoice* m_cClimatologyType;
 		wxCheckBox* m_cbCurrents;
 		wxPanel* m_pCyclones;
 		

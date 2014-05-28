@@ -174,13 +174,14 @@ struct RouteMapConfiguration {
     bool AvoidCycloneTracks;
     int CycloneMonths, CycloneDays, CycloneWindSpeed, CycloneClimatologyStartYear;
 
-    bool UseGrib, UseClimatology;
+    bool UseGrib;
+    enum ClimatologyDataType {DISABLED, CUMULATIVE_MAP, CUMULATIVE_MINUS_CALMS, MOST_LIKELY, AVERAGE};
+    enum ClimatologyDataType ClimatologyType;
     bool AllowDataDeficient;
+
     bool DetectLand, Currents, InvertedRegions, Anchoring;
 
     std::list<double> DegreeSteps;
-
-    bool (*Climatology())(int setting, const wxDateTime &, double, double, double &, double &);
 
     double StartLat, StartLon, EndLat, EndLon; /* computed values */
 
@@ -231,6 +232,8 @@ public:
     wxDateTime EndDate();
 
     static bool (*ClimatologyData)(int setting, const wxDateTime &, double, double, double &, double &);
+    static bool (*ClimatologyWindAtlasData)(const wxDateTime &, double, double, int &count,
+                                            double *, double *, double &, double &);
     static int (*ClimatologyCycloneTrackCrossings)(double lat1, double lon1, double lat2, double lon2,
                                                    const wxDateTime &date, int dayrange, int min_windspeed,
                                                    const wxDateTime &cyclonedata_startdate);

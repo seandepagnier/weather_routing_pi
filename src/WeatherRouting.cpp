@@ -914,7 +914,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                         (e, "CycloneClimatologyStartYear", 1985);
                     
                     configuration.UseGrib = AttributeBool(e, "UseGrib", true);
-                    configuration.UseClimatology = AttributeBool(e, "UseClimatology", true);
+                    configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
+                        AttributeInt(e, "ClimatologyType", RouteMapConfiguration::CUMULATIVE_MAP);
                     configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
                     configuration.DetectLand = AttributeBool(e, "DetectLand", true);
                     configuration.Currents = AttributeBool(e, "Currents", true);
@@ -1004,8 +1005,9 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("CycloneClimatologyStartYear", configuration.CycloneClimatologyStartYear);
 
         c->SetAttribute("UseGrib", configuration.UseGrib);
-        c->SetAttribute("UseClimatology", configuration.UseClimatology);
+        c->SetAttribute("UseClimatology", configuration.ClimatologyType);
         c->SetAttribute("AllowDataDeficient", configuration.AllowDataDeficient);
+
         c->SetAttribute("DetectLand", configuration.DetectLand);
         c->SetAttribute("Currents", configuration.Currents);
         c->SetAttribute("InvertedRegions", configuration.InvertedRegions);
@@ -1435,7 +1437,8 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.CycloneWindSpeed = 50;
     configuration.CycloneClimatologyStartYear = 1985;
 
-    configuration.UseGrib = configuration.UseClimatology = true;
+    configuration.UseGrib = true;
+    configuration.ClimatologyType = RouteMapConfiguration::CUMULATIVE_MAP;
     configuration.AllowDataDeficient = false;
     configuration.DetectLand = true;
     configuration.Currents = false;

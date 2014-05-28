@@ -14,20 +14,20 @@ it is possible to form a map determining the best route
 to any given location within the map.
 
 <h3><u>Quick Start</u></h3>
-First, load the grib file used for routing using the grib plugin.  Next, open the Weather Routing plugin from the main toolbar and right click the map and Select "Weather Route Position" at the starting location.  Repeat this step for the destination.  Now, from the Configuration menu (next to File) Select "New".  From here you must configure your vessel correctly in the boat dialog.  When ready, select "Compute" from the Configuration menu to compute the weather route.
+First, load the grib file used for routing using the grib plugin.  Next, open the Weather Routing plugin from the main toolbar and right click the map and Select "Weather Route Position" at the starting location.  Repeat this step for the destination.  Now, in the Weather Routing window from the Configuration menu (next to File) Select "New".  From here you must configure your vessel correctly in the boat dialog.  When ready, select "Compute" from the Configuration menu to compute the weather route.
 
 <h3><u>Warning</u></h3>
-As of July 2, 2013, the algorithm exhibits a few flaws which can result in suboptimal
+As of May 27, 2014, the algorithm exhibits a few flaws which can result in suboptimal
 routes.  Try increasing the time step and/or disabling currents to help mitigate these.
 
   <h3><u>Background</u></h3>
 
-<p>Integration with the grib plugin (version 2.1 or later) allows for
+<p>Integration with the grib plugin (versioin 2.1 or later) allows for
 knowledge of weather conditions.  The climatology plugin can also
 provide a source of data for longer voyages, but be warned that using
 the climatology data, especially in variable wind areas is unlikely
-to give useful results.  Using climatology for currents is more useful
-and can be used with grib wind data when current data is not available.
+to give realistic results.  Using climatology for currents is more useful
+and can be used with grib wind data when grib current data is not available.
 <br>
 For example, in the case where data is valid from both sources,
 grib will always be choosen.  If current data is available from climatology,
@@ -39,7 +39,7 @@ as the computation proceeds.  Once a computation is completed, the
 course and position of the boat as it sails along the computed route
 can be viewed during grib playback.
 
-<p>Wind data is required; if no Current or wave height is available, they are assumed to be zero.
+<p>Wind data is required; if no Current or Swell data is available, they are assumed to be zero.
 
 <p>
 The Supported Options Include:
@@ -48,6 +48,18 @@ The Supported Options Include:
     Less than 3 degrees between steps usually takes a long time to calculate and it is usually
     better to use a shorter time step instead.</li>
   <li><b>Time Step</b> Time to sail before considering a course or sail change.</li>
+  <li><b>Grib</b> Enable using current grib from grib plugin.</li>
+  <li><b>Climatology</b> <ul>
+      <li><b>Disable</b> do not allow climatology to be used</li>
+      <li><b>Cumulative Map</b> Pretend the wind comes from all of the directions in the wind atlas
+        for the percentage of time based on the atlas.</li>
+      <li><b>Cumulative - Calms</b> Like Cumulative Map, except the boat also drifts without sailing
+        during calms.</li>
+      <li><b>Most Likely</b> Use the most likely wind direction from atlas, with most likely wind speed</li>
+      <li><b>Average</b> Use wind vector average for wind direction,
+        and wind magnitude average for wind speed</li></ul>
+  <li><b>Allow Data Deficient</b> Continue to navigate on last valid wind data
+    even if there is no more valid wind data in the area/time.</li>
   <li><b>Integrator</b> Newton's method is default and fastest, but doesn't take into account changes
     in boat speed along each step.  Rutta Kunge is much more accurate but slower.</li>
   <li><b>Max Diverted Course</b> Maximum course error in heading from start toward target destination to attempt.
@@ -74,8 +86,6 @@ The Supported Options Include:
     isn't too deep) rather than continue to navigate if there is a contrary current which
     is swifter than the boat can travel.  This allows the route to reach the destination sooner
     by sitting in place until the current abades.</li>
-  <li><b>Allow Data Deficient</b> Continue to navigate on last valid wind data
-    even if there is no more valid wind data in the area/time.</li>
 </ul>
 
 <H3>Boat</H3>
@@ -176,7 +186,7 @@ would enable you to gauge how essential it is to actually paint a bottom, or if
 you don't mind (as I have done many times) to clean your bottom in the middle
 of the ocean, you could calculate how much time it would save (hopefully more
 than the time spent scraping the growth off).  There is also the case of sails losing shape, and
-becoming less efficient over the course of a long passage.
+becoming less efficient over the course of a very long passage.
 
 <p><h4>The Weather Routing plugin is written and maintained by <a href="http://seandepagnier.users.sourceforge.net">Sean D'Epagnier</a></h4>
 </body></html>

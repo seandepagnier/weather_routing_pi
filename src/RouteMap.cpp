@@ -118,19 +118,52 @@ static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
 
 enum {WIND, CURRENT};
 
-static bool Wind(GribRecordSet *grib,
-                 bool (*ClimatologyData)(int setting, const wxDateTime &, double, double, double &, double &),
-                 const wxDateTime &time,
-                 bool AllowDataDeficient, Position *p,
-                 double &WG, double &VWG)
+
+static bool Wind(GribRecordSet *grib, RouteMapConfiguration::ClimatologyDataType climatology,
+                 const wxDateTime &time, bool AllowDataDeficient,
+                 Position *p, double &WG, double &VWG)
 {
     do {
         if(GribWind(grib, p->lat, p->lon, WG, VWG))
             return true;
 
-        if(ClimatologyData && ClimatologyData(WIND, time, p->lat, p->lon, WG, VWG)) {
-            WG = heading_resolve(WG + 180); /* direction comming from */
+        switch(climatology) {
+        case RouteMapConfiguration::CUMULATIVE_MAP:
+        case RouteMapConfiguration::CUMULATIVE_MINUS_CALMS:
+        case RouteMapConfiguration::MOST_LIKELY:
+        {
+            int count = 8;
+            double directions[8], speeds[8], storm, calm;
+            if(!RouteMap::ClimatologyWindAtlasData(time, p->lat, p->lon, count,
+                                                   directions, speeds, storm, calm))
+                break;
+
+            switch(climatology) {
+            case RouteMapConfiguration::CUMULATIVE_MAP:
+            case RouteMapConfiguration::CUMULATIVE_MINUS_CALMS:
+                break;
+            case RouteMapConfiguration::MOST_LIKELY:
+            {
+                double max_direction = 0;
+                int maxi;
+                for(int i=0; i<count; i++)
+                    if(directions[i] > max_direction) {
+                        max_direction = directions[i];
+                        maxi = i;
+                    }
+                WG = 360*maxi/count;
+                VWG = speeds[maxi];
+            } break;
+            default: return false;
+            }
             return true;
+        } break;
+        case RouteMapConfiguration::AVERAGE:
+            if(RouteMap::ClimatologyData(WIND, time, p->lat, p->lon, WG, VWG)) {
+                WG = heading_resolve(WG + 180); /* direction comming from */
+                return true;
+            }
+        default: break;
         }
 
         p = p->parent; /* should we use parent's time here ? */
@@ -161,15 +194,15 @@ static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
     return true;
 }
 
-static bool Current(GribRecordSet *grib,
-                    bool (*ClimatologyData)(int setting, const wxDateTime &, double, double, double &, double &),
+static bool Current(GribRecordSet *grib, RouteMapConfiguration::ClimatologyDataType climatology,
                     const wxDateTime &time, double lat, double lon,
                     double &C, double &VC)
 {
     if(GribCurrent(grib, lat, lon, C, VC))
         return true;
 
-    if(ClimatologyData && ClimatologyData(CURRENT, time, lat, lon, C, VC))
+    if(climatology != RouteMapConfiguration::DISABLED &&
+       RouteMap::ClimatologyData(CURRENT, time, lat, lon, C, VC))
         return true;
 
     return false;
@@ -387,11 +420,11 @@ bool Position::GetPlotData(GribRecordSet *grib, double dt,
                            RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(grib, lat, lon);
-    if(!Wind(grib, configuration.Climatology(), data.time,
+    if(!Wind(grib, configuration.ClimatologyType, data.time,
              configuration.AllowDataDeficient, this, data.WG, data.VWG))
         return false;
 
-    if(!Current(grib, configuration.Climatology(), data.time, lat, lon, data.C, data.VC))
+    if(!Current(grib, configuration.ClimatologyType, data.time, lat, lon, data.C, data.VC))
         data.C = data.VC = 0;
 
     OverWater(data.C, data.VC, data.WG, data.VWG, data.W, data.VW);
@@ -419,13 +452,13 @@ bool rk_step(double lat, double lon, double timeseconds, double BG, double dist,
 
     double k1_WG, k1_VWG;
     Position k1(k1_lat, k1_lon);
-    if(!Wind(grib, configuration.Climatology(), time,
+    if(!Wind(grib, configuration.ClimatologyType, time,
              configuration.AllowDataDeficient, &k1, k1_WG, k1_VWG))
         return false;
     
     double k1_C, k1_VC;
     double k1_W, k1_VW;
-    if(!configuration.Currents || !Current(grib, configuration.Climatology(),
+    if(!configuration.Currents || !Current(grib, configuration.ClimatologyType,
                                            time, k1_lat, k1_lon, k1_C, k1_VC)) {
         k1_C = k1_VC = 0;
         k1_W = k1_WG, k1_VW = k1_VWG;
@@ -477,7 +510,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         return false;
 
     double WG, VWG;
-    if(!Wind(grib, configuration.Climatology(), time, configuration.AllowDataDeficient, this, WG, VWG))
+    if(!Wind(grib, configuration.ClimatologyType, time, configuration.AllowDataDeficient, this, WG, VWG))
         return false;
 
     if(VWG > configuration.MaxWindKnots)
@@ -485,7 +518,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     double C, VC;
     double W, VW;
-    if(!configuration.Currents || !Current(grib, configuration.Climatology(), time, lat, lon, C, VC)) {
+    if(!configuration.Currents || !Current(grib, configuration.ClimatologyType, time, lat, lon, C, VC)) {
         C = VC = 0;
         W = WG, VW = VWG;
     } else
@@ -498,15 +531,6 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     double parentbearing = NAN;
     if(parent && (configuration.TackingTime || configuration.MaxTacks>=0))
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
-
-#if 0
-    if(configuration.MaxDivertedCourse < 180) {
-        double bearing;
-        ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, lat, lon, &bearing, 0);
-        if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxDivertedCourse)
-            return false;
-    }
-#endif
 
     double bearing = NAN;
     if(configuration.MaxSearchAngle < 180)
@@ -531,8 +555,8 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         /* avoid propagating from positions which go in a direction outside of
            the search angle from the correct course.  */
         if(!isnan(bearing) && fabs(heading_resolve(B - bearing)) > configuration.MaxSearchAngle) {
-//            if(first_backtrackavoid && parent)
-//                goto first_backtrack;
+            if(first_backtrackavoid && parent)
+                goto first_backtrack;
             continue;
         }
 
@@ -967,7 +991,7 @@ bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfi
     double timeseconds = configuration.dt;
     do {
         double C, VC;
-        if(configuration.Currents && Current(grib, configuration.Climatology(),
+        if(configuration.Currents && Current(grib, configuration.ClimatologyType,
                                              time, p->lat, p->lon, C, VC)) {
             /* drift distance over ground */
             double dist = VC * timeseconds / 3600.0;
@@ -1913,14 +1937,10 @@ bool RouteMapConfiguration::Update()
     return true;
 }
 
-bool (*RouteMapConfiguration::Climatology())
-(int setting, const wxDateTime &, double, double, double &, double &)
-{
-    return UseClimatology ? RouteMap::ClimatologyData : NULL;
-}
-
 bool (*RouteMap::ClimatologyData)
 (int setting, const wxDateTime &, double, double, double &, double &) = NULL;
+bool (*RouteMap::ClimatologyWindAtlasData)(const wxDateTime &, double, double, int &count,
+                                           double *, double *, double &, double &) = NULL;
 int (*RouteMap::ClimatologyCycloneTrackCrossings)(double, double, double, double,
                                                   const wxDateTime &, int, int,
                                                   const wxDateTime &) = NULL;
@@ -2037,7 +2057,7 @@ bool RouteMap::Propagate()
        (!m_NewGrib ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       !m_Configuration.UseClimatology &&
+       m_Configuration.ClimatologyType == RouteMapConfiguration::DISABLED &&
        !m_Configuration.AllowDataDeficient) {
         m_bFinished = true;
         m_bGribFailed = true;
@@ -2048,7 +2068,8 @@ bool RouteMap::Propagate()
     if((!m_NewGrib ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       m_Configuration.UseClimatology && ClimatologyData &&
+       m_Configuration.ClimatologyType != RouteMapConfiguration::DISABLED
+       && ClimatologyData &&
        !m_Configuration.AllowDataDeficient) {
         double WG, VWG;
         wxDateTime time = wxDateTime::Now();
@@ -2073,7 +2094,7 @@ bool RouteMap::Propagate()
     }
 
 
-    if(!m_Configuration.UseGrib && !m_Configuration.UseClimatology) {
+    if(!m_Configuration.UseGrib && m_Configuration.ClimatologyType == RouteMapConfiguration::DISABLED) {
         m_bFinished = true;
         m_bNoData = true;
         Unlock();

@@ -218,7 +218,6 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         r.Parse(message_body, &v);
 
         int major = v[_T("ClimatologyVersionMajor")].AsInt();
-//        int minor = v[_T("ClimatologyVersionMinor")].AsInt();
         if(major > 0) {
             wxMessageDialog mdlg(m_parent_window,
                                  _("Climatology plugin version not supported, no climatology data\n"),
@@ -227,14 +226,19 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             return;
         }
 
+//        int minor = v[_T("ClimatologyVersionMinor")].AsInt();
+
         wxString sptr = v[_T("ClimatologyDataPtr")].AsString();
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyData);
+
+        sptr = v[_T("ClimatologyWindAtlasDataPtr")].AsString();
+        sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyWindAtlasData);
 
         sptr = v[_T("ClimatologyCycloneTrackCrossingsPtr")].AsString();
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyCycloneTrackCrossings);
 
         if(m_pWeather_Routing) {
-            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseClimatology->Enable(RouteMap::ClimatologyData);
+            m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable(RouteMap::ClimatologyData);
             m_pWeather_Routing->m_ConfigurationDialog.m_pCyclones->Enable
                 (RouteMap::ClimatologyCycloneTrackCrossings);
         }

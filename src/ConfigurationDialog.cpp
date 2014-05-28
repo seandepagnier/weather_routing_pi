@@ -203,7 +203,7 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
     m_cbAllowDataDeficient->SetValue(configuration.AllowDataDeficient);
 
     m_cbUseGrib->SetValue(configuration.UseGrib);
-    m_cbUseClimatology->SetValue(configuration.UseClimatology);
+    m_cClimatologyType->SetSelection(configuration.ClimatologyType);
 }
 
 RouteMapConfiguration ConfigurationDialog::Configuration()
@@ -272,7 +272,8 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     configuration.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
 
     configuration.UseGrib = m_cbUseGrib->GetValue();
-    configuration.UseClimatology = m_cbUseClimatology->GetValue();
+    configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
+        m_cClimatologyType->GetSelection();
 
     return configuration;
 }
