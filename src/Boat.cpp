@@ -79,6 +79,7 @@ wxString Boat::OpenXML(wxString filename)
             if(plan.computed) {
                 plan.eta = AttributeDouble(e, "eta", .5);
                 plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
+                plan.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
                 plan.wing_wing_running = AttributeBool(e, "wing_wing_running", false);
                 plan.wind_speed_step = 3;
                 plan.wind_degree_step = DEGREE_STEP;
@@ -166,6 +167,7 @@ wxString Boat::SaveXML(wxString filename)
             sprintf(str, "%.4f", Plans[i].luff_angle);
             plan->SetAttribute("luff_angle", str);
 
+            plan->SetAttribute("optimize_tacking", Plans[i].optimize_tacking);
             plan->SetAttribute("wing_wing_running", Plans[i].wing_wing_running);
         } else {
             plan->SetAttribute("csvFileName", Plans[i].csvFileName.mb_str());

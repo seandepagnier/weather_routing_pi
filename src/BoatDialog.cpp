@@ -57,11 +57,15 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     m_sWakeDrag->SetValue(m_Boat.wake_drag * 100.0);
 
     m_SelectedSailPlan = 0;
+    BoatPlan &curplan = m_Boat.Plans[m_SelectedSailPlan];
+
+    m_cbWingWingRunning->SetValue(curplan.wing_wing_running);
+    m_cbOptimizeTacking->SetValue(curplan.optimize_tacking);
+
+    SetEta(curplan.eta);
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan].eta * 1000.0);
 
     UpdateStats();
-    UpdateVMG();
 
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
@@ -434,13 +438,10 @@ void BoatDialog::OnRecompute()
 
 void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
 {
-    m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();
-    m_PlotWindow->Refresh();
-}
-
-void BoatDialog::OnResetOptimalTackingSpeed( wxCommandEvent& event )
-{
-    m_Boat.Plans[m_SelectedSailPlan].ResetOptimalTackingSpeed();
+    if(event.IsChecked())
+        m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();
+    else
+        m_Boat.Plans[m_SelectedSailPlan].ResetOptimalTackingSpeed();
     m_PlotWindow->Refresh();
 }
 
@@ -470,9 +471,12 @@ so resulting boat polar may appear bumpy.\n"),
 void BoatDialog::OnSailPlanSelected( wxListEvent& event )
 {
     m_SelectedSailPlan = event.GetIndex();
-    m_sEta->SetValue(m_Boat.Plans[m_SelectedSailPlan].eta * 1000.0);
     m_sLuffAngle->SetValue(m_Boat.Plans[m_SelectedSailPlan].luff_angle);
+    m_cbOptimizeTacking->SetValue(m_Boat.Plans[m_SelectedSailPlan].optimize_tacking);
     m_cbWingWingRunning->SetValue(m_Boat.Plans[m_SelectedSailPlan].wing_wing_running);
+    double eta = m_Boat.Plans[m_SelectedSailPlan].eta;
+    SetEta(eta);
+    m_sEta->SetValue(sqrt(eta) * 1000.0);
 
     bool c = m_Boat.Plans[m_SelectedSailPlan].computed;
     m_sbComputation->ShowItems(c);
@@ -494,7 +498,14 @@ void BoatDialog::OnPolarMode( wxCommandEvent& event )
     Fit();
 }
 
-void BoatDialog::OnEta( wxScrollEvent& event )
+void BoatDialog::OnEtaSlider( wxScrollEvent& event )
+{
+    SetEta(pow(m_sEta->GetValue() / 1000.0, 2));
+    StoreBoatParameters();
+    Compute();
+}
+
+void BoatDialog::OnEta( wxCommandEvent& event )
 {
     StoreBoatParameters();
     Compute();
@@ -534,8 +545,9 @@ void BoatDialog::StoreBoatParameters()
         return;
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-    plan.eta = m_sEta->GetValue() / 1000.0;
+    m_tEta->GetValue().ToDouble(&plan.eta);
     plan.luff_angle = m_sLuffAngle->GetValue();
+    plan.optimize_tacking = m_cbOptimizeTacking->GetValue();
     plan.wing_wing_running = m_cbWingWingRunning->GetValue();
 
     m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
@@ -568,8 +580,8 @@ void BoatDialog::RepopulatePlans()
         m_lBoatPlans->SetItem(idx, spETA, wxString::Format(_T("%.2f"), plan.eta));
     }
 
-    m_lBoatPlans->SetColumnWidth(spNAME, 150);
-    m_lBoatPlans->SetColumnWidth(spETA, 60);
+    m_lBoatPlans->SetColumnWidth(spNAME, 80);
+    m_lBoatPlans->SetColumnWidth(spETA, 50);
 
     if(m_Boat.Plans.size() > 1)
         m_bDeleteBoatPlan->Enable();
@@ -595,9 +607,13 @@ void BoatDialog::Compute()
     plan.ComputeBoatSpeeds(m_Boat);
 
     UpdateVMG();
+
+    if(m_cbOptimizeTacking->IsChecked())
+        m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();
+
     m_PlotWindow->Refresh();
-    m_lBoatPlans->SetItem(m_SelectedSailPlan, spETA, wxString::Format(_T("%.3f"),
-                                                                       m_sEta->GetValue()/1000.0));
+    m_lBoatPlans->SetItem(m_SelectedSailPlan, spETA, wxString::Format
+                          (_T("%.3f"), m_sEta->GetValue()/1000.0));
 }
 
 void BoatDialog::UpdateVMG()

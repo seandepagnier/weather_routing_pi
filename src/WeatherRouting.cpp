@@ -495,7 +495,14 @@ void WeatherRouting::UpdateComputeState()
     m_gProgress->SetValue(0);
 
     m_bRunning = true;
-    m_mCompute->SetText(_( "&Stop" ));
+    
+#if wxCHECK_VERSION(3, 0, 0)
+    m_mCompute->SetItemLabel
+#else
+    m_mCompute->SetText
+#endif
+        (_( "&Stop" ));
+
     m_mCompute->Enable();
     m_mComputeAll->Enable(false);
     m_StartTime = wxDateTime::Now();
@@ -1071,6 +1078,7 @@ void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
     m_WeatherRoutes.push_back(weatherroute);
 
     wxListItem item;
+    item.SetId(m_lWeatherRoutes->GetItemCount());
     item.SetData(weatherroute);
     UpdateItem(m_lWeatherRoutes->InsertItem(item));
 
@@ -1341,7 +1349,14 @@ void WeatherRouting::Stop()
 
     m_gProgress->SetValue(0);
     m_bRunning = false;
-    m_mCompute->SetText(wxString(_( "&Compute" )) + wxT('\t') + wxT("Ctrl+C"));
+
+#if wxCHECK_VERSION(3, 0, 0)
+    m_mCompute->SetItemLabel
+#else
+    m_mCompute->SetText
+#endif
+        (wxString(_( "&Compute" )) + wxT('\t') + wxT("Ctrl+C"));
+
     SetEnableConfigurationMenu();
     m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
 }

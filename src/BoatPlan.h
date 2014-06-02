@@ -118,6 +118,7 @@ public:
 
     /* if computed */
     double eta, luff_angle;
+    bool optimize_tacking;
     bool wing_wing_running;
 
     /* if not computed (csv table) */

@@ -158,7 +158,8 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
                                             configuration.StartTime.GetHour()
                                             + (double)configuration.StartTime.GetMinute()/60.0));
 
-    m_fpBoat->SetPath(configuration.boatFileName);
+    wxFileName path = configuration.boatFileName;
+    m_fpBoat->SetFileName(path);
 
     int dt = configuration.dt;
     int hours = dt / 3600;

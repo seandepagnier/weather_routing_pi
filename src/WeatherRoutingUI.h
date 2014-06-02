@@ -312,6 +312,7 @@ class BoatDialogBase : public wxDialog
 		wxStaticBoxSizer* m_sbComputation;
 		wxStaticText* m_staticText961;
 		wxSlider* m_sEta;
+		wxTextCtrl* m_tEta;
 		wxStaticText* m_staticText35;
 		wxSpinCtrl* m_sFrictionalDrag;
 		wxStaticText* m_staticText112;
@@ -344,8 +345,7 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stBestCourseDownWindPortTack;
 		wxStaticText* m_staticText35113;
 		wxStaticText* m_stBestCourseDownWindStarboardTack;
-		wxButton* m_bOptimizeTacking;
-		wxButton* m_bResetOptimizeTacking;
+		wxCheckBox* m_cbOptimizeTacking;
 		wxPanel* m_panel10;
 		wxListBox* m_lSwitchPlans;
 		wxButton* m_bNewSwitchPlanRule;
@@ -379,7 +379,8 @@ class BoatDialogBase : public wxDialog
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnPolarMode( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEta( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnEtaSlider( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnEta( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
@@ -389,7 +390,6 @@ class BoatDialogBase : public wxDialog
 		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarCSVFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnResetOptimalTackingSpeed( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNewSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }

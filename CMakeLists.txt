@@ -11,8 +11,6 @@ PROJECT(weather_routing_pi)
 SET(PACKAGE_NAME weather_routing_pi)
 SET(CPACK_PACKAGE_CONTACT "Sean D'Epagnier ")
 
-MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
-
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "11")
 
@@ -44,17 +42,22 @@ SET(SRC_WEATHER_ROUTING
 
             src/GribRecord.cpp  
 #            src/zuFile.cpp 
+)
 
+IF(WIN32)
+SET(SRC_JSON
             src/wxJSON/jsonval.cpp
             src/wxJSON/jsonreader.cpp
-            src/wxJSON/jsonwriter.cpp
-
+            src/wxJSON/jsonwriter.cpp)
+SET(SRC_TINYXML
             src/tinyxml/tinyxml.cpp
-            src/tinyxml/tinystr.cpp
             src/tinyxml/tinyxmlparser.cpp
             src/tinyxml/tinyxmlerror.cpp
 )
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING})
+ENDIF(WIN32)
+ADD_DEFINITIONS(-DTIXML_USE_STL)
+
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING} ${SRC_JSON} ${SRC_TINYXML})
 
 #IF(NOT UNIX)
 #    INCLUDE_DIRECTORIES(src/zlib-1.2.3)

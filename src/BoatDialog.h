@@ -36,7 +36,6 @@ class weather_routing_pi;
 class BoatDialog : public BoatDialogBase
 {
 public:
-
     BoatDialog(wxWindow *parent, wxString boatpath);
     ~BoatDialog();
 
@@ -62,14 +61,14 @@ private:
     void OnRecomputeSpin( wxSpinEvent& event ) { OnRecompute(); }
     void OnRecompute( wxCommandEvent& event ) { OnRecompute(); }
     void OnOptimizeTacking( wxCommandEvent& event );
-    void OnResetOptimalTackingSpeed( wxCommandEvent& event );
     void OnUpdateStatistics( wxCommandEvent& event ) { StoreBoatParameters(); UpdateStats(); }
     void OnUpdateStatisticsSpin( wxSpinEvent& event ) { StoreBoatParameters(); UpdateStats(); }
     void OnRecomputeDrag( wxCommandEvent& event );
     void OnDragInfo( wxCommandEvent& event );
     void OnSailPlanSelected( wxListEvent& event );
     void OnPolarMode( wxCommandEvent& event );
-    void OnEta( wxScrollEvent& event );
+    void OnEtaSlider( wxScrollEvent& event );
+    void OnEta( wxCommandEvent& event );
     void OnNewBoatPlan( wxCommandEvent& event );
     void OnDeleteBoatPlan( wxCommandEvent& event );
 
@@ -77,6 +76,7 @@ private:
     void RepopulatePlans();
     void Compute();
     void UpdateTrackingControls();
+    void SetEta(double eta) { m_tEta->SetValue(wxString::Format(_T("%.5g"), eta)); }
 
     void OnNewSwitchPlanRule( wxCommandEvent& event );
     void OnEditSwitchPlanRule( wxCommandEvent& event );
