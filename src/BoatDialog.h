@@ -44,6 +44,7 @@ public:
 
 private:
     void OnMouseEventsPlot( wxMouseEvent& event );
+    void PlotVMG(wxPaintDC &dc, double W, double s);
     void OnPaintPlot( wxPaintEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlot( wxCommandEvent& event ) { m_PlotWindow->Refresh(); }

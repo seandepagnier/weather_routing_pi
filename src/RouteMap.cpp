@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -78,6 +78,8 @@
 
 #include "georef.h"
 
+#define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
+
 static double Swell(GribRecordSet *grib, double lat, double lon)
 {
     if(!grib)
@@ -112,7 +114,7 @@ static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
         return false;
 
     WG = positive_degrees(rad2deg(atan2(-vx, -vy)));
-    VWG = hypot(vy, vx) * 3.6 / 1.852;
+    VWG = distance(vy, vx) * 3.6 / 1.852;
     return true;
 }
 
@@ -158,7 +160,7 @@ static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
         return false;
 
     C = positive_degrees(rad2deg(atan2(-vx, -vy)));
-    VC = hypot(vy, vx) * 3.6 / 1.852;
+    VC = distance(vy, vx) * 3.6 / 1.852;
     return true;
 }
 
@@ -200,16 +202,14 @@ static void OverWater(double C, double VC, double WG, double VWG, double &WA, do
     double Cy = VC * sin(deg2rad(C));
     double Wx = VWG * cos(deg2rad(WG)) - Cx;
     double Wy = VWG * sin(deg2rad(WG)) - Cy;
-    VW = hypot(Wx, Wy);
+    VW = distance(Wx, Wy);
     WA = rad2deg(atan2(Wy, Wx));
 }
 
 /* provisions to compute boat movement over ground
 
    BG  - boat direction over ground
-   BGV - boat speed over ground (gps velocity)
-*/
-
+   BGV - boat speed over ground (gps velocity)  */
 static void BoatOverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
 {
     if(VC == 0) { // short-cut if no currents
@@ -223,7 +223,7 @@ static void BoatOverGround(double B, double VB, double C, double VC, double &BG,
     double BGy = VB * sin(deg2rad(B)) + Cy;
 
     BG  = rad2deg(atan2(BGy, BGx));
-    VBG = hypot(BGx, BGy);
+    VBG = distance(BGx, BGy);
 }
 
 /* find intersection of two line segments
@@ -570,8 +570,8 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         /* avoid propagating from positions which go in a direction outside of
            the search angle from the correct course.  */
         if(!isnan(bearing) && fabs(heading_resolve(B - bearing)) > configuration.MaxSearchAngle) {
-            if(first_backtrackavoid && parent)
-                goto first_backtrack;
+//            if(first_backtrackavoid && parent)
+//                goto first_backtrack;
             continue;
         }
 
@@ -666,7 +666,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         }
 #endif
 
-#if 1
+#if 0
         /* test to avoid extra computations related to backtracking */
         if(prev != next && parent) {
             d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
@@ -1008,6 +1008,7 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
 }
 
 /* apply current to given route, and return if it changed at all */
+#if 0
 bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration)
 {
     if(!skippoints)
@@ -1039,6 +1040,7 @@ bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfi
 
     return ret;
 }
+#endif
 
 enum { MINLON, MAXLON, MINLAT, MAXLAT };
 /* return false if longitude is possibly invalid
@@ -1867,26 +1869,44 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
 {
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         bool propagated = false;
+        
+        IsoRoute *x;
+        /* if anchoring is allowed, then we can propagate a second time,
+           so copy the list before clearing the propagate flag,
+           when depth data is implemented we will need to flag positions as propagated
+           if they are too deep to anchor here. */
+        if(configuration.Anchoring)
+            x = new IsoRoute(*it);
 
         /* build up a list of iso regions for each point
            in the current iso */
         if((*it)->Propagate(routelist, grib, time, configuration))
             propagated = true;
+        
+        if(!configuration.Anchoring)
+            x = new IsoRoute(*it);
 
-        IsoRoute *x = new IsoRoute(*it);
         for(IsoRouteList::iterator cit = (*it)->children.begin();
-            cit != (*it)->children.end(); cit++)
+            cit != (*it)->children.end(); cit++) {
+            IsoRoute *y;
+            if(configuration.Anchoring)
+                y = new IsoRoute(*cit, x);
+            else
+                y = NULL;
             if((*cit)->Propagate(routelist, grib, time, configuration)) {
-                x->children.push_back(new IsoRoute(*cit, x)); /* copy child */
+                if(!configuration.Anchoring)
+                    y = new IsoRoute(*cit, x);
+                x->children.push_back(y); /* copy child */
                 propagated = true;
-            }
+            } else
+                delete y;
+        }
 
         /* if any propagation occured even for children, then we clone this route
            this prevents backtracking, otherwise, we don't need this route
-           (it's a dead end) but update it to drift with the current */
+           (it's a dead end) */
         if(propagated) {
-            IsoRoute *y = NULL;
-            if(configuration.Anchoring) {
+#if 0
                 y = new IsoRoute(x);
                 for(IsoRouteList::iterator cit = x->children.begin();
                     cit != x->children.end(); cit++)
@@ -1897,7 +1917,7 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
                     delete y; /* I guess we didn't need it after all */
             } else
                 x->ApplyCurrents(grib, time, configuration);
-
+#endif
             routelist.push_back(x);
         } else
             delete x; /* didn't need it */

@@ -292,7 +292,7 @@ class BoatDialogBase : public wxDialog
 		wxNotebook* m_notebook1;
 		wxPanel* m_panel3;
 		wxChoice* m_cPlotType;
-		wxChoice* m_cPlotAxis;
+		wxChoice* m_cPlotVariable;
 		wxSpinCtrl* m_sWindSpeed;
 		wxStaticText* m_stTrueWindAngle;
 		wxStaticText* m_staticText21;

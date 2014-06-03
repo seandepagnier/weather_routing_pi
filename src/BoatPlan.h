@@ -103,6 +103,8 @@ class BoatPlan
 public:
     static double VelocityApparentWind(double VB, double W, double VW);
     static double DirectionApparentWind(double VA, double VB, double W, double VW);
+    static double DirectionApparentWind(double VB, double W, double VW);
+
     void BoatSteadyState(double W, double VW, double &B, double &VB, double &A, double &VA,
                          Boat &boat);
     wxString TrySwitchBoatPlan(double VW, double H, double Swell,
@@ -134,6 +136,7 @@ public:
     static int ClosestVWi(int VW);
 
     double Speed(double W, double VW);
+    double SpeedAtApparentWind(double &A, double VW, double *pW=0);
     SailingVMG GetVMG(double VW);
     double TrueWindSpeed(double VB, double W, double maxVW);
     void Set(int Wi, int VWi, double VB);

@@ -115,11 +115,6 @@ wxString Boat::OpenXML(wxString filename)
         }
     }
 
-//    if(!cleared) {
-//        Plans.push_back(BoatPlan(_("Initial Plan"), *this));
-//        Plans[0].ComputeBoatSpeeds(*this);
-//    }
-
     return _T("");
 }
 
@@ -161,7 +156,7 @@ wxString Boat::SaveXML(wxString filename)
 
         plan->SetAttribute("computed", Plans[i].computed);
         if(Plans[i].computed) {
-            sprintf(str, "%.4f", Plans[i].eta);
+            sprintf(str, "%.4g", Plans[i].eta);
             plan->SetAttribute("eta", str);
 
             sprintf(str, "%.4f", Plans[i].luff_angle);

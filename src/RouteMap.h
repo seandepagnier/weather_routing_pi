@@ -106,7 +106,7 @@ public:
     bool CompletelyContained(IsoRoute *r);
     bool ContainsRoute(IsoRoute *r);
 
-    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration);
+//    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration);
     void FindIsoRouteBounds(double bounds[4]);
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon, double *dist=0);

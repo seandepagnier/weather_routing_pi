@@ -326,9 +326,9 @@ cos(Pi-W)=-cos(W)|   |
 
             Law of sines:
 
-      sin A   sin W   sin W-A
-      ----- = ----- = -------
-       VW      VA       VB
+      sin A   sin Pi-W   sin W-A
+      ----- = -------- = -------
+       VW        VA        VB
 
             Law of cosines;
            ________________________
@@ -337,7 +337,7 @@ cos(Pi-W)=-cos(W)|   |
        \/
            ________________________
           /  2    2
-   VA =  / VW + VB  + 2 VW VB cos(W)
+   VA =  / VW + VB  + 2 VW VB cos(Pi-W)
        \/
            ___________________________
           /  2    2
@@ -524,9 +524,10 @@ If the overall result is
                (each-vb nA nVA nVB)))))))
 */
 
+/* compute apparent wind speed from boat speed and true wind */
 double BoatPlan::VelocityApparentWind(double VB, double W, double VW)
 {
-  return sqrt(VW*VW + VB*VB + 2*VW*VB*cos(W)); /* law of cosines */
+  return sqrt(VW*VW + VB*VB + 2*VW*VB*cos(W)); /* law of cosines, W is flipped by 180 */
 }
 
 /*
@@ -551,9 +552,17 @@ double BoatPlan::DirectionApparentWind(double VA, double VB, double W, double VW
   if(VB == 0) /* trig identity breaks down, but if we aren't */
     return W; /*   moving, apparent wind is true wind */
   double cosA = (VA*VA + VB*VB - VW*VW) / (2*VA*VB);
-  if(cosA > 1) cosA = 1; else if(cosA < -1) cosA = -1; /* slight arithematic errors */
+  if(cosA > 1) cosA = 1; else if(cosA < -1) cosA = -1; /* slight arithmatic errors */
   double ac = acos(cosA);
+  while(W > M_PI) W-=2*M_PI;
+  while(W < -M_PI) W+=2*M_PI;
   return W > 0 ? ac : -ac;
+}
+
+double BoatPlan::DirectionApparentWind(double VB, double W, double VW)
+{
+    double VA = VelocityApparentWind(VB, W, VW);
+    return DirectionApparentWind(VA, VB, W, VW);
 }
 
 /* start out with the boat stopped, and over time, iterate accelerating boat
@@ -623,7 +632,8 @@ wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
 }
 
 BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
-    : Name(PlanName), eta(.25), luff_angle(15)
+    : Name(PlanName), eta(.25), luff_angle(15),
+      optimize_tacking(true), wing_wing_running(false)
 {
     memset(speed, 0, sizeof speed);
     memset(VMG, 0, sizeof VMG);
@@ -646,7 +656,7 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat)
             double B, VB, A, VA;
             BoatSteadyState(deg2rad(W), VW, B, VB, A, VA, boat);
             Set(Wi, VWi, VB);
-            if(W != 0)
+            if(W != 0) // assume symmetric performance
                 Set(DEGREE_COUNT-Wi, VWi, VB);
         }
 
@@ -767,7 +777,7 @@ int BoatPlan::ClosestVWi(int VW)
     return VWi;
 }
 
-/* compute boat speed from given power level, true wind angle and true wind speed */
+/* compute boat speed from true wind angle and true wind speed */
 double BoatPlan::Speed(double W, double VW)
 {
     W = positive_degrees(W);
@@ -798,6 +808,23 @@ double BoatPlan::Speed(double W, double VW)
     double VB2 = interp_value(VW, VW1, VW2, VB12, VB22);
 
     double VB = interp_value(W, W1, W2, VB1, VB2);
+    return VB;
+}
+
+double BoatPlan::SpeedAtApparentWind(double &A, double VW, double *pW)
+{
+    int iters = 0;
+    double VB, e, dA = A, W = A; // initial guess
+    do {
+        VB = Speed(W, VW);
+        double VA = VelocityApparentWind(VB, deg2rad(W), VW);
+        A = rad2deg(DirectionApparentWind(VA, VB, deg2rad(W), VW));
+        
+        e = (dA - A)*4/5; /* I didn't determine the optimal constant/expression, but this works */
+        W += e;
+    } while(fabs(e) > 1e-2 && ++iters < 24);
+
+    if(pW) *pW = W;
     return VB;
 }
 
