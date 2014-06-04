@@ -576,12 +576,23 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
     double lp = .03;
     for(;;) {
         double v = VelocityBoat(A, VA);
-        double a = v - VB;            
+
+        if(v == 0) { // we cannot sail this way
+            B = 0;
+            VB = 0;
+            return;
+        }
+        double a = v - VB;
 
         double drag = boat.FrictionDrag(VB) + boat.WakeDrag(VB);
+
+        if(isnan(drag)) {
+            VB = 0;
+            return;
+        }
         a -= drag;
 
-        if(fabs(a) < 1e-2 || a < 0) {
+        if(fabs(a) < 1e-2) {
             B = AngleofAttackBoat(A, VA);
             return; /* reached steady state */
         }

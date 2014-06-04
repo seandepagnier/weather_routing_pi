@@ -132,7 +132,7 @@ static bool Wind(GribRecordSet *grib,
 
         if(climatology != RouteMapConfiguration::DISABLED &&
            RouteMap::ClimatologyData(WIND, time, p->lat, p->lon, WG, VWG)) {
-            WG = heading_resolve(WG + 180); /* direction comming from */
+            WG = heading_resolve(WG);
             return true;
         }
 
@@ -502,7 +502,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             return false;
 
         for(int i=0; i<windatlas_count; i++) {
-            double WG = i*2*M_PI/windatlas_count;
+            double WG = i*360/windatlas_count;
             double VWG = speeds[i];
 
             OverWater(C, VC, WG, VWG, Wc[i], VWc[i]);
@@ -528,10 +528,9 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         if(directions[maxia] < directions[maxib])
             maxia = maxib;
 
-        double maxid = directions[maxia] / directions[maxi] / 2;
-        WG = positive_degrees(360*(maxid*maxia + (1-maxid)*maxi)/windatlas_count);
-        VWG = maxid*speeds[maxia]/directions[maxia] +
-            (1-maxid)*speeds[maxi]/directions[maxi];
+        double maxid = 1 / (directions[maxi] / directions[maxia] + 1);
+        WG = positive_degrees(maxid*Wc[maxia] + (1-maxid)*Wc[maxi]);
+        VWG = maxid*VWc[maxia] + (1-maxid)*VWc[maxi];
     }
 
     OverWater(C, VC, WG, VWG, W, VW);
@@ -581,7 +580,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             VB = 0;
             for(int i = 0; i<windatlas_count; i++) {
                 double VBc = configuration.boat.Plans[newsailplan].Speed(H-W+Wc[i], VWc[i]);
-                VB = directions[i]*VBc;
+                VB += directions[i]*VBc;
             }
             
             if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)

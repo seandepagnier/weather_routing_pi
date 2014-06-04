@@ -1012,7 +1012,7 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("CycloneClimatologyStartYear", configuration.CycloneClimatologyStartYear);
 
         c->SetAttribute("UseGrib", configuration.UseGrib);
-        c->SetAttribute("UseClimatology", configuration.ClimatologyType);
+        c->SetAttribute("ClimatologyType", configuration.ClimatologyType);
         c->SetAttribute("AllowDataDeficient", configuration.AllowDataDeficient);
 
         c->SetAttribute("DetectLand", configuration.DetectLand);

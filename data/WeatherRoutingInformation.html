@@ -52,12 +52,13 @@ The Supported Options Include:
   <li><b>Climatology</b> <ul>
       <li><b>Disable</b> do not allow climatology to be used</li>
       <li><b>Cumulative Map</b> Pretend the wind comes from all of the directions in the wind atlas
-        for the percentage of time based on the atlas.</li>
-      <li><b>Cumulative - Calms</b> Like Cumulative Map, except the boat also drifts without sailing
-        during calms.</li>
-      <li><b>Most Likely</b> Use the most likely wind direction from atlas, with most likely wind speed</li>
-      <li><b>Average</b> Use wind vector average for wind direction,
-        and wind magnitude average for wind speed</li></ul>
+        for the percentage of time based on the atlas.  For this mode to work optimally, you should sail
+      at all angles from 0 to 360, and check "optimize tacking" in the vmg tab of the boat dialog.  This will
+      allow the program to assume you will tack as needed in sub-isobar intervals to take advantage of wind shifts.</li>
+      <li><b>Cumulative - Calms</b> Like Cumulative Map, except the boat also drifts without sailing during calms.</li>
+      <li><b>Most Likely</b> Use the interpolated most likely wind direction from atlas, with the most likely wind speed.</li>
+      <li><b>Average</b> Use wind vector average for wind direction, and wind magnitude average for wind speed.  This
+    is the fastest but not very accurate except in prevailing conditions.</li></ul>
   <li><b>Allow Data Deficient</b> Continue to navigate on last valid wind data
     even if there is no more valid wind data in the area/time.</li>
   <li><b>Integrator</b> Newton's method is default and fastest, but doesn't take into account changes

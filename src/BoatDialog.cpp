@@ -116,6 +116,7 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
     } else {
         double A = heading_resolve(B);
         VB = m_Boat.Plans[m_SelectedSailPlan].SpeedAtApparentWind(A, VW, &W);
+        W = positive_degrees(W);
     }
 
     m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));

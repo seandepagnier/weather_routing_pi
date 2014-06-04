@@ -309,6 +309,7 @@ double Boat::FrictionDrag(double VB)
  */
 double Boat::WakeDrag(double VB)
 {
+//#if 0 // this may be theoretically correct in flat water, but is complex and not practical
     if(VB == 0) return 0;
 
     const double G = 9.8;
@@ -318,7 +319,18 @@ double Boat::WakeDrag(double VB)
     double F2 = square(F), invF2 = 1/F2;
     double D = square(sin(M_PI - invF2) / (M_PI - invF2) / (1 + M_PI * F2));
 
-    return wake_drag * wake_drag * D * VB * VB * 4; /* D is max of .25 (at F=.56) so normalize to 1 */
+    double wave_drag = wake_drag * wake_drag * D * VB * VB * 4; /* D is max of .25 (at F=.56) so normalize to 1 */
+
+//#else
+    // classic hull speed exponential without planing possible
+    double hull_speed = 1.34*sqrt(lwl_ft);
+//    double our_wave_drag = 2 * wake_drag * (pow(8, VB / sqrt(lwl_ft)) - 1);
+
+    double coeff = VB / sqrt(lwl_ft);
+    if(coeff < 1)
+        return 0;
+
+    return pow(3, coeff - 1) * wave_drag;
 }
 
 void Boat::RecomputeDrag()
