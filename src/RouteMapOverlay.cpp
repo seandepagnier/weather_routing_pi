@@ -52,7 +52,7 @@ void *RouteMapOverlayThread::Entry()
             wxThread::Sleep(5);
         }
 
-    m_RouteMapOverlay.DeleteThread();
+//    m_RouteMapOverlay.m_Thread = NULL;
     return 0;
 }
 
@@ -82,15 +82,13 @@ void RouteMapOverlay::Start()
     m_Thread->Run();
 }
 
-void RouteMapOverlay::Stop()
-{
-    m_Thread->Delete();
-    DeleteThread();
-}
-
 void RouteMapOverlay::DeleteThread()
 {
-//    delete m_Thread;
+    if(!m_Thread)
+        return;
+
+    m_Thread->Delete();
+    delete m_Thread;
     m_Thread = NULL;
 }
 

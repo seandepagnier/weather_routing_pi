@@ -76,7 +76,7 @@ void SettingsDialog::LoadSettings()
     pConf->Read( _T("SquaresAtSailChanges"), &SquaresAtSailChanges, SquaresAtSailChanges);
     m_cbSquaresAtSailChanges->SetValue(SquaresAtSailChanges);
 
-    int ConcurrentThreads = m_sConcurrentThreads->GetValue();
+    int ConcurrentThreads = wxThread::GetCPUCount();
     pConf->Read( _T("ConcurrentThreads"), &ConcurrentThreads, ConcurrentThreads);
     m_sConcurrentThreads->SetValue(ConcurrentThreads);
     

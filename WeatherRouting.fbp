@@ -876,7 +876,7 @@
                         <event name="OnUpdateUI"></event>
                     </object>
                 </object>
-                <object class="wxMenu" expanded="0">
+                <object class="wxMenu" expanded="1">
                     <property name="label">&amp;Configuration</property>
                     <property name="name">m_mConfiguration</property>
                     <property name="permission">protected</property>
@@ -1002,6 +1002,21 @@
                         <property name="shortcut">Ctrl+A</property>
                         <property name="unchecked_bitmap"></property>
                         <event name="OnMenuSelection">OnComputeAll</event>
+                        <event name="OnUpdateUI"></event>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">&amp;Stop</property>
+                        <property name="name">m_mStop</property>
+                        <property name="permission">protected</property>
+                        <property name="shortcut">Ctrl+Z</property>
+                        <property name="unchecked_bitmap"></property>
+                        <event name="OnMenuSelection">OnStop</event>
                         <event name="OnUpdateUI"></event>
                     </object>
                     <object class="wxMenuItem" expanded="0">

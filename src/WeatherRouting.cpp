@@ -106,7 +106,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(this),
       m_ConfigurationBatchDialog(this), m_SettingsDialog(this),
       m_StatisticsDialog(this), m_ReportDialog(this), m_FilterRoutesDialog(this),
-      m_bRunning(false), m_bSkipUpdateCurrentItem(false),
+      m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItem(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
       m_bShowSettings(false), m_bShowStatistics(false), m_bShowReport(false),
       m_bShowFilter(false), m_weather_routing_pi(plugin)
@@ -166,14 +166,12 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
                        ( WeatherRouting::OnHideConfigurationTimer ), NULL, this);
 
     SetEnableConfigurationMenu();
-
-    /* initialize crossing land routine from main thread as it is
-       not re-entrant */
-    PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
 }
 
 WeatherRouting::~WeatherRouting( )
 {
+    Stop();
+
     m_SettingsDialog.SaveSettings();
 
     wxFileConfig *pConf = GetOCPNConfigObject();
@@ -490,44 +488,47 @@ void WeatherRouting::OnWeatherRoutesListLeftDown(wxMouseEvent &event)
 
 void WeatherRouting::UpdateComputeState()
 {
-    m_RoutesToRun = m_WaitingRouteMaps.size();
     m_gProgress->SetRange(m_RoutesToRun);
-    m_gProgress->SetValue(0);
+
+    if(m_bRunning)
+        return;
 
     m_bRunning = true;
+    m_gProgress->SetValue(0);
     
-#if wxCHECK_VERSION(3, 0, 0)
-    m_mCompute->SetItemLabel
-#else
-    m_mCompute->SetText
-#endif
-        (_( "&Stop" ));
-
     m_mCompute->Enable();
-    m_mComputeAll->Enable(false);
     m_StartTime = wxDateTime::Now();
     m_tCompute.Start(0, true);
+
 }
 
 int debugcnt, debuglimit = 1, debugsize = 2;
 void WeatherRouting::OnCompute( wxCommandEvent& event )
 {
-    if(m_bRunning)
-        Stop();
-    else {
-        Start(CurrentRouteMap());
-        UpdateComputeState();
-    }
+    /* initialize crossing land routine from main thread as it is
+       not re-entrant, and cannot be done by worker-threads later */
+    PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
+
+    Start(CurrentRouteMap());
+    UpdateComputeState();
 }
 
 void WeatherRouting::OnComputeAll ( wxCommandEvent& event )
 {
-    /* todo: make this work when already running to start routes not computed,
-       and not waiting */
-    if(!m_bRunning) {
-        StartAll();
-        UpdateComputeState();
-    }
+    /* initialize crossing land routine from main thread as it is
+       not re-entrant, and cannot be done by worker-threads later */
+    PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
+
+    if(!m_bRunning)
+        m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
+
+    StartAll();
+    UpdateComputeState();
+}
+
+void WeatherRouting::OnStop( wxCommandEvent& event )
+{
+    Stop();
 }
 
 #define FAIL(X) do { error = X; goto failed; } while(0)
@@ -750,6 +751,8 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         it != m_RunningRouteMaps.end(); ) {
         RouteMapOverlay *routemapoverlay = *it;
         if(!routemapoverlay->Running()) {
+            routemapoverlay->DeleteThread();
+
             UpdateRouteMap(routemapoverlay);
             it = m_RunningRouteMaps.erase(it);
 
@@ -824,7 +827,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
     SetTitle(_("Weather Routing") + wxString(_T(" - ")) + fn.GetFullName());
 
     wxProgressDialog *progressdialog = NULL;
-    wxDateTime start = wxDateTime::Now();
+    wxDateTime start = wxDateTime::UNow();
 
     if(!doc.LoadFile(filename.mb_str()))
         FAIL(_("Failed to load file."));
@@ -846,7 +849,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 if(!progressdialog->Update(i))
                     return true;
             } else {
-                wxDateTime now = wxDateTime::Now();
+                wxDateTime now = wxDateTime::UNow();
                 /* if it's going to take more than a half second, show a progress dialog */
                 if((now-start).GetMilliseconds() > 250 && i < count/2) {
                     progressdialog = new wxProgressDialog(
@@ -942,6 +945,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     FAIL(_("Unrecognized xml node"));
         }
     }
+
     delete progressdialog;
     return true;
 failed:
@@ -1046,6 +1050,8 @@ void WeatherRouting::SetEnableConfigurationMenu()
     m_mCompute->Enable(current);
     m_mExport->Enable(current);
 
+    m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size());
+
     bool cnt = m_lWeatherRoutes->GetItemCount();
     m_mDeleteAll->Enable(cnt);
     m_mComputeAll->Enable(cnt);
@@ -1062,7 +1068,7 @@ void WeatherRouting::UpdateConfigurations()
         RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
         weatherroute->routemapoverlay->SetConfiguration(c);
 
-        weatherroute->Update(true);
+        weatherroute->Update(this, true);
         UpdateItem(i);
     }
 }
@@ -1073,7 +1079,7 @@ void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
     RouteMapOverlay *routemapoverlay = weatherroute->routemapoverlay;
     routemapoverlay->SetConfiguration(configuration);
     routemapoverlay->Reset();
-    weatherroute->Update();
+    weatherroute->Update(this);
 
     m_WeatherRoutes.push_back(weatherroute);
 
@@ -1093,14 +1099,14 @@ void WeatherRouting::UpdateRouteMap(RouteMapOverlay *routemapoverlay)
         WeatherRoute *weatherroute =
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
         if(weatherroute->routemapoverlay == routemapoverlay) {
-            weatherroute->Update();
+            weatherroute->Update(this);
             UpdateItem(i);
             return;
         }
     }
 }
 
-void WeatherRoute::Update(bool stateonly)
+void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
 {
     if(!stateonly) {
         RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
@@ -1160,6 +1166,12 @@ void WeatherRoute::Update(bool stateonly)
                 State += _("Failed");
             }
         } else {
+            for(std::list<RouteMapOverlay*>::iterator it = wr->m_WaitingRouteMaps.begin();
+                it != wr->m_WaitingRouteMaps.end(); it++)
+                if(*it == routemapoverlay) {
+                    State = _("Waiting...");
+                    return;
+                }
             State = _("Not Computed");
         }
     }
@@ -1200,12 +1212,12 @@ void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
     RouteMapOverlay *rmo = weatherroute->routemapoverlay;
     for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
         it != m_RunningRouteMaps.end(); it++)
-        if(*it == rmo)
-            (*it)->Stop();
+        if(*it == rmo && rmo->Running())
+            rmo->DeleteThread();
 
     rmo->SetConfiguration(configuration);
 
-    weatherroute->Update();
+    weatherroute->Update(this);
 
     for(long index = 0; index<m_lWeatherRoutes->GetItemCount(); index++) {
         WeatherRoute *wr = reinterpret_cast<WeatherRoute*>
@@ -1244,7 +1256,7 @@ void WeatherRouting::UpdateStates()
 {
     for(std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
         it != m_WeatherRoutes.end(); it++)
-        (*it)->Update(true);
+        (*it)->Update(this, true);
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
         UpdateItem(i);
 }
@@ -1314,12 +1326,26 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
         !routemapoverlay->ClimatologyFailed()))
         return;
 
+    // already running?
+    for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
+        it != m_RunningRouteMaps.end(); it++)
+        if(*it == routemapoverlay)
+            return;
+
+    // already waiting?
+    for(std::list<RouteMapOverlay*>::iterator it = m_WaitingRouteMaps.begin();
+        it != m_WaitingRouteMaps.end(); it++)
+        if(*it == routemapoverlay)
+            return;
+
     wxString error = routemapoverlay->Reset();
-    if(error.empty())
+    if(error.empty()) {
+        m_RoutesToRun++;
         m_WaitingRouteMaps.push_back(routemapoverlay);
-    else {
-        wxMessageDialog mdlg(this, error,
-                             _("Weather Routing"), wxOK | wxICON_ERROR);
+        SetEnableConfigurationMenu();
+        UpdateStates();
+    } else {
+        wxMessageDialog mdlg(this, error, _("Weather Routing"), wxOK | wxICON_ERROR);
         mdlg.ShowModal();
     }
 }
@@ -1327,8 +1353,6 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
 
 void WeatherRouting::StartAll()
 {
-    m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
-
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
         RouteMapOverlay *routemapoverlay =
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)))->routemapoverlay;
@@ -1338,24 +1362,47 @@ void WeatherRouting::StartAll()
 
 void WeatherRouting::Stop()
 {
+    /* stop all the threads at once, rather than waiting for each one before
+       telling the next to stop */
+    for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
+        it != m_RunningRouteMaps.end(); it++)
+        (*it)->Stop();
+
+    wxProgressDialog *progressdialog = NULL;
+//    wxDateTime start = wxDateTime::UNow();
+
+    int c = 0;
     for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
         it != m_RunningRouteMaps.end(); it++) {
-        (*it)->Stop();
+        while((*it)->Running()) {
+/* progress dialog calls event loop!!
+            wxDateTime now = wxDateTime::UNow();
+            if(!progressdialog && (now - start).GetMilliseconds() > 300) {
+                progressdialog = new wxProgressDialog(_("Weather Routing"),
+                                                      _("Waiting for threads to finish"),
+                                                      m_RunningRouteMaps.size(), this,
+                                                      wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
+                progressdialog->Update(c);
+            }
+*/
+            wxThread::Sleep(100);
+        }
+        (*it)->ResetFinished();
+        (*it)->DeleteThread();
         UpdateRouteMap(*it);
+
+        if(progressdialog)
+            progressdialog->Update(c++);
     }
+
+    delete progressdialog;
 
     m_RunningRouteMaps.clear();
     m_WaitingRouteMaps.clear();
 
+    m_RoutesToRun = 0;
     m_gProgress->SetValue(0);
     m_bRunning = false;
-
-#if wxCHECK_VERSION(3, 0, 0)
-    m_mCompute->SetItemLabel
-#else
-    m_mCompute->SetText
-#endif
-        (wxString(_( "&Compute" )) + wxT('\t') + wxT("Ctrl+C"));
 
     SetEnableConfigurationMenu();
     m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);

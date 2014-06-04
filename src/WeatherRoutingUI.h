@@ -71,6 +71,7 @@ class WeatherRoutingBase : public wxFrame
 		wxMenuItem* m_mDelete;
 		wxMenuItem* m_mCompute;
 		wxMenuItem* m_mComputeAll;
+		wxMenuItem* m_mStop;
 		wxMenuItem* m_mExport;
 		wxMenuItem* m_mExportAll;
 		wxMenu* m_mView;
@@ -97,6 +98,7 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnDeleteAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnComputeAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnStop( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }

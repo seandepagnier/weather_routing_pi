@@ -2014,9 +2014,6 @@ void RouteMap::PositionLatLon(wxString Name, double &lat, double &lon)
 
 bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration)
 {
-    /* once we have multiple worker threads, we can delegate a workers here
-       to merge routes. */
-               
     IsoRouteList unmerged;
     while(routelist.size()) {
         if(TestAbort())
@@ -2036,12 +2033,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
 #endif
               Merge(rl, r1, r2, 0, configuration.InvertedRegions)) {
 #if 1 /* TODO: find fastest method */
-# if 1
-              routelist.splice(routelist.end(), rl);
-# else
-                for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); ++it)
-                    routelist.push_front(*it);
-# endif
+                routelist.splice(routelist.end(), rl);
 #else /* merge new routes with each other right away before hitting the main list */
                 IsoRouteList unmerged2;
                 while(rl.size() > 0) {

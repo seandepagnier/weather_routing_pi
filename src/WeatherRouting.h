@@ -40,13 +40,14 @@
 #include "FilterRoutesDialog.h"
 
 class weather_routing_pi;
+class WeatherRouting;
 
 class WeatherRoute
 {
 public:
     WeatherRoute();
     ~WeatherRoute();
-    void Update(bool stateonly=false);
+    void Update(WeatherRouting *wr, bool stateonly=false);
 
     bool Filtered;
     wxString BoatFilename, Start, StartTime, End, Time, Distance, AvgSpeed, State;
@@ -108,6 +109,7 @@ private:
     void UpdateComputeState();
     void OnCompute( wxCommandEvent& event );
     void OnComputeAll( wxCommandEvent& event );
+    void OnStop( wxCommandEvent& event );
     void OnResetAll( wxCommandEvent& event );
     void OnPositions( wxCommandEvent& event );
     void OnBatch( wxCommandEvent& event );
@@ -153,8 +155,6 @@ private:
     StatisticsDialog m_StatisticsDialog;
     ReportDialog m_ReportDialog;
     FilterRoutesDialog m_FilterRoutesDialog;
-
-    bool m_bComputing;
 
     wxTimer m_tCompute, m_tHideConfiguration;
 

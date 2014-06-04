@@ -239,6 +239,8 @@ public:
                                                    const wxDateTime &cyclonedata_startdate);
 
     static std::list<RouteMapPosition> Positions;
+    void Stop() { Lock(); m_bFinished = true; Unlock(); }
+    void ResetFinished() { Lock(); m_bFinished = false; Unlock(); }
 
 protected:
     virtual void Clear();

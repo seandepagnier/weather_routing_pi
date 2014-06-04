@@ -44,6 +44,7 @@ private:
 
 class RouteMapOverlay : public RouteMap
 {
+    friend class RouteMapOverlayThread;
 public:
     enum RouteInfoType {DISTANCE, AVGSPEED, PERCENTAGE_UPWIND, PORT_STARBOARD, AVGWIND, AVGWAVE};
 
@@ -69,11 +70,10 @@ public:
     virtual void Clear();
     virtual void Lock() { routemutex.Lock(); }
     virtual void Unlock() { routemutex.Unlock(); }
-    bool Running() { return m_Thread; }
+    bool Running() { return m_Thread && m_Thread->IsRunning(); }
 
     void Start();
-    void Stop();
-    void DeleteThread();
+    void DeleteThread(); // like Stop(), but waits until the thread is deleted
 
     bool m_UpdateOverlay;
     bool m_bEndRouteVisible;
@@ -81,7 +81,8 @@ public:
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent, int AlternateRouteThickness,
                               ocpnDC &dc, PlugIn_ViewPort &vp);
-    virtual bool TestAbort() { return m_Thread->TestDestroy(); }
+    virtual bool TestAbort() { return Finished(); }
+    //return m_Thread->TestDestroy(); }
 
     RouteMapOverlayThread *m_Thread;
     wxMutex routemutex;
