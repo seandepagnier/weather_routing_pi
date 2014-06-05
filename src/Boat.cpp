@@ -323,7 +323,7 @@ double Boat::WakeDrag(double VB)
 
 //#else
     // classic hull speed exponential without planing possible
-    double hull_speed = 1.34*sqrt(lwl_ft);
+//    double hull_speed = 1.34*sqrt(lwl_ft);
 //    double our_wave_drag = 2 * wake_drag * (pow(8, VB / sqrt(lwl_ft)) - 1);
 
     double coeff = VB / sqrt(lwl_ft);

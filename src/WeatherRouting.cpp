@@ -505,20 +505,12 @@ void WeatherRouting::UpdateComputeState()
 int debugcnt, debuglimit = 1, debugsize = 2;
 void WeatherRouting::OnCompute( wxCommandEvent& event )
 {
-    /* initialize crossing land routine from main thread as it is
-       not re-entrant, and cannot be done by worker-threads later */
-    PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
-
     Start(CurrentRouteMap());
     UpdateComputeState();
 }
 
 void WeatherRouting::OnComputeAll ( wxCommandEvent& event )
 {
-    /* initialize crossing land routine from main thread as it is
-       not re-entrant, and cannot be done by worker-threads later */
-    PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
-
     if(!m_bRunning)
         m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
 
@@ -1325,6 +1317,18 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
         !routemapoverlay->GribFailed() &&
         !routemapoverlay->ClimatologyFailed()))
         return;
+
+    RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+    /* initialize crossing land routine from main thread as it is
+       not re-entrant, and cannot be done by worker-threads later */
+    if(configuration.DetectLand)
+        PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
+    if(configuration.ClimatologyType != RouteMapConfiguration::DISABLED) {
+        /* query climatology to load it from main thread */
+        double dir, speed;
+        if(RouteMap::ClimatologyData)
+            RouteMap::ClimatologyData(0, wxDateTime::Now(), 0, 0, dir, speed);
+    }
 
     // already running?
     for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
