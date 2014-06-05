@@ -414,7 +414,7 @@ fromSM(double x, double y, double lat0, double lon0, double *lat, double *lon)
 
 void toSM_ECC(double lat, double lon, double lat0, double lon0, double *x, double *y)
 {
-      double xlon, z, x1, s, y3, s0, y30, y4;
+    double xlon, z, x1, s, s0;//,y3, y30, y4;
 
       double falsen;
       double test;
@@ -453,11 +453,11 @@ void toSM_ECC(double lat, double lon, double lat0, double lon0, double *x, doubl
 
 // y =.5 ln( (1 + sin t) / (1 - sin t) )
       s = sin(lat * DEGREE);
-      y3 = (.5 * log((1 + s) / (1 - s))) * z;
+//      y3 = (.5 * log((1 + s) / (1 - s))) * z;
 
       s0 = sin(lat0 * DEGREE);
-      y30 = (.5 * log((1 + s0) / (1 - s0))) * z;
-      y4 = y3 - y30;
+//      y30 = (.5 * log((1 + s0) / (1 - s0))) * z;
+//      y4 = y3 - y30;
 //      *y = y4;
 
     //Add eccentricity terms
@@ -624,7 +624,7 @@ fromPOLY(double x, double y, double lat0, double lon0, double *lat, double *lon)
 
 void  toTM(float lat, float lon, float lat0, float lon0, double *x, double *y)
 {
-      double A, a, es, f, k0, lambda, phi, lambda0, phi0;
+    double A, a, es, f, k0;//, lambda, phi, lambda0, phi0;
 
       double eccPrimeSquared;
       double N, T, C, MM;
@@ -644,11 +644,11 @@ void  toTM(float lat, float lon, float lat0, float lon0, double *x, double *y)
 
       es = 2 * f - f * f;
       eccSquared = es;
-      lambda = lon * DEGREE;
-      phi = lat * DEGREE;
+//      lambda = lon * DEGREE;
+//      phi = lat * DEGREE;
 
-      phi0 = lat0 * DEGREE;
-      lambda0 = lon0 * DEGREE;
+//      phi0 = lat0 * DEGREE;
+//      lambda0 = lon0 * DEGREE;
 
       eccPrimeSquared = (eccSquared)/(1-eccSquared);
 
@@ -684,7 +684,7 @@ void  toTM(float lat, float lon, float lat0, float lon0, double *x, double *y)
 void fromTM (double x, double y, double lat0, double lon0, double *lat, double *lon)
 {
 
-      double a, k0, es, f, e1, mu, phi1, phi0, lambda0;
+    double a, k0, es, f, e1, mu;//, phi1, phi0, lambda0;
 
       double eccSquared;
       double eccPrimeSquared;
@@ -693,8 +693,8 @@ void fromTM (double x, double y, double lat0, double lon0, double *lat, double *
       double LongOrigin = lon0;
       double rad2deg = 1./DEGREE;
 
-      phi0 = lat0 * DEGREE;
-      lambda0 = lon0 * DEGREE;
+//      phi0 = lat0 * DEGREE;
+//      lambda0 = lon0 * DEGREE;
 
 // constants for WGS-84
 
@@ -714,7 +714,7 @@ void fromTM (double x, double y, double lat0, double lon0, double *lat, double *
       phi1Rad = mu      + (3*e1/2-27*e1*e1*e1/32)*sin(2*mu)
                   + (21*e1*e1/16-55*e1*e1*e1*e1/32)*sin(4*mu)
                   +(151*e1*e1*e1/96)*sin(6*mu);
-      phi1 = phi1Rad*rad2deg;
+//      phi1 = phi1Rad*rad2deg;
 
       N1 = a/sqrt(1-eccSquared*sin(phi1Rad)*sin(phi1Rad));
       T1 = tan(phi1Rad)*tan(phi1Rad);
@@ -771,7 +771,7 @@ void MolodenskyTransform (double lat, double lon, double *to_lat, double *to_lon
       double clon = cos (from_lon);
       double ssqlat = slat * slat;
       double adb = 1.0 / (1.0 - from_f);  // "a divided by b"
-      double dlat, dlon, dh;
+      double dlat, dlon;//, dh;
 
       double rn = from_a / sqrt (1.0 - from_esq * ssqlat);
       double rm = from_a * (1. - from_esq) / pow ((1.0 - from_esq * ssqlat), 1.5);
@@ -783,8 +783,8 @@ void MolodenskyTransform (double lat, double lon, double *to_lat, double *to_lon
 
       dlon = (-dx * slon + dy * clon) / ((rn + from_h) * clat);
 
-      dh = (dx * clat * clon) + (dy * clat * slon) + (dz * slat)
-                  - (da * (from_a / rn)) + ((df * rn * ssqlat) / adb);
+//      dh = (dx * clat * clon) + (dy * clat * slon) + (dz * slat)
+//                  - (da * (from_a / rn)) + ((df * rn * ssqlat) / adb);
 
       *to_lon = lon + dlon/DEGREE;
       *to_lat = lat + dlat/DEGREE;
@@ -865,7 +865,7 @@ void ll_gc_ll(double lat, double lon, double brg, double dist, double *dlat, dou
  int ellipse;
  double geod_f;
  double geod_a;
- double es, onef, f, f64, f2, f4;
+ double es, onef, f, f4;//f64, f2;
 
     /*      Setup the static parameters  */
     phi1 = lat * DEGREE;            /* Initial Position  */
@@ -887,9 +887,9 @@ void ll_gc_ll(double lat, double lon, double brg, double dist, double *dlat, dou
       es = 2 * f - f * f;
       onef = sqrt(1. - es);
       geod_f = 1 - onef;
-      f2 = geod_f/2;
+//      f2 = geod_f/2;
       f4 = geod_f/4;
-      f64 = geod_f*geod_f/64;
+//      f64 = geod_f*geod_f/64;
 
       al12 = adjlon(al12); /* reduce to  +- 0-PI */
       signS = fabs(al12) > HALFPI ? 1 : 0;
@@ -999,8 +999,8 @@ void ll_gc_ll(double lat, double lon, double brg, double dist, double *dlat, dou
 void ll_gc_ll_reverse(double lat1, double lon1, double lat2, double lon2,
                      double *bearing, double *dist)
 {
- double th1,costh1,sinth1,sina12,cosa12,M,N,c1,c2,D,P,s1;
- int merid, signS;
+// double th1,costh1,sinth1,sina12,cosa12,M,N,c1,c2,D,P,s1;
+// int merid, signS;
 
 /*   Input/Output from geodesic functions   */
  double al12;           /* Forward azimuth */
@@ -1100,7 +1100,6 @@ void ll_gc_ll_reverse(double lat1, double lon1, double lat2, double lon2,
 }
 
 
-
 /* --------------------------------------------------------------------------------- */
 /*
 // Given the lat/long of starting point and ending point,
@@ -1111,19 +1110,19 @@ void ll_gc_ll_reverse(double lat1, double lon1, double lat2, double lon2,
 
 double DistGreatCircle(double slat, double slon, double dlat, double dlon)
 {
- double th1,costh1,sinth1,sina12,cosa12,M,N,c1,c2,D,P,s1;
- int merid, signS;
+// double th1,costh1,sinth1,sina12,cosa12,M,N,c1,c2,D,P,s1;
+// int merid, signS;
 
 /*   Input/Output from geodesic functions   */
- double al12;           /* Forward azimuth */
- double al21;           /* Back azimuth    */
+// double al12;           /* Forward azimuth */
+// double al21;           /* Back azimuth    */
  double geod_S;         /* Distance        */
  double phi1, lam1, phi2, lam2;
 
  int ellipse;
  double geod_f;
  double geod_a;
- double es, onef, f, f64, f2, f4;
+ double es, onef, f, f64, f4;//, f2;
 
       double d5;
       phi1 = slat * DEGREE;
@@ -1134,7 +1133,7 @@ double DistGreatCircle(double slat, double slon, double dlat, double dlon)
 //void geod_inv(struct georef_state *state)
 {
       double      th1,th2,thm,dthm,dlamm,dlam,sindlamm,costhm,sinthm,cosdthm,
-      sindthm,L,E,cosd,d,X,Y,T,sind,tandlammp,u,v,D,A,B;
+          sindthm,L,E,cosd,d,X,Y,T,sind,D,A,B;//u, v, tandlammp;
 
 
             /*   Stuff the WGS84 projection parameters as necessary
@@ -1148,7 +1147,7 @@ double DistGreatCircle(double slat, double slon, double dlat, double dlon)
       es = 2 * f - f * f;
       onef = sqrt(1. - es);
       geod_f = 1 - onef;
-      f2 = geod_f/2;
+//      f2 = geod_f/2;
       f4 = geod_f/4;
       f64 = geod_f*geod_f/64;
 
@@ -1164,8 +1163,8 @@ double DistGreatCircle(double slat, double slon, double dlat, double dlon)
       dthm = .5 * (th2 - th1);
       dlamm = .5 * ( dlam = adjlon(lam2 - lam1) );
       if (fabs(dlam) < DTOL && fabs(dthm) < DTOL) {
-            al12 =  al21 = geod_S = 0.;
-            return;
+//            al12 =  al21 = geod_S = 0.;
+            return 0;
       }
       sindlamm = sin(dlamm);
       costhm = cos(thm);      sinthm = sin(thm);
@@ -1189,23 +1188,24 @@ double DistGreatCircle(double slat, double slon, double dlat, double dlon)
             geod_S = geod_a * sind * (T - f4 * (T * X - Y) +
                         f64 * (X * (A + (T - .5 * (A - E)) * X) -
                         Y * (B + E * Y) + D * X * Y));
-            tandlammp = tan(.5 * (dlam - .25 * (Y + Y - E * (4. - X)) *
-                        (f2 * T + f64 * (32. * T - (20. * T - A)
-                        * X - (B + 4.) * Y)) * tan(dlam)));
+//            tandlammp = tan(.5 * (dlam - .25 * (Y + Y - E * (4. - X)) *
+            //                      (f2 * T + f64 * (32. * T - (20. * T - A)
+            //          * X - (B + 4.) * Y)) * tan(dlam)));
       } else {
             geod_S = geod_a * d;
-            tandlammp = tan(dlamm);
+//            tandlammp = tan(dlamm);
       }
-      u = atan2(sindthm , (tandlammp * costhm));
-      v = atan2(cosdthm , (tandlammp * sinthm));
-      al12 = adjlon(TWOPI + v - u);
-      al21 = adjlon(TWOPI - v - u);
+//      u = atan2(sindthm , (tandlammp * costhm));
+//      v = atan2(cosdthm , (tandlammp * sinthm));
+//      al12 = adjlon(TWOPI + v - u);
+//      al21 = adjlon(TWOPI - v - u);
 }
 
       d5 = geod_S / 1852.0;
 
       return d5;
 }
+
 
 void DistanceBearingMercator(double lat0, double lon0, double lat1, double lon1, double *brg, double *dist)
 {

@@ -47,7 +47,7 @@ class SkipPosition;
 class Position
 {
 public:
-    Position(double latitude, double longitude, int sp=0, int t=0, int u=0, int pr=0, Position *p=NULL);
+    Position(double latitude, double longitude, Position *p=NULL, int sp=0, int t=0, int u=0, int pr=0);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
@@ -69,7 +69,7 @@ public:
     Position *prev, *next; /* doubly linked circular list of positions */
 
     bool propagated;
-    bool drawn;
+    bool drawn, copied;
 };
 
 /* circular skip list of positions which point to where we

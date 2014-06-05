@@ -144,7 +144,8 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
     m_lDegreeSteps->Clear();
     for(double v = from; v <= to; v+=by) {
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
-        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), -v));
+        if(v > 0 && v < 180)
+            m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), -v));
     }
     Update();
 }

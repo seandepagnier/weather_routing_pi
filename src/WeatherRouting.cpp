@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -511,9 +511,6 @@ void WeatherRouting::OnCompute( wxCommandEvent& event )
 
 void WeatherRouting::OnComputeAll ( wxCommandEvent& event )
 {
-    if(!m_bRunning)
-        m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
-
     StartAll();
     UpdateComputeState();
 }
@@ -783,7 +780,7 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         UpdateStates();
         
     static int cycles; /* don't refresh all the time */
-    if((++cycles > 25 || !m_RunningRouteMaps.size())
+    if((++cycles > 50 || !m_RunningRouteMaps.size())
        && CurrentRouteMap() && CurrentRouteMap()->Updated()) {
         cycles = 0;
         m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
@@ -1336,6 +1333,9 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
         if(*it == routemapoverlay)
             return;
 
+    if(!m_bRunning)
+        m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
+
     // already waiting?
     for(std::list<RouteMapOverlay*>::iterator it = m_WaitingRouteMaps.begin();
         it != m_WaitingRouteMaps.end(); it++)
@@ -1409,7 +1409,8 @@ void WeatherRouting::Stop()
     m_bRunning = false;
 
     SetEnableConfigurationMenu();
-    m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
+    if(m_StartTime.IsValid())
+        m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
 }
 
 void WeatherRouting::Reset()

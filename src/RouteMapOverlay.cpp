@@ -143,7 +143,8 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronT
     if(!dc.GetDC())
         glBegin(GL_LINES);
     do {
-        DrawLine(p, p->next, dc, vp);
+        if(!p->copied || !p->next->copied)
+            DrawLine(p, p->next, dc, vp);
         p = p->next;
     } while(p != s->point);
     if(!dc.GetDC())
@@ -161,7 +162,8 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent, int Al
     Position *pos = r->skippoints->point;
     do {
         for(Position *p = pos; p && !p->drawn && p->parent; p = p->parent) {
-            DrawLine(p, p->parent, dc, vp);
+            if(!p->copied || each_parent)
+                DrawLine(p, p->parent, dc, vp);
             p->drawn = true;
             if(!each_parent)
                 break;
@@ -253,7 +255,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                     it = origin.end();
                     it--;
                 }
-            
+
                 wxColour black(0, 0, 0);
                 SetColor(dc, false, black, AlternateRouteThickness);
                 if(!dc.GetDC())
@@ -558,9 +560,9 @@ void RouteMapOverlay::UpdateDestination()
     if(endp) {
         if(done) {
             delete destination_position;
-            destination_position = new Position(configuration.EndLat, configuration.EndLon,
+            destination_position = new Position(configuration.EndLat, configuration.EndLon, endp,
                                                 endp->sailplan, endp->tacks,
-                                                endp->upwind, endp->propagations, endp);
+                                                endp->upwind, endp->propagations);
             last_destination_position = destination_position;
         } else
             last_destination_position = endp;
