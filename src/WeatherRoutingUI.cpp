@@ -56,7 +56,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	fgSizer17->SetFlexibleDirection( wxBOTH );
 	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
 	
-	m_lWeatherRoutes = new wxListCtrl( m_panel12, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
+	m_lWeatherRoutes = new wxListCtrl( m_panel12, wxID_ANY, wxDefaultPosition, wxSize( -1,100 ), wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
 	fgSizer17->Add( m_lWeatherRoutes, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer116;
@@ -278,6 +278,149 @@ WeatherRoutingBase::~WeatherRoutingBase()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnPlot ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
+	
+}
+
+SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxSize( -1,290 ), wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer92;
+	fgSizer92 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer92->SetFlexibleDirection( wxBOTH );
+	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer25;
+	sbSizer25 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Display") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer18;
+	fgSizer18 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer18->SetFlexibleDirection( wxBOTH );
+	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
+	
+	wxFlexGridSizer* fgSizer42;
+	fgSizer42 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer42->SetFlexibleDirection( wxBOTH );
+	fgSizer42->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText74 = new wxStaticText( this, wxID_ANY, _("Cursor Route Color"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText74->Wrap( -1 );
+	fgSizer42->Add( m_staticText74, 0, wxALL, 5 );
+	
+	m_cpCursorRoute = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 255, 0 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	fgSizer42->Add( m_cpCursorRoute, 0, wxALL, 5 );
+	
+	m_staticText73 = new wxStaticText( this, wxID_ANY, _("Destination Route Color"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText73->Wrap( -1 );
+	fgSizer42->Add( m_staticText73, 0, wxALL, 5 );
+	
+	m_cpDestinationRoute = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 0, 255 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
+	fgSizer42->Add( m_cpDestinationRoute, 0, wxALL, 5 );
+	
+	m_staticText75 = new wxStaticText( this, wxID_ANY, _("Route Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText75->Wrap( -1 );
+	fgSizer42->Add( m_staticText75, 0, wxALL, 5 );
+	
+	m_sRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 10, 4 );
+	fgSizer42->Add( m_sRouteThickness, 0, wxALL, 5 );
+	
+	m_staticText70 = new wxStaticText( this, wxID_ANY, _("Iso Chron Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText70->Wrap( -1 );
+	fgSizer42->Add( m_staticText70, 0, wxALL, 5 );
+	
+	m_sIsoChronThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 2 );
+	fgSizer42->Add( m_sIsoChronThickness, 0, wxALL, 5 );
+	
+	m_staticText71 = new wxStaticText( this, wxID_ANY, _("Alternate Routes Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText71->Wrap( -1 );
+	fgSizer42->Add( m_staticText71, 0, wxALL, 5 );
+	
+	m_sAlternateRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
+	fgSizer42->Add( m_sAlternateRouteThickness, 0, wxALL, 5 );
+	
+	
+	fgSizer18->Add( fgSizer42, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer82;
+	fgSizer82 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer82->SetFlexibleDirection( wxBOTH );
+	fgSizer82->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_cbAlternatesForAll = new wxCheckBox( this, wxID_ANY, _("Alternates for all IsoChrons"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer82->Add( m_cbAlternatesForAll, 0, wxALL, 5 );
+	
+	m_cbSquaresAtSailChanges = new wxCheckBox( this, wxID_ANY, _("Squares at Sail Changes"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbSquaresAtSailChanges->SetValue(true); 
+	fgSizer82->Add( m_cbSquaresAtSailChanges, 0, wxALL, 5 );
+	
+	
+	fgSizer18->Add( fgSizer82, 1, wxEXPAND, 5 );
+	
+	
+	sbSizer25->Add( fgSizer18, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer92->Add( sbSizer25, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer26;
+	sbSizer26 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Computation") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer93;
+	fgSizer93 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer93->SetFlexibleDirection( wxBOTH );
+	fgSizer93->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText115 = new wxStaticText( this, wxID_ANY, _("Number of Concurrent threads"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText115->Wrap( -1 );
+	fgSizer93->Add( m_staticText115, 0, wxALL, 5 );
+	
+	m_sConcurrentThreads = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 64, 1 );
+	fgSizer93->Add( m_sConcurrentThreads, 0, wxALL, 5 );
+	
+	
+	sbSizer26->Add( fgSizer93, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer92->Add( sbSizer26, 1, wxEXPAND, 5 );
+	
+	m_sdbSizer1 = new wxStdDialogButtonSizer();
+	m_sdbSizer1OK = new wxButton( this, wxID_OK );
+	m_sdbSizer1->AddButton( m_sdbSizer1OK );
+	m_sdbSizer1Help = new wxButton( this, wxID_HELP );
+	m_sdbSizer1->AddButton( m_sdbSizer1Help );
+	m_sdbSizer1->Realize();
+	
+	fgSizer92->Add( m_sdbSizer1, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer92 );
+	this->Layout();
+	fgSizer92->Fit( this );
+	
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	m_cpCursorRoute->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
+	m_cpDestinationRoute->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
+	m_sRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_sIsoChronThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_sAlternateRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_cbAlternatesForAll->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbSquaresAtSailChanges->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_sdbSizer1Help->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
+}
+
+SettingsDialogBase::~SettingsDialogBase()
+{
+	// Disconnect Events
+	m_cpCursorRoute->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
+	m_cpDestinationRoute->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
+	m_sRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_sIsoChronThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_sAlternateRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_cbAlternatesForAll->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbSquaresAtSailChanges->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_sdbSizer1Help->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
 	
 }
 
@@ -945,149 +1088,6 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_bClearDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );
 	m_bGenerateDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnGenerateDegreeSteps ), NULL, this );
 	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClose ), NULL, this );
-	
-}
-
-SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
-{
-	this->SetSizeHints( wxSize( -1,290 ), wxDefaultSize );
-	
-	wxFlexGridSizer* fgSizer92;
-	fgSizer92 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer92->SetFlexibleDirection( wxBOTH );
-	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticBoxSizer* sbSizer25;
-	sbSizer25 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Display") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer18;
-	fgSizer18 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer18->SetFlexibleDirection( wxBOTH );
-	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
-	
-	wxFlexGridSizer* fgSizer42;
-	fgSizer42 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer42->SetFlexibleDirection( wxBOTH );
-	fgSizer42->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText74 = new wxStaticText( this, wxID_ANY, _("Cursor Route Color"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText74->Wrap( -1 );
-	fgSizer42->Add( m_staticText74, 0, wxALL, 5 );
-	
-	m_cpCursorRoute = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 255, 0 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer42->Add( m_cpCursorRoute, 0, wxALL, 5 );
-	
-	m_staticText73 = new wxStaticText( this, wxID_ANY, _("Destination Route Color"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText73->Wrap( -1 );
-	fgSizer42->Add( m_staticText73, 0, wxALL, 5 );
-	
-	m_cpDestinationRoute = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 0, 255 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE );
-	fgSizer42->Add( m_cpDestinationRoute, 0, wxALL, 5 );
-	
-	m_staticText75 = new wxStaticText( this, wxID_ANY, _("Route Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText75->Wrap( -1 );
-	fgSizer42->Add( m_staticText75, 0, wxALL, 5 );
-	
-	m_sRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 10, 4 );
-	fgSizer42->Add( m_sRouteThickness, 0, wxALL, 5 );
-	
-	m_staticText70 = new wxStaticText( this, wxID_ANY, _("Iso Chron Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText70->Wrap( -1 );
-	fgSizer42->Add( m_staticText70, 0, wxALL, 5 );
-	
-	m_sIsoChronThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 2 );
-	fgSizer42->Add( m_sIsoChronThickness, 0, wxALL, 5 );
-	
-	m_staticText71 = new wxStaticText( this, wxID_ANY, _("Alternate Routes Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText71->Wrap( -1 );
-	fgSizer42->Add( m_staticText71, 0, wxALL, 5 );
-	
-	m_sAlternateRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
-	fgSizer42->Add( m_sAlternateRouteThickness, 0, wxALL, 5 );
-	
-	
-	fgSizer18->Add( fgSizer42, 1, wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer82;
-	fgSizer82 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer82->SetFlexibleDirection( wxBOTH );
-	fgSizer82->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_cbAlternatesForAll = new wxCheckBox( this, wxID_ANY, _("Alternates for all IsoChrons"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer82->Add( m_cbAlternatesForAll, 0, wxALL, 5 );
-	
-	m_cbSquaresAtSailChanges = new wxCheckBox( this, wxID_ANY, _("Squares at Sail Changes"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_cbSquaresAtSailChanges->SetValue(true); 
-	fgSizer82->Add( m_cbSquaresAtSailChanges, 0, wxALL, 5 );
-	
-	
-	fgSizer18->Add( fgSizer82, 1, wxEXPAND, 5 );
-	
-	
-	sbSizer25->Add( fgSizer18, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer92->Add( sbSizer25, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer26;
-	sbSizer26 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Computation") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer93;
-	fgSizer93 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer93->SetFlexibleDirection( wxBOTH );
-	fgSizer93->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText115 = new wxStaticText( this, wxID_ANY, _("Number of Concurrent threads"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText115->Wrap( -1 );
-	fgSizer93->Add( m_staticText115, 0, wxALL, 5 );
-	
-	m_sConcurrentThreads = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 64, 1 );
-	fgSizer93->Add( m_sConcurrentThreads, 0, wxALL, 5 );
-	
-	
-	sbSizer26->Add( fgSizer93, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer92->Add( sbSizer26, 1, wxEXPAND, 5 );
-	
-	m_sdbSizer1 = new wxStdDialogButtonSizer();
-	m_sdbSizer1OK = new wxButton( this, wxID_OK );
-	m_sdbSizer1->AddButton( m_sdbSizer1OK );
-	m_sdbSizer1Help = new wxButton( this, wxID_HELP );
-	m_sdbSizer1->AddButton( m_sdbSizer1Help );
-	m_sdbSizer1->Realize();
-	
-	fgSizer92->Add( m_sdbSizer1, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( fgSizer92 );
-	this->Layout();
-	fgSizer92->Fit( this );
-	
-	this->Centre( wxBOTH );
-	
-	// Connect Events
-	m_cpCursorRoute->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
-	m_cpDestinationRoute->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
-	m_sRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
-	m_sIsoChronThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
-	m_sAlternateRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
-	m_cbAlternatesForAll->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_cbSquaresAtSailChanges->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_sdbSizer1Help->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
-}
-
-SettingsDialogBase::~SettingsDialogBase()
-{
-	// Disconnect Events
-	m_cpCursorRoute->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
-	m_cpDestinationRoute->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SettingsDialogBase::OnUpdateColor ), NULL, this );
-	m_sRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
-	m_sIsoChronThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
-	m_sAlternateRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
-	m_cbAlternatesForAll->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_cbSquaresAtSailChanges->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_sdbSizer1Help->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
 	
 }
 
@@ -2034,6 +2034,11 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer77->Add( 0, 0, 1, wxEXPAND, 5 );
 	
+	wxFlexGridSizer* fgSizer97;
+	fgSizer97 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer97->SetFlexibleDirection( wxBOTH );
+	fgSizer97->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	wxFlexGridSizer* fgSizer78;
 	fgSizer78 = new wxFlexGridSizer( 0, 3, 0, 0 );
 	fgSizer78->SetFlexibleDirection( wxBOTH );
@@ -2088,15 +2093,18 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer78->Add( m_stMousePosition3, 0, wxALL, 5 );
 	
 	
-	fgSizer77->Add( fgSizer78, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer12->Add( fgSizer77, 1, wxEXPAND, 5 );
+	fgSizer97->Add( fgSizer78, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer16;
 	fgSizer16 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer16->SetFlexibleDirection( wxBOTH );
 	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_rbCurrentRoute = new wxRadioButton( this, wxID_ANY, _("Current Route"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer16->Add( m_rbCurrentRoute, 0, wxALL, 5 );
+	
+	m_rbCursorRoute = new wxRadioButton( this, wxID_ANY, _("Cursor Route"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer16->Add( m_rbCursorRoute, 0, wxALL, 5 );
 	
 	m_sdbSizer4 = new wxStdDialogButtonSizer();
 	m_sdbSizer4OK = new wxButton( this, wxID_OK );
@@ -2106,7 +2114,13 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer16->Add( m_sdbSizer4, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer12->Add( fgSizer16, 1, wxEXPAND, 5 );
+	fgSizer97->Add( fgSizer16, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer77->Add( fgSizer97, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer12->Add( fgSizer77, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer3->Add( fgSizer12, 1, wxEXPAND, 5 );
@@ -2154,6 +2168,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_cVariable1->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
 	m_cVariable2->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
 	m_cVariable3->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
+	m_rbCurrentRoute->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdateRoute ), NULL, this );
 }
 
 PlotDialogBase::~PlotDialogBase()
@@ -2195,6 +2210,7 @@ PlotDialogBase::~PlotDialogBase()
 	m_cVariable1->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
 	m_cVariable2->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
 	m_cVariable3->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdatePlotVariable ), NULL, this );
+	m_rbCurrentRoute->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( PlotDialogBase::OnUpdateRoute ), NULL, this );
 	
 }
 
@@ -2395,61 +2411,49 @@ ReportDialogBase::ReportDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	
 	wxFlexGridSizer* fgSizer90;
 	fgSizer90 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer90->AddGrowableCol( 0 );
+	fgSizer90->AddGrowableRow( 0 );
+	fgSizer90->AddGrowableRow( 1 );
 	fgSizer90->SetFlexibleDirection( wxBOTH );
 	fgSizer90->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxStaticBoxSizer* sbSizer32;
-	sbSizer32 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Route") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer91;
-	fgSizer91 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer91->SetFlexibleDirection( wxBOTH );
-	fgSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxFlexGridSizer* fgSizer92;
-	fgSizer92 = new wxFlexGridSizer( 1, 0, 0, 0 );
-	fgSizer92->SetFlexibleDirection( wxBOTH );
-	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText120 = new wxStaticText( this, wxID_ANY, _("Start"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText120->Wrap( -1 );
-	fgSizer92->Add( m_staticText120, 0, wxALL, 5 );
-	
-	m_stStart = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_stStart->Wrap( -1 );
-	fgSizer92->Add( m_stStart, 0, wxALL, 5 );
-	
-	m_staticText122 = new wxStaticText( this, wxID_ANY, _("End"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText122->Wrap( -1 );
-	fgSizer92->Add( m_staticText122, 0, wxALL, 5 );
-	
-	m_stEnd = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_stEnd->Wrap( -1 );
-	fgSizer92->Add( m_stEnd, 0, wxALL, 5 );
-	
-	m_cbAllRoutes = new wxCheckBox( this, wxID_ANY, _("Report All Routes"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer92->Add( m_cbAllRoutes, 0, wxALL, 5 );
-	
-	
-	fgSizer91->Add( fgSizer92, 1, wxEXPAND, 5 );
-	
-	m_tRouteReport = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
-	fgSizer91->Add( m_tRouteReport, 0, wxALL|wxEXPAND, 5 );
-	
-	
-	sbSizer32->Add( fgSizer91, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer90->Add( sbSizer32, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer31;
 	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Current Configuration") ), wxVERTICAL );
 	
-	m_tConfigurationReport = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY );
-	sbSizer31->Add( m_tConfigurationReport, 0, wxALL|wxEXPAND, 5 );
+	wxFlexGridSizer* fgSizer98;
+	fgSizer98 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer98->AddGrowableCol( 0 );
+	fgSizer98->AddGrowableRow( 0 );
+	fgSizer98->SetFlexibleDirection( wxBOTH );
+	fgSizer98->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_htmlConfigurationReport = new wxHtmlWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_AUTO );
+	fgSizer98->Add( m_htmlConfigurationReport, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sbSizer31->Add( fgSizer98, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer90->Add( sbSizer31, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer32;
+	sbSizer32 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Routes") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer99;
+	fgSizer99 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer99->AddGrowableCol( 0 );
+	fgSizer99->AddGrowableRow( 0 );
+	fgSizer99->SetFlexibleDirection( wxBOTH );
+	fgSizer99->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_htmlRoutesReport = new wxHtmlWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_AUTO );
+	fgSizer99->Add( m_htmlRoutesReport, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sbSizer32->Add( fgSizer99, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer90->Add( sbSizer32, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer93;
 	fgSizer93 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -2469,12 +2473,10 @@ ReportDialogBase::ReportDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	
 	this->SetSizer( fgSizer90 );
 	this->Layout();
-	fgSizer90->Fit( this );
 	
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	m_cbAllRoutes->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ReportDialogBase::OnReportAllRoutes ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnInformation ), NULL, this );
 	m_bClose->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnClose ), NULL, this );
 }
@@ -2482,7 +2484,6 @@ ReportDialogBase::ReportDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 ReportDialogBase::~ReportDialogBase()
 {
 	// Disconnect Events
-	m_cbAllRoutes->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ReportDialogBase::OnReportAllRoutes ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnInformation ), NULL, this );
 	m_bClose->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ReportDialogBase::OnClose ), NULL, this );
 	

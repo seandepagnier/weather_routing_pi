@@ -31,27 +31,67 @@
 #include <math.h>
 #include <time.h>
 
-#include "ReportDialog.h"
+#include "ocpn_plugin.h"
 
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 
-ReportDialog::ReportDialog(wxWindow *parent)
-    : ReportDialogBase(parent)
+#include "WeatherRouting.h"
+
+ReportDialog::ReportDialog( WeatherRouting &weatherrouting )
+    : ReportDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting)
 {
     SetRouteMapOverlay(NULL);
 }
 
 void ReportDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
 {
-    // ...
-    GenerateReport();
+    GenerateRoutesReport();
+
+    if(routemapoverlay == NULL) {
+        m_htmlConfigurationReport->SetPage(_("No Configuration selected."));
+        return;
+    }
+
+    if(!routemapoverlay->ReachedDestination()) {
+        m_htmlConfigurationReport->SetPage(_("Destination not yet reached."));
+        return;
+    }
+
+    wxString page;
+    RouteMapConfiguration c = routemapoverlay->GetConfiguration();
+    std::list<PlotData> p = routemapoverlay->GetPlotData();
+
+    page += _("Route from ") + c.Start + _(" to ") + c.End + _(" Leaving ") + c.StartTime.Format();
+    page += _T("<p>");
+    double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
+    double distance_sailed = routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE);
+    page += _("Distance sailed: ") + wxString::Format
+        (_T("%.3f NMi : %.3f (%.2f%%) "), distance_sailed,
+         distance_sailed - distance, distance_sailed / distance - 1) +
+        _("longer than great circle route") + _T("\n");
+    page += _("Averages: ") +
+        wxString::Format(_T(" %.2f "), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED)) + _("speed") +
+        wxString::Format(_T(" %.2f "), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWIND)) + _("wind") +
+        wxString::Format(_T(" %.2f "), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWAVE)) + _("wave") + _T("\n");
+
+    m_htmlConfigurationReport->SetPage(page);
 }
 
-void ReportDialog::OnReportAllRoutes( wxCommandEvent& event )
+void ReportDialog::GenerateRoutesReport()
 {
-    GenerateReport();
+    /* sort configurations interate over each group of configurations
+       with the same start and end to determine best and worst times,
+       and cyclone crossings to determine cyclone times
+
+       determine if currents significantly improve this (boat over ground speed average is 10% or
+       more faster than boat over water)  then attempt to determine which current based on lat/lon
+       eg, gulf stream, japan, current aghulles current etc.. and report it.
+
+    */
+
+    m_htmlRoutesReport->SetPage(_("No report yet."));
 }
 
 void ReportDialog::OnInformation( wxCommandEvent& event )
@@ -65,8 +105,4 @@ An overview can be given of the best times, expected speed, and weather conditio
 If climatology is available, cyclone risk and additional weather conditions may be described."),
                          _("Weather Routing Report"), wxOK | wxICON_INFORMATION);
     mdlg.ShowModal();
-}
-
-void ReportDialog::GenerateReport()
-{
 }

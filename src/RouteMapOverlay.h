@@ -59,9 +59,8 @@ public:
     void RenderCourse(Position *pos, wxDateTime time, bool SquaresAtSailChanges,
                       ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
-    std::list<PlotData> GetPlotData();
-    double RouteInfo(enum RouteInfoType type);
-    void RouteInfo(double &distance, double &avgspeed, double &percentage_upwind);
+    std::list<PlotData> GetPlotData(bool cursor_route=false);
+    double RouteInfo(enum RouteInfoType type, bool cursor_route=false);
 
     bool Updated();
     void UpdateCursorPosition();

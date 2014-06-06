@@ -312,8 +312,10 @@ bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort 
 void weather_routing_pi::OnCursorLatLonTimer( wxTimerEvent & )
 {
     RouteMapOverlay *crm = m_pWeather_Routing->CurrentRouteMap();
-    if(crm && crm->SetCursorLatLon(m_cursor_lat, m_cursor_lon))
+    if(crm && crm->SetCursorLatLon(m_cursor_lat, m_cursor_lon)) {
         RequestRefresh(m_parent_window);
+        m_pWeather_Routing->CursorRouteChanged();
+    }
 }
 
 bool weather_routing_pi::LoadConfig(void)

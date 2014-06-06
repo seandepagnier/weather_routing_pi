@@ -41,8 +41,8 @@
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
 
-ConfigurationDialog::ConfigurationDialog(WeatherRouting *weatherrouting)
-    : ConfigurationDialogBase(weatherrouting), m_WeatherRouting(weatherrouting)
+ConfigurationDialog::ConfigurationDialog(WeatherRouting &weatherrouting)
+    : ConfigurationDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting)
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -71,7 +71,7 @@ void ConfigurationDialog::EditBoat( )
 
     if(updated == wxID_OK) {
         /* update any configurations that use this boat */
-        m_WeatherRouting->UpdateBoatFilename(Configuration());
+        m_WeatherRouting.UpdateBoatFilename(Configuration());
         Update();
     }
 }
@@ -316,5 +316,5 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 
 void ConfigurationDialog::Update()
 {
-    m_WeatherRouting->SetConfigurationCurrentRoute(Configuration());
+    m_WeatherRouting.SetConfigurationCurrentRoute(Configuration());
 }

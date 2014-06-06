@@ -34,18 +34,17 @@
 
 #include "Utilities.h"
 #include "Boat.h"
-#include "RouteMap.h"
-#include "PlotDialog.h"
+#include "RouteMapOverlay.h"
+#include "WeatherRouting.h"
 
 //---------------------------------------------------------------------------------------
 //          Weather Routing Dialog Implementation
 //---------------------------------------------------------------------------------------
 
 
-PlotDialog::PlotDialog( wxWindow *parent, std::list<PlotData> &PlotData )
-    : PlotDialogBase(parent), m_PlotData(PlotData)
+PlotDialog::PlotDialog( WeatherRouting &weatherrouting )
+    : PlotDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting)
 {
-    GetScale();
 }
 
 PlotDialog::~PlotDialog()
@@ -180,4 +179,18 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
         s = dc.GetTextExtent(value);
         dc.DrawText(value, 0, x*h - s.y/2);
     }
+}
+
+void PlotDialog::OnUpdateRoute( wxCommandEvent& event )
+{
+    SetRouteMapOverlay(m_WeatherRouting.CurrentRouteMap());
+}
+
+void PlotDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
+{
+    if(!routemapoverlay)
+        m_PlotData.clear();
+    else
+        m_PlotData = routemapoverlay->GetPlotData(m_rbCursorRoute->GetValue());
+    GetScale();
 }

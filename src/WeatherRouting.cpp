@@ -41,7 +41,6 @@
 #include "RouteMapOverlay.h"
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
-#include "PlotDialog.h"
 #include "AboutDialog.h"
 
 /* XPM */
@@ -103,9 +102,9 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 }
 
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
-    : WeatherRoutingBase(parent), m_ConfigurationDialog(this),
-      m_ConfigurationBatchDialog(this), m_SettingsDialog(this),
-      m_StatisticsDialog(this), m_ReportDialog(this), m_FilterRoutesDialog(this),
+    : WeatherRoutingBase(parent), m_ConfigurationDialog(*this),
+      m_ConfigurationBatchDialog(this), m_SettingsDialog(this), m_StatisticsDialog(this),
+      m_ReportDialog(*this), m_PlotDialog(*this), m_FilterRoutesDialog(this),
       m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItem(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
       m_bShowSettings(false), m_bShowStatistics(false), m_bShowReport(false),
@@ -275,6 +274,12 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
     
     m_ConfigurationDialog.AddSource(name);
     m_ConfigurationBatchDialog.AddSource(name);
+}
+
+void WeatherRouting::CursorRouteChanged()
+{
+    if(m_PlotDialog.IsShown() && m_PlotDialog.m_rbCursorRoute->GetValue())
+        m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
 }
 
 void WeatherRouting::OnNewPosition( wxCommandEvent& event )
@@ -457,6 +462,9 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
 
     if(m_ReportDialog.IsShown())
         m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
+
+    if(m_PlotDialog.IsShown())
+        m_PlotDialog.SetRouteMapOverlay(routemapoverlay);
 
     if(m_ConfigurationBatchDialog.IsShown())
         m_ConfigurationBatchDialog.Reset();
@@ -651,12 +659,18 @@ bool WeatherRouting::Show(bool show)
         m_ConfigurationDialog.Show(m_bShowConfiguration);
         m_ConfigurationBatchDialog.Show(m_bShowConfigurationBatch);
         m_SettingsDialog.Show(m_bShowSettings);
+
         if(m_bShowStatistics)
             m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
         m_StatisticsDialog.Show(m_bShowStatistics);
+
         if(m_bShowReport)
             m_ReportDialog.SetRouteMapOverlay(CurrentRouteMap());
-        m_StatisticsDialog.Show(m_bShowStatistics);
+
+        if(m_bShowPlot)
+            m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
+        m_PlotDialog.Show(m_bShowPlot);
+
         m_FilterRoutesDialog.Show(m_bShowFilter);
     } else {
         m_bShowConfiguration = m_ConfigurationDialog.IsShown();
@@ -664,6 +678,7 @@ bool WeatherRouting::Show(bool show)
         m_bShowSettings = m_SettingsDialog.IsShown();
         m_bShowStatistics = m_StatisticsDialog.IsShown();
         m_bShowReport = m_ReportDialog.IsShown();
+        m_bShowPlot = m_PlotDialog.IsShown();
         m_bShowFilter = m_FilterRoutesDialog.IsShown();
     }
 
@@ -713,11 +728,8 @@ void WeatherRouting::OnReport( wxCommandEvent& event )
 
 void WeatherRouting::OnPlot ( wxCommandEvent& event )
 {
-    if(CurrentRouteMap(true)) {
-        std::list<PlotData> plotdata = CurrentRouteMap()->GetPlotData();
-        PlotDialog plotdialog(this, plotdata);
-        plotdialog.ShowModal();
-    }
+    m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
+    m_PlotDialog.Show();
 }
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
@@ -786,6 +798,8 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
         if(m_StatisticsDialog.IsShown())
             m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
+        if(m_PlotDialog.IsShown())
+            m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
 
         m_StartTime = wxDateTime::Now();
         GetParent()->Refresh();
@@ -1282,7 +1296,7 @@ void WeatherRouting::RebuildList()
 
 void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
 {
-    std::list<PlotData> plotdata = routemapoverlay.GetPlotData();
+    std::list<PlotData> plotdata = routemapoverlay.GetPlotData(false);
 
     if(plotdata.size() == 0) {
         wxMessageDialog mdlg(this, _("Empty Route, nothing to export\n"),

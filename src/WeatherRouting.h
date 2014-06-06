@@ -37,6 +37,7 @@
 #include "SettingsDialog.h"
 #include "StatisticsDialog.h"
 #include "ReportDialog.h"
+#include "PlotDialog.h"
 #include "FilterRoutesDialog.h"
 
 class weather_routing_pi;
@@ -89,11 +90,12 @@ public:
     void AddPosition(double lat, double lon);
     void AddPosition(double lat, double lon, wxString name);
 
+    void CursorRouteChanged();
+
 private:
 
     void OnNewPosition( wxCommandEvent& event );
     void OnUpdateBoat( wxCommandEvent& event );
-//    void OnListLabelEdit( wxListEvent& event );
     void OnRemovePosition( wxCommandEvent& event );
     void OnClearPositions( wxCommandEvent& event );
     void OnClose( wxCloseEvent& event ) { Hide(); }
@@ -154,6 +156,7 @@ private:
     SettingsDialog m_SettingsDialog;
     StatisticsDialog m_StatisticsDialog;
     ReportDialog m_ReportDialog;
+    PlotDialog m_PlotDialog;
     FilterRoutesDialog m_FilterRoutesDialog;
 
     wxTimer m_tCompute, m_tHideConfiguration;
@@ -168,7 +171,7 @@ private:
     bool m_bSkipUpdateCurrentItem;
 
     bool m_bShowConfiguration, m_bShowConfigurationBatch;
-    bool m_bShowSettings, m_bShowStatistics, m_bShowReport, m_bShowFilter;
+    bool m_bShowSettings, m_bShowStatistics, m_bShowReport, m_bShowPlot, m_bShowFilter;
 
     weather_routing_pi &m_weather_routing_pi;
 };

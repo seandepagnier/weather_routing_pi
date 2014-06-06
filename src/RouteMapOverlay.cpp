@@ -409,9 +409,9 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
     m_bNeedsGrib = false;
 }
 
-std::list<PlotData> RouteMapOverlay::GetPlotData()
+std::list<PlotData> RouteMapOverlay::GetPlotData(bool cursor_route)
 {
-    Position *pos = last_destination_position;
+    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
     std::list<PlotData> plotdatalist;
     if(!pos)
         return plotdatalist;
@@ -465,9 +465,9 @@ std::list<PlotData> RouteMapOverlay::GetPlotData()
     return plotdatalist;
 }
 
-double RouteMapOverlay::RouteInfo(enum RouteInfoType type)
+double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
 {
-    std::list<PlotData> plotdata = GetPlotData();
+    std::list<PlotData> plotdata = GetPlotData(cursor_route);
     double total = 0, count = 0, lat0, lon0;
     for(std::list<PlotData>::iterator it=plotdata.begin(); it!=plotdata.end(); it++)
     {

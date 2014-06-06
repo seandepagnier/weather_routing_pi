@@ -190,38 +190,32 @@ static bool Current(GribRecordSet *grib, RouteMapConfiguration::ClimatologyDataT
    WA  - Angle of wind relative to true north
    VW - velocity of wind over water
 */
-static void OverWater(double C, double VC, double WG, double VWG, double &WA, double &VW)
+static void OverWater(double WG, double VWG, double C, double VC, double &WA, double &VW)
 {
     if(VC == 0) { // short-cut if no currents
-        WA = WG;
-        VW = VWG;
+        WA = WG, VW = VWG;
         return;
     }
 
-    double Cx = VC * cos(deg2rad(C));
-    double Cy = VC * sin(deg2rad(C));
-    double Wx = VWG * cos(deg2rad(WG)) - Cx;
-    double Wy = VWG * sin(deg2rad(WG)) - Cy;
-    VW = distance(Wx, Wy);
+    double Cx = VC * cos(deg2rad(C)), Cy = VC * sin(deg2rad(C));
+    double Wx = VWG * cos(deg2rad(WG)) - Cx, Wy = VWG * sin(deg2rad(WG)) - Cy;
     WA = rad2deg(atan2(Wy, Wx));
+    VW = distance(Wx, Wy);
 }
 
 /* provisions to compute boat movement over ground
 
    BG  - boat direction over ground
    BGV - boat speed over ground (gps velocity)  */
-static void BoatOverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
+static void OverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
 {
     if(VC == 0) { // short-cut if no currents
         BG = B, VBG = VB;
         return;
     }
 
-    double Cx = VC * cos(deg2rad(C));
-    double Cy = VC * sin(deg2rad(C));
-    double BGx = VB * cos(deg2rad(B)) + Cx;
-    double BGy = VB * sin(deg2rad(B)) + Cy;
-
+    double Cx = VC * cos(deg2rad(C)), Cy = VC * sin(deg2rad(C));
+    double BGx = VB * cos(deg2rad(B)) + Cx, BGy = VB * sin(deg2rad(B)) + Cy;
     BG  = rad2deg(atan2(BGy, BGx));
     VBG = distance(BGx, BGy);
 }
@@ -390,39 +384,16 @@ SkipPosition *Position::BuildSkipList()
     return skippoints;
 }
 
-/* get data from a position for plotting */
-bool Position::GetPlotData(GribRecordSet *grib, double dt,
-                           RouteMapConfiguration &configuration, PlotData &data)
+struct climatology_wind_atlas
 {
-    data.WVHT = Swell(grib, lat, lon);
-    if(!Wind(grib, configuration.ClimatologyType, data.time,
-             configuration.AllowDataDeficient, this, data.WG, data.VWG))
-        return false;
-
-    if(!Current(grib, configuration.ClimatologyType, data.time, lat, lon, data.C, data.VC))
-        data.C = data.VC = 0;
-
-    OverWater(data.C, data.VC, data.WG, data.VWG, data.W, data.VW);
-
-    if(parent) {
-        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &data.BG, &data.VBG);
-        if(dt == 0)
-            data.VBG = 0;
-        else
-            data.VBG *= 3600 / dt;
-        OverWater(data.C, data.VC, data.BG, data.VBG, data.B, data.VB);
-        return true;
-    }
-
-    return false;
-}
+    double W[8], VW[8], storm, calm, directions[8];
+};
 
 static inline bool ReadWindAndCurrents
 (GribRecordSet *grib, const wxDateTime &time, RouteMapConfiguration &configuration, Position *p,
 /* normal data */
  double &WG, double &VWG, double &W, double &VW, double &C, double &VC,
-/* for climatology graph */
- double Wc[8], double VWc[8], double &storm, double &calm, double directions[8])
+ climatology_wind_atlas &atlas)
 {
     /* read current data */
     if(!configuration.Currents || !Current(grib, configuration.ClimatologyType,
@@ -437,7 +408,7 @@ static inline bool ReadWindAndCurrents
     } else if(configuration.ClimatologyType != RouteMapConfiguration::DISABLED) {
         double speeds[8];
         while(!RouteMap::ClimatologyWindAtlasData(time, p->lat, p->lon, windatlas_count,
-                                                  directions, speeds, storm, calm)) {
+                                                  atlas.directions, speeds, atlas.storm, atlas.calm)) {
             if(!configuration.AllowDataDeficient)
                 return false;
             p = p->parent;
@@ -445,22 +416,23 @@ static inline bool ReadWindAndCurrents
                 return false;
         }
 
+        /* compute wind speeds over water with the given current */
         for(int i=0; i<windatlas_count; i++) {
             double WG = i*360/windatlas_count;
             double VWG = speeds[i];
-
-            OverWater(C, VC, WG, VWG, Wc[i], VWc[i]);
+            OverWater(WG, VWG, C, VC, atlas.W[i], atlas.VW[i]);
         }
 
+        /* find most likely wind direction */
         double max_direction = 0;
         int maxi;
         for(int i=0; i<windatlas_count; i++)
-            if(directions[i] > max_direction) {
-                max_direction = directions[i];
+            if(atlas.directions[i] > max_direction) {
+                max_direction = atlas.directions[i];
                 maxi = i;
             }
         
-        /* now compute next most likely octant next to it and
+        /* now compute next most likely wind octant (adjacent to most likely) and
            linearly interpolate speed and direction from these two octants,
            we use this as the most likely wind, and base wind direction for the map */
         int maxia = maxi+1, maxib = maxi-1;
@@ -469,23 +441,51 @@ static inline bool ReadWindAndCurrents
         if(maxib < 0)
             maxib = windatlas_count - 1;
 
-        if(directions[maxia] < directions[maxib])
+        if(atlas.directions[maxia] < atlas.directions[maxib])
             maxia = maxib;
 
-        double maxid = 1 / (directions[maxi] / directions[maxia] + 1);
-        WG = positive_degrees(maxid*Wc[maxia] + (1-maxid)*Wc[maxi]);
-        VWG = maxid*VWc[maxia] + (1-maxid)*VWc[maxi];
+        double maxid = 1 / (atlas.directions[maxi] / atlas.directions[maxia] + 1);
+        double angle1 = atlas.W[maxia], angle2 = atlas.W[maxi];
+        while(angle1 - angle2 > 180) angle1 -= 360;
+        while(angle2 - angle1 > 180) angle2 -= 360;
+        W = positive_degrees(maxid*angle1 + (1-maxid)*angle2);
+        VW = maxid*atlas.VW[maxia] + (1-maxid)*atlas.VW[maxi];
+        
+        OverGround(W, VW, C, VC, WG, VWG);
+        return true;
     }
 
-    OverWater(C, VC, WG, VWG, W, VW);
+    OverWater(WG, VWG, C, VC, W, VW);
     return true;
+}
+
+/* get data from a position for plotting */
+bool Position::GetPlotData(GribRecordSet *grib, double dt,
+                           RouteMapConfiguration &configuration, PlotData &data)
+{
+    data.WVHT = Swell(grib, lat, lon);
+
+    climatology_wind_atlas atlas;
+    ReadWindAndCurrents(grib, data.time, configuration, this,
+                        data.WG, data.VWG, data.W, data.VW, data.C, data.VC, atlas);
+
+    if(parent) {
+        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &data.BG, &data.VBG);
+        if(dt == 0)
+            data.VBG = 0;
+        else
+            data.VBG *= 3600 / dt;
+        OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
+        return true;
+    }
+
+    return false;
 }
 
 static inline bool ComputeBoatSpeed
 (RouteMapConfiguration &configuration, double timeseconds,
  double WG, double VWG, double W, double VW, double C, double VC, double &H,
-/* for climatology graph */
- double Wc[8], double VWc[8], double &storm, double &calm, double directions[8],
+ climatology_wind_atlas &atlas,
  double &B, double &VB, double &BG, double &VBG, double &dist, int newsailplan)
 {
     if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MAP ||
@@ -494,12 +494,12 @@ static inline bool ComputeBoatSpeed
         VB = 0;
         int windatlas_count = 8;
         for(int i = 0; i<windatlas_count; i++) {
-            double VBc = configuration.boat.Plans[newsailplan].Speed(H-W+Wc[i], VWc[i]);
-            VB += directions[i]*VBc;
+            double VBc = configuration.boat.Plans[newsailplan].Speed(H-W+atlas.W[i], atlas.VW[i]);
+            VB += atlas.directions[i]*VBc;
         }
 
         if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)
-            VB *= 1-calm;
+            VB *= 1-atlas.calm;
     } else
         VB = configuration.boat.Plans[newsailplan].Speed(H, VW);
 
@@ -508,7 +508,7 @@ static inline bool ComputeBoatSpeed
         return false; //B = VB = 0;
 
     /* compound boatspeed with current */
-    BoatOverGround(B, VB, C, VC, BG, VBG);
+    OverGround(B, VB, C, VC, BG, VBG);
 
     if(!VBG) // no speed
         return false;
@@ -528,19 +528,16 @@ bool rk_step(Position *p, double timeseconds, double BG, double dist, double H,
     ll_gc_ll(p->lat, p->lon, BG, dist, &k1_lat, &k1_lon);
 
     double WG, VWG, W, VW, C, VC;
-    double Wc[8], VWc[8], storm, calm, directions[8];
+    climatology_wind_atlas atlas;
     Position rk(k1_lat, k1_lon, p->parent); // parent so deficient data can find parent
-
     if(!ReadWindAndCurrents(grib, time, configuration, &rk,
-                            WG, VWG, W, VW, C, VC,
-                            Wc, VWc, storm, calm, directions))
+                            WG, VWG, W, VW, C, VC, atlas))
         return false;
 
     double B = W + H; /* rotated relative to true wind */
 
     double VB, VBG; // outputs
-    if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H,
-                         Wc, VWc, storm, calm, directions,
+    if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas,
                          B, VB, rk_BG, VBG, rk_dist, newsailplan))
         return false;
 
@@ -588,10 +585,9 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         return false;
 
     double WG, VWG, W, VW, C, VC;
-    double Wc[8], VWc[8], storm, calm, directions[8];
+    climatology_wind_atlas atlas;
     if(!ReadWindAndCurrents(grib, time, configuration, this,
-                            WG, VWG, W, VW, C, VC,
-                            Wc, VWc, storm, calm, directions))
+                            WG, VWG, W, VW, C, VC, atlas))
         return false;
 
     if(VW > configuration.MaxWindKnots)
@@ -632,8 +628,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                                                                time, lat, lon, daytime);
         B = W + H; /* rotated relative to true wind */
 
-        if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H,
-                             Wc, VWc, storm, calm, directions,
+        if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas,
                              B, VB, BG, VBG, dist, newsailplan))
             continue;
 

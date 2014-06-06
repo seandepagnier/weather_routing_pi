@@ -39,7 +39,7 @@ class weather_routing_pi;
 class ConfigurationDialog : public ConfigurationDialogBase
 {
 public:
-    ConfigurationDialog(WeatherRouting *weatherrouting);
+    ConfigurationDialog(WeatherRouting &weatherrouting);
     ~ConfigurationDialog();
 
     void EditBoat( );
@@ -74,7 +74,7 @@ private:
 
     void SetStartDateTime(wxDateTime datetime);
 
-    WeatherRouting *m_WeatherRouting;
+    WeatherRouting &m_WeatherRouting;
 };
 
 #endif

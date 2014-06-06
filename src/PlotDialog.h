@@ -34,13 +34,16 @@
 #include "WeatherRoutingUI.h"
 
 class weather_routing_pi;
+class WeatherRouting;
 
 class PlotDialog : public PlotDialogBase
 {
 public:
 
-    PlotDialog( wxWindow *parent, std::list<PlotData> &PlotData);
+    PlotDialog( WeatherRouting &weatherrouting );
     ~PlotDialog();
+
+    void SetRouteMapOverlay(RouteMapOverlay *routemapoverlay);
 
 private:
     enum Variable { BOAT_VELOCITY_GROUND, BOAT_COURSE_GROUND, BOAT_VELOCITY_WATER, BOAT_COURSE_WATER,
@@ -55,6 +58,8 @@ private:
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlot( wxScrollEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlotVariable( wxCommandEvent& event ) { GetScale(); m_PlotWindow->Refresh(); }
+    void OnUpdateRoute( wxCommandEvent& event );
+
 
 private:
     double GetValue(PlotData &data, int var);
@@ -65,7 +70,9 @@ private:
     double m_mintime, m_maxtime;
     double m_minvalue, m_maxvalue;
 
-    std::list<PlotData> &m_PlotData;
+    std::list<PlotData> m_PlotData;
+
+    WeatherRouting &m_WeatherRouting;
 };
 
 #endif

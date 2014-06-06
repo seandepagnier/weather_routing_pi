@@ -31,15 +31,16 @@ class RouteMapOverlay;
 class ReportDialog : public ReportDialogBase
 {
 public:
-    ReportDialog( wxWindow *parent );
+    ReportDialog( WeatherRouting &weatherrouting );
 
     void SetRouteMapOverlay(RouteMapOverlay *routemapoverlay);
 
 protected:
-    void OnReportAllRoutes( wxCommandEvent& event );
+    void GenerateRoutesReport();
     void OnInformation( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event ) { Hide(); }
 
 private:
-    void GenerateReport();
+
+    WeatherRouting &m_WeatherRouting;
 };
