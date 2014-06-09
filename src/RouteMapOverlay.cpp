@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -485,6 +485,9 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
         case AVGSPEED:
             total += it->VBG;
             break;
+        case AVGSPEEDWATER:
+            total += it->VB;
+            break;
         case PERCENTAGE_UPWIND:
             if(fabs(it->B - it->W) < 90)
                 total++;
@@ -500,10 +503,10 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
             total += it->WVHT;
             break;
         }
-
         count++;
     }
 
+    /* fixup data */
     switch(type) {
     case DISTANCE:
         if(total == 0)
@@ -513,6 +516,7 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
     case PORT_STARBOARD:
         total *= 100.0;
     case AVGSPEED:
+    case AVGSPEEDWATER:
     case AVGWIND:
     case AVGWAVE:
         total /= count;

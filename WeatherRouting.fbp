@@ -23995,8 +23995,8 @@
             <property name="minimum_size"></property>
             <property name="name">ReportDialogBase</property>
             <property name="pos"></property>
-            <property name="size">400,400</property>
-            <property name="style">wxDEFAULT_DIALOG_STYLE</property>
+            <property name="size">600,440</property>
+            <property name="style">wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Weather Route Report</property>
             <property name="tooltip"></property>

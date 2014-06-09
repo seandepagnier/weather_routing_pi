@@ -107,7 +107,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
       m_ReportDialog(*this), m_PlotDialog(*this), m_FilterRoutesDialog(this),
       m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItem(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
-      m_bShowSettings(false), m_bShowStatistics(false), m_bShowReport(false),
+      m_bShowSettings(false), m_bShowStatistics(false),
+      m_bShowReport(false), m_bShowPlot(false),
       m_bShowFilter(false), m_weather_routing_pi(plugin)
 {
     m_SettingsDialog.LoadSettings();
@@ -457,14 +458,7 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
     } else
         m_tHideConfiguration.Start(25, true);
 
-    if(m_StatisticsDialog.IsShown())
-        m_StatisticsDialog.SetRouteMapOverlay(routemapoverlay);
-
-    if(m_ReportDialog.IsShown())
-        m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
-
-    if(m_PlotDialog.IsShown())
-        m_PlotDialog.SetRouteMapOverlay(routemapoverlay);
+    UpdateDialogs();
 
     if(m_ConfigurationBatchDialog.IsShown())
         m_ConfigurationBatchDialog.Reset();
@@ -1076,6 +1070,19 @@ void WeatherRouting::UpdateConfigurations()
     }
 }
 
+void WeatherRouting::UpdateDialogs()
+{
+    RouteMapOverlay *routemapoverlay = CurrentRouteMap();
+    if(m_StatisticsDialog.IsShown())
+        m_StatisticsDialog.SetRouteMapOverlay(routemapoverlay);
+
+    if(m_ReportDialog.IsShown())
+        m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
+
+    if(m_PlotDialog.IsShown())
+        m_PlotDialog.SetRouteMapOverlay(routemapoverlay);
+}
+
 void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
 {
     WeatherRoute *weatherroute = new WeatherRoute;
@@ -1438,11 +1445,15 @@ void WeatherRouting::Reset()
         weatherroute->routemapoverlay->Reset();
     }
 
+    UpdateDialogs();
+
     GetParent()->Refresh();
 }
 
 void WeatherRouting::DeleteRouteMap(RouteMapOverlay *routemapoverlay)
 {
+    bool current = routemapoverlay == CurrentRouteMap();
+
     for(std::list<RouteMapOverlay*>::iterator it = m_WaitingRouteMaps.begin();
         it != m_WaitingRouteMaps.end(); it++)
         if(*it == routemapoverlay) {
@@ -1475,6 +1486,9 @@ void WeatherRouting::DeleteRouteMap(RouteMapOverlay *routemapoverlay)
         }
 
     SetEnableConfigurationMenu();
+
+    if(current)
+        UpdateDialogs();
 }
 
 RouteMapConfiguration WeatherRouting::DefaultConfiguration()

@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -193,4 +193,5 @@ void PlotDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
     else
         m_PlotData = routemapoverlay->GetPlotData(m_rbCursorRoute->GetValue());
     GetScale();
+    m_PlotWindow->Refresh();
 }

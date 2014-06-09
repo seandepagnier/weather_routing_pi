@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -46,7 +46,8 @@ class RouteMapOverlay : public RouteMap
 {
     friend class RouteMapOverlayThread;
 public:
-    enum RouteInfoType {DISTANCE, AVGSPEED, PERCENTAGE_UPWIND, PORT_STARBOARD, AVGWIND, AVGWAVE};
+    enum RouteInfoType {DISTANCE, AVGSPEED, AVGSPEEDWATER,
+                        PERCENTAGE_UPWIND, PORT_STARBOARD, AVGWIND, AVGWAVE};
 
     RouteMapOverlay();
     ~RouteMapOverlay();
@@ -61,6 +62,7 @@ public:
     void RequestGrib(wxDateTime time);
     std::list<PlotData> GetPlotData(bool cursor_route=false);
     double RouteInfo(enum RouteInfoType type, bool cursor_route=false);
+    Position *GetDestination() { return destination_position; }
 
     bool Updated();
     void UpdateCursorPosition();

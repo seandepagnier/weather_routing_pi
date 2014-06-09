@@ -748,22 +748,19 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                 continue;
         }
 
-#if 1
-    if(configuration.MaxDivertedCourse < 180) {
-        double bearing, dist;
-        ll_gc_ll_reverse(dlat, dlon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
+        if(configuration.MaxDivertedCourse < 180) {
+            double bearing, dist;
+            ll_gc_ll_reverse(dlat, dlon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
 
-        double bearing1, dist1;
-        ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, dlat, dlon, &bearing1, &dist1);
+            double bearing1, dist1;
+            ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, dlat, dlon, &bearing1, &dist1);
 
-        double term = (dist1 + dist) / dist;
-        term = pow(term/16, 4) + 1; // make 1 until the end, then make big
+            double term = (dist1 + dist) / dist;
+            term = pow(term/16, 4) + 1; // make 1 until the end, then make big
 
-        if(fabs(heading_resolve(bearing1 - bearing)) > configuration.MaxDivertedCourse * term)
-            continue;
-    }
-#endif
-
+            if(fabs(heading_resolve(bearing1 - bearing)) > configuration.MaxDivertedCourse * term)
+                continue;
+        }
 
         /* landfall test */
         if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
