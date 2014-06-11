@@ -97,6 +97,7 @@ void ConfigurationBatchDialog::AddSource(wxString name)
     
 void ConfigurationBatchDialog::RemoveSource( wxString name )
 {
+    int i = 0;
     for(std::vector<BatchSource*>::iterator it = sources.begin();
         it != sources.end();) {
         for(std::list<BatchDestination*>::iterator it2 = (*it)->destinations.begin();
@@ -109,8 +110,12 @@ void ConfigurationBatchDialog::RemoveSource( wxString name )
         if((*it)->Name == name) {
             delete *it;
             it = sources.erase(it);
-        } else
+            m_lSources->Delete(i);
+            m_lDestinations->Delete(i);
+        } else {
             it++;
+            i++;
+        }
     }
 }
 
@@ -120,6 +125,33 @@ void ConfigurationBatchDialog::ClearSources()
         it != sources.end();it++)
         delete *it;
     sources.clear();
+
+    m_lSources->Clear();
+    m_lDestinations->Clear();
+}
+
+void ConfigurationBatchDialog::OnDaily( wxCommandEvent& event )
+{
+    m_tStartDays->SetValue(_T("365"));
+    m_tStartHours->SetValue(_T("0"));
+    m_tStartSpacingDays->SetValue(_T("1"));
+    m_tStartSpacingHours->SetValue(_T("0"));
+}
+
+void ConfigurationBatchDialog::OnWeekly( wxCommandEvent& event )
+{
+    m_tStartDays->SetValue(_T("360"));
+    m_tStartHours->SetValue(_T("0"));
+    m_tStartSpacingDays->SetValue(_T("7"));
+    m_tStartSpacingHours->SetValue(_T("0"));
+}
+
+void ConfigurationBatchDialog::OnMonthly( wxCommandEvent& event )
+{
+    m_tStartDays->SetValue(_T("340"));
+    m_tStartHours->SetValue(_T("0"));
+    m_tStartSpacingDays->SetValue(_T("30"));
+    m_tStartSpacingHours->SetValue(_T("0"));
 }
 
 void ConfigurationBatchDialog::OnSources( wxCommandEvent& event )
@@ -248,7 +280,7 @@ void ConfigurationBatchDialog::OnGenerate( wxCommandEvent& event )
 
 void ConfigurationBatchDialog::Reset()
 {
-    m_tStartDays->SetValue(_T("0"));
+    m_tStartDays->SetValue(_T("365"));
     m_tStartHours->SetValue(_T("0"));
     m_tStartSpacingDays->SetValue(_T("1"));
     m_tStartSpacingHours->SetValue(_T("0"));

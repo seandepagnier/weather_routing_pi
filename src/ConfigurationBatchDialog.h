@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -56,7 +56,7 @@ public:
 
     void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
     void AddSource(wxString name);
-    void RemoveSource( wxString name );
+    void RemoveSource(wxString name);
     void ClearSources();
 
     void Reset();
@@ -64,6 +64,9 @@ public:
     std::vector<BatchSource*> sources;
 
 protected:
+    void OnDaily( wxCommandEvent& event );
+    void OnWeekly( wxCommandEvent& event );
+    void OnMonthly( wxCommandEvent& event );
     void OnSources( wxCommandEvent& event );
     void OnDestinations( wxCommandEvent& event );
     void OnRemoveSource( wxCommandEvent& event );

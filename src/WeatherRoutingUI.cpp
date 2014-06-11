@@ -2553,11 +2553,18 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	
 	wxFlexGridSizer* fgSizer76;
 	fgSizer76 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer76->AddGrowableCol( 0 );
+	fgSizer76->AddGrowableRow( 0 );
 	fgSizer76->SetFlexibleDirection( wxBOTH );
 	fgSizer76->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	m_notebookConfigurations = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_panel8 = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer98;
+	fgSizer98 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer98->SetFlexibleDirection( wxBOTH );
+	fgSizer98->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	wxFlexGridSizer* fgSizer77;
 	fgSizer77 = new wxFlexGridSizer( 0, 3, 0, 0 );
 	fgSizer77->SetFlexibleDirection( wxBOTH );
@@ -2617,14 +2624,35 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	fgSizer77->Add( m_staticText126, 0, wxALL, 5 );
 	
 	
-	m_panel8->SetSizer( fgSizer77 );
+	fgSizer98->Add( fgSizer77, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer101;
+	fgSizer101 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer101->SetFlexibleDirection( wxBOTH );
+	fgSizer101->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_button38 = new wxButton( m_panel8, wxID_ANY, _("Daily"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer101->Add( m_button38, 0, wxALL, 5 );
+	
+	m_button39 = new wxButton( m_panel8, wxID_ANY, _("Weekly"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer101->Add( m_button39, 0, wxALL, 5 );
+	
+	m_button40 = new wxButton( m_panel8, wxID_ANY, _("Monthly"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer101->Add( m_button40, 0, wxALL, 5 );
+	
+	
+	fgSizer98->Add( fgSizer101, 1, wxEXPAND, 5 );
+	
+	
+	m_panel8->SetSizer( fgSizer98 );
 	m_panel8->Layout();
-	fgSizer77->Fit( m_panel8 );
+	fgSizer98->Fit( m_panel8 );
 	m_notebookConfigurations->AddPage( m_panel8, _("Start Time"), true );
 	m_pRoutes = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer62;
 	fgSizer62 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer62->AddGrowableCol( 0 );
+	fgSizer62->AddGrowableRow( 0 );
 	fgSizer62->SetFlexibleDirection( wxBOTH );
 	fgSizer62->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -2779,11 +2807,13 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	
 	this->SetSizer( fgSizer76 );
 	this->Layout();
-	fgSizer76->Fit( this );
 	
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	m_button38->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDaily ), NULL, this );
+	m_button39->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnWeekly ), NULL, this );
+	m_button40->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnMonthly ), NULL, this );
 	m_lSources->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnSources ), NULL, this );
 	m_lDestinations->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDestinations ), NULL, this );
 	m_bConnect->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnConnect ), NULL, this );
@@ -2799,6 +2829,9 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 ConfigurationBatchDialogBase::~ConfigurationBatchDialogBase()
 {
 	// Disconnect Events
+	m_button38->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDaily ), NULL, this );
+	m_button39->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnWeekly ), NULL, this );
+	m_button40->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnMonthly ), NULL, this );
 	m_lSources->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnSources ), NULL, this );
 	m_lDestinations->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDestinations ), NULL, this );
 	m_bConnect->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnConnect ), NULL, this );

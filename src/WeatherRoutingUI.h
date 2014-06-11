@@ -632,6 +632,9 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText124;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText126;
+		wxButton* m_button38;
+		wxButton* m_button39;
+		wxButton* m_button40;
 		wxPanel* m_pRoutes;
 		wxListBox* m_lSources;
 		wxListBox* m_lDestinations;
@@ -649,6 +652,9 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnDaily( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnWeekly( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMonthly( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSources( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDestinations( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnConnect( wxCommandEvent& event ) { event.Skip(); }
@@ -668,7 +674,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxTextCtrl* m_tStartSpacingHours;
 		wxListBox* m_lBoats;
 		
-		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,400 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~ConfigurationBatchDialogBase();
 	
 };

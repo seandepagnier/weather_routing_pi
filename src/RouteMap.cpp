@@ -726,11 +726,20 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
         if(configuration.MaxDivertedCourse < 180) {
             double bearing, dist;
-            ll_gc_ll_reverse(dlat, dlon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
-
             double bearing1, dist1;
+#if 0
+            ll_gc_ll_reverse(dlat, dlon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
             ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, dlat, dlon, &bearing1, &dist1);
+#else
+            /* this is definately faster, and actually works better in higher latitudes */
+            double d1 = dlat - configuration.EndLat, d2 = dlon - configuration.EndLon;
+            bearing = rad2deg(atan2(d2, d1));
+            dist = sqrt(pow(d1, 2) + pow(d2, 2));
 
+            d1 = configuration.StartLat - dlat, d2 = configuration.StartLon - dlon;
+            bearing1 = rad2deg(atan2(d2, d1));
+            dist1 = sqrt(pow(d1, 2) + pow(d2, 2));
+#endif
             double term = (dist1 + dist) / dist;
             term = pow(term/16, 4) + 1; // make 1 until the end, then make big
 

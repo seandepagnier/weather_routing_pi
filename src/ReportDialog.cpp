@@ -204,12 +204,12 @@ void ReportDialog::GenerateRoutesReport()
                     prev = it2;
                     prev--;
                     if(prev == overlays.end()) prev--;
-                    page += best_time_start.Format(_T("%d %B ")) +
-                        _("to") + (*prev)->EndTime().Format(_T(" %d %B"));
                     if(first_print)
                         first_print = false;
                     else
                         page += _(" and ");
+                    page += best_time_start.Format(_T("%d %B ")) +
+                        _("to") + (*prev)->EndTime().Format(_T(" %d %B"));
                 }
                 last_bad = any_bad = true;
             } else {
