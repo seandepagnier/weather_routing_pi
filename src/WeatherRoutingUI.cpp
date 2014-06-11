@@ -105,20 +105,20 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	m_mPosition = new wxMenu();
 	wxMenuItem* m_mNewPosition;
-	m_mNewPosition = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("New Position") ) , wxEmptyString, wxITEM_NORMAL );
+	m_mNewPosition = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("&New Position") ) , wxEmptyString, wxITEM_NORMAL );
 	m_mPosition->Append( m_mNewPosition );
 	
 	wxMenuItem* m_mUpdateBoat;
 	m_mUpdateBoat = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("&Update Boat Position") ) + wxT('\t') + wxT("Ctrl+U"), wxEmptyString, wxITEM_NORMAL );
 	m_mPosition->Append( m_mUpdateBoat );
 	
-	wxMenuItem* m_mRemove;
-	m_mRemove = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("&Remove") ) , wxEmptyString, wxITEM_NORMAL );
-	m_mPosition->Append( m_mRemove );
+	wxMenuItem* m_mDeletePosition;
+	m_mDeletePosition = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("&Delete") ) , wxEmptyString, wxITEM_NORMAL );
+	m_mPosition->Append( m_mDeletePosition );
 	
-	wxMenuItem* m_mClear;
-	m_mClear = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("&Clear") ) , wxEmptyString, wxITEM_NORMAL );
-	m_mPosition->Append( m_mClear );
+	wxMenuItem* m_mDeleteAllPositions;
+	m_mDeleteAllPositions = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("Delete &All") ) , wxEmptyString, wxITEM_NORMAL );
+	m_mPosition->Append( m_mDeleteAllPositions );
 	
 	m_menubar3->Append( m_mPosition, _("&Position") ); 
 	
@@ -210,18 +210,20 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
+	m_lPositions->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnPositionKeyDown ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditConfigurationClick ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSort ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteKeyDown ), NULL, this );
 	this->Connect( m_mOpen->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnOpen ) );
 	this->Connect( m_mSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnSave ) );
 	this->Connect( m_mClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnClose ) );
 	this->Connect( m_mNewPosition->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnNewPosition ) );
 	this->Connect( m_mUpdateBoat->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnUpdateBoat ) );
-	this->Connect( m_mRemove->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnRemovePosition ) );
-	this->Connect( m_mClear->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnClearPositions ) );
+	this->Connect( m_mDeletePosition->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnDeletePosition ) );
+	this->Connect( m_mDeleteAllPositions->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnDeleteAllPositions ) );
 	this->Connect( m_mNew->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnNew ) );
 	this->Connect( m_mBatch->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnBatch ) );
 	this->Connect( m_mEdit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnEditConfiguration ) );
@@ -247,18 +249,20 @@ WeatherRoutingBase::~WeatherRoutingBase()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
+	m_lPositions->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnPositionKeyDown ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditConfigurationClick ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSort ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteKeyDown ), NULL, this );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnOpen ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnSave ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnClose ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnNewPosition ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnUpdateBoat ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnRemovePosition ) );
-	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnClearPositions ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnDeletePosition ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnDeleteAllPositions ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnNew ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnBatch ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnEditConfiguration ) );
@@ -765,17 +769,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText1191->Wrap( -1 );
 	fgSizer951->Add( m_staticText1191, 0, wxALL, 5 );
 	
-	m_staticText126 = new wxStaticText( m_panel12, wxID_ANY, _("Max Upwind"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText126->Wrap( -1 );
-	fgSizer951->Add( m_staticText126, 0, wxALL, 5 );
-	
-	m_sMaxUpwindPercentage = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 100 );
-	fgSizer951->Add( m_sMaxUpwindPercentage, 0, wxALL, 5 );
-	
-	m_staticText127 = new wxStaticText( m_panel12, wxID_ANY, _("percentage"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText127->Wrap( -1 );
-	fgSizer951->Add( m_staticText127, 0, wxALL, 5 );
-	
 	
 	m_panel12->SetSizer( fgSizer951 );
 	m_panel12->Layout();
@@ -1034,7 +1027,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sMaxLatitude->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxTacks->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sMaxUpwindPercentage->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_cAvoidCycloneTracks->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
 	m_sCycloneMonths->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sCycloneDays->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
@@ -1077,7 +1069,6 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sMaxLatitude->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxTacks->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sMaxUpwindPercentage->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_cAvoidCycloneTracks->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
 	m_sCycloneMonths->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sCycloneDays->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
@@ -2050,7 +2041,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer78->Add( m_staticText140, 0, wxALL, 5 );
 	
-	wxString m_cVariable1Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height") };
+	wxString m_cVariable1Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable1NChoices = sizeof( m_cVariable1Choices ) / sizeof( wxString );
 	m_cVariable1 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable1NChoices, m_cVariable1Choices, 0 );
 	m_cVariable1->SetSelection( 3 );
@@ -2066,7 +2057,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer78->Add( m_staticText1401, 0, wxALL, 5 );
 	
-	wxString m_cVariable2Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height") };
+	wxString m_cVariable2Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable2NChoices = sizeof( m_cVariable2Choices ) / sizeof( wxString );
 	m_cVariable2 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable2NChoices, m_cVariable2Choices, 0 );
 	m_cVariable2->SetSelection( 5 );
@@ -2082,7 +2073,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer78->Add( m_staticText14011, 0, wxALL, 5 );
 	
-	wxString m_cVariable3Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height") };
+	wxString m_cVariable3Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable3NChoices = sizeof( m_cVariable3Choices ) / sizeof( wxString );
 	m_cVariable3 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable3NChoices, m_cVariable3Choices, 0 );
 	m_cVariable3->SetSelection( 11 );

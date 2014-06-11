@@ -39,6 +39,7 @@ struct PlotData
     wxDateTime time;
     double lat, lon;
     double VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
+    int tacks;
 };
 
 class SkipPosition;
@@ -47,7 +48,8 @@ class SkipPosition;
 class Position
 {
 public:
-    Position(double latitude, double longitude, Position *p=NULL, int sp=0, int t=0, int u=0, int pr=0);
+    Position(double latitude, double longitude, Position *p=NULL, double pheading=NAN,
+             int sp=0, int t=0);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
@@ -56,14 +58,17 @@ public:
                      RouteMapConfiguration &configuration, PlotData &data);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, const wxDateTime &time,
                    RouteMapConfiguration &configuration);
+    double PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
+                          RouteMapConfiguration &configuration, double &H);
+
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
 
     double lat, lon;
 
+    double parent_heading; /* angle relative to true wind we sailed from parent to this position */
     int sailplan; /* which sail plan in the boat we are using */
     int tacks; /* how many times we have tacked to get to this position */
-    int upwind, propagations; /* propagation counts */
 
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */
@@ -113,10 +118,14 @@ public:
     Position *ClosestPosition(double lat, double lon, double *dist=0);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib,
                    wxDateTime &time, RouteMapConfiguration &configuration);
+    void PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
+                        RouteMapConfiguration &configuration, double &mindt,
+                        Position *&endp, double &minH, bool &mintacked);
 
     int SkipCount();
     int Count();
     void UpdateStatistics(int &routes, int &invroutes, int &skippositions, int &positions);
+    void ResetDrawnFlag();
     
     SkipPosition *skippoints; /* skip list of positions */
 
@@ -138,7 +147,8 @@ public:
     bool Contains(Position &p);
     bool Contains(double lat, double lon);
     Position* ClosestPosition(double lat, double lon, double *dist=0);
-  
+    void ResetDrawnFlag();
+
     IsoRouteList routes;
     wxDateTime time;
     GribRecordSet *m_Grib;
@@ -203,7 +213,7 @@ public:
 
     static void PositionLatLon(wxString Name, double &lat, double &lon);
 
-    wxString Reset();
+    void Reset();
 
 #define LOCKING_ACCESSOR(name, flag) bool name() { Lock(); bool ret = flag; Unlock(); return ret; }
     LOCKING_ACCESSOR(Finished, m_bFinished)
@@ -230,7 +240,6 @@ public:
 
     void GetStatistics(int &isochrons, int &routes, int &invroutes, int &skippositions, int &positions);
     bool Propagate();
-    wxDateTime EndDate();
 
     static bool (*ClimatologyData)(int setting, const wxDateTime &, double, double, double &, double &);
     static bool (*ClimatologyWindAtlasData)(const wxDateTime &, double, double, int &count,
@@ -242,6 +251,7 @@ public:
     static std::list<RouteMapPosition> Positions;
     void Stop() { Lock(); m_bFinished = true; Unlock(); }
     void ResetFinished() { Lock(); m_bFinished = false; Unlock(); }
+    wxString LoadBoat() { return m_Configuration.boat.OpenXML(m_Configuration.boatFileName); }
 
 protected:
     virtual void Clear();

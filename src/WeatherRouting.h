@@ -96,9 +96,10 @@ private:
 
     void OnNewPosition( wxCommandEvent& event );
     void OnUpdateBoat( wxCommandEvent& event );
-    void OnRemovePosition( wxCommandEvent& event );
-    void OnClearPositions( wxCommandEvent& event );
+    void OnDeletePosition( wxCommandEvent& event );
+    void OnDeleteAllPositions( wxCommandEvent& event );
     void OnClose( wxCloseEvent& event ) { Hide(); }
+    void OnPositionKeyDown( wxListEvent& event );
     void OnEditConfiguration();
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
@@ -107,6 +108,7 @@ private:
     void OnEditConfigurationClick( wxMouseEvent& event ) { OnEditConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );
     void OnWeatherRouteSelected( wxListEvent& event );
+    void OnWeatherRouteKeyDown( wxListEvent& event );
     void OnWeatherRoutesListLeftDown(wxMouseEvent &event);
     void UpdateComputeState();
     void OnCompute( wxCommandEvent& event );

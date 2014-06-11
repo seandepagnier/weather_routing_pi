@@ -72,14 +72,21 @@ RouteMapOverlay::~RouteMapOverlay()
         Stop();
 }
 
-void RouteMapOverlay::Start()
+bool RouteMapOverlay::Start(wxString &error)
 {
     if(m_Thread) {
-        printf("error, thread already created\n");
-        return;
+        error = _("error, thread already created\n");
+        return false;
     }
+
+    error = LoadBoat();
+
+    if(error.size())
+        return false;
+
     m_Thread = new RouteMapOverlayThread(*this);
     m_Thread->Run();
+    return true;
 }
 
 void RouteMapOverlay::DeleteThread()
@@ -198,7 +205,8 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
 
         static const double NORM_FACTOR = 16;
-        if(!dc.GetDC()) {
+        const bool use_dl = false;
+        if(!dc.GetDC() && use_dl) {
             glPushMatrix();
 
             /* center display list on start lat/lon */
@@ -210,14 +218,14 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             glRotated(vp.rotation*180/M_PI, 0, 0, 1);
         }
 
-        if(!dc.GetDC() && !m_UpdateOverlay) {
+        if(!dc.GetDC() && !m_UpdateOverlay && use_dl) {
             glCallList(m_overlaylist);
             glPopMatrix();
 
         } else {
             PlugIn_ViewPort nvp = vp;
 
-            if(!dc.GetDC()) {
+            if(!dc.GetDC() && use_dl) {
                 m_UpdateOverlay = false;
 
                 if(!m_overlaylist)
@@ -239,14 +247,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 /* reset drawn flag for all positions
                    this is used to avoid duplicating alternate route segments */
                 for(it = origin.begin(); it != origin.end(); ++it)
-                    for(IsoRouteList::iterator rit = (*it)->routes.begin();
-                        rit != (*it)->routes.end(); ++rit) {
-                        Position *pos = (*rit)->skippoints->point;
-                        do {
-                            pos->drawn = false;
-                            pos = pos->next;
-                        } while(pos != (*rit)->skippoints->point);
-                    }
+                    (*it)->ResetDrawnFlag();
 
                 bool AlternatesForAll = settingsdialog.m_cbAlternatesForAll->GetValue();
                 if(AlternatesForAll)
@@ -299,7 +300,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 Unlock();
             }
         
-            if(!dc.GetDC()) {
+            if(!dc.GetDC() && use_dl) {
                 glEndList();
                 glCallList(m_overlaylist);
                 glPopMatrix();
@@ -341,7 +342,10 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool SquaresA
         if(SquaresAtSailChanges && p->sailplan != sailplan) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, p->lat, p->lon);
-            dc.DrawRectangle(r.x-5, r.y-5, 10, 10);
+            glVertex2i(r.x-5, r.y-5), glVertex2i(r.x+5, r.y-5);
+            glVertex2i(r.x+5, r.y-5), glVertex2i(r.x+5, r.y+5);
+            glVertex2i(r.x+5, r.y+5), glVertex2i(r.x-5, r.y+5);
+            glVertex2i(r.x-5, r.y+5), glVertex2i(r.x-5, r.y-5);
             sailplan = p->sailplan;
         }
     }
@@ -439,10 +443,10 @@ std::list<PlotData> RouteMapOverlay::GetPlotData(bool cursor_route)
         /* this omits the starting position */
         double dt = 0;
         if(p != destination_position) {
-            wxDateTime enddate = itn==it ? EndDate() : (*itn)->time;
-            wxDateTime startdate = (*it)->time;
-            if(startdate.IsValid() && enddate.IsValid())
-                dt = (enddate - startdate).GetSeconds().ToDouble();
+            wxDateTime endtime = itn==it ? EndTime() : (*itn)->time;
+            wxDateTime starttime = (*it)->time;
+            if(starttime.IsValid() && endtime.IsValid())
+                dt = (endtime - starttime).GetSeconds().ToDouble();
         }
         data.time = (*it)->time;
         data.lat = p->lat, data.lon = p->lon;
@@ -525,6 +529,28 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
     return total;
 }
 
+bool RouteMapOverlay::CycloneTimes(wxDateTime &first, wxDateTime &last)
+{
+    if(!RouteMap::ClimatologyCycloneTrackCrossings)
+        return false;
+
+    wxDateTime startdate(1, wxDateTime::Jan, 1985);
+    for(Position *p = destination_position; p && p->parent; p = p->parent)
+        for(int i=0; i<12; i++) {
+            int days = wxDateTime::GetNumberOfDays((wxDateTime::Month)i, 1999);
+            wxDateTime month(1, (wxDateTime::Month)i, 1999), month_end(days, (wxDateTime::Month)i, 1999);
+            if(RouteMap::ClimatologyCycloneTrackCrossings(p->parent->lat, p->parent->lon, p->lat, p->lon,
+                                                      month, days, 60, startdate)) {
+                if(!first.IsValid())
+                    first = month;
+                if(!last.IsValid() || last < month_end)
+                    last = month_end;
+            }
+        }
+
+    return first.IsValid();
+}
+
 void RouteMapOverlay::Clear()
 {
     RouteMap::Clear();
@@ -560,18 +586,39 @@ void RouteMapOverlay::UpdateDestination()
     RouteMapConfiguration configuration = GetConfiguration();
 
     bool done = ReachedDestination();
-    Position *endp = ClosestPosition(configuration.EndLat, configuration.EndLon, 0, done);
-    if(endp) {
-        if(done) {
-            delete destination_position;
-            destination_position = new Position(configuration.EndLat, configuration.EndLon, endp,
-                                                endp->sailplan, endp->tacks,
-                                                endp->upwind, endp->propagations);
-            last_destination_position = destination_position;
-        } else
-            last_destination_position = endp;
-    } else
-        last_destination_position = NULL;
+    if(done) {
+        delete destination_position;
+
+        Lock();
+        /* this doesn't happen often, so can be slow.. for each position in the last
+           isochron, we try to propagate to the destination */
+        IsoChronList::iterator iit = origin.end();
+        iit--; iit--; /* second from last isochron */
+        IsoChron *isochron = *iit;
+        double mindt = INFINITY;
+        Position *endp;
+        double minH;
+        bool mintacked;
+
+        for(IsoRouteList::iterator it = isochron->routes.begin(); it != isochron->routes.end(); ++it)
+            (*it)->PropagateToEnd(isochron->m_Grib, isochron->time, configuration, mindt, endp, minH, mintacked);
+        Unlock();
+
+        if(isinf(mindt))
+            goto not_able_to_propagate;
+
+        destination_position = new Position(configuration.EndLat, configuration.EndLon,
+                                        endp, minH, endp->sailplan, endp->tacks + mintacked);
+
+        m_EndTime = isochron->time + wxTimeSpan::Milliseconds(1000*mindt);
+
+        last_destination_position = destination_position;
+    } else {
+    not_able_to_propagate:
+        last_destination_position = ClosestPosition(configuration.EndLat, configuration.EndLon, 0, done);
+
+        m_EndTime = wxDateTime(); // invalid
+    }
 
     m_bUpdated = true;
     m_UpdateOverlay = true;

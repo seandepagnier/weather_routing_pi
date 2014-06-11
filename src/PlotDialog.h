@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -50,8 +50,7 @@ private:
                     WIND_VELOCITY, WIND_DIRECTION, WIND_COURSE,
                     WIND_VELOCITY_GROUND, WIND_DIRECTION_GROUND, WIND_COURSE_GROUND,
                     APPARENT_WIND_VELOCITY, APPARENT_WIND_DIRECTION,
-                    CURRENT_VELOCITY, CURRENT_DIRECTION,
-                    SIG_WAVE_HEIGHT };
+                    CURRENT_VELOCITY, CURRENT_DIRECTION, SIG_WAVE_HEIGHT, TACKS };
 
     void OnMouseEventsPlot( wxMouseEvent& event );
     void OnPaintPlot( wxPaintEvent& event );

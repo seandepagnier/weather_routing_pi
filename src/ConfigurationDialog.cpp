@@ -129,6 +129,14 @@ void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
 
 void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 {
+    RouteMapConfiguration configuration = Configuration();
+    GenerateDegreeSteps(configuration);
+    SetConfiguration(configuration);
+    m_WeatherRouting.SetConfigurationCurrentRoute(configuration);
+}
+
+void ConfigurationDialog::GenerateDegreeSteps(RouteMapConfiguration &configuration)
+{
     double from, to, by;
     m_tFromDegrees->GetValue().ToDouble(&from);
     m_tToDegrees->GetValue().ToDouble(&to);
@@ -141,13 +149,12 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
         return;
     }
 
-    m_lDegreeSteps->Clear();
+    configuration.DegreeSteps.clear();
     for(double v = from; v <= to; v+=by) {
-        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
-        if(v > 0 && v < 180)
-            m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), -v));
+        configuration.DegreeSteps.push_back(v);
+        configuration.DegreeSteps.push_back(-v);
     }
-    Update();
+    configuration.DegreeSteps.sort();
 }
 
 void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
@@ -189,7 +196,6 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
     m_sMaxLatitude->SetValue(configuration.MaxLatitude);
     m_sMaxTacks->SetValue(configuration.MaxTacks);
     m_sTackingTime->SetValue(configuration.TackingTime);
-    m_sMaxUpwindPercentage->SetValue(configuration.MaxUpwindPercentage);
 
     m_cAvoidCycloneTracks->SetValue(configuration.AvoidCycloneTracks);
     m_sCycloneMonths->SetValue(configuration.CycloneMonths);
@@ -258,7 +264,6 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     configuration.MaxLatitude = m_sMaxLatitude->GetValue();
     configuration.MaxTacks = m_sMaxTacks->GetValue();
     configuration.TackingTime = m_sTackingTime->GetValue();
-    configuration.MaxUpwindPercentage = m_sMaxUpwindPercentage->GetValue();
 
     configuration.AvoidCycloneTracks = m_cAvoidCycloneTracks->GetValue();
     configuration.CycloneMonths = m_sCycloneMonths->GetValue();

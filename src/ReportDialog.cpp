@@ -65,42 +65,49 @@ void ReportDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
     RouteMapConfiguration c = routemapoverlay->GetConfiguration();
     std::list<PlotData> p = routemapoverlay->GetPlotData();
 
-    page += _("Route from ") + c.Start + _(" to ") + c.End + _T("&nsbp;");
-    page += _("Leaving ") + c.StartTime.Format();
-    page += _("Arriving ") + routemapoverlay->EndDate().Format();
-    page += _(" Duration ") + (routemapoverlay->EndDate() - c.StartTime).Format();
+    page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
+    page += _("Leaving ") + c.StartTime.Format() + _T("<dt>");
+    page += _("Arriving ") + routemapoverlay->EndTime().Format() + _T("<dt>");
+    page += _("Duration ") + (routemapoverlay->EndTime() - c.StartTime).Format() + _T("<dt>");
     page += _T("<p>");
     double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
     double distance_sailed = routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE);
     page += _("Distance sailed: ") + wxString::Format
-        (_T("%.2f NMi : %.2f Nmi (%.2f%%) "), distance_sailed,
-         distance_sailed - distance, distance_sailed / distance - 1) +
-        _("longer than great circle route") + _T("&nsbp;");
+        (_T("%.2f NMi : %.2f NMi or %.2f%% "), distance_sailed,
+         distance_sailed - distance, (distance_sailed / distance - 1) * 100.0) +
+        _("longer than great circle route") + _T("<br>");
 
     double avgspeed = routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED);
     double avgspeedwater = routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEEDWATER);
-    page += _("Averages:") + _T("&nsbp;");
-    page += _("Speed knots") + _T(": ") + wxString::Format
-        (_T(" %.2f "), avgspeed) + _T("&nsbp;");
-    page += _("Water Speed knots") + _T(": ") + wxString::Format
-        (_T(" %.2f "), avgspeedwater) + _T("&nsbp;");
-    page += _("Wind knots") + _T(": ") + wxString::Format
-        (_T(" %.2f "), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWIND)) + _T("&nsbp;");
-    page += _("Wave ht meters") + _T(": ") + wxString::Format
-        (_T(" %.2f "), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWAVE)) + _T("&nsbp;");
+    page += _("Average Ground Speed") + _T(": ") + wxString::Format
+        (_T(" %.2f"), avgspeed) + _T(" knots<dt>");
+    page += _("Average Water Speed") + _T(": ") + wxString::Format
+        (_T(" %.2f"), avgspeedwater) + _T(" knots<dt>");
+    page += _("Average Wind") + _T(": ") + wxString::Format
+        (_T(" %.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWIND)) + _T(" knots<dt>");
+    page += _("Average Wave ht") + _T(": ") + wxString::Format
+        (_T(" %.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWAVE)) + _T(" meters<dt>");
+    page += _("Upwind") + _T(": ") + wxString::Format
+        (_T(" %.2f%%"), routemapoverlay->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND)) + _T("<dt>");
+    double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
+    page += _("Port/Starboard") + _T(": ") +
+        (isnan(port_starboard) ? _T("nan") : wxString::Format
+         (_T("%d/%d"), (int)port_starboard, 100-(int)port_starboard)) + _T("<dt>");
 
     Position *destination = routemapoverlay->GetDestination();
 
-    page += _T("<p>");
-    page += _("Number of tacks") + wxString::Format(_T(": %d "), destination->tacks) + _T("&nsbp;\n");
+    page += _("Number of tacks") + wxString::Format(_T(": %d "), destination->tacks) + _T("<dt>\n");
 
     /* determine if currents significantly improve this (boat over ground speed average is 10% or
        more faster than boat over water)  then attempt to determine which current based on lat/lon
        eg, gulf stream, japan, current aghulles current etc.. and report it. */
     page += _T("<p>");
     double wspddiff = avgspeed / avgspeedwater;
-    if(fabs(1-wspddiff) > .1) {
-        page += wxString::Format(_T("%.2%% "), (1 - wspddiff) * 100.0) + _("speed change due to");
+    if(fabs(1-wspddiff) > .03) {
+        page += wxString::Format
+            (_T("%.2f%% "), ((wspddiff > 1 ?
+                              avgspeed / avgspeedwater : avgspeedwater / avgspeed) - 1) * 100.0)
+            + _("speed change due to ");
         if(wspddiff > 1)
             page += _("favorable");
         else
@@ -144,18 +151,98 @@ void ReportDialog::GenerateRoutesReport()
         page += c.Start + _(" to ") + c.End + _T(" ") + wxString::Format
             (_("(%ld configurations)\n"), overlays.size());
 
+        /* determine fastest time */
         wxTimeSpan fastest_time;
         RouteMapOverlay *fastest;
         for(std::list<RouteMapOverlay *>::iterator it2 = overlays.begin(); it2 != overlays.end(); it2++) {
-            wxTimeSpan current_time = ((*it2)->EndDate() - (*it2)->StartTime());
+            wxTimeSpan current_time = ((*it2)->EndTime() - (*it2)->StartTime());
             if(*it2 == first || current_time < fastest_time) {
                 fastest_time = current_time;
                 fastest = *it2;
             }
         }
-        page += _("Fastest configuration leaves ") + fastest->StartTime().Format();
-        page += _(" average speed") + wxString::Format
-            (_T(": %.2f knots<br>"), fastest->RouteInfo(RouteMapOverlay::AVGSPEED));
+        page += _("<dt>Fastest configuration leaves ") + fastest->StartTime().Format();
+        page += _("<dt>average speed") + wxString::Format
+            (_T(": %.2f knots"), fastest->RouteInfo(RouteMapOverlay::AVGSPEED));
+
+        /* determine best times if upwind percentage is below 50 */
+        page += _T("<dt>");
+        page += _("Best Times (mostly downwind)") + _T(": ");
+
+        wxDateTime first_cyclone_time, last_cyclone_time;
+        bool last_bad, any_bad, any_good = false, first_print = true;
+
+        wxDateTime best_time_start;
+
+        std::list<RouteMapOverlay *>::iterator it2, it2end = overlays.begin(), prev;
+        last_bad = overlays.back()->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND) > 50;
+
+        for(it2 = overlays.begin(); it2 != overlays.end(); it2++)
+            if((*it2)->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND) > 50) {
+                any_bad = last_bad = true;
+            } else {
+                if(!best_time_start.IsValid() && last_bad) {
+                    best_time_start = (*it2)->StartTime();
+                    it2end = it2;
+                    it2++;
+                    break;
+                }
+                last_bad = false;
+            }
+
+        if(it2 == overlays.end())
+            it2++;
+        for(;;) {
+            if(it2 == it2end)
+                break;
+            it2++;
+            if(it2 == overlays.end())
+                it2++;
+
+            if((*it2)->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND) > 50) {
+                if(!last_bad) {
+                    prev = it2;
+                    prev--;
+                    if(prev == overlays.end()) prev--;
+                    page += best_time_start.Format(_T("%d %B ")) +
+                        _("to") + (*prev)->EndTime().Format(_T(" %d %B"));
+                    if(first_print)
+                        first_print = false;
+                    else
+                        page += _(" and ");
+                }
+                last_bad = any_bad = true;
+            } else {
+                if(last_bad)
+                    best_time_start = (*it2)->StartTime();
+                last_bad = false;
+                any_good = true;
+            }
+/* disabled until we fix this, because it is really slow
+            wxDateTime first, last;
+            if((*it2)->CycloneTimes(first, last)) {
+                if(!first_cyclone_time.IsValid() || first < first_cyclone_time)
+                    first_cyclone_time = (*it2)->StartTime();
+                if(!last_cyclone_time.IsValid() || last < last_cyclone_time)
+                    last_cyclone_time = (*it2)->EndTime();
+            }
+*/
+        }
+
+        if(!any_bad)
+            page += _("any");
+        else if(!any_good)
+            page += _("none");
+
+        page += _T("<dt>");
+        page += _("Cyclones") + _T(": ");
+        if(first_cyclone_time.IsValid())
+            page += wxDateTime::GetMonthName(first_cyclone_time.GetMonth()) + _(" to ") +
+                    wxDateTime::GetMonthName(first_cyclone_time.GetMonth());
+        else if(RouteMap::ClimatologyCycloneTrackCrossings)
+            page += _("none");
+        else
+            page += _("unavailable");
     }
 
     m_htmlRoutesReport->SetPage(page);

@@ -41,7 +41,7 @@ can be viewed during grib playback.
 
 <p>Wind data is required; if no Current or Swell data is available, they are assumed to be zero.
 
-<h3>Options</h3>
+<h3>Configuration Options</h3>
 
 <p>
 <ul>
@@ -63,7 +63,7 @@ can be viewed during grib playback.
     even if there is no more valid wind data in the area/time.</li>
   <li><b>Integrator</b> Newton's method is default and fastest, but doesn't take into account changes
     in wind/current along each step.  Rutta Kunge (4th order) is much more accurate taking 4 samples, but slower.</li>
-  <li><b>Max Diverted Course</b> Maximum course error to continue toward destination.  Not all possible courses will be considered and therefore the most optimal route may not be found.  This greatly speeds the rate of computation.</li>
+  <li><b>Max Diverted Course</b> Maximum course error to continue toward destination.  Not all possible courses will be considered and therefore the most optimal route may not be found.  This usually (but not in all cases) is obvious when the optimal route is sometimes near the edge of the graph.  This greatly speeds the rate of computation.</li>
   <li><b>Max Search Angle</b> Like Max Diverted Course, except the search range is based from the starting position to the destination.</li>
   <li><b>Max Wind Knots</b> Do not navigate in areas with more wind than this value.</li>
   <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
@@ -184,17 +184,17 @@ becoming less efficient over the course of a very long passage.
 <p>Todo list:
 <ul>
 <li>Optimize land detection routine
+<li>Optimize cyclone detection routine
+<li>Implement cyclone crossing detection
 <li>Improve boat polar computation
-<li>Generate reports
-<li>Improve plot display and make it interactive with cursor route
 <li>Allow user to configure fields in main configurations table
 <li>Allow multiple selection of configurations to edit more than one at the same time
-<li>Implement cyclone crossing detection
 <li>Add constraint for wind against current (bad seastate)
-<li>Correct end point (last route) calculation
+<li>Make segment intersection test better and thus avoid removing points in almost all cases
 <li>Fix issues with the backtrack optimization so it can be used
 <li>Profile and optimize (shortcut or lookup expensive routines)
 <li>Determine best way way to reduce excessive propagations at the edge of graph
+<li>Fix inverted regions
 </ul>
 
 <p><h4>The Weather Routing plugin is written and maintained by <a href="http://seandepagnier.users.sourceforge.net">Sean D'Epagnier</a></h4> Please contact me with questions, suggestions and feedback.

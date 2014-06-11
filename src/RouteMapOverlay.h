@@ -62,18 +62,21 @@ public:
     void RequestGrib(wxDateTime time);
     std::list<PlotData> GetPlotData(bool cursor_route=false);
     double RouteInfo(enum RouteInfoType type, bool cursor_route=false);
+    bool CycloneTimes(wxDateTime &first, wxDateTime &last);
     Position *GetDestination() { return destination_position; }
 
     bool Updated();
     void UpdateCursorPosition();
     void UpdateDestination();
 
+    wxDateTime EndTime() { return m_EndTime; }
+
     virtual void Clear();
     virtual void Lock() { routemutex.Lock(); }
     virtual void Unlock() { routemutex.Unlock(); }
     bool Running() { return m_Thread && m_Thread->IsRunning(); }
 
-    void Start();
+    bool Start(wxString &error);
     void DeleteThread(); // like Stop(), but waits until the thread is deleted
 
     bool m_UpdateOverlay;
@@ -94,6 +97,7 @@ private:
 
     double last_cursor_lat, last_cursor_lon;
     Position *last_cursor_position, *destination_position, *last_destination_position;
+    wxDateTime m_EndTime;
     bool m_bUpdated;
 
     int m_overlaylist;

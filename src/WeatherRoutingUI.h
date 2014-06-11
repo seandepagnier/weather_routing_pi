@@ -80,17 +80,19 @@ class WeatherRoutingBase : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnPositionKeyDown( wxListEvent& event ) { event.Skip(); }
 		virtual void OnEditConfigurationClick( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnWeatherRouteKeyDown( wxListEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNewPosition( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateBoat( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRemovePosition( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClearPositions( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeletePosition( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDeleteAllPositions( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNew( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBatch( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditConfiguration( wxCommandEvent& event ) { event.Skip(); }
@@ -221,9 +223,6 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText24;
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText1191;
-		wxStaticText* m_staticText126;
-		wxSpinCtrl* m_sMaxUpwindPercentage;
-		wxStaticText* m_staticText127;
 		wxCheckBox* m_cAvoidCycloneTracks;
 		wxStaticText* m_staticText1281;
 		wxSpinCtrl* m_sCycloneMonths;

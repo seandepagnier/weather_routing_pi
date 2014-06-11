@@ -25,6 +25,7 @@
  */
 
 #include <wx/wx.h>
+#include <wx/filename.h>
 
 #include "tinyxml/tinyxml.h"
 
@@ -44,6 +45,11 @@ Boat::~Boat()
 
 wxString Boat::OpenXML(wxString filename)
 {
+    /* shortcut if already loaded, and boat wasn't modified */
+    wxDateTime last_filetime = wxFileName(filename).GetModificationTime();
+    if(m_last_filename == filename && m_last_filetime.IsValid() && m_last_filetime == last_filetime)
+        return _T("");
+
     bool cleared = false;
     Plans.clear();
     
@@ -115,6 +121,8 @@ wxString Boat::OpenXML(wxString filename)
         }
     }
 
+    m_last_filename = filename;
+    m_last_filetime = last_filetime;
     return _T("");
 }
 

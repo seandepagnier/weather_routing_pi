@@ -102,6 +102,7 @@ double PlotDialog::GetValue(PlotData &data, int var)
     case CURRENT_VELOCITY: return data.VC;
     case CURRENT_DIRECTION: return data.C;
     case SIG_WAVE_HEIGHT: return data.WVHT;
+    case TACKS: return data.tacks;
     }
     return NAN;
 }

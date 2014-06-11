@@ -245,8 +245,8 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 
 #undef EPS
 #undef EPS2
-#define EPS 2e-10
-#define EPS2 2e-5
+#define EPS 2e-14
+#define EPS2 2e-7 // should be half the exponent of EPS
     if(fabs(denom) < EPS) { /* parallel or really close to parallel */
         if(fabs((y1*ax - ay*x1)*bx - (y3*bx - by*x3)*ax) > EPS2)
             return 0; /* different intercepts, no intersection */
@@ -286,9 +286,9 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 }
 
 #define EPSILON (2e-10)
-Position::Position(double latitude, double longitude, Position *p, int sp, int t, int u, int pr)
-    : lat(latitude), lon(longitude), sailplan(sp), tacks(t),
-      upwind(u), propagations(pr),
+Position::Position(double latitude, double longitude, Position *p,
+                   double pheading, int sp, int t)
+    : lat(latitude), lon(longitude), parent_heading(pheading), sailplan(sp), tacks(t),
       parent(p), propagated(false), copied(false)
 {
     lat -= fmod(lat, EPSILON);
@@ -296,8 +296,8 @@ Position::Position(double latitude, double longitude, Position *p, int sp, int t
 }
 
 Position::Position(Position *p)
-    : lat(p->lat), lon(p->lon), sailplan(p->sailplan), tacks(p->tacks),
-      upwind(p->upwind), propagations(p->propagations),
+    : lat(p->lat), lon(p->lon), parent_heading(p->parent_heading),
+      sailplan(p->sailplan), tacks(p->tacks),
       parent(p->parent), propagated(p->propagated), copied(true)
 {
 }
@@ -464,6 +464,7 @@ bool Position::GetPlotData(GribRecordSet *grib, double dt,
                            RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(grib, lat, lon);
+    data.tacks = tacks;
 
     climatology_wind_atlas atlas;
     ReadWindAndCurrents(grib, data.time, configuration, this,
@@ -595,17 +596,8 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     int daytime = -1; /* unknown */
 
-    double parentbearing = NAN;
-    /* compute parent bearing if needed;
-       the tack should probably be stored as a flag in the position class instead */
-    if(parent && (configuration.TackingTime || configuration.MaxTacks>=0))
-        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parentbearing, 0);
-
     double timeseconds = configuration.dt;
     double dist;
-
-    bool tacked = false;
-    int cur_upwind = 0;
 
     int propagation_direction = 1, propagation_skips = 0;
     std::list<double>::iterator it = configuration.DegreeSteps.begin(), orig_end = configuration.DegreeSteps.end();
@@ -621,7 +613,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             break;
     skipin:
 
-        double H = *it;
+        double H = heading_resolve(*it);
         double B, VB, BG, VBG;
 
         int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
@@ -632,30 +624,14 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                              B, VB, BG, VBG, dist, newsailplan))
             continue;
 
-        /* perform upwind percentage calculation relative to apparent wind,
-           techically can be done before computing boat over ground speed to bail sooner,
-           but this is simpler logically */
-        if(configuration.MaxUpwindPercentage < 100) {
-            double VA = BoatPlan::VelocityApparentWind(VB, deg2rad(H), VW);
-            double A = rad2deg(BoatPlan::DirectionApparentWind(VA, VB, deg2rad(H), VW));
+        /* did we tack thru the wind? apply penalty */
+        bool tacked = false;
+        if(parent_heading*H < 0 && fabs(parent_heading - H) < 180) {
+            timeseconds -= configuration.TackingTime;
 
-            if(fabs(A) < 90) { /* use 90 degrees.. maybe we can allow the user to set this */
-                if(100.0 * (upwind + 1) / (propagations + 1) > configuration.MaxUpwindPercentage)
-                    continue;
-                cur_upwind = 1;
-            }
-        }
-
-        /* did we tack? apply penalty */
-        if(!isnan(parentbearing)) {
-            double hrpb = heading_resolve(parentbearing), hrb = B;
-            if(hrpb*hrb < 0 && fabs(hrpb - hrb) < 180) {
-                timeseconds -= configuration.TackingTime;
-
-                if(configuration.MaxTacks >= 0 && tacks >= configuration.MaxTacks)
-                    continue;
-                tacked = true;
-            }
+            if(configuration.MaxTacks >= 0 && tacks >= configuration.MaxTacks)
+                continue;
+            tacked = true;
         }
 
         double dlat, dlon, nrdlon;
@@ -776,8 +752,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                 continue;
         }
 
-        Position *rp = new Position(dlat, dlon, this, newsailplan, tacks + tacked,
-                                    upwind + cur_upwind, propagations + 1);
+        Position *rp = new Position(dlat, dlon, this, H, newsailplan, tacks + tacked);
 
         rp->propagated = current_propagated;
 
@@ -835,29 +810,61 @@ reset:
     return true;
 }
 
-wxDateTime RouteMap::EndDate()
+/* propagate to the end position in the configuration, and return the number of seconds it takes */
+double Position::PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
+                                RouteMapConfiguration &configuration, double &H)
 {
-    IsoChronList::iterator it = origin.end();
-    if(it == origin.begin())
-        return wxDateTime();
-    it--;
+    double WG, VWG, W, VW, C, VC;
+    climatology_wind_atlas atlas;
+    if(!ReadWindAndCurrents(grib, time, configuration, this,
+                            WG, VWG, W, VW, C, VC, atlas))
+        return NAN;
 
-    double dista;
-    wxDateTime timea = (*it)->time;
-    Position *a = (*it)->ClosestPosition(m_Configuration.EndLat, m_Configuration.EndLon, &dista);
-    if(!a || it == origin.begin())
-        return wxDateTime();
+    /* todo: we should make sure we don't tack if we are already at the max tacks,
+       possibly perform other tests and/or switch sail plan? */
+    double bearing, dist;
+    ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
 
-    it--;
-    double distb;
-    wxDateTime timeb = (*it)->time;
-    Position *b = (*it)->ClosestPosition(m_Configuration.EndLat, m_Configuration.EndLon, &distb);
-    if(!b)
-        return wxDateTime();
+    /* figure out bearing and distance to go, because it is a non-linear problem if compounded
+       with currents solve iteratively (without currents only one iteration will ever occur */
+    double B, VB, BG = W, VBG;
+    int iters = 0;
+    H = 0;
+    do {
+        /* make our correction in range */
+        while(bearing - BG > 180)
+            bearing -= 360;
+        while(BG - bearing > 180)
+            bearing += 360;
 
-    double seconds = (timea - timeb).GetSeconds().ToLong();
-    wxTimeSpan span_after_b = wxTimeSpan::Seconds(seconds * distb / (dista + distb));
-    return timeb + span_after_b;
+        H += bearing - BG;
+        B = W + H; /* rotated relative to true wind */
+
+        double dummy_dist; // not used
+        if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas,
+                             B, VB, BG, VBG, dummy_dist, sailplan))
+            return NAN;
+
+        if(++iters == 10) // give up
+            return NAN;
+    } while((bearing - BG) > 1e-3);
+
+    /* landfall test */
+    if(configuration.DetectLand && CrossesLand(configuration.EndLat, configuration.EndLon))
+        return NAN;
+
+    /* crosses cyclone track(s)? */
+    if(configuration.AvoidCycloneTracks) {
+        int crossings = RouteMap::ClimatologyCycloneTrackCrossings
+            (lat, lon, configuration.EndLat, configuration.EndLon,
+             time, configuration.CycloneMonths*30 +
+             configuration.CycloneDays, configuration.CycloneWindSpeed,
+             wxDateTime(0, 0, configuration.CycloneClimatologyStartYear));
+        if(crossings > 0)
+            return NAN;
+    }
+
+    return 3600.0 * dist / VBG;
 }
 
 double Position::Distance(Position *p)
@@ -969,7 +976,7 @@ void IsoRoute::Print()
     else {
         Position *p = skippoints->point;
         do {
-            printf("%.8f %.8f\n", p->lon, p->lat);
+            printf("%.10f %.10f\n", p->lon, p->lat);
             p = p->next;
         } while(p != skippoints->point);
         printf("\n");
@@ -983,7 +990,7 @@ void IsoRoute::PrintSkip()
     else {
         SkipPosition *s = skippoints;
         do {
-            printf("%.4f %.4f\n", s->point->lon, s->point->lat);
+            printf("%.10f %.10f\n", s->point->lon, s->point->lat);
             s = s->next;
         } while(s != skippoints);
         printf("\n");
@@ -1088,6 +1095,11 @@ bool IsoRoute::CompletelyContained(IsoRoute *r)
    only test first point, but if it fails try other points */
 bool IsoRoute::ContainsRoute(IsoRoute *r)
 {
+    /*
+    static int c;
+    printf("cnt: %d\n", c++);
+    */
+
     Position *pos = r->skippoints->point;
     do {
         switch(Contains(*pos, false)) {
@@ -1097,8 +1109,16 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
 
         pos = pos->next;
     } while(pos != r->skippoints->point); /* avoid deadlock.. lets hope we dont do this often */
-
     printf("bad contains route\n");
+/*
+    Print();
+    printf("\n\n");
+    PrintSkip();
+    printf("\n\n");
+    r->Print();
+    printf("\n\n");
+    r->PrintSkip();
+*/
     return true; /* probably good to say it is contained in this unlikely case */
 }
 
@@ -1980,6 +2000,19 @@ Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
     return minpos;
 }
 
+void IsoRoute::ResetDrawnFlag()
+{
+
+    Position *pos = skippoints->point;
+    do {
+        pos->drawn = false;
+        pos = pos->next;
+    } while(pos != skippoints->point);
+
+    for(IsoRouteList::iterator cit = children.begin(); cit != children.end(); cit++)
+        (*cit)->ResetDrawnFlag();
+}
+
 bool IsoRoute::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                          wxDateTime &time, RouteMapConfiguration &configuration)
 {
@@ -1992,6 +2025,40 @@ bool IsoRoute::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             p = p->next;
         } while(p != skippoints->point);
     return ret;
+}
+
+void IsoRoute::PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
+                              RouteMapConfiguration &configuration, double &mindt,
+                              Position *&endp, double &minH, bool &mintacked)
+{
+    Position *p = skippoints->point;
+
+    do {
+        double H;
+        double dt = p->PropagateToEnd(grib, time, configuration, H);
+
+        /* did we tack thru the wind? apply penalty */
+        bool tacked = false;
+        if(p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
+            tacked = true;
+            dt += configuration.TackingTime;
+        
+            if(configuration.MaxTacks >= 0 && p->tacks >= configuration.MaxTacks)
+                dt = NAN;
+        }
+
+
+        if(!isnan(dt) && dt < mindt) {
+            mindt = dt;
+            minH = H;
+            endp = p;
+            mintacked = tacked;
+        }
+        p = p->next;
+    } while(p != skippoints->point);
+
+    for(IsoRouteList::iterator cit = children.begin(); cit != children.end(); cit++)
+        (*cit)->PropagateToEnd(grib, time, configuration, mindt, endp, minH, mintacked);
 }
 
 int IsoRoute::SkipCount()
@@ -2114,7 +2181,7 @@ bool IsoChron::Contains(Position &p)
 {
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
         switch((*it)->Contains(p, true)) {
-        case -1: printf("-1 contains!\n");
+        case -1: // treat too close to call as not contained
         case 0: continue;
         default: return true;
         }
@@ -2142,6 +2209,12 @@ Position* IsoChron::ClosestPosition(double lat, double lon, double *dist)
     if(dist)
         *dist = mindist;
     return minpos;
+}
+
+void IsoChron::ResetDrawnFlag()
+{
+    for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it)
+        (*it)->ResetDrawnFlag();
 }
 
 bool RouteMapConfiguration::Update()
@@ -2384,11 +2457,13 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
     double mindist = INFINITY;
     Lock();
 
-    IsoChronList::iterator last = origin.end();
+    IsoChronList::iterator it = origin.end();
     if(before_last)
-        last--;
+        it--;
 
-    for(IsoChronList::iterator it = origin.begin(); it != last; ++it) {
+    Position p(lat, m_Configuration.positive_longitudes ? positive_degrees(lon) : lon);
+    do {
+        it--;
         double dist;
         Position *pos = (*it)->ClosestPosition(lat, lon, &dist);
         
@@ -2396,7 +2471,12 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
             minpos = pos;
             mindist = dist;
         }
-    }
+
+        /* bail if we don't contain because obviously we aren't getting any closer */
+        if(!(*it)->Contains(p))
+            break;
+    } while(it != origin.begin());
+
     Unlock();
 
     if(dist)
@@ -2404,12 +2484,10 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
     return minpos;
 }
 
-wxString RouteMap::Reset()
+void RouteMap::Reset()
 {
     Lock();
     Clear();
-
-    wxString boaterror = m_Configuration.boat.OpenXML(m_Configuration.boatFileName);
 
     m_NewGrib = NULL;
     m_NewTime = m_Configuration.StartTime;
@@ -2422,8 +2500,6 @@ wxString RouteMap::Reset()
     m_bFinished = false;
 
     Unlock();
-
-    return boaterror;
 }
 
 void RouteMap::SetNewGrib(GribRecordSet *grib)

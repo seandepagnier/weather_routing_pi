@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -59,4 +59,8 @@ public:
 
     double displacement_tons, lwl_ft, loa_ft, beam_ft;
     double frictional_drag, wake_drag;
+
+private:
+    wxString   m_last_filename;
+    wxDateTime m_last_filetime;
 };
