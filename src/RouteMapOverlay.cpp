@@ -487,10 +487,39 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
             lon0 = it->lon;
         } break;
         case AVGSPEED:
+            total += it->VB;
+            break;
+        case MAXSPEED:
+            if(total < it->VB)
+                total = it->VB;
+            break;
+        case AVGSPEEDGROUND:
             total += it->VBG;
             break;
-        case AVGSPEEDWATER:
-            total += it->VB;
+        case MAXSPEEDGROUND:
+            if(total < it->VBG)
+               total = it->VBG;
+            break;
+        case AVGWIND:
+            total += it->VW;
+            break;
+        case MAXWIND:
+            if(total < it->VW)
+                total = it->VW;
+            break;
+        case AVGCURRENT:
+            total += it->VC;
+            break;
+        case MAXCURRENT:
+            if(total < it->VC)
+                total = it->VC;
+            break;
+        case AVGSWELL:
+            total += it->WVHT;
+            break;
+        case MAXSWELL:
+            if(total < it->WVHT)
+                total = it->WVHT;
             break;
         case PERCENTAGE_UPWIND:
             if(fabs(it->B - it->W) < 90)
@@ -499,12 +528,6 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
         case PORT_STARBOARD:
             if(it->B - it->W > 0)
                 total++;
-            break;
-        case AVGWIND:
-            total += it->VW;
-            break;
-        case AVGWAVE:
-            total += it->WVHT;
             break;
         }
         count++;
@@ -520,10 +543,12 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
     case PORT_STARBOARD:
         total *= 100.0;
     case AVGSPEED:
-    case AVGSPEEDWATER:
+    case AVGSPEEDGROUND:
     case AVGWIND:
-    case AVGWAVE:
+    case AVGCURRENT:
+    case AVGSWELL:
         total /= count;
+    default:
         break;
     }
     return total;

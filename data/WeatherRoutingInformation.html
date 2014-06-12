@@ -181,17 +181,16 @@ becoming less efficient over the course of a very long passage.
 
 <p>Todo list:
 <ul>
+<li>Profile and optimize (shortcut or lookup expensive routines)
 <li>Optimize land detection routine
 <li>Optimize cyclone detection routine
 <li>Implement cyclone crossing detection
-<li>Improve boat polar computation
-<li>Allow user to configure fields in main configurations table
 <li>Allow multiple selection of configurations to edit more than one at the same time
-<li>Fix merdian problem, so we split the world on the opposite of end longitude, and don't propagate past it
+<li>Improve boat polar computation
 <li>Add constraint for wind against current (bad seastate)
-<li>Make segment intersection test better and thus avoid removing points in almost all cases
+<li>Make segment intersection test smarter and thus avoid deleting points in almost all cases
 <li>Fix issues with the backtrack optimization so it can be used
-<li>Profile and optimize (shortcut or lookup expensive routines)
+<li>Fix merdian problem, so we split the world on the opposite of end longitude, and don't propagate past it
 <li>Determine best way way to reduce excessive propagations at the edge of graph
 <li>Fix inverted regions
 </ul>

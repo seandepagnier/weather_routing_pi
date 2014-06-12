@@ -46,23 +46,6 @@ StatisticsDialog::StatisticsDialog(wxWindow *parent)
 void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
 {
     if(routemapoverlay) {
-        m_stPercentageUpwind->SetLabel
-            (wxString::Format(_T("%2.f%%"), routemapoverlay->RouteInfo
-                              (RouteMapOverlay::PERCENTAGE_UPWIND)));
-
-        double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
-        m_stPortStarboard->SetLabel(isnan(port_starboard) ? _T("nan")
-                                    : wxString::Format(_T("%d/%d"),
-                                                       (int)port_starboard, 100-(int)port_starboard));
-
-        m_stAverageWindKnots->SetLabel
-            (wxString::Format(_T("%2.f knts"), routemapoverlay->RouteInfo
-                              (RouteMapOverlay::AVGWIND)));
-
-        m_stAverageWaveHeight->SetLabel
-            (wxString::Format(_T("%2.f"), routemapoverlay->RouteInfo
-                              (RouteMapOverlay::AVGWAVE)));
-
         m_stState->SetLabel(routemapoverlay->Running() ? _("Running") : _("Stopped"));
        
         int isochrons, routes, invroutes, skippositions, positions;
@@ -73,11 +56,6 @@ void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
         m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
         m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
     } else {
-        m_stPercentageUpwind->SetLabel(_T(""));
-        m_stPortStarboard->SetLabel(_T(""));
-        m_stAverageWindKnots->SetLabel(_T(""));
-        m_stAverageWaveHeight->SetLabel(_T(""));
-
         m_stState->SetLabel(_("No Route"));
         m_stIsoChrons->SetLabel(_T(""));
         m_stRoutes->SetLabel(_T(""));

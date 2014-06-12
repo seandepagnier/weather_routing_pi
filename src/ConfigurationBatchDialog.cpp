@@ -130,6 +130,14 @@ void ConfigurationBatchDialog::ClearSources()
     m_lDestinations->Clear();
 }
 
+void ConfigurationBatchDialog::OnOnce( wxCommandEvent& event )
+{
+    m_tStartDays->SetValue(_T("0"));
+    m_tStartHours->SetValue(_T("0"));
+    m_tStartSpacingDays->SetValue(_T("1"));
+    m_tStartSpacingHours->SetValue(_T("0"));
+}
+
 void ConfigurationBatchDialog::OnDaily( wxCommandEvent& event )
 {
     m_tStartDays->SetValue(_T("365"));

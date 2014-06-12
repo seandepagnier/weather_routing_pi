@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -79,6 +79,21 @@ void SettingsDialog::LoadSettings()
     int ConcurrentThreads = wxThread::GetCPUCount();
     pConf->Read( _T("ConcurrentThreads"), &ConcurrentThreads, ConcurrentThreads);
     m_sConcurrentThreads->SetValue(ConcurrentThreads);
+
+    // set defaults
+    bool columns[WeatherRouting::NUM_COLS];
+    for(int i=0; i<WeatherRouting::NUM_COLS; i++)
+        columns[i] = i < WeatherRouting::DISTANCE && i == WeatherRouting::STATE;
+
+    for(int i=0; i<WeatherRouting::NUM_COLS; i++) {
+        if(i == 0)
+            m_cblFields->Append(_("Visible"));
+        else
+            m_cblFields->Append(column_names[i]);
+        pConf->Read( wxString::Format(_T("Column%d"), i), &columns[i], columns[i]);
+        m_cblFields->Check(i, columns[i]);
+    }
+
     
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "SettingsDialogX" ), &p.x, p.x);
@@ -115,6 +130,9 @@ void SettingsDialog::SaveSettings( )
     int ConcurrentThreads = m_sConcurrentThreads->GetValue();
     pConf->Write( _T("ConcurrentThreads"), ConcurrentThreads);
 
+    for(int i=0; i<WeatherRouting::NUM_COLS; i++)
+        pConf->Write( wxString::Format(_T("Column%d"), i), m_cblFields->IsChecked(i));
+
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "SettingsDialogX" ), p.x);
     pConf->Write ( _T ( "SettingsDialogY" ), p.y);
@@ -125,6 +143,13 @@ void SettingsDialog::OnUpdate( )
     WeatherRouting *weather_routing = dynamic_cast<WeatherRouting*>(GetParent());
     if(weather_routing)
         weather_routing->UpdateDisplaySettings();
+}
+
+void SettingsDialog::OnUpdateColumns( wxCommandEvent& event )
+{
+    WeatherRouting *weather_routing = dynamic_cast<WeatherRouting*>(GetParent());
+    if(weather_routing)
+        weather_routing->UpdateColumns();
 }
 
 void SettingsDialog::OnHelp( wxCommandEvent& event )

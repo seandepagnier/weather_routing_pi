@@ -51,15 +51,32 @@ public:
     void Update(WeatherRouting *wr, bool stateonly=false);
 
     bool Filtered;
-    wxString BoatFilename, Start, StartTime, End, Time, Distance, AvgSpeed, State;
+    wxString BoatFilename, Start, StartTime, End, EndTime, Time, Distance,
+        AvgSpeed, MaxSpeed, AvgSpeedGround, MaxSpeedGround, AvgWind, MaxWind,
+        AvgCurrent, MaxCurrent, AvgSwell, MaxSwell, UpwindPercentage, PortStarboard, State;
     RouteMapOverlay *routemapoverlay;
 };
+
+static const wxString column_names[] = {_T(""), _("Start"), _("Start Time"),
+                                        _("End"), _("End Time"), _("Time"), _("Distance"),
+                                        _("Avg Speed"), _("Max Speed"),
+                                        _("Avg Speed Ground"), _("Max Speed Ground"),
+                                        _("Avg Wind"), _("Max Wind"),
+                                        _("Avg Current"), _("Max Current"),
+                                        _("Avg Swell"), _("Max Swell"),
+                                        _("Upwind Percentage"),
+                                        _("Port Starboard"), _("State")};
 
 class WeatherRouting : public WeatherRoutingBase
 {
 public:
     enum {POSITION_NAME=0, POSITION_LAT, POSITION_LON};
-    enum {VISIBLE=0, START, STARTTIME, END, TIME, DISTANCE, AVGSPEED, STATE};
+
+    enum {VISIBLE=0, START, STARTTIME, END, ENDTIME, TIME, DISTANCE, AVGSPEED, MAXSPEED,
+          AVGSPEEDGROUND, MAXSPEEDGROUND,
+          AVGWIND, MAXWIND, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
+          UPWIND_PERCENTAGE, PORT_STARBOARD, STATE, NUM_COLS};
+    long columns[NUM_COLS];
 
     WeatherRouting(wxWindow *parent, weather_routing_pi &plugin);
     ~WeatherRouting();
@@ -91,6 +108,7 @@ public:
     void AddPosition(double lat, double lon, wxString name);
 
     void CursorRouteChanged();
+    void UpdateColumns();
 
 private:
 

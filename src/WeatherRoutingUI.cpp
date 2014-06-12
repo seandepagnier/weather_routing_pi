@@ -294,6 +294,11 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	fgSizer92->SetFlexibleDirection( wxBOTH );
 	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxFlexGridSizer* fgSizer100;
+	fgSizer100 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer100->SetFlexibleDirection( wxBOTH );
+	fgSizer100->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	wxStaticBoxSizer* sbSizer25;
 	sbSizer25 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Display") ), wxVERTICAL );
 	
@@ -364,7 +369,14 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	sbSizer25->Add( fgSizer18, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer92->Add( sbSizer25, 1, wxEXPAND, 5 );
+	fgSizer100->Add( sbSizer25, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer101;
+	fgSizer101 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer101->AddGrowableCol( 0 );
+	fgSizer101->AddGrowableRow( 1 );
+	fgSizer101->SetFlexibleDirection( wxBOTH );
+	fgSizer101->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* sbSizer26;
 	sbSizer26 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Computation") ), wxVERTICAL );
@@ -385,7 +397,17 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	sbSizer26->Add( fgSizer93, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer92->Add( sbSizer26, 1, wxEXPAND, 5 );
+	fgSizer101->Add( sbSizer26, 1, wxEXPAND, 5 );
+	
+	wxArrayString m_cblFieldsChoices;
+	m_cblFields = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cblFieldsChoices, 0 );
+	fgSizer101->Add( m_cblFields, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer100->Add( fgSizer101, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer92->Add( fgSizer100, 1, wxEXPAND, 5 );
 	
 	m_sdbSizer1 = new wxStdDialogButtonSizer();
 	m_sdbSizer1OK = new wxButton( this, wxID_OK );
@@ -411,6 +433,7 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_sAlternateRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_cbAlternatesForAll->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbSquaresAtSailChanges->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cblFields->Connect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_sdbSizer1Help->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
 }
 
@@ -424,6 +447,7 @@ SettingsDialogBase::~SettingsDialogBase()
 	m_sAlternateRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_cbAlternatesForAll->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbSquaresAtSailChanges->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cblFields->Disconnect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_sdbSizer1Help->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
 	
 }
@@ -2291,38 +2315,6 @@ StatisticsDialogBase::StatisticsDialogBase( wxWindow* parent, wxWindowID id, con
 	fgSizer29->SetFlexibleDirection( wxBOTH );
 	fgSizer29->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText116 = new wxStaticText( this, wxID_ANY, _("Upwind"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText116->Wrap( -1 );
-	fgSizer29->Add( m_staticText116, 0, wxALL, 5 );
-	
-	m_stPercentageUpwind = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_stPercentageUpwind->Wrap( -1 );
-	fgSizer29->Add( m_stPercentageUpwind, 0, wxALL, 5 );
-	
-	m_staticText125 = new wxStaticText( this, wxID_ANY, _("Port/Starboard"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText125->Wrap( -1 );
-	fgSizer29->Add( m_staticText125, 0, wxALL, 5 );
-	
-	m_stPortStarboard = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_stPortStarboard->Wrap( -1 );
-	fgSizer29->Add( m_stPortStarboard, 0, wxALL, 5 );
-	
-	m_staticText121 = new wxStaticText( this, wxID_ANY, _("Average Wind"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText121->Wrap( -1 );
-	fgSizer29->Add( m_staticText121, 0, wxALL, 5 );
-	
-	m_stAverageWindKnots = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_stAverageWindKnots->Wrap( -1 );
-	fgSizer29->Add( m_stAverageWindKnots, 0, wxALL, 5 );
-	
-	m_staticText123 = new wxStaticText( this, wxID_ANY, _("Average Wave (M)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText123->Wrap( -1 );
-	fgSizer29->Add( m_staticText123, 0, wxALL, 5 );
-	
-	m_stAverageWaveHeight = new wxStaticText( this, wxID_ANY, _("N/A"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_stAverageWaveHeight->Wrap( -1 );
-	fgSizer29->Add( m_stAverageWaveHeight, 0, wxALL, 5 );
-	
 	m_staticText47 = new wxStaticText( this, wxID_ANY, _("State"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText47->Wrap( -1 );
 	fgSizer29->Add( m_staticText47, 0, wxALL, 5 );
@@ -2631,6 +2623,9 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	fgSizer101->SetFlexibleDirection( wxBOTH );
 	fgSizer101->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	m_button41 = new wxButton( m_panel8, wxID_ANY, _("Once"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer101->Add( m_button41, 0, wxALL, 5 );
+	
 	m_button38 = new wxButton( m_panel8, wxID_ANY, _("Daily"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer101->Add( m_button38, 0, wxALL, 5 );
 	
@@ -2811,6 +2806,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	m_button41->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnOnce ), NULL, this );
 	m_button38->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDaily ), NULL, this );
 	m_button39->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnWeekly ), NULL, this );
 	m_button40->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnMonthly ), NULL, this );
@@ -2829,6 +2825,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 ConfigurationBatchDialogBase::~ConfigurationBatchDialogBase()
 {
 	// Disconnect Events
+	m_button41->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnOnce ), NULL, this );
 	m_button38->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDaily ), NULL, this );
 	m_button39->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnWeekly ), NULL, this );
 	m_button40->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnMonthly ), NULL, this );

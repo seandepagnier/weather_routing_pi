@@ -31,6 +31,7 @@
 #include <wx/clrpicker.h>
 #include <wx/spinctrl.h>
 #include <wx/checkbox.h>
+#include <wx/checklst.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/combobox.h>
@@ -152,6 +153,7 @@ class SettingsDialogBase : public wxDialog
 		virtual void OnUpdateColor( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateColumns( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnHelp( wxCommandEvent& event ) { event.Skip(); }
 		
 	
@@ -164,6 +166,7 @@ class SettingsDialogBase : public wxDialog
 		wxCheckBox* m_cbAlternatesForAll;
 		wxCheckBox* m_cbSquaresAtSailChanges;
 		wxSpinCtrl* m_sConcurrentThreads;
+		wxCheckListBox* m_cblFields;
 		
 		SettingsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Settings"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxCAPTION ); 
 		~SettingsDialogBase();
@@ -532,10 +535,6 @@ class StatisticsDialogBase : public wxDialog
 	protected:
 		wxStaticText* m_staticText511;
 		wxStaticText* m_stRunTime;
-		wxStaticText* m_staticText116;
-		wxStaticText* m_staticText125;
-		wxStaticText* m_staticText121;
-		wxStaticText* m_staticText123;
 		wxStaticText* m_staticText47;
 		wxStaticText* m_stState;
 		wxStaticText* m_staticText53;
@@ -552,10 +551,6 @@ class StatisticsDialogBase : public wxDialog
 		wxButton* m_sdbSizer5OK;
 	
 	public:
-		wxStaticText* m_stPercentageUpwind;
-		wxStaticText* m_stPortStarboard;
-		wxStaticText* m_stAverageWindKnots;
-		wxStaticText* m_stAverageWaveHeight;
 		
 		StatisticsDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Statistics"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~StatisticsDialogBase();
@@ -632,6 +627,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxStaticText* m_staticText124;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText126;
+		wxButton* m_button41;
 		wxButton* m_button38;
 		wxButton* m_button39;
 		wxButton* m_button40;
@@ -652,6 +648,7 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxButton* m_bClose;
 		
 		// Virtual event handlers, overide them in your derived class
+		virtual void OnOnce( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDaily( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnWeekly( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnMonthly( wxCommandEvent& event ) { event.Skip(); }

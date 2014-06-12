@@ -78,15 +78,15 @@ void ReportDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
         _("longer than great circle route") + _T("<br>");
 
     double avgspeed = routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED);
-    double avgspeedwater = routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEEDWATER);
-    page += _("Average Ground Speed") + _T(": ") + wxString::Format
-        (_T(" %.2f"), avgspeed) + _T(" knots<dt>");
+    double avgspeedground = routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEEDGROUND);
     page += _("Average Water Speed") + _T(": ") + wxString::Format
-        (_T(" %.2f"), avgspeedwater) + _T(" knots<dt>");
+        (_T(" %.2f"), avgspeed) + _T(" knots<dt>");
+    page += _("Average Ground Speed") + _T(": ") + wxString::Format
+        (_T(" %.2f"), avgspeedground) + _T(" knots<dt>");
     page += _("Average Wind") + _T(": ") + wxString::Format
         (_T(" %.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWIND)) + _T(" knots<dt>");
-    page += _("Average Wave ht") + _T(": ") + wxString::Format
-        (_T(" %.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWAVE)) + _T(" meters<dt>");
+    page += _("Average Swell") + _T(": ") + wxString::Format
+        (_T(" %.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSWELL)) + _T(" meters<dt>");
     page += _("Upwind") + _T(": ") + wxString::Format
         (_T(" %.2f%%"), routemapoverlay->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND)) + _T("<dt>");
     double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
@@ -102,11 +102,9 @@ void ReportDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
        more faster than boat over water)  then attempt to determine which current based on lat/lon
        eg, gulf stream, japan, current aghulles current etc.. and report it. */
     page += _T("<p>");
-    double wspddiff = avgspeed / avgspeedwater;
+    double wspddiff = avgspeedground / avgspeed;
     if(fabs(1-wspddiff) > .03) {
-        page += wxString::Format
-            (_T("%.2f%% "), ((wspddiff > 1 ?
-                              avgspeed / avgspeedwater : avgspeedwater / avgspeed) - 1) * 100.0)
+        page += wxString::Format (_T("%.2f%% "), ((wspddiff > 1 ? wspddiff : 1/wspddiff) - 1) * 100.0)
             + _("speed change due to ");
         if(wspddiff > 1)
             page += _("favorable");
@@ -162,7 +160,7 @@ void ReportDialog::GenerateRoutesReport()
             }
         }
         page += _("<dt>Fastest configuration leaves ") + fastest->StartTime().Format();
-        page += _("<dt>average speed") + wxString::Format
+        page += _T(" ") + _("average speed") + wxString::Format
             (_T(": %.2f knots"), fastest->RouteInfo(RouteMapOverlay::AVGSPEED));
 
         /* determine best times if upwind percentage is below 50 */

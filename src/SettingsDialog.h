@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -45,6 +45,7 @@ public:
     void OnUpdateSpin( wxSpinEvent& event ) { OnUpdate(); }
     void OnUpdate( wxCommandEvent& event ) { OnUpdate(); }
     void OnUpdate( );
+    void OnUpdateColumns( wxCommandEvent& event );
     void OnHelp( wxCommandEvent& event );
 };
 

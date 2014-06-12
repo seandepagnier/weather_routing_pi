@@ -64,6 +64,7 @@ public:
     std::vector<BatchSource*> sources;
 
 protected:
+    void OnOnce( wxCommandEvent& event );
     void OnDaily( wxCommandEvent& event );
     void OnWeekly( wxCommandEvent& event );
     void OnMonthly( wxCommandEvent& event );
