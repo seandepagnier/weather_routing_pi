@@ -147,7 +147,7 @@ void ReportDialog::GenerateRoutesReport()
         RouteMapConfiguration c = first->GetConfiguration();
         page += _T("<p>");
         page += c.Start + _T(" ") + _("to") + _T(" ") + c.End + _T(" ") + wxString::Format
-            (_T("(%ld ") + _("configurations") + _T(")\n"), overlays.size());
+            (_T("(%ld ") + wxString(_("configurations")) + _T(")\n"), overlays.size());
 
         /* determine fastest time */
         wxTimeSpan fastest_time;

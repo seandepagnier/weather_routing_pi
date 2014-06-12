@@ -333,11 +333,9 @@ msgid ""
 msgstr ""
 #
 msgid ""
-"Climatology plugin version not supported, no climatology data\n"
-"."
+"Climatology plugin version not supported, no climatology data."
 msgstr ""
-"Version du complément Climatology non supportée, pas de données de "
-"climatologie.\n"
+"Version du complément Climatology non supportée, pas de données de climatologie."
 #
 msgid "Climatology starting cyclone year"
 msgstr ""
