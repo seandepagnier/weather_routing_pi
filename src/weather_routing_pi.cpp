@@ -217,22 +217,26 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         wxJSONValue v;
         r.Parse(message_body, &v);
 
-        int major = v[_T("ClimatologyVersionMajor")].AsInt();
-        if(major > 0) {
-            wxMessageDialog mdlg(m_parent_window,
-                                 _("Climatology plugin version not supported, no climatology data\n."),
-                                 _("Weather Routing"), wxOK | wxICON_WARNING);
-            mdlg.ShowModal();
-            return;
-        }
-
-        int minor = v[_T("ClimatologyVersionMinor")].AsInt();
-
-        if(minor < 9) {
-            wxMessageDialog mdlg(m_parent_window,
-                                 _("Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"),
-                                 _("Weather Routing"), wxOK | wxICON_WARNING);
-            mdlg.ShowModal();
+        static bool shown_warnings;
+        if(!shown_warnings) {
+            shown_warnings = true;
+            int major = v[_T("ClimatologyVersionMajor")].AsInt();
+            if(major > 0) {
+                wxMessageDialog mdlg(m_parent_window,
+                                     _("Climatology plugin version not supported, no climatology data\n."),
+                                     _("Weather Routing"), wxOK | wxICON_WARNING);
+                mdlg.ShowModal();
+                return;
+            }
+            
+            int minor = v[_T("ClimatologyVersionMinor")].AsInt();
+            
+            if(minor < 9) {
+                wxMessageDialog mdlg(m_parent_window,
+                                     _("Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"),
+                                     _("Weather Routing"), wxOK | wxICON_WARNING);
+                mdlg.ShowModal();
+            }
         }
 
         wxString sptr = v[_T("ClimatologyDataPtr")].AsString();

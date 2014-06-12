@@ -1184,7 +1184,8 @@ void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
     wxListItem item;
     item.SetId(m_lWeatherRoutes->GetItemCount());
     item.SetData(weatherroute);
-    UpdateItem(m_lWeatherRoutes->InsertItem(item));
+    if(m_lWeatherRoutes->GetColumnCount())
+        UpdateItem(m_lWeatherRoutes->InsertItem(item));
 
     m_mDeleteAll->Enable();
     m_mComputeAll->Enable();

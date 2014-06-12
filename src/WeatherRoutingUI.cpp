@@ -287,15 +287,19 @@ WeatherRoutingBase::~WeatherRoutingBase()
 
 SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxSize( -1,290 ), wxDefaultSize );
+	this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
 	
 	wxFlexGridSizer* fgSizer92;
 	fgSizer92 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer92->AddGrowableCol( 0 );
+	fgSizer92->AddGrowableRow( 0 );
 	fgSizer92->SetFlexibleDirection( wxBOTH );
 	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* fgSizer100;
 	fgSizer100 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer100->AddGrowableCol( 1 );
+	fgSizer100->AddGrowableRow( 0 );
 	fgSizer100->SetFlexibleDirection( wxBOTH );
 	fgSizer100->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
