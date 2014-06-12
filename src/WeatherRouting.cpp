@@ -1382,6 +1382,9 @@ void WeatherRouting::UpdateItem(long index)
     if(columns[AVGSWELL] >= 0)
         m_lWeatherRoutes->SetItem(index, columns[AVGSWELL], weatherroute->AvgSwell);
 
+    if(columns[MAXSWELL] >= 0)
+        m_lWeatherRoutes->SetItem(index, columns[MAXSWELL], weatherroute->MaxSwell);
+
     if(columns[UPWIND_PERCENTAGE] >= 0)
         m_lWeatherRoutes->SetItem(index, columns[UPWIND_PERCENTAGE], weatherroute->UpwindPercentage);
 
