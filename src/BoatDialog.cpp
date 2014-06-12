@@ -713,24 +713,24 @@ void BoatDialog::PopulatePlans()
     for(unsigned int i=0; i<boatplan.SwitchPlans.size(); i++) {
         SwitchPlan plan = boatplan.SwitchPlans[i];
     
-        wxString des, a, andstr = _(" and ");
+        wxString des, a, andstr = wxString(_T(" ")) + _("and") + wxString(_T(" "));
         if(!isnan(plan.MaxWindSpeed))
-            des += a + _("Wind Speed > ") + wxString::Format(_("%.0f"), plan.MaxWindSpeed), a = andstr;
+            des += a + _("Wind Speed > ") + wxString::Format(_T("%.0f"), plan.MaxWindSpeed), a = andstr;
         
         if(!isnan(plan.MinWindSpeed))
-            des += a + _("Wind Speed < ") + wxString::Format(_("%.0f"), plan.MinWindSpeed), a = andstr;
+            des += a + _("Wind Speed < ") + wxString::Format(_T("%.0f"), plan.MinWindSpeed), a = andstr;
 
         if(!isnan(plan.MaxWindDirection))
-            des += a + _("Wind Direction > ") + wxString::Format(_("%.0f"), plan.MaxWindDirection), a = andstr;
+            des += a + _("Wind Direction > ") + wxString::Format(_T("%.0f"), plan.MaxWindDirection), a = andstr;
         
         if(!isnan(plan.MinWindDirection))
-            des += a + _("Wind Direction < ") + wxString::Format(_("%.0f"), plan.MinWindDirection), a = andstr;
+            des += a + _("Wind Direction < ") + wxString::Format(_T("%.0f"), plan.MinWindDirection), a = andstr;
         
         if(!isnan(plan.MaxWaveHeight))
-            des += a + _("Wave Height > ") + wxString::Format(_("%.0f"), plan.MaxWaveHeight), a = andstr;
+            des += a + _("Wave Height > ") + wxString::Format(_T("%.0f"), plan.MaxWaveHeight), a = andstr;
 
         if(!isnan(plan.MinWaveHeight))
-            des += a + _("Wave Height < ") + wxString::Format(_("%.0f"), plan.MinWaveHeight), a = andstr;
+            des += a + _("Wave Height < ") + wxString::Format(_T("%.0f"), plan.MinWaveHeight), a = andstr;
 
         if(!plan.DayTime) {
             des += a + _("Night Time");

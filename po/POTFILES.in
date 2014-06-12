@@ -13,10 +13,10 @@ src/ConfigurationDialog.cpp
 src/ConfigurationDialog.h
 src/FilterRoutesDialog.cpp
 src/FilterRoutesDialog.h
-src/icons.cpp
-src/icons.h
 src/PlotDialog.cpp
 src/PlotDialog.h
+src/ReportDialog.cpp
+src/ReportDialog.h
 src/RouteMap.cpp
 src/RouteMap.h
 src/RouteMapOverlay.cpp

@@ -1,0 +1,1360 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Complément WeatherRouting pour openCPN\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2014-06-12 21:25+0800\n"
+"PO-Revision-Date: 2014-03-13 15:39+0100\n"
+"Last-Translator: Gilletarom <contact@gilletarom.fr>\n"
+"Language-Team: Gilletarom <contactàgilletarom;fr>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+#
+msgid "        N/A         "
+msgstr "        N/A         "
+#
+msgid " Close"
+msgstr "Fermer"
+#
+msgid " and "
+msgstr " et "
+#
+msgid " currents."
+msgstr "Courants"
+#
+msgid " switch to "
+msgstr " échangé avec "
+#
+msgid " to "
+msgstr ""
+#
+msgid "&About"
+msgstr "&Au sujet de"
+#
+msgid "&Batch"
+msgstr "&Batch"
+#
+msgid "&Close"
+msgstr "&Fermer"
+#
+msgid "&Compute"
+msgstr "&Compilé"
+#
+msgid "&Configuration"
+msgstr "&Configuration"
+#
+msgid "&Delete"
+msgstr "&Supprimer"
+#
+msgid "&Edit"
+msgstr "&Editer"
+#
+msgid "&File"
+msgstr "&Fichier"
+#
+msgid "&Filter"
+msgstr "&Filtrer"
+#
+msgid "&GoTo"
+msgstr ""
+#
+msgid "&Help"
+msgstr "&Aide"
+#
+msgid "&Information"
+msgstr "&Information"
+#
+msgid "&New"
+msgstr "&Noveau"
+#
+msgid "&New Position"
+msgstr "&Noveau Position"
+#
+msgid "&Open"
+msgstr "&Ouvrir"
+#
+msgid "&Plot"
+msgstr ""
+#
+msgid "&Position"
+msgstr "&Position"
+#
+msgid "&Reset All"
+msgstr "&Remettre tout à zéro"
+#
+msgid "&Save"
+msgstr "&Sauver"
+#
+msgid "&Settings"
+msgstr "&Paramètres"
+#
+msgid "&Stop"
+msgstr "&Arrêter"
+#
+msgid "&Update Boat Position"
+msgstr "&Position de routage"
+#
+msgid "&View"
+msgstr "&Voir"
+#
+#, fuzzy, c-format
+msgid "(%ld configurations)\n"
+msgstr "Configurations"
+#
+msgid "(-1 for unlimited)"
+msgstr "(-1 pour sans limite)"
+#
+msgid "-120"
+msgstr "-120"
+#
+msgid "-150"
+msgstr "-150"
+#
+msgid "-45"
+msgstr "-45"
+#
+msgid "-60"
+msgstr "-60"
+#
+msgid "-90"
+msgstr "-90"
+#
+msgid "0"
+msgstr "0"
+#
+msgid "120"
+msgstr "120"
+#
+msgid "150"
+msgstr "150"
+#
+msgid "170"
+msgstr "170"
+#
+msgid "45"
+msgstr "45"
+#
+msgid "5"
+msgstr "5"
+#
+msgid "60"
+msgstr "60"
+#
+msgid "90"
+msgstr "90"
+#
+msgid "<Computed>"
+msgstr "<Compilé>"
+#
+#, fuzzy
+msgid "<dt>Fastest configuration leaves "
+msgstr "Sélectionner la configuration"
+#
+#, fuzzy
+msgid "About Author"
+msgstr "Au sujet de l'auteur"
+#
+msgid "About Weather Routing"
+msgstr "Au sujet de Weather routing"
+#
+msgid "Add"
+msgstr "Ajouter"
+#
+#, fuzzy
+msgid "Additional"
+msgstr "Frictionnel"
+#
+# Epaisseur alternative des routes  ???
+msgid "Alternate Routes Thickness"
+msgstr "Epaisseur de route alternative"
+#
+msgid "Alternates for all IsoChrons"
+msgstr "Alternative pour toutes les isochrones"
+#
+msgid "Anchoring"
+msgstr "Encré"
+#
+msgid "Apparent Wind"
+msgstr "Vent apparent"
+#
+msgid "Apparent Wind Direction"
+msgstr "Direction apparente du vent"
+#
+msgid "Apparent Wind Velocity"
+msgstr "Vitesse apparente du vent"
+#
+msgid "Arriving "
+msgstr ""
+#
+msgid "Auto Connect"
+msgstr "Connecter automatiquement"
+#
+msgid "Average"
+msgstr "Vent moyen"
+#
+msgid "Average Ground Speed"
+msgstr "Vitesse moyenne"
+#
+msgid "Average Swell"
+msgstr "Houle maximale"
+#
+msgid "Average Water Speed"
+msgstr "Vague moyenne (M)"
+#
+msgid "Average Wind"
+msgstr "Vent moyen"
+#
+msgid "Avg Current"
+msgstr "Courants"
+#
+msgid "Avg Speed"
+msgstr "Vitesse moyenne"
+#
+msgid "Avg Speed Ground"
+msgstr "Vitesse moyenne"
+#
+msgid "Avg Swell"
+msgstr "Houle maximale"
+#
+msgid "Avg Wind"
+msgstr "Vent moyen"
+#
+msgid "Avoid crossing cyclone tracks"
+msgstr ""
+#
+msgid "Batch configuration"
+msgstr "Batch Configuration"
+#
+msgid ""
+"Batch mode generates multiple configurations based on the selected "
+"configuration."
+msgstr ""
+"Le mode par lot génère de multiples configurations, en fonction de la "
+"configuration choisie."
+#
+# ??????  Course down ?
+#, fuzzy
+msgid "Best Course Down Wind Port Tack"
+msgstr "Best Course Down Wind Port Tack"
+#
+# ??????? Course down ?
+#, fuzzy
+msgid "Best Course Down Wind Starboard Tack"
+msgstr "Best Course Down Wind Starboard Tack"
+#
+# ???????????  Course up ?
+#, fuzzy
+msgid "Best Course Up Wind Port Tack"
+msgstr "Best Course Up Wind Port Tack"
+#
+# ????????  Course up ?
+#, fuzzy
+msgid "Best Course Up Wind Starboard Tack"
+msgstr "Best Course Up Wind Starboard Tack"
+#
+msgid "Best Times (mostly downwind)"
+msgstr ""
+#
+msgid "Boat"
+msgstr "Bateau"
+#
+msgid "Boat Course Ground"
+msgstr "Cap fond du bateau"
+#
+msgid "Boat Course Water"
+msgstr "Cap eau du bateau"
+#
+msgid "Boat Velocity Ground"
+msgstr "Vitesse fond du bateau"
+#
+msgid "Boat Velocity Water"
+msgstr "Vitesse eau du bateau"
+#
+msgid "BoatFileName"
+msgstr "BoatFileName"
+#
+msgid "Boats"
+msgstr "Bateaux"
+#
+msgid "By"
+msgstr "Par"
+#
+msgid "Cancel"
+msgstr "Effacer"
+#
+msgid "Cannot edit switch plan since there is no other plan to switch to."
+msgstr ""
+"Impossible d'éditer l'échange de plan parce qu'il n'y a pas d'autre plan pour "
+"effectuer l'échange."
+#
+msgid "Cannot have min and max wave height"
+msgstr "Impossible d'avoir les hauteurs minimale et maximale des vagues"
+#
+msgid "Cannot have min and max wind direction"
+msgstr "Impossible d'avoir les directions minimale et maximale du vent"
+#
+msgid "Cannot have min and max wind speed"
+msgstr "Impossible d'avoir les vitesses minimum et le maximum du vent"
+#
+msgid "Cannot make a rule from nothing specified."
+msgstr "Impossible de construire une règle en l'absence de spécification."
+#
+msgid "Cannot make a rule if neither daytime nor nighttime is specified."
+msgstr ""
+"Impossible de construire une règle si ni la période de jour, ni celle de nuit "
+"ne sont spécifiées."
+#
+msgid "Capsize Risk"
+msgstr "Risque de chavirage"
+#
+msgid "Catamaran"
+msgstr "Catamaran"
+#
+msgid "Category"
+msgstr "Catégorie"
+#
+msgid "Clear"
+msgstr "Effacer"
+#
+msgid "Climatology"
+msgstr "Climatology"
+#
+msgid ""
+"Climatology plugin out of date, it must be upgraded or resulting routings may "
+"be incorrect.\n"
+msgstr ""
+#
+msgid ""
+"Climatology plugin version not supported, no climatology data\n"
+"."
+msgstr ""
+"Version du complément Climatology non supportée, pas de données de "
+"climatologie.\n"
+#
+msgid "Climatology starting cyclone year"
+msgstr ""
+#
+msgid "Close"
+msgstr "Fermer"
+#
+msgid "Comfort Factor"
+msgstr "Facteur de confort"
+#
+msgid "Common"
+msgstr ""
+#
+msgid "Complete"
+msgstr "Compléter"
+#
+# ???
+msgid "Computation"
+msgstr "Calcul en cours"
+#
+msgid "Compute &All"
+msgstr "Compilé &Tout"
+#
+msgid "Compute optimal routes based on weather and constraints."
+msgstr "Calculer la route optimale basée sur la météo et les contraintes."
+#
+msgid "Computing..."
+msgstr "Calcul en cours"
+#
+msgid "Conditions"
+msgstr "Conditions"
+#
+msgid "Configurations"
+msgstr "Configurations"
+#
+msgid "Connect"
+msgstr "Connecter"
+#
+msgid "Constraints"
+msgstr "Contraintes"
+#
+msgid "Courses (relative to true wind)"
+msgstr ""
+#
+msgid "Cumulative - Calms"
+msgstr ""
+#
+msgid "Cumulative Map"
+msgstr ""
+#
+#, fuzzy
+msgid "Current Configuration"
+msgstr "Sélectionner la configuration"
+#
+msgid "Current Direction"
+msgstr "Direction du courant"
+#
+msgid "Current Route"
+msgstr "Route courante"
+#
+msgid "Current Time"
+msgstr "Heure du courant"
+#
+msgid "Current Velocity"
+msgstr "Vitesse du courant"
+#
+msgid "Currents"
+msgstr "Courants"
+#
+msgid "Cursor Route"
+msgstr "Couleur du curseur de la route"
+#
+# Traduction à revoir :
+# NON TRADUIT :
+# Alternate Routes Thickness -- thickness for alternate routes\n
+# TRADUCTION Ollé ollé !!! :
+# Filtrer les routes par Climatology --_ Ceci ne fait rien actuellement. Mais il est dans les intentions de l'auteur de faire des météo-routes qui découlent des données grib et de la climatologie pour rendre clair l'usage des données.\n
+# Nombre de processus concurrents -- S'il existe plusieurs configurations, elles peuvent conduire à des solutions différentes . Il serait possible de gagner du temps sur une machine multi-processeurs.\n
+#, fuzzy
+msgid ""
+"Cursor Route -- optimal route closest to the cursor\n"
+"Destination Route -- optimal route to the desired destination\n"
+"Route Thickness -- thickness to draw Cursor and Destination Routes\n"
+"Iso Chron Thickness -- thickness for isochrons on map\n"
+"Alternate Routes Thickness -- thickness for alternate routes\n"
+"Note: All thicknesses can be set to 0 to disable their display\n"
+"Alternates for all Isochrons -- display all alternate routes not only the "
+"ones which reach the last isochron\n"
+"Squares At Sail Changes -- render squares along Routes whenever a sail change "
+"is made\n"
+"Filter Routes by Climatology -- This currently does nothing, but I intended "
+"to make weather route maps which derive data from grib and climatology "
+"clearly render which data was used where \n"
+"\n"
+"Number of Concurrent Threads -- if there are multiple configurations, they "
+"can be computed in separate threads which allows a speedup if there are "
+"multiple processors\n"
+msgstr ""
+"Cursor Route -- optimal route closest to the cursor\n"
+"Destination Route -- optimal route to the desired destination\n"
+"Route Thickness -- thickness to draw Cursor and Destination Routes\n"
+"Iso Chron Thickness -- thickness for isochrons on map\n"
+"Alternate Routes Thickness -- thickness for alternate routes\n"
+"Note: All thicknesses can be set to 0 to disable their display\n"
+"Alternates for all Isochrons -- display all alternate routes not only the "
+"ones which reach the last isochron\n"
+"Squares At Sail Changes -- render squares along Routes whenever a sail change "
+"is made\n"
+"Filter Routes by Climatology -- This currently does nothing, but I intended "
+"to make weather route maps which derive data from grib and climatology "
+"clearly render which data was used where \n"
+"\n"
+"Number of Concurrent Threads -- if there are multiple configurations, they "
+"can be computed in separate threads which allows a speedup if there are "
+"multiple processors\n"
+#
+msgid "Cursor Route Color"
+msgstr "Couleur du curseur de la route"
+#
+msgid "Cyclones"
+msgstr ""
+#
+msgid "Daily"
+msgstr ""
+#
+msgid "Data Source"
+msgstr "Source des données"
+#
+msgid "Date"
+msgstr "Date"
+#
+msgid "Day Time"
+msgstr "Période diurne"
+#
+msgid "Days"
+msgstr ""
+#
+msgid "Deg"
+msgstr "Deg"
+#
+msgid "Degrees"
+msgstr "Degrés"
+#
+msgid "Delete"
+msgstr "Supprimer"
+#
+msgid "Delete &All"
+msgstr "Supprimer &Tout"
+#
+msgid "Delete All"
+msgstr "Supprimer Tout"
+#
+msgid "Destination Route Color"
+msgstr "Couleur de la destination de la route"
+#
+msgid "Destination not yet reached."
+msgstr "Couleur de la destination de la route"
+#
+msgid "Destinations"
+msgstr "Destinations"
+#
+msgid "Detect Land"
+msgstr "Détecter la terre"
+#
+#, fuzzy
+msgid "Disable"
+msgstr "Variable"
+#
+msgid "Disconnect All"
+msgstr "Déconnecter tout"
+#
+msgid "Displacement Length Ratio"
+msgstr "Ratio déplacement / longueur"
+#
+msgid "Display"
+msgstr "Afficher"
+#
+msgid "Distance"
+msgstr "Distance"
+#
+msgid "Distance sailed: "
+msgstr "Distance"
+#
+msgid "Done"
+msgstr "Fait"
+#
+msgid "Drag"
+msgstr "Glisser"
+#
+msgid "Drag Computation"
+msgstr "Faire glisser les résultats"
+#
+# ??????
+# Glisser dépend à la fois des vagues et de l'état du bateau \ n
+# Ceci peut être calculé sur la base de l'état de la carène puis modifié manuellement. \n
+# Avec les réglages appropriés, la vitesse de coque sera atteinte, mais aussi cassée en fonction du planage. \n
+# Une valeur 0 zéro signifie pas sillage, où 100 est le plus lourd déplacement. \n
+# Ceci prend également en compte les différentes harmoniques de la vague du sillage avant que la vitesse de coque ne soit atteinte, de sorte que la polaire du bateau puisse paraitre  cahotique. \n
+#, fuzzy
+msgid ""
+"Drag is both frictional and wave based\n"
+"This can be computed based on boat values above then modified manually.\n"
+"With proper settings hull speed will be achieved, but also break into planing "
+"mode possible.\n"
+"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
+"This also takes into account the different harmonics of wakes before hull "
+"speed is reached, so resulting boat polar may appear bumpy.\n"
+msgstr ""
+"Drag is both frictional and wave based\n"
+"This can be computed based on boat values above then modified manually.\n"
+"With proper settings hull speed will be achieved, but also break into planing "
+"mode possible.\n"
+"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
+"This also takes into account the different harmonics of wakes before hull "
+"speed is reached, so resulting boat polar may appear bumpy.\n"
+#
+msgid "Duration "
+msgstr "Configuration"
+#
+msgid "E&xport"
+msgstr "E&xporter"
+#
+msgid "Edit"
+msgstr "Editer"
+#
+msgid "Empty Route, nothing to export\n"
+msgstr "Route vide, rien à exporter\n"
+#
+msgid "End"
+msgstr "Fin"
+#
+msgid "End Time"
+msgstr "Durée d'éxecution"
+#
+msgid "Enter Latitude"
+msgstr "Entrer le nom"
+#
+msgid "Enter Longitude"
+msgstr ""
+#
+msgid "Enter Name"
+msgstr "Entrer le nom"
+#
+msgid "Eta"
+msgstr "ETA"
+#
+msgid "Export All"
+msgstr "Exporter tout"
+#
+msgid "Failed"
+msgstr "Echec"
+#
+# csv : est un type de fichier utilisable avec excel ?
+# Si oui on peut traduire par :
+# Echec de lecture du fichier csv
+# mais y a t il assez de place ?
+msgid "Failed reading csv: "
+msgstr "Echec de lecture csv :"
+#
+# csv : est ce un type de fichier utilisable avec excel ?
+msgid "Failed saving boat polar to csv"
+msgstr "Echec de sauvegarde de la polaire du bateau en csv"
+#
+msgid "Failed saving file: "
+msgstr "Impossible de sauver le fichier : "
+#
+msgid "Failed to find plan name to switch to in list"
+msgstr ""
+"Impossible de trouver le plan, ayant ce nom dans la liste, pour l'échanger."
+#
+msgid "Failed to load file."
+msgstr "Impossible de charger le fichier."
+#
+msgid "Failed to load file: "
+msgstr "Impossible de charger le fichier."
+#
+msgid "Failed to open file: "
+msgstr "Echec d'ouverture du fichier : "
+#
+msgid "Failed to save xml file: "
+msgstr "Impossible de sauvegarder le fichier xml :"
+#
+msgid "Failed to start configuration: "
+msgstr "Sélectionner la configuration"
+#
+# Quoi est dupliqué ? nom ou position ?
+# traduction à revoir. "dupliqué" ou "dupliquée" ?
+# De plus, discaring est sans doute mal écrit. Ce doit être Discarding d'où comme traduction éventuelle : Abandon.
+msgid "File contains duplicate position name, discaring\n"
+msgstr "Le fichier comporte des noms de position dupliqués. Abandon\n"
+#
+msgid "FileName"
+msgstr "FileName"
+#
+msgid "Filter"
+msgstr "Filtrer"
+#
+# ???
+# Ou filtre de route
+# ou route filtrée ?
+msgid "Filter Routes"
+msgstr "Filtrer les routes"
+#
+msgid "For"
+msgstr "Pour"
+#
+msgid "Frictional"
+msgstr "Frictionnel"
+#
+msgid "From"
+msgstr "Depuis"
+#
+msgid "Generate"
+msgstr "Générer"
+#
+msgid "Grib"
+msgstr "Grib"
+#
+msgid "Grib Time"
+msgstr "Heure du grib"
+#
+msgid "Hour"
+msgstr "Heure"
+#
+msgid "Hour(s)"
+msgstr "Heure(s)"
+#
+msgid "Hull Speed"
+msgstr "Vitesse de la coque"
+#
+msgid "Info"
+msgstr "Info"
+#
+msgid "Information"
+msgstr "Information"
+#
+msgid "Initial Plan"
+msgstr "Plan initial"
+#
+msgid "Integrator"
+msgstr ""
+#
+msgid "InvRoutes"
+msgstr "InvRoutes"
+#
+msgid "Invalid Date Time."
+msgstr "date et heure invalides."
+#
+msgid "Invalid Start/End"
+msgstr "Départ et fin invalide"
+#
+msgid "Invalid settings, nothing will be done."
+msgstr "Paramètres invalides, rien ne peut être fait."
+#
+msgid "Invalid xml file"
+msgstr "Fichier xml invalide"
+#
+msgid "Invalid xml file (no OCPWeatherRoutingBoat node): "
+msgstr "Echec de lecture du fichier xml (pas de noeud OCPWeatherroutingboat )"
+#
+msgid "Inverted Regions"
+msgstr "Région inversée"
+#
+msgid "Iso Chron Thickness"
+msgstr "Epaisseur des isochrones"
+#
+msgid "Iso Chrons"
+msgstr "Isochrones"
+#
+msgid "Knots"
+msgstr "Noeuds"
+#
+#  ?????  De quoi est il question ? Dernier ou dernière ?
+msgid "Last Valid if Data Deficient"
+msgstr "Dernier valide si les données sont insuffisantes"
+#
+msgid "Lat"
+msgstr "Lat"
+#
+msgid "Leaving "
+msgstr ""
+#
+msgid "Load"
+msgstr "Charger"
+#
+msgid "Lon"
+msgstr "Lon"
+#
+# ?????
+msgid "Max # of Tacks"
+msgstr "Maximum # de traces"
+#
+#  ???
+#, fuzzy
+msgid "Max Current"
+msgstr "Max Courants"
+#
+# ??????
+msgid "Max Diverted Course"
+msgstr "Cap dévié au maximum"
+#
+# ????
+# +- latitude maximale
+# Plus ou moins latitude maximale
+msgid "Max Latitude +-"
+msgstr "Latitude maximale +-"
+#
+# ????? Qu'est ce que ce point ? Est le point où deux layline se rencontrent ?
+#, fuzzy
+msgid "Max Pointing Angle Apparent WInd"
+msgstr "Max Point Angle"
+#
+# ????? Qu'est ce que ce point ? Est le point où deux layline se rencontrent ?
+#, fuzzy
+msgid "Max Search Angle"
+msgstr "Max Point Angle"
+#
+#, fuzzy
+msgid "Max Speed"
+msgstr "Houle maximale"
+#
+msgid "Max Speed Ground"
+msgstr ""
+#
+msgid "Max Swell"
+msgstr "Houle maximale"
+#
+msgid "Max Wind"
+msgstr "Vent maximum"
+#
+msgid "Meters"
+msgstr "Mètres"
+#
+msgid "Mono"
+msgstr "Mono"
+#
+msgid "Monthly"
+msgstr ""
+#
+msgid "Months"
+msgstr ""
+#
+msgid "Most Likely"
+msgstr ""
+#
+msgid "Must select a configuration to generate from"
+msgstr ""
+#
+msgid "N/A"
+msgstr "N/A"
+#
+msgid "Name"
+msgstr "Nom"
+#
+msgid "Nautical Miles"
+msgstr "Miles nautiques"
+#
+msgid "New"
+msgstr "Nouveau"
+#
+msgid "New Plan"
+msgstr "Nouveau plan"
+#
+#, fuzzy
+msgid "New Position"
+msgstr "Position"
+#
+msgid "Newtons Method"
+msgstr ""
+#
+msgid "Night Time"
+msgstr "Période nocturne"
+#
+#, fuzzy
+msgid "No Configuration selected."
+msgstr "Configurations"
+#
+msgid "No Data"
+msgstr "Pas de donnée"
+#
+#, fuzzy
+msgid "No Route"
+msgstr "Routes"
+#
+# ?????
+msgid "No Weather Route selected"
+msgstr "Pas de météo-route sélectionnée"
+#
+msgid "No routes to report yet."
+msgstr ""
+#
+# ou "non calculé" ?
+msgid "Not Computed"
+msgstr "Non compilé"
+#
+msgid "Number of Concurrent threads"
+msgstr "Nombre de fils concurents"
+#
+#, fuzzy
+msgid "Number of tacks"
+msgstr "Nombre de fils concurents"
+#
+#
+msgid "Once"
+msgstr ""
+#
+msgid "Open"
+msgstr "Ouvrir"
+#
+msgid "OpenCPN Weather Routing Plugin"
+msgstr "Complément Weather  Routing pour OpenCPN"
+#
+msgid "Optimize Tacking"
+msgstr "Optimiser le virement de bord"
+#
+msgid "Options"
+msgstr "Options"
+#
+msgid "Overall"
+msgstr "global"
+#
+msgid "Plot"
+msgstr "Point"
+#
+msgid "Plot Type"
+msgstr "Type de tracé"
+#
+msgid "Polar"
+msgstr "Polaire"
+#
+msgid "Polar CSV File Settings"
+msgstr "CSV Paramètres CSV"
+#
+msgid "Polar Computation Settings"
+msgstr "Paramètres de routage"
+#
+# ou "non calculé" ?
+#, fuzzy
+msgid "Polar Computed"
+msgstr "Non compilé"
+#
+msgid "Polar Config"
+msgstr "Fichier de la polaire"
+#
+msgid "Polar From CSV"
+msgstr ""
+#
+msgid "Port Starboard"
+msgstr "Babord/Tribord"
+#
+msgid "Port/Starboard"
+msgstr "Babord/Tribord"
+#
+msgid "Position"
+msgstr "Position"
+#
+msgid "Positions"
+msgstr "Positions"
+#
+msgid "Proa"
+msgstr "Proa"
+#
+msgid "Recompute"
+msgstr "Recalculer"
+#
+msgid "Rect"
+msgstr "Rect"
+#
+msgid "Remove"
+msgstr "Retirer"
+#
+msgid "Report"
+msgstr "Exporter"
+#
+msgid "Reset"
+msgstr "Remettre à zéro"
+#
+msgid "Reset All"
+msgstr "Remettre tout à zéro"
+#
+msgid "Route Thickness"
+msgstr "Epaisseur de la route"
+#
+msgid "Route from "
+msgstr ""
+#
+msgid "Routes"
+msgstr "Routes"
+#
+msgid "Run Time"
+msgstr "Durée d'éxecution"
+#
+msgid "Runge Kutta"
+msgstr ""
+#
+msgid "Running"
+msgstr "Exécution en cours"
+#
+msgid "S&tatistics"
+msgstr "S&tatistiques"
+#
+msgid "Sail Plans"
+msgstr "Plans de route"
+#
+msgid "Save As"
+msgstr "Sauver comme "
+#
+msgid "Save As CSV"
+msgstr "Sauver comme "
+#
+msgid "Save and Close"
+msgstr "Sauver & Fermer"
+#
+msgid "Scale"
+msgstr "Echelle"
+#
+msgid "Select Configuration"
+msgstr "Sélectionner la configuration"
+#
+msgid "Select Polar"
+msgstr "Sélectionner la polaire"
+#
+msgid "Select a file"
+msgstr "Sélectionner un fichier"
+#
+msgid "Sig Wave Height"
+msgstr "Signal de hauteur de vague"
+#
+msgid "Skip Positions"
+msgstr "Sauter les positions"
+#
+msgid "Sources"
+msgstr "Sources"
+#
+msgid "Spaced"
+msgstr "Espacé"
+#
+# ????
+# Préciser les conditions où il faut changer pour un autre plan. \n
+# Si les conditions changent de façon spectaculaire, le programme se penchera sur le plan que nous avons juste changé pour voir s'il est besoin de changer à nouveau, donc il est seulement nécessaire de définir des règles pour le prochain plan.
+#, fuzzy
+msgid ""
+"Specify conditions where we should change to a different plan.\n"
+"If conditions change dramatically, then the program will look at the plan we "
+"just changed to and see if it needs to change again, so there is only need to "
+"specify rules for the next closest plan."
+msgstr ""
+"Specify conditions where we should change to a different plan.\n"
+"If conditions change dramatically, then the program will look at the plan we "
+"just changed to and see if it needs to change again, so there is only need to "
+"specify rules for the next closest plan."
+#
+# ????
+msgid "Squares at Sail Changes"
+msgstr "Carrés aux changements de voiles"
+#
+msgid "Start"
+msgstr "Départ"
+#
+msgid "Start Time"
+msgstr "Heure de départ"
+#
+msgid "Starting"
+msgstr "Démarrage"
+#
+msgid "State"
+msgstr "Etat"
+#
+msgid "Statistics"
+msgstr "Statistiques"
+#
+msgid "Stopped"
+msgstr "Arrêté"
+#
+msgid "Submarine"
+msgstr "Sousmarin"
+#
+msgid "Switch Plan"
+msgstr "Echanger le plan"
+#
+# Faut il mettre un s à planS
+msgid "Switch Plan Rules"
+msgstr "Règles d'échange de plan"
+#
+msgid "Switch Sail Plan Configuration"
+msgstr "Echanger la configuration du plan de route"
+#
+msgid "Tacking Time"
+msgstr "Horaire du virement de bord"
+#
+msgid "Tacks"
+msgstr ""
+#
+# ?????
+msgid ""
+"The weather routing plugin for opencpn is intended to aid in planning sailing "
+"routes based on computerized weather data and boat sailing ability.\n"
+"\n"
+"This also means to educate users about weather trends, to \"discover\" new "
+"cruising routes, and to avoid adverse conditions.\n"
+"\n"
+"License: GPLv3+\n"
+"\n"
+"Source Code:\n"
+"https://github.com/seandepagnier/weather_routing_pi\n"
+"\n"
+"Author:\n"
+"Sean D'Epagnier\n"
+"\n"
+"Many thanks to all of the translators and testers."
+msgstr ""
+"Le complément Weather Routing pour OpenCPN a pour objectif d'aider à la "
+"plannification de routes pour les voiliers à partir des données de la "
+"météorologie et des caractéristiques du bateau.\n"
+"\n"
+"Il peut aussi servir à former les utilisateurs à utiliser les tendances "
+"météorologiques, à découvrir de nouveaux itinéraires de croisière, pour "
+"éviter des conditions défavorables.\n"
+"\n"
+"License: GPLv3+\n"
+"\n"
+"Code source :\n"
+"https://github.com/seandepagnier/weather_routing_pi\n"
+"\n"
+"Auteur :\n"
+"Sean D'Epagnier\n"
+"\n"
+"Grands remerciements aux traducteurs et aux testeurs."
+#
+msgid "Then Switch to"
+msgstr "Ensuite échanger avec"
+#
+msgid "This name already exists, replace?\n"
+msgstr "Ce nom éxiste déjà. Voulez vous le remplacer ?\n"
+#
+msgid "Time"
+msgstr "Heure"
+#
+msgid "Time Step"
+msgstr "Pas de l'heure"
+#
+msgid "To"
+msgstr "vers"
+#
+msgid "Trimaran"
+msgstr "Trimaran"
+#
+msgid "True Wind"
+msgstr "Vent vrai"
+#
+#, fuzzy
+msgid "True Wind Kts"
+msgstr "Vent vrai"
+#
+msgid "Unrecognized xml node"
+msgstr "Node xml non reconnu"
+#
+#  ??
+msgid "Upwind"
+msgstr "vent fort"
+#
+msgid "Upwind Percentage"
+msgstr ""
+#
+msgid "VMG"
+msgstr "VMG"
+#
+msgid "Variable"
+msgstr "Variable"
+#
+msgid "Visible"
+msgstr ""
+#
+#, fuzzy
+msgid "Waiting..."
+msgstr "Calcul en cours"
+#
+#
+msgid "Wake"
+msgstr "Réveiller"
+#
+# ?????
+msgid "Warning: less than 4 different degree steps specified\n"
+msgstr "Alerte : Pas de moins de 4 degrés d'écart spécifié\n"
+#
+msgid "Wave Height <"
+msgstr "Hauteur de vague <"
+#
+msgid "Wave Height < "
+msgstr "Hauteur de vague <"
+#
+msgid "Wave Height >"
+msgstr "Hauteur de vague >"
+#
+msgid "Wave Height > "
+msgstr "Hauteur de vague >"
+#
+msgid "Weather Route"
+msgstr "Météo-route"
+#
+msgid "Weather Route Plot"
+msgstr "Point de météo-route"
+#
+msgid "Weather Route Point"
+msgstr "Point de météo-route"
+#
+msgid "Weather Route Position"
+msgstr "Position de routage"
+#
+#, fuzzy
+msgid "Weather Route Report"
+msgstr "Point de météo-route"
+#
+msgid "Weather Routing"
+msgstr "Routage"
+#
+#, fuzzy
+msgid "Weather Routing Configuration"
+msgstr "Point de météo-route"
+#
+#, fuzzy
+msgid "Weather Routing Configuration Batch"
+msgstr "Statistiques de routage"
+#
+msgid "Weather Routing Report"
+msgstr "Point de météo-route"
+#
+msgid ""
+"Weather Routing Reports gives an overview of a given route based on multiple "
+"configurations.\n"
+"\n"
+"For example using the configuration batch dialog, it is possible to easily "
+"generate multiple otherwise identical configurations which have different "
+"starting times. Once all of these configurations are computed, they become "
+"available to the report generator. An overview can be given of the best "
+"times, expected speed, and weather conditions. If climatology is available, "
+"cyclone risk and additional weather conditions may be described."
+msgstr ""
+#
+msgid "Weather Routing Settings"
+msgstr "Paramètres de routage"
+#
+msgid "Weather Routing Statistics"
+msgstr "Statistiques de routage"
+#
+msgid ""
+"Weather Routing features include:\n"
+"  optimal routing subject to various constraints based on weather data\n"
+"  automatic boat polar computation\n"
+msgstr ""
+"Complément Weather Routing pour OpenCPN\n"
+"\n"
+"Il fournit des prévisions de routage incluant :\n"
+" routage automatique en fonction de différentes contraintes.\n"
+"          Vitesse optimale basée sur le vent et les courants\n"
+"          Calcul de la vitesse du bateau\n"
+#
+msgid "WeatherRouting"
+msgstr "WeatherRouting"
+#
+msgid "Weather_Routing"
+msgstr "Weather_Routing"
+#
+msgid "Weekly"
+msgstr ""
+#
+#  ????? Pourquoi pas "Chemin du vent" mais bon, c'est absurde ....
+msgid "Wind Course"
+msgstr "Cap du vent"
+#
+# Pourquoi pas "Chemin du vent fond"
+msgid "Wind Course Ground"
+msgstr "Cap fond du vent"
+#
+msgid "Wind Degree Step"
+msgstr "Pas en degré de la direction du vent"
+#
+msgid "Wind Direction"
+msgstr "Direction du vent"
+#
+msgid "Wind Direction <"
+msgstr "Direction du vent <"
+#
+msgid "Wind Direction < "
+msgstr "Direction du vent < "
+#
+msgid "Wind Direction >"
+msgstr "Direction du vent >"
+#
+msgid "Wind Direction > "
+msgstr "Direction du vent > "
+#
+msgid "Wind Direction Ground"
+msgstr "Direction fond du vent"
+#
+msgid "Wind Speed <"
+msgstr "Vitesse du vent <"
+#
+msgid "Wind Speed < "
+msgstr "Vitesse du vent < "
+#
+msgid "Wind Speed >"
+msgstr "Vitesse du vent >"
+#
+msgid "Wind Speed > "
+msgstr "Vitesse du vent > "
+#
+msgid "Wind Speed Step"
+msgstr "Pas de la vitesse du vent"
+#
+msgid "Wind Velocity"
+msgstr "Vitesse du vent"
+#
+msgid "Wind Velocity Ground"
+msgstr "Vitesse fond du vent"
+#
+msgid "Wing and Wing Running"
+msgstr ""
+#
+msgid "With at least windspeed"
+msgstr ""
+#
+msgid "Within"
+msgstr "Dans"
+#
+# ????
+msgid "Zero Time Step invalid"
+msgstr "Pas de temps invalide (zéro)"
+#
+#, fuzzy
+msgid "and"
+msgstr " et "
+#
+msgid "any"
+msgstr ""
+#
+msgid "average speed"
+msgstr "Vitesse moyenne"
+#
+msgid "beam"
+msgstr "faisceau"
+#
+msgid "day(s)"
+msgstr "jour(s)"
+#
+msgid "degrees"
+msgstr "degrés"
+#
+#  ?????
+msgid "disp tons"
+msgstr "tonnes disp"
+#
+msgid "error, thread already created\n"
+msgstr ""
+#
+#, fuzzy
+msgid "favorable"
+msgstr "Variable"
+#
+msgid "h"
+msgstr "h"
+#
+msgid "hour(s)"
+msgstr "Heure(s)"
+#
+msgid "knots"
+msgstr "Noeuds"
+#
+# Abréviations pour ?????
+msgid "loa ft"
+msgstr "loa ft"
+#
+msgid "longer than great circle route"
+msgstr ""
+#
+# Abréviations de ????
+msgid "lwl ft"
+msgstr "lwl ft"
+#
+msgid "m"
+msgstr "m"
+#
+msgid "meters"
+msgstr "Mètres"
+#
+msgid "none"
+msgstr ""
+#
+# Ne pas modifier, chemin vers un fichier html dans le PC.
+# the idea is to use a different file here for french if possible
+#, fuzzy
+msgid "plugins/weather_routing_pi/data/WeatherRoutingInformation.html"
+msgstr "plugins/weather_routing/data/WeatherRoutingInformation.html"
+#
+msgid "s"
+msgstr "s"
+#
+msgid "seconds"
+msgstr "secondes"
+#
+msgid "speed change due to "
+msgstr ""
+#
+msgid "to"
+msgstr ""
+#
+msgid "type"
+msgstr "type"
+#
+msgid "unavailable"
+msgstr "Variable"
+#
+msgid "unfavorable"
+msgstr "Variable"
+#
+msgid "within"
+msgstr "Dans"
+#
+msgid "~"
+msgstr ""

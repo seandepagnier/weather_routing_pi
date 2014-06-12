@@ -575,7 +575,7 @@ void WeatherRouting::OnOpen( wxCommandEvent& event )
 {
     wxString error;
     wxFileDialog openDialog
-        ( this, _( "Select Configuration" ), _("~"), wxT ( "" ),
+        ( this, _( "Select Configuration" ), _T(""), wxT ( "" ),
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
@@ -587,7 +587,7 @@ void WeatherRouting::OnSave( wxCommandEvent& event )
 {
     wxString error;
     wxFileDialog saveDialog
-        ( this, _( "Select Configuration" ), _("~"), wxT ( "" ),
+        ( this, _( "Select Configuration" ), _(""), wxT ( "" ),
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_SAVE  );
 
@@ -808,7 +808,8 @@ void WeatherRouting::OnPlot ( wxCommandEvent& event )
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
 {
     wxString infolocation = *GetpSharedDataLocation()
-        + _("plugins/weather_routing_pi/data/WeatherRoutingInformation.html");
+        + _T("plugins/weather_routing_pi/data/")
+        + _("WeatherRoutingInformation.html");
     wxLaunchDefaultBrowser(_T("file://") + infolocation);
 }
 
