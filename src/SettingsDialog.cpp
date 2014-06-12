@@ -93,7 +93,6 @@ void SettingsDialog::LoadSettings()
         pConf->Read( wxString::Format(_T("Column%d"), i), &columns[i], columns[i]);
         m_cblFields->Check(i, columns[i]);
     }
-
     
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "SettingsDialogX" ), &p.x, p.x);

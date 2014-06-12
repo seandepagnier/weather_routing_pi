@@ -280,7 +280,7 @@ void WeatherRouting::UpdateColumns()
 
     for(int i=0; i<NUM_COLS; i++) {
         if(m_SettingsDialog.m_cblFields->IsChecked(i))
-            columns[i] = m_lWeatherRoutes->AppendColumn(column_names[i]);
+            columns[i] = m_lWeatherRoutes->InsertColumn(m_lWeatherRoutes->GetColumnCount(), column_names[i]);
         else
             columns[i] = -1;
     }

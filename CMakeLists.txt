@@ -41,7 +41,6 @@ SET(SRC_WEATHER_ROUTING
             src/georef.c
 
             src/GribRecord.cpp  
-#            src/zuFile.cpp 
 )
 
 IF(WIN32)

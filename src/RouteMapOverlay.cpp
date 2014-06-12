@@ -472,7 +472,7 @@ std::list<PlotData> RouteMapOverlay::GetPlotData(bool cursor_route)
 double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
 {
     std::list<PlotData> plotdata = GetPlotData(cursor_route);
-    double total = 0, count = 0, lat0, lon0;
+    double total = 0, count = 0, lat0 = 0, lon0 = 0;
     for(std::list<PlotData>::iterator it=plotdata.begin(); it!=plotdata.end(); it++)
     {
         switch(type) {

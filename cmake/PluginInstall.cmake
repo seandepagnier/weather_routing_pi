@@ -4,10 +4,6 @@
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
 
-IF(NOT APPLE)
-  TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${wxWidgets_LIBRARIES} ${EXTRA_LIBS} )
-ENDIF(NOT APPLE)
-
 IF(WIN32)
   SET(PARENT "opencpn")
 
@@ -37,12 +33,17 @@ IF(UNIX)
     NAMES
     gcov
     PATHS
-    /usr/lib/gcc/i686-pc-linux-gnu/4.7
+    /usr/lib/gcc/x86_64-linux-gnu/4.8.1
     )
 
   SET(EXTRA_LIBS ${EXTRA_LIBS} ${GCOV_LIBRARY})
+
  ENDIF(PROFILING)
 ENDIF(UNIX)
+
+IF(NOT APPLE)
+  TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${wxWidgets_LIBRARIES} ${EXTRA_LIBS} )
+ENDIF(NOT APPLE)
 
 IF(APPLE)
   INSTALL(TARGETS ${PACKAGE_NAME} RUNTIME LIBRARY DESTINATION ${CMAKE_BINARY_DIR}/OpenCPN.app/Contents/SharedSupport/plugins)

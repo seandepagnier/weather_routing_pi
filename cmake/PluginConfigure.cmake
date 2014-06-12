@@ -23,16 +23,18 @@ SET(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}" )
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 
-# SET(PROFILING 1)
+#SET(PROFILING 1)
 
 #  IF NOT DEBUGGING CFLAGS="-O2 -march=native"
 IF(NOT MSVC)
+#    ADD_DEFINITIONS( " -pg " )
+#    SET(CMAKE_EXE_LINKER_FLAGS -pg) # must build opencpn with -pg
+   # SET(CMAKE_SHARED_LINKER_FLAGS -pg) # must build opencpn with -pg
+
  IF(PROFILING)
-  ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
- ELSE(PROFILING)
-#  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
- ADD_DEFINITIONS( "-Wall -g -O0 -fexceptions" )
+  ADD_DEFINITIONS( "-fprofile-arcs -ftest-coverage" )
  ENDIF(PROFILING)
+ ADD_DEFINITIONS( "-Wall -g -O0 -fexceptions" )
 
  IF(NOT APPLE)
   SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,-Bsymbolic")

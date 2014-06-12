@@ -425,7 +425,7 @@ static inline bool ReadWindAndCurrents
 
         /* find most likely wind direction */
         double max_direction = 0;
-        int maxi;
+        int maxi = 0;
         for(int i=0; i<windatlas_count; i++)
             if(atlas.directions[i] > max_direction) {
                 max_direction = atlas.directions[i];
@@ -1757,7 +1757,7 @@ startnormalizing:
                 Normalize(sub, x, x, level + 1, inverted_regions);
                 if(inverted_regions) {
                   for(IsoRouteList::iterator it = sub.begin(); it != sub.end(); ++it) {
-                    if((*it)->children.size()) {
+                    if(!(*it)->children.empty()) {
                       printf("grandchild detected\n");
                       delete *it;
                     } else if(route1->direction == (*it)->direction) {
@@ -1810,7 +1810,7 @@ startnormalizing:
             int sc2 = route2->children.size();
             if(sc1 && sc2)
                 printf("both have children: %d %d\n", sc1, sc2);
-            
+
             route1->children.splice(route1->children.end(), route2->children);
             route2->skippoints = NULL; /* all points are now in route1 */
             delete route2;
@@ -1901,10 +1901,10 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
                 IsoRouteList childrenmask; /* non-inverted */
                 IsoRouteList mergedchildren; /* inverted */
                 childrenmask.push_back(route2);
-                while(childrenmask.size() > 0) {
+                while(!childrenmask.empty()) {
                     IsoRoute *r1 = childrenmask.front();
                     childrenmask.pop_front();
-                    while(route1->children.size() > 0) {
+                    while(!route1->children.empty()) {
                         IsoRoute *r2 = route1->children.front();
                         route1->children.pop_front();
                         IsoRouteList childrl; /* see if there is a merge */
@@ -2287,13 +2287,13 @@ void RouteMap::PositionLatLon(wxString Name, double &lat, double &lon)
 bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration)
 {
     IsoRouteList unmerged;
-    while(routelist.size()) {
+    while(!routelist.empty()) {
         if(TestAbort())
             return false;
 
         IsoRoute *r1 = routelist.front();
         routelist.pop_front();
-        while(routelist.size()) {
+        while(!routelist.empty()) {
             IsoRoute *r2 = routelist.front();
             routelist.pop_front();
             IsoRouteList rl;
@@ -2308,10 +2308,10 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
                 routelist.splice(routelist.end(), rl);
 #else /* merge new routes with each other right away before hitting the main list */
                 IsoRouteList unmerged2;
-                while(rl.size() > 0) {
+                while(!rl.empty()) {
                     r1 = rl.front();
                     rl.pop_front();
-                    while(rl.size() > 0) {
+                    while(!rl.empty()) {
                         r2 = rl.front();
                         rl.pop_front();
                         IsoRouteList rl2;
@@ -2418,13 +2418,12 @@ bool RouteMap::Propagate()
     IsoRouteList routelist;
     Unlock();
 
-    if(origin.size())
-        origin.back()->PropagateIntoList(routelist, grib, time, configuration);
-    else {
+    if(origin.empty()) {
         Position *np = new Position(configuration.StartLat, configuration.StartLon);
         np->prev = np->next = np;
         routelist.push_back(new IsoRoute(np->BuildSkipList()));
-    }
+    } else
+        origin.back()->PropagateIntoList(routelist, grib, time, configuration);
 
     Lock();
     m_NewGrib = NULL;
@@ -2433,15 +2432,16 @@ bool RouteMap::Propagate()
     Unlock();
 
     IsoChron* update;
-    if(routelist.size()) {
+    if(routelist.empty())
+        update = NULL;
+    else {
         IsoRouteList merged;
         if(!ReduceList(merged, routelist, configuration)) {
             Unlock();
             return false;
         }
         update = new IsoChron(merged, time, grib);
-    } else
-        update = NULL;
+    }
 
     Lock();
     if(update) {
@@ -2459,7 +2459,7 @@ bool RouteMap::Propagate()
 
 Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool before_last)
 {
-    if(!origin.size())
+    if(origin.empty())
         return NULL;
 
     Position *minpos = NULL;
