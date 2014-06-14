@@ -195,6 +195,17 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         wxJSONValue v;
         r.Parse(message_body, &v);
 
+        static bool shown_warnings;
+        if(!shown_warnings) {
+            if(v[_T("GribVersionMajor")].IsNull() || v[_T("GribVersionMajor")].AsInt() != 2 ||
+               v[_T("GribVersionMinor")].IsNull() || v[_T("GribVersionMinor")].AsInt() != 2) {
+                wxMessageDialog mdlg(m_parent_window,
+                                     _("Grib plugin version not supported."),
+                                     _("Weather Routing"), wxOK | wxICON_WARNING);
+                mdlg.ShowModal();
+            }
+        }
+
         wxString sptr = v[_T("TimelineSetPtr")].AsString();
         wxCharBuffer bptr = sptr.To8BitData();
         const char* ptr = bptr.data();

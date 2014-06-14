@@ -57,6 +57,19 @@ void  GribRecord::translateDataType()
             && levelValue == 0) dataType = GRB_WTMP;
 
 	}
+    //------------------------
+	//DNMI-NEurope.grb
+	//------------------------
+    else if ( (idCenter==88 && idModel==255 && idGrid==255)
+		|| (idCenter==88 && idModel==230 && idGrid==255)
+		|| (idCenter==88 && idModel==200 && idGrid==255)
+		|| (idCenter==88 && idModel==67 && idGrid==255) )
+    {
+        if( dataType==GRB_TEMP && levelType==LV_GND_SURF && levelValue==0 ) {       //air temperature at groud level
+            levelType = LV_ABOV_GND; levelValue = 2;
+        }
+		dataCenterModel = NORWAY_METNO;
+    }
 	//------------------------
 	// WRF NMM grib.meteorologic.net
 	//------------------------
@@ -131,6 +144,7 @@ void  GribRecord::translateDataType()
 	//------------------------
 	else
 	{
+        dataCenterModel = OTHER_DATA_CENTER;
 //		printf("Uncorrected GribRecord: ");
 //		this->print();
 //		this->knownData = false;
@@ -161,9 +175,9 @@ void GribRecord::print()
 //-------------------------------------------------------------------------------
 // Lecture depuis un fichier
 //-------------------------------------------------------------------------------
-#if 0
 GribRecord::GribRecord(ZUFILE* file, int id_)
 {
+#if 0
     id = id_;
 //   seekStart = zu_tell(file);           // moved to section 0 read
     data    = NULL;
@@ -232,8 +246,9 @@ GribRecord::GribRecord(ZUFILE* file, int id_)
 		translateDataType();
 		setDataType(dataType);
 	}
-}
 #endif
+}
+
 //-------------------------------------------------------------------------------
 // Constructeur de recopie
 //-------------------------------------------------------------------------------
@@ -263,31 +278,74 @@ GribRecord::GribRecord(const GribRecord &rec1, const GribRecord &rec2, double d)
 {
     *this = rec1;
 
+    // for now, both records must have same Di/Dj
+    if(!rec1.ok || !rec2.ok || rec1.Di != rec2.Di || rec1.Dj != rec2.Dj) {
+        ok=false;
+        return;
+    }
+
+    /* get overlapping region */
+    La1 = wxMax(rec1.La1, rec2.La1);
+    Lo1 = wxMax(rec1.Lo1, rec2.Lo1);
+    La2 = wxMin(rec1.La2, rec2.La2);
+    Lo2 = wxMin(rec1.Lo2, rec2.Lo2);
+
+    /* no overlap */
+    if(La1 > La2 || Lo1 > Lo2) {
+        ok=false;
+        return;
+    }
+
+    /* compute integer sizes for data array */
+    Ni = (Lo2-Lo1)/Di + 1;
+    Nj = (La2-La1)/Dj + 1;
+    
+    /* compute offsets into data arrays */
+    double rec1offdi = (Lo1 - rec1.Lo1)/Di, rec1offdj = (La1 - rec1.La1)/Dj;
+    double rec2offdi = (Lo1 - rec2.Lo1)/Di, rec2offdj = (La1 - rec2.La1)/Dj;
+
+    /* currently only work if we overlap so spatial interpolation is not needed */
+    if(floor(rec1offdi) != rec1offdi || floor(rec2offdi) != rec2offdi ||
+       floor(rec1offdj) != rec1offdj || floor(rec2offdj) != rec2offdj) {
+        ok = false;
+        return;
+    }
+
+    int rec1offi = rec1offdi, rec2offi = rec2offdi;
+    int rec1offj = rec1offdj, rec2offj = rec2offdj;
+ 
     /* TODO: for wave direction we need to do something else because 360 wraps will mess it up */
     // recopie les champs de bits
-    if (rec1.data && rec2.data && rec1.Ni == rec2.Ni && rec1.Nj == rec2.Nj) {
-        int size = rec1.Ni*rec1.Nj;
-        this->data = new double[size];
-        for (int i=0; i<size; i++) {
-            if(rec1.data[i] == GRIB_NOTDEF || rec2.data[i] == GRIB_NOTDEF)
-                this->data[i] = GRIB_NOTDEF;
-            else
-                this->data[i] = (1-d)*rec1.data[i] + d*rec2.data[i];
+    if (rec1.data && rec2.data) {
+        int size = Ni*Nj;
+        data = new double[size];
+        for (int i=0; i<Ni; i++) {
+            for (int j=0; j<Nj; j++) {
+                double data1 = rec1.data[(j+rec1offj)*rec1.Ni + i+rec1offi];
+                double data2 = rec2.data[(j+rec2offj)*rec2.Ni + i+rec2offi];
+                if(data1 == GRIB_NOTDEF || data2 == GRIB_NOTDEF)
+                    data[j*Ni+i] = GRIB_NOTDEF;
+                else
+                    data[j*Ni+i] = (1-d)*data1 + d*data2;
+            }
         }
     } else
         ok=false;
 
     if (rec1.BMSbits != NULL && rec2.BMSbits != NULL) {
-        if(rec1.sectionSize3 == rec2.sectionSize3) {
-        int size = rec1.sectionSize3-6;
-        this->BMSbits = new zuchar[size];
+//            int size1 = rec1.sectionSize3-6, size2 = rec2.sectionSize3-6;
+        int size = Ni*Nj;
+        BMSbits = new zuchar[size];
         for (int i=0; i<size; i++)
-            this->BMSbits[i] = rec1.BMSbits[i] & rec2.BMSbits[i];
-        } else
-            ok = false;
-    }
+            BMSbits[i] = 0;// todo: fix this rec1.BMSbits[i+rec1off] & rec2.BMSbits[i+rec2off];
+    } else
+        BMSbits = NULL;
 
     /* should maybe update strCurDate ? */
+
+    /* maybe this is wrong? */
+    latMin = La1, latMax = La2;
+    lonMin = Lo1, lonMax = Lo2;
 }
 
 GribRecord *GribRecord::MagnitudeRecord(const GribRecord &rec1, const GribRecord &rec2)
