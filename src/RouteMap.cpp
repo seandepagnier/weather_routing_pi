@@ -113,7 +113,7 @@ static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
     if(vx == GRIB_NOTDEF || vy == GRIB_NOTDEF)
         return false;
 
-    WG = positive_degrees(rad2deg(atan2(-vx, -vy)));
+    WG = rad2deg(atan2(-vx, -vy));
     VWG = distance(vy, vx) * 3.6 / 1.852;
     return true;
 }
@@ -425,7 +425,7 @@ static inline bool ReadWindAndCurrents
                 double angle1 = atlas.W[maxia], angle2 = atlas.W[maxi];
                 while(angle1 - angle2 > 180) angle1 -= 360;
                 while(angle2 - angle1 > 180) angle2 -= 360;
-                W = positive_degrees(maxid*angle1 + (1-maxid)*angle2);
+                W = heading_resolve(maxid*angle1 + (1-maxid)*angle2);
                 VW = maxid*atlas.VW[maxia] + (1-maxid)*atlas.VW[maxi];
         
                 OverGround(W, VW, C, VC, WG, VWG);
@@ -462,6 +462,7 @@ bool Position::GetPlotData(GribRecordSet *grib, double dt,
         else
             data.VBG *= 3600 / dt;
         OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
+
         return true;
     }
 
@@ -2040,7 +2041,6 @@ void IsoRoute::PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
             if(configuration.MaxTacks >= 0 && p->tacks >= configuration.MaxTacks)
                 dt = NAN;
         }
-
 
         if(!isnan(dt) && dt < mindt) {
             mindt = dt;

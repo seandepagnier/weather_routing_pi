@@ -522,11 +522,11 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
                 total = it->WVHT;
             break;
         case PERCENTAGE_UPWIND:
-            if(fabs(it->B - it->W) < 90)
+            if(fabs(heading_resolve(it->B - it->W)) < 90)
                 total++;
             break;
         case PORT_STARBOARD:
-            if(it->B - it->W > 0)
+            if(heading_resolve(it->B - it->W) > 0)
                 total++;
             break;
         default:

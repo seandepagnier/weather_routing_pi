@@ -1279,7 +1279,7 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
                                         (RouteMapOverlay::PERCENTAGE_UPWIND));
 
     double ps = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
-    PortStarboard = wxString::Format(_T("%02.0f/%02.0f"), ps, 100-ps);
+    PortStarboard = wxString::Format(_T("%.0f/%.0f"), ps, 100-ps);
 
     Tacks = wxString::Format(_T("%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::TACKS));
 
