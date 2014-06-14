@@ -186,7 +186,7 @@ struct RouteMapConfiguration {
     int CycloneMonths, CycloneDays, CycloneWindSpeed, CycloneClimatologyStartYear;
 
     bool UseGrib;
-    enum ClimatologyDataType {DISABLED, CUMULATIVE_MAP, CUMULATIVE_MINUS_CALMS, MOST_LIKELY, AVERAGE};
+    enum ClimatologyDataType {DISABLED, CURRENTS_ONLY, CUMULATIVE_MAP, CUMULATIVE_MINUS_CALMS, MOST_LIKELY, AVERAGE};
     enum ClimatologyDataType ClimatologyType;
     bool AllowDataDeficient;
 

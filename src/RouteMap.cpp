@@ -120,27 +120,6 @@ static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
 
 enum {WIND, CURRENT};
 
-/* Compute wind speed/direction from grib or climatology */
-static bool Wind(GribRecordSet *grib,
-                 RouteMapConfiguration::ClimatologyDataType climatology,
-                 const wxDateTime &time, bool AllowDataDeficient,
-                 Position *p, double &WG, double &VWG)
-{
-    do {
-        if(grib && GribWind(grib, p->lat, p->lon, WG, VWG))
-            return true;
-
-        if(climatology != RouteMapConfiguration::DISABLED &&
-           RouteMap::ClimatologyData(WIND, time, p->lat, p->lon, WG, VWG)) {
-            WG = heading_resolve(WG);
-            return true;
-        }
-
-        p = p->parent;
-    } while(AllowDataDeficient && p);
-    return false;
-}
-
 static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
                                double &C, double &VC)
 {
@@ -400,59 +379,65 @@ static inline bool ReadWindAndCurrents
                                            time, p->lat, p->lon, C, VC))
         C = VC = 0;
 
-    int windatlas_count = 8;
-    if(grib || configuration.ClimatologyType == RouteMapConfiguration::AVERAGE) {
-        if(!Wind(grib, configuration.ClimatologyType, time,
-                 configuration.AllowDataDeficient, p, WG, VWG))
-        return false;
-    } else if(configuration.ClimatologyType != RouteMapConfiguration::DISABLED) {
-        double speeds[8];
-        while(!RouteMap::ClimatologyWindAtlasData(time, p->lat, p->lon, windatlas_count,
+    for(;;) {
+        if(grib && GribWind(grib, p->lat, p->lon, WG, VWG))
+            break;
+
+        if(configuration.ClimatologyType == RouteMapConfiguration::AVERAGE &&
+           RouteMap::ClimatologyData(WIND, time, p->lat, p->lon, WG, VWG)) {
+            WG = heading_resolve(WG);
+            break;
+        } else if(configuration.ClimatologyType > RouteMapConfiguration::CURRENTS_ONLY) {
+            int windatlas_count = 8;
+            double speeds[8];
+            if(RouteMap::ClimatologyWindAtlasData(time, p->lat, p->lon, windatlas_count,
                                                   atlas.directions, speeds, atlas.storm, atlas.calm)) {
-            if(!configuration.AllowDataDeficient)
-                return false;
-            p = p->parent;
-            if(!p)
-                return false;
-        }
 
-        /* compute wind speeds over water with the given current */
-        for(int i=0; i<windatlas_count; i++) {
-            double WG = i*360/windatlas_count;
-            double VWG = speeds[i];
-            OverWater(WG, VWG, C, VC, atlas.W[i], atlas.VW[i]);
-        }
+                /* compute wind speeds over water with the given current */
+                for(int i=0; i<windatlas_count; i++) {
+                    double WG = i*360/windatlas_count;
+                    double VWG = speeds[i];
+                    OverWater(WG, VWG, C, VC, atlas.W[i], atlas.VW[i]);
+                }
 
-        /* find most likely wind direction */
-        double max_direction = 0;
-        int maxi = 0;
-        for(int i=0; i<windatlas_count; i++)
-            if(atlas.directions[i] > max_direction) {
-                max_direction = atlas.directions[i];
-                maxi = i;
+                /* find most likely wind direction */
+                double max_direction = 0;
+                int maxi = 0;
+                for(int i=0; i<windatlas_count; i++)
+                    if(atlas.directions[i] > max_direction) {
+                        max_direction = atlas.directions[i];
+                        maxi = i;
+                    }
+                
+                /* now compute next most likely wind octant (adjacent to most likely) and
+                   linearly interpolate speed and direction from these two octants,
+                   we use this as the most likely wind, and base wind direction for the map */
+                int maxia = maxi+1, maxib = maxi-1;
+                if(maxia == windatlas_count)
+                    maxia = 0;
+                if(maxib < 0)
+                    maxib = windatlas_count - 1;
+                
+                if(atlas.directions[maxia] < atlas.directions[maxib])
+                    maxia = maxib;
+
+                double maxid = 1 / (atlas.directions[maxi] / atlas.directions[maxia] + 1);
+                double angle1 = atlas.W[maxia], angle2 = atlas.W[maxi];
+                while(angle1 - angle2 > 180) angle1 -= 360;
+                while(angle2 - angle1 > 180) angle2 -= 360;
+                W = positive_degrees(maxid*angle1 + (1-maxid)*angle2);
+                VW = maxid*atlas.VW[maxia] + (1-maxid)*atlas.VW[maxi];
+        
+                OverGround(W, VW, C, VC, WG, VWG);
+                return true;
             }
-        
-        /* now compute next most likely wind octant (adjacent to most likely) and
-           linearly interpolate speed and direction from these two octants,
-           we use this as the most likely wind, and base wind direction for the map */
-        int maxia = maxi+1, maxib = maxi-1;
-        if(maxia == windatlas_count)
-            maxia = 0;
-        if(maxib < 0)
-            maxib = windatlas_count - 1;
+        }
 
-        if(atlas.directions[maxia] < atlas.directions[maxib])
-            maxia = maxib;
-
-        double maxid = 1 / (atlas.directions[maxi] / atlas.directions[maxia] + 1);
-        double angle1 = atlas.W[maxia], angle2 = atlas.W[maxi];
-        while(angle1 - angle2 > 180) angle1 -= 360;
-        while(angle2 - angle1 > 180) angle2 -= 360;
-        W = positive_degrees(maxid*angle1 + (1-maxid)*angle2);
-        VW = maxid*atlas.VW[maxia] + (1-maxid)*atlas.VW[maxi];
-        
-        OverGround(W, VW, C, VC, WG, VWG);
-        return true;
+        if(!configuration.AllowDataDeficient)
+            return false;
+        p = p->parent;
+        if(!p)
+            return false;
     }
 
     OverWater(WG, VWG, C, VC, W, VW);
@@ -2367,7 +2352,7 @@ bool RouteMap::Propagate()
        (!m_NewGrib ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       m_Configuration.ClimatologyType == RouteMapConfiguration::DISABLED &&
+       m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&
        !m_Configuration.AllowDataDeficient) {
         m_bFinished = true;
         m_bGribFailed = true;
@@ -2378,7 +2363,7 @@ bool RouteMap::Propagate()
     if((!m_NewGrib ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
         !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       m_Configuration.ClimatologyType != RouteMapConfiguration::DISABLED
+       m_Configuration.ClimatologyType > RouteMapConfiguration::CURRENTS_ONLY
        && ClimatologyData &&
        !m_Configuration.AllowDataDeficient) {
         double WG, VWG;
@@ -2404,7 +2389,8 @@ bool RouteMap::Propagate()
     }
 
 
-    if(!m_Configuration.UseGrib && m_Configuration.ClimatologyType == RouteMapConfiguration::DISABLED) {
+    if(!m_Configuration.UseGrib &&
+       m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY) {
         m_bFinished = true;
         m_bNoData = true;
         Unlock();

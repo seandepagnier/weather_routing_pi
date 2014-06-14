@@ -617,7 +617,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer961->SetFlexibleDirection( wxBOTH );
 	fgSizer961->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxString m_cClimatologyTypeChoices[] = { _("Disable"), _("Cumulative Map"), _("Cumulative - Calms"), _("Most Likely"), _("Average") };
+	wxString m_cClimatologyTypeChoices[] = { _("Disable"), _("Currents Only"), _("Cumulative Map"), _("Cumulative - Calms"), _("Most Likely"), _("Average") };
 	int m_cClimatologyTypeNChoices = sizeof( m_cClimatologyTypeChoices ) / sizeof( wxString );
 	m_cClimatologyType = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cClimatologyTypeNChoices, m_cClimatologyTypeChoices, 0 );
 	m_cClimatologyType->SetSelection( 1 );
