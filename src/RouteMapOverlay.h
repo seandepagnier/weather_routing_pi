@@ -48,7 +48,7 @@ class RouteMapOverlay : public RouteMap
 public:
     enum RouteInfoType {DISTANCE, AVGSPEED, MAXSPEED, AVGSPEEDGROUND, MAXSPEEDGROUND,
                         AVGWIND, MAXWIND, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
-                        PERCENTAGE_UPWIND, PORT_STARBOARD};
+                        PERCENTAGE_UPWIND, PORT_STARBOARD, TACKS};
 
     RouteMapOverlay();
     ~RouteMapOverlay();

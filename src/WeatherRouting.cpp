@@ -1281,6 +1281,8 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
     double ps = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
     PortStarboard = wxString::Format(_T("%02.0f/%02.0f"), ps, 100-ps);
 
+    Tacks = wxString::Format(_T("%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::TACKS));
+
     if(!routemapoverlay->Valid())
         State = _("Invalid Start/End");
     else
@@ -1391,6 +1393,11 @@ void WeatherRouting::UpdateItem(long index)
 
     if(columns[PORT_STARBOARD] >= 0)
         m_lWeatherRoutes->SetItem(index, columns[PORT_STARBOARD], weatherroute->PortStarboard);
+
+    if(columns[TACKS] >= 0) {
+        m_lWeatherRoutes->SetItem(index, columns[TACKS], weatherroute->Tacks);
+        m_lWeatherRoutes->SetColumnWidth(columns[TACKS], wxLIST_AUTOSIZE);
+    }
 
     if(columns[STATE] >= 0) {
         m_lWeatherRoutes->SetItem(index, columns[STATE], weatherroute->State);

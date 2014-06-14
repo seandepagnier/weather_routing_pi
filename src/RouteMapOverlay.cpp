@@ -529,12 +529,16 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
             if(it->B - it->W > 0)
                 total++;
             break;
+        default:
+            break;
         }
         count++;
     }
 
     /* fixup data */
     switch(type) {
+    case TACKS:
+        return plotdata.size() ? plotdata.back().tacks : 0;
     case DISTANCE:
         if(total == 0)
             total = NAN;
