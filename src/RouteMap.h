@@ -180,7 +180,7 @@ struct RouteMapConfiguration {
     IntegratorType Integrator;
 
     double MaxDivertedCourse, MaxSearchAngle, MaxWindKnots, MaxSwellMeters;
-    double MaxLatitude, MaxTacks, TackingTime, MaxUpwindPercentage;
+    double MaxLatitude, MaxTacks, TackingTime, WindVSCurrent;
 
     bool AvoidCycloneTracks;
     int CycloneMonths, CycloneDays, CycloneWindSpeed, CycloneClimatologyStartYear;

@@ -466,8 +466,7 @@ void WeatherRouting::OnWeatherRouteSort( wxListEvent& event )
         for(int index=0; index<m_lWeatherRoutes->GetItemCount(); index++) {
             WeatherRoute *weatherroute =
                 reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
-            weatherroute->routemapoverlay->m_bEndRouteVisible =
-                !weatherroute->routemapoverlay->m_bEndRouteVisible;
+            weatherroute->routemapoverlay->m_bEndRouteVisible = sortorder == 1;
             UpdateItem(index);
         }
         RequestRefresh( GetParent() );
@@ -668,13 +667,21 @@ void WeatherRouting::GenerateBatch()
     StartSpan = wxTimeSpan::Days(days);
 
     dlg.m_tStartHours->GetValue().ToDouble(&hours);
-    StartSpan += wxTimeSpan::Hours(hours);
-        
+    StartSpan += wxTimeSpan::Seconds(3600*hours);
+
     dlg.m_tStartSpacingDays->GetValue().ToDouble(&days);
     StartSpacingSpan = wxTimeSpan::Days(days);
         
     dlg.m_tStartSpacingHours->GetValue().ToDouble(&hours);
-    StartSpacingSpan += wxTimeSpan::Hours(hours);
+    StartSpacingSpan += wxTimeSpan::Seconds(3600*hours);
+
+    if(!StartSpacingSpan.GetSeconds().ToLong()) {
+        wxMessageDialog mdlg(this, _("Zero time span forbidden, aborting."),
+                             _("Weather Routing"), wxOK | wxICON_ERROR);
+        mdlg.ShowModal();
+        return;
+    }
+
     wxDateTime EndTime = configuration.StartTime+StartSpan;
 
     wxProgressDialog *progressdialog = NULL;
@@ -732,27 +739,33 @@ bool WeatherRouting::Show(bool show)
         m_ConfigurationDialog.Show(m_bShowConfiguration);
         m_ConfigurationBatchDialog.Show(m_bShowConfigurationBatch);
         m_SettingsDialog.Show(m_bShowSettings);
-
-        if(m_bShowStatistics)
-            m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
+//        if(m_bShowStatistics)
+//            m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
         m_StatisticsDialog.Show(m_bShowStatistics);
-
-        if(m_bShowReport)
-            m_ReportDialog.SetRouteMapOverlay(CurrentRouteMap());
-
-        if(m_bShowPlot)
-            m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
+        m_ReportDialog.Show(m_bShowReport);
         m_PlotDialog.Show(m_bShowPlot);
-
         m_FilterRoutesDialog.Show(m_bShowFilter);
     } else {
         m_bShowConfiguration = m_ConfigurationDialog.IsShown();
+        m_ConfigurationDialog.Hide();
+
         m_bShowConfigurationBatch = m_ConfigurationBatchDialog.IsShown();
+        m_ConfigurationBatchDialog.Hide();
+
         m_bShowSettings = m_SettingsDialog.IsShown();
+        m_SettingsDialog.Hide();
+
         m_bShowStatistics = m_StatisticsDialog.IsShown();
+        m_StatisticsDialog.Hide();
+
         m_bShowReport = m_ReportDialog.IsShown();
+        m_ReportDialog.Hide();
+
         m_bShowPlot = m_PlotDialog.IsShown();
+        m_PlotDialog.Hide();
+
         m_bShowFilter = m_FilterRoutesDialog.IsShown();
+        m_FilterRoutesDialog.Hide();
     }
 
     return WeatherRoutingBase::Show(show);
@@ -833,6 +846,7 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
             UpdateRouteMap(routemapoverlay);
 
             /* update report if needed */
+            m_ReportDialog.m_bReportStale = true;
             if(m_ReportDialog.IsShown()) {
                 if(routemapoverlay == CurrentRouteMap())
                     m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
@@ -995,6 +1009,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
                     configuration.MaxTacks = AttributeDouble(e, "MaxTacks", -1);
                     configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
+                    configuration.WindVSCurrent = AttributeDouble(e, "WindVSCurrent", 0);
 
                     configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
                     configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 3);
@@ -1094,6 +1109,7 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("MaxLatitude", configuration.MaxLatitude);
         c->SetAttribute("MaxTacks", configuration.MaxTacks);
         c->SetAttribute("TackingTime", configuration.TackingTime);
+        c->SetAttribute("WindVSCurrent", configuration.WindVSCurrent);
 
         c->SetAttribute("AvoidCycloneTracks", configuration.AvoidCycloneTracks);
         c->SetAttribute("CycloneMonths", configuration.CycloneMonths);
@@ -1671,6 +1687,8 @@ void WeatherRouting::DeleteRouteMap(RouteMapOverlay *routemapoverlay)
             break;
         }
 
+    m_ReportDialog.m_bReportStale = true;
+
     SetEnableConfigurationMenu();
 
     if(current)
@@ -1710,6 +1728,7 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.MaxLatitude = 90;
     configuration.MaxTacks = -1;
     configuration.TackingTime = 0;
+    configuration.WindVSCurrent = 0;
     
     configuration.AvoidCycloneTracks = false;
     configuration.CycloneMonths = 3;

@@ -133,8 +133,8 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
     if(dc.GetDC())
         dc.DrawLine(p1p.x, p1p.y, p2p.x, p2p.y);
     else {
-        glVertex2i(p1p.x, p1p.y);
-        glVertex2i(p2p.x, p2p.y);
+        glVertex2d(p1p.x, p1p.y);
+        glVertex2d(p2p.x, p2p.y);
     }
 }
 
@@ -205,7 +205,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
 
         static const double NORM_FACTOR = 16;
-        const bool use_dl = false;
+        const bool use_dl = true;
         if(!dc.GetDC() && use_dl) {
             glPushMatrix();
 
@@ -213,7 +213,8 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
             wxPoint point;
             GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
-            glTranslatef(point.x, point.y, 0);
+
+            glTranslated(point.x, point.y, 0);
             glScalef(vp.view_scale_ppm / NORM_FACTOR, vp.view_scale_ppm / NORM_FACTOR, 1);
             glRotated(vp.rotation*180/M_PI, 0, 0, 1);
         }
@@ -234,6 +235,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 glNewList(m_overlaylist, GL_COMPILE);
 
                 nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
+                nvp.pix_width = nvp.pix_height = 0;
                 nvp.view_scale_ppm = NORM_FACTOR;
                 nvp.rotation = nvp.skew = 0;
             }
@@ -462,9 +464,6 @@ std::list<PlotData> RouteMapOverlay::GetPlotData(bool cursor_route)
             it--;
     }
 
-    m_NewGrib = NULL;
-    m_bNeedsGrib = true;
-
     Unlock();
     return plotdatalist;
 }
@@ -558,26 +557,35 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
     return total;
 }
 
-bool RouteMapOverlay::CycloneTimes(wxDateTime &first, wxDateTime &last)
+/* how many cyclone tracks did we cross? which month? */
+int RouteMapOverlay::Cyclones(int *months)
 {
     if(!RouteMap::ClimatologyCycloneTrackCrossings)
-        return false;
+        return 0;
 
     wxDateTime startdate(1, wxDateTime::Jan, 1985);
-    for(Position *p = destination_position; p && p->parent; p = p->parent)
-        for(int i=0; i<12; i++) {
-            int days = wxDateTime::GetNumberOfDays((wxDateTime::Month)i, 1999);
-            wxDateTime month(1, (wxDateTime::Month)i, 1999), month_end(days, (wxDateTime::Month)i, 1999);
-            if(RouteMap::ClimatologyCycloneTrackCrossings(p->parent->lat, p->parent->lon, p->lat, p->lon,
-                                                      month, days, 60, startdate)) {
-                if(!first.IsValid())
-                    first = month;
-                if(!last.IsValid() || last < month_end)
-                    last = month_end;
-            }
+    int windknots = 60; // consider cyclones with 60 knot sustained wind or more
+    int days = 30; // search for 30 day range
+    int cyclones = 0;
+
+    Lock();
+    wxDateTime ptime = m_EndTime;
+    IsoChronList::iterator it = origin.end();
+
+    for(Position *p = destination_position; p && p->parent; p = p->parent) {
+        if(RouteMap::ClimatologyCycloneTrackCrossings(p->parent->lat, p->parent->lon, p->lat, p->lon,
+                                                      ptime, days, windknots, startdate)) {
+            if(months)
+                months[ptime.GetMonth()]++;
+            cyclones++;
         }
 
-    return first.IsValid();
+        it--;
+        ptime = (*it)->time;
+    }
+
+    Unlock();
+    return cyclones;
 }
 
 void RouteMapOverlay::Clear()

@@ -183,7 +183,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	m_mView->Append( m_mStatistics );
 	
 	wxMenuItem* m_mReport;
-	m_mReport = new wxMenuItem( m_mView, wxID_ANY, wxString( _("Report") ) , wxEmptyString, wxITEM_NORMAL );
+	m_mReport = new wxMenuItem( m_mView, wxID_ANY, wxString( _("&Report") ) , wxEmptyString, wxITEM_NORMAL );
 	m_mView->Append( m_mReport );
 	
 	wxMenuItem* m_mPlot;
@@ -334,7 +334,7 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_staticText75->Wrap( -1 );
 	fgSizer42->Add( m_staticText75, 0, wxALL, 5 );
 	
-	m_sRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 10, 4 );
+	m_sRouteThickness = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 4 );
 	fgSizer42->Add( m_sRouteThickness, 0, wxALL, 5 );
 	
 	m_staticText70 = new wxStaticText( this, wxID_ANY, _("Iso Chron Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -796,6 +796,17 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText1191 = new wxStaticText( m_panel12, wxID_ANY, _("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1191->Wrap( -1 );
 	fgSizer951->Add( m_staticText1191, 0, wxALL, 5 );
+	
+	m_staticText120 = new wxStaticText( m_panel12, wxID_ANY, _("Wind vs Current"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText120->Wrap( -1 );
+	fgSizer951->Add( m_staticText120, 0, wxALL, 5 );
+	
+	m_sWindVSCurrent = new wxSpinCtrl( m_panel12, wxID_ANY, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
+	fgSizer951->Add( m_sWindVSCurrent, 0, wxALL, 5 );
+	
+	m_staticText121 = new wxStaticText( m_panel12, wxID_ANY, _("(0 to disable)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText121->Wrap( -1 );
+	fgSizer951->Add( m_staticText121, 0, wxALL, 5 );
 	
 	
 	m_panel12->SetSizer( fgSizer951 );

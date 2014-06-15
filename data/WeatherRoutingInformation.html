@@ -79,13 +79,17 @@ can be viewed during grib playback.
   <li><b>Max Wind Knots</b> Do not navigate in areas with more wind than this value.</li>
   <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
   <li><b>Max Latitude</b> Do not navigate above (or below in the southern hemisphere) this latitude.</li>
-  <li><b>Max # of Tacks</b> Does not attempt to tack more than this number of times.  Currently it tacks as much as it likes initially, then stops tacking at the limit, therefore if a very low number or an even/odd mis-match is given, a very sub-optimal track may be produced.  For this reason a value of -1 (unlimited tacks) is recommended</li>
+  <li><b>Max # of Tacks</b> Does not attempt to tack more than this number of times.  Currently it tacks as much as it likes initially, then stops tacking at the limit, therefore if a very low number or an even/odd mis-match is given, a very sub-optimal track may be produced.  For this reason a value of -1 (unlimited tacks) is recomended</li>
   <li><b>Tacking Time</b> Penalty for course change from one tack to the other in seconds.  This is normally irrelevant for ocean passages, but could be useful for routes in tight quarters  Setting to 0 avoids extra calculations. </li>
+  <li><b>Wind VS Current</b> When wind opposes current rough seas can be produced.  This constraint multiplies the current vector by 1/10th of the wind speed, and if the result exceeds this value, navigation in this area is avoided.  Eg, a value of 8 would prevent navigating when 30 knots of wind opposes a 3 knot current (30/10*3 = 9) or 21 knots of wind against a 4 knot current or 41 knots of wind against a 2 knot current.  The default of 0 disables this test.
   <li><b>Avoid Cyclone Tracks</b> Uses climatology cyclone tracks to avoid routings which cross historic cyclones.</li>
   <li><b>Courses (relative to true wind)</b> A list of courses to attempt sailing.  Excluding certain values can force the route to explicity show tacks/jibes.  Another option is to remove all upwind values to find a course which is always running off the wind (even if it is much longer.)  Good results typically have a course every 3-5 degrees; more steps takes longer computation time.</li>
 </ul>
 
-<H3>Boat</H3>
+<h3>Batch Mode</h3>
+<p>Once a weather route is successfully computed, it is possible to determine the best time to leave.  To do this, many configurations must be generated each with a different start time.  Starting by selecting a single configuration with the earliest starting time.  From the configuration menu, select batch (ctrl+b) From here, enter the number of days/hours to generate spans.  Using decimal values for hours is allowed (ie: 0.5 for half-hour)  Once generate is selected, many configurations should appear.  Now, "Compute All (ctrl+a)" can be selected from the configurations menu.  A total progress bar can be seen under the configurations.  Finally a report describing the routes is available from the View menu.
+
+<h3>Boat</h3>
 
 <p>
 The boat dialog displays the polar plot of the boat's speed vs true wind direction as well as showing other details.  An xml file specifies the boat parameters and each sail plan.  Two file types of polars are supported; CSV (same as qtVlm) and xml parameters which describe how to compute the polar.
@@ -182,16 +186,12 @@ becoming less efficient over the course of a very long passage.
 
 <p>Todo list:
 <ul>
-<li>Profile and optimize (shortcut or lookup expensive routines)
-<li>Optimize land detection routine
-<li>Optimize cyclone detection routine
-<li>Bring display list back with improved accuracy
-<li>Implement cyclone crossing detection
-<li>Allow multiple selection of configurations to edit more than one at the same time
-<li>Improve boat polar computation
-<li>Add constraint for wind against current (bad seastate)
-<li>Make segment intersection test smarter and thus avoid deleting points in almost all cases
+<li>Optimize: ll_gc_ll, climatology wind atlas, land detection, and cyclone detection
 <li>Fix issues with the backtrack optimization so it can be used
+<li>Allow multiple selection of configurations to edit more than one at the same time
+<li>Make segment intersection test smarter and thus avoid deleting points in almost all cases
+
+<li>Improve boat polar computation
 <li>Fix merdian problem, so we split the world on the opposite of end longitude, and don't propagate past it
 <li>Determine best way way to reduce excessive propagations at the edge of graph
 <li>Fix inverted regions

@@ -90,10 +90,7 @@ void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
 
 void ConfigurationDialog::OnAvoidCyclones( wxCommandEvent& event )
 {
-    m_sCycloneMonths->Enable(event.IsChecked());
-    m_sCycloneDays->Enable(event.IsChecked());
-    m_sCycloneWindSpeed->Enable(event.IsChecked());
-    m_sCycloneClimatologyStartYear->Enable(event.IsChecked());
+    UpdateCycloneControls();
     Update();
 }
 
@@ -196,12 +193,14 @@ void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
     m_sMaxLatitude->SetValue(configuration.MaxLatitude);
     m_sMaxTacks->SetValue(configuration.MaxTacks);
     m_sTackingTime->SetValue(configuration.TackingTime);
+    m_sWindVSCurrent->SetValue(configuration.WindVSCurrent);
 
     m_cAvoidCycloneTracks->SetValue(configuration.AvoidCycloneTracks);
     m_sCycloneMonths->SetValue(configuration.CycloneMonths);
     m_sCycloneDays->SetValue(configuration.CycloneDays);
     m_sCycloneWindSpeed->SetValue(configuration.CycloneWindSpeed);
     m_sCycloneClimatologyStartYear->SetValue(configuration.CycloneClimatologyStartYear);
+    UpdateCycloneControls();
 
     m_cbDetectLand->SetValue(configuration.DetectLand);
     m_cbCurrents->SetValue(configuration.Currents);
@@ -264,6 +263,7 @@ RouteMapConfiguration ConfigurationDialog::Configuration()
     configuration.MaxLatitude = m_sMaxLatitude->GetValue();
     configuration.MaxTacks = m_sMaxTacks->GetValue();
     configuration.TackingTime = m_sTackingTime->GetValue();
+    configuration.WindVSCurrent = m_sWindVSCurrent->GetValue();
 
     configuration.AvoidCycloneTracks = m_cAvoidCycloneTracks->GetValue();
     configuration.CycloneMonths = m_sCycloneMonths->GetValue();
@@ -322,4 +322,12 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 void ConfigurationDialog::Update()
 {
     m_WeatherRouting.SetConfigurationCurrentRoute(Configuration());
+}
+
+void ConfigurationDialog::UpdateCycloneControls()
+{
+    m_sCycloneMonths->Enable(m_cAvoidCycloneTracks->GetValue());
+    m_sCycloneDays->Enable(m_cAvoidCycloneTracks->GetValue());
+    m_sCycloneWindSpeed->Enable(m_cAvoidCycloneTracks->GetValue());
+    m_sCycloneClimatologyStartYear->Enable(m_cAvoidCycloneTracks->GetValue());
 }

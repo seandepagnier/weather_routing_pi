@@ -35,6 +35,8 @@ public:
 
     void SetRouteMapOverlay(RouteMapOverlay *routemapoverlay);
 
+    bool m_bReportStale;
+
 protected:
     void GenerateRoutesReport();
     void OnInformation( wxCommandEvent& event );

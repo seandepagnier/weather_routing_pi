@@ -63,7 +63,7 @@ public:
     void RequestGrib(wxDateTime time);
     std::list<PlotData> GetPlotData(bool cursor_route=false);
     double RouteInfo(enum RouteInfoType type, bool cursor_route=false);
-    bool CycloneTimes(wxDateTime &first, wxDateTime &last);
+    int Cyclones(int *months);
     Position *GetDestination() { return destination_position; }
 
     bool Updated();
@@ -87,7 +87,6 @@ private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent, int AlternateRouteThickness,
                               ocpnDC &dc, PlugIn_ViewPort &vp);
     virtual bool TestAbort() { return Finished(); }
-    //return m_Thread->TestDestroy(); }
 
     RouteMapOverlayThread *m_Thread;
     wxMutex routemutex;

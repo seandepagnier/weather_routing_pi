@@ -226,6 +226,9 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText24;
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText1191;
+		wxStaticText* m_staticText120;
+		wxSpinCtrl* m_sWindVSCurrent;
+		wxStaticText* m_staticText121;
 		wxCheckBox* m_cAvoidCycloneTracks;
 		wxStaticText* m_staticText1281;
 		wxSpinCtrl* m_sCycloneMonths;

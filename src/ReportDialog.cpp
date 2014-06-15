@@ -26,6 +26,7 @@
  */
 
 #include <wx/wx.h>
+#include <wx/progdlg.h>
 
 #include <map>
 
@@ -44,6 +45,7 @@
 ReportDialog::ReportDialog( WeatherRouting &weatherrouting )
     : ReportDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting)
 {
+    m_bReportStale = true;
     SetRouteMapOverlay(NULL);
 }
 
@@ -66,8 +68,8 @@ void ReportDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
     std::list<PlotData> p = routemapoverlay->GetPlotData();
 
     page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
-    page += _("Leaving ") + c.StartTime.Format() + _T("<dt>");
-    page += _("Arriving ") + routemapoverlay->EndTime().Format() + _T("<dt>");
+    page += _("Leaving ") + c.StartTime.Format(_T("%x")) + _T("<dt>");
+    page += _("Arriving ") + routemapoverlay->EndTime().Format(_T("%x")) + _T("<dt>");
     page += _("Duration ") + (routemapoverlay->EndTime() - c.StartTime).Format() + _T("<dt>");
     page += _T("<p>");
     double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
@@ -118,6 +120,10 @@ void ReportDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
 
 void ReportDialog::GenerateRoutesReport()
 {
+    if(!m_bReportStale)
+        return;
+    m_bReportStale = false;
+
     /* sort configurations interate over each group of configurations
        with the same start and end to determine best and worst times,
        and cyclone crossings to determine cyclone times
@@ -159,15 +165,14 @@ void ReportDialog::GenerateRoutesReport()
                 fastest = *it2;
             }
         }
-        page += _("<dt>Fastest configuration leaves ") + fastest->StartTime().Format();
-        page += wxString(_T(" ")) + _("average speed") + wxString::Format
+        page += _("<dt>Fastest configuration ") + fastest->StartTime().Format(_T("%x"));
+        page += wxString(_T(" ")) + _("avg speed") + wxString::Format
             (_T(": %.2f knots"), fastest->RouteInfo(RouteMapOverlay::AVGSPEED));
 
         /* determine best times if upwind percentage is below 50 */
         page += _T("<dt>");
         page += _("Best Times (mostly downwind)") + wxString(_T(": "));
 
-        wxDateTime first_cyclone_time, last_cyclone_time;
         bool last_bad, any_bad, any_good = false, first_print = true;
 
         wxDateTime best_time_start;
@@ -216,15 +221,6 @@ void ReportDialog::GenerateRoutesReport()
                 last_bad = false;
                 any_good = true;
             }
-/* disabled until we fix this, because it is really slow
-            wxDateTime first, last;
-            if((*it2)->CycloneTimes(first, last)) {
-                if(!first_cyclone_time.IsValid() || first < first_cyclone_time)
-                    first_cyclone_time = (*it2)->StartTime();
-                if(!last_cyclone_time.IsValid() || last < last_cyclone_time)
-                    last_cyclone_time = (*it2)->EndTime();
-            }
-*/
         }
 
         if(!any_bad)
@@ -234,13 +230,79 @@ void ReportDialog::GenerateRoutesReport()
 
         page += _T("<dt>");
         page += _("Cyclones") + wxString(_T(": "));
-        if(first_cyclone_time.IsValid())
-            page += wxDateTime::GetMonthName(first_cyclone_time.GetMonth()) + _(" to ") +
-                    wxDateTime::GetMonthName(first_cyclone_time.GetMonth());
-        else if(RouteMap::ClimatologyCycloneTrackCrossings)
-            page += _("none");
+
+        wxProgressDialog progressdialog(_("Weather Routing"), _("Calculating Cyclone Crossings"),
+                                        overlays.size(), this, wxPD_ELAPSED_TIME);
+        int pdi = 0;
+
+        int cyclonemonths[12] = {0};
+        std::list<RouteMapOverlay *> cyclone_safe_routes;
+        bool allsafe = true, nonesafe = true;
+        for(it2 = overlays.begin(); it2 != overlays.end(); it2++) {
+            if((*it2)->Cyclones(cyclonemonths)) {
+                cyclone_safe_routes.push_back(NULL);
+                allsafe = false;
+            } else {
+                cyclone_safe_routes.push_back(*it2);
+                nonesafe = false;
+            }
+
+            progressdialog.Update(pdi++);
+        }
+        
+        int i, j;
+        for(i=0, j=11; i<12; j=i++)
+            /* get first cyclone month */
+            if(cyclonemonths[i] && !cyclonemonths[j]) {
+                int lm = i;
+                page += wxDateTime::GetMonthName((wxDateTime::Month)i);
+                for(int k=i+1, l=i; k!= i; l = k++) {
+                    if(k==12) k = 0;
+                    if(cyclonemonths[k] && !cyclonemonths[l]) {
+                        page += _(" and ") + wxDateTime::GetMonthName((wxDateTime::Month)k);
+                        lm = k;
+                    } else if(!cyclonemonths[k] && cyclonemonths[l] && l!=lm)
+                        page += _(" to ") + wxDateTime::GetMonthName((wxDateTime::Month)l);
+                }
+                goto had_some_cyclones;
+            }
+                    
+        if(cyclonemonths[0])
+            page += _("all months");
         else
-            page += _("unavailable");
+            page += _("none");
+
+    had_some_cyclones:;
+
+        page += _T("<dt>");
+        if(allsafe)
+            page += _("All routes are safe from cyclones.");
+        else if(nonesafe)
+            page += _("No routes found to be safe from cyclones.");
+        else {
+            page += _("Start times for cyclone safe routes: ");
+            /* note: does not merge beginning and end of linked list for safe times,
+               this sometimes might be nice, but they will be in different years. */
+            bool first = true;
+            for(it2 = cyclone_safe_routes.begin(); it2 != cyclone_safe_routes.end(); it2++) {
+                if(!*it2) continue;
+                if(!first)
+                    page += _(" and ");
+                first = false;
+                page += (*it2)->StartTime().Format(_T("%x"));
+
+                if(++it2 == cyclone_safe_routes.end())
+                    break;
+
+                if(!*it2)
+                    continue;
+
+                while(*it2 && ++it2 != cyclone_safe_routes.end());
+
+                it2--;
+                page += _(" to ") + (*it2)->StartTime().Format(_T("%x"));
+            }
+        }
     }
 
     m_htmlRoutesReport->SetPage(page);

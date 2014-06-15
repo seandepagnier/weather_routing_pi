@@ -101,20 +101,12 @@ static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
     if(!grib)
         return false;
 
-    GribRecord *grx = grib->m_GribRecordPtrArray[Idx_WIND_VX];
-    GribRecord *gry = grib->m_GribRecordPtrArray[Idx_WIND_VY];
-
-    if(!grx || !gry)
+    if(!GribRecord::getInterpolatedValues(VWG, WG,
+                                          grib->m_GribRecordPtrArray[Idx_WIND_VX],
+                                          grib->m_GribRecordPtrArray[Idx_WIND_VY], lon, lat))
         return false;
 
-    double vx = grx->getInterpolatedValue(lon, lat, true);
-    double vy = gry->getInterpolatedValue(lon, lat, true);
-
-    if(vx == GRIB_NOTDEF || vy == GRIB_NOTDEF)
-        return false;
-
-    WG = rad2deg(atan2(-vx, -vy));
-    VWG = distance(vy, vx) * 3.6 / 1.852;
+    VWG *= 3.6 / 1.852; // knots
     return true;
 }
 
@@ -126,20 +118,13 @@ static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
     if(!grib)
         return false;
 
-    GribRecord *grx = grib->m_GribRecordPtrArray[Idx_SEACURRENT_VX];
-    GribRecord *gry = grib->m_GribRecordPtrArray[Idx_SEACURRENT_VY];
-
-    if(!grx || !gry)
+    if(!GribRecord::getInterpolatedValues(VC, C,
+                                          grib->m_GribRecordPtrArray[Idx_SEACURRENT_VX],
+                                          grib->m_GribRecordPtrArray[Idx_SEACURRENT_VY],
+                                          lon, lat))
         return false;
 
-    double vx = grx->getInterpolatedValue(lon, lat, true);
-    double vy = grx->getInterpolatedValue(lon, lat, true);
-
-    if(vx == GRIB_NOTDEF || vy == GRIB_NOTDEF)
-        return false;
-
-    C = positive_degrees(rad2deg(atan2(-vx, -vy)));
-    VC = distance(vy, vx) * 3.6 / 1.852;
+    VC *= 3.6 / 1.852; // knots
     return true;
 }
 
@@ -580,6 +565,15 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     if(VW > configuration.MaxWindKnots)
         return false;
 
+    if(configuration.WindVSCurrent) {
+        /* these are already computed in OverWater.. could optimize by reusing them */
+        double Wx = VW*cos(deg2rad(W)), Wy = VW*sin(deg2rad(W));
+        double Cx = VC*cos(deg2rad(C)), Cy = VC*sin(deg2rad(W));
+
+        if(Wx*Cx + Wy*Cy + 10*configuration.WindVSCurrent < 0)
+            return false;
+    }
+
     int daytime = -1; /* unknown */
 
     double timeseconds = configuration.dt;
@@ -742,7 +736,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             int crossings = RouteMap::ClimatologyCycloneTrackCrossings
                 (lat, lon, dlat, dlon, time, configuration.CycloneMonths*30 +
                  configuration.CycloneDays, configuration.CycloneWindSpeed,
-                 wxDateTime(0, 0, configuration.CycloneClimatologyStartYear));
+                 wxDateTime(1, wxDateTime::Jan, configuration.CycloneClimatologyStartYear));
             if(crossings > 0)
                 continue;
         }
