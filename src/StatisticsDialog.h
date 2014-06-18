@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,7 +35,7 @@ class StatisticsDialog : public StatisticsDialogBase
 {
 public:
     StatisticsDialog( wxWindow *parent );
-    void SetRouteMapOverlay(RouteMapOverlay *routemapoverlay);
+    void SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverlays);
     void SetRunTime(wxTimeSpan RunTime);
 };
 

@@ -35,14 +35,16 @@
 
 #include "Utilities.h"
 #include "Boat.h"
-#include "RouteMap.h"
+#include "RouteMapOverlay.h"
 #include "ConfigurationDialog.h"
 #include "BoatDialog.h"
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
 
 ConfigurationDialog::ConfigurationDialog(WeatherRouting &weatherrouting)
-    : ConfigurationDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting)
+    : ConfigurationDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting),
+      m_bBlockUpdate(false)
+
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -71,7 +73,7 @@ void ConfigurationDialog::EditBoat( )
 
     if(updated == wxID_OK) {
         /* update any configurations that use this boat */
-        m_WeatherRouting.UpdateBoatFilename(Configuration());
+        m_WeatherRouting.UpdateBoatFilename(boatdlg.m_boatpath);
         Update();
     }
 }
@@ -90,12 +92,27 @@ void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
 
 void ConfigurationDialog::OnAvoidCyclones( wxCommandEvent& event )
 {
-    UpdateCycloneControls();
+    Update();
+}
+
+// ensure mutually exclusive
+void ConfigurationDialog::OnUpdateIntegratorNewton( wxCommandEvent& event )
+{
+    m_cbNewton->Set3StateValue(wxCHK_CHECKED);
+    m_cbRungeKutta->Set3StateValue(wxCHK_UNCHECKED);
+    Update();
+}
+
+void ConfigurationDialog::OnUpdateIntegratorRungeKutta( wxCommandEvent& event )
+{
+    m_cbRungeKutta->Set3StateValue(wxCHK_CHECKED);
+    m_cbNewton->Set3StateValue(wxCHK_UNCHECKED);
     Update();
 }
 
 void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
 {
+    m_lDegreeSteps->Enable();
     int s = m_lDegreeSteps->GetSelection();
     if(s == -1)
         s = m_lDegreeSteps->GetCount();
@@ -120,20 +137,16 @@ void ConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& event )
 
 void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
 {
+    m_lDegreeSteps->Enable();
     m_lDegreeSteps->Clear();
     Update();
 }
 
 void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 {
-    RouteMapConfiguration configuration = Configuration();
-    GenerateDegreeSteps(configuration);
-    SetConfiguration(configuration);
-    m_WeatherRouting.SetConfigurationCurrentRoute(configuration);
-}
+    m_lDegreeSteps->Enable();
+    m_lDegreeSteps->Clear();
 
-void ConfigurationDialog::GenerateDegreeSteps(RouteMapConfiguration &configuration)
-{
     double from, to, by;
     m_tFromDegrees->GetValue().ToDouble(&from);
     m_tToDegrees->GetValue().ToDouble(&to);
@@ -146,143 +159,117 @@ void ConfigurationDialog::GenerateDegreeSteps(RouteMapConfiguration &configurati
         return;
     }
 
-    configuration.DegreeSteps.clear();
-    for(double v = from; v <= to; v+=by) {
-        configuration.DegreeSteps.push_back(v);
-        configuration.DegreeSteps.push_back(-v);
-    }
-    configuration.DegreeSteps.sort();
+    double v;
+    for(v = from; v <= to; v+=by)
+        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
+
+    if(v == to) v -= by;
+    for(; v >= from; v-=by)
+        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), 360-v));
+
+    Update();
 }
 
-void ConfigurationDialog::SetConfiguration(RouteMapConfiguration configuration)
+#define SET_CHECKBOX_FIELD(FIELD, VALUE)              \
+    do { \
+    bool alltrue = true, allfalse = true; \
+    for(std::list<RouteMapConfiguration>::iterator it = configurations.begin(); \
+        it != configurations.end(); it++)                          \
+        if(VALUE) allfalse = false; else alltrue = false; \
+    m_cb##FIELD->Set3StateValue(alltrue ? wxCHK_CHECKED : allfalse ? wxCHK_UNCHECKED : wxCHK_UNDETERMINED); \
+    } while (0)
+
+#define SET_CHECKBOX(FIELD)              \
+    SET_CHECKBOX_FIELD(FIELD, (*it).FIELD)
+
+#define SET_CONTROL_VALUE(VALUE, CONTROL, SETTER, TYPE, NULLVALUE)     \
+    do { \
+    bool allsame = true;                            \
+    TYPE value; \
+    for(std::list<RouteMapConfiguration>::iterator it = configurations.begin(); \
+        it != configurations.end(); it++) {                             \
+        if(it == configurations.begin()) \
+            value = VALUE;                \
+        else if(value != VALUE) {         \
+            allsame = false; \
+            break; \
+        } \
+    } \
+    CONTROL->SETTER(allsame ? value : NULLVALUE); \
+    } while (0)
+
+#define SET_CONTROL(FIELD, CONTROL, SETTER, TYPE, NULLVALUE) \
+    SET_CONTROL_VALUE((*it).FIELD, CONTROL, SETTER, TYPE, NULLVALUE)
+
+#define SET_CHOICE(FIELD) SET_CONTROL(FIELD, m_c##FIELD, SetValue, wxString, _T(""))
+
+#define SET_SPIN_VALUE(FIELD, VALUE)                                          \
+    m_s##FIELD->Enable(); \
+    SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, int, (m_s##FIELD->Disable(), value))
+
+#define SET_SPIN(FIELD) \
+    SET_SPIN_VALUE(FIELD, (*it).FIELD)
+
+void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> configurations)
 {
-    m_cStart->SetValue(configuration.Start);
+    m_bBlockUpdate = true;
 
-    m_dpStartDate->SetValue(configuration.StartTime);
-    m_tStartHour->SetValue(wxString::Format(_T("%.2f"),
-                                            configuration.StartTime.GetHour()
-                                            + (double)configuration.StartTime.GetMinute()/60.0));
+    SET_CHOICE(Start);
+    SET_CONTROL(StartTime, m_dpStartDate, SetValue, wxDateTime, wxDateTime());
+    SET_CONTROL_VALUE(wxString::Format(_T("%.2f"), (*it).StartTime.GetHour()
+                                            + (double)(*it).StartTime.GetMinute()/60.0),
+                m_tStartHour, SetValue, wxString, _T(""));
 
-    wxFileName path = configuration.boatFileName;
-    m_fpBoat->SetPath(path.GetFullPath());
+    SET_SPIN_VALUE(TimeStepHours, (*it).dt / 3600);
+    SET_SPIN_VALUE(TimeStepMinutes, ((int)(*it).dt / 60) % 60);
+    SET_SPIN_VALUE(TimeStepSeconds, (int)(*it).dt%60);
 
-    int dt = configuration.dt;
-    int hours = dt / 3600;
-    m_sTimeStepHours->SetValue(wxString::Format(_T("%d"), hours));
-    dt -= hours * 3600;
-    int minutes = dt / 60;
-    m_sTimeStepMinutes->SetValue(wxString::Format(_T("%d"), minutes));
-    dt -= minutes * 60;
-    m_sTimeStepSeconds->SetValue(wxString::Format(_T("%d"), dt));
+    SET_CONTROL(boatFileName, m_fpBoat, SetPath, wxString, _T(""));
 
-    m_cEnd->SetValue(configuration.End);
+    SET_CHOICE(End);
 
     m_lDegreeSteps->Clear();
-    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
-        it != configuration.DegreeSteps.end(); it++)
+    m_lDegreeSteps->Enable();
+    std::list<RouteMapConfiguration>::iterator it = configurations.begin();
+    std::list<double> firstDegreeSteps = it->DegreeSteps;
+    for(it++; it != configurations.end(); it++)
+        if(firstDegreeSteps != it->DegreeSteps)
+            m_lDegreeSteps->Disable();
+
+    for(std::list<double>::iterator it = firstDegreeSteps.begin();
+        it != firstDegreeSteps.end(); it++)
         m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), *it));
 
-    m_rbNewton->SetValue(configuration.Integrator == RouteMapConfiguration::NEWTON);
-    m_rbRungeKutta->SetValue(configuration.Integrator == RouteMapConfiguration::RUNGE_KUTTA);
+    SET_CHECKBOX_FIELD(Newton, (*it).Integrator == RouteMapConfiguration::NEWTON);
+    SET_CHECKBOX_FIELD(RungeKutta, (*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA);
 
-    m_sMaxDivertedCourse->SetValue(configuration.MaxDivertedCourse);
-    m_sMaxSearchAngle->SetValue(configuration.MaxSearchAngle);
-    m_sMaxWindKnots->SetValue(configuration.MaxWindKnots);
-    m_sMaxSwellMeters->SetValue(configuration.MaxSwellMeters);
+    SET_SPIN(MaxDivertedCourse);
+    SET_SPIN(MaxSearchAngle);
+    SET_SPIN(MaxWindKnots);
+    SET_SPIN(MaxSwellMeters);
 
-    m_sMaxLatitude->SetValue(configuration.MaxLatitude);
-    m_sMaxTacks->SetValue(configuration.MaxTacks);
-    m_sTackingTime->SetValue(configuration.TackingTime);
-    m_sWindVSCurrent->SetValue(configuration.WindVSCurrent);
+    SET_SPIN(MaxLatitude);
+    SET_SPIN(MaxTacks);
+    SET_SPIN(TackingTime);
+    SET_SPIN(WindVSCurrent);
 
-    m_cAvoidCycloneTracks->SetValue(configuration.AvoidCycloneTracks);
-    m_sCycloneMonths->SetValue(configuration.CycloneMonths);
-    m_sCycloneDays->SetValue(configuration.CycloneDays);
-    m_sCycloneWindSpeed->SetValue(configuration.CycloneWindSpeed);
-    m_sCycloneClimatologyStartYear->SetValue(configuration.CycloneClimatologyStartYear);
-    UpdateCycloneControls();
+    SET_CHECKBOX(AvoidCycloneTracks);
+    SET_SPIN(CycloneMonths);
+    SET_SPIN(CycloneDays);
+    SET_SPIN(CycloneWindSpeed);
+    SET_SPIN(CycloneClimatologyStartYear);
 
-    m_cbDetectLand->SetValue(configuration.DetectLand);
-    m_cbCurrents->SetValue(configuration.Currents);
-    m_cbInvertedRegions->SetValue(configuration.InvertedRegions);
-    m_cbAnchoring->SetValue(configuration.Anchoring);
+    SET_CHECKBOX(DetectLand);
+    SET_CHECKBOX(Currents);
+    SET_CHECKBOX(InvertedRegions);
+    SET_CHECKBOX(Anchoring);
 
-    m_cbAllowDataDeficient->SetValue(configuration.AllowDataDeficient);
+    SET_CHECKBOX(AllowDataDeficient);
+    SET_CHECKBOX(UseGrib);
 
-    m_cbUseGrib->SetValue(configuration.UseGrib);
-    m_cClimatologyType->SetSelection(configuration.ClimatologyType);
-}
+    SET_CONTROL(ClimatologyType, m_cClimatologyType, SetSelection, int, -1);
 
-RouteMapConfiguration ConfigurationDialog::Configuration()
-{
-    RouteMapConfiguration configuration;
-
-    configuration.Start = m_cStart->GetValue();
-
-    configuration.StartTime = m_dpStartDate->GetValue();
-    double hour;
-    m_tStartHour->GetValue().ToDouble(&hour);
-    configuration.StartTime.SetHour((int)hour);
-    configuration.StartTime.SetMinute((int)(60*hour)%60);
-
-    configuration.boatFileName = m_fpBoat->GetPath();
-
-    configuration.dt = 60*(60*m_sTimeStepHours->GetValue()
-                     + m_sTimeStepMinutes->GetValue())
-        + m_sTimeStepSeconds->GetValue();
-    if(configuration.dt == 0) {
-        wxMessageDialog mdlg(this, _("Zero Time Step invalid"),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
-        mdlg.ShowModal();
-    }
-
-    configuration.End = m_cEnd->GetValue();
-
-    if(m_lDegreeSteps->GetCount() < 4) {
-        wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
-                             wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
-        mdlg.ShowModal();
-    }
-
-    configuration.DegreeSteps.clear();
-    for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++) {
-        double step;
-        m_lDegreeSteps->GetString(i).ToDouble(&step);
-        configuration.DegreeSteps.push_back(positive_degrees(step));
-    }
-    configuration.DegreeSteps.sort();
-
-    configuration.Integrator = m_rbRungeKutta->GetValue() ?
-        RouteMapConfiguration::RUNGE_KUTTA : RouteMapConfiguration::NEWTON;
-
-    configuration.MaxDivertedCourse = m_sMaxDivertedCourse->GetValue();
-    configuration.MaxSearchAngle = m_sMaxSearchAngle->GetValue();
-    configuration.MaxWindKnots = m_sMaxWindKnots->GetValue();
-    configuration.MaxSwellMeters = m_sMaxSwellMeters->GetValue();
-
-    configuration.MaxLatitude = m_sMaxLatitude->GetValue();
-    configuration.MaxTacks = m_sMaxTacks->GetValue();
-    configuration.TackingTime = m_sTackingTime->GetValue();
-    configuration.WindVSCurrent = m_sWindVSCurrent->GetValue();
-
-    configuration.AvoidCycloneTracks = m_cAvoidCycloneTracks->GetValue();
-    configuration.CycloneMonths = m_sCycloneMonths->GetValue();
-    configuration.CycloneDays = m_sCycloneDays->GetValue();
-    configuration.CycloneWindSpeed = m_sCycloneWindSpeed->GetValue();
-    configuration.CycloneClimatologyStartYear = m_sCycloneClimatologyStartYear->GetValue();
-
-    configuration.DetectLand = m_cbDetectLand->GetValue();
-    configuration.Currents = m_cbCurrents->GetValue();
-    configuration.InvertedRegions = m_cbInvertedRegions->GetValue();
-    configuration.Anchoring = m_cbAnchoring->GetValue();
-
-    configuration.AllowDataDeficient = m_cbAllowDataDeficient->GetValue();
-
-    configuration.UseGrib = m_cbUseGrib->GetValue();
-    configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
-        m_cClimatologyType->GetSelection();
-
-    return configuration;
+    m_bBlockUpdate = false;
 }
 
 void ConfigurationDialog::AddSource(wxString name)
@@ -319,15 +306,114 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
     }
 }
 
+#define GET_CHECKBOX(FIELD) \
+           do { \
+           if(m_cb##FIELD->Get3StateValue() == wxCHK_UNCHECKED) \
+               configuration.FIELD = false; \
+           else if(m_cb##FIELD->Get3StateValue() == wxCHK_CHECKED) \
+               configuration.FIELD = true; \
+           } while(0)
+
+#define GET_SPIN(FIELD) \
+    if(m_s##FIELD->IsEnabled())                                      \
+        configuration.FIELD = m_s##FIELD->GetValue()
+
 void ConfigurationDialog::Update()
 {
-    m_WeatherRouting.SetConfigurationCurrentRoute(Configuration());
-}
+    if(m_bBlockUpdate)
+        return;
 
-void ConfigurationDialog::UpdateCycloneControls()
-{
-    m_sCycloneMonths->Enable(m_cAvoidCycloneTracks->GetValue());
-    m_sCycloneDays->Enable(m_cAvoidCycloneTracks->GetValue());
-    m_sCycloneWindSpeed->Enable(m_cAvoidCycloneTracks->GetValue());
-    m_sCycloneClimatologyStartYear->Enable(m_cAvoidCycloneTracks->GetValue());
+    std::list<RouteMapOverlay*> currentroutemaps = m_WeatherRouting.CurrentRouteMaps();
+    for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+        it != currentroutemaps.end(); it++) {
+
+        RouteMapConfiguration configuration = (*it)->GetConfiguration();
+
+        if(!m_cStart->GetValue().empty())
+            configuration.Start = m_cStart->GetValue();
+
+        if(m_dpStartDate->GetValue().IsValid())
+            configuration.StartTime = m_dpStartDate->GetValue();
+
+        if(!m_tStartHour->GetValue().empty()) {
+            double hour;
+            m_tStartHour->GetValue().ToDouble(&hour);
+            configuration.StartTime.SetHour((int)hour);
+            configuration.StartTime.SetMinute((int)(60*hour)%60);
+        }
+
+        if(!m_fpBoat->GetPath().empty())
+            configuration.boatFileName = m_fpBoat->GetPath();
+
+        if(m_sTimeStepHours->IsEnabled()) {
+            configuration.dt = 60*(60*m_sTimeStepHours->GetValue()
+                                   + m_sTimeStepMinutes->GetValue())
+                + m_sTimeStepSeconds->GetValue();
+        }
+
+        if(!m_cEnd->GetValue().empty())
+            configuration.End = m_cEnd->GetValue();
+
+        if(m_cbNewton->Get3StateValue() == wxCHK_CHECKED)
+            configuration.Integrator = RouteMapConfiguration::NEWTON;
+        else if(m_cbRungeKutta->Get3StateValue() == wxCHK_CHECKED)
+            configuration.Integrator = RouteMapConfiguration::RUNGE_KUTTA;
+
+        GET_SPIN(MaxDivertedCourse);
+        GET_SPIN(MaxSearchAngle);
+        GET_SPIN(MaxWindKnots);
+        GET_SPIN(MaxSwellMeters);
+
+        GET_SPIN(MaxLatitude);
+        GET_SPIN(MaxTacks);
+        GET_SPIN(TackingTime);
+        GET_SPIN(WindVSCurrent);
+
+        GET_CHECKBOX(AvoidCycloneTracks);
+        GET_SPIN(CycloneMonths);
+        GET_SPIN(CycloneDays);
+        GET_SPIN(CycloneWindSpeed);
+        GET_SPIN(CycloneClimatologyStartYear);
+
+        GET_CHECKBOX(DetectLand);
+        GET_CHECKBOX(Currents);
+        GET_CHECKBOX(InvertedRegions);
+        GET_CHECKBOX(Anchoring);
+
+        GET_CHECKBOX(AllowDataDeficient);
+
+        GET_CHECKBOX(UseGrib);
+
+        if(m_cClimatologyType->GetSelection() != -1)
+            configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
+                m_cClimatologyType->GetSelection();
+
+        if(m_lDegreeSteps->IsEnabled()) {
+            configuration.DegreeSteps.clear();
+            for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++) {
+                double step;
+                m_lDegreeSteps->GetString(i).ToDouble(&step);
+                configuration.DegreeSteps.push_back(positive_degrees(step));
+            }
+            configuration.DegreeSteps.sort();
+        }
+
+        (*it)->SetConfiguration(configuration);
+    }
+
+#if 0    
+    if(configuration.dt == 0) {
+        wxMessageDialog mdlg(this, _("Zero Time Step invalid"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+    }
+#endif
+
+    if(m_lDegreeSteps->GetCount() < 4) {
+        wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
+                             wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
+        mdlg.ShowModal();
+    }
+
+    m_WeatherRouting.UpdateCurrentConfigurations();
 }

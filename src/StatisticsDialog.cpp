@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,6 +31,8 @@
 #include <math.h>
 #include <time.h>
 
+#include <list>
+
 #include "StatisticsDialog.h"
 
 #include "Utilities.h"
@@ -40,29 +42,31 @@
 StatisticsDialog::StatisticsDialog(wxWindow *parent)
     : StatisticsDialogBase(parent)
 {
-    SetRouteMapOverlay(NULL);
+    SetRouteMapOverlays(std::list<RouteMapOverlay*>());
 }
 
-void StatisticsDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
+void StatisticsDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverlays)
 {
-    if(routemapoverlay) {
-        m_stState->SetLabel(routemapoverlay->Running() ? _("Running") : _("Stopped"));
-       
+    bool running = false;
+    int tisochrons = 0, troutes = 0, tinvroutes = 0, tskippositions = 0, tpositions = 0;
+    for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
+        it != routemapoverlays.end(); it++) {
+        if((*it)->Running())
+            running = true;
+
         int isochrons, routes, invroutes, skippositions, positions;
-        routemapoverlay->GetStatistics(isochrons, routes, invroutes, skippositions, positions);
-        m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), isochrons));
-        m_stRoutes->SetLabel(wxString::Format(_T("%d"), routes));
-        m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), invroutes));
-        m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), skippositions));
-        m_stPositions->SetLabel(wxString::Format(_T("%d"), positions));
-    } else {
-        m_stState->SetLabel(_("No Route"));
-        m_stIsoChrons->SetLabel(_T(""));
-        m_stRoutes->SetLabel(_T(""));
-        m_stInvRoutes->SetLabel(_T(""));
-        m_stSkipPositions->SetLabel(_T(""));
-        m_stPositions->SetLabel(_T(""));
+        (*it)->GetStatistics(isochrons, routes, invroutes, skippositions, positions);
+        tisochrons += isochrons, troutes += routes, tinvroutes += invroutes;
+        tskippositions+= skippositions, tpositions += positions;
     }
+
+    m_stState->SetLabel(routemapoverlays.empty() ? _("No Route") :
+                        running ? _("Running") : _("Stopped"));
+    m_stIsoChrons->SetLabel(wxString::Format(_T("%d"), tisochrons));
+    m_stRoutes->SetLabel(wxString::Format(_T("%d"), troutes));
+    m_stInvRoutes->SetLabel(wxString::Format(_T("%d"), tinvroutes));
+    m_stSkipPositions->SetLabel(wxString::Format(_T("%d"), tskippositions));
+    m_stPositions->SetLabel(wxString::Format(_T("%d"), tpositions));
 
     Fit();
 }

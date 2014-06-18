@@ -56,7 +56,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	fgSizer17->SetFlexibleDirection( wxBOTH );
 	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
 	
-	m_lWeatherRoutes = new wxListCtrl( m_panel12, wxID_ANY, wxDefaultPosition, wxSize( -1,100 ), wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
+	m_lWeatherRoutes = new wxListCtrl( m_panel12, wxID_ANY, wxDefaultPosition, wxSize( -1,100 ), wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxHSCROLL|wxVSCROLL );
 	fgSizer17->Add( m_lWeatherRoutes, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer116;
@@ -634,7 +634,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	fgSizer58->Add( fgSizer59, 1, wxEXPAND, 5 );
 	
-	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, _("Last Valid if Data Deficient"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, _("Last Valid if Data Deficient"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer58->Add( m_cbAllowDataDeficient, 0, wxALL, 5 );
 	
 	
@@ -651,18 +651,18 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer23->SetFlexibleDirection( wxBOTH );
 	fgSizer23->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_cbDetectLand = new wxCheckBox( this, wxID_ANY, _("Detect Land"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbDetectLand = new wxCheckBox( this, wxID_ANY, _("Detect Land"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	m_cbDetectLand->SetValue(true); 
 	fgSizer23->Add( m_cbDetectLand, 0, wxALL, 5 );
 	
-	m_cbCurrents = new wxCheckBox( this, wxID_ANY, _("Currents"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbCurrents = new wxCheckBox( this, wxID_ANY, _("Currents"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	m_cbCurrents->SetValue(true); 
 	fgSizer23->Add( m_cbCurrents, 0, wxALL, 5 );
 	
-	m_cbInvertedRegions = new wxCheckBox( this, wxID_ANY, _("Inverted Regions"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbInvertedRegions = new wxCheckBox( this, wxID_ANY, _("Inverted Regions"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer23->Add( m_cbInvertedRegions, 0, wxALL, 5 );
 	
-	m_cbAnchoring = new wxCheckBox( this, wxID_ANY, _("Anchoring"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbAnchoring = new wxCheckBox( this, wxID_ANY, _("Anchoring"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer23->Add( m_cbAnchoring, 0, wxALL, 5 );
 	
 	
@@ -687,11 +687,11 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer981->SetFlexibleDirection( wxBOTH );
 	fgSizer981->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_rbNewton = new wxRadioButton( this, wxID_ANY, _("Newtons Method"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer981->Add( m_rbNewton, 0, wxALL, 5 );
+	m_cbNewton = new wxCheckBox( this, wxID_ANY, _("Newton's Method"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
+	fgSizer981->Add( m_cbNewton, 0, wxALL, 5 );
 	
-	m_rbRungeKutta = new wxRadioButton( this, wxID_ANY, _("Runge Kutta"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer981->Add( m_rbRungeKutta, 0, wxALL, 5 );
+	m_cbRungeKutta = new wxCheckBox( this, wxID_ANY, _("Runge Kutta"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
+	fgSizer981->Add( m_cbRungeKutta, 0, wxALL, 5 );
 	
 	
 	sbSizer33->Add( fgSizer981, 1, wxEXPAND, 5 );
@@ -821,8 +821,8 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer941->SetFlexibleDirection( wxBOTH );
 	fgSizer941->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_cAvoidCycloneTracks = new wxCheckBox( m_pCyclones, wxID_ANY, _("Avoid crossing cyclone tracks"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer941->Add( m_cAvoidCycloneTracks, 0, wxALL, 5 );
+	m_cbAvoidCycloneTracks = new wxCheckBox( m_pCyclones, wxID_ANY, _("Avoid crossing cyclone tracks"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
+	fgSizer941->Add( m_cbAvoidCycloneTracks, 0, wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer952;
 	fgSizer952 = new wxFlexGridSizer( 0, 5, 0, 0 );
@@ -834,8 +834,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer952->Add( m_staticText1281, 0, wxALL, 5 );
 	
 	m_sCycloneMonths = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 6, 3 );
-	m_sCycloneMonths->Enable( false );
-	
 	fgSizer952->Add( m_sCycloneMonths, 0, wxALL, 5 );
 	
 	m_staticText1291 = new wxStaticText( m_pCyclones, wxID_ANY, _("Months"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -843,8 +841,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer952->Add( m_staticText1291, 0, wxALL, 5 );
 	
 	m_sCycloneDays = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 183, 0 );
-	m_sCycloneDays->Enable( false );
-	
 	fgSizer952->Add( m_sCycloneDays, 0, wxALL, 5 );
 	
 	m_staticText130 = new wxStaticText( m_pCyclones, wxID_ANY, _("Days"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -864,8 +860,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer96->Add( m_staticText1311, 0, wxALL, 5 );
 	
 	m_sCycloneWindSpeed = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 300, 50 );
-	m_sCycloneWindSpeed->Enable( false );
-	
 	fgSizer96->Add( m_sCycloneWindSpeed, 0, wxALL, 5 );
 	
 	m_staticText132 = new wxStaticText( m_pCyclones, wxID_ANY, _("knots"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -885,8 +879,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer97->Add( m_staticText133, 0, wxALL, 5 );
 	
 	m_sCycloneClimatologyStartYear = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1900, 3000, 1985 );
-	m_sCycloneClimatologyStartYear->Enable( false );
-	
 	fgSizer97->Add( m_sCycloneClimatologyStartYear, 0, wxALL, 5 );
 	
 	
@@ -1045,8 +1037,11 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_tStartHour->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bCurrentTime->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnCurrentTime ), NULL, this );
 	m_cEnd->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_sTimeStepHours->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepHours->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sTimeStepMinutes->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepMinutes->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sTimeStepSeconds->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepSeconds->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_fpBoat->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ConfigurationDialogBase::OnUpdateFile ), NULL, this );
 	m_bEditBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnEditBoat ), NULL, this );
@@ -1057,19 +1052,79 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cbCurrents->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbInvertedRegions->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbAnchoring->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_rbNewton->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_rbRungeKutta->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbNewton->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdateIntegratorNewton ), NULL, this );
+	m_cbRungeKutta->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdateIntegratorRungeKutta ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxDivertedCourse->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSearchAngle->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxWindKnots->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxWindKnots->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSwellMeters->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxLatitude->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxLatitude->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxTacks->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxTacks->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_cAvoidCycloneTracks->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
+	m_sWindVSCurrent->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_cbAvoidCycloneTracks->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
+	m_sCycloneMonths->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneMonths->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sCycloneDays->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneDays->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sCycloneWindSpeed->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sCycloneClimatologyStartYear->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneClimatologyStartYear->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_bAddDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
 	m_bRemoveDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
@@ -1087,8 +1142,11 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_tStartHour->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bCurrentTime->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnCurrentTime ), NULL, this );
 	m_cEnd->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_sTimeStepHours->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepHours->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sTimeStepMinutes->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepMinutes->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sTimeStepSeconds->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepSeconds->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_fpBoat->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( ConfigurationDialogBase::OnUpdateFile ), NULL, this );
 	m_bEditBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnEditBoat ), NULL, this );
@@ -1099,19 +1157,79 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_cbCurrents->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbInvertedRegions->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbAnchoring->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_rbNewton->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
-	m_rbRungeKutta->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_cbNewton->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdateIntegratorNewton ), NULL, this );
+	m_cbRungeKutta->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdateIntegratorRungeKutta ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxDivertedCourse->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxDivertedCourse->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSearchAngle->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSearchAngle->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxWindKnots->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxWindKnots->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxSwellMeters->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSwellMeters->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxLatitude->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxLatitude->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxTacks->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxTacks->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sTackingTime->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_cAvoidCycloneTracks->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
+	m_sWindVSCurrent->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_cbAvoidCycloneTracks->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
+	m_sCycloneMonths->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneMonths->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sCycloneDays->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneDays->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sCycloneWindSpeed->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sCycloneClimatologyStartYear->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneClimatologyStartYear->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_bAddDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
 	m_bRemoveDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );

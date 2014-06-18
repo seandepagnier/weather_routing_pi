@@ -40,10 +40,10 @@
 #include <wx/textctrl.h>
 #include <wx/filepicker.h>
 #include <wx/choice.h>
-#include <wx/radiobut.h>
 #include <wx/notebook.h>
 #include <wx/listbox.h>
 #include <wx/scrolwin.h>
+#include <wx/radiobut.h>
 #include <wx/slider.h>
 #include <wx/html/htmlwin.h>
 
@@ -194,14 +194,13 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText111;
 		wxSpinCtrl* m_sTimeStepSeconds;
 		wxStaticText* m_staticText112;
-		wxFilePickerCtrl* m_fpBoat;
 		wxButton* m_bEditBoat;
 		wxCheckBox* m_cbAllowDataDeficient;
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
-		wxRadioButton* m_rbNewton;
-		wxRadioButton* m_rbRungeKutta;
+		wxCheckBox* m_cbNewton;
+		wxCheckBox* m_cbRungeKutta;
 		wxNotebook* m_notebook4;
 		wxPanel* m_panel11;
 		wxStaticText* m_staticText20;
@@ -229,7 +228,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText120;
 		wxSpinCtrl* m_sWindVSCurrent;
 		wxStaticText* m_staticText121;
-		wxCheckBox* m_cAvoidCycloneTracks;
+		wxCheckBox* m_cbAvoidCycloneTracks;
 		wxStaticText* m_staticText1281;
 		wxSpinCtrl* m_sCycloneMonths;
 		wxStaticText* m_staticText1291;
@@ -262,9 +261,12 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnUpdateDate( wxDateEvent& event ) { event.Skip(); }
 		virtual void OnGribTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
+		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdateFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateIntegratorNewton( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateIntegratorRungeKutta( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddDegreeStep( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveDegreeStep( wxCommandEvent& event ) { event.Skip(); }
@@ -275,6 +277,7 @@ class ConfigurationDialogBase : public wxDialog
 	
 	public:
 		wxDatePickerCtrl* m_dpStartDate;
+		wxFilePickerCtrl* m_fpBoat;
 		wxCheckBox* m_cbUseGrib;
 		wxChoice* m_cClimatologyType;
 		wxCheckBox* m_cbCurrents;

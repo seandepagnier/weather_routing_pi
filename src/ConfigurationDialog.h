@@ -43,11 +43,8 @@ public:
     ~ConfigurationDialog();
 
     void EditBoat( );
-    void SetConfiguration(RouteMapConfiguration configuration);
+    void SetConfigurations(std::list<RouteMapConfiguration>configuration);
     void Update();
-
-    RouteMapConfiguration Configuration();
-    void GenerateDegreeSteps(RouteMapConfiguration &configuration);
 
     void AddSource(wxString name);
     void RemoveSource( wxString name );
@@ -63,6 +60,14 @@ protected:
     void OnUpdateSpin( wxSpinEvent& event ) { Update(); }
     void OnUpdateFile( wxFileDirPickerEvent& event ) { Update(); }
     void OnEditBoat( wxCommandEvent& event ) { EditBoat(); }
+    void OnUpdateIntegratorNewton( wxCommandEvent& event );
+    void OnUpdateIntegratorRungeKutta( wxCommandEvent& event );
+
+    void EnableSpin( wxMouseEvent& event ) {
+        wxDynamicCast(event.GetEventObject(), wxSpinCtrl)->Enable();
+        event.Skip();
+    }
+
     void OnAvoidCyclones( wxCommandEvent& event );
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );
@@ -78,6 +83,7 @@ private:
     void SetStartDateTime(wxDateTime datetime);
 
     WeatherRouting &m_WeatherRouting;
+    bool m_bBlockUpdate;
 };
 
 #endif

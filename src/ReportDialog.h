@@ -33,7 +33,7 @@ class ReportDialog : public ReportDialogBase
 public:
     ReportDialog( WeatherRouting &weatherrouting );
 
-    void SetRouteMapOverlay(RouteMapOverlay *routemapoverlay);
+    void SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverlays);
 
     bool m_bReportStale;
 

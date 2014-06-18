@@ -184,7 +184,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
 
 void PlotDialog::OnUpdateRoute( wxCommandEvent& event )
 {
-    SetRouteMapOverlay(m_WeatherRouting.CurrentRouteMap());
+    SetRouteMapOverlay(m_WeatherRouting.FirstCurrentRouteMap());
 }
 
 void PlotDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)

@@ -293,21 +293,32 @@ void ConfigurationBatchDialog::Reset()
     m_tStartSpacingDays->SetValue(_T("1"));
     m_tStartSpacingHours->SetValue(_T("0"));
 
-    RouteMapOverlay *routemapoverlay = m_WeatherRouting.CurrentRouteMap();
-    if(routemapoverlay) {
-        RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+    for(std::vector<BatchSource*>::iterator bit = sources.begin();
+        bit != sources.end(); bit++)
+        (*bit)->destinations.clear();
 
-        for(std::vector<BatchSource*>::iterator it = sources.begin();
-            it != sources.end(); it++) {
-            (*it)->destinations.clear();
+    std::list<RouteMapOverlay *>currentroutemaps = m_WeatherRouting.CurrentRouteMaps();
+    for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+        it != currentroutemaps.end(); it++) {
 
-            if((*it)->Name == configuration.Start)
-                for(std::vector<BatchSource*>::iterator it2 = sources.begin();
-                    it2 != sources.end(); it2++)
-                    if((*it2)->Name == configuration.End)
-                        (*it)->destinations.push_back(*it2);
+        RouteMapConfiguration configuration = (*it)->GetConfiguration();
+        
+        for(std::vector<BatchSource*>::iterator bit = sources.begin();
+            bit != sources.end(); bit++) {
+            if((*bit)->Name == configuration.Start)
+                for(std::vector<BatchSource*>::iterator bit2 = sources.begin();
+                    bit2 != sources.end(); bit2++)
+                    if((*bit2)->Name == configuration.End) {
+                        bool have = false;
+                        for(std::list<BatchDestination*>::iterator bit3 = (*bit)->destinations.begin();
+                            bit3 != (*bit)->destinations.end(); bit3++)
+                            if(*bit3 == *bit2)
+                                have = true;
+                        if(!have)
+                            (*bit)->destinations.push_back(*bit2);
+                    }
         }
-
+        
         m_lBoats->Clear();
         m_lBoats->Append(configuration.boatFileName);
     }

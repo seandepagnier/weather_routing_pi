@@ -105,7 +105,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(*this),
       m_ConfigurationBatchDialog(this), m_SettingsDialog(this), m_StatisticsDialog(this),
       m_ReportDialog(*this), m_PlotDialog(*this), m_FilterRoutesDialog(this),
-      m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItem(false),
+      m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItems(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
       m_bShowSettings(false), m_bShowStatistics(false),
       m_bShowReport(false), m_bShowPlot(false),
@@ -197,7 +197,6 @@ void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
     if(!time.IsValid())
         time = wxDateTime::Now();
 
-    RouteMapOverlay *routemapoverlay = CurrentRouteMap();
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
@@ -205,8 +204,10 @@ void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
             weatherroute->routemapoverlay->Render(time, m_SettingsDialog, dc, vp, true);
     }
 
-    if(routemapoverlay)
-        routemapoverlay->Render(time, m_SettingsDialog, dc, vp, false);
+    std::list<RouteMapOverlay *>currentroutemaps = CurrentRouteMaps();
+    for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+        it != currentroutemaps.end(); it++)
+        (*it)->Render(time, m_SettingsDialog, dc, vp, false);
 
     m_ConfigurationBatchDialog.Render(dc, vp);
 
@@ -271,7 +272,7 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
 void WeatherRouting::CursorRouteChanged()
 {
     if(m_PlotDialog.IsShown() && m_PlotDialog.m_rbCursorRoute->GetValue())
-        m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
+        m_PlotDialog.SetRouteMapOverlay(FirstCurrentRouteMap());
 }
 
 void WeatherRouting::UpdateColumns()
@@ -407,28 +408,55 @@ void WeatherRouting::OnPositionKeyDown( wxListEvent& event )
 
 void WeatherRouting::OnEditConfiguration()
 {
-    RouteMapOverlay *routemapoverlay = CurrentRouteMap(true);
-    if(routemapoverlay) {
-        m_ConfigurationDialog.Show();
-        /* if boat filename doesn't exist open boat dialog immediately */
-        if(!wxFileName::FileExists(routemapoverlay->GetConfiguration().boatFileName))
-            m_ConfigurationDialog.EditBoat();
-    }
+    std::list<RouteMapOverlay *>routemapoverlays = CurrentRouteMaps(true);
+    if(routemapoverlays.empty())
+        return;
+
+    m_ConfigurationDialog.Show();
+
+    /* if boat filename doesn't exist open boat dialog immediately */
+    wxString boatfilename = m_ConfigurationDialog.m_fpBoat->GetPath();
+    if(!boatfilename.empty() && !wxFileName::FileExists(boatfilename))
+        m_ConfigurationDialog.EditBoat();
 }
 
 void WeatherRouting::OnGoTo( wxCommandEvent& event )
 {
-    RouteMapOverlay *rmo = CurrentRouteMap(true);
-    if(rmo) {
-        RouteMapConfiguration config = rmo->GetConfiguration();
+    std::list<RouteMapOverlay *>currentroutemaps = CurrentRouteMaps(true);
+    if(currentroutemaps.empty())
+        return;
 
-        double distance;
-        DistanceBearingMercator_Plugin(config.StartLat, config.StartLon,
-                                       config.EndLat, config.EndLon,
-                                       NULL, &distance);
+    double avg_lat=0, avg_lonx=0, avg_lony=0, total = 0;
+    for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+        it != currentroutemaps.end(); it++) {
+        RouteMapConfiguration configuration = (*it)->GetConfiguration();
+        avg_lat += configuration.StartLat + configuration.EndLat;
+        avg_lonx = cos(deg2rad(configuration.StartLon)) + cos(deg2rad(configuration.EndLon));
+        avg_lony = sin(deg2rad(configuration.StartLon)) + sin(deg2rad(configuration.EndLon));
 
-        JumpToPosition(config.StartLat, config.StartLon, .25/distance);
+        total += 2;
     }
+
+    avg_lat /= total, avg_lonx /= total, avg_lony /= total;
+    double avg_lon = rad2deg(atan2(avg_lony, avg_lonx));
+
+    double max_distance = 0;
+    for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+        it != currentroutemaps.end(); it++) {
+        RouteMapConfiguration configuration = (*it)->GetConfiguration();
+        double distance;
+        DistanceBearingMercator_Plugin(avg_lat, avg_lon,
+                                       configuration.StartLat, configuration.StartLon,
+                                       NULL, &distance);
+        max_distance = wxMax(distance, max_distance);
+        DistanceBearingMercator_Plugin(avg_lat, avg_lon,
+                                       configuration.EndLat, configuration.EndLon,
+                                       NULL, &distance);
+        max_distance = wxMax(distance, max_distance);
+    }
+
+    if(max_distance)
+        JumpToPosition(avg_lat, avg_lon, .125/max_distance);
 }
 
 void WeatherRouting::OnDelete( wxCommandEvent& event )
@@ -436,10 +464,9 @@ void WeatherRouting::OnDelete( wxCommandEvent& event )
     long index = m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if (index < 0) return;
 
-    WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
-        (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
-    DeleteRouteMap(weatherroute->routemapoverlay);
+    DeleteRouteMaps(CurrentRouteMaps());
 
+    /* select map just after the first one selected */
     int cnt = m_lWeatherRoutes->GetItemCount();
     m_lWeatherRoutes->SetItemState(index == cnt ? index - 1 : index,
                                    wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -448,11 +475,14 @@ void WeatherRouting::OnDelete( wxCommandEvent& event )
 
 void WeatherRouting::OnDeleteAll( wxCommandEvent& event )
 {
+    std::list<RouteMapOverlay *>allroutemapoverlays;
     while(m_lWeatherRoutes->GetItemCount()) {
         WeatherRoute *weatherroute =
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(0)));
-        DeleteRouteMap(weatherroute->routemapoverlay);
+        allroutemapoverlays.push_back(weatherroute->routemapoverlay);
     }
+
+    DeleteRouteMaps(allroutemapoverlays);
 
     GetParent()->Refresh();
 }
@@ -478,17 +508,23 @@ void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
 {
     GetParent()->Refresh();
 
-    RouteMapOverlay *routemapoverlay = CurrentRouteMap();
+    std::list<RouteMapOverlay*>currentroutemaps = CurrentRouteMaps();
+    std::list<RouteMapConfiguration> currentconfigurations;
+    for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+        it != currentroutemaps.end(); it++) {
+        (*it)->SetCursorLatLon(m_weather_routing_pi.m_cursor_lat,
+                               m_weather_routing_pi.m_cursor_lon);
+        currentconfigurations.push_back((*it)->GetConfiguration());
+    }
 
-    if(routemapoverlay) {
-        routemapoverlay->SetCursorLatLon(m_weather_routing_pi.m_cursor_lat,
-                                         m_weather_routing_pi.m_cursor_lon);
-        m_tHideConfiguration.Stop();
-        m_bSkipUpdateCurrentItem = true;
-        m_ConfigurationDialog.SetConfiguration(routemapoverlay->GetConfiguration());
-        m_bSkipUpdateCurrentItem = false;
-    } else
+    if(currentroutemaps.empty())
         m_tHideConfiguration.Start(25, true);
+    else {
+        m_tHideConfiguration.Stop();
+        m_bSkipUpdateCurrentItems = true;
+        m_ConfigurationDialog.SetConfigurations(currentconfigurations);
+        m_bSkipUpdateCurrentItems = false;
+    }
 
     UpdateDialogs();
 
@@ -554,7 +590,10 @@ void WeatherRouting::UpdateComputeState()
 int debugcnt, debuglimit = 1, debugsize = 2;
 void WeatherRouting::OnCompute( wxCommandEvent& event )
 {
-    Start(CurrentRouteMap());
+    std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
+    for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+        it != currentroutemaps.end(); it++)
+        Start(*it);
     UpdateComputeState();
 }
 
@@ -602,39 +641,19 @@ void WeatherRouting::OnClose( wxCommandEvent& event )
 void WeatherRouting::OnNew( wxCommandEvent& event )
 {
     RouteMapConfiguration configuration;
-    if(CurrentRouteMap())
-        configuration = CurrentRouteMap()->GetConfiguration();
+    if(FirstCurrentRouteMap())
+        configuration = FirstCurrentRouteMap()->GetConfiguration();
     else
         configuration = DefaultConfiguration();
 
-#if 0 /* to have a unique name */
-    for(int idx = 0;;idx++) {
-        wxString name = configuration.Name;
-        wxString n1 = name.BeforeLast('-'), n2 = name.AfterLast('-');
-        long l;
-        if(n1.size() && n2.ToLong(&l))
-            name = n1;
-
-        if(idx > 0)
-            name += wxString::Format(_T("-%d"), idx);
-        for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
-            WeatherRoute *weatherroute =
-                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
-            RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
-            if(c.Name == name)
-                goto outer_continue;
-        }
-        configuration.Name = name;
-        break;
-    outer_continue:;
-    }
-#endif
-
     AddConfiguration(configuration);
+
+    // deselect all
+    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
+        m_lWeatherRoutes->SetItemState(i, wxLIST_STATE_DONTCARE, wxLIST_STATE_DONTCARE);
 
     m_lWeatherRoutes->SetItemState(m_lWeatherRoutes->GetItemCount() - 1,
                                    wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-
     OnEditConfiguration();
 }
 
@@ -649,20 +668,16 @@ void WeatherRouting::OnBatch( wxCommandEvent& event )
 
 void WeatherRouting::GenerateBatch()
 {
-    RouteMapOverlay *routemapoverlay = CurrentRouteMap(true);
-    if(!routemapoverlay) {
-        wxMessageDialog mdlg(this, _("Must select a configuration to generate from"),
-                             _("Weather Routing"), wxOK | wxICON_ERROR);
-        mdlg.ShowModal();
-        return;
-    }
+    std::list<RouteMapOverlay *>routemapoverlays = CurrentRouteMaps(true);
 
-    RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
-    ConfigurationBatchDialog &dlg = m_ConfigurationBatchDialog;
+    wxProgressDialog *progressdialog = NULL;
+    int count = routemapoverlays.size(), c = 0;
+    int times = 0;
 
     wxTimeSpan StartSpan, StartSpacingSpan;
     double days, hours;
 
+    ConfigurationBatchDialog &dlg = m_ConfigurationBatchDialog;        
     dlg.m_tStartDays->GetValue().ToDouble(&days);
     StartSpan = wxTimeSpan::Days(days);
 
@@ -682,52 +697,58 @@ void WeatherRouting::GenerateBatch()
         return;
     }
 
-    wxDateTime EndTime = configuration.StartTime+StartSpan;
+    wxDateTime StartTime = wxDateTime::Now(), EndTime = StartTime+StartSpan;
 
-    wxProgressDialog *progressdialog = NULL;
-    int count = 0, c = 0;
-    for(wxDateTime start = configuration.StartTime; start <= EndTime; start += StartSpacingSpan)
-        count++;
-
+    for(wxDateTime start = StartTime; start <= EndTime; start += StartSpacingSpan)
+        times++;
+    
     int sources = 0;
     for(std::vector<BatchSource*>::iterator it = dlg.sources.begin();
         it != dlg.sources.end(); it++)
         for(std::list<BatchDestination*>::iterator it2 = (*it)->destinations.begin();
             it2 != (*it)->destinations.end(); it2++)
             sources++;
-
+    
     count *= sources;
     count *= dlg.m_lBoats->GetCount();
-
+    
     if(count > 10) {
         progressdialog = new wxProgressDialog(
             _("Batch configuration"), _("Weather Routing"), count, this,
             wxPD_CAN_ABORT | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
     }
-        
-    for(; configuration.StartTime <= EndTime; configuration.StartTime += StartSpacingSpan) {
-        for(std::vector<BatchSource*>::iterator it = dlg.sources.begin();
-            it != dlg.sources.end(); it++) {
-            configuration.Start = (*it)->Name;
 
-            for(std::list<BatchDestination*>::iterator it2 = (*it)->destinations.begin();
-                it2 != (*it)->destinations.end(); it2++) {
-                configuration.End = (*it2)->Name;
+    for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
+        it != routemapoverlays.end(); it++) {
+        RouteMapConfiguration configuration = (*it)->GetConfiguration();
 
-                for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
-                    configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
-                    AddConfiguration(configuration);
-                    m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
-                    configuration = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration();
+        EndTime = configuration.StartTime+StartSpan;
 
-                    if(progressdialog && !progressdialog->Update(c++))
-                        goto abort;
+        for(; configuration.StartTime <= EndTime; configuration.StartTime += StartSpacingSpan) {
+            for(std::vector<BatchSource*>::iterator it = dlg.sources.begin();
+                it != dlg.sources.end(); it++) {
+                configuration.Start = (*it)->Name;
+
+                for(std::list<BatchDestination*>::iterator it2 = (*it)->destinations.begin();
+                    it2 != (*it)->destinations.end(); it2++) {
+                    configuration.End = (*it2)->Name;
+
+                    for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
+                        configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
+                        AddConfiguration(configuration);
+                        m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
+                        configuration = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration();
+
+                        if(progressdialog && !progressdialog->Update(c++))
+                            goto abort;
+                    }
                 }
             }
         }
     }
 abort:
-    DeleteRouteMap(routemapoverlay);
+    DeleteRouteMaps(routemapoverlays);
+
     delete progressdialog;
 }
 
@@ -739,8 +760,6 @@ bool WeatherRouting::Show(bool show)
         m_ConfigurationDialog.Show(m_bShowConfiguration);
         m_ConfigurationBatchDialog.Show(m_bShowConfigurationBatch);
         m_SettingsDialog.Show(m_bShowSettings);
-//        if(m_bShowStatistics)
-//            m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
         m_StatisticsDialog.Show(m_bShowStatistics);
         m_ReportDialog.Show(m_bShowReport);
         m_PlotDialog.Show(m_bShowPlot);
@@ -784,8 +803,10 @@ void WeatherRouting::OnResetAll( wxCommandEvent& event )
 
 void WeatherRouting::OnExport ( wxCommandEvent& event )
 {
-    if(CurrentRouteMap(true))
-        Export(*CurrentRouteMap());
+    std::list<RouteMapOverlay *>routemapoverlays = CurrentRouteMaps(true);
+    for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
+        it != routemapoverlays.end(); it++)
+        Export(**it);
 }
 
 void WeatherRouting::OnExportAll( wxCommandEvent& event )
@@ -802,27 +823,26 @@ void WeatherRouting::OnSettings( wxCommandEvent& event )
 
 void WeatherRouting::OnStatistics( wxCommandEvent& event )
 {
-    m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
+    m_StatisticsDialog.SetRouteMapOverlays(CurrentRouteMaps());
     m_StatisticsDialog.Show();
 }
 
 void WeatherRouting::OnReport( wxCommandEvent& event )
 {
-    m_ReportDialog.SetRouteMapOverlay(CurrentRouteMap());
+    m_ReportDialog.SetRouteMapOverlays(CurrentRouteMaps());
     m_ReportDialog.Show();
 }
 
 void WeatherRouting::OnPlot ( wxCommandEvent& event )
 {
-    m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
+    m_PlotDialog.SetRouteMapOverlay(FirstCurrentRouteMap());
     m_PlotDialog.Show();
 }
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
 {
     wxString infolocation = *GetpSharedDataLocation()
-        + _T("plugins/weather_routing_pi/data/")
-        + _("WeatherRoutingInformation.html");
+        + _T("plugins/weather_routing_pi/data/") + _("WeatherRoutingInformation.html");
     wxLaunchDefaultBrowser(_T("file://") + infolocation);
 }
 
@@ -848,8 +868,13 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
             /* update report if needed */
             m_ReportDialog.m_bReportStale = true;
             if(m_ReportDialog.IsShown()) {
-                if(routemapoverlay == CurrentRouteMap())
-                    m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
+                std::list<RouteMapOverlay *>routemapoverlays = CurrentRouteMaps();
+                for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
+                    it != routemapoverlays.end(); it++)
+                    if(routemapoverlay == *it) {
+                        m_ReportDialog.SetRouteMapOverlays(routemapoverlays);
+                        break;
+                    }
             }
 
             continue;
@@ -881,17 +906,24 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
     }
         
     static int cycles; /* don't refresh all the time */
-    if((++cycles > 50 || !m_RunningRouteMaps.size())
-       && CurrentRouteMap() && CurrentRouteMap()->Updated()) {
+    if(++cycles > 50 || !m_RunningRouteMaps.size()) {
         cycles = 0;
-        m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
-        if(m_StatisticsDialog.IsShown())
-            m_StatisticsDialog.SetRouteMapOverlay(CurrentRouteMap());
-        if(m_PlotDialog.IsShown())
-            m_PlotDialog.SetRouteMapOverlay(CurrentRouteMap());
 
-        m_StartTime = wxDateTime::Now();
-        GetParent()->Refresh();
+        std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
+        for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
+            it != currentroutemaps.end(); it++)
+            if((*it)->Updated()) {
+
+                m_StatisticsDialog.SetRunTime(m_RunTime += wxDateTime::Now() - m_StartTime);
+                if(m_StatisticsDialog.IsShown())
+                    m_StatisticsDialog.SetRouteMapOverlays(CurrentRouteMaps());
+                if(m_PlotDialog.IsShown())
+                    m_PlotDialog.SetRouteMapOverlay(FirstCurrentRouteMap());
+
+                m_StartTime = wxDateTime::Now();
+                GetParent()->Refresh();
+                break;
+            }
     }
 
     if(m_RunningRouteMaps.size()) {
@@ -1144,7 +1176,7 @@ void WeatherRouting::SaveXML(wxString filename)
 
 void WeatherRouting::SetEnableConfigurationMenu()
 {
-    bool current = CurrentRouteMap();
+    bool current = FirstCurrentRouteMap();
     m_mBatch->Enable(current);
     m_mEdit->Enable(current);
     m_mGoTo->Enable(current);
@@ -1177,15 +1209,15 @@ void WeatherRouting::UpdateConfigurations()
 
 void WeatherRouting::UpdateDialogs()
 {
-    RouteMapOverlay *routemapoverlay = CurrentRouteMap();
+    std::list<RouteMapOverlay *>routemapoverlays = CurrentRouteMaps();
     if(m_StatisticsDialog.IsShown())
-        m_StatisticsDialog.SetRouteMapOverlay(routemapoverlay);
+        m_StatisticsDialog.SetRouteMapOverlays(routemapoverlays);
 
     if(m_ReportDialog.IsShown())
-        m_ReportDialog.SetRouteMapOverlay(routemapoverlay);
+        m_ReportDialog.SetRouteMapOverlays(routemapoverlays);
 
     if(m_PlotDialog.IsShown())
-        m_PlotDialog.SetRouteMapOverlay(routemapoverlay);
+        m_PlotDialog.SetRouteMapOverlay(FirstCurrentRouteMap());
 }
 
 void WeatherRouting::AddConfiguration(RouteMapConfiguration configuration)
@@ -1424,7 +1456,7 @@ void WeatherRouting::UpdateItem(long index)
 void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
                                            WeatherRoute *weatherroute)
 {
-    if(m_bSkipUpdateCurrentItem)
+    if(m_bSkipUpdateCurrentItems)
         return;
 
     RouteMapOverlay *rmo = weatherroute->routemapoverlay;
@@ -1447,26 +1479,28 @@ void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
     }
 }
 
-void WeatherRouting::SetConfigurationCurrentRoute(RouteMapConfiguration configuration)
-{
-    long index = m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    if (index < 0) return;
-
-    WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
-        (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
-
-    SetConfigurationRoute(configuration, weatherroute);
-}
-
-void WeatherRouting::UpdateBoatFilename(RouteMapConfiguration configuration)
+void WeatherRouting::UpdateBoatFilename(wxString boatFileName)
 {
     for(long index = 0; index<m_lWeatherRoutes->GetItemCount(); index++) {
         WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
             (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
 
         RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
-        if(c.boatFileName == configuration.boatFileName)
+        if(c.boatFileName == boatFileName)
             SetConfigurationRoute(c, weatherroute);
+    }
+}
+
+void WeatherRouting::UpdateCurrentConfigurations()
+{
+    long index = -1;
+    for(;;) {
+        index = m_lWeatherRoutes->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if(index == -1)
+            break;
+        WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
+            (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+        SetConfigurationRoute(weatherroute->routemapoverlay->GetConfiguration(), weatherroute);
     }
 }
 
@@ -1479,21 +1513,31 @@ void WeatherRouting::UpdateStates()
         UpdateItem(i);
 }
 
-RouteMapOverlay *WeatherRouting::CurrentRouteMap(bool messagedialog)
+std::list <RouteMapOverlay *>WeatherRouting::CurrentRouteMaps(bool messagedialog)
 {
-    long index = m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    RouteMapOverlay *routemapoverlay = NULL;
-    if (index >= 0)
-        routemapoverlay = reinterpret_cast<WeatherRoute*>
-            (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)))->routemapoverlay;
+    std::list<RouteMapOverlay *>routemapoverlays;
+    long index = -1;
+    for(;;) {
+        index = m_lWeatherRoutes->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        if(index == -1)
+            break;
+        routemapoverlays.push_back(reinterpret_cast<WeatherRoute*>
+                                   (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)))->routemapoverlay);
+    }
 
-    if(messagedialog && !routemapoverlay) {
+    if(messagedialog && routemapoverlays.empty()) {
         wxMessageDialog mdlg(this, _("No Weather Route selected"),
                              _("Weather Routing"), wxOK | wxICON_WARNING);
         mdlg.ShowModal();
     }
 
-    return routemapoverlay;
+    return routemapoverlays;
+}
+
+RouteMapOverlay *WeatherRouting::FirstCurrentRouteMap()
+{
+    std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
+    return currentroutemaps.empty() ? NULL : currentroutemaps.front();
 }
 
 void WeatherRouting::RebuildList()
@@ -1652,40 +1696,50 @@ void WeatherRouting::Reset()
     GetParent()->Refresh();
 }
 
-void WeatherRouting::DeleteRouteMap(RouteMapOverlay *routemapoverlay)
+void WeatherRouting::DeleteRouteMaps(std::list<RouteMapOverlay *>routemapoverlays)
 {
-    bool current = routemapoverlay == CurrentRouteMap();
+    bool current = false;
+    for(std::list<RouteMapOverlay*>::iterator it = routemapoverlays.begin();
+        it != routemapoverlays.end(); it++) {
+        std::list<RouteMapOverlay *>currentroutemaps = CurrentRouteMaps();
+        for(std::list<RouteMapOverlay*>::iterator cit = currentroutemaps.begin();
+            cit != currentroutemaps.end(); cit++)
+            if(*it == *cit) {
+                current = true;
+                break;
+            }
 
-    for(std::list<RouteMapOverlay*>::iterator it = m_WaitingRouteMaps.begin();
-        it != m_WaitingRouteMaps.end(); it++)
-        if(*it == routemapoverlay) {
-            m_WaitingRouteMaps.erase(it);
-            break;
+        for(std::list<RouteMapOverlay*>::iterator wit = m_WaitingRouteMaps.begin();
+            wit != m_WaitingRouteMaps.end(); wit++)
+            if(*it == *wit) {
+                m_WaitingRouteMaps.erase(wit);
+                break;
+            }
+
+        for(std::list<RouteMapOverlay*>::iterator rit = m_RunningRouteMaps.begin();
+            rit != m_RunningRouteMaps.end(); rit++)
+            if(*it == *rit) {
+                m_RunningRouteMaps.erase(rit);
+                break;
+            }
+
+        for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+            WeatherRoute *weatherroute =
+                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+            if(weatherroute->routemapoverlay == *it) {
+                m_lWeatherRoutes->DeleteItem(i);
+                break;
+            }
         }
 
-    for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
-        it != m_RunningRouteMaps.end(); it++)
-        if(*it == routemapoverlay) {
-            m_RunningRouteMaps.erase(it);
-            break;
-        }
-
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
-        WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
-        if(weatherroute->routemapoverlay == routemapoverlay) {
-            m_lWeatherRoutes->DeleteItem(i);
-            break;
-        }
+        for(std::list<WeatherRoute*>::iterator writ = m_WeatherRoutes.begin();
+            writ != m_WeatherRoutes.end(); writ++)
+            if((*writ)->routemapoverlay == *it) {
+                delete *writ;
+                m_WeatherRoutes.erase(writ);
+                break;
+            }
     }
-
-    for(std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
-        it != m_WeatherRoutes.end(); it++)
-        if((*it)->routemapoverlay == routemapoverlay) {
-            delete *it;
-            m_WeatherRoutes.erase(it);
-            break;
-        }
 
     m_ReportDialog.m_bReportStale = true;
 
@@ -1744,7 +1798,12 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.InvertedRegions = false;
     configuration.Anchoring = false;
 
-    m_ConfigurationDialog.GenerateDegreeSteps(configuration);
+    configuration.DegreeSteps.clear();
+    for(double v = 45; v < 170; v+=5) {
+        configuration.DegreeSteps.push_back(v);
+        configuration.DegreeSteps.push_back(360-v);
+    }
+    configuration.DegreeSteps.sort();
 
     return configuration;
 }

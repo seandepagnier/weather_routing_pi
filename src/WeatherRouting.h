@@ -90,11 +90,13 @@ public:
 
     void SetConfigurationRoute(RouteMapConfiguration configuration,
                                WeatherRoute *weatherroute);
-    void SetConfigurationCurrentRoute(RouteMapConfiguration configuration);
-    void UpdateBoatFilename(RouteMapConfiguration configuration);
+    void UpdateBoatFilename(wxString boatFileName);
 
+    void UpdateCurrentConfigurations();
     void UpdateStates();
-    RouteMapOverlay *CurrentRouteMap(bool messagedialog = false), *m_RouteMapOverlayNeedingGrib;
+    std::list<RouteMapOverlay*> CurrentRouteMaps(bool messagedialog = false);
+    RouteMapOverlay *FirstCurrentRouteMap();
+    RouteMapOverlay *m_RouteMapOverlayNeedingGrib;
 
     void RebuildList();
     std::list<RouteMapOverlay*> m_RunningRouteMaps, m_WaitingRouteMaps;
@@ -172,7 +174,7 @@ private:
     void StartAll();
     void Stop();
 
-    void DeleteRouteMap(RouteMapOverlay *routemapoverlay);
+    void DeleteRouteMaps(std::list<RouteMapOverlay *>routemapoverlays);
     RouteMapConfiguration DefaultConfiguration();
 
     SettingsDialog m_SettingsDialog;
@@ -190,7 +192,7 @@ private:
     wxString m_default_configuration_path;
 
     int m_RoutesToRun;
-    bool m_bSkipUpdateCurrentItem;
+    bool m_bSkipUpdateCurrentItems;
 
     bool m_bShowConfiguration, m_bShowConfigurationBatch;
     bool m_bShowSettings, m_bShowStatistics, m_bShowReport, m_bShowPlot, m_bShowFilter;

@@ -163,7 +163,7 @@ int weather_routing_pi::GetToolbarToolCount(void)
 
 void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 {
-    if(m_pWeather_Routing && m_pWeather_Routing->CurrentRouteMap() && !m_tCursorLatLon.IsRunning())
+    if(m_pWeather_Routing && m_pWeather_Routing->FirstCurrentRouteMap() && !m_tCursorLatLon.IsRunning())
         m_tCursorLatLon.Start(50, true);
 
     m_cursor_lat = lat;
@@ -327,8 +327,14 @@ bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort 
 
 void weather_routing_pi::OnCursorLatLonTimer( wxTimerEvent & )
 {
-    RouteMapOverlay *crm = m_pWeather_Routing->CurrentRouteMap();
-    if(crm && crm->SetCursorLatLon(m_cursor_lat, m_cursor_lon)) {
+    std::list<RouteMapOverlay *>routemapoverlays = m_pWeather_Routing->CurrentRouteMaps();
+    bool refresh = false;
+    for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
+        it != routemapoverlays.end(); it++)
+        if((*it)->SetCursorLatLon(m_cursor_lat, m_cursor_lon))
+            refresh = true;
+
+    if(refresh) {
         RequestRefresh(m_parent_window);
         m_pWeather_Routing->CursorRouteChanged();
     }

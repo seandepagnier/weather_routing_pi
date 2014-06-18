@@ -46,73 +46,78 @@ ReportDialog::ReportDialog( WeatherRouting &weatherrouting )
     : ReportDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting)
 {
     m_bReportStale = true;
-    SetRouteMapOverlay(NULL);
+    SetRouteMapOverlays(std::list<RouteMapOverlay*>());
 }
 
-void ReportDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
+void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverlays)
 {
     GenerateRoutesReport();
 
-    if(routemapoverlay == NULL) {
+    if(routemapoverlays.empty()) {
         m_htmlConfigurationReport->SetPage(_("No Configuration selected."));
         return;
     }
 
-    if(!routemapoverlay->ReachedDestination()) {
-        m_htmlConfigurationReport->SetPage(_("Destination not yet reached."));
-        return;
-    }
-
     wxString page;
-    RouteMapConfiguration c = routemapoverlay->GetConfiguration();
-    std::list<PlotData> p = routemapoverlay->GetPlotData();
+    for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
+        it != routemapoverlays.end(); it++) {
 
-    page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
-    page += _("Leaving ") + c.StartTime.Format(_T("%x")) + _T("<dt>");
-    page += _("Arriving ") + routemapoverlay->EndTime().Format(_T("%x")) + _T("<dt>");
-    page += _("Duration ") + (routemapoverlay->EndTime() - c.StartTime).Format() + _T("<dt>");
-    page += _T("<p>");
-    double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
-    double distance_sailed = routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE);
-    page += _("Distance sailed: ") + wxString::Format
-        (_T("%.2f NMi : %.2f NMi or %.2f%% "), distance_sailed,
-         distance_sailed - distance, (distance_sailed / distance - 1) * 100.0) +
-        _("longer than great circle route") + _T("<br>");
+        page += _T("<p>");
+        if(!(*it)->ReachedDestination()) {
+            m_htmlConfigurationReport->SetPage(_("Destination not yet reached."));
+            continue;
+        }
 
-    double avgspeed = routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED);
-    double avgspeedground = routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEEDGROUND);
-    page += _("Average Water Speed") + wxString(_T(": ")) + wxString::Format
-        (_T(" %.2f"), avgspeed) + _T(" knots<dt>");
-    page += _("Average Ground Speed") + wxString(_T(": ")) + wxString::Format
-        (_T(" %.2f"), avgspeedground) + _T(" knots<dt>");
-    page += _("Average Wind") + wxString(_T(": ")) + wxString::Format
-        (_T(" %.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWIND)) + _T(" knots<dt>");
-    page += _("Average Swell") + wxString(_T(": ")) + wxString::Format
-        (_T(" %.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSWELL)) + _T(" meters<dt>");
-    page += _("Upwind") + wxString(_T(": ")) + wxString::Format
-        (_T(" %.2f%%"), routemapoverlay->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND)) + _T("<dt>");
-    double port_starboard = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
-    page += _("Port/Starboard") + wxString(_T(": ")) +
-        (isnan(port_starboard) ? _T("nan") : wxString::Format
-         (_T("%d/%d"), (int)port_starboard, 100-(int)port_starboard)) + _T("<dt>");
+        RouteMapConfiguration c = (*it)->GetConfiguration();
+        std::list<PlotData> p = (*it)->GetPlotData();
 
-    Position *destination = routemapoverlay->GetDestination();
+        page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
+        page += _("Leaving ") + c.StartTime.Format(_T("%x")) + _T("<dt>");
+        page += _("Arriving ") + (*it)->EndTime().Format(_T("%x")) + _T("<dt>");
+        page += _("Duration ") + ((*it)->EndTime() - c.StartTime).Format() + _T("<dt>");
+        page += _T("<p>");
+        double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
+        double distance_sailed = (*it)->RouteInfo(RouteMapOverlay::DISTANCE);
+        page += _("Distance sailed: ") + wxString::Format
+            (_T("%.2f NMi : %.2f NMi or %.2f%% "), distance_sailed,
+             distance_sailed - distance, (distance_sailed / distance - 1) * 100.0) +
+            _("longer than great circle route") + _T("<br>");
 
-    page += _("Number of tacks") + wxString::Format(_T(": %d "), destination->tacks) + _T("<dt>\n");
+        double avgspeed = (*it)->RouteInfo(RouteMapOverlay::AVGSPEED);
+        double avgspeedground = (*it)->RouteInfo(RouteMapOverlay::AVGSPEEDGROUND);
+        page += _("Average Water Speed") + wxString(_T(": ")) + wxString::Format
+            (_T(" %.2f"), avgspeed) + _T(" knots<dt>");
+        page += _("Average Ground Speed") + wxString(_T(": ")) + wxString::Format
+            (_T(" %.2f"), avgspeedground) + _T(" knots<dt>");
+        page += _("Average Wind") + wxString(_T(": ")) + wxString::Format
+            (_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::AVGWIND)) + _T(" knots<dt>");
+        page += _("Average Swell") + wxString(_T(": ")) + wxString::Format
+            (_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::AVGSWELL)) + _T(" meters<dt>");
+        page += _("Upwind") + wxString(_T(": ")) + wxString::Format
+            (_T(" %.2f%%"), (*it)->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND)) + _T("<dt>");
+        double port_starboard = (*it)->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
+        page += _("Port/Starboard") + wxString(_T(": ")) +
+            (isnan(port_starboard) ? _T("nan") : wxString::Format
+             (_T("%d/%d"), (int)port_starboard, 100-(int)port_starboard)) + _T("<dt>");
 
-    /* determine if currents significantly improve this (boat over ground speed average is 10% or
-       more faster than boat over water)  then attempt to determine which current based on lat/lon
-       eg, gulf stream, japan, current aghulles current etc.. and report it. */
-    page += _T("<p>");
-    double wspddiff = avgspeedground / avgspeed;
-    if(fabs(1-wspddiff) > .03) {
-        page += wxString::Format (_T("%.2f%% "), ((wspddiff > 1 ? wspddiff : 1/wspddiff) - 1) * 100.0)
-            + _("speed change due to ");
-        if(wspddiff > 1)
-            page += _("favorable");
-        else
-            page += _("unfavorable");
-        page += _(" currents.");
+        Position *destination = (*it)->GetDestination();
+
+        page += _("Number of tacks") + wxString::Format(_T(": %d "), destination->tacks) + _T("<dt>\n");
+
+        /* determine if currents significantly improve this (boat over ground speed average is 10% or
+           more faster than boat over water)  then attempt to determine which current based on lat/lon
+           eg, gulf stream, japan, current aghulles current etc.. and report it. */
+        page += _T("<p>");
+        double wspddiff = avgspeedground / avgspeed;
+        if(fabs(1-wspddiff) > .03) {
+            page += wxString::Format (_T("%.2f%% "), ((wspddiff > 1 ? wspddiff : 1/wspddiff) - 1) * 100.0)
+                + _("speed change due to ");
+            if(wspddiff > 1)
+                page += _("favorable");
+            else
+                page += _("unfavorable");
+            page += _(" currents.");
+        }
     }
 
     m_htmlConfigurationReport->SetPage(page);
@@ -256,8 +261,10 @@ void ReportDialog::GenerateRoutesReport()
             if(cyclonemonths[i] && !cyclonemonths[j]) {
                 int lm = i;
                 page += wxDateTime::GetMonthName((wxDateTime::Month)i);
-                for(int k=i+1, l=i; k!= i; l = k++) {
+                for(int k=i+1, l=i; ; l = k++) {
                     if(k==12) k = 0;
+                    if(k == i)
+                        break;
                     if(cyclonemonths[k] && !cyclonemonths[l]) {
                         page += _(" and ") + wxDateTime::GetMonthName((wxDateTime::Month)k);
                         lm = k;
