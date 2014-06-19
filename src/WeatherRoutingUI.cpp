@@ -499,7 +499,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText28->Wrap( -1 );
 	fgSizer94->Add( m_staticText28, 0, wxALL, 5 );
 	
-	m_dpStartDate = new wxDatePickerCtrl( this, wxID_ANY, wxDefaultDateTime, wxDefaultPosition, wxDefaultSize, wxDP_DEFAULT );
+	m_dpStartDate = new wxDatePickerCtrl( this, wxID_ANY, wxDefaultDateTime, wxDefaultPosition, wxDefaultSize, wxDP_ALLOWNONE|wxDP_DEFAULT );
 	fgSizer94->Add( m_dpStartDate, 0, wxALL, 5 );
 	
 	m_bGribTime = new wxButton( this, wxID_ANY, _("Grib Time"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -850,40 +850,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	fgSizer941->Add( fgSizer952, 1, wxEXPAND, 5 );
 	
-	wxFlexGridSizer* fgSizer96;
-	fgSizer96 = new wxFlexGridSizer( 0, 3, 0, 0 );
-	fgSizer96->SetFlexibleDirection( wxBOTH );
-	fgSizer96->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText1311 = new wxStaticText( m_pCyclones, wxID_ANY, _("With at least windspeed"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1311->Wrap( -1 );
-	fgSizer96->Add( m_staticText1311, 0, wxALL, 5 );
-	
-	m_sCycloneWindSpeed = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 300, 50 );
-	fgSizer96->Add( m_sCycloneWindSpeed, 0, wxALL, 5 );
-	
-	m_staticText132 = new wxStaticText( m_pCyclones, wxID_ANY, _("knots"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText132->Wrap( -1 );
-	fgSizer96->Add( m_staticText132, 0, wxALL, 5 );
-	
-	
-	fgSizer941->Add( fgSizer96, 1, wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer97;
-	fgSizer97 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer97->SetFlexibleDirection( wxBOTH );
-	fgSizer97->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText133 = new wxStaticText( m_pCyclones, wxID_ANY, _("Climatology starting cyclone year"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText133->Wrap( -1 );
-	fgSizer97->Add( m_staticText133, 0, wxALL, 5 );
-	
-	m_sCycloneClimatologyStartYear = new wxSpinCtrl( m_pCyclones, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1900, 3000, 1985 );
-	fgSizer97->Add( m_sCycloneClimatologyStartYear, 0, wxALL, 5 );
-	
-	
-	fgSizer941->Add( fgSizer97, 1, wxEXPAND, 5 );
-	
 	
 	m_pCyclones->SetSizer( fgSizer941 );
 	m_pCyclones->Layout();
@@ -1117,15 +1083,12 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sTackingTime->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sWindVSCurrent->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sWindVSCurrent->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_cbAvoidCycloneTracks->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
 	m_sCycloneMonths->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneMonths->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sCycloneDays->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneDays->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sCycloneWindSpeed->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sCycloneWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sCycloneClimatologyStartYear->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sCycloneClimatologyStartYear->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_bAddDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
 	m_bRemoveDegreeStep->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
 	m_bClearDegreeSteps->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );
@@ -1222,15 +1185,12 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sTackingTime->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sWindVSCurrent->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sWindVSCurrent->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_cbAvoidCycloneTracks->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAvoidCyclones ), NULL, this );
 	m_sCycloneMonths->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneMonths->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sCycloneDays->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sCycloneDays->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sCycloneWindSpeed->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sCycloneWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sCycloneClimatologyStartYear->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sCycloneClimatologyStartYear->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_bAddDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnAddDegreeStep ), NULL, this );
 	m_bRemoveDegreeStep->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnRemoveDegreeStep ), NULL, this );
 	m_bClearDegreeSteps->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnClearDegreeSteps ), NULL, this );

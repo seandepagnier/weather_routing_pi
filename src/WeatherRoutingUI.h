@@ -234,11 +234,6 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText1291;
 		wxSpinCtrl* m_sCycloneDays;
 		wxStaticText* m_staticText130;
-		wxStaticText* m_staticText1311;
-		wxSpinCtrl* m_sCycloneWindSpeed;
-		wxStaticText* m_staticText132;
-		wxStaticText* m_staticText133;
-		wxSpinCtrl* m_sCycloneClimatologyStartYear;
 		wxListBox* m_lDegreeSteps;
 		wxTextCtrl* m_tDegreeStep;
 		wxButton* m_bAddDegreeStep;

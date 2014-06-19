@@ -243,7 +243,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             
             int minor = v[_T("ClimatologyVersionMinor")].AsInt();
             
-            if(minor < 9) {
+            if(minor < 10) {
                 wxMessageDialog mdlg(m_parent_window,
                                      _("Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"),
                                      _("Weather Routing"), wxOK | wxICON_WARNING);

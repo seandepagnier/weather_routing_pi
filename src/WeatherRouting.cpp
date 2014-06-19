@@ -650,7 +650,7 @@ void WeatherRouting::OnNew( wxCommandEvent& event )
 
     // deselect all
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
-        m_lWeatherRoutes->SetItemState(i, wxLIST_STATE_DONTCARE, wxLIST_STATE_DONTCARE);
+        m_lWeatherRoutes->SetItemState(i, 0, wxLIST_STATE_SELECTED);
 
     m_lWeatherRoutes->SetItemState(m_lWeatherRoutes->GetItemCount() - 1,
                                    wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
@@ -1046,10 +1046,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
                     configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 3);
                     configuration.CycloneDays = AttributeInt(e, "CycloneDays", 0);
-                    configuration.CycloneWindSpeed = AttributeInt(e, "CycloneWindSpeed", 50);
-                    configuration.CycloneClimatologyStartYear = AttributeInt
-                        (e, "CycloneClimatologyStartYear", 1985);
-                    
+
                     configuration.UseGrib = AttributeBool(e, "UseGrib", true);
                     configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
                         AttributeInt(e, "ClimatologyType", RouteMapConfiguration::CUMULATIVE_MAP);
@@ -1146,8 +1143,6 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("AvoidCycloneTracks", configuration.AvoidCycloneTracks);
         c->SetAttribute("CycloneMonths", configuration.CycloneMonths);
         c->SetAttribute("CycloneDays", configuration.CycloneDays);
-        c->SetAttribute("CycloneWindSpeed", configuration.CycloneWindSpeed);
-        c->SetAttribute("CycloneClimatologyStartYear", configuration.CycloneClimatologyStartYear);
 
         c->SetAttribute("UseGrib", configuration.UseGrib);
         c->SetAttribute("ClimatologyType", configuration.ClimatologyType);
@@ -1787,8 +1782,6 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.AvoidCycloneTracks = false;
     configuration.CycloneMonths = 3;
     configuration.CycloneDays = 0;
-    configuration.CycloneWindSpeed = 50;
-    configuration.CycloneClimatologyStartYear = 1985;
 
     configuration.UseGrib = true;
     configuration.ClimatologyType = RouteMapConfiguration::CUMULATIVE_MAP;

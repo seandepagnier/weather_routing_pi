@@ -256,8 +256,6 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(AvoidCycloneTracks);
     SET_SPIN(CycloneMonths);
     SET_SPIN(CycloneDays);
-    SET_SPIN(CycloneWindSpeed);
-    SET_SPIN(CycloneClimatologyStartYear);
 
     SET_CHECKBOX(DetectLand);
     SET_CHECKBOX(Currents);
@@ -372,8 +370,6 @@ void ConfigurationDialog::Update()
         GET_CHECKBOX(AvoidCycloneTracks);
         GET_SPIN(CycloneMonths);
         GET_SPIN(CycloneDays);
-        GET_SPIN(CycloneWindSpeed);
-        GET_SPIN(CycloneClimatologyStartYear);
 
         GET_CHECKBOX(DetectLand);
         GET_CHECKBOX(Currents);

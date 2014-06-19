@@ -183,7 +183,7 @@ struct RouteMapConfiguration {
     double MaxLatitude, MaxTacks, TackingTime, WindVSCurrent;
 
     bool AvoidCycloneTracks;
-    int CycloneMonths, CycloneDays, CycloneWindSpeed, CycloneClimatologyStartYear;
+    int CycloneMonths, CycloneDays;
 
     bool UseGrib;
     enum ClimatologyDataType {DISABLED, CURRENTS_ONLY, CUMULATIVE_MAP, CUMULATIVE_MINUS_CALMS, MOST_LIKELY, AVERAGE};
@@ -245,9 +245,7 @@ public:
     static bool (*ClimatologyWindAtlasData)(const wxDateTime &, double, double, int &count,
                                             double *, double *, double &, double &);
     static int (*ClimatologyCycloneTrackCrossings)(double lat1, double lon1, double lat2, double lon2,
-                                                   const wxDateTime &date, int dayrange, int min_windspeed,
-                                                   const wxDateTime &cyclonedata_startdate);
-
+                                                   const wxDateTime &date, int dayrange);
     static std::list<RouteMapPosition> Positions;
     void Stop() { Lock(); m_bFinished = true; Unlock(); }
     void ResetFinished() { Lock(); m_bFinished = false; Unlock(); }

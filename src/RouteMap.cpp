@@ -568,9 +568,9 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     if(configuration.WindVSCurrent) {
         /* these are already computed in OverWater.. could optimize by reusing them */
         double Wx = VW*cos(deg2rad(W)), Wy = VW*sin(deg2rad(W));
-        double Cx = VC*cos(deg2rad(C)), Cy = VC*sin(deg2rad(W));
+        double Cx = VC*cos(deg2rad(C) + M_PI), Cy = VC*sin(deg2rad(C) + M_PI);
 
-        if(Wx*Cx + Wy*Cy + 10*configuration.WindVSCurrent < 0)
+        if(Wx*Cx + Wy*Cy + configuration.WindVSCurrent < 0)
             return false;
     }
 
@@ -735,8 +735,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         if(configuration.AvoidCycloneTracks) {
             int crossings = RouteMap::ClimatologyCycloneTrackCrossings
                 (lat, lon, dlat, dlon, time, configuration.CycloneMonths*30 +
-                 configuration.CycloneDays, configuration.CycloneWindSpeed,
-                 wxDateTime(1, wxDateTime::Jan, configuration.CycloneClimatologyStartYear));
+                 configuration.CycloneDays);
             if(crossings > 0)
                 continue;
         }
@@ -847,8 +846,8 @@ double Position::PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
         int crossings = RouteMap::ClimatologyCycloneTrackCrossings
             (lat, lon, configuration.EndLat, configuration.EndLon,
              time, configuration.CycloneMonths*30 +
-             configuration.CycloneDays, configuration.CycloneWindSpeed,
-             wxDateTime(0, 0, configuration.CycloneClimatologyStartYear));
+             configuration.CycloneDays);
+
         if(crossings > 0)
             return NAN;
     }
@@ -2239,8 +2238,7 @@ bool (*RouteMap::ClimatologyData)
 bool (*RouteMap::ClimatologyWindAtlasData)(const wxDateTime &, double, double, int &count,
                                            double *, double *, double &, double &) = NULL;
 int (*RouteMap::ClimatologyCycloneTrackCrossings)(double, double, double, double,
-                                                  const wxDateTime &, int, int,
-                                                  const wxDateTime &) = NULL;
+                                                  const wxDateTime &, int) = NULL;
 
 std::list<RouteMapPosition> RouteMap::Positions;
 
@@ -2375,7 +2373,7 @@ bool RouteMap::Propagate()
     /* test for cyclone data if needed */
     if(m_Configuration.AvoidCycloneTracks &&
        (!ClimatologyCycloneTrackCrossings ||
-        ClimatologyCycloneTrackCrossings(0, 0, 0, 0, wxDateTime(), 0, 0, wxDateTime())==-1)) {
+        ClimatologyCycloneTrackCrossings(0, 0, 0, 0, wxDateTime(), 0)==-1)) {
         m_bFinished = true;
         m_bClimatologyFailed = true;
         Unlock();

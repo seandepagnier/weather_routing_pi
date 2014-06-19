@@ -563,8 +563,6 @@ int RouteMapOverlay::Cyclones(int *months)
     if(!RouteMap::ClimatologyCycloneTrackCrossings)
         return 0;
 
-    wxDateTime startdate(1, wxDateTime::Jan, 1985);
-    int windknots = 60; // consider cyclones with 60 knot sustained wind or more
     int days = 30; // search for 30 day range
     int cyclones = 0;
 
@@ -573,8 +571,8 @@ int RouteMapOverlay::Cyclones(int *months)
     IsoChronList::iterator it = origin.end();
 
     for(Position *p = destination_position; p && p->parent; p = p->parent) {
-        if(RouteMap::ClimatologyCycloneTrackCrossings(p->parent->lat, p->parent->lon, p->lat, p->lon,
-                                                      ptime, days, windknots, startdate)) {
+        if(RouteMap::ClimatologyCycloneTrackCrossings(p->parent->lat, p->parent->lon,
+                                                      p->lat, p->lon, ptime, days)) {
             if(months)
                 months[ptime.GetMonth()]++;
             cyclones++;
