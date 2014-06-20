@@ -578,6 +578,17 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     double timeseconds = configuration.dt;
     double dist;
+#define USE_FAST_TEST 1
+#if USE_FAST_TEST
+    double d0, d1, d2;
+    d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
+#else
+    double bearing1, bearing2, bearing3;
+    ll_gc_ll_reverse(lat, lon, prev->lat, prev->lon, &bearing1, 0);
+    if(bearing1 >= 180) bearing1 -= 360;
+    ll_gc_ll_reverse(lat, lon, next->lat, next->lon, &bearing2, 0);
+    if(bearing2 >= 180) bearing2 -= 360;
+#endif
 
     int propagation_direction = 1, propagation_skips = 0;
     std::list<double>::iterator it = configuration.DegreeSteps.begin(), orig_end = configuration.DegreeSteps.end();
@@ -586,12 +597,16 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     std::list<double>::iterator       end = orig_end;
 
     for(;;) {
+        if(it == end)
+            break;
+
+        if(propagation_direction == -2)
+            propagation_direction = -1;
+
+    skipin:
         if(propagation_direction==1) it++; else it--;
         if(it == configuration.DegreeSteps.end()) /* skip past end node in circular linked list */
         {  if(propagation_direction==1) it++; else it--; }
-        if(it == end)
-            break;
-    skipin:
 
         double H = heading_resolve(*it);
         double B, VB, BG, VBG;
@@ -647,50 +662,67 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
 
         bool current_propagated = false;
-#if 0 // unfortunately still bugged
+#if 1
         /* test to avoid extra computations related to backtracking,
            this doesn't help a lot, but if we could stop, and reverse until
            failing again, then we would avoid a lot of calculations.  If the
            first test fails, simply skip to the opposite H and start from
            there */
-        if(prev != next && parent) {
-            if(!current_propagated) {
-
-                double d0, d1, d2;
-                d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
-                d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
+        if(prev != next && configuration.DegreeSteps.size() > 4) {
+#if USE_FAST_TEST
+            d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
+            if(d1 > 0) {
+                if(d0 > 0) {
+                    d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
+                    current_propagated = d2 > 0;
+                } else
+                    current_propagated = true;
+            } else {
                 d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
-                
-                current_propagated = ((d1 > 0 && d2 > 0) || (d0 < 0 && (d1 > 0 || d2 > 0)));
+                current_propagated = d2 > 0;
             }
-                
+#else
+            bearing3 = BG;
+            if(bearing1 > bearing2)
+                current_propagated = bearing3 > bearing2 && bearing3 < bearing1;
+            else
+                current_propagated = bearing3 > bearing2 || bearing3 < bearing1;
+#endif
+#if 1 // enable reversing direction to skip known backtracks
             if(current_propagated) {
                 if(propagation_direction == 1) {
                     if (count) {
                         if(!points->prev->propagated) {
-                           propagation_direction = -2;
-                           end = it;
-                           it = orig_end;
+                            propagation_direction = -2;
+                            end = it;
+                            if(++end == configuration.DegreeSteps.end())
+                                end++;
+                            it = orig_end;
+                            it++;
                         }
                     } else { // initial point was a miss.. skip ahead and try there?
-                        if(propagation_skips < 2) {
-                            for(unsigned int skip = 0; skip < configuration.DegreeSteps.size()/3; skip++)
+#if 1 // enable skipping ahead to try to get past known backtracks
+                        if(propagation_skips < 3) {
+                            for(unsigned int skip = 0; skip < configuration.DegreeSteps.size()/4; skip++)
                                 it++;
-                            if(it == configuration.DegreeSteps.end())
+                            if(it == configuration.DegreeSteps.end()) {
+                                printf("should never hit\n");
                                 it++;
+                            }
 
                             orig_end = end = it;
                             propagation_skips++;
                             goto skipin;
                         }
+#endif
                     }
-                } else {
+                } else
                     it = end; // finished after this one
-                    it++;
-                }
             }
+#endif
         }
-#endif  
+#endif
+        propagation_skips = 4; // no more skips
 
         nrdlon = dlon;
         if(configuration.positive_longitudes && dlon < 0)
@@ -750,10 +782,9 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             points->prev->next = rp;
             points->prev = rp;
             
-            if(propagation_direction == -1)
+            if(propagation_direction == -1) {
                 points = points->prev;
-            if(propagation_direction == -2)
-                propagation_direction = -1;
+            }
         } else {
             rp->prev = rp->next = rp;
             points = rp;
@@ -780,6 +811,7 @@ reset:
         if(p == points)
             break;
     }
+
 #endif
 
     if(count < 3) { /* would get eliminated anyway, but save the extra steps */
