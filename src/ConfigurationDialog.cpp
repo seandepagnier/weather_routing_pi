@@ -185,12 +185,10 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 #define SET_CONTROL_VALUE(VALUE, CONTROL, SETTER, TYPE, NULLVALUE)     \
     do { \
     bool allsame = true;                            \
-    TYPE value = NULLVALUE; \
-    for(std::list<RouteMapConfiguration>::iterator it = configurations.begin(); \
-        it != configurations.end(); it++) {                             \
-        if(it == configurations.begin()) \
-            value = VALUE;                \
-        else if(value != VALUE) {         \
+    std::list<RouteMapConfiguration>::iterator it = configurations.begin(); \
+    TYPE value = VALUE; \
+    for(it++; it != configurations.end(); it++) {                             \
+        if(value != VALUE) {                                       \
             allsame = false; \
             break; \
         } \

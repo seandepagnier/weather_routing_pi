@@ -69,6 +69,9 @@
 
 #include <wx/wx.h>
 
+#include <stdlib.h>
+#include <math.h>
+
 #include "ocpn_plugin.h"
 #include "GribRecordSet.h"
 

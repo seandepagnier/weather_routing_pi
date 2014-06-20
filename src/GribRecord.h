@@ -25,7 +25,7 @@ Elément de base d'un fichier GRIB
 #define GRIBRECORD_H
 
 #include <iostream>
-#include <cmath>
+//#include <cmath>
 
 class ZUFILE;
 //#include "zuFile.h"

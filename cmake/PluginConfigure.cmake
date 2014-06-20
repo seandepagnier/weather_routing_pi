@@ -34,7 +34,7 @@ IF(NOT MSVC)
  IF(PROFILING)
   ADD_DEFINITIONS( "-fprofile-arcs -ftest-coverage" )
  ENDIF(PROFILING)
- ADD_DEFINITIONS( "-Wall -g -O3 -fexceptions" )
+ ADD_DEFINITIONS( "-Wall -g -O0 -fexceptions" )
 
  IF(NOT APPLE)
   SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,-Bsymbolic")
