@@ -617,8 +617,12 @@ void WeatherRouting::OnOpen( wxCommandEvent& event )
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
-    if( openDialog.ShowModal() == wxID_OK )
+    if( openDialog.ShowModal() == wxID_OK ) {
+        wxCommandEvent event;
+        OnDeleteAllPositions( event );
+        OnDeleteAll( event );
         OpenXML(openDialog.GetPath());
+    }
 }
 
 void WeatherRouting::OnSave( wxCommandEvent& event )

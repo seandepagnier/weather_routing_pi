@@ -581,7 +581,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     double timeseconds = configuration.dt;
     double dist;
-#define USE_FAST_TEST 1
+//#define USE_FAST_TEST 1
 #if USE_FAST_TEST
     double d0, d1, d2;
     d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
@@ -636,19 +636,6 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         if(configuration.Integrator == RouteMapConfiguration::RUNGE_KUTTA) {
             double k2_dist, k2_BG, k3_dist, k3_BG, k4_dist, k4_BG;
             // a lot more experimentation is needed here
-#if 0
-            if(!rk_step(p, timeseconds,    BG,    dist/2, H,
-                        configuration, grib, time, newsailplan, k2_BG, k2_dist) ||
-               !rk_step(p, timeseconds, k2_BG, k2_dist/2, H,
-                        configuration, grib, time, newsailplan, k3_BG, k3_dist) ||
-               !rk_step(p, timeseconds, k3_BG, k3_dist,   H,
-                        configuration, grib, time, newsailplan, k4_BG, k4_dist))
-                continue;
-            ll_gc_ll(lat,  lon,     BG,    dist/6, &dlat, &dlon);
-            ll_gc_ll(dlat, dlon, k2_BG, k2_dist/3, &dlat, &dlon);
-            ll_gc_ll(dlat, dlon, k3_BG, k3_dist/3, &dlat, &dlon);
-            ll_gc_ll(dlat, dlon, k4_BG, k4_dist/6, &dlat, &dlon);
-#else
             wxDateTime rk_time_2 = time + wxTimeSpan::Seconds(timeseconds/2);
             wxDateTime rk_time = time + wxTimeSpan::Seconds(timeseconds);
             if(!rk_step(this, timeseconds, BG,    dist/2, H,
@@ -660,7 +647,6 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                 continue;
 
             ll_gc_ll(lat, lon, BG, dist/6 + k2_dist/3 + k3_dist/3 + k4_dist/6, &dlat, &dlon);
-#endif
         } else /* newtons method */
             ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
 
@@ -795,7 +781,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         count++;
     }
 
-#if 1 // remove strings that are already propagated */
+#if 0 // remove strings that are already propagated */
 reset:
     Position *p = points;
     while(count >= 3) {

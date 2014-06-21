@@ -218,7 +218,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
                                             + (double)(*it).StartTime.GetMinute()/60.0),
                 m_tStartHour, SetValue, wxString, _T(""));
 
-    SET_SPIN_VALUE(TimeStepHours, (*it).dt / 3600);
+    SET_SPIN_VALUE(TimeStepHours, (int)((*it).dt / 3600));
     SET_SPIN_VALUE(TimeStepMinutes, ((int)(*it).dt / 60) % 60);
     SET_SPIN_VALUE(TimeStepSeconds, (int)(*it).dt%60);
 
