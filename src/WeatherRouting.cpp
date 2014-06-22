@@ -587,7 +587,6 @@ void WeatherRouting::UpdateComputeState()
 
 }
 
-int debugcnt, debuglimit = 1, debugsize = 2;
 void WeatherRouting::OnCompute( wxCommandEvent& event )
 {
     std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();

@@ -650,7 +650,7 @@ void RouteMapOverlay::UpdateDestination()
         last_destination_position = destination_position;
     } else {
     not_able_to_propagate:
-        last_destination_position = ClosestPosition(configuration.EndLat, configuration.EndLon, 0, done);
+        last_destination_position = ClosestPosition(configuration.EndLat, configuration.EndLon);
 
         m_EndTime = wxDateTime(); // invalid
     }

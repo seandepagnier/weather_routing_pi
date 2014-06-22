@@ -206,6 +206,16 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 {
     double ax = x2 - x1, ay = y2 - y1;
     double bx = x3 - x4, by = y3 - y4;
+
+#if 0
+#define EPS3 1e-5
+        if(fabs(ax) < EPS3 && fabs(ay) < EPS3) /* first segment is a zero segment */
+            return -2;
+
+        if(fabs(bx) < EPS3 && fabs(by) < EPS3) /* second segment is a zero segment */
+            return 2;
+#endif
+
     double cx = x1 - x3, cy = y1 - y3;
 
     double denom = ay * bx - ax * by;
@@ -215,13 +225,15 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 #define EPS 2e-14
 #define EPS2 2e-7 // should be half the exponent of EPS
     if(fabs(denom) < EPS) { /* parallel or really close to parallel */
-        if(fabs((y1*ax - ay*x1)*bx - (y3*bx - by*x3)*ax) > EPS2)
-            return 0; /* different intercepts, no intersection */
-
         /* we already know from initial test we are overlapping,
            for parallel line segments, there is no way to tell
            which direction the intersection occurs */
-        if(!ax && !ay) /* first segment is a zero segment */
+
+#define PEPS 2e-11
+        if(fabs((y1*ax - ay*x1)*bx - (y3*bx - by*x3)*ax) > PEPS)
+            return 0; /* different intercepts, no intersection */
+
+        if(ax == 0 && ay == 0) /* first segment is a zero segment */
             return -2;
 
         /* can invalidate a point on either segment for overlapping parallel,
@@ -229,7 +241,7 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
         double dx = x2 - x3, dy = y2 - y3;
         double da = ax*ax + bx*bx, db = cx*cx + cy*cy, dc = dx*dx + dy*dy;
         if(db <= da && dc <= da) /* point 3 is between 1 and 2 */
-            return 2; 
+            return 2;
         return 3;
     }
 
@@ -651,7 +663,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
 
         bool current_propagated = false;
-#if 1
+#if 0
         /* test to avoid extra computations related to backtracking,
            this doesn't help a lot, but if we could stop, and reverse until
            failing again, then we would avoid a lot of calculations.  If the
@@ -1118,7 +1130,7 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
 
         pos = pos->next;
     } while(pos != r->skippoints->point); /* avoid deadlock.. lets hope we dont do this often */
-    printf("bad contains route\n");
+//    printf("bad contains route\n");
 /*
     Print();
     printf("\n\n");
@@ -1217,7 +1229,7 @@ void IsoRoute::PerturbPosition(SkipPosition *s, Position *p)
     if(s->next->point == p)
         s = s->next;
 
-    double epsilon = 2e-7;
+    double epsilon = 2e-6;
     if(s->point == p) {
         switch(s->quadrant + 4*s->prev->quadrant) {
         case 1: case 3:
@@ -1255,46 +1267,31 @@ void IsoRoute::PerturbPosition(SkipPosition *s, Position *p)
    we need to update the skip list if this point falls on a skip position*/
 void IsoRoute::RemovePosition(SkipPosition *s, Position *p)
 {
-    if(s == s->next) {
-        delete s->point;
-        delete s;
-        skippoints = NULL;
-    } else {
-        p->next->prev = p->prev;
-        p->prev->next = p->next;
-    }
+    p->next->prev = p->prev;
+    p->prev->next = p->next;
 
     if(s->point == p) {
-#if 0
-    /* possible optimization to avoid rebuilding the skip list.. is this really useful? */
-        /* warning: this is not correct yet */
-        int pquadrant = s->prev->quadrant;
-        int quadrant = FindQuadrant(p->prev, p->next);
-        if(quadrant == pquadrant) {
-            s->point = p->next;
-            if(s->point == s->next->point || quadrant == s->quadrant) {
-                s->prev->next = s->next;
-                s->next->prev = s->prev;
-                delete s;
-            }
+        if(s == s->next) {
+            delete s;
+            skippoints = NULL;
         } else {
-            s->point = p->prev;
-            if(s->point == s->prev->point || quadrant = s->next->quadrant) {
-                s->next->point = s->point;
-                s->prev->next = s->next;
-                s->next->prev = s->prev;
-                delete s;
-            }
-            s->quadrant = quadrant;
+            /* rebuild skip list */
+            Position *points = skippoints->point;
+            if(p == points)
+                points = points->next;
+            DeleteSkipPoints(skippoints);
+            skippoints = points->BuildSkipList();
+
+            /* make sure the skip points start at the minimum
+               latitude so we know we are on the outside */
+            SkipPosition *min = skippoints, *cur = skippoints;
+            do {
+                if(cur->point->lat < min->point->lat)
+                    min = cur;
+                cur = cur->next;
+            } while(cur != skippoints);
+            skippoints = min;
         }
-#else
-        /* rebuild skip list */
-        Position *points = skippoints->point;
-        if(p == points)
-            points = points->next;
-        DeleteSkipPoints(skippoints);
-        skippoints = points->BuildSkipList();
-#endif
     }
     delete p;
 }
@@ -1691,7 +1688,7 @@ startnormalizing:
 #else
             printf("-3\n");
           route1->PerturbPosition(sp, q);
-#endif
+#endif 
           goto reset;
         case 2:
           route1->skippoints = spend;
@@ -1734,6 +1731,7 @@ startnormalizing:
           SwapSkipSegments(sp, sq, sr, ss); /* update skip lists */
 
           /* now update skip list properly */
+          Position *orig_sppoint = sp->point;
           if(sp->quadrant != sr->quadrant) {
             int rquadrant = sr->quadrant, pquadrant = sp->quadrant;
             FixSkipList(sp, ss, p, s, rquadrant, spend, ssend);
@@ -1826,6 +1824,23 @@ startnormalizing:
 #endif
             normalizing = true;
           }
+
+          if( sp->point != orig_sppoint)
+          {
+              /* it is possible we are no longer on the outside
+                 so we find the min latitude in the skiplist and
+                 then reset to that (there is certainly a faster way to
+                 deal with this case, but it doesn't happen very often) */
+                SkipPosition *min = sp, *cur = sp;
+                do {
+                    if(cur->point->lat < min->point->lat)
+                        min = cur;
+                    cur = cur->next;
+                } while(cur != sp);
+                route1->skippoints = min;
+                goto reset;
+          }
+
           goto startnormalizing;
         }
       skipmerge:        
@@ -2168,16 +2183,16 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
            (it's a dead end) */
         if(propagated) {
 #if 0
-                y = new IsoRoute(x);
-                for(IsoRouteList::iterator cit = x->children.begin();
-                    cit != x->children.end(); cit++)
-                    y->children.push_back(new IsoRoute(*cit, y)); /* copy child */
-                if(x->ApplyCurrents(grib, time, configuration))
-                    routelist.push_back(y);
-                else
-                    delete y; /* I guess we didn't need it after all */
-            } else
-                x->ApplyCurrents(grib, time, configuration);
+            y = new IsoRoute(x);
+            for(IsoRouteList::iterator cit = x->children.begin();
+                cit != x->children.end(); cit++)
+                y->children.push_back(new IsoRoute(*cit, y)); /* copy child */
+            if(x->ApplyCurrents(grib, time, configuration))
+                routelist.push_back(y);
+            else
+                delete y; /* I guess we didn't need it after all */
+        } else
+            x->ApplyCurrents(grib, time, configuration);
 #endif
             routelist.push_back(x);
         } else
@@ -2296,34 +2311,8 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
             routelist.pop_front();
             IsoRouteList rl;
 
-//            extern int debugsize, debugcnt, debuglimit;
-            if(
-#if 0
-              (origin.size() < debugsize || debugcnt++ < debuglimit) &&
-#endif
-              Merge(rl, r1, r2, 0, configuration.InvertedRegions)) {
-#if 1 /* TODO: find fastest method */
+            if(Merge(rl, r1, r2, 0, configuration.InvertedRegions)) {
                 routelist.splice(routelist.end(), rl);
-#else /* merge new routes with each other right away before hitting the main list */
-                IsoRouteList unmerged2;
-                while(!rl.empty()) {
-                    r1 = rl.front();
-                    rl.pop_front();
-                    while(!rl.empty()) {
-                        r2 = rl.front();
-                        rl.pop_front();
-                        IsoRouteList rl2;
-                        if(Merge(rl2, r1, r2, 0, configuration.InvertedRegions)) {
-                            rl.splice(rl.end(), rl2);
-                            goto remerge2;
-                        } else
-                            unmerged2.push_back(r2);
-                    }
-                    unmerged.push_back(r1);
-                remerge2:
-                    unmerged.splice(unmerged.end(), unmerged2);
-                }
-#endif
                 goto remerge;
             } else
                 unmerged.push_back(r2);
@@ -2341,12 +2330,6 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
 /* enlarge the map by 1 level */
 bool RouteMap::Propagate()
 {
-#if 0
-    extern int debugsize;
-    if((int)origin.size() > debugsize)
-        return false;
-#endif
-
     Lock();
     if(!m_bValid) {
         Unlock();
