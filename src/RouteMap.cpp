@@ -191,7 +191,8 @@ static void OverGround(double B, double VB, double C, double VC, double &BG, dou
    if no intersection return 0, otherwise, 1 if the
    second line crosses from right to left, or -1 for left to right
 
-   In the case that an end point basically lies on a segment, then
+   In the case that it is too close to determine, we find which endpoint
+   is the problematic point (and will be deleted from the graph)
    -2: first point first seg
    -3: second point first seg
    2: first point second seg
@@ -206,16 +207,6 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 {
     double ax = x2 - x1, ay = y2 - y1;
     double bx = x3 - x4, by = y3 - y4;
-
-#if 0
-#define EPS3 1e-5
-        if(fabs(ax) < EPS3 && fabs(ay) < EPS3) /* first segment is a zero segment */
-            return -2;
-
-        if(fabs(bx) < EPS3 && fabs(by) < EPS3) /* second segment is a zero segment */
-            return 2;
-#endif
-
     double cx = x1 - x3, cy = y1 - y3;
 
     double denom = ay * bx - ax * by;
@@ -225,16 +216,24 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 #define EPS 2e-14
 #define EPS2 2e-7 // should be half the exponent of EPS
     if(fabs(denom) < EPS) { /* parallel or really close to parallel */
+#if 1
+#define EPS3 1e-5
+        if(fabs(ax) < EPS3 && fabs(ay) < EPS3) /* first segment is a zero segment */
+            return -2;
+
+        if(fabs(bx) < EPS3 && fabs(by) < EPS3) /* second segment is a zero segment */
+            return 2;
+#else
+        if(ax == 0 && ay == 0) /* first segment is a zero segment */
+            return -2;
+#endif
+
         /* we already know from initial test we are overlapping,
            for parallel line segments, there is no way to tell
            which direction the intersection occurs */
-
 #define PEPS 2e-11
         if(fabs((y1*ax - ay*x1)*bx - (y3*bx - by*x3)*ax) > PEPS)
             return 0; /* different intercepts, no intersection */
-
-        if(ax == 0 && ay == 0) /* first segment is a zero segment */
-            return -2;
 
         /* can invalidate a point on either segment for overlapping parallel,
            we will always choose second segment */
@@ -1116,11 +1115,6 @@ bool IsoRoute::CompletelyContained(IsoRoute *r)
    only test first point, but if it fails try other points */
 bool IsoRoute::ContainsRoute(IsoRoute *r)
 {
-    /*
-    static int c;
-    printf("cnt: %d\n", c++);
-    */
-
     Position *pos = r->skippoints->point;
     do {
         switch(Contains(*pos, false)) {
@@ -1131,16 +1125,59 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
         pos = pos->next;
     } while(pos != r->skippoints->point); /* avoid deadlock.. lets hope we dont do this often */
 //    printf("bad contains route\n");
-/*
-    Print();
-    printf("\n\n");
-    PrintSkip();
-    printf("\n\n");
-    r->Print();
-    printf("\n\n");
-    r->PrintSkip();
-*/
     return true; /* probably good to say it is contained in this unlikely case */
+}
+
+void IsoRoute::ReduceClosePoints()
+{
+    return;
+
+    const double eps = 1e-5;
+#if 0
+    SkipPosition *s = skippoints;
+    do {
+        Position *p = s->point;
+        while(p != s->next->point) {
+            Position *n = p->next;
+            double dlat = p->lat - n->lat, dlon = p->lon - n->lon;
+            if(fabs(dlat) < eps && fabs(dlon) < eps) {
+                if(n != s->next->point) {
+                    p->next = n->next;
+                    n->next->prev = p;
+                    delete n;
+                } else {
+                    if(p != s->point) {
+                        p->prev->next = n;
+                        n->prev = p->prev;
+                        delete p;
+                    }
+                    break;
+                }
+            } else
+                p = n;
+        }
+        s = s->next;
+    } while(s != skippoints);
+#else
+    Position *p = skippoints->point;
+    while(p != skippoints->point->prev) {
+        Position *n = p->next;
+        double dlat = p->lat - n->lat, dlon = p->lon - n->lon;
+        if(fabs(dlat) < eps && fabs(dlon) < eps) {
+            p->next = n->next;
+            n->next->prev = p;
+            delete n;
+        } else
+            p = n;
+    }
+
+    DeleteSkipPoints(skippoints);
+    skippoints = p->BuildSkipList();
+#endif
+
+    for(IsoRouteList::iterator it = children.begin();
+        it != children.end(); it++)
+        (*it)->ReduceClosePoints();
 }
 
 /* apply current to given route, and return if it changed at all */
@@ -2422,6 +2459,11 @@ bool RouteMap::Propagate()
             Unlock();
             return false;
         }
+#if 1
+        for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
+            (*it)->ReduceClosePoints();
+#endif
+
         update = new IsoChron(merged, time, grib);
     }
 

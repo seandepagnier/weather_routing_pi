@@ -84,7 +84,7 @@ public:
     bool m_bEndRouteVisible;
 
 private:
-    void RenderAlternateRoute(IsoRoute *r, bool each_parent, int AlternateRouteThickness,
+    void RenderAlternateRoute(IsoRoute *r, bool each_parent,
                               ocpnDC &dc, PlugIn_ViewPort &vp);
     virtual bool TestAbort() { return Finished(); }
 

@@ -111,6 +111,7 @@ public:
     bool CompletelyContained(IsoRoute *r);
     bool ContainsRoute(IsoRoute *r);
 
+    void ReduceClosePoints();
 //    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration);
     void FindIsoRouteBounds(double bounds[4]);
     void PerturbPosition(SkipPosition *s, Position *p);

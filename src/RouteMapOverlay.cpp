@@ -99,17 +99,29 @@ void RouteMapOverlay::DeleteThread()
     m_Thread = NULL;
 }
 
-void SetColor(ocpnDC &dc, bool penifgl, wxColour c, int w)
+static void SetColor(ocpnDC &dc, wxColour c, bool penifgl = false)
 {
     if(!dc.GetDC()) {
         glColor4ub(c.Red(), c.Green(), c.Blue(), 168);
+        if(!penifgl)
+            return;
+    }
+    wxPen pen = dc.GetPen();
+    pen.SetColour(c);
+    dc.SetPen(pen);
+}
+
+static void SetWidth(ocpnDC &dc, int w, bool penifgl = false)
+{
+    if(!dc.GetDC()) {
         glLineWidth(w);
         if(!penifgl)
             return;
     }
-    dc.SetPen(wxPen(c, w));
+    wxPen pen = dc.GetPen();
+    pen.SetWidth(w);
+    dc.SetPen(pen);
 }
-
 
 void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
                                ocpnDC &dc, PlugIn_ViewPort &vp)
@@ -146,7 +158,7 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronT
         return;
 
     Position *p = s->point;
-    SetColor(dc, false, color, IsoChronThickness);
+    SetColor(dc, color);
     if(!dc.GetDC())
         glBegin(GL_LINES);
     do {
@@ -163,7 +175,7 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronT
         RenderIsoRoute(*it, cyan, IsoChronThickness, dc, vp);
 }
 
-void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent, int AlternateRouteThickness,
+void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
                                            ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     Position *pos = r->skippoints->point;
@@ -179,11 +191,10 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent, int Al
         pos = pos->next;
     } while(pos != r->skippoints->point);
 
-    for(IsoRouteList::iterator cit = r->children.begin(); cit != r->children.end(); cit++) {
-        wxColour blue(0, 0, 255);
-        SetColor(dc, false, blue, AlternateRouteThickness);
-        RenderAlternateRoute(*cit, each_parent, AlternateRouteThickness, dc, vp);
-    }
+    wxColour blue(0, 0, 255);
+    SetColor(dc, blue);
+    for(IsoRouteList::iterator cit = r->children.begin(); cit != r->children.end(); cit++)
+        RenderAlternateRoute(*cit, each_parent, dc, vp);
 }
 
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
@@ -194,13 +205,15 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
         wxPoint r;
         GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
-        SetColor(dc, true, *wxBLUE, 3);
+        SetColor(dc, *wxBLUE, true);
+        SetWidth(dc, 3, true);
         dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
         dc.DrawLine(r.x, r.y-10, r.x-10, r.y+7);
         dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
 
         GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
-        SetColor(dc, true, *wxRED, 3);
+        SetColor(dc, *wxRED, true);
+        SetWidth(dc, 3, true);
         dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
         dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
 
@@ -259,14 +272,15 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                     it--;
                 }
 
-                wxColour black(0, 0, 0);
-                SetColor(dc, false, black, AlternateRouteThickness);
+                SetWidth(dc, AlternateRouteThickness);
                 if(!dc.GetDC())
                     glBegin(GL_LINES);
                 for(; it != origin.end(); ++it)
                     for(IsoRouteList::iterator rit = (*it)->routes.begin();
-                        rit != (*it)->routes.end(); ++rit)
-                        RenderAlternateRoute(*rit, !AlternatesForAll, AlternateRouteThickness, dc, nvp);
+                        rit != (*it)->routes.end(); ++rit) {
+                        SetColor(dc, *wxBLACK);
+                        RenderAlternateRoute(*rit, !AlternatesForAll, dc, nvp);
+                    }
 
                 if(!dc.GetDC())
                     glEnd();
@@ -317,10 +331,12 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         bool SquaresAtSailChanges = settingsdialog.m_cbSquaresAtSailChanges->GetValue();
 
         if(!justendroute) {
-            SetColor(dc, true, CursorColor, RouteThickness);
+            SetColor(dc, CursorColor, true);
+            SetWidth(dc, RouteThickness, true);
             RenderCourse(last_cursor_position, time, SquaresAtSailChanges, dc, vp);
         }
-        SetColor(dc, true, DestinationColor, RouteThickness);
+        SetColor(dc, DestinationColor, true);
+        SetWidth(dc, RouteThickness, true);
         RenderCourse(last_destination_position, time, SquaresAtSailChanges, dc, vp);
     }
 }
