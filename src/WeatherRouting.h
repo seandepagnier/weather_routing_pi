@@ -165,7 +165,7 @@ private:
 
     void AddConfiguration(RouteMapConfiguration configuration);
     void UpdateRouteMap(RouteMapOverlay *routemapoverlay);
-    void UpdateItem(long index);
+    void UpdateItem(long index, bool stateonly=false);
 
     RouteMap *SelectedRouteMap();
     void Export(RouteMapOverlay &routemapoverlay);

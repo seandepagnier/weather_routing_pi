@@ -2218,21 +2218,10 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
         /* if any propagation occured even for children, then we clone this route
            this prevents backtracking, otherwise, we don't need this route
            (it's a dead end) */
-        if(propagated) {
-#if 0
-            y = new IsoRoute(x);
-            for(IsoRouteList::iterator cit = x->children.begin();
-                cit != x->children.end(); cit++)
-                y->children.push_back(new IsoRoute(*cit, y)); /* copy child */
-            if(x->ApplyCurrents(grib, time, configuration))
-                routelist.push_back(y);
-            else
-                delete y; /* I guess we didn't need it after all */
-        } else
-            x->ApplyCurrents(grib, time, configuration);
-#endif
-            routelist.push_back(x);
-        } else
+        if(propagated)
+//            routelist.push_back(x);
+            routelist.push_front(x); // slightly faster
+        else
             delete x; /* didn't need it */
     }
 }

@@ -431,62 +431,65 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
     m_bNeedsGrib = false;
 }
 
-std::list<PlotData> RouteMapOverlay::GetPlotData(bool cursor_route)
+std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 {
-    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
-    std::list<PlotData> plotdatalist;
-    if(!pos)
-        return plotdatalist;
+    std::list<PlotData> &plotdata = cursor_route ? last_cursor_plotdata : last_destination_plotdata;
+    if(plotdata.empty()) {
+        Position *pos = cursor_route ? last_cursor_position : last_destination_position;
+        if(!pos)
+            return plotdata;
 
-    RouteMapConfiguration configuration = GetConfiguration();
-    Lock();
-    IsoChronList::iterator it = origin.begin(), itn;
+        RouteMapConfiguration configuration = GetConfiguration();
+        Lock();
+        IsoChronList::iterator it = origin.begin(), itn;
 
-    /* get route iso for this position */
-    Position *p, *l;
-    p=pos->parent;
-    if(last_destination_position == destination_position)
-        p=p->parent;
-    for(; p; p=p->parent)
-        if(++it == origin.end())
-            return plotdatalist;
+        /* get route iso for this position */
+        Position *p, *l;
+        p=pos->parent;
+        if(last_destination_position == destination_position)
+            p=p->parent;
+        for(; p; p=p->parent)
+            if(++it == origin.end())
+                return plotdata;
 
-    itn = it;
-
-    l = pos;
-    for(p = pos; p; p = p->parent) {
-        GribRecordSet *grib = (*it)->m_Grib;
-
-        PlotData data;
-        /* this omits the starting position */
-        double dt = 0;
-        if(p != destination_position) {
-            wxDateTime endtime = itn==it ? EndTime() : (*itn)->time;
-            wxDateTime starttime = (*it)->time;
-            if(starttime.IsValid() && endtime.IsValid())
-                dt = (endtime - starttime).GetSeconds().ToDouble();
-        }
-        data.time = (*it)->time;
-        data.lat = p->lat, data.lon = p->lon;
-        if(l->GetPlotData(grib, dt, configuration, data))
-            plotdatalist.push_front(data);
-
-        l = p;
         itn = it;
 
-        if(it == origin.begin())
-            break;
-        if(p != destination_position)
-            it--;
-    }
+        l = pos;
+        for(p = pos; p; p = p->parent) {
+            GribRecordSet *grib = (*it)->m_Grib;
 
-    Unlock();
-    return plotdatalist;
+            PlotData data;
+            /* this omits the starting position */
+            double dt = 0;
+            if(p != destination_position) {
+                wxDateTime endtime = itn==it ? EndTime() : (*itn)->time;
+                wxDateTime starttime = (*it)->time;
+                if(starttime.IsValid() && endtime.IsValid())
+                    dt = (endtime - starttime).GetSeconds().ToDouble();
+            }
+            data.time = (*it)->time;
+            data.lat = p->lat, data.lon = p->lon;
+            if(l->GetPlotData(grib, dt, configuration, data))
+                plotdata.push_front(data);
+
+            l = p;
+            itn = it;
+
+            if(it == origin.begin())
+                break;
+            if(p != destination_position)
+                it--;
+        }
+
+        Unlock();
+    }
+    return plotdata;
 }
 
 double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
 {
-    std::list<PlotData> plotdata = GetPlotData(cursor_route);
+    std::list<PlotData> &plotdata = GetPlotData(cursor_route);
+
     double total = 0, count = 0, lat0 = 0, lon0 = 0;
     for(std::list<PlotData>::iterator it=plotdata.begin(); it!=plotdata.end(); it++)
     {
@@ -607,12 +610,17 @@ void RouteMapOverlay::Clear()
     RouteMap::Clear();
     last_cursor_position = NULL;
     last_destination_position = NULL;
+    last_cursor_plotdata.clear();
+    last_destination_plotdata.clear();
     m_UpdateOverlay = true;
 }
 
 void RouteMapOverlay::UpdateCursorPosition()
 {
+    Position *last_last_cursor_position = last_cursor_position;
     last_cursor_position = ClosestPosition(last_cursor_lat, last_cursor_lon);
+    if(last_last_cursor_position != last_cursor_position)
+        last_cursor_plotdata.clear();
 }
 
 bool RouteMapOverlay::SetCursorLatLon(double lat, double lon)
@@ -635,7 +643,7 @@ bool RouteMapOverlay::Updated()
 void RouteMapOverlay::UpdateDestination()
 {
     RouteMapConfiguration configuration = GetConfiguration();
-
+    Position *last_last_destination_position = last_destination_position;
     bool done = ReachedDestination();
     if(done) {
         delete destination_position;
@@ -670,6 +678,9 @@ void RouteMapOverlay::UpdateDestination()
 
         m_EndTime = wxDateTime(); // invalid
     }
+
+    if(last_last_destination_position != last_destination_position)
+        last_destination_plotdata.clear();
 
     m_bUpdated = true;
     m_UpdateOverlay = true;

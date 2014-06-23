@@ -61,7 +61,7 @@ public:
     void RenderCourse(Position *pos, wxDateTime time, bool SquaresAtSailChanges,
                       ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
-    std::list<PlotData> GetPlotData(bool cursor_route=false);
+    std::list<PlotData> &GetPlotData(bool cursor_route=false);
     double RouteInfo(enum RouteInfoType type, bool cursor_route=false);
     int Cyclones(int *months);
     Position *GetDestination() { return destination_position; }
@@ -101,4 +101,6 @@ private:
     bool m_bUpdated;
 
     int m_overlaylist;
+
+    std::list<PlotData> last_destination_plotdata, last_cursor_plotdata;
 };

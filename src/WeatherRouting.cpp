@@ -1266,68 +1266,68 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
             EndTime = endtime.Format(_T("%x %H:%M"));
         else
             EndTime = _T("N/A");
+        
+        wxDateTime starttime = routemapoverlay->StartTime();
+        if(starttime.IsValid() && endtime.IsValid()) {
+            wxTimeSpan span = endtime - starttime;
+            int days = span.GetDays();
+            span -= wxTimeSpan::Days(days);
+            int hours = span.GetHours();
+            span -= wxTimeSpan::Hours(hours);
+            double minutes = (double)span.GetSeconds().ToLong()/60.0;
+            span -= wxTimeSpan::Minutes(span.GetMinutes());
+            int seconds = (double)span.GetSeconds().ToLong();
+        
+            Time = (days ? wxString::Format(_T("%dd "), days) : _T("")) +
+                (hours || days ? wxString::Format(_T("%02d:%02d"), hours, (int)round(minutes)) :
+                 wxString::Format(_T("%02d %02d"), (int)floor(minutes), seconds));
+        } else
+            Time = _("N/A");
+
+        RouteMapConfiguration c = routemapoverlay->GetConfiguration();
+
+        Distance =  wxString::Format
+            (_T("%.0f/%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE),
+             DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon));
+    
+        AvgSpeed = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED));
+
+        MaxSpeed = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXSPEED));
+    
+        AvgSpeedGround = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEEDGROUND));
+
+        MaxSpeedGround = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXSPEEDGROUND));
+
+        AvgWind = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWIND));
+
+        MaxWind = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXWIND));
+
+        AvgCurrent = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGCURRENT));
+
+        MaxCurrent = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXCURRENT));
+
+        AvgSwell = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSWELL));
+
+        MaxSwell = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXSWELL));
+
+        UpwindPercentage = wxString::Format(_T("%.2f%%"), routemapoverlay->RouteInfo
+                                            (RouteMapOverlay::PERCENTAGE_UPWIND));
+
+        double ps = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
+        PortStarboard = wxString::Format(_T("%.0f/%.0f"), ps, 100-ps);
+
+        Tacks = wxString::Format(_T("%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::TACKS));
     }
-        
-    wxDateTime starttime = routemapoverlay->StartTime(), endtime = routemapoverlay->EndTime();
-    if(starttime.IsValid() && endtime.IsValid()) {
-        wxTimeSpan span = endtime - starttime;
-        int days = span.GetDays();
-        span -= wxTimeSpan::Days(days);
-        int hours = span.GetHours();
-        span -= wxTimeSpan::Hours(hours);
-        double minutes = (double)span.GetSeconds().ToLong()/60.0;
-        span -= wxTimeSpan::Minutes(span.GetMinutes());
-        int seconds = (double)span.GetSeconds().ToLong();
-        
-        Time = (days ? wxString::Format(_T("%dd "), days) : _T("")) +
-            (hours || days ? wxString::Format(_T("%02d:%02d"), hours, (int)round(minutes)) :
-             wxString::Format(_T("%02d %02d"), (int)floor(minutes), seconds));
-    } else
-        Time = _("N/A");
-
-    RouteMapConfiguration c = routemapoverlay->GetConfiguration();
-
-    Distance =  wxString::Format
-        (_T("%.0f/%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE),
-         DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon));
-    
-    AvgSpeed = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED));
-
-    MaxSpeed = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXSPEED));
-    
-    AvgSpeedGround = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEEDGROUND));
-
-    MaxSpeedGround = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXSPEEDGROUND));
-
-    AvgWind = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGWIND));
-
-    MaxWind = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXWIND));
-
-    AvgCurrent = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGCURRENT));
-
-    MaxCurrent = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXCURRENT));
-
-    AvgSwell = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSWELL));
-
-    MaxSwell = wxString::Format
-        (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXSWELL));
-
-    UpwindPercentage = wxString::Format(_T("%.2f%%"), routemapoverlay->RouteInfo
-                                        (RouteMapOverlay::PERCENTAGE_UPWIND));
-
-    double ps = routemapoverlay->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
-    PortStarboard = wxString::Format(_T("%.0f/%.0f"), ps, 100-ps);
-
-    Tacks = wxString::Format(_T("%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::TACKS));
 
     if(!routemapoverlay->Valid())
         State = _("Invalid Start/End");
@@ -1366,83 +1366,85 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
     }
 }
 
-void WeatherRouting::UpdateItem(long index)
+void WeatherRouting::UpdateItem(long index, bool stateonly)
 {
     WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
         (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
 
-    if(columns[VISIBLE] >= 0) {
-        m_lWeatherRoutes->SetItemImage(index, weatherroute->routemapoverlay->m_bEndRouteVisible ? 0 : -1);
-        m_lWeatherRoutes->SetColumnWidth(columns[VISIBLE], 28);
-    }
+    if(!stateonly) {
+        if(columns[VISIBLE] >= 0) {
+            m_lWeatherRoutes->SetItemImage(index, weatherroute->routemapoverlay->m_bEndRouteVisible ? 0 : -1);
+            m_lWeatherRoutes->SetColumnWidth(columns[VISIBLE], 28);
+        }
 
-    if(columns[START] >= 0) {
-        m_lWeatherRoutes->SetItem(index, columns[START], weatherroute->Start);
-        m_lWeatherRoutes->SetColumnWidth(columns[START], wxLIST_AUTOSIZE);
-    }
+        if(columns[START] >= 0) {
+            m_lWeatherRoutes->SetItem(index, columns[START], weatherroute->Start);
+            m_lWeatherRoutes->SetColumnWidth(columns[START], wxLIST_AUTOSIZE);
+        }
 
-    if(columns[STARTTIME] >= 0) {
-        m_lWeatherRoutes->SetItem(index, columns[STARTTIME], weatherroute->StartTime);
-        m_lWeatherRoutes->SetColumnWidth(columns[STARTTIME], wxLIST_AUTOSIZE);
-    }
+        if(columns[STARTTIME] >= 0) {
+            m_lWeatherRoutes->SetItem(index, columns[STARTTIME], weatherroute->StartTime);
+            m_lWeatherRoutes->SetColumnWidth(columns[STARTTIME], wxLIST_AUTOSIZE);
+        }
 
-    if(columns[END] >= 0) {
-        m_lWeatherRoutes->SetItem(index, columns[END], weatherroute->End);
-        m_lWeatherRoutes->SetColumnWidth(columns[END], wxLIST_AUTOSIZE);
-    }
+        if(columns[END] >= 0) {
+            m_lWeatherRoutes->SetItem(index, columns[END], weatherroute->End);
+            m_lWeatherRoutes->SetColumnWidth(columns[END], wxLIST_AUTOSIZE);
+        }
 
-    if(columns[ENDTIME] >= 0) {
-        m_lWeatherRoutes->SetItem(index, columns[ENDTIME], weatherroute->EndTime);
-        m_lWeatherRoutes->SetColumnWidth(columns[ENDTIME], wxLIST_AUTOSIZE);
-    }
+        if(columns[ENDTIME] >= 0) {
+            m_lWeatherRoutes->SetItem(index, columns[ENDTIME], weatherroute->EndTime);
+            m_lWeatherRoutes->SetColumnWidth(columns[ENDTIME], wxLIST_AUTOSIZE);
+        }
 
-    if(columns[TIME] >= 0) {
-        m_lWeatherRoutes->SetItem(index, columns[TIME], weatherroute->Time);
-        m_lWeatherRoutes->SetColumnWidth(columns[TIME], wxLIST_AUTOSIZE);
-    }
+        if(columns[TIME] >= 0) {
+            m_lWeatherRoutes->SetItem(index, columns[TIME], weatherroute->Time);
+            m_lWeatherRoutes->SetColumnWidth(columns[TIME], wxLIST_AUTOSIZE);
+        }
 
-    if(columns[DISTANCE] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[DISTANCE], weatherroute->Distance);
+        if(columns[DISTANCE] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[DISTANCE], weatherroute->Distance);
 
-    if(columns[AVGSPEED] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[AVGSPEED], weatherroute->AvgSpeed);
+        if(columns[AVGSPEED] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[AVGSPEED], weatherroute->AvgSpeed);
 
-    if(columns[MAXSPEED] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[MAXSPEED], weatherroute->MaxSpeed);
+        if(columns[MAXSPEED] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[MAXSPEED], weatherroute->MaxSpeed);
 
-    if(columns[AVGSPEEDGROUND] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[AVGSPEEDGROUND], weatherroute->AvgSpeedGround);
+        if(columns[AVGSPEEDGROUND] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[AVGSPEEDGROUND], weatherroute->AvgSpeedGround);
 
-    if(columns[MAXSPEEDGROUND] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[MAXSPEEDGROUND], weatherroute->MaxSpeedGround);
+        if(columns[MAXSPEEDGROUND] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[MAXSPEEDGROUND], weatherroute->MaxSpeedGround);
 
-    if(columns[AVGWIND] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[AVGWIND], weatherroute->AvgWind);
+        if(columns[AVGWIND] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[AVGWIND], weatherroute->AvgWind);
 
-    if(columns[MAXWIND] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[MAXWIND], weatherroute->MaxWind);
+        if(columns[MAXWIND] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[MAXWIND], weatherroute->MaxWind);
 
-    if(columns[AVGCURRENT] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[AVGCURRENT], weatherroute->AvgCurrent);
+        if(columns[AVGCURRENT] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[AVGCURRENT], weatherroute->AvgCurrent);
 
-    if(columns[MAXCURRENT] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[MAXCURRENT], weatherroute->MaxCurrent);
+        if(columns[MAXCURRENT] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[MAXCURRENT], weatherroute->MaxCurrent);
 
-    if(columns[AVGSWELL] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[AVGSWELL], weatherroute->AvgSwell);
+        if(columns[AVGSWELL] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[AVGSWELL], weatherroute->AvgSwell);
 
-    if(columns[MAXSWELL] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[MAXSWELL], weatherroute->MaxSwell);
+        if(columns[MAXSWELL] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[MAXSWELL], weatherroute->MaxSwell);
 
-    if(columns[UPWIND_PERCENTAGE] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[UPWIND_PERCENTAGE], weatherroute->UpwindPercentage);
+        if(columns[UPWIND_PERCENTAGE] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[UPWIND_PERCENTAGE], weatherroute->UpwindPercentage);
 
-    if(columns[PORT_STARBOARD] >= 0)
-        m_lWeatherRoutes->SetItem(index, columns[PORT_STARBOARD], weatherroute->PortStarboard);
+        if(columns[PORT_STARBOARD] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[PORT_STARBOARD], weatherroute->PortStarboard);
 
-    if(columns[TACKS] >= 0) {
-        m_lWeatherRoutes->SetItem(index, columns[TACKS], weatherroute->Tacks);
-        m_lWeatherRoutes->SetColumnWidth(columns[TACKS], wxLIST_AUTOSIZE);
+        if(columns[TACKS] >= 0) {
+            m_lWeatherRoutes->SetItem(index, columns[TACKS], weatherroute->Tacks);
+            m_lWeatherRoutes->SetColumnWidth(columns[TACKS], wxLIST_AUTOSIZE);
+        }
     }
 
     if(columns[STATE] >= 0) {
@@ -1471,7 +1473,7 @@ void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
         WeatherRoute *wr = reinterpret_cast<WeatherRoute*>
             (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
         if(weatherroute == wr) {
-            UpdateItem(index);
+            UpdateItem(index, true);
             break;
         }
     }
@@ -1508,7 +1510,7 @@ void WeatherRouting::UpdateStates()
         it != m_WeatherRoutes.end(); it++)
         (*it)->Update(this, true);
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
-        UpdateItem(i);
+        UpdateItem(i, true);
 }
 
 std::list <RouteMapOverlay *>WeatherRouting::CurrentRouteMaps(bool messagedialog)
