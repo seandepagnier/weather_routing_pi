@@ -186,21 +186,22 @@ becoming less efficient over the course of a very long passage.
 
 <p>Todo list:
 <ul>
-<li>Make position removal avoid rebuilding skip list
 <li>Fix backtracking anomallies
 
 <li>Make segment intersection test smarter and thus avoid deleting points in almost all cases
 <li>Optimize ll_gc_ll
 <li>Optimize climatology wind atlas
+<li>Improve boat polar computation
 <li>Analyze merging to keep monster route at end, possibly add a propagation skip
 <li>implement depth and overhead height from vector charts
 <li>fix runge kutta for grib to use the right timeslices
-<li>Improve boat polar computation
 <li>Optimize coastline detection, to build whole all submap cells at once when loading the cell
 <li>Fix merdian problem, so we split the world on the opposite of end longitude, and don't propagate past it
+<li>User option for grid reduction resolution?
 <li>Determine best way way to reduce excessive propagations at the edge of graph
 <li>Fix inverted region anomallies, analyze child routes, and remove if end is not contained
 <li>Optimize end calculation by using only positions which are parents of non-propagated positions
+<li>Make position removal avoid rebuilding skip list
 </ul>
 
 <p><h4>The Weather Routing plugin is written and maintained by <a href="http://seandepagnier.users.sourceforge.net">Sean D'Epagnier</a></h4> Please contact me with questions, suggestions and feedback.

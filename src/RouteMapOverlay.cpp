@@ -150,7 +150,7 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
     }
 }
 
-void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronThickness,
+void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color,
                                      ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     SkipPosition *s = r->skippoints;
@@ -172,7 +172,7 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronT
     /* now render any children */
     wxColour cyan(0, 255, 255);
     for(IsoRouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
-        RenderIsoRoute(*it, cyan, IsoChronThickness, dc, vp);
+        RenderIsoRoute(*it, cyan, dc, vp);
 }
 
 void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
@@ -300,6 +300,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
             int IsoChronThickness = settingsdialog.m_sIsoChronThickness->GetValue();
             if(IsoChronThickness) {
+                SetWidth(dc, IsoChronThickness);
                 Lock();
                 int c = 0;
                 for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
@@ -307,7 +308,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                     wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
                 
                     for(IsoRouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
-                        RenderIsoRoute(*j, color, IsoChronThickness, dc, nvp);
+                        RenderIsoRoute(*j, color, dc, nvp);
                 
                     if(++c == (sizeof routecolors) / (sizeof *routecolors))
                         c = 0;

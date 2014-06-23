@@ -54,7 +54,7 @@ public:
     ~RouteMapOverlay();
 
     bool SetCursorLatLon(double lat, double lon);
-    void RenderIsoRoute(IsoRoute *r, wxColour &color, int IsoChronThickness,
+    void RenderIsoRoute(IsoRoute *r, wxColour &color,
                         ocpnDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute);

@@ -592,42 +592,69 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     double timeseconds = configuration.dt;
     double dist;
+
+    bool first_avoid = true;
+    Position *rp;
 //#define USE_FAST_TEST 1
 #if USE_FAST_TEST
     double d0, d1, d2;
     d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
 #else
-    double bearing1, bearing2, bearing3;
+    double bearing1, bearing2;
     ll_gc_ll_reverse(lat, lon, prev->lat, prev->lon, &bearing1, 0);
     if(bearing1 >= 180) bearing1 -= 360;
     ll_gc_ll_reverse(lat, lon, next->lat, next->lon, &bearing2, 0);
     if(bearing2 >= 180) bearing2 -= 360;
 #endif
 
-    int propagation_direction = 1, propagation_skips = 0;
-    std::list<double>::iterator it = configuration.DegreeSteps.begin(), orig_end = configuration.DegreeSteps.end();
-    it--;
-    orig_end--;
-    std::list<double>::iterator       end = orig_end;
-
-    for(;;) {
-        if(it == end)
-            break;
-
-        if(propagation_direction == -2)
-            propagation_direction = -1;
-
-    skipin:
-        if(propagation_direction==1) it++; else it--;
-        if(it == configuration.DegreeSteps.end()) /* skip past end node in circular linked list */
-        {  if(propagation_direction==1) it++; else it--; }
+    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
+        it != configuration.DegreeSteps.end(); it++) {
 
         double H = heading_resolve(*it);
         double B, VB, BG, VBG;
 
+        B = W + H; /* rotated relative to true wind */
+
+        bool current_propagated = false;
+#if 0
+        /* test to avoid extra computations related to backtracking,
+           this doesn't help a lot, but if we could stop, and reverse until
+           failing again, then we would avoid a lot of calculations.  If the
+           first test fails, simply skip to the opposite H and start from
+           there */
+        if(prev != next) {
+#if USE_FAST_TEST
+            d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
+            if(d1 > 0) {
+                if(d0 > 0) {
+                    d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
+                    current_propagated = d2 > 0;
+                } else
+                    current_propagated = true;
+            } else {
+                d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
+                current_propagated = d2 > 0;
+            }
+#else
+            double bearing3 = heading_resolve(B);
+            if((bearing1 > bearing2 && bearing3 > bearing2 && bearing3 < bearing1) ||
+               (bearing1 <= bearing2 && (bearing3 > bearing2 || bearing3 < bearing1))) {
+                if(first_avoid) {
+                    first_avoid = false;
+                    rp = new Position(this);
+                    rp->lat = (lat + parent->lat)/2;
+                    rp->lon = (lon + parent->lon)/2;
+                    rp->propagated = true;
+                    goto add_position;
+                } else
+                    continue;
+            }
+#endif
+        }
+#endif
+        {
         int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
                                                                time, lat, lon, daytime);
-        B = W + H; /* rotated relative to true wind */
 
         if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas,
                              B, VB, BG, VBG, dist, newsailplan))
@@ -660,69 +687,6 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             ll_gc_ll(lat, lon, BG, dist/6 + k2_dist/3 + k3_dist/3 + k4_dist/6, &dlat, &dlon);
         } else /* newtons method */
             ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
-
-        bool current_propagated = false;
-#if 0
-        /* test to avoid extra computations related to backtracking,
-           this doesn't help a lot, but if we could stop, and reverse until
-           failing again, then we would avoid a lot of calculations.  If the
-           first test fails, simply skip to the opposite H and start from
-           there */
-        if(prev != next && configuration.DegreeSteps.size() > 4) {
-#if USE_FAST_TEST
-            d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
-            if(d1 > 0) {
-                if(d0 > 0) {
-                    d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
-                    current_propagated = d2 > 0;
-                } else
-                    current_propagated = true;
-            } else {
-                d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
-                current_propagated = d2 > 0;
-            }
-#else
-            bearing3 = BG;
-            if(bearing1 > bearing2)
-                current_propagated = bearing3 > bearing2 && bearing3 < bearing1;
-            else
-                current_propagated = bearing3 > bearing2 || bearing3 < bearing1;
-#endif
-#if 1 // enable reversing direction to skip known backtracks
-            if(current_propagated) {
-                if(propagation_direction == 1) {
-                    if (count) {
-                        if(!points->prev->propagated) {
-                            propagation_direction = -2;
-                            end = it;
-                            if(++end == configuration.DegreeSteps.end())
-                                end++;
-                            it = orig_end;
-                            it++;
-                        }
-                    } else { // initial point was a miss.. skip ahead and try there?
-#if 1 // enable skipping ahead to try to get past known backtracks
-                        if(propagation_skips < 3) {
-                            for(unsigned int skip = 0; skip < configuration.DegreeSteps.size()/4; skip++)
-                                it++;
-                            if(it == configuration.DegreeSteps.end()) {
-                                printf("should never hit\n");
-                                it++;
-                            }
-
-                            orig_end = end = it;
-                            propagation_skips++;
-                            goto skipin;
-                        }
-#endif
-                    }
-                } else
-                    it = end; // finished after this one
-            }
-#endif
-        }
-#endif
-        propagation_skips = 4; // no more skips
 
         nrdlon = dlon;
         if(configuration.positive_longitudes && dlon < 0)
@@ -772,19 +736,16 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                 continue;
         }
 
-        Position *rp = new Position(dlat, dlon, this, H, newsailplan, tacks + tacked);
-
+        rp = new Position(dlat, dlon, this, H, newsailplan, tacks + tacked);
         rp->propagated = current_propagated;
+    }
+    add_position:
 
         if(points) {
             rp->prev=points->prev;
             rp->next=points;
             points->prev->next = rp;
             points->prev = rp;
-            
-            if(propagation_direction == -1) {
-                points = points->prev;
-            }
         } else {
             rp->prev = rp->next = rp;
             points = rp;
@@ -821,12 +782,7 @@ reset:
     }
 
     IsoRoute *nr = new IsoRoute(points->BuildSkipList());
-#if 1
     routelist.push_back(nr);
-#else
-    bool Normalize(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool inverted_regions);
-    Normalize(routelist, nr, nr, 0, configuration.InvertedRegions);
-#endif
     return true;
 }
 
@@ -1128,37 +1084,11 @@ bool IsoRoute::ContainsRoute(IsoRoute *r)
     return true; /* probably good to say it is contained in this unlikely case */
 }
 
+/* remove points which are right next to eachother on the graph to speed
+   computation time */
 void IsoRoute::ReduceClosePoints()
 {
-    return;
-
-    const double eps = 1e-5;
-#if 0
-    SkipPosition *s = skippoints;
-    do {
-        Position *p = s->point;
-        while(p != s->next->point) {
-            Position *n = p->next;
-            double dlat = p->lat - n->lat, dlon = p->lon - n->lon;
-            if(fabs(dlat) < eps && fabs(dlon) < eps) {
-                if(n != s->next->point) {
-                    p->next = n->next;
-                    n->next->prev = p;
-                    delete n;
-                } else {
-                    if(p != s->point) {
-                        p->prev->next = n;
-                        n->prev = p->prev;
-                        delete p;
-                    }
-                    break;
-                }
-            } else
-                p = n;
-        }
-        s = s->next;
-    } while(s != skippoints);
-#else
+    const double eps = 2e-5; /* resolution of 2 meters should be sufficient */
     Position *p = skippoints->point;
     while(p != skippoints->point->prev) {
         Position *n = p->next;
@@ -1173,7 +1103,6 @@ void IsoRoute::ReduceClosePoints()
 
     DeleteSkipPoints(skippoints);
     skippoints = p->BuildSkipList();
-#endif
 
     for(IsoRouteList::iterator it = children.begin();
         it != children.end(); it++)
@@ -1258,46 +1187,6 @@ bool checkskiplist(SkipPosition *s)
         s = s->next;
     } while(s != skippoints);
     return true;
-}
-
-/* nudge a position by a miniscule amount so it can pass the intersection test */
-void IsoRoute::PerturbPosition(SkipPosition *s, Position *p)
-{
-    if(s->next->point == p)
-        s = s->next;
-
-    double epsilon = 2e-6;
-    if(s->point == p) {
-        switch(s->quadrant + 4*s->prev->quadrant) {
-        case 1: case 3:
-        case 9:  case 11: p->lon -= epsilon; break;
-        case 4: case 6:
-        case 12: case 14: p->lon += epsilon; break;
-        case 2: case 7:   p->lat -= epsilon; break;
-        case 8: case 13:  p->lat += epsilon; break;
-        default: printf("invalid skip list\n");
-        }
-    } else {
-        switch(s->quadrant) {
-        case 0: case 2: p->lon -= epsilon;
-            if(p->lon >= p->next->lon) return;
-            break;
-        case 1: case 3: p->lon += epsilon;
-            if(p->lon <= p->next->lon) return;
-            break;
-        }
-
-        printf("perturb traffic jam\n");
-#if 0
-        PerturbPosition(s, p->next);
-#else
-        /* rebuild skip list */
-        Position *points = skippoints->point;
-        DeleteSkipPoints(skippoints);
-        skippoints = points->BuildSkipList();
-#endif
-    }
-
 }
 
 /* remove and delete a position given it's last skip position,
@@ -1657,9 +1546,6 @@ startnormalizing:
 #endif
     skip_bounds_compute:
 
-          static int c;
-          c++;
-    
     p = pstart;
     do {
       q = p->next;
@@ -1707,45 +1593,20 @@ startnormalizing:
         dir = TestIntersectionXY(px, py, qx, qy, rx, ry, sx, sy);
         switch(dir) {
         case -2:
-          route1->skippoints = spend;
-          route2->skippoints = ssend;
-#define RESOLVE_REMOVAL 1  // switch to try pertubation
-#if RESOLVE_REMOVAL
+          route1->skippoints = spend, route2->skippoints = ssend;
           route1->RemovePosition(sp, p);
-#else 
-            printf("-2\n");
-         route1->PerturbPosition(sp, p);
-#endif
           goto reset;
         case -3:
-          route1->skippoints = spend;
-          route2->skippoints = ssend;
-#if RESOLVE_REMOVAL
+          route1->skippoints = spend, route2->skippoints = ssend;
           route1->RemovePosition(sq, q);
-#else
-            printf("-3\n");
-          route1->PerturbPosition(sp, q);
-#endif 
           goto reset;
         case 2:
-          route1->skippoints = spend;
-          route2->skippoints = ssend;
-#if RESOLVE_REMOVAL
+          route1->skippoints = spend, route2->skippoints = ssend;
           route2->RemovePosition(sr, r);
-#else
-            printf("2\n");
-          route2->PerturbPosition(sr, r);
-#endif
           goto reset;
         case 3:
-          route1->skippoints = spend;
-          route2->skippoints = ssend;
-#if RESOLVE_REMOVAL
+          route1->skippoints = spend, route2->skippoints = ssend;
           route2->RemovePosition(ss, s);
-#else
-            printf("3\n");
-          route2->PerturbPosition(sr, s);
-#endif
           goto reset;
         case -1:
         case 1:
@@ -1762,6 +1623,9 @@ startnormalizing:
               /* inverted invalid test */
               if(route1->direction == 1 && route2->direction == -1)
                 goto skipmerge;
+          } else {
+              if(level == 0 && dir == -1 && route1->direction == 1)
+                  goto skipmerge;
           }
 
           SwapSegments(p, q, r, s); /* update position list */
@@ -1783,7 +1647,7 @@ startnormalizing:
               ssend = sp->next;
 
             if(level == 0) {
-              if(dir != route1->direction || sr->next->next == sr) { /* slight numerical error, or outer inversion */
+                if(dir != route1->direction || sr->next->next == sr) { /* slight numerical error, or outer inversion */
                 DeletePoints(r);
                 DeleteSkipPoints(sr);
               } else {
@@ -1797,15 +1661,15 @@ startnormalizing:
                       delete *it;
                     } else if(route1->direction == (*it)->direction) {
                       rl.push_back(*it); /* sibling */
-                    } else if((*it)->Count() < 16) {
-                      printf("too small to be a useful child: %d\n", (*it)->Count());
+                    } else if((*it)->Count() < 24) {
+//                      printf("too small to be a useful child: %d\n", (*it)->Count());
                       delete *it;
                     } else if(!(route1->skippoints=spend, route1->CompletelyContained(*it))) {
-                      printf("not correct to be child: %d\n", (*it)->Count());
+//                      printf("not correct to be child: %d\n", (*it)->Count());
                       delete *it;
                     } else { /* different direction contained.. it is a child */
                       /* we should merge it with the other children here */
-                      printf("Child route: %d\n", (*it)->Count());
+//                      printf("Child route: %d\n", (*it)->Count());
                       IsoRoute *child = *it;
                       child->parent = route1;
                       route1->children.push_back(child);
@@ -1932,12 +1796,12 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
     if(route1->ContainsRoute(route2)) {
         if(inverted_regions) {
             if(route1->direction == 1 && route2->direction == 1) {
-                int sc1 = route1->children.size();
-                int sc2 = route2->children.size();
                     /* if both region have children, they should get merged
                        correctly here instead of this */
-                if(sc1 && sc2)
-                    printf("both have children contains: %d %d\n", sc1, sc2);
+                //int sc1 = route1->children.size();
+                //int sc2 = route2->children.size();
+                //if(sc1 && sc2)
+                //printf("both have children contains: %d %d\n", sc1, sc2);
 
                 /* remove all of route2's children, route1 clears them
                    (unless they interected with route1 children which we don't handle yet */
@@ -1987,7 +1851,7 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
             } else {
                 /* this is a child route with a normal route completely inside..
                    a contrived situation it is, should not get here often */
-                printf("contrived delete: %d, %d\n", route1->Count(), route2->Count());
+//                printf("contrived delete: %d, %d\n", route1->Count(), route2->Count());
                 delete route2;
             }
         } else /* no inverted regions mode */
@@ -2337,7 +2201,29 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
             routelist.pop_front();
             IsoRouteList rl;
 
+#if 0
+            static int dbgcnt;
+            dbgcnt++;
+            if(dbgcnt==29213) {
+                printf("here\n");
+            }
+            int r1c = r1->Count(), r2c = r2->Count();
+#endif
             if(Merge(rl, r1, r2, 0, configuration.InvertedRegions)) {
+#if 0
+                if(r1c > 1 || r2c > 1) {
+                    double sum = 0;
+                    for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); it++)
+                        sum += (*it)->Count();
+
+                    if(origin.size()>20 && (r1c > sum || r2c > sum) && (r1c > 100 || r2c > 100) ) {
+                        printf("%d %d %d %d : ", origin.size(), dbgcnt, r1c, r2c);
+                        for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); it++)
+                            printf("%d ", (*it)->Count());
+                        printf("\n");
+                    }
+                }
+#endif
                 routelist.splice(routelist.end(), rl);
                 goto remerge;
             } else
@@ -2448,10 +2334,9 @@ bool RouteMap::Propagate()
             Unlock();
             return false;
         }
-#if 1
+
         for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
             (*it)->ReduceClosePoints();
-#endif
 
         update = new IsoChron(merged, time, grib);
     }

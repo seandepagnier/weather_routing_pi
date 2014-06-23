@@ -165,7 +165,8 @@ void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
 
     if(v == to) v -= by;
     for(; v >= from; v-=by)
-        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), 360-v));
+        if(v > 0 && v < 180)
+            m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), 360-v));
 
     Update();
 }
@@ -390,6 +391,17 @@ void ConfigurationDialog::Update()
                 configuration.DegreeSteps.push_back(positive_degrees(step));
             }
             configuration.DegreeSteps.sort();
+
+            /* delete duplicates */
+            double last = NAN;
+            for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
+                it != configuration.DegreeSteps.end();)
+                if(!isnan(last) && last == *it)
+                    configuration.DegreeSteps.erase(it);
+                else {
+                    last = *it;
+                    it++;
+                }
         }
 
         (*it)->SetConfiguration(configuration);

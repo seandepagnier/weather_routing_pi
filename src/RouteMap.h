@@ -114,7 +114,7 @@ public:
     void ReduceClosePoints();
 //    bool ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfiguration &configuration);
     void FindIsoRouteBounds(double bounds[4]);
-    void PerturbPosition(SkipPosition *s, Position *p);
+
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon, double *dist=0);
     bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib,
