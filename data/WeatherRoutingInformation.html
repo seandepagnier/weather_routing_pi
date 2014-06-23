@@ -45,7 +45,7 @@ can be viewed during grib playback.
 
 <p>
 <ul>
-  <li><b>Time Step</b> Time to sail before considering a course or sail change.  This is the difference between the isochrons on the map.  Generally the routes become faster with smaller time steps, so you can determine if the timestep is sufficient if doubling it gives a route very nearly as fast.</li>
+  <li><b>Time Step</b> Time to sail before considering a course or sail change.  This is the difference in time between the isochrons on the map.  Small time-steps are needed to navigate through narrow channels and give a more accurate result.  Generally the route's computed time becomes faster with smaller time steps as it can find a more optimal route with more variation, however it will take longer to calculate (generally 4 times longer for each time step doubling).</li>
   <li><b>Grib</b> Enable using current grib from grib plugin.</li>
   <li><b>Climatology</b> <ul>
       <li><b>Disable</b> Do not allow climatology to be used.</li>
@@ -186,19 +186,20 @@ becoming less efficient over the course of a very long passage.
 
 <p>Todo list:
 <ul>
-<li>Fix backtracking anomallies
+<li>Finalize backtracking
 
-<li>Make segment intersection test smarter and thus avoid deleting points in almost all cases
+<li>Improve boat polar computation
 <li>Optimize ll_gc_ll
 <li>Optimize climatology wind atlas
-<li>Improve boat polar computation
 <li>Analyze merging to keep monster route at end, possibly add a propagation skip
 <li>implement depth and overhead height from vector charts
 <li>fix runge kutta for grib to use the right timeslices
+<li>Fix issues where routes are not fully normalized
 <li>Optimize coastline detection, to build whole all submap cells at once when loading the cell
 <li>Fix merdian problem, so we split the world on the opposite of end longitude, and don't propagate past it
 <li>User option for grid reduction resolution?
 <li>Determine best way way to reduce excessive propagations at the edge of graph
+<li>Make segment intersection test smarter and thus avoid deleting points in almost all cases
 <li>Fix inverted region anomallies, analyze child routes, and remove if end is not contained
 <li>Optimize end calculation by using only positions which are parents of non-propagated positions
 <li>Make position removal avoid rebuilding skip list

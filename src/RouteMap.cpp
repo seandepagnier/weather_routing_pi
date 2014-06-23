@@ -601,10 +601,25 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
 #else
     double bearing1, bearing2;
+#if 0
     ll_gc_ll_reverse(lat, lon, prev->lat, prev->lon, &bearing1, 0);
     if(bearing1 >= 180) bearing1 -= 360;
     ll_gc_ll_reverse(lat, lon, next->lat, next->lon, &bearing2, 0);
     if(bearing2 >= 180) bearing2 -= 360;
+    const double delta = 3;
+    bearing2 += delta;
+    bearing1 -= delta;
+#endif
+
+    double theta = 90;
+    if(parent) {
+        double parent_bearing;
+        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parent_bearing, 0);
+
+        bearing1 = heading_resolve( parent_bearing - theta);
+        bearing2 = heading_resolve( parent_bearing + theta);
+    }
+
 #endif
 
     for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
@@ -616,13 +631,13 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         B = W + H; /* rotated relative to true wind */
 
         bool current_propagated = false;
-#if 0
+#if 1
         /* test to avoid extra computations related to backtracking,
            this doesn't help a lot, but if we could stop, and reverse until
            failing again, then we would avoid a lot of calculations.  If the
            first test fails, simply skip to the opposite H and start from
            there */
-        if(prev != next) {
+        if(prev != next && theta <= 179) {
 #if USE_FAST_TEST
             d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
             if(d1 > 0) {
@@ -638,7 +653,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 #else
             double bearing3 = heading_resolve(B);
             if((bearing1 > bearing2 && bearing3 > bearing2 && bearing3 < bearing1) ||
-               (bearing1 <= bearing2 && (bearing3 > bearing2 || bearing3 < bearing1))) {
+               (bearing1 < bearing2 && (bearing3 > bearing2 || bearing3 < bearing1))) {
                 if(first_avoid) {
                     first_avoid = false;
                     rp = new Position(this);
@@ -753,28 +768,6 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         count++;
     }
 
-#if 0 // remove strings that are already propagated */
-reset:
-    Position *p = points;
-    while(count >= 3) {
-        Position *pn = p->next;
-        if(p->prev->propagated && p->propagated && p->next->propagated) {
-            p->prev->next = p->next;
-            p->next->prev = p->prev;
-            delete p;
-            count--;
-            if(p == points) {
-                points = pn;
-                goto reset;
-            }
-        }
-        p = pn;
-        if(p == points)
-            break;
-    }
-
-#endif
-
     if(count < 3) { /* would get eliminated anyway, but save the extra steps */
         if(count)
             DeletePoints(points);
@@ -825,8 +818,9 @@ double Position::PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
             return NAN;
     } while((bearing - BG) > 1e-3);
 
-    /* landfall test */
-    if(configuration.DetectLand && CrossesLand(configuration.EndLat, configuration.EndLon))
+    /* landfall test if we are within 60 miles (otherwise it's very slow) */
+    if(configuration.DetectLand && dist < 60
+       && CrossesLand(configuration.EndLat, configuration.EndLon))
         return NAN;
 
     /* crosses cyclone track(s)? */
@@ -925,6 +919,17 @@ void DeleteSkipPoints(SkipPosition *skippoints)
 IsoRoute::IsoRoute(SkipPosition *s, int dir)
     : skippoints(s), direction(dir), parent(NULL)
 {
+#if 1
+            /* make sure the skip points start at the minimum
+               latitude so we know we are on the outside */
+            SkipPosition *min = skippoints, *cur = skippoints;
+            do {
+                if(cur->point->lat < min->point->lat)
+                    min = cur;
+                cur = cur->next;
+            } while(cur != skippoints);
+            skippoints = min;
+#endif
 }
 
 /* copy constructor */
@@ -1647,7 +1652,8 @@ startnormalizing:
               ssend = sp->next;
 
             if(level == 0) {
-                if(dir != route1->direction || sr->next->next == sr) { /* slight numerical error, or outer inversion */
+              /* slight numerical error, or outer inversion */
+              if(dir != route1->direction || sr->next->next == sr) {
                 DeletePoints(r);
                 DeleteSkipPoints(sr);
               } else {
@@ -1759,6 +1765,19 @@ startnormalizing:
 
   if(normalizing) {
     route1->skippoints = spend;
+
+#if 1
+            /* make sure the skip points start at the minimum
+               latitude so we know we are on the outside */
+            SkipPosition *min = route1->skippoints, *cur = route1->skippoints;
+            do {
+                if(cur->point->lat < min->point->lat)
+                    min = cur;
+                cur = cur->next;
+            } while(cur != route1->skippoints);
+            route1->skippoints = min;
+#endif
+
     rl.push_back(route1);
     return true;
   }
@@ -2204,7 +2223,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
 #if 0
             static int dbgcnt;
             dbgcnt++;
-            if(dbgcnt==29213) {
+            if(dbgcnt==681019) {
                 printf("here\n");
             }
             int r1c = r1->Count(), r2c = r2->Count();
@@ -2216,7 +2235,7 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
                     for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); it++)
                         sum += (*it)->Count();
 
-                    if(origin.size()>20 && (r1c > sum || r2c > sum) && (r1c > 100 || r2c > 100) ) {
+                    if((r1c > 2*sum || r2c > 2*sum) && (r1c > 100 || r2c > 100) ) {
                         printf("%d %d %d %d : ", origin.size(), dbgcnt, r1c, r2c);
                         for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); it++)
                             printf("%d ", (*it)->Count());

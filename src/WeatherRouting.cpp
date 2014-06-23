@@ -476,9 +476,9 @@ void WeatherRouting::OnDelete( wxCommandEvent& event )
 void WeatherRouting::OnDeleteAll( wxCommandEvent& event )
 {
     std::list<RouteMapOverlay *>allroutemapoverlays;
-    while(m_lWeatherRoutes->GetItemCount()) {
+    for(int i=0; i< m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(0)));
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
         allroutemapoverlays.push_back(weatherroute->routemapoverlay);
     }
 
@@ -1252,6 +1252,8 @@ void WeatherRouting::UpdateRouteMap(RouteMapOverlay *routemapoverlay)
     }
 }
 
+/* we could speed this up more with another flag for when we need to update
+   parameters but not computed route information */
 void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
 {
     if(!stateonly) {
@@ -1284,11 +1286,10 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
         } else
             Time = _("N/A");
 
-        RouteMapConfiguration c = routemapoverlay->GetConfiguration();
-
         Distance =  wxString::Format
             (_T("%.0f/%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE),
-             DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon));
+             DistGreatCircle_Plugin(configuration.StartLat, configuration.StartLon,
+                                    configuration.EndLat, configuration.EndLon));
     
         AvgSpeed = wxString::Format
             (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGSPEED));
@@ -1342,15 +1343,15 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
                 State = _T("");
                 if(routemapoverlay->GribFailed()) {
                     State = _("Grib");
-                    State += _T(" ");
+                    State += _T(": ");
                 }
                 if(routemapoverlay->ClimatologyFailed()) {
                     State = _("Climatology");
-                    State += _T(" ");
+                    State += _T(": ");
                 }
                 if(routemapoverlay->NoData()) {
                     State = _("No Data");
-                    State += _T(" ");
+                    State += _T(": ");
                 }
                 State += _("Failed");
             }
@@ -1473,7 +1474,7 @@ void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
         WeatherRoute *wr = reinterpret_cast<WeatherRoute*>
             (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
         if(weatherroute == wr) {
-            UpdateItem(index, true);
+            UpdateItem(index);
             break;
         }
     }
