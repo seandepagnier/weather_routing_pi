@@ -1036,13 +1036,13 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.Integrator = (RouteMapConfiguration::IntegratorType)
                         AttributeInt(e, "Integrator", 0);
 
-                    configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 180);
-                    configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 180);
+                    configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 90);
+                    configuration.MaxCourseAngle = AttributeDouble(e, "MaxCourseAngle", 180);
+                    configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 120);
                     configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
-                    configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
 
+                    configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
                     configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
-                    configuration.MaxTacks = AttributeDouble(e, "MaxTacks", -1);
                     configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
                     configuration.WindVSCurrent = AttributeDouble(e, "WindVSCurrent", 0);
 
@@ -1134,12 +1134,12 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("Integrator", configuration.Integrator);
 
         c->SetAttribute("MaxDivertedCourse", configuration.MaxDivertedCourse);
+        c->SetAttribute("MaxCourseAngle", configuration.MaxCourseAngle);
         c->SetAttribute("MaxSearchAngle", configuration.MaxSearchAngle);
         c->SetAttribute("MaxWindKnots", configuration.MaxWindKnots);
-        c->SetAttribute("MaxSwellMeters", configuration.MaxSwellMeters);
 
+        c->SetAttribute("MaxSwellMeters", configuration.MaxSwellMeters);
         c->SetAttribute("MaxLatitude", configuration.MaxLatitude);
-        c->SetAttribute("MaxTacks", configuration.MaxTacks);
         c->SetAttribute("TackingTime", configuration.TackingTime);
         c->SetAttribute("WindVSCurrent", configuration.WindVSCurrent);
 
@@ -1454,8 +1454,8 @@ void WeatherRouting::UpdateItem(long index, bool stateonly)
     }
 }
 
-void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
-                                           WeatherRoute *weatherroute)
+// The configuration changed, so stop computation and update the display in the list
+void WeatherRouting::SetConfigurationRoute(WeatherRoute *weatherroute)
 {
     if(m_bSkipUpdateCurrentItems)
         return;
@@ -1465,8 +1465,6 @@ void WeatherRouting::SetConfigurationRoute(RouteMapConfiguration configuration,
         it != m_RunningRouteMaps.end(); it++)
         if(*it == rmo && rmo->Running())
             rmo->DeleteThread();
-
-    rmo->SetConfiguration(configuration);
 
     weatherroute->Update(this);
 
@@ -1488,7 +1486,7 @@ void WeatherRouting::UpdateBoatFilename(wxString boatFileName)
 
         RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
         if(c.boatFileName == boatFileName)
-            SetConfigurationRoute(c, weatherroute);
+            SetConfigurationRoute(weatherroute);
     }
 }
 
@@ -1501,7 +1499,7 @@ void WeatherRouting::UpdateCurrentConfigurations()
             break;
         WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
             (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
-        SetConfigurationRoute(weatherroute->routemapoverlay->GetConfiguration(), weatherroute);
+        SetConfigurationRoute(weatherroute);
     }
 }
 
@@ -1640,24 +1638,14 @@ void WeatherRouting::Stop()
         (*it)->Stop();
 
     wxProgressDialog *progressdialog = NULL;
-//    wxDateTime start = wxDateTime::UNow();
 
     int c = 0;
     for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
         it != m_RunningRouteMaps.end(); it++) {
-        while((*it)->Running()) {
-/* progress dialog calls event loop!!
-            wxDateTime now = wxDateTime::UNow();
-            if(!progressdialog && (now - start).GetMilliseconds() > 300) {
-                progressdialog = new wxProgressDialog(_("Weather Routing"),
-                                                      _("Waiting for threads to finish"),
-                                                      m_RunningRouteMaps.size(), this,
-                                                      wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
-                progressdialog->Update(c);
-            }
-*/
+        // Wait for threads to finish
+        while((*it)->Running())
             wxThread::Sleep(100);
-        }
+
         (*it)->ResetFinished();
         (*it)->DeleteThread();
 
@@ -1776,12 +1764,12 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.Integrator = RouteMapConfiguration::NEWTON;
 
     configuration.MaxDivertedCourse = 90;
-    configuration.MaxSearchAngle = 180;
+    configuration.MaxCourseAngle = 180;
+    configuration.MaxSearchAngle = 120;
     configuration.MaxWindKnots = 100;
-    configuration.MaxSwellMeters = 20;
 
+    configuration.MaxSwellMeters = 20;
     configuration.MaxLatitude = 90;
-    configuration.MaxTacks = -1;
     configuration.TackingTime = 0;
     configuration.WindVSCurrent = 0;
     

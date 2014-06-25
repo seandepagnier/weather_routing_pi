@@ -88,8 +88,7 @@ public:
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
 
-    void SetConfigurationRoute(RouteMapConfiguration configuration,
-                               WeatherRoute *weatherroute);
+    void SetConfigurationRoute(WeatherRoute *weatherroute);
     void UpdateBoatFilename(wxString boatFileName);
 
     void UpdateCurrentConfigurations();

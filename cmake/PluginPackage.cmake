@@ -74,10 +74,16 @@ IF(UNIX AND NOT APPLE)
 #    ENDIF(RPMTools_FOUND)
 
 # need apt-get install rpm, for rpmbuild
-    SET(CPACK_GENERATOR "DEB;RPM;TBZ2")
-
     SET(PACKAGE_DEPS "opencpn, bzip2, gzip")
     SET(PACKAGE_RELEASE 1)
+
+
+  IF (CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
+    SET (ARCH "armhf")
+    # don't bother with rpm on armhf
+    SET(CPACK_GENERATOR "DEB;TBZ2")
+  ELSE ()
+    SET(CPACK_GENERATOR "DEB;RPM;TBZ2")
 
     IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
       SET (ARCH "amd64")
@@ -87,6 +93,7 @@ IF(UNIX AND NOT APPLE)
       # note: in a chroot must use "setarch i686 make package"
       SET(CPACK_RPM_PACKAGE_ARCHITECTURE "i686")
     ENDIF (CMAKE_SIZEOF_VOID_P MATCHES "8")
+  ENDIF ()
 
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS ${PACKAGE_DEPS})
     SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS ${PACKAGE_RECS})

@@ -530,14 +530,6 @@ bool rk_step(Position *p, double timeseconds, double BG, double dist, double H,
     return true;
 }
 
-inline double TestDirection(double x1, double y1, double x2, double y2, double x3, double y3)
-{
-    double ax = x2 - x1, ay = y2 - y1;
-    double bx = x2 - x3, by = y2 - y3;
-    double denom = ay * bx - ax * by;
-    return denom;
-}
-
 void DeletePoints(Position *point)
 {
     Position *p = point;
@@ -595,32 +587,16 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
     bool first_avoid = true;
     Position *rp;
-//#define USE_FAST_TEST 1
-#if USE_FAST_TEST
-    double d0, d1, d2;
-    d0 = TestDirection(prev->lat, prev->lon, lat, lon, next->lat, next->lon);
-#else
-    double bearing1, bearing2;
-#if 0
-    ll_gc_ll_reverse(lat, lon, prev->lat, prev->lon, &bearing1, 0);
-    if(bearing1 >= 180) bearing1 -= 360;
-    ll_gc_ll_reverse(lat, lon, next->lat, next->lon, &bearing2, 0);
-    if(bearing2 >= 180) bearing2 -= 360;
-    const double delta = 3;
-    bearing2 += delta;
-    bearing1 -= delta;
-#endif
 
-    double theta = 90;
-    if(parent) {
+    double bearing1 = NAN, bearing2;
+    if(parent && configuration.MaxSearchAngle < 180) {
+        // We could cache this in the position to avoid recalculating
         double parent_bearing;
         ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parent_bearing, 0);
 
-        bearing1 = heading_resolve( parent_bearing - theta);
-        bearing2 = heading_resolve( parent_bearing + theta);
+        bearing1 = heading_resolve( parent_bearing - configuration.MaxSearchAngle);
+        bearing2 = heading_resolve( parent_bearing + configuration.MaxSearchAngle);
     }
-
-#endif
 
     for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
         it != configuration.DegreeSteps.end(); it++) {
@@ -637,34 +613,22 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
            failing again, then we would avoid a lot of calculations.  If the
            first test fails, simply skip to the opposite H and start from
            there */
-        if(prev != next && theta <= 179) {
-#if USE_FAST_TEST
-            d1 = TestDirection(prev->lat, prev->lon, lat, lon, dlat, dlon);
-            if(d1 > 0) {
-                if(d0 > 0) {
-                    d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
-                    current_propagated = d2 > 0;
-                } else
-                    current_propagated = true;
-            } else {
-                d2 = TestDirection(dlat, dlon, lat, lon, next->lat, next->lon);
-                current_propagated = d2 > 0;
-            }
-#else
+        if(!isnan(bearing1)) {
             double bearing3 = heading_resolve(B);
             if((bearing1 > bearing2 && bearing3 > bearing2 && bearing3 < bearing1) ||
                (bearing1 < bearing2 && (bearing3 > bearing2 || bearing3 < bearing1))) {
                 if(first_avoid) {
+                    /* add a position behind the lines to ensure our route intersects
+                       with the previous one to nicely merge the resulting graph */
                     first_avoid = false;
                     rp = new Position(this);
                     rp->lat = (lat + parent->lat)/2;
                     rp->lon = (lon + parent->lon)/2;
-                    rp->propagated = true;
+                    rp->propagated = true; // not a "real" position so we don't propagate it either.
                     goto add_position;
                 } else
                     continue;
             }
-#endif
         }
 #endif
         {
@@ -679,9 +643,10 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         bool tacked = false;
         if(parent_heading*H < 0 && fabs(parent_heading - H) < 180) {
             timeseconds -= configuration.TackingTime;
-
+#if 0
             if(configuration.MaxTacks >= 0 && tacks >= configuration.MaxTacks)
                 continue;
+#endif
             tacked = true;
         }
 
@@ -707,11 +672,16 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         if(configuration.positive_longitudes && dlon < 0)
             dlon += 360;
 
-        if(configuration.MaxSearchAngle < 180) {
+        if(configuration.MaxCourseAngle < 180) {
             double bearing;
+#if 0
             ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, dlat, dlon, &bearing, 0);
-
-            if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxSearchAngle)
+#else
+            /* this is definately faster, and actually works better in higher latitudes */
+            double d1 = dlat - configuration.StartLat, d2 = dlon - configuration.StartLon;
+            bearing = rad2deg(atan2(d2, d1));
+#endif
+            if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxCourseAngle)
                 continue;
         }
 
@@ -919,17 +889,9 @@ void DeleteSkipPoints(SkipPosition *skippoints)
 IsoRoute::IsoRoute(SkipPosition *s, int dir)
     : skippoints(s), direction(dir), parent(NULL)
 {
-#if 1
-            /* make sure the skip points start at the minimum
-               latitude so we know we are on the outside */
-            SkipPosition *min = skippoints, *cur = skippoints;
-            do {
-                if(cur->point->lat < min->point->lat)
-                    min = cur;
-                cur = cur->next;
-            } while(cur != skippoints);
-            skippoints = min;
-#endif
+    /* make sure the skip points start at the minimum
+       latitude so we know we are on the outside */
+    MinimizeLat();
 }
 
 /* copy constructor */
@@ -976,6 +938,17 @@ void IsoRoute::PrintSkip()
         } while(s != skippoints);
         printf("\n");
     }
+}
+
+void IsoRoute::MinimizeLat()
+{
+    SkipPosition *min = skippoints, *cur = skippoints;
+    do {
+        if(cur->point->lat < min->point->lat)
+            min = cur;
+        cur = cur->next;
+    } while(cur != skippoints);
+    skippoints = min;
 }
 
 /* how many times do we cross this route going from this point to infinity,
@@ -1212,16 +1185,9 @@ void IsoRoute::RemovePosition(SkipPosition *s, Position *p)
                 points = points->next;
             DeleteSkipPoints(skippoints);
             skippoints = points->BuildSkipList();
-
             /* make sure the skip points start at the minimum
                latitude so we know we are on the outside */
-            SkipPosition *min = skippoints, *cur = skippoints;
-            do {
-                if(cur->point->lat < min->point->lat)
-                    min = cur;
-                cur = cur->next;
-            } while(cur != skippoints);
-            skippoints = min;
+            MinimizeLat();
         }
     }
     delete p;
@@ -1735,17 +1701,11 @@ startnormalizing:
           if( sp->point != orig_sppoint)
           {
               /* it is possible we are no longer on the outside
-                 so we find the min latitude in the skiplist and
-                 then reset to that (there is certainly a faster way to
-                 deal with this case, but it doesn't happen very often) */
-                SkipPosition *min = sp, *cur = sp;
-                do {
-                    if(cur->point->lat < min->point->lat)
-                        min = cur;
-                    cur = cur->next;
-                } while(cur != sp);
-                route1->skippoints = min;
-                goto reset;
+                 because of the skip list getting contracted
+                 so we must minimize the latitude at the start of the skiplist */
+              route1->skippoints = sp;
+              route1->MinimizeLat();
+              goto reset;
           }
 
           goto startnormalizing;
@@ -1766,18 +1726,9 @@ startnormalizing:
   if(normalizing) {
     route1->skippoints = spend;
 
-#if 1
-            /* make sure the skip points start at the minimum
-               latitude so we know we are on the outside */
-            SkipPosition *min = route1->skippoints, *cur = route1->skippoints;
-            do {
-                if(cur->point->lat < min->point->lat)
-                    min = cur;
-                cur = cur->next;
-            } while(cur != route1->skippoints);
-            route1->skippoints = min;
-#endif
-
+    /* make sure the skip points start at the minimum
+       latitude so we know we are on the outside */
+    route1->MinimizeLat();
     rl.push_back(route1);
     return true;
   }
@@ -1986,9 +1937,10 @@ void IsoRoute::PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
         if(p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
             tacked = true;
             dt += configuration.TackingTime;
-        
+#if 0        
             if(configuration.MaxTacks >= 0 && p->tacks >= configuration.MaxTacks)
                 dt = NAN;
+#endif
         }
 
         if(!isnan(dt) && dt < mindt) {

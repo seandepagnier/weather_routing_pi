@@ -11,8 +11,8 @@ PROJECT(weather_routing_pi)
 SET(PACKAGE_NAME weather_routing_pi)
 SET(CPACK_PACKAGE_CONTACT "Sean D'Epagnier ")
 
-SET(VERSION_MAJOR "0")
-SET(VERSION_MINOR "12")
+SET(VERSION_MAJOR "1")
+SET(VERSION_MINOR "0")
 
 INCLUDE("cmake/PluginConfigure.cmake")
 

@@ -243,12 +243,12 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX_FIELD(RungeKutta, (*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA);
 
     SET_SPIN(MaxDivertedCourse);
+    SET_SPIN(MaxCourseAngle);
     SET_SPIN(MaxSearchAngle);
     SET_SPIN(MaxWindKnots);
-    SET_SPIN(MaxSwellMeters);
 
+    SET_SPIN(MaxSwellMeters);
     SET_SPIN(MaxLatitude);
-    SET_SPIN(MaxTacks);
     SET_SPIN(TackingTime);
     SET_SPIN(WindVSCurrent);
 
@@ -320,11 +320,13 @@ void ConfigurationDialog::Update()
     if(m_bBlockUpdate)
         return;
 
+    bool refresh = false;
+    RouteMapConfiguration configuration;
     std::list<RouteMapOverlay*> currentroutemaps = m_WeatherRouting.CurrentRouteMaps();
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++) {
 
-        RouteMapConfiguration configuration = (*it)->GetConfiguration();
+        configuration = (*it)->GetConfiguration();
 
         if(!m_cStart->GetValue().empty())
             configuration.Start = m_cStart->GetValue();
@@ -357,12 +359,12 @@ void ConfigurationDialog::Update()
             configuration.Integrator = RouteMapConfiguration::RUNGE_KUTTA;
 
         GET_SPIN(MaxDivertedCourse);
+        GET_SPIN(MaxCourseAngle);
         GET_SPIN(MaxSearchAngle);
         GET_SPIN(MaxWindKnots);
-        GET_SPIN(MaxSwellMeters);
 
+        GET_SPIN(MaxSwellMeters);
         GET_SPIN(MaxLatitude);
-        GET_SPIN(MaxTacks);
         GET_SPIN(TackingTime);
         GET_SPIN(WindVSCurrent);
 
@@ -405,15 +407,21 @@ void ConfigurationDialog::Update()
         }
 
         (*it)->SetConfiguration(configuration);
+
+        /* if the start position changed, we must reset the route */
+        RouteMapConfiguration newc = (*it)->GetConfiguration();
+        if(newc.StartLat != configuration.StartLat || newc.StartLon != configuration.StartLon) {
+            (*it)->Reset();
+            refresh = true;
+        } else if(newc.EndLat != configuration.EndLat || newc.EndLon != configuration.EndLon)
+            refresh = true; // update drawing X
     }
 
-#if 0    
     if(configuration.dt == 0) {
-        wxMessageDialog mdlg(this, _("Zero Time Step invalid"),
+        wxMessageDialog mdlg(this, _("Zero Time Step is invalid"),
                              _("Weather Routing"), wxOK | wxICON_WARNING);
         mdlg.ShowModal();
     }
-#endif
 
     if(m_lDegreeSteps->GetCount() < 4) {
         wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
@@ -422,4 +430,7 @@ void ConfigurationDialog::Update()
     }
 
     m_WeatherRouting.UpdateCurrentConfigurations();
+
+    if(refresh)
+        m_WeatherRouting.GetParent()->Refresh();
 }

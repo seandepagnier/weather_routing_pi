@@ -720,11 +720,22 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText1181->Wrap( -1 );
 	fgSizer110->Add( m_staticText1181, 0, wxALL, 5 );
 	
+	m_staticText119 = new wxStaticText( m_panel11, wxID_ANY, _("Max Course Angle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText119->Wrap( -1 );
+	fgSizer110->Add( m_staticText119, 0, wxALL, 5 );
+	
+	m_sMaxCourseAngle = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 180 );
+	fgSizer110->Add( m_sMaxCourseAngle, 0, wxALL, 5 );
+	
+	m_staticText1251 = new wxStaticText( m_panel11, wxID_ANY, _("degrees"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1251->Wrap( -1 );
+	fgSizer110->Add( m_staticText1251, 0, wxALL, 5 );
+	
 	m_staticText124 = new wxStaticText( m_panel11, wxID_ANY, _("Max Search Angle"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText124->Wrap( -1 );
 	fgSizer110->Add( m_staticText124, 0, wxALL, 5 );
 	
-	m_sMaxSearchAngle = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 180 );
+	m_sMaxSearchAngle = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 180, 120 );
 	fgSizer110->Add( m_sMaxSearchAngle, 0, wxALL, 5 );
 	
 	m_staticText125 = new wxStaticText( m_panel11, wxID_ANY, _("degrees"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -742,17 +753,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText128->Wrap( -1 );
 	fgSizer110->Add( m_staticText128, 0, wxALL, 5 );
 	
-	m_staticText27 = new wxStaticText( m_panel11, wxID_ANY, _("Max Swell"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText27->Wrap( -1 );
-	fgSizer110->Add( m_staticText27, 0, wxALL, 5 );
-	
-	m_sMaxSwellMeters = new wxSpinCtrl( m_panel11, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 20 );
-	fgSizer110->Add( m_sMaxSwellMeters, 0, wxALL, 5 );
-	
-	m_staticText129 = new wxStaticText( m_panel11, wxID_ANY, _("meters"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText129->Wrap( -1 );
-	fgSizer110->Add( m_staticText129, 0, wxALL, 5 );
-	
 	
 	m_panel11->SetSizer( fgSizer110 );
 	m_panel11->Layout();
@@ -763,6 +763,17 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer951 = new wxFlexGridSizer( 0, 3, 0, 0 );
 	fgSizer951->SetFlexibleDirection( wxBOTH );
 	fgSizer951->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText27 = new wxStaticText( m_panel12, wxID_ANY, _("Max Swell"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText27->Wrap( -1 );
+	fgSizer951->Add( m_staticText27, 0, wxALL, 5 );
+	
+	m_sMaxSwellMeters = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 20 );
+	fgSizer951->Add( m_sMaxSwellMeters, 0, wxALL, 5 );
+	
+	m_staticText129 = new wxStaticText( m_panel12, wxID_ANY, _("meters"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText129->Wrap( -1 );
+	fgSizer951->Add( m_staticText129, 0, wxALL, 5 );
 	
 	m_staticText26 = new wxStaticText( m_panel12, wxID_ANY, _("Max Latitude +-"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText26->Wrap( -1 );
@@ -775,17 +786,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText131->Wrap( -1 );
 	fgSizer951->Add( m_staticText131, 0, wxALL, 5 );
 	
-	m_staticText1131 = new wxStaticText( m_panel12, wxID_ANY, _("Max # of Tacks"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1131->Wrap( -1 );
-	fgSizer951->Add( m_staticText1131, 0, wxALL, 5 );
-	
-	m_sMaxTacks = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, -1, 10000, -1 );
-	fgSizer951->Add( m_sMaxTacks, 0, wxALL, 5 );
-	
-	m_staticText1141 = new wxStaticText( m_panel12, wxID_ANY, _("(-1 for unlimited)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1141->Wrap( -1 );
-	fgSizer951->Add( m_staticText1141, 0, wxALL, 5 );
-	
 	m_staticText24 = new wxStaticText( m_panel12, wxID_ANY, _("Tacking Time"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText24->Wrap( -1 );
 	fgSizer951->Add( m_staticText24, 0, wxALL, 5 );
@@ -793,9 +793,9 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sTackingTime = new wxSpinCtrl( m_panel12, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 1000, 10 );
 	fgSizer951->Add( m_sTackingTime, 0, wxALL, 5 );
 	
-	m_staticText1191 = new wxStaticText( m_panel12, wxID_ANY, _("seconds"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1191->Wrap( -1 );
-	fgSizer951->Add( m_staticText1191, 0, wxALL, 5 );
+	m_staticText121 = new wxStaticText( m_panel12, wxID_ANY, _("(0 to disable)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText121->Wrap( -1 );
+	fgSizer951->Add( m_staticText121, 0, wxALL, 5 );
 	
 	m_staticText120 = new wxStaticText( m_panel12, wxID_ANY, _("Wind vs Current"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText120->Wrap( -1 );
@@ -803,10 +803,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	m_sWindVSCurrent = new wxSpinCtrl( m_panel12, wxID_ANY, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 100, 0 );
 	fgSizer951->Add( m_sWindVSCurrent, 0, wxALL, 5 );
-	
-	m_staticText121 = new wxStaticText( m_panel12, wxID_ANY, _("(0 to disable)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText121->Wrap( -1 );
-	fgSizer951->Add( m_staticText121, 0, wxALL, 5 );
 	
 	
 	m_panel12->SetSizer( fgSizer951 );
@@ -936,7 +932,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText113->Wrap( -1 );
 	fgSizer107->Add( m_staticText113, 0, wxALL, 5 );
 	
-	m_tFromDegrees = new wxTextCtrl( this, wxID_ANY, _("45"), wxDefaultPosition, wxSize( 40,-1 ), 0 );
+	m_tFromDegrees = new wxTextCtrl( this, wxID_ANY, _("0"), wxDefaultPosition, wxSize( 40,-1 ), 0 );
 	fgSizer107->Add( m_tFromDegrees, 0, wxALL, 5 );
 	
 	m_staticText114 = new wxStaticText( this, wxID_ANY, _("Degrees"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -947,7 +943,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText115->Wrap( -1 );
 	fgSizer107->Add( m_staticText115, 0, wxALL, 5 );
 	
-	m_tToDegrees = new wxTextCtrl( this, wxID_ANY, _("170"), wxDefaultPosition, wxSize( 40,-1 ), 0 );
+	m_tToDegrees = new wxTextCtrl( this, wxID_ANY, _("180"), wxDefaultPosition, wxSize( 40,-1 ), 0 );
 	fgSizer107->Add( m_tToDegrees, 0, wxALL, 5 );
 	
 	m_staticText116 = new wxStaticText( this, wxID_ANY, _("Degrees"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1034,6 +1030,20 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sMaxDivertedCourse->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxDivertedCourse->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxDivertedCourse->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxSearchAngle->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSearchAngle->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSearchAngle->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
@@ -1066,8 +1076,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sMaxSwellMeters->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxLatitude->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxLatitude->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sMaxTacks->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sMaxTacks->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
@@ -1136,6 +1144,20 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sMaxDivertedCourse->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxDivertedCourse->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxDivertedCourse->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_MIDDLE_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_RIGHT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_MIDDLE_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_RIGHT_DCLICK, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_LEAVE_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sMaxCourseAngle->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxSearchAngle->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSearchAngle->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSearchAngle->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
@@ -1168,8 +1190,6 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sMaxSwellMeters->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sMaxLatitude->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxLatitude->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sMaxTacks->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sMaxTacks->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_LEFT_UP, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_MIDDLE_DOWN, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );

@@ -79,8 +79,8 @@ public:
 
 /* circular skip list of positions which point to where we
    change direction of quadrant.
-   That way we can eliminate a long string of positions very quickly
-   all go in the same direction.  */
+   That way we can skip past a long string of positions very quickly
+   when they all go in the same direction.  */
 class SkipPosition
 {
 public:
@@ -105,6 +105,7 @@ public:
     void Print(); /* for debugging */
     void PrintSkip();
 
+    void MinimizeLat();
     int IntersectionCount(Position &pos);
     int Contains(Position &pos, bool test_children);
 
@@ -180,8 +181,8 @@ struct RouteMapConfiguration {
     enum IntegratorType { NEWTON, RUNGE_KUTTA };
     IntegratorType Integrator;
 
-    double MaxDivertedCourse, MaxSearchAngle, MaxWindKnots, MaxSwellMeters;
-    double MaxLatitude, MaxTacks, TackingTime, WindVSCurrent;
+    double MaxDivertedCourse, MaxCourseAngle, MaxSearchAngle, MaxWindKnots;
+    double MaxSwellMeters, MaxLatitude, TackingTime, WindVSCurrent;
 
     bool AvoidCycloneTracks;
     int CycloneMonths, CycloneDays;
