@@ -185,7 +185,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 
         if(m_pWeather_Routing) {
             m_pWeather_Routing->m_ConfigurationDialog.m_GribTimelineTime = time;
-            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseGrib->Enable();
+//            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseGrib->Enable();
             RequestRefresh(m_parent_window);
         }
     }

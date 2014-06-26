@@ -280,9 +280,10 @@ void WeatherRouting::UpdateColumns()
     m_lWeatherRoutes->DeleteAllColumns();
 
     for(int i=0; i<NUM_COLS; i++) {
-        if(m_SettingsDialog.m_cblFields->IsChecked(i))
-            columns[i] = m_lWeatherRoutes->InsertColumn(m_lWeatherRoutes->GetColumnCount(), column_names[i]);
-        else
+        if(m_SettingsDialog.m_cblFields->IsChecked(i)) {
+            columns[i] = m_lWeatherRoutes->GetColumnCount();
+            m_lWeatherRoutes->InsertColumn(columns[i], column_names[i]);
+        } else
             columns[i] = -1;
     }
 
@@ -1774,11 +1775,11 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.WindVSCurrent = 0;
     
     configuration.AvoidCycloneTracks = false;
-    configuration.CycloneMonths = 3;
+    configuration.CycloneMonths = 1;
     configuration.CycloneDays = 0;
 
     configuration.UseGrib = true;
-    configuration.ClimatologyType = RouteMapConfiguration::CUMULATIVE_MAP;
+    configuration.ClimatologyType = RouteMapConfiguration::MOST_LIKELY;
     configuration.AllowDataDeficient = false;
     configuration.DetectLand = true;
     configuration.Currents = false;
@@ -1786,9 +1787,10 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.Anchoring = false;
 
     configuration.DegreeSteps.clear();
-    for(double v = 45; v < 170; v+=5) {
+    for(double v = 0; v <= 180; v+=5) {
         configuration.DegreeSteps.push_back(v);
-        configuration.DegreeSteps.push_back(360-v);
+        if(v > 0 && v < 180)
+            configuration.DegreeSteps.push_back(360-v);
     }
     configuration.DegreeSteps.sort();
 

@@ -604,8 +604,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	m_cbUseGrib = new wxCheckBox( this, wxID_ANY, _("Grib"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_cbUseGrib->SetValue(true); 
-	m_cbUseGrib->Enable( false );
-	
 	fgSizer59->Add( m_cbUseGrib, 0, wxALL, 5 );
 	
 	wxStaticBoxSizer* sbSizer34;
