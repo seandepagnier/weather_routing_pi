@@ -1048,7 +1048,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.WindVSCurrent = AttributeDouble(e, "WindVSCurrent", 0);
 
                     configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
-                    configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 3);
+                    configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 2);
                     configuration.CycloneDays = AttributeInt(e, "CycloneDays", 0);
 
                     configuration.UseGrib = AttributeBool(e, "UseGrib", true);
