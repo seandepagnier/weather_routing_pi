@@ -244,12 +244,16 @@ void ReportDialog::GenerateRoutesReport()
         std::list<RouteMapOverlay *> cyclone_safe_routes;
         bool allsafe = true, nonesafe = true;
         for(it2 = overlays.begin(); it2 != overlays.end(); it2++) {
-            if((*it2)->Cyclones(cyclonemonths)) {
-                cyclone_safe_routes.push_back(NULL);
-                allsafe = false;
-            } else {
+            switch((*it2)->Cyclones(cyclonemonths)) {
+            case -1:
+                page += _("Climatology data unavailable.");
+                goto cyclonesfailed;
+            case 0:
                 cyclone_safe_routes.push_back(*it2);
                 nonesafe = false;
+            default:
+                cyclone_safe_routes.push_back(NULL);
+                allsafe = false;
             }
 
             progressdialog.Update(pdi++);
@@ -310,6 +314,7 @@ void ReportDialog::GenerateRoutesReport()
                 page += _(" to ") + (*it2)->StartTime().Format(_T("%x"));
             }
         }
+    cyclonesfailed:;
     }
 
     m_htmlRoutesReport->SetPage(page);

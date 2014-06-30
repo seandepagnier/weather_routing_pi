@@ -581,7 +581,7 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
 int RouteMapOverlay::Cyclones(int *months)
 {
     if(!RouteMap::ClimatologyCycloneTrackCrossings)
-        return 0;
+        return -1;
 
     int days = 30; // search for 30 day range
     int cyclones = 0;
