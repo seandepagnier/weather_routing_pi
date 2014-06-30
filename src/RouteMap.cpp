@@ -139,6 +139,7 @@ static bool Current(GribRecordSet *grib, RouteMapConfiguration::ClimatologyDataT
         return true;
 
     if(climatology != RouteMapConfiguration::DISABLED &&
+       RouteMap::ClimatologyData &&
        RouteMap::ClimatologyData(CURRENT, time, lat, lon, C, VC))
         return true;
 
@@ -383,10 +384,12 @@ static inline bool ReadWindAndCurrents
             break;
 
         if(configuration.ClimatologyType == RouteMapConfiguration::AVERAGE &&
+           RouteMap::ClimatologyData &&
            RouteMap::ClimatologyData(WIND, time, p->lat, p->lon, WG, VWG)) {
             WG = heading_resolve(WG);
             break;
-        } else if(configuration.ClimatologyType > RouteMapConfiguration::CURRENTS_ONLY) {
+        } else if(configuration.ClimatologyType > RouteMapConfiguration::CURRENTS_ONLY
+                  && RouteMap::ClimatologyWindAtlasData) {
             int windatlas_count = 8;
             double speeds[8];
             if(RouteMap::ClimatologyWindAtlasData(time, p->lat, p->lon, windatlas_count,
@@ -713,7 +716,8 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             continue;
 
         /* crosses cyclone track(s)? */
-        if(configuration.AvoidCycloneTracks) {
+        if(configuration.AvoidCycloneTracks &&
+           RouteMap::ClimatologyCycloneTrackCrossings) {
             int crossings = RouteMap::ClimatologyCycloneTrackCrossings
                 (lat, lon, dlat, dlon, time, configuration.CycloneMonths*30 +
                  configuration.CycloneDays);
@@ -794,7 +798,8 @@ double Position::PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
         return NAN;
 
     /* crosses cyclone track(s)? */
-    if(configuration.AvoidCycloneTracks) {
+    if(configuration.AvoidCycloneTracks &&
+       RouteMap::ClimatologyCycloneTrackCrossings) {
         int crossings = RouteMap::ClimatologyCycloneTrackCrossings
             (lat, lon, configuration.EndLat, configuration.EndLon,
              time, configuration.CycloneMonths*30 +
