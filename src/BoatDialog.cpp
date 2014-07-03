@@ -307,6 +307,9 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
 void BoatDialog::OnUpdateWindSpeed( wxSpinEvent& event )
 {
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    plan.ComputeBoatSpeeds(m_Boat, m_sWindSpeed->GetValue());
+
     UpdateVMG();
     m_PlotWindow->Refresh();
 }
@@ -581,7 +584,7 @@ void BoatDialog::RepopulatePlans()
 
     if(m_Boat.Plans.size() == 0) {
         m_Boat.Plans.push_back(BoatPlan(_("Initial Plan"), m_Boat));
-        m_Boat.Plans[0].ComputeBoatSpeeds(m_Boat);
+        m_Boat.Plans[0].ComputeBoatSpeeds(m_Boat, m_sWindSpeed->GetValue());
     }
 
     for(unsigned int i=0; i<m_Boat.Plans.size(); i++) {
@@ -618,7 +621,7 @@ void BoatDialog::Compute()
         return;
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-    plan.ComputeBoatSpeeds(m_Boat);
+    plan.ComputeBoatSpeeds(m_Boat, m_sWindSpeed->GetValue());
 
     UpdateVMG();
 

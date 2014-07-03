@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -127,7 +127,7 @@ public:
     wxString csvFileName;
     int wind_speed_step, wind_degree_step;
 
-    void ComputeBoatSpeeds(Boat &boat);
+    void ComputeBoatSpeeds(Boat &boat, int speed = -1);
     void OptimizeTackingSpeed();
     void ResetOptimalTackingSpeed();
     void SetSpeedsFromTable(BoatSpeedTable &table);
@@ -146,7 +146,7 @@ private:
     SailingVMG VMG[num_wind_speeds];
 
     int BestVMG(int VW, int startW, int endW, int upwind);
-    void CalculateVMG();
+    void CalculateVMG(int speed);
 
     double AngleofAttackBoat(double A, double VA);
     double VelocityBoat(double A, double VA);

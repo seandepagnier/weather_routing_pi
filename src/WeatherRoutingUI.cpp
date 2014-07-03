@@ -1316,7 +1316,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	wxStaticBoxSizer* sbSizer8;
 	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, _("True Wind Kts") ), wxVERTICAL );
 	
-	m_sWindSpeed = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 1, 59, 15 );
+	m_sWindSpeed = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 1, 60, 15 );
 	sbSizer8->Add( m_sWindSpeed, 0, wxALL, 5 );
 	
 	

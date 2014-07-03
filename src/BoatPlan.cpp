@@ -574,6 +574,11 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
     /* starting out not moving */
     VB = 0, A = W, VA = VW;
     double lp = .1;
+
+    const int count = 128;
+    double bucket = 0;
+    int bcount = 0;
+
     for(;;) {
         double v = VelocityBoat(A, VA);
 
@@ -592,15 +597,27 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
         }
         a -= drag;
 
+        if(bcount == count) {
+            VB = bucket / count;
+            a = 0;
+        }
+
         if(fabs(a) < 1e-2 || lp < 1e-2) {
+            if(VB < 0) // not allowing backwards sailing
+                VB = 0;
             B = AngleofAttackBoat(A, VA);
             return; /* reached steady state */
+        }
+
+        if(a < 0) {
+            bucket += VB;
+            bcount++;
+//            lp *= .97;
         }
 
         VB = (1-lp)*VB + lp*(VB+a); /* lowpass to get a smooth update */
         VA = VelocityApparentWind(VB, W, VW);
         A =  DirectionApparentWind(VA, VB, W, VW);
-        lp *= .97;
     }
 }
 
@@ -657,11 +674,23 @@ BoatPlan::~BoatPlan()
 
 /* eta is a measure of efficiency of the boat, from .01 for racing boats to .5 for
    heavy cruisers */
-void BoatPlan::ComputeBoatSpeeds(Boat &boat)
+void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
 {
     csvFileName = _("<Computed>");
 
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++)
+    int min = 0, max;
+
+    if(speed == -1) // all speeds
+        max = num_wind_speeds - 1;
+    else {
+        max = ClosestVWi(speed);
+        if(wind_speeds[max] == speed)
+            min = max;
+        else if(max)
+            min = max - 1;
+    }
+
+    for(int VWi = min; VWi <= max; VWi++) {
         for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi++) {
             double VW = wind_speeds[VWi];
             double W = Wi * DEGREE_STEP;
@@ -672,7 +701,9 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat)
                 Set(DEGREE_COUNT-Wi, VWi, VB);
         }
 
-    CalculateVMG();
+        CalculateVMG(VWi);
+    }
+
     computed = true;
 }
 
@@ -685,8 +716,8 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat)
 */
 void BoatPlan::OptimizeTackingSpeed()
 {
-    CalculateVMG();
     for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
+        CalculateVMG(VWi);
         for(int Wi = 0; Wi <= DEGREE_COUNT; Wi++) {
             int at = Wi, bt, ct;
             
@@ -744,14 +775,16 @@ void BoatPlan::ResetOptimalTackingSpeed()
 
 void BoatPlan::SetSpeedsFromTable(BoatSpeedTable &table)
 {
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++)
+    for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
         for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi++) {
             double VB = table.InterpolateSpeed(wind_speeds[VWi], Wi*DEGREE_STEP);
             Set(Wi, VWi, VB);
             if(Wi != 0)
                 Set(DEGREE_COUNT-Wi, VWi, VB);
         }
-    CalculateVMG();
+        CalculateVMG(VWi);
+    }
+
     computed = false;
 }
 
@@ -926,12 +959,10 @@ int BoatPlan::BestVMG(int VWi, int startW, int endW, int upwind)
     return maxWi;
 }
 
-void BoatPlan::CalculateVMG()
+void BoatPlan::CalculateVMG(int VWi)
 {
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
-        VMG[VWi].StarboardTackUpWind   = BestVMG(VWi, DEGREE_COUNT*3/4, DEGREE_COUNT*4/4,  1);
-        VMG[VWi].PortTackUpWind        = BestVMG(VWi, DEGREE_COUNT*0/4, DEGREE_COUNT*1/4,  1);
-        VMG[VWi].StarboardTackDownWind = BestVMG(VWi, DEGREE_COUNT*2/4, DEGREE_COUNT*3/4, -1);
-        VMG[VWi].PortTackDownWind      = BestVMG(VWi, DEGREE_COUNT*1/4, DEGREE_COUNT*2/4, -1);
-    }
+    VMG[VWi].StarboardTackUpWind   = BestVMG(VWi, DEGREE_COUNT*3/4, DEGREE_COUNT*4/4,  1);
+    VMG[VWi].PortTackUpWind        = BestVMG(VWi, DEGREE_COUNT*0/4, DEGREE_COUNT*1/4,  1);
+    VMG[VWi].StarboardTackDownWind = BestVMG(VWi, DEGREE_COUNT*2/4, DEGREE_COUNT*3/4, -1);
+    VMG[VWi].PortTackDownWind      = BestVMG(VWi, DEGREE_COUNT*1/4, DEGREE_COUNT*2/4, -1);
 }
