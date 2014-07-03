@@ -573,7 +573,7 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
 {
     /* starting out not moving */
     VB = 0, A = W, VA = VW;
-    double lp = .03;
+    double lp = .1;
     for(;;) {
         double v = VelocityBoat(A, VA);
 
@@ -592,7 +592,7 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
         }
         a -= drag;
 
-        if(fabs(a) < 1e-2) {
+        if(fabs(a) < 1e-2 || lp < 1e-2) {
             B = AngleofAttackBoat(A, VA);
             return; /* reached steady state */
         }
@@ -600,6 +600,7 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
         VB = (1-lp)*VB + lp*(VB+a); /* lowpass to get a smooth update */
         VA = VelocityApparentWind(VB, W, VW);
         A =  DirectionApparentWind(VA, VB, W, VW);
+        lp *= .97;
     }
 }
 
