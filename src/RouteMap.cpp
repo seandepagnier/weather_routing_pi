@@ -610,12 +610,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         B = W + H; /* rotated relative to true wind */
 
         bool current_propagated = false;
-#if 1
-        /* test to avoid extra computations related to backtracking,
-           this doesn't help a lot, but if we could stop, and reverse until
-           failing again, then we would avoid a lot of calculations.  If the
-           first test fails, simply skip to the opposite H and start from
-           there */
+        /* test to avoid extra computations related to backtracking */
         if(!isnan(bearing1)) {
             double bearing3 = heading_resolve(B);
             if((bearing1 > bearing2 && bearing3 > bearing2 && bearing3 < bearing1) ||
@@ -633,24 +628,20 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                     continue;
             }
         }
-#endif
+
         {
         int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
                                                                time, lat, lon, daytime);
-
+        
         if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas,
                              B, VB, BG, VBG, dist, newsailplan))
             continue;
-
+        
         /* did we tack thru the wind? apply penalty */
         bool tacked = false;
         if(parent_heading*H < 0 && fabs(parent_heading - H) < 180) {
-            timeseconds -= configuration.TackingTime;
-#if 0
-            if(configuration.MaxTacks >= 0 && tacks >= configuration.MaxTacks)
-                continue;
-#endif
-            tacked = true;
+                timeseconds -= configuration.TackingTime;
+                tacked = true;
         }
 
         double dlat, dlon, nrdlon;
@@ -677,13 +668,10 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
         if(configuration.MaxCourseAngle < 180) {
             double bearing;
-#if 0
-            ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, dlat, dlon, &bearing, 0);
-#else
-            /* this is definately faster, and actually works better in higher latitudes */
+            // this is faster than gc distance, and actually works better in higher latitudes
             double d1 = dlat - configuration.StartLat, d2 = dlon - configuration.StartLon;
             bearing = rad2deg(atan2(d2, d1));
-#endif
+
             if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxCourseAngle)
                 continue;
         }
@@ -691,11 +679,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         if(configuration.MaxDivertedCourse < 180) {
             double bearing, dist;
             double bearing1, dist1;
-#if 0
-            ll_gc_ll_reverse(dlat, dlon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
-            ll_gc_ll_reverse(configuration.StartLat, configuration.StartLon, dlat, dlon, &bearing1, &dist1);
-#else
-            /* this is definately faster, and actually works better in higher latitudes */
+
             double d1 = dlat - configuration.EndLat, d2 = dlon - configuration.EndLon;
             bearing = rad2deg(atan2(d2, d1));
             dist = sqrt(pow(d1, 2) + pow(d2, 2));
@@ -703,7 +687,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             d1 = configuration.StartLat - dlat, d2 = configuration.StartLon - dlon;
             bearing1 = rad2deg(atan2(d2, d1));
             dist1 = sqrt(pow(d1, 2) + pow(d2, 2));
-#endif
+
             double term = (dist1 + dist) / dist;
             term = pow(term/16, 4) + 1; // make 1 until the end, then make big
 
