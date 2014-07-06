@@ -40,6 +40,7 @@
 #include "BoatDialog.h"
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
+#include "icons.h"
 
 ConfigurationDialog::ConfigurationDialog(WeatherRouting &weatherrouting)
     : ConfigurationDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting),
@@ -68,6 +69,11 @@ ConfigurationDialog::~ConfigurationDialog( )
 void ConfigurationDialog::EditBoat( )
 {
     BoatDialog boatdlg(this, m_fpBoat->GetPath());
+
+    wxIcon icon;
+    icon.CopyFromBitmap(*_img_WeatherRouting);
+    boatdlg.SetIcon(icon);
+
     int updated = boatdlg.ShowModal();
     m_fpBoat->SetPath(boatdlg.m_boatpath);
 

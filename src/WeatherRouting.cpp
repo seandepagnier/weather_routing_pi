@@ -42,6 +42,7 @@
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
 #include "AboutDialog.h"
+#include "icons.h"
 
 /* XPM */
 static const char *eye[]={
@@ -111,6 +112,16 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
       m_bShowReport(false), m_bShowPlot(false),
       m_bShowFilter(false), m_weather_routing_pi(plugin)
 {
+    wxIcon icon;
+    icon.CopyFromBitmap(*_img_WeatherRouting);
+    m_ConfigurationDialog.SetIcon(icon);
+    m_ConfigurationBatchDialog.SetIcon(icon);
+    m_SettingsDialog.SetIcon(icon);
+    m_StatisticsDialog.SetIcon(icon);
+    m_ReportDialog.SetIcon(icon);
+    m_PlotDialog.SetIcon(icon);
+    m_FilterRoutesDialog.SetIcon(icon);
+
     m_SettingsDialog.LoadSettings();
 
     m_lPositions->InsertColumn(POSITION_NAME, _("Name"));

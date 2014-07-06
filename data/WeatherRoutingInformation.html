@@ -92,7 +92,30 @@ can be viewed during grib playback.
 The boat dialog displays the polar plot of the boat's speed vs true wind direction as well as showing other details.  An xml file specifies the boat parameters and each sail plan.  Two file types of polars are supported; CSV (same as qtVlm) and xml parameters which describe how to compute the polar.
 
 <p>
-The VMG tab shows the best courses for up and down wind on each tack.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If this option is chosen, then the boat will assume the ability to sail in these angles (it is assumed the captain will tack periodically to maintain any course.)  If tacking is not optimized, then weather routing will tack only at the isochrons, resulting in overlapping alternate routes, and potentially slightly less optimal course (but will specifically display where to tack.)  It also may take significantly longer to compute courses in areas with rugged coastlines.
+<h4>Plot tab</h4>
+<dt>specifies the parameters for the plot displayed.
+<ul>
+  <li><b>Polar</b> Typical polar diagram showing boat speeds at a given wind speed.
+  <li><b>Speed</b> Plot boat speed across all wind speeds at a given wind angle.
+</ul>
+
+The tracking displays give data based on the mouse position over the plot.
+
+<p>
+<h4>Polar Config tab</h4>
+<dt>Configure the polar data to use.  Either Compute with various parameters, or specify a CSV file which contains a table of boat speeds for all possible true wind speeds and directions.
+
+<p>
+<h4>VMG tab</h4>
+<dt>Shows the best courses for up and down wind on each tack for a given true windspeed.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If this option is chosen, then the boat will assume the ability to sail in these angles (it is assumed the captain will tack periodically to maintain any course.)  If tacking is not optimized, then weather routing will tack only at the isochrons, resulting in overlapping alternate routes, and potentially slightly less optimal course (but will specifically display where to tack.)  It also may take significantly longer to compute courses in areas with rugged coastlines.
+
+<p>
+<h4>Switch Plan Rules</h4>
+<dt>It is possible to specify several sail plans (ie spinnaker or not) and then for each plan make a rule for when it is appropriate to switch to a different sail plan.
+
+<p>
+<h4>Statistics</h4>
+<dt>Displays miscellaneous statistics about the boat.
 
 <p>Most users should measure their boat performance (speed at each wind speed and direction relative to true wind) and load a CSV polar file of these records instead of computing them automatically.  In the future, the computations could be greatly improved with more parameters to yield more accurate results.
 
@@ -183,16 +206,12 @@ becoming less efficient over the course of a very long passage.
 
 <p>Todo list:
 <ul>
-<li>Finalize backtracking
-
 <li>Improve boat polar computation
 <li>Optimize ll_gc_ll
 <li>Optimize climatology wind atlas
-<li>Analyze merging to keep monster route at end, possibly add a propagation skip
 <li>implement depth and overhead height from vector charts
 <li>fix runge kutta for grib to use the right timeslices
 <li>Fix issues where routes are not fully normalized
-<li>Optimize coastline detection, to build whole all submap cells at once when loading the cell
 <li>Fix merdian problem, so we split the world on the opposite of end longitude, and don't propagate past it
 <li>User option for grid reduction resolution?
 <li>Determine best way way to reduce excessive propagations at the edge of graph

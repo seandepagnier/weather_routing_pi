@@ -43,6 +43,7 @@
 #include <wx/notebook.h>
 #include <wx/listbox.h>
 #include <wx/scrolwin.h>
+#include <wx/listbook.h>
 #include <wx/radiobut.h>
 #include <wx/slider.h>
 #include <wx/html/htmlwin.h>
@@ -294,11 +295,16 @@ class BoatDialogBase : public wxDialog
 		wxButton* m_bNewBoatPlan;
 		wxButton* m_bDeleteBoatPlan;
 		wxScrolledWindow* m_PlotWindow;
-		wxNotebook* m_notebook1;
+		wxNotebook* m_nNotebook;
 		wxPanel* m_panel3;
+		wxListbook* m_lPlotType;
+		wxPanel* m_panel14;
 		wxChoice* m_cPlotType;
 		wxChoice* m_cPlotVariable;
 		wxSpinCtrl* m_sWindSpeed;
+		wxPanel* m_panel16;
+		wxChoice* m_cSpeedPlotVariable;
+		wxSpinCtrl* m_sWindDirection;
 		wxStaticText* m_stTrueWindAngle;
 		wxStaticText* m_staticText21;
 		wxStaticText* m_stTrueWindKnots;
@@ -381,8 +387,10 @@ class BoatDialogBase : public wxDialog
 		virtual void OnMouseEventsPlot( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
+		virtual void OnUpdatePlot( wxListbookEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdatePlot( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnPolarMode( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEtaSlider( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnEta( wxCommandEvent& event ) { event.Skip(); }

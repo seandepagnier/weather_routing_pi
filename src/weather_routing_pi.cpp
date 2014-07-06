@@ -261,9 +261,10 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyCycloneTrackCrossings);
 
         if(m_pWeather_Routing) {
-            m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable(RouteMap::ClimatologyData);
+            m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable
+                ((bool)RouteMap::ClimatologyData);
             m_pWeather_Routing->m_ConfigurationDialog.m_pCyclones->Enable
-                (RouteMap::ClimatologyCycloneTrackCrossings);
+                ((bool)RouteMap::ClimatologyCycloneTrackCrossings);
         }
     }
 }

@@ -1282,13 +1282,16 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer12->SetFlexibleDirection( wxBOTH );
 	fgSizer12->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_notebook1 = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
-	m_panel3 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_nNotebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panel3 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer18;
 	fgSizer18 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer18->AddGrowableCol( 0 );
 	fgSizer18->SetFlexibleDirection( wxBOTH );
 	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	m_lPlotType = new wxListbook( m_panel3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLB_DEFAULT );
+	m_panel14 = new wxPanel( m_lPlotType, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer24;
 	fgSizer24 = new wxFlexGridSizer( 0, 4, 0, 0 );
 	fgSizer24->AddGrowableCol( 1 );
@@ -1296,17 +1299,17 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer24->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* sbSizer7;
-	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, _("Plot Type") ), wxHORIZONTAL );
+	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( m_panel14, wxID_ANY, _("Plot Type") ), wxHORIZONTAL );
 	
 	wxString m_cPlotTypeChoices[] = { _("Polar"), _("Rect") };
 	int m_cPlotTypeNChoices = sizeof( m_cPlotTypeChoices ) / sizeof( wxString );
-	m_cPlotType = new wxChoice( m_panel3, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotTypeNChoices, m_cPlotTypeChoices, 0 );
+	m_cPlotType = new wxChoice( m_panel14, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotTypeNChoices, m_cPlotTypeChoices, 0 );
 	m_cPlotType->SetSelection( 0 );
 	sbSizer7->Add( m_cPlotType, 0, wxALL, 5 );
 	
-	wxString m_cPlotVariableChoices[] = { _("True Wind"), _("Apparent Wind") };
+	wxString m_cPlotVariableChoices[] = { _("True Wind Dir / True Wind Speed"), _("Apparent Wind Dir / True Wind Speed"), _("True Wind Dir / Apparent Wind Speed"), _("Apparent Wind Dir / Apparent Wind Speed") };
 	int m_cPlotVariableNChoices = sizeof( m_cPlotVariableChoices ) / sizeof( wxString );
-	m_cPlotVariable = new wxChoice( m_panel3, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotVariableNChoices, m_cPlotVariableChoices, 0 );
+	m_cPlotVariable = new wxChoice( m_panel14, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotVariableNChoices, m_cPlotVariableChoices, 0 );
 	m_cPlotVariable->SetSelection( 0 );
 	sbSizer7->Add( m_cPlotVariable, 0, wxALL, 5 );
 	
@@ -1314,16 +1317,67 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer24->Add( sbSizer7, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer8;
-	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, _("True Wind Kts") ), wxVERTICAL );
+	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_panel14, wxID_ANY, _("Wind Kts") ), wxVERTICAL );
 	
-	m_sWindSpeed = new wxSpinCtrl( m_panel3, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 1, 60, 15 );
+	m_sWindSpeed = new wxSpinCtrl( m_panel14, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 1, 60, 15 );
 	sbSizer8->Add( m_sWindSpeed, 0, wxALL, 5 );
 	
 	
 	fgSizer24->Add( sbSizer8, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer18->Add( fgSizer24, 1, wxEXPAND, 5 );
+	m_panel14->SetSizer( fgSizer24 );
+	m_panel14->Layout();
+	fgSizer24->Fit( m_panel14 );
+	m_lPlotType->AddPage( m_panel14, _("Polar"), true );
+	m_panel16 = new wxPanel( m_lPlotType, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer100;
+	fgSizer100 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer100->SetFlexibleDirection( wxBOTH );
+	fgSizer100->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxStaticBoxSizer* sbSizer35;
+	sbSizer35 = new wxStaticBoxSizer( new wxStaticBox( m_panel16, wxID_ANY, _("Plot Type") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer101;
+	fgSizer101 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer101->SetFlexibleDirection( wxBOTH );
+	fgSizer101->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxString m_cSpeedPlotVariableChoices[] = { _("True Wind Dir / True Wind Speed"), _("Apparent Wind Dir / True Wind Speed"), _("True Wind Dir / Apparent Wind Speed"), _("Apparent Wind Dir / Apparent Wind Speed") };
+	int m_cSpeedPlotVariableNChoices = sizeof( m_cSpeedPlotVariableChoices ) / sizeof( wxString );
+	m_cSpeedPlotVariable = new wxChoice( m_panel16, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cSpeedPlotVariableNChoices, m_cSpeedPlotVariableChoices, 0 );
+	m_cSpeedPlotVariable->SetSelection( 0 );
+	fgSizer101->Add( m_cSpeedPlotVariable, 0, wxALL, 5 );
+	
+	
+	sbSizer35->Add( fgSizer101, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer100->Add( sbSizer35, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer36;
+	sbSizer36 = new wxStaticBoxSizer( new wxStaticBox( m_panel16, wxID_ANY, _("Wind Direction") ), wxVERTICAL );
+	
+	m_sWindDirection = new wxSpinCtrl( m_panel16, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 359, 90 );
+	sbSizer36->Add( m_sWindDirection, 0, wxALL, 5 );
+	
+	
+	fgSizer100->Add( sbSizer36, 1, wxEXPAND, 5 );
+	
+	
+	m_panel16->SetSizer( fgSizer100 );
+	m_panel16->Layout();
+	fgSizer100->Fit( m_panel16 );
+	m_lPlotType->AddPage( m_panel16, _("Speed"), false );
+	#ifndef __WXGTK__ // Small icon style not supported in GTK
+	wxListView* m_lPlotTypeListView = m_lPlotType->GetListView();
+	long m_lPlotTypeFlags = m_lPlotTypeListView->GetWindowStyleFlag();
+	m_lPlotTypeFlags = ( m_lPlotTypeFlags & ~wxLC_ICON ) | wxLC_SMALL_ICON;
+	m_lPlotTypeListView->SetWindowStyleFlag( m_lPlotTypeFlags );
+	#endif
+	
+	fgSizer18->Add( m_lPlotType, 1, wxEXPAND | wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer23;
 	fgSizer23 = new wxFlexGridSizer( 0, 4, 0, 0 );
@@ -1427,8 +1481,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_notebook1->AddPage( m_panel3, _("Plot"), true );
-	m_pPolarConfig = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_nNotebook->AddPage( m_panel3, _("Plot"), true );
+	m_pPolarConfig = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* m_fgConfig;
 	m_fgConfig = new wxFlexGridSizer( 0, 1, 0, 0 );
 	m_fgConfig->AddGrowableCol( 0 );
@@ -1629,8 +1683,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_pPolarConfig->SetSizer( m_fgConfig );
 	m_pPolarConfig->Layout();
 	m_fgConfig->Fit( m_pPolarConfig );
-	m_notebook1->AddPage( m_pPolarConfig, _("Polar Config"), false );
-	m_panel311 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_nNotebook->AddPage( m_pPolarConfig, _("Polar Config"), false );
+	m_panel311 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer1811;
 	fgSizer1811 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer1811->SetFlexibleDirection( wxBOTH );
@@ -1691,8 +1745,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel311->SetSizer( fgSizer1811 );
 	m_panel311->Layout();
 	fgSizer1811->Fit( m_panel311 );
-	m_notebook1->AddPage( m_panel311, _("VMG"), false );
-	m_panel10 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_nNotebook->AddPage( m_panel311, _("VMG"), false );
+	m_panel10 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer45;
 	fgSizer45 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer45->AddGrowableCol( 0 );
@@ -1733,8 +1787,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel10->SetSizer( fgSizer45 );
 	m_panel10->Layout();
 	fgSizer45->Fit( m_panel10 );
-	m_notebook1->AddPage( m_panel10, _("Switch Plan Rules"), false );
-	m_panel5 = new wxPanel( m_notebook1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_nNotebook->AddPage( m_panel10, _("Switch Plan Rules"), false );
+	m_panel5 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer52;
 	fgSizer52 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer52->SetFlexibleDirection( wxBOTH );
@@ -1806,9 +1860,9 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel5->SetSizer( fgSizer52 );
 	m_panel5->Layout();
 	fgSizer52->Fit( m_panel5 );
-	m_notebook1->AddPage( m_panel5, _("Statistics"), false );
+	m_nNotebook->AddPage( m_panel5, _("Statistics"), false );
 	
-	fgSizer12->Add( m_notebook1, 1, wxEXPAND | wxALL, 5 );
+	fgSizer12->Add( m_nNotebook, 1, wxEXPAND | wxALL, 5 );
 	
 	
 	fgSizer3->Add( fgSizer12, 1, wxEXPAND, 5 );
@@ -1876,9 +1930,12 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_PlotWindow->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( BoatDialogBase::OnMouseEventsPlot ), NULL, this );
 	m_PlotWindow->Connect( wxEVT_PAINT, wxPaintEventHandler( BoatDialogBase::OnPaintPlot ), NULL, this );
 	m_PlotWindow->Connect( wxEVT_SIZE, wxSizeEventHandler( BoatDialogBase::OnSizePlot ), NULL, this );
+	m_lPlotType->Connect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotVariable->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_sWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
+	m_cSpeedPlotVariable->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_sWindDirection->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_rbComputed->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_rbCSV->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_sEta->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
@@ -1935,9 +1992,12 @@ BoatDialogBase::~BoatDialogBase()
 	m_PlotWindow->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( BoatDialogBase::OnMouseEventsPlot ), NULL, this );
 	m_PlotWindow->Disconnect( wxEVT_PAINT, wxPaintEventHandler( BoatDialogBase::OnPaintPlot ), NULL, this );
 	m_PlotWindow->Disconnect( wxEVT_SIZE, wxSizeEventHandler( BoatDialogBase::OnSizePlot ), NULL, this );
+	m_lPlotType->Disconnect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotVariable->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_sWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
+	m_cSpeedPlotVariable->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_sWindDirection->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_rbComputed->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_rbCSV->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_sEta->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );

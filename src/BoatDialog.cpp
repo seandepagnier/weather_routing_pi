@@ -91,32 +91,72 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
     m_PlotWindow->GetSize( &w, &h);
 
     /* range + to - */
-    double B;
-    if(m_cPlotType->GetSelection() == 0) { // polar
-        if(!m_PlotScale)
-            return;
+    double W, VW, B, VB, A, VA;
+    double windspeed;
+    int selection;
 
-        double x = (double)p.x - w/2;
-        double y = (double)p.y - h/2;
+    switch(m_lPlotType->GetSelection()) {
+    case 0:
+        if(m_cPlotType->GetSelection() == 0) { // polar
+            if(!m_PlotScale)
+                return;
+            
+            double x = (double)p.x - w/2;
+            double y = (double)p.y - h/2;
+            
+            /* range +- */
+            x /= m_PlotScale;
+            y /= m_PlotScale;
+            
+            B = rad2posdeg(atan2(x, -y));
+        } else
+            B = (double)p.x/w*360;
+        
+        windspeed = m_sWindSpeed->GetValue();
+        selection = m_cPlotVariable->GetSelection();
+        break;
+    case 1:
+    {
+        B = m_sWindDirection->GetValue();
+        double i = (double)p.x/w*num_wind_speeds;
+        int i0 = floor(i), i1 = ceil(i);
+        double d = i - i0;
+        windspeed = (1-d)*wind_speeds[i0] + d*wind_speeds[i1];
+        selection = m_cSpeedPlotVariable->GetSelection();
+    } break;
+    }
 
-        /* range +- */
-        x /= m_PlotScale;
-        y /= m_PlotScale;
-
-        B = rad2posdeg(atan2(x, -y));
-    } else
-        B = (double)p.x/w*360;
-
-    double VW = m_sWindSpeed->GetValue();
-
-    double W, VB;
-    if(m_cPlotVariable->GetSelection() == 0) { // true wind
+    switch(selection) {
+    case 0: // true wind
         W = B;
-        VB = m_Boat.Plans[m_SelectedSailPlan].Speed(B, VW);
-    } else {
-        double A = heading_resolve(B);
-        VB = m_Boat.Plans[m_SelectedSailPlan].SpeedAtApparentWind(A, VW, &W);
+        VW = windspeed;
+        VB = m_Boat.Plans[m_SelectedSailPlan].Speed(W, VW);
+
+        VA = BoatPlan::VelocityApparentWind(VB, deg2rad(W), VW);
+        A = rad2posdeg(BoatPlan::DirectionApparentWind(VA, VB, deg2rad(W), VW));
+        break;
+    case 1:
+        A = heading_resolve(B);
+        VW = windspeed;
+        VB = m_Boat.Plans[m_SelectedSailPlan].SpeedAtApparentWindDirection(A, VW, &W);
         W = positive_degrees(W);
+
+        VA = BoatPlan::VelocityApparentWind(VB, deg2rad(W), VW);
+        break;
+    case 2:
+        W = B;
+        VA = windspeed;
+        VB = m_Boat.Plans[m_SelectedSailPlan].SpeedAtApparentWindSpeed(W, VA);
+        VW = BoatPlan::VelocityTrueWind(VA, VB, deg2rad(W));
+        A = rad2posdeg(BoatPlan::DirectionApparentWind(VA, VB, deg2rad(W), VW));
+        break;
+    case 3:
+        A = heading_resolve(B);
+        VA = windspeed;
+
+        // for now don't try to compute these
+        VB = NAN;
+        VW = NAN, W = NAN;
     }
 
     m_stBoatAngle->SetLabel(wxString::Format(_T("%03.0f"), B));
@@ -131,9 +171,6 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
     m_stTrueWindAngle->SetLabel(wxString::Format(_T("%03.0f"), W));
     m_stTrueWindKnots->SetLabel(wxString::Format(_T("%.1f"), VW));
 
-    double VA = BoatPlan::VelocityApparentWind(VB, deg2rad(W), VW);
-    double A = rad2posdeg(BoatPlan::DirectionApparentWind(VA, VB, deg2rad(W), VW));
-
     m_stApparentWindAngle->SetLabel(wxString::Format(_T("%03.0f"), A));
 
     m_stApparentWindKnots->SetLabel(wxString::Format(_T("%.1f"), VA));
@@ -145,7 +182,7 @@ void BoatDialog::PlotVMG(wxPaintDC &dc, double W, double s)
     m_PlotWindow->GetSize( &w, &h);
 
     double H;
-    if(m_cPlotVariable->GetSelection() == 0) // true wind
+    if((m_cPlotVariable->GetSelection() & 1) == 0) // true wind
         H = W;
     else { // apparent wind
         BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
@@ -163,27 +200,25 @@ void BoatDialog::PlotVMG(wxPaintDC &dc, double W, double s)
     }
 }
 
-void BoatDialog::OnPaintPlot(wxPaintEvent& event)
+void BoatDialog::PaintPolar(wxPaintDC &dc)
 {
-    wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
-    if(!window)
-        return;
-
-    wxPaintDC dc(window);
-    dc.SetBackgroundMode(wxTRANSPARENT);
-
     int w, h;
     m_PlotWindow->GetSize( &w, &h);
     double maxVB = 0;
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-    int VW = m_sWindSpeed->GetValue();
+    int windspeed = m_sWindSpeed->GetValue();
 
     int H, i;
     /* plot scale */
+    int selection = m_cPlotVariable->GetSelection();
+
     for(H = 0, i=0; H<DEGREES; H += DEGREE_STEP, i++) {
         double VB;
-        VB = plan.Speed(H, VW);
+        if(selection < 2)
+            VB = plan.Speed(H, windspeed);
+        else
+            VB = plan.SpeedAtApparentWindSpeed(H, windspeed);
 
         if(VB > maxVB)
             maxVB = VB;
@@ -196,7 +231,6 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     if(maxVB <= 0) maxVB = 1; /* avoid lock */
     double Vstep = ceil(maxVB / 5);
     maxVB += Vstep;
-
 
     if(m_cPlotType->GetSelection() == 0) { // polar
         m_PlotScale = (w < h ? w : h)/1.8 / (maxVB+1);
@@ -243,7 +277,8 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
     /* vmg */
     double s = maxVB*m_PlotScale;
-    SailingVMG vmg = plan.GetVMG(VW);
+    SailingVMG vmg = selection < 2 ? plan.GetVMGTrueWind(windspeed)
+                                 : plan.GetVMGApparentWind(windspeed);
 
     dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
 
@@ -257,15 +292,29 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
     /* boat speeds */
     int lx, ly;
+    bool lastvalid = false;
+
+    dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
 
     for(double W = 0; W<=DEGREES; W += 1) {
-        double VB = plan.Speed(W, VW);
-        if(m_cPlotVariable->GetSelection() == 0 || W == DEGREES) // true wind
-            H = W;
-        else // apparent wind
-            H = rad2posdeg(BoatPlan::DirectionApparentWind(VB, deg2rad(W), VW));
+        double VB;
+        if(selection < 2)
+            VB = plan.Speed(W, windspeed);
+        else
+            VB = plan.SpeedAtApparentWindSpeed(W, windspeed);
 
-        dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
+        if(isnan(VB)) {
+            lastvalid = false;
+            continue;
+        }
+
+        if(W == DEGREES)
+            selection = 0;
+
+        if(selection & 1)
+            H = rad2posdeg(BoatPlan::DirectionApparentWind(VB, deg2rad(W), windspeed));
+        else
+            H = W;
 
         int px, py;
         if(m_cPlotType->GetSelection() == 0) { // polar
@@ -276,9 +325,11 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
             py = h - 2*m_PlotScale*VB;
         }
 
-        if(W > 0)
+        if(lastvalid)
             dc.DrawLine(lx, ly, px, py);
+
         lx = px, ly = py;
+        lastvalid = true;
 
 #if 0
         if(W == m_MouseW) {
@@ -305,13 +356,112 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     }
 }
 
+void BoatDialog::PaintSpeed(wxPaintDC &dc)
+{
+    int w, h;
+    m_PlotWindow->GetSize( &w, &h);
+    double maxVB = 0;
+
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    int H = m_sWindDirection->GetValue();
+
+    /* plot scale */
+    int selection = m_cSpeedPlotVariable->GetSelection();
+
+    for(int s = 0; s<num_wind_speeds; s++) {
+        double windspeed = wind_speeds[s], VB;
+
+        if(selection < 2)
+            VB = plan.Speed(H, windspeed);
+        else
+            VB = plan.SpeedAtApparentWindSpeed(H, windspeed);
+
+        if(VB > maxVB)
+            maxVB = VB;
+    }
+    
+    dc.SetPen(wxPen(wxColor(0, 0, 0)));
+    dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    dc.SetTextForeground(wxColour(0, 55, 75));
+
+    if(maxVB <= 0) maxVB = 1; /* avoid lock */
+    double Vstep = ceil(maxVB / 5);
+    maxVB += Vstep;
+
+    m_PlotScale = h/1.8 / (maxVB+1);
+
+    for(double V = Vstep; V <= maxVB; V+=Vstep) {
+        int y = h - 2*V*m_PlotScale;
+        dc.DrawLine(0, y, w, y);
+        dc.DrawText(wxString::Format(_T("%.0f"), V), 0, y);
+    }
+
+    dc.SetTextForeground(wxColour(0, 0, 155));
+
+    for(int s = 0; s<num_wind_speeds; s++) {
+        double windspeed = wind_speeds[s];
+
+        double x = s * w / num_wind_speeds;
+        dc.DrawLine(x, 0, x, h);
+
+        wxString str = wxString::Format(_T("%.0f"), windspeed);
+        int sw, sh;
+        dc.GetTextExtent(str, &sw, &sh);
+        dc.DrawText(str, x, 0);
+    }
+
+    /* boat speeds */
+    int lx, ly;
+    bool lastvalid = false;
+
+    dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
+
+    for(int s = 0; s<num_wind_speeds; s++) {
+        double windspeed = wind_speeds[s];
+
+        double VB;
+        switch(selection) {
+        case 0: VB = plan.Speed(H, windspeed); break;
+        case 1: VB = plan.SpeedAtApparentWindSpeed(H, windspeed); break;
+        case 2: VB = plan.SpeedAtApparentWindDirection(H, windspeed); break;
+        case 3: VB = NAN; break;
+        }
+
+        if(isnan(VB)) {
+            lastvalid = false;
+            continue;
+        }
+
+        int px, py;
+        px = s * w / num_wind_speeds;
+        py = h - 2*m_PlotScale*VB;
+
+        if(lastvalid)
+            dc.DrawLine(lx, ly, px, py);
+
+        lx = px, ly = py;
+        lastvalid = true;
+    }
+}
+
+void BoatDialog::OnPaintPlot(wxPaintEvent& event)
+{
+    wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
+    if(!window)
+        return;
+
+    wxPaintDC dc(window);
+    dc.SetBackgroundMode(wxTRANSPARENT);
+
+    switch(m_lPlotType->GetSelection()) {
+    case 0: PaintPolar(dc); break;
+    case 1: PaintSpeed(dc); break;
+    }
+}
+
 void BoatDialog::OnUpdateWindSpeed( wxSpinEvent& event )
 {
-    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-    plan.ComputeBoatSpeeds(m_Boat, m_sWindSpeed->GetValue());
-
-    UpdateVMG();
-    m_PlotWindow->Refresh();
+    Compute();
 }
 
 void BoatDialog::OnOpen ( wxCommandEvent& event )
@@ -621,7 +771,11 @@ void BoatDialog::Compute()
         return;
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-    plan.ComputeBoatSpeeds(m_Boat, m_sWindSpeed->GetValue());
+
+    int selection = m_cPlotVariable->GetSelection();
+
+    plan.ComputeBoatSpeeds(m_Boat, (selection < 2 && m_lPlotType->GetSelection() == 0)
+                           ? m_sWindSpeed->GetValue() : -1);
 
     UpdateVMG();
 
@@ -632,19 +786,25 @@ void BoatDialog::Compute()
     m_lBoatPlans->SetItem(m_SelectedSailPlan, spETA, wxString::Format(_T("%.2f"), plan.eta));
 }
 
-void BoatDialog::UpdateVMG()
+wxString BoatDialog::FormatVMG(double W, double VW)
 {
-    int VW = m_sWindSpeed->GetValue();
-    SailingVMG vmg = m_Boat.Plans[m_SelectedSailPlan].GetVMG(VW);
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    double A = rad2posdeg(BoatPlan::DirectionApparentWind(plan.Speed(W, VW), deg2rad(W), VW));
+    return wxString::Format(_T("%.1f True %.1f Apparent"), W, A);
+}
 
-    m_stBestCourseUpWindPortTack->SetLabel
-        (wxString::Format(_T("%d"), vmg.PortTackUpWind));
-    m_stBestCourseUpWindStarboardTack->SetLabel
-        (wxString::Format(_T("%d"), vmg.StarboardTackUpWind));
-    m_stBestCourseDownWindPortTack->SetLabel
-        (wxString::Format(_T("%d"), vmg.PortTackDownWind));
-    m_stBestCourseDownWindStarboardTack->SetLabel
-        (wxString::Format(_T("%d"), vmg.StarboardTackDownWind));
+void BoatDialog::UpdateVMG()
+{ 
+    int windspeed = m_sWindSpeed->GetValue();
+    int selection = m_cPlotVariable->GetSelection();
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    SailingVMG vmg = selection < 2 ? plan.GetVMGTrueWind(windspeed)
+                                 : plan.GetVMGApparentWind(windspeed);
+
+    m_stBestCourseUpWindPortTack->SetLabel(FormatVMG(vmg.PortTackUpWind, windspeed));
+    m_stBestCourseUpWindStarboardTack->SetLabel(FormatVMG(vmg.StarboardTackUpWind, windspeed));
+    m_stBestCourseDownWindPortTack->SetLabel(FormatVMG(vmg.PortTackDownWind, windspeed));
+    m_stBestCourseDownWindStarboardTack->SetLabel(FormatVMG(vmg.StarboardTackDownWind, windspeed));
 }
 
 void BoatDialog::OnNewSwitchPlanRule( wxCommandEvent& event )
@@ -755,4 +915,3 @@ void BoatDialog::UpdateStats()
     m_stComfortFactor->SetLabel(wxString::Format(_T("%.3f"), m_Boat.ComfortFactor()));
     m_stDisplacementLengthRatio->SetLabel(wxString::Format(_T("%.3f"), m_Boat.DisplacementLengthRatio()));
 }
-

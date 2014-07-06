@@ -45,10 +45,14 @@ public:
 private:
     void OnMouseEventsPlot( wxMouseEvent& event );
     void PlotVMG(wxPaintDC &dc, double W, double s);
+
+    void PaintPolar(wxPaintDC &dc);
+    void PaintSpeed(wxPaintDC &dc);
     void OnPaintPlot( wxPaintEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxCommandEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxSpinEvent& event ) { m_PlotWindow->Refresh(); }
+    void OnUpdatePlot( wxListbookEvent& event ) { OnRecompute(); m_PlotWindow->Refresh(); }
+    void OnUpdatePlot( wxCommandEvent& event ) { OnRecompute(); m_PlotWindow->Refresh(); }
+    void OnUpdatePlot( wxSpinEvent& event ) { OnRecompute(); m_PlotWindow->Refresh(); }
     void OnUpdateWindSpeed( wxSpinEvent& event );
     void OnOpen( wxCommandEvent& event );
     void Save();
@@ -84,6 +88,7 @@ private:
     void OnDeleteSwitchPlanRule( wxCommandEvent& event );
     void PopulatePlans();
 
+    wxString FormatVMG(double W, double VW);
     void UpdateVMG();
     void UpdateStats();
 

@@ -45,8 +45,8 @@ struct SailingSpeed
 
 struct SailingVMG
 {
-    int PortTackUpWind, StarboardTackUpWind;
-    int PortTackDownWind, StarboardTackDownWind;
+    float PortTackUpWind, StarboardTackUpWind;
+    float PortTackDownWind, StarboardTackDownWind;
 };
 
 #define MAX_WINDSPEEDS_IN_TABLE 100
@@ -104,6 +104,7 @@ public:
     static double VelocityApparentWind(double VB, double W, double VW);
     static double DirectionApparentWind(double VA, double VB, double W, double VW);
     static double DirectionApparentWind(double VB, double W, double VW);
+    static double VelocityTrueWind(double VA, double VB, double W);
 
     void BoatSteadyState(double W, double VW, double &B, double &VB, double &A, double &VA,
                          Boat &boat);
@@ -136,8 +137,13 @@ public:
     static int ClosestVWi(int VW);
 
     double Speed(double W, double VW);
-    double SpeedAtApparentWind(double &A, double VW, double *pW=0);
-    SailingVMG GetVMG(double VW);
+    double SpeedAtApparentWindDirection(double A, double VW, double *pW=0);
+
+    double SpeedAtApparentWindSpeed(double W, double VA);
+
+    SailingVMG GetVMGTrueWind(double VW);
+    SailingVMG GetVMGApparentWind(double VA);
+
     double TrueWindSpeed(double VB, double W, double maxVW);
     void Set(int Wi, int VWi, double VB);
 

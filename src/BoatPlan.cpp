@@ -565,6 +565,28 @@ double BoatPlan::DirectionApparentWind(double VB, double W, double VW)
     return DirectionApparentWind(VA, VB, W, VW);
 }
 
+/*
+     2      2    2
+   VA  =  VW + VB  + 2 VW VB cos(Pi-W)
+
+     2                        2    2
+   VW + 2 VW VB cos(Pi-W) + VB - VA  = 0
+
+   a = 1
+   b = 2 * VB * cos(Pi - W)
+   c = VB^2 - VA^2
+*/
+double BoatPlan::VelocityTrueWind(double VA, double VB, double W)
+{
+    double a = 1, b = 2 * VB * cos(M_PI - W), c = VB*VB - VA*VA;
+    double det = b*b - 4*a*c;
+
+//    if(fabsf(W) < M_PI/2)
+//        return (-b - sqrt(det)) / (2 * a);
+
+    return (-b + sqrt(det)) / (2 * a);
+}
+
 /* start out with the boat stopped, and over time, iterate accelerating boat
    until it reaches steady state.  The speed of the boat is known already
    from apparent wind, this function finds it for true wind */
@@ -856,7 +878,7 @@ double BoatPlan::Speed(double W, double VW)
     return VB;
 }
 
-double BoatPlan::SpeedAtApparentWind(double &A, double VW, double *pW)
+double BoatPlan::SpeedAtApparentWindDirection(double A, double VW, double *pW)
 {
     int iters = 0;
     double VB, e, dA = A, W = A; // initial guess
@@ -873,7 +895,23 @@ double BoatPlan::SpeedAtApparentWind(double &A, double VW, double *pW)
     return VB;
 }
 
-SailingVMG BoatPlan::GetVMG(double VW)
+double BoatPlan::SpeedAtApparentWindSpeed(double W, double VA)
+{
+    double VW = VA;
+
+    int iters = 0;
+    for(;;) {
+        double VB = Speed(W, VW);
+        double cVA = VelocityApparentWind(VB, deg2rad(W), VW);
+        if(isnan(cVA) || iters++ > 1000)
+            return NAN;
+        if(fabsf(cVA - VA) < 1e-1)
+            return VB;
+        VW -= (cVA - VA) / 5;
+    }
+}
+
+SailingVMG BoatPlan::GetVMGTrueWind(double VW)
 {
     int VW2i = ClosestVWi(VW), VW1i = VW2i > 1 ? VW2i - 1 : 1;
     SailingVMG vmg, vmg1 = VMG[VW1i], vmg2 = VMG[VW2i];
@@ -888,6 +926,36 @@ SailingVMG BoatPlan::GetVMG(double VW)
     vmg.StarboardTackDownWind = DEGREE_STEP * interp_value
         (VW, VW1, VW2, vmg1.StarboardTackDownWind, vmg2.StarboardTackDownWind);
     return vmg;
+}
+
+#define COMPUTE_APPARENT_VMG(name) \
+do { \
+    double VW = VA; \
+    for(;;) { \
+        SailingVMG vmg = GetVMGTrueWind(VW); \
+        double VB = Speed(vmg.name, VW); \
+        double nVW = VW/2 + VelocityTrueWind(VA, VB, deg2rad(vmg.name))/2;       \
+        if(fabsf(nVW - VW) < 1e-1) { \
+            avmg.name = vmg.name; \
+            break; \
+        } \
+        VW = nVW; \
+    } \
+} while(0)
+
+SailingVMG BoatPlan::GetVMGApparentWind(double VA)
+{
+    SailingVMG avmg;
+#if 1
+    avmg = GetVMGTrueWind(VA); // incorrect
+#else
+    // buggy
+    COMPUTE_APPARENT_VMG(PortTackUpWind);
+    COMPUTE_APPARENT_VMG(StarboardTackUpWind);
+    COMPUTE_APPARENT_VMG(PortTackDownWind);
+    COMPUTE_APPARENT_VMG(StarboardTackDownWind);
+#endif
+    return avmg;
 }
 
 /* find true wind speed from boat speed and true wind direction, because often at high
