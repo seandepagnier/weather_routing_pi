@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -881,33 +881,76 @@ double BoatPlan::Speed(double W, double VW)
 double BoatPlan::SpeedAtApparentWindDirection(double A, double VW, double *pW)
 {
     int iters = 0;
-    double VB, e, dA = A, W = A; // initial guess
-    do {
-        VB = Speed(W, VW);
-        double VA = VelocityApparentWind(VB, deg2rad(W), VW);
-        A = rad2deg(DirectionApparentWind(VA, VB, deg2rad(W), VW));
-        
-        e = (dA - A)*4/5; /* I didn't determine the optimal constant/expression, but this works */
-        W += e;
-    } while(fabs(e) > 1e-2 && ++iters < 24);
+    double VB = 0, W = A; // initial guess
+    double lp = 1;
+    for(;;) {
+        double cVB = Speed(W, VW);
+        VB -= (VB - cVB) * lp;
 
-    if(pW) *pW = W;
-    return VB;
+        double VA = VelocityApparentWind(VB, deg2rad(W), VW);
+        double cA = rad2posdeg(DirectionApparentWind(VA, VB, deg2rad(W), VW));
+
+        if(isnan(cA) || iters++ > 256) {
+            if(pW) *pW = NAN;
+            return NAN;
+        }
+
+        if(fabs(cA - A) < 2e-2) {
+            if(pW) *pW = W;
+            return cVB;
+        }
+
+        W -= (cA - A) * lp;
+        lp *= .97;
+    }
 }
 
 double BoatPlan::SpeedAtApparentWindSpeed(double W, double VA)
 {
-    double VW = VA;
-
     int iters = 0;
+    double VW = VA, VB = 0; // initial guess
+    double lp = 1;
     for(;;) {
-        double VB = Speed(W, VW);
+        double cVB = Speed(W, VW);
+        VB -= (VB - cVB) * lp;
+
         double cVA = VelocityApparentWind(VB, deg2rad(W), VW);
-        if(isnan(cVA) || iters++ > 1000)
+        if(isnan(cVA) || iters++ > 256)
             return NAN;
-        if(fabsf(cVA - VA) < 1e-1)
-            return VB;
-        VW -= (cVA - VA) / 5;
+
+        if(fabsf(cVA - VA) < 2e-2)
+            return cVB;
+
+        VW -= (cVA - VA) * lp;
+        lp *= .97;
+    }
+}
+
+double BoatPlan::SpeedAtApparentWind(double A, double VA, double *pW)
+{
+    int iters = 0;
+    double VW = VA, W = A, VB = 0; // initial guess
+    double lp = 1;
+    for(;;) {
+        double cVB = Speed(W, VW);
+        VB -= (VB - cVB) * lp;
+
+        double cVA = VelocityApparentWind(VB, deg2rad(W), VW);
+        double cA = rad2posdeg(DirectionApparentWind(cVA, VB, deg2rad(W), VW));
+
+        if(isnan(cVA) || isnan(cA) || iters++ > 256) {
+            if(pW) *pW = NAN;
+            return NAN;
+        }
+
+        if(fabsf(cVA - VA) < 2e-2 && fabsf(cA - A) < 2e-2) {
+            if(pW) *pW = W;
+            return cVB;
+        }
+
+        VW -= (cVA - VA) * lp;
+        W -= (cA - A) * lp;
+        lp *= .97;
     }
 }
 
@@ -1013,10 +1056,10 @@ void BoatPlan::Set(int Wi, int VWi, double VB)
     speed[VWi][Wi].w = 1; /* weighted all on first course */
 }
 
-int BoatPlan::BestVMG(int VWi, int startW, int endW, int upwind)
+float BoatPlan::BestVMG(int VWi, int startW, int endW, int upwind)
 {
     double maxVB = 0;
-    int maxWi = 0;
+    float maxWi = NAN;
     for(int Wi = startW; Wi <= endW; Wi++) {
         double VB = upwind*cos(deg2rad(Wi*DEGREE_STEP))*speed[VWi][Wi].origVB;
         if(VB > maxVB) {
@@ -1024,6 +1067,8 @@ int BoatPlan::BestVMG(int VWi, int startW, int endW, int upwind)
             maxWi = Wi;
         }
     }
+    // TODO: linear interpolate
+
     return maxWi;
 }
 

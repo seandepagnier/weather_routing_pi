@@ -300,11 +300,11 @@ class BoatDialogBase : public wxDialog
 		wxListbook* m_lPlotType;
 		wxPanel* m_panel14;
 		wxChoice* m_cPlotType;
-		wxChoice* m_cPlotVariable;
 		wxSpinCtrl* m_sWindSpeed;
 		wxPanel* m_panel16;
-		wxChoice* m_cSpeedPlotVariable;
 		wxSpinCtrl* m_sWindDirection;
+		wxPanel* m_panel161;
+		wxChoice* m_cPlotVariable;
 		wxStaticText* m_stTrueWindAngle;
 		wxStaticText* m_staticText21;
 		wxStaticText* m_stTrueWindKnots;
@@ -348,6 +348,9 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText125;
 		wxStaticText* m_stWindDegreeStep;
 		wxPanel* m_panel311;
+		wxStaticText* m_staticText118;
+		wxSpinCtrl* m_sVMGWindSpeed;
+		wxChoice* m_cVMGTrueApparent;
 		wxStaticText* m_staticText3511;
 		wxStaticText* m_stBestCourseUpWindPortTack;
 		wxStaticText* m_staticText35111;
@@ -389,7 +392,6 @@ class BoatDialogBase : public wxDialog
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxListbookEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdateWindSpeed( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnPolarMode( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEtaSlider( wxScrollEvent& event ) { event.Skip(); }
@@ -402,6 +404,8 @@ class BoatDialogBase : public wxDialog
 		virtual void OnUpdateStatisticsSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarCSVFile( wxFileDirPickerEvent& event ) { event.Skip(); }
+		virtual void OnUpdateVMG( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdateVMG( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNewSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }

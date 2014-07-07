@@ -138,8 +138,8 @@ public:
 
     double Speed(double W, double VW);
     double SpeedAtApparentWindDirection(double A, double VW, double *pW=0);
-
     double SpeedAtApparentWindSpeed(double W, double VA);
+    double SpeedAtApparentWind(double A, double VA, double *pW=0);
 
     SailingVMG GetVMGTrueWind(double VW);
     SailingVMG GetVMGApparentWind(double VA);
@@ -151,7 +151,7 @@ private:
     SailingSpeed speed[num_wind_speeds][DEGREE_COUNT];
     SailingVMG VMG[num_wind_speeds];
 
-    int BestVMG(int VW, int startW, int endW, int upwind);
+    float BestVMG(int VW, int startW, int endW, int upwind);
     void CalculateVMG(int speed);
 
     double AngleofAttackBoat(double A, double VA);

@@ -1290,6 +1290,11 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer18->SetFlexibleDirection( wxBOTH );
 	fgSizer18->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxFlexGridSizer* fgSizer1021;
+	fgSizer1021 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1021->SetFlexibleDirection( wxBOTH );
+	fgSizer1021->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	m_lPlotType = new wxListbook( m_panel3, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLB_DEFAULT );
 	m_panel14 = new wxPanel( m_lPlotType, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer24;
@@ -1298,23 +1303,17 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer24->SetFlexibleDirection( wxBOTH );
 	fgSizer24->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxStaticBoxSizer* sbSizer7;
-	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( m_panel14, wxID_ANY, _("Plot Type") ), wxHORIZONTAL );
+	wxStaticBoxSizer* sbSizer37;
+	sbSizer37 = new wxStaticBoxSizer( new wxStaticBox( m_panel14, wxID_ANY, _("Coordinates") ), wxVERTICAL );
 	
 	wxString m_cPlotTypeChoices[] = { _("Polar"), _("Rect") };
 	int m_cPlotTypeNChoices = sizeof( m_cPlotTypeChoices ) / sizeof( wxString );
 	m_cPlotType = new wxChoice( m_panel14, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotTypeNChoices, m_cPlotTypeChoices, 0 );
 	m_cPlotType->SetSelection( 0 );
-	sbSizer7->Add( m_cPlotType, 0, wxALL, 5 );
-	
-	wxString m_cPlotVariableChoices[] = { _("True Wind Dir / True Wind Speed"), _("Apparent Wind Dir / True Wind Speed"), _("True Wind Dir / Apparent Wind Speed"), _("Apparent Wind Dir / Apparent Wind Speed") };
-	int m_cPlotVariableNChoices = sizeof( m_cPlotVariableChoices ) / sizeof( wxString );
-	m_cPlotVariable = new wxChoice( m_panel14, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotVariableNChoices, m_cPlotVariableChoices, 0 );
-	m_cPlotVariable->SetSelection( 0 );
-	sbSizer7->Add( m_cPlotVariable, 0, wxALL, 5 );
+	sbSizer37->Add( m_cPlotType, 0, wxALL, 5 );
 	
 	
-	fgSizer24->Add( sbSizer7, 1, wxEXPAND, 5 );
+	fgSizer24->Add( sbSizer37, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer8;
 	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_panel14, wxID_ANY, _("Wind Kts") ), wxVERTICAL );
@@ -1336,26 +1335,6 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer100->SetFlexibleDirection( wxBOTH );
 	fgSizer100->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxStaticBoxSizer* sbSizer35;
-	sbSizer35 = new wxStaticBoxSizer( new wxStaticBox( m_panel16, wxID_ANY, _("Plot Type") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer101;
-	fgSizer101 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer101->SetFlexibleDirection( wxBOTH );
-	fgSizer101->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxString m_cSpeedPlotVariableChoices[] = { _("True Wind Dir / True Wind Speed"), _("Apparent Wind Dir / True Wind Speed"), _("True Wind Dir / Apparent Wind Speed"), _("Apparent Wind Dir / Apparent Wind Speed") };
-	int m_cSpeedPlotVariableNChoices = sizeof( m_cSpeedPlotVariableChoices ) / sizeof( wxString );
-	m_cSpeedPlotVariable = new wxChoice( m_panel16, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cSpeedPlotVariableNChoices, m_cSpeedPlotVariableChoices, 0 );
-	m_cSpeedPlotVariable->SetSelection( 0 );
-	fgSizer101->Add( m_cSpeedPlotVariable, 0, wxALL, 5 );
-	
-	
-	sbSizer35->Add( fgSizer101, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer100->Add( sbSizer35, 1, wxEXPAND, 5 );
-	
 	wxStaticBoxSizer* sbSizer36;
 	sbSizer36 = new wxStaticBoxSizer( new wxStaticBox( m_panel16, wxID_ANY, _("Wind Direction") ), wxVERTICAL );
 	
@@ -1370,6 +1349,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel16->Layout();
 	fgSizer100->Fit( m_panel16 );
 	m_lPlotType->AddPage( m_panel16, _("Speed"), false );
+	m_panel161 = new wxPanel( m_lPlotType, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	m_lPlotType->AddPage( m_panel161, _("VMG"), false );
 	#ifndef __WXGTK__ // Small icon style not supported in GTK
 	wxListView* m_lPlotTypeListView = m_lPlotType->GetListView();
 	long m_lPlotTypeFlags = m_lPlotTypeListView->GetWindowStyleFlag();
@@ -1377,7 +1358,22 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_lPlotTypeListView->SetWindowStyleFlag( m_lPlotTypeFlags );
 	#endif
 	
-	fgSizer18->Add( m_lPlotType, 1, wxEXPAND | wxALL, 5 );
+	fgSizer1021->Add( m_lPlotType, 1, wxEXPAND | wxALL, 5 );
+	
+	wxStaticBoxSizer* sbSizer7;
+	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( m_panel3, wxID_ANY, _("Plot Type") ), wxHORIZONTAL );
+	
+	wxString m_cPlotVariableChoices[] = { _("True Wind Dir / True Wind Speed"), _("Apparent Wind Dir / True Wind Speed"), _("True Wind Dir / Apparent Wind Speed"), _("Apparent Wind Dir / Apparent Wind Speed") };
+	int m_cPlotVariableNChoices = sizeof( m_cPlotVariableChoices ) / sizeof( wxString );
+	m_cPlotVariable = new wxChoice( m_panel3, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotVariableNChoices, m_cPlotVariableChoices, 0 );
+	m_cPlotVariable->SetSelection( 0 );
+	sbSizer7->Add( m_cPlotVariable, 0, wxALL, 5 );
+	
+	
+	fgSizer1021->Add( sbSizer7, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer18->Add( fgSizer1021, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer23;
 	fgSizer23 = new wxFlexGridSizer( 0, 4, 0, 0 );
@@ -1516,6 +1512,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer49 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer49->AddGrowableCol( 0 );
 	fgSizer49->AddGrowableRow( 0 );
+	fgSizer49->AddGrowableRow( 1 );
 	fgSizer49->SetFlexibleDirection( wxBOTH );
 	fgSizer49->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -1689,6 +1686,27 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer1811 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer1811->SetFlexibleDirection( wxBOTH );
 	fgSizer1811->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer102;
+	fgSizer102 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer102->SetFlexibleDirection( wxBOTH );
+	fgSizer102->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText118 = new wxStaticText( m_panel311, wxID_ANY, _("Wind Speed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText118->Wrap( -1 );
+	fgSizer102->Add( m_staticText118, 0, wxALL, 5 );
+	
+	m_sVMGWindSpeed = new wxSpinCtrl( m_panel311, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 60, 15 );
+	fgSizer102->Add( m_sVMGWindSpeed, 0, wxALL, 5 );
+	
+	wxString m_cVMGTrueApparentChoices[] = { _("True"), _("Apparent") };
+	int m_cVMGTrueApparentNChoices = sizeof( m_cVMGTrueApparentChoices ) / sizeof( wxString );
+	m_cVMGTrueApparent = new wxChoice( m_panel311, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVMGTrueApparentNChoices, m_cVMGTrueApparentChoices, 0 );
+	m_cVMGTrueApparent->SetSelection( 0 );
+	fgSizer102->Add( m_cVMGTrueApparent, 0, wxALL, 5 );
+	
+	
+	fgSizer1811->Add( fgSizer102, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer2411;
 	fgSizer2411 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -1932,10 +1950,9 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_PlotWindow->Connect( wxEVT_SIZE, wxSizeEventHandler( BoatDialogBase::OnSizePlot ), NULL, this );
 	m_lPlotType->Connect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
-	m_cPlotVariable->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
-	m_sWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
-	m_cSpeedPlotVariable->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_sWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_sWindDirection->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_cPlotVariable->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_rbComputed->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_rbCSV->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_sEta->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
@@ -1959,6 +1976,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sLWL->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecomputeSpin ), NULL, this );
 	m_bSaveCSV->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSaveCSV ), NULL, this );
 	m_fpCSVPath->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( BoatDialogBase::OnPolarCSVFile ), NULL, this );
+	m_sVMGWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
+	m_cVMGTrueApparent->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cbOptimizeTacking->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );
 	m_bNewSwitchPlanRule->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnNewSwitchPlanRule ), NULL, this );
 	m_bEditSwitchBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditSwitchPlanRule ), NULL, this );
@@ -1994,10 +2013,9 @@ BoatDialogBase::~BoatDialogBase()
 	m_PlotWindow->Disconnect( wxEVT_SIZE, wxSizeEventHandler( BoatDialogBase::OnSizePlot ), NULL, this );
 	m_lPlotType->Disconnect( wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_cPlotType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
-	m_cPlotVariable->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
-	m_sWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateWindSpeed ), NULL, this );
-	m_cSpeedPlotVariable->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_sWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_sWindDirection->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
+	m_cPlotVariable->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_rbComputed->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_rbCSV->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
 	m_sEta->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
@@ -2021,6 +2039,8 @@ BoatDialogBase::~BoatDialogBase()
 	m_sLWL->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecomputeSpin ), NULL, this );
 	m_bSaveCSV->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSaveCSV ), NULL, this );
 	m_fpCSVPath->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( BoatDialogBase::OnPolarCSVFile ), NULL, this );
+	m_sVMGWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
+	m_cVMGTrueApparent->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cbOptimizeTacking->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );
 	m_bNewSwitchPlanRule->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnNewSwitchPlanRule ), NULL, this );
 	m_bEditSwitchBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditSwitchPlanRule ), NULL, this );

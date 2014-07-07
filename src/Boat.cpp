@@ -288,7 +288,7 @@ double Boat::HullSpeed()
 /* assume frictional drag is related to speed squared */
 double Boat::FrictionDrag(double VB)
 {
-    return frictional_drag*VB*VB;
+    return 10*frictional_drag*VB*VB;
 }
 
 /* wave drag in terms of froude number
@@ -338,7 +338,7 @@ double Boat::WakeDrag(double VB)
     if(coeff < 1)
         return 0;
 
-    double drag = (pow(20, coeff - 1) - 1) * wake_drag * 20;
+    double drag = (pow(20, coeff - 1) - 1) * wake_drag * 10;
 
     if(drag > VB)
         drag = VB;

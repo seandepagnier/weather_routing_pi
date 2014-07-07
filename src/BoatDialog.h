@@ -48,12 +48,14 @@ private:
 
     void PaintPolar(wxPaintDC &dc);
     void PaintSpeed(wxPaintDC &dc);
+    void PaintVMG(wxPaintDC &dc);
+
     void OnPaintPlot( wxPaintEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxListbookEvent& event ) { OnRecompute(); m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxCommandEvent& event ) { OnRecompute(); m_PlotWindow->Refresh(); }
-    void OnUpdatePlot( wxSpinEvent& event ) { OnRecompute(); m_PlotWindow->Refresh(); }
-    void OnUpdateWindSpeed( wxSpinEvent& event );
+    void OnUpdatePlot();
+    void OnUpdatePlot( wxListbookEvent& event ) { OnUpdatePlot(); }
+    void OnUpdatePlot( wxCommandEvent& event ) { OnUpdatePlot(); }
+    void OnUpdatePlot( wxSpinEvent& event ) { OnUpdatePlot(); }
     void OnOpen( wxCommandEvent& event );
     void Save();
     void OnSaveAs( wxCommandEvent& event );
@@ -62,6 +64,8 @@ private:
     void LoadCSV( );
     void OnSaveCSV( wxCommandEvent& event );
     void OnPolarCSVFile( wxFileDirPickerEvent& event );
+    void OnUpdateVMG( wxSpinEvent& event ) { UpdateVMG(); }
+    void OnUpdateVMG( wxCommandEvent& event ) { UpdateVMG(); }
     void OnRecompute( );
     void OnRecomputeSpin( wxSpinEvent& event ) { OnRecompute(); }
     void OnRecompute( wxCommandEvent& event ) { OnRecompute(); }
