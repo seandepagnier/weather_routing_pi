@@ -337,7 +337,7 @@ cos(Pi-W)=-cos(W)|   |
        \/
            ________________________
           /  2    2
-   VA =  / VW + VB  + 2 VW VB cos(Pi-W)
+   VA =  / VW + VB  + 2 VW VB cos(W)
        \/
            ___________________________
           /  2    2
@@ -567,22 +567,22 @@ double BoatPlan::DirectionApparentWind(double VB, double W, double VW)
 
 /*
      2      2    2
-   VA  =  VW + VB  + 2 VW VB cos(Pi-W)
+   VA  =  VW + VB  + 2 VW VB cos(W)
 
      2                        2    2
-   VW + 2 VW VB cos(Pi-W) + VB - VA  = 0
+   VW + 2 VW VB cos(W) + VB - VA  = 0
 
    a = 1
-   b = 2 * VB * cos(Pi - W)
+   b = 2 * VB * cos(W)
    c = VB^2 - VA^2
 */
 double BoatPlan::VelocityTrueWind(double VA, double VB, double W)
 {
-    double a = 1, b = 2 * VB * cos(M_PI - W), c = VB*VB - VA*VA;
+    double a = 1, b = 2 * VB * cos(W), c = VB*VB - VA*VA;
     double det = b*b - 4*a*c;
 
-//    if(fabsf(W) < M_PI/2)
-//        return (-b - sqrt(det)) / (2 * a);
+    if(-b - sqrt(det) > 0)
+        printf("ambiguous true wind.\n");
 
     return (-b + sqrt(det)) / (2 * a);
 }
@@ -698,19 +698,13 @@ BoatPlan::~BoatPlan()
    heavy cruisers */
 void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
 {
-    csvFileName = _("<Computed>");
+    csvFileName = _T("<Computed>");
 
-    int min = 0, max;
-
+    int min, max;
     if(speed == -1) // all speeds
-        max = num_wind_speeds - 1;
-    else {
-        max = ClosestVWi(speed);
-        if(wind_speeds[max] == speed)
-            min = max;
-        else if(max)
-            min = max - 1;
-    }
+        min = 0, max = num_wind_speeds - 1;
+    else
+        min = ClosestVWi(speed), max = min + 1;
 
     for(int VWi = min; VWi <= max; VWi++) {
         for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi++) {
@@ -740,38 +734,41 @@ void BoatPlan::OptimizeTackingSpeed()
 {
     for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
         CalculateVMG(VWi);
-        for(int Wi = 0; Wi <= DEGREE_COUNT; Wi++) {
-            int at = Wi, bt, ct;
+        for(int Wi = 0; Wi < DEGREE_COUNT; Wi++) {
+            int at = Wi * DEGREE_STEP;
+            double bt, ct;
             
             if(Wi >= DEGREE_COUNT*1/4 && Wi < DEGREE_COUNT*3/4) {
-                bt = VMG[VWi].StarboardTackDownWind;
-                ct = VMG[VWi].PortTackDownWind;
+                bt = VMG[VWi].values[SailingVMG::STARBOARD_DOWNWIND];
+                ct = VMG[VWi].values[SailingVMG::PORT_DOWNWIND];
             } else {
-                bt = VMG[VWi].StarboardTackUpWind;
-                ct = VMG[VWi].PortTackUpWind;
+                bt = VMG[VWi].values[SailingVMG::STARBOARD_UPWIND];
+                ct = VMG[VWi].values[SailingVMG::PORT_UPWIND];
             }
+            if(isnan(bt) || isnan(ct))
+                continue;
             
-            SailingSpeed &a = speed[VWi][at];
-            SailingSpeed &b = speed[VWi][bt];
-            SailingSpeed &c = speed[VWi][ct];
+            SailingSpeed &a = speed[VWi][Wi];
+            double b = Speed(bt, wind_speeds[VWi]);
+            double c = Speed(ct, wind_speeds[VWi]);
             
             /* w is the weight between b and c tacks (.5 for equal time on each
                t is the improvement factor]
                bcVB * sin(a) = w*b.VB*sin(b) + (1-w)*c.VB*sin(c)
                bcVB * cos(a) = w*b.VB*cos(b) + (1-w)*c.VB*cos(c) */
-            double ar = deg2rad(at*DEGREE_STEP);
-            double br = deg2rad(bt*DEGREE_STEP);
-            double cr = deg2rad(ct*DEGREE_STEP);
+            double ar = deg2rad(at);
+            double br = deg2rad(bt);
+            double cr = deg2rad(ct);
             double sa = sin(ar), ca = cos(ar);
             double sb = sin(br), cb = cos(br);
             double sc = sin(cr), cc = cos(cr);
             double X = ca*sc-sa*cc, Y = sa*cb-ca*sb;
-            double d = (X*c.VB + Y*b.VB);
-            double w = X*c.VB / d;
+            double d = (X*c + Y*b);
+            double w = X*c / d;
             
             if(w > 0 && w < 1) {
                 double Z = cb*sc-sb*cc;
-                double bcVB = Z*b.VB*c.VB / d;
+                double bcVB = Z*b*c / d;
                 if(bcVB > a.VB) {
                     a.VB = bcVB;
                     if(at > 180)
@@ -835,13 +832,15 @@ BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
     return boatspeedtable;
 }
 
+// return index of wind speed in table which less than our wind speed,
+// or second from last (adding 1 to this value is a valid wind speed)
 int BoatPlan::ClosestVWi(int VW)
 {
     int VWi;
     for(VWi = 0; VWi < num_wind_speeds-1; VWi++)
-        if(wind_speeds[VWi] >= VW)
+        if(wind_speeds[VWi] > VW)
             break;
-    return VWi;
+    return VWi-1;
 }
 
 /* compute boat speed from true wind angle and true wind speed */
@@ -956,48 +955,43 @@ double BoatPlan::SpeedAtApparentWind(double A, double VA, double *pW)
 
 SailingVMG BoatPlan::GetVMGTrueWind(double VW)
 {
-    int VW2i = ClosestVWi(VW), VW1i = VW2i > 1 ? VW2i - 1 : 1;
+    int VW1i = ClosestVWi(VW), VW2i = VW1i + 1;
     SailingVMG vmg, vmg1 = VMG[VW1i], vmg2 = VMG[VW2i];
     double VW1 = wind_speeds[VW1i], VW2 = wind_speeds[VW2i];
 
-    vmg.PortTackUpWind = DEGREE_STEP * interp_value
-        (VW, VW1, VW2, vmg1.PortTackUpWind, vmg2.PortTackUpWind);
-    vmg.StarboardTackUpWind = DEGREE_STEP * interp_value
-        (VW, VW1, VW2, vmg1.StarboardTackUpWind, vmg2.StarboardTackUpWind);
-    vmg.PortTackDownWind = DEGREE_STEP * interp_value
-        (VW, VW1, VW2, vmg1.PortTackDownWind, vmg2.PortTackDownWind);
-    vmg.StarboardTackDownWind = DEGREE_STEP * interp_value
-        (VW, VW1, VW2, vmg1.StarboardTackDownWind, vmg2.StarboardTackDownWind);
+    for(int i=0; i<4; i++)
+        vmg.values[i] = interp_value(VW, VW1, VW2, vmg1.values[i], vmg2.values[i]);
+
     return vmg;
 }
-
-#define COMPUTE_APPARENT_VMG(name) \
-do { \
-    double VW = VA; \
-    for(;;) { \
-        SailingVMG vmg = GetVMGTrueWind(VW); \
-        double VB = Speed(vmg.name, VW); \
-        double nVW = VW/2 + VelocityTrueWind(VA, VB, deg2rad(vmg.name))/2;       \
-        if(fabsf(nVW - VW) < 1e-1) { \
-            avmg.name = vmg.name; \
-            break; \
-        } \
-        VW = nVW; \
-    } \
-} while(0)
 
 SailingVMG BoatPlan::GetVMGApparentWind(double VA)
 {
     SailingVMG avmg;
-#if 1
-    avmg = GetVMGTrueWind(VA); // incorrect
-#else
-    // buggy
-    COMPUTE_APPARENT_VMG(PortTackUpWind);
-    COMPUTE_APPARENT_VMG(StarboardTackUpWind);
-    COMPUTE_APPARENT_VMG(PortTackDownWind);
-    COMPUTE_APPARENT_VMG(StarboardTackDownWind);
-#endif
+
+    for(int i=0; i<4; i++) {
+        int iters = 0;
+        double VW = VA, lp = 1;
+        for(;;) {
+            SailingVMG vmg = GetVMGTrueWind(VW);
+            double W = vmg.values[i];
+            if(isnan(W) || iters++ > 128) {
+                avmg.values[i] = NAN;
+                break;
+            }
+
+            double VB = Speed(W, VW);
+            double cVA = VelocityApparentWind(VB, deg2rad(W), VW);            
+            if(fabsf(cVA - VA) < 2e-1) {
+                avmg.values[i] = W;
+                break;
+            }
+
+            VW -= (cVA - VA) * lp;
+            lp *= .97;
+        }
+    }
+
     return avmg;
 }
 
@@ -1064,7 +1058,7 @@ float BoatPlan::BestVMG(int VWi, int startW, int endW, int upwind)
         double VB = upwind*cos(deg2rad(Wi*DEGREE_STEP))*speed[VWi][Wi].origVB;
         if(VB > maxVB) {
             maxVB = VB;
-            maxWi = Wi;
+            maxWi = Wi*DEGREE_STEP;
         }
     }
     // TODO: linear interpolate
@@ -1074,8 +1068,7 @@ float BoatPlan::BestVMG(int VWi, int startW, int endW, int upwind)
 
 void BoatPlan::CalculateVMG(int VWi)
 {
-    VMG[VWi].StarboardTackUpWind   = BestVMG(VWi, DEGREE_COUNT*3/4, DEGREE_COUNT*4/4,  1);
-    VMG[VWi].PortTackUpWind        = BestVMG(VWi, DEGREE_COUNT*0/4, DEGREE_COUNT*1/4,  1);
-    VMG[VWi].StarboardTackDownWind = BestVMG(VWi, DEGREE_COUNT*2/4, DEGREE_COUNT*3/4, -1);
-    VMG[VWi].PortTackDownWind      = BestVMG(VWi, DEGREE_COUNT*1/4, DEGREE_COUNT*2/4, -1);
+    int s[4] = {3, 0, 2, 1}, e[4] = {4, 1, 3, 2}, sign[4] = {1, 1, -1, -1};
+    for(int i=0; i<4; i++)
+        VMG[VWi].values[i] = BestVMG(VWi, DEGREE_COUNT*s[i]/4, DEGREE_COUNT*e[i]/4, sign[i]);
 }

@@ -181,6 +181,9 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
 
 void BoatDialog::PlotVMG(wxPaintDC &dc, double W, double s)
 {
+    if(isnan(W))
+        return;
+
     int w, h;
     m_PlotWindow->GetSize( &w, &h);
 
@@ -207,14 +210,15 @@ static void PlotPolarData(wxDC &dc, double *values, int count, double scale, int
 {
     int lx, ly;
     bool lastvalid = false;
-    for(int i = 0; i<count; i++) {
-        if(isnan(values[i])) {
+    for(int i = 0; i<=count; i++) {
+        int j = i%count;
+        if(isnan(values[j])) {
             lastvalid = false;
             continue;
         }
 
-        int px =  scale*values[i]*sin(deg2rad(i)) + w/2;
-        int py = -scale*values[i]*cos(deg2rad(i)) + h/2;
+        int px =  scale*values[j]*sin(deg2rad(i)) + w/2;
+        int py = -scale*values[j]*cos(deg2rad(i)) + h/2;
 
         if(lastvalid)
             dc.DrawLine(lx, ly, px, py);
@@ -326,13 +330,13 @@ void BoatDialog::PaintPolar(wxPaintDC &dc)
 
     dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
 
-    PlotVMG(dc, vmg.PortTackUpWind, s);
-    PlotVMG(dc, vmg.StarboardTackUpWind, s);
+    PlotVMG(dc, vmg.values[SailingVMG::PORT_UPWIND], s);
+    PlotVMG(dc, vmg.values[SailingVMG::STARBOARD_UPWIND], s);
 
     dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
 
-    PlotVMG(dc, vmg.PortTackDownWind, s);
-    PlotVMG(dc, vmg.StarboardTackDownWind, s);
+    PlotVMG(dc, vmg.values[SailingVMG::PORT_DOWNWIND], s);
+    PlotVMG(dc, vmg.values[SailingVMG::STARBOARD_DOWNWIND], s);
 
     /* boat speeds */
     double values[DEGREES];
@@ -504,7 +508,7 @@ void BoatDialog::PaintVMG(wxPaintDC &dc)
     // Only render port tack.. later we could do starboard if the polar is not symmetric
     double values[count];
     for(int s = 0; s<count; s++) {
-        values[s] = vmgs[s].PortTackUpWind;
+        values[s] = vmgs[s].values[SailingVMG::PORT_UPWIND];
         if(selection & 1 && !isnan(values[s]))
             values[s] = rad2posdeg(BoatPlan::DirectionApparentWind
                                    (plan.Speed(values[s], windspeeds[s]),
@@ -516,7 +520,7 @@ void BoatDialog::PaintVMG(wxPaintDC &dc)
     PlotRectangularData(dc, values, count, scale, w, h);
 
     for(int s = 0; s<count; s++) {
-        values[s] = vmgs[s].PortTackDownWind;
+        values[s] = vmgs[s].values[SailingVMG::PORT_DOWNWIND];
 
         if(selection & 1 && !isnan(values[s]))
             values[s] = rad2posdeg(BoatPlan::DirectionApparentWind
@@ -754,6 +758,12 @@ void BoatDialog::OnPolarMode( wxCommandEvent& event )
     m_Boat.Plans[m_SelectedSailPlan].computed = c;
     m_sbComputation->ShowItems(c);
     m_sbCSV->ShowItems(!c);
+
+    if(c)
+        OnRecompute();
+    else
+        LoadCSV();
+
     m_pPolarConfig->Fit();
     Fit();
 }
@@ -882,7 +892,8 @@ void BoatDialog::Compute()
 wxString BoatDialog::FormatVMG(double W, double VW)
 {
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-    double A = rad2posdeg(BoatPlan::DirectionApparentWind(plan.Speed(W, VW), deg2rad(W), VW));
+    double A = isnan(W) ? NAN :
+        rad2posdeg(BoatPlan::DirectionApparentWind(plan.Speed(W, VW), deg2rad(W), VW));
     return wxString::Format(_T("%.1f True %.1f Apparent"), W, A);
 }
 
@@ -894,10 +905,10 @@ void BoatDialog::UpdateVMG()
         plan.GetVMGApparentWind(windspeed) :
         plan.GetVMGTrueWind(windspeed);
 
-    m_stBestCourseUpWindPortTack->SetLabel(FormatVMG(vmg.PortTackUpWind, windspeed));
-    m_stBestCourseUpWindStarboardTack->SetLabel(FormatVMG(vmg.StarboardTackUpWind, windspeed));
-    m_stBestCourseDownWindPortTack->SetLabel(FormatVMG(vmg.PortTackDownWind, windspeed));
-    m_stBestCourseDownWindStarboardTack->SetLabel(FormatVMG(vmg.StarboardTackDownWind, windspeed));
+    m_stBestCourseUpWindPortTack->SetLabel(FormatVMG(vmg.values[SailingVMG::PORT_UPWIND], windspeed));
+    m_stBestCourseUpWindStarboardTack->SetLabel(FormatVMG(vmg.values[SailingVMG::STARBOARD_UPWIND], windspeed));
+    m_stBestCourseDownWindPortTack->SetLabel(FormatVMG(vmg.values[SailingVMG::PORT_DOWNWIND], windspeed));
+    m_stBestCourseDownWindStarboardTack->SetLabel(FormatVMG(vmg.values[SailingVMG::STARBOARD_DOWNWIND], windspeed));
 }
 
 void BoatDialog::OnNewSwitchPlanRule( wxCommandEvent& event )

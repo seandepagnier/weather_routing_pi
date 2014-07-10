@@ -1526,10 +1526,10 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText961->Wrap( -1 );
 	fgSizer53->Add( m_staticText961, 0, wxALL, 5 );
 	
-	m_sEta = new wxSlider( m_pPolarConfig, wxID_ANY, 50, 1, 1000, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	m_sEta = new wxSlider( m_pPolarConfig, wxID_ANY, 500, 1, 1000, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	fgSizer53->Add( m_sEta, 0, wxALL|wxEXPAND, 5 );
 	
-	m_tEta = new wxTextCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_tEta = new wxTextCtrl( m_pPolarConfig, wxID_ANY, _("0.25"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer53->Add( m_tEta, 0, wxALL, 5 );
 	
 	
@@ -1651,7 +1651,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText93->Wrap( -1 );
 	fgSizer34->Add( m_staticText93, 0, wxALL, 5 );
 	
-	m_fpCSVPath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE );
+	m_fpCSVPath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
 	fgSizer34->Add( m_fpCSVPath, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText123 = new wxStaticText( m_pPolarConfig, wxID_ANY, _("Wind Speed Step"), wxDefaultPosition, wxDefaultSize, 0 );

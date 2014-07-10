@@ -338,7 +338,7 @@ double Boat::WakeDrag(double VB)
     if(coeff < 1)
         return 0;
 
-    double drag = (pow(20, coeff - 1) - 1) * wake_drag * 10;
+    double drag = (pow(32, coeff - 1) - 1) * wake_drag * 10;
 
     if(drag > VB)
         drag = VB;

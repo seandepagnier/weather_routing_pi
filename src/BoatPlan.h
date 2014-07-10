@@ -45,8 +45,8 @@ struct SailingSpeed
 
 struct SailingVMG
 {
-    float PortTackUpWind, StarboardTackUpWind;
-    float PortTackDownWind, StarboardTackDownWind;
+    enum { STARBOARD_UPWIND, PORT_UPWIND, STARBOARD_DOWNWIND, PORT_DOWNWIND};
+    float values[4];
 };
 
 #define MAX_WINDSPEEDS_IN_TABLE 100

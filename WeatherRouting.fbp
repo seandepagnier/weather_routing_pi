@@ -12728,7 +12728,7 @@
                                                                                     <property name="validator_style">wxFILTER_NONE</property>
                                                                                     <property name="validator_type">wxDefaultValidator</property>
                                                                                     <property name="validator_variable"></property>
-                                                                                    <property name="value">50</property>
+                                                                                    <property name="value">500</property>
                                                                                     <property name="window_extra_style"></property>
                                                                                     <property name="window_name"></property>
                                                                                     <property name="window_style"></property>
@@ -12832,10 +12832,10 @@
                                                                                     <property name="toolbar_pane">0</property>
                                                                                     <property name="tooltip"></property>
                                                                                     <property name="validator_data_type"></property>
-                                                                                    <property name="validator_style">wxFILTER_NONE</property>
+                                                                                    <property name="validator_style">wxFILTER_NUMERIC</property>
                                                                                     <property name="validator_type">wxDefaultValidator</property>
                                                                                     <property name="validator_variable"></property>
-                                                                                    <property name="value"></property>
+                                                                                    <property name="value">0.25</property>
                                                                                     <property name="window_extra_style"></property>
                                                                                     <property name="window_name"></property>
                                                                                     <property name="window_style"></property>
@@ -14496,7 +14496,7 @@
                                                                     <property name="resize">Resizable</property>
                                                                     <property name="show">1</property>
                                                                     <property name="size"></property>
-                                                                    <property name="style">wxFLP_DEFAULT_STYLE</property>
+                                                                    <property name="style">wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL</property>
                                                                     <property name="subclass"></property>
                                                                     <property name="toolbar_pane">0</property>
                                                                     <property name="tooltip"></property>
