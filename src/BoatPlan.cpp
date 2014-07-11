@@ -34,6 +34,13 @@
 #include "Utilities.h"
 #include "Boat.h"
 
+static const int computed_wind_speeds[] = {0, 2, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32, 36, 40, 45, 50, 55, 60};
+static const int num_computed_wind_speeds = (sizeof computed_wind_speeds) / (sizeof *computed_wind_speeds);
+
+static const double computed_max_knots = computed_wind_speeds[num_computed_wind_speeds - 1];
+static const int computed_degree_step = 3;
+static const int computed_degree_count = (DEGREES / computed_degree_step);
+
 /* give value for y at a given x location on a segment */
 double interp_value(double x, double x1, double x2, double y1, double y2)
 {
@@ -55,15 +62,15 @@ BoatSpeedTable::~BoatSpeedTable()
 {
 }
 
+#define MAX_WINDSPEEDS_IN_TABLE 200
 bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_degree_step)
 {
     FILE *f = fopen(filename, "r");
-    numwindspeeds=0;
-
     if(!f)
         return false;
 
     char line[1024];
+    double lastentryW = -1;
 
     char *token, *saveptr;
     if(!fgets(line, sizeof line, f))
@@ -77,22 +84,28 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
         goto failed; /* unrecognized format */
     
     while((token = strtok_r(NULL, ";", &saveptr))) {
-        windspeeds[numwindspeeds++] = strtod(token, 0);
-        if(numwindspeeds > MAX_WINDSPEEDS_IN_TABLE)
+        windspeeds.push_back(strtod(token, 0));
+        if(windspeeds.size() > MAX_WINDSPEEDS_IN_TABLE)
             goto failed;
     }
-    wind_speed_step = windspeeds[numwindspeeds-1] / numwindspeeds;
+
+    wind_speed_step = windspeeds.back() / windspeeds.size();
 
     wind_degree_step = 0;
     while(fgets(line, sizeof line, f)) {
         token = strtok_r(line, ";", &saveptr);
         BoatSpeedTableEntry entry;
         entry.W = strtod(token, 0);
-        int i=0;
-        while((token = strtok_r(NULL, ";", &saveptr)))
-            entry.boatspeed[i++] = strtod(token, 0);
-        if(i > MAX_WINDSPEEDS_IN_TABLE)
+        if(entry.W < 0 || entry.W > 180)
             goto failed;
+        if(entry.W <= lastentryW)
+            goto failed;
+        lastentryW = entry.W;
+        while((token = strtok_r(NULL, ";", &saveptr))) {
+            entry.boatspeed.push_back(strtod(token, 0));
+            if(entry.boatspeed.size() > MAX_WINDSPEEDS_IN_TABLE)
+                goto failed;
+        }
         table.push_back(entry);
         wind_degree_step++;
     }
@@ -112,19 +125,18 @@ failed:
 bool BoatSpeedTable::Save(const char *filename)
 {
     FILE *f = fopen(filename, "w");
-    int numwindspeeds=0;
 
     if(!f)
         return false;
 
     fputs("twa/tws", f);
-    for(int i = 0; i<=numwindspeeds; i++)
+    for(unsigned int i = 0; i<=windspeeds.size(); i++)
         fprintf(f, ";%d", (int)windspeeds[i]);
 
-    for(std::list<BoatSpeedTableEntry>::iterator it = table.begin();
+    for(std::vector<BoatSpeedTableEntry>::iterator it = table.begin();
         it != table.end(); it++) {
         fprintf(f, "%d", (int)(*it).W);
-        for(int i = 0; i<=numwindspeeds; i++) {
+        for(unsigned int i = 0; i<=windspeeds.size(); i++) {
             fprintf(f, ";%.2f", (*it).boatspeed[i]);
         }
         fputs("\n", f);
@@ -136,7 +148,7 @@ bool BoatSpeedTable::Save(const char *filename)
 double BoatSpeedTable::InterpolateSpeed(double VW, double W)
 {
     BoatSpeedTableEntry *minW = NULL, *maxW = NULL;
-    for(BoatSpeedTableEntryList::iterator it = table.begin(); it != table.end(); ++it) {
+    for(std::vector<BoatSpeedTableEntry>::iterator it = table.begin(); it != table.end(); ++it) {
         if((*it).W >= W && (!maxW || maxW->W > (*it).W))
             maxW = &(*it);
 
@@ -145,7 +157,7 @@ double BoatSpeedTable::InterpolateSpeed(double VW, double W)
     }
 
     int minVWind = -1, maxVWind = -1;
-    for(int i=0; i<numwindspeeds; i++) {
+    for(unsigned int i=0; i<windspeeds.size(); i++) {
         if(windspeeds[i] >= VW && (maxVWind == -1 || windspeeds[maxVWind] > windspeeds[i]))
             maxVWind = i;
 
@@ -686,12 +698,6 @@ BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
     : Name(PlanName), eta(.25), luff_angle(15),
       optimize_tacking(true), wing_wing_running(false)
 {
-    memset(speed, 0, sizeof speed);
-    memset(VMG, 0, sizeof VMG);
-}
-
-BoatPlan::~BoatPlan()
-{
 }
 
 /* eta is a measure of efficiency of the boat, from .01 for racing boats to .5 for
@@ -700,21 +706,37 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
 {
     csvFileName = _T("<Computed>");
 
+    if(!computed ||
+       wind_speeds.size() != num_computed_wind_speeds ||
+       degree_steps.size() != computed_degree_count) {
+        wind_speeds.clear();
+        degree_steps.clear();
+
+        for(int Wi = 0; Wi < computed_degree_count; Wi++)
+            degree_steps.push_back(computed_degree_step*Wi);
+        UpdateDegreeStepLookup();
+
+        for(int VWi = 0; VWi < num_computed_wind_speeds; VWi++) {
+            wind_speeds.push_back(SailingWindSpeed(computed_wind_speeds[VWi]));
+            wind_speeds[VWi].speeds.resize(degree_steps.size());
+        }
+    }
+
     int min, max;
     if(speed == -1) // all speeds
-        min = 0, max = num_wind_speeds - 1;
+        min = 0, max = wind_speeds.size() - 1;
     else
         min = ClosestVWi(speed), max = min + 1;
 
     for(int VWi = min; VWi <= max; VWi++) {
-        for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi++) {
-            double VW = wind_speeds[VWi];
-            double W = Wi * DEGREE_STEP;
+        for(int Wi = 0; Wi <= computed_degree_count/2; Wi++) {
+            double VW = wind_speeds[VWi].VW;
+            double W = Wi * computed_degree_step;
             double B, VB, A, VA;
             BoatSteadyState(deg2rad(W), VW, B, VB, A, VA, boat);
             Set(Wi, VWi, VB);
             if(W != 0) // assume symmetric performance
-                Set(DEGREE_COUNT-Wi, VWi, VB);
+                Set(computed_degree_count-Wi, VWi, VB);
         }
 
         CalculateVMG(VWi);
@@ -732,25 +754,26 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
 */
 void BoatPlan::OptimizeTackingSpeed()
 {
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
-        CalculateVMG(VWi);
-        for(int Wi = 0; Wi < DEGREE_COUNT; Wi++) {
-            int at = Wi * DEGREE_STEP;
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++) {
+//        CalculateVMG(VWi);
+        for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
+            double at = degree_steps[Wi];
             double bt, ct;
             
-            if(Wi >= DEGREE_COUNT*1/4 && Wi < DEGREE_COUNT*3/4) {
-                bt = VMG[VWi].values[SailingVMG::STARBOARD_DOWNWIND];
-                ct = VMG[VWi].values[SailingVMG::PORT_DOWNWIND];
+            if(at > 90 && at < 270) {
+                bt = wind_speeds[VWi].VMG.values[SailingVMG::STARBOARD_DOWNWIND];
+                ct = wind_speeds[VWi].VMG.values[SailingVMG::PORT_DOWNWIND];
             } else {
-                bt = VMG[VWi].values[SailingVMG::STARBOARD_UPWIND];
-                ct = VMG[VWi].values[SailingVMG::PORT_UPWIND];
+                bt = wind_speeds[VWi].VMG.values[SailingVMG::STARBOARD_UPWIND];
+                ct = wind_speeds[VWi].VMG.values[SailingVMG::PORT_UPWIND];
             }
+
             if(isnan(bt) || isnan(ct))
                 continue;
             
-            SailingSpeed &a = speed[VWi][Wi];
-            double b = Speed(bt, wind_speeds[VWi]);
-            double c = Speed(ct, wind_speeds[VWi]);
+            SailingSpeed &a = wind_speeds[VWi].speeds[Wi];
+            double b = Speed(bt, wind_speeds[VWi].VW);
+            double c = Speed(ct, wind_speeds[VWi].VW);
             
             /* w is the weight between b and c tacks (.5 for equal time on each
                t is the improvement factor]
@@ -783,9 +806,9 @@ void BoatPlan::OptimizeTackingSpeed()
 
 void BoatPlan::ResetOptimalTackingSpeed()
 {
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++)
-        for(int Wi = 0; Wi <= DEGREE_COUNT; Wi++) {
-            SailingSpeed &a = speed[VWi][Wi];
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+        for(unsigned int Wi = 0; Wi <= degree_steps.size(); Wi++) {
+            SailingSpeed &a = wind_speeds[VWi].speeds[Wi];
             a.VB = a.origVB;
             a.b = Wi;
             a.w = 1;
@@ -794,15 +817,38 @@ void BoatPlan::ResetOptimalTackingSpeed()
 
 void BoatPlan::SetSpeedsFromTable(BoatSpeedTable &table)
 {
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
-        for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi++) {
-            double VB = table.InterpolateSpeed(wind_speeds[VWi], Wi*DEGREE_STEP);
+    wind_speeds.clear();
+    degree_steps.clear();
+    
+    for(unsigned int VWi = 0; VWi < table.windspeeds.size(); VWi++)
+        wind_speeds.push_back(SailingWindSpeed(table.windspeeds[VWi]));
+
+    unsigned int Wi;
+    for(Wi = 0; Wi < table.table.size(); Wi++)
+        degree_steps.push_back(table.table[Wi].W);
+    int Win = table.table.size()-1;
+    if(degree_steps[Win] == 180) Win--;
+    for(; Win >= 0; Wi++, Win--) {
+        if(degree_steps[Win] == 0)
+            break;
+        degree_steps.push_back(DEGREES - degree_steps[Win]);
+    }
+    
+    UpdateDegreeStepLookup();
+
+    for(unsigned int VWi = 0; VWi < table.windspeeds.size(); VWi++) {
+        wind_speeds[VWi].speeds.resize(degree_steps.size());
+        for(unsigned int Wi = 0; Wi < table.table.size(); Wi++) {
+            double VB = table.table[Wi].boatspeed[VWi];
+                //InterpolateSpeed(wind_speeds[VWi], Wi*DEGREE_STEP);
             Set(Wi, VWi, VB);
             if(Wi != 0)
-                Set(DEGREE_COUNT-Wi, VWi, VB);
+                Set(degree_steps.size()-Wi, VWi, VB);
         }
-        CalculateVMG(VWi);
     }
+
+    for(unsigned int VWi = 0; VWi < table.windspeeds.size(); VWi++)
+        CalculateVMG(VWi);
 
     computed = false;
 }
@@ -811,21 +857,17 @@ BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
 {
     BoatSpeedTable boatspeedtable;
 
-    for(;;) {
-        boatspeedtable.numwindspeeds = num_wind_speeds;
-        if(boatspeedtable.numwindspeeds < MAX_WINDSPEEDS_IN_TABLE)
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+        boatspeedtable.windspeeds.push_back(wind_speeds[VWi].VW);
+
+    for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
+        if(degree_steps[Wi] > 180) // table is assuming symmetric performance 
             break;
-        wind_speed_step *= 2;
-    }
 
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++)
-        boatspeedtable.windspeeds[VWi] = wind_speeds[VWi];
-
-    for(int Wi = 0; Wi <= DEGREE_COUNT/2; Wi+=wind_degree_step) {
         BoatSpeedTableEntry entry;
-        for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
-            entry.W = Wi*DEGREE_STEP;
-            entry.boatspeed[VWi] = speed[VWi][Wi].VB;
+        for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++) {
+            entry.W = degree_steps[Wi];
+            entry.boatspeed[VWi] = wind_speeds[VWi].speeds[Wi].VB;
         }
         boatspeedtable.table.push_back(entry);
     }
@@ -834,47 +876,40 @@ BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
 
 // return index of wind speed in table which less than our wind speed,
 // or second from last (adding 1 to this value is a valid wind speed)
-int BoatPlan::ClosestVWi(int VW)
+int BoatPlan::ClosestVWi(double VW)
 {
-    int VWi;
-    for(VWi = 0; VWi < num_wind_speeds-1; VWi++)
-        if(wind_speeds[VWi] > VW)
-            break;
-    return VWi-1;
+    for(unsigned int VWi = 1; VWi < wind_speeds.size()-1; VWi++)
+        if(wind_speeds[VWi].VW > VW)
+            return VWi - 1;
+
+    return wind_speeds.size()-2;
 }
 
 /* compute boat speed from true wind angle and true wind speed */
 double BoatPlan::Speed(double W, double VW)
 {
-    W = positive_degrees(W);
-    if(VW < 0 || VW > MAX_KNOTS)
+    if(VW < 0 || VW > computed_max_knots)
         return NAN;
 
-    double W1 = floor(W/DEGREE_STEP)*DEGREE_STEP;
-    double W2 = ceil(W/DEGREE_STEP)*DEGREE_STEP;
+    W = positive_degrees(W);
+    unsigned int W1i = degree_step_index[(int)floor(W)], W2i;
+    if(W1i == degree_steps.size()-1)
+        W2i = 0;
+    else
+        W2i = W1i+1;
+    double W1 = degree_steps[W1i], W2 = degree_steps[W2i];
 
-    /* get headings nearby each other */
-    while(W1 - W2 > 180)
-        W2 += 360;
-    while(W2 - W1 > 180)
-        W1 += 360;
+    int VW1i = ClosestVWi(VW), VW2i = VW1i + 1;
+    SailingWindSpeed &ws1 = wind_speeds[VW1i], &ws2 = wind_speeds[VW2i];
+    double VW1 = ws1.VW, VW2 = ws2.VW;
 
-    int W1i = positive_degrees(W1)/DEGREE_STEP;
-    int W2i = positive_degrees(W2)/DEGREE_STEP;
-
-    int VW1i = ClosestVWi(VW), VW2i = VW1i+1;
-    double VW1 = wind_speeds[VW1i], VW2 = wind_speeds[VW2i];
-
-    double VB11 = speed[VW1i][W1i].VB;
-    double VB12 = speed[VW1i][W2i].VB;
-    double VB21 = speed[VW2i][W1i].VB;
-    double VB22 = speed[VW2i][W2i].VB;
+    double VB11 = ws1.speeds[W1i].VB, VB12 = ws1.speeds[W2i].VB;
+    double VB21 = ws2.speeds[W1i].VB, VB22 = ws2.speeds[W2i].VB;
 
     double VB1 = interp_value(VW, VW1, VW2, VB11, VB21);
     double VB2 = interp_value(VW, VW1, VW2, VB12, VB22);
 
-    double VB = interp_value(W, W1, W2, VB1, VB2);
-    return VB;
+    return       interp_value(W, W1, W2, VB1, VB2);
 }
 
 double BoatPlan::SpeedAtApparentWindDirection(double A, double VW, double *pW)
@@ -956,8 +991,9 @@ double BoatPlan::SpeedAtApparentWind(double A, double VA, double *pW)
 SailingVMG BoatPlan::GetVMGTrueWind(double VW)
 {
     int VW1i = ClosestVWi(VW), VW2i = VW1i + 1;
-    SailingVMG vmg, vmg1 = VMG[VW1i], vmg2 = VMG[VW2i];
-    double VW1 = wind_speeds[VW1i], VW2 = wind_speeds[VW2i];
+    SailingWindSpeed &ws1 = wind_speeds[VW1i], &ws2 = wind_speeds[VW2i];
+    double VW1 = ws1.VW, VW2 = ws2.VW;
+    SailingVMG vmg, vmg1 = ws1.VMG, vmg2 = ws2.VMG;
 
     for(int i=0; i<4; i++)
         vmg.values[i] = interp_value(VW, VW1, VW2, vmg1.values[i], vmg2.values[i]);
@@ -999,34 +1035,29 @@ SailingVMG BoatPlan::GetVMGApparentWind(double VA)
    winds the polar inverts and boat speed is lower, we can specify the max VW to search */
 double BoatPlan::TrueWindSpeed(double VB, double W, double maxVW)
 {
-    int W1 = floor(W/DEGREE_STEP)*DEGREE_STEP;
-    int W2 = ceil(W/DEGREE_STEP)*DEGREE_STEP;
-
-    /* get headings nearby */
-    while(W1 - W2 > 180)
-        W2 += 360;
-    while(W2 - W1 > 180)
-        W1 += 360;
-
-    W1 = positive_degrees(W1);
-    W2 = positive_degrees(W2);
-
-    int W1i = W1/DEGREE_STEP, W2i = W2/DEGREE_STEP;
+    W = positive_degrees(W);
+    unsigned int W1i = degree_step_index[(int)floor(W)], W2i;
+    if(W1i == degree_steps.size()-1)
+        W2i = 0;
+    else
+        W2i = W1i++;
+    double W1 = degree_steps[W1i], W2 = degree_steps[W2i];
 
     double VB1min = INFINITY, VW1min = NAN, VB1max = 0, VW1max = NAN;
     double VB2min = INFINITY, VW2min = NAN, VB2max = 0, VW2max = NAN;
 
-    for(int VWi = 0; VWi < num_wind_speeds; VWi++) {
-        if(wind_speeds[VWi] > maxVW)
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++) {
+        if(wind_speeds[VWi].VW > maxVW)
             break;
 
-        double VB1 = speed[VWi][W1i].VB;
-        if(VB1 > VB && VB1 < VB1min) VB1min = VB1, VW1min = wind_speeds[VWi];
-        if(VB1 < VB && VB1 > VB1max) VB1max = VB1, VW1max = wind_speeds[VWi];
+        SailingWindSpeed &ws = wind_speeds[VWi];
+        double VB1 = ws.speeds[W1i].VB;
+        if(VB1 > VB && VB1 < VB1min) VB1min = VB1, VW1min = ws.VW;
+        if(VB1 < VB && VB1 > VB1max) VB1max = VB1, VW1max = ws.VW;
 
-        double VB2 = speed[VWi][W2i].VB;
-        if(VB2 > VB && VB2 < VB2min) VB2min = VB2, VW2min = wind_speeds[VWi];
-        if(VB2 < VB && VB2 > VB2max) VB2max = VB2, VW2max = wind_speeds[VWi];
+        double VB2 = ws.speeds[W2i].VB;
+        if(VB2 > VB && VB2 < VB2min) VB2min = VB2, VW2min = ws.VW;
+        if(VB2 < VB && VB2 > VB2max) VB2max = VB2, VW2max = ws.VW;
     }
 
     double VBmin = interp_value(W, W1, W2, VB1min, VB2min);
@@ -1037,38 +1068,77 @@ double BoatPlan::TrueWindSpeed(double VB, double W, double maxVW)
     return interp_value(VB, VBmin, VBmax, VWmin, VWmax);
 }
 
-void BoatPlan::Set(int Wi, int VWi, double VB)
+void BoatPlan::Set(unsigned int Wi, unsigned int VWi, double VB)
 {
-    if(Wi < 0 || Wi >= DEGREE_COUNT ||
-       VWi < 0 || VWi > num_wind_speeds)
+    if(Wi >= degree_steps.size() ||
+       VWi > wind_speeds.size())
         return; /* maybe log warning here? */
     
-    speed[VWi][Wi].VB = VB;
-    speed[VWi][Wi].origVB = VB;
-    speed[VWi][Wi].slipangle = 0;
-    speed[VWi][Wi].b = Wi;
-    speed[VWi][Wi].w = 1; /* weighted all on first course */
+    SailingSpeed &s = wind_speeds[VWi].speeds[Wi];
+    s.VB = VB;
+    s.origVB = VB;
+    s.slipangle = 0;
+    s.b = Wi;
+    s.w = 1; /* weighted all on first course */
 }
 
-float BoatPlan::BestVMG(int VWi, int startW, int endW, int upwind)
+void BoatPlan::UpdateDegreeStepLookup()
 {
-    double maxVB = 0;
-    float maxWi = NAN;
-    for(int Wi = startW; Wi <= endW; Wi++) {
-        double VB = upwind*cos(deg2rad(Wi*DEGREE_STEP))*speed[VWi][Wi].origVB;
-        if(VB > maxVB) {
-            maxVB = VB;
-            maxWi = Wi*DEGREE_STEP;
-        }
+    for(int d = 0; d < DEGREES; d++) {
+        unsigned int Wi;
+        for(Wi = 0; Wi < degree_steps.size(); Wi++)
+            if(d < degree_steps[Wi])
+                break;
+        degree_step_index[d] = Wi - 1;
     }
-    // TODO: linear interpolate
-
-    return maxWi;
 }
 
 void BoatPlan::CalculateVMG(int VWi)
 {
-    int s[4] = {3, 0, 2, 1}, e[4] = {4, 1, 3, 2}, sign[4] = {1, 1, -1, -1};
-    for(int i=0; i<4; i++)
-        VMG[VWi].values[i] = BestVMG(VWi, DEGREE_COUNT*s[i]/4, DEGREE_COUNT*e[i]/4, sign[i]);
+    SailingWindSpeed &ws = wind_speeds[VWi];
+    // limits for port/starboard upwind/downwind
+    const double limits[4][2] = {{270, 360}, {0, 90}, {180, 270}, {90, 180}};
+    for(int i=0; i<4; i++) {
+        double upwind = i < 2 ? 1 : -1;
+        double maxVB = 0;
+        float maxW = NAN;
+        unsigned int maxWi;
+        for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
+            double W = degree_steps[Wi];
+
+            if(W < limits[i][0] || W > limits[i][1])
+                continue;
+
+            double VB = upwind*cos(deg2rad(W))*ws.speeds[Wi].origVB;
+            if(VB > maxVB) {
+                maxVB = VB;
+                maxW = W;
+                maxWi = Wi;
+            }
+        }
+
+#if 1
+        if(!isnan(maxW)) {
+            unsigned int Wi1 = maxWi > 0 ? maxWi - 1 : degree_steps.size() - 1;
+            unsigned int Wi2 = maxWi < degree_steps.size() - 1 ? maxWi + 1 : 0;
+            double dsmaxWi = degree_steps[maxWi];
+            double step = wxMax(fabsf(dsmaxWi - degree_steps[Wi1]),
+                                fabsf(dsmaxWi - degree_steps[Wi2])) / 4;
+
+            while(step > 2e-3) {
+                double W1 = maxW-step, W2 = maxW+step;
+                double VB1 = upwind*cos(deg2rad(W1))*Speed(W1, ws.VW);
+                double VB2 = upwind*cos(deg2rad(W2))*Speed(W2, ws.VW);
+
+                if(VB1 > VB2)
+                    maxW = (W1 + maxW) / 2;
+                else
+                    maxW = (W2 + maxW) / 2;
+
+                step /= 2;
+            }
+        }
+#endif
+        ws.VMG.values[i] = maxW;
+    }
 }

@@ -39,6 +39,10 @@
 
 enum {spNAME, spETA};
 
+// for plotting
+static const int wind_speeds[] = {0, 2, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32, 36, 40, 45, 50, 55, 60};
+static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
+
 BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     : BoatDialogBase(parent), m_boatpath(boatpath), m_PlotScale(0)
 {
@@ -261,7 +265,7 @@ void BoatDialog::PaintPolar(wxPaintDC &dc)
     /* plot scale */
     int selection = m_cPlotVariable->GetSelection();
 
-    for(H = 0, i=0; H<DEGREES; H += DEGREE_STEP, i++) {
+    for(H = 0, i=0; H<DEGREES; H += 3, i++) {
         double VB;
         if(selection < 2)
             VB = plan.Speed(H, windspeed);

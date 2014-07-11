@@ -24,14 +24,7 @@
  ***************************************************************************
  */
 
-static const int wind_speeds[] = {0, 2, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32, 36, 40, 45, 50, 55, 60};
-static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
-
-#define MAX_KNOTS wind_speeds[num_wind_speeds - 1]
-
-#define DEGREES 360
-#define DEGREE_STEP 3
-#define DEGREE_COUNT (DEGREES / DEGREE_STEP)
+#include <vector>
 
 struct SailingSpeed
 {
@@ -40,7 +33,7 @@ struct SailingSpeed
     float slipangle; /* angle of boat relative to its movement thru water */
 
     float w; /* weight of time on each tack */
-    unsigned char b, c; /* tacks to sail relative to true wind */
+    float b, c; /* tacks to sail relative to true wind */
 };
 
 struct SailingVMG
@@ -49,18 +42,12 @@ struct SailingVMG
     float values[4];
 };
 
-#define MAX_WINDSPEEDS_IN_TABLE 100
-
 class BoatSpeedTableEntry
 {
 public:
-  double W;
-  double boatspeed[MAX_WINDSPEEDS_IN_TABLE];
+    double W;
+    std::vector<double> boatspeed;
 };
-
-#include <list>
-#include <vector>
-typedef std::list<BoatSpeedTableEntry> BoatSpeedTableEntryList;
 
 class BoatSpeedTable
 {
@@ -72,11 +59,9 @@ public:
     bool Save(const char *filename);
 
     double InterpolateSpeed(double VW, double W);
-    
-    int numwindspeeds;
-    double windspeeds[MAX_WINDSPEEDS_IN_TABLE];
-    
-    BoatSpeedTableEntryList table;
+
+    std::vector<double> windspeeds;
+    std::vector<BoatSpeedTableEntry> table;
 };
 
 class SwitchPlan
@@ -98,6 +83,8 @@ public:
 
 class Boat;
 
+#define DEGREES 360
+
 class BoatPlan
 {
 public:
@@ -106,13 +93,12 @@ public:
     static double DirectionApparentWind(double VB, double W, double VW);
     static double VelocityTrueWind(double VA, double VB, double W);
 
-    void BoatSteadyState(double W, double VW, double &B, double &VB, double &A, double &VA,
-                         Boat &boat);
+    void BoatSteadyState(double W, double VW, double &B, double &VB,
+                         double &A, double &VA, Boat &boat);
     wxString TrySwitchBoatPlan(double VW, double H, double Swell,
                                const wxDateTime &gribtime, double lat, double lon, int &daytime);
 
     BoatPlan(wxString PlanName, Boat &boat);
-    ~BoatPlan();
 
     std::vector<SwitchPlan> SwitchPlans;
 
@@ -134,7 +120,7 @@ public:
     void SetSpeedsFromTable(BoatSpeedTable &table);
     BoatSpeedTable CreateTable(int wind_speed_step, int wind_degree_step);
 
-    static int ClosestVWi(int VW);
+    int ClosestVWi(double VW);
 
     double Speed(double W, double VW);
     double SpeedAtApparentWindDirection(double A, double VW, double *pW=0);
@@ -145,19 +131,31 @@ public:
     SailingVMG GetVMGApparentWind(double VA);
 
     double TrueWindSpeed(double VB, double W, double maxVW);
-    void Set(int Wi, int VWi, double VB);
+    void Set(unsigned int Wi, unsigned int VWi, double VB);
 
 private:
-    SailingSpeed speed[num_wind_speeds][DEGREE_COUNT];
-    SailingVMG VMG[num_wind_speeds];
-
-    float BestVMG(int VW, int startW, int endW, int upwind);
+    void UpdateDegreeStepLookup();
     void CalculateVMG(int speed);
 
     double AngleofAttackBoat(double A, double VA);
     double VelocityBoat(double A, double VA);
 
     double m_MouseW;
+
+    double max_knots;
+
+    struct SailingWindSpeed {
+        SailingWindSpeed(double nVW) : VW(nVW) {}
+
+        double VW;
+        std::vector<SailingSpeed> speeds; // by degree_count
+        SailingVMG VMG;
+    }; // num_wind_speeds
+
+    std::vector<SailingWindSpeed> wind_speeds;
+    std::vector<double> degree_steps;
+
+    unsigned int degree_step_index[DEGREES];
 };
 
 /* calculate power from solar charged battery system
