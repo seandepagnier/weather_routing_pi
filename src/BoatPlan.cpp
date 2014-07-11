@@ -31,6 +31,8 @@
 #include <string.h>
 #include <math.h>
 
+#include "zuFile.h"
+
 #include "Utilities.h"
 #include "Boat.h"
 
@@ -65,7 +67,7 @@ BoatSpeedTable::~BoatSpeedTable()
 #define MAX_WINDSPEEDS_IN_TABLE 200
 bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_degree_step)
 {
-    FILE *f = fopen(filename, "r");
+    ZUFILE *f = zu_open(filename, "r");
     if(!f)
         return false;
 
@@ -73,7 +75,7 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
     double lastentryW = -1;
 
     char *token, *saveptr;
-    if(!fgets(line, sizeof line, f))
+    if(!zu_gets(f, line, sizeof line))
         goto failed; /* error here too */
     token = strtok_r(line, ";", &saveptr);
 
@@ -89,10 +91,10 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
             goto failed;
     }
 
-    wind_speed_step = windspeeds.back() / windspeeds.size();
+    wind_speed_step = (int)round((double)windspeeds.back() / windspeeds.size());
 
     wind_degree_step = 0;
-    while(fgets(line, sizeof line, f)) {
+    while(zu_gets(f, line, sizeof line)) {
         token = strtok_r(line, ";", &saveptr);
         BoatSpeedTableEntry entry;
         entry.W = strtod(token, 0);
@@ -114,11 +116,11 @@ bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_
         wind_degree_step = 2;
     wind_degree_step = 180 / (wind_degree_step - 1);
 
-    fclose(f);
+    zu_close(f);
     return true;
     
 failed:
-    fclose(f);
+    zu_close(f);
     return false;
 }
 
@@ -130,14 +132,15 @@ bool BoatSpeedTable::Save(const char *filename)
         return false;
 
     fputs("twa/tws", f);
-    for(unsigned int i = 0; i<=windspeeds.size(); i++)
+    for(unsigned int i = 0; i<windspeeds.size(); i++)
         fprintf(f, ";%d", (int)windspeeds[i]);
+    fputs("\n", f);
 
     for(std::vector<BoatSpeedTableEntry>::iterator it = table.begin();
         it != table.end(); it++) {
         fprintf(f, "%d", (int)(*it).W);
-        for(unsigned int i = 0; i<=windspeeds.size(); i++) {
-            fprintf(f, ";%.2f", (*it).boatspeed[i]);
+        for(unsigned int i = 0; i<windspeeds.size(); i++) {
+            fprintf(f, ";%.5f", (*it).boatspeed[i]);
         }
         fputs("\n", f);
     }
@@ -867,7 +870,7 @@ BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
         BoatSpeedTableEntry entry;
         for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++) {
             entry.W = degree_steps[Wi];
-            entry.boatspeed[VWi] = wind_speeds[VWi].speeds[Wi].VB;
+            entry.boatspeed.push_back(wind_speeds[VWi].speeds[Wi].VB);
         }
         boatspeedtable.table.push_back(entry);
     }

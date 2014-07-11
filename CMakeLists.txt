@@ -35,11 +35,10 @@ SET(SRC_WEATHER_ROUTING
             src/RouteMapOverlay.cpp
             src/Utilities.cpp
             src/WeatherRoutingUI.cpp
-
             src/icons.cpp
 
+            src/zuFile.cpp
             src/georef.c
-
             src/GribRecord.cpp  
 )
 
