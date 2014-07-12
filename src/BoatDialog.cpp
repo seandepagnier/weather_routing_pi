@@ -438,7 +438,7 @@ void BoatDialog::PaintSpeed(wxPaintDC &dc)
     }
 
     /* boat speeds */
-    double values[num_wind_speeds];
+    double *values = new double[num_wind_speeds];
     for(int s = 0; s<num_wind_speeds; s++) {
         double windspeed = wind_speeds[s];
         switch(selection) {
@@ -451,6 +451,7 @@ void BoatDialog::PaintSpeed(wxPaintDC &dc)
 
     dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
     PlotRectangularData(dc, values, num_wind_speeds, 2*m_PlotScale, w, h);
+    delete [] values;
 }
 
 void BoatDialog::PaintVMG(wxPaintDC &dc)
@@ -466,19 +467,6 @@ void BoatDialog::PaintVMG(wxPaintDC &dc)
 
     /* plot scale */
     int selection = m_cPlotVariable->GetSelection();
-
-    SailingVMG vmgs[count];
-    double windspeeds[count];
-    for(int s = 0; s<count; s++) {
-        int s0 = s/mul;
-        double d = (double)s/mul - s0;
-        double windspeed1 = wind_speeds[s0];
-        double windspeed2 = wind_speeds[s0+1];
-        windspeeds[s] = (1-d)*windspeed1 + d*windspeed2;
-
-        vmgs[s] = selection < 2 ? plan.GetVMGTrueWind(windspeeds[s]) :
-            plan.GetVMGApparentWind(windspeeds[s]);
-    }
 
     double min = 0, max = 190, step = 10;
     
@@ -510,30 +498,37 @@ void BoatDialog::PaintVMG(wxPaintDC &dc)
     }
 
     // Only render port tack.. later we could do starboard if the polar is not symmetric
-    double values[count];
+    double *valuesup = new double[count], *valuesdown = new double[count];
     for(int s = 0; s<count; s++) {
-        values[s] = vmgs[s].values[SailingVMG::PORT_UPWIND];
-        if(selection & 1 && !isnan(values[s]))
-            values[s] = rad2posdeg(BoatPlan::DirectionApparentWind
-                                   (plan.Speed(values[s], windspeeds[s]),
-                                    deg2rad(values[s]), windspeeds[s]));
-    }
+        int s0 = s/mul, v;
+        double d = (double)s/mul - s0;
+        double windspeed1 = wind_speeds[s0];
+        double windspeed2 = wind_speeds[s0+1];
+        double windspeed = (1-d)*windspeed1 + d*windspeed2;
 
+        SailingVMG vmg = selection < 2 ? plan.GetVMGTrueWind(windspeed) :
+            plan.GetVMGApparentWind(windspeed);
+
+        v = vmg.values[SailingVMG::PORT_UPWIND];
+        if(selection & 1 && !isnan(v))
+            v = rad2posdeg(BoatPlan::DirectionApparentWind
+                                   (plan.Speed(v, windspeed), deg2rad(v), windspeed));
+        valuesup[s] = v;
+
+        v = vmg.values[SailingVMG::PORT_DOWNWIND];
+        if(selection & 1 && !isnan(v))
+            v = rad2posdeg(BoatPlan::DirectionApparentWind
+                                   (plan.Speed(v, windspeed), deg2rad(v), windspeed));
+        valuesdown[s] = v;
+    }
 
     dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
-    PlotRectangularData(dc, values, count, scale, w, h);
-
-    for(int s = 0; s<count; s++) {
-        values[s] = vmgs[s].values[SailingVMG::PORT_DOWNWIND];
-
-        if(selection & 1 && !isnan(values[s]))
-            values[s] = rad2posdeg(BoatPlan::DirectionApparentWind
-                                   (plan.Speed(values[s], windspeeds[s]),
-                                    deg2rad(values[s]), windspeeds[s]));
-    }
+    PlotRectangularData(dc, valuesup, count, scale, w, h);
 
     dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
-    PlotRectangularData(dc, values, count, scale, w, h);
+    PlotRectangularData(dc, valuesdown, count, scale, w, h);
+    delete [] valuesup;
+    delete [] valuesdown;
 }
 
 void BoatDialog::OnPaintPlot(wxPaintEvent& event)
