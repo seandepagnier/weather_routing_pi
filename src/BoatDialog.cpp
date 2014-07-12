@@ -562,7 +562,7 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
 
     wxFileDialog openDialog
         ( this, _( "Select Polar" ), path, wxT ( "" ),
-          wxT ( "Boat polar files (*.xml, *.csv)|*.XML;*.xml;*.CSV;*.csv|All files (*.*)|*.*" ),
+          wxT ( "Boat polar files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
@@ -586,18 +586,30 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
     }
 }
 
-void BoatDialog::LoadCSV()
+void BoatDialog::LoadCSV(bool switched)
 {
     wxString filename = m_fpCSVPath->GetPath();
-
     BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
     if(plan.Open(filename.mb_str()))
         RepopulatePlans();
     else {
-        wxMessageDialog md(this, _("Failed reading csv: ") + filename,
-                           _("OpenCPN Weather Routing Plugin"),
-                           wxICON_ERROR | wxOK );
-        md.ShowModal();
+        if(switched) {
+            wxFileDialog openDialog
+                ( this, _( "Select Polar CSV" ), m_fpCSVPath->GetPath(), wxT ( "" ),
+                  wxT ( "CSV (*.csv)|*.CSV;*.csv;*.csv.gz;*.csv.bz2|All files (*.*)|*.*" ),
+                  wxFD_OPEN  );
+
+            if( openDialog.ShowModal() == wxID_OK ) {
+                m_fpCSVPath->SetPath(openDialog.GetPath());
+                LoadCSV(false);
+            } else
+                m_rbComputed->SetValue(true);
+        } else {
+//            wxMessageDialog md(this, _("Failed reading csv: ") + filename,
+//                               _("OpenCPN Weather Routing Plugin"),
+//                               wxICON_ERROR | wxOK );
+//            md.ShowModal();
+        }
         return;
     }
     
@@ -663,6 +675,7 @@ void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
         pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
 
         BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
+        plan.ComputeBoatSpeeds(m_Boat, -1);
         if(!plan.Save(saveDialog.GetPath().mb_str())) {
             wxMessageDialog md(this, _("Failed saving boat polar to csv"), _("OpenCPN Weather Routing Plugin"),
                                wxICON_ERROR | wxOK );
@@ -759,8 +772,9 @@ void BoatDialog::OnPolarMode( wxCommandEvent& event )
 
     if(c)
         OnRecompute();
-    else
-        LoadCSV();
+    else {
+        LoadCSV(true);
+    }
 
     m_pPolarConfig->Fit();
     Fit();

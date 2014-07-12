@@ -605,19 +605,18 @@ failed:
 bool BoatPlan::Save(const char *filename)
 {
     FILE *f = fopen(filename, "w");
-
     if(!f)
         return false;
 
     fputs("twa/tws", f);
     for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
-        fprintf(f, ";%.2g", wind_speeds[VWi].VW);
+        fprintf(f, ";%.4g", wind_speeds[VWi].VW);
     fputs("\n", f);
 
     for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
         if(degree_steps[Wi] > 180)
             break;
-        fprintf(f, "%.2g", degree_steps[Wi]);
+        fprintf(f, "%.5g", degree_steps[Wi]);
         for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
             fprintf(f, ";%.5g", wind_speeds[VWi].speeds[Wi].VB);
         fputs("\n", f);
@@ -731,8 +730,7 @@ BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
    heavy cruisers */
 void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
 {
-    csvFileName = _T("<Computed>");
-
+//    csvFileName = _T("");
     if(!computed ||
        wind_speeds.size() != num_computed_wind_speeds ||
        degree_steps.size() != computed_degree_count) {
@@ -884,11 +882,14 @@ double BoatPlan::Speed(double W, double VW)
 
     W = positive_degrees(W);
     unsigned int W1i = degree_step_index[(int)floor(W)], W2i;
-    if(W1i == degree_steps.size()-1)
+    double W1 = degree_steps[W1i], W2;
+    if(W1i == degree_steps.size()-1) {
         W2i = 0;
-    else
+        W2 = 360 + degree_steps[0];
+    } else {
         W2i = W1i+1;
-    double W1 = degree_steps[W1i], W2 = degree_steps[W2i];
+        W2 = degree_steps[W2i];
+    }
 
     int VW1i = ClosestVWi(VW), VW2i = VW1i + 1;
     SailingWindSpeed &ws1 = wind_speeds[VW1i], &ws2 = wind_speeds[VW2i];

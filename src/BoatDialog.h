@@ -61,7 +61,7 @@ private:
     void OnSaveAs( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event ) { Save(); }
     void OnClose( wxCommandEvent& event );
-    void LoadCSV( );
+    void LoadCSV(bool switched = false);
     void OnSaveCSV( wxCommandEvent& event );
     void OnPolarCSVFile( wxFileDirPickerEvent& event );
     void OnUpdateVMG( wxSpinEvent& event ) { UpdateVMG(); }

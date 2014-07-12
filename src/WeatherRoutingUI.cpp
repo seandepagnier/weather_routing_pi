@@ -1651,7 +1651,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText93->Wrap( -1 );
 	fgSizer34->Add( m_staticText93, 0, wxALL, 5 );
 	
-	m_fpCSVPath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
+	m_fpCSVPath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("CSV (*.csv)|*.CSV;*.csv;*.csv.gz;*.csv.bz2|All files (*.*)|*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
 	fgSizer34->Add( m_fpCSVPath, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText123 = new wxStaticText( m_pPolarConfig, wxID_ANY, _("Wind Speed Step"), wxDefaultPosition, wxDefaultSize, 0 );
