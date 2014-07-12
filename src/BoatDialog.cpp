@@ -500,8 +500,8 @@ void BoatDialog::PaintVMG(wxPaintDC &dc)
     // Only render port tack.. later we could do starboard if the polar is not symmetric
     double *valuesup = new double[count], *valuesdown = new double[count];
     for(int s = 0; s<count; s++) {
-        int s0 = s/mul, v;
-        double d = (double)s/mul - s0;
+        int s0 = s/mul;
+        double d = (double)s/mul - s0, v;
         double windspeed1 = wind_speeds[s0];
         double windspeed2 = wind_speeds[s0+1];
         double windspeed = (1-d)*windspeed1 + d*windspeed2;
