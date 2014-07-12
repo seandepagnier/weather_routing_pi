@@ -591,13 +591,9 @@ void BoatDialog::LoadCSV()
     wxString filename = m_fpCSVPath->GetPath();
 
     BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
-    BoatSpeedTable table;
-    if(table.Open(filename.mb_str(),
-                  plan.wind_speed_step, plan.wind_degree_step)) {
-        plan.csvFileName = filename;
-        plan.SetSpeedsFromTable(table);
+    if(plan.Open(filename.mb_str()))
         RepopulatePlans();
-    } else {
+    else {
         wxMessageDialog md(this, _("Failed reading csv: ") + filename,
                            _("OpenCPN Weather Routing Plugin"),
                            wxICON_ERROR | wxOK );
@@ -666,11 +662,9 @@ void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
         pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
         pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
 
-        BoatSpeedTable table = m_Boat.Plans[m_SelectedSailPlan].CreateTable
-            (3, 3);
-        if(!table.Save(saveDialog.GetPath().mb_str())) {
-            wxMessageDialog md(this, _("Failed saving boat polar to csv"),
-                               _("OpenCPN Weather Routing Plugin"),
+        BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
+        if(!plan.Save(saveDialog.GetPath().mb_str())) {
+            wxMessageDialog md(this, _("Failed saving boat polar to csv"), _("OpenCPN Weather Routing Plugin"),
                                wxICON_ERROR | wxOK );
             md.ShowModal();
         }

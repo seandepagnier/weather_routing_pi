@@ -56,98 +56,8 @@ double interp_value(double x, double x1, double x2, double y1, double y2)
     return x2 - x1 ? (y2 - y1)*(x - x1)/(x2 - x1) + y1 : y1;
 }
 
-BoatSpeedTable::BoatSpeedTable()
-{
-}
-
-BoatSpeedTable::~BoatSpeedTable()
-{
-}
-
-#define MAX_WINDSPEEDS_IN_TABLE 200
-bool BoatSpeedTable::Open(const char *filename, int &wind_speed_step, int &wind_degree_step)
-{
-    ZUFILE *f = zu_open(filename, "r");
-    if(!f)
-        return false;
-
-    char line[1024];
-    double lastentryW = -1;
-
-    char *token, *saveptr;
-    if(!zu_gets(f, line, sizeof line))
-        goto failed; /* error here too */
-    token = strtok_r(line, ";", &saveptr);
-
-    /* chomp invisible bytes */
-    while(*token < 0) token++;
-
-    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
-        goto failed; /* unrecognized format */
-    
-    while((token = strtok_r(NULL, ";", &saveptr))) {
-        windspeeds.push_back(strtod(token, 0));
-        if(windspeeds.size() > MAX_WINDSPEEDS_IN_TABLE)
-            goto failed;
-    }
-
-    wind_speed_step = (int)round((double)windspeeds.back() / windspeeds.size());
-
-    wind_degree_step = 0;
-    while(zu_gets(f, line, sizeof line)) {
-        token = strtok_r(line, ";", &saveptr);
-        BoatSpeedTableEntry entry;
-        entry.W = strtod(token, 0);
-        if(entry.W < 0 || entry.W > 180)
-            goto failed;
-        if(entry.W <= lastentryW)
-            goto failed;
-        lastentryW = entry.W;
-        while((token = strtok_r(NULL, ";", &saveptr))) {
-            entry.boatspeed.push_back(strtod(token, 0));
-            if(entry.boatspeed.size() > MAX_WINDSPEEDS_IN_TABLE)
-                goto failed;
-        }
-        table.push_back(entry);
-        wind_degree_step++;
-    }
-
-    if(wind_degree_step < 2)
-        wind_degree_step = 2;
-    wind_degree_step = 180 / (wind_degree_step - 1);
-
-    zu_close(f);
-    return true;
-    
-failed:
-    zu_close(f);
-    return false;
-}
-
-bool BoatSpeedTable::Save(const char *filename)
-{
-    FILE *f = fopen(filename, "w");
-
-    if(!f)
-        return false;
-
-    fputs("twa/tws", f);
-    for(unsigned int i = 0; i<windspeeds.size(); i++)
-        fprintf(f, ";%d", (int)windspeeds[i]);
-    fputs("\n", f);
-
-    for(std::vector<BoatSpeedTableEntry>::iterator it = table.begin();
-        it != table.end(); it++) {
-        fprintf(f, "%d", (int)(*it).W);
-        for(unsigned int i = 0; i<windspeeds.size(); i++) {
-            fprintf(f, ";%.5f", (*it).boatspeed[i]);
-        }
-        fputs("\n", f);
-    }
-    fclose(f);
-    return true;
-}
-
+/* used to convert from one table to another */
+#if 0
 double BoatSpeedTable::InterpolateSpeed(double VW, double W)
 {
     BoatSpeedTableEntry *minW = NULL, *maxW = NULL;
@@ -189,6 +99,7 @@ double BoatSpeedTable::InterpolateSpeed(double VW, double W)
 
     return interp_value(W, x1, x2, y1, y2);
 }
+#endif
 
 /* to calculate power required to get the boat on plane
 
@@ -602,6 +513,119 @@ double BoatPlan::VelocityTrueWind(double VA, double VB, double W)
     return (-b + sqrt(det)) / (2 * a);
 }
 
+#define MAX_WINDSPEEDS_IN_TABLE 200
+bool BoatPlan::Open(const char *filename)
+{
+    wind_speeds.clear();
+    degree_steps.clear();
+    
+    ZUFILE *f = zu_open(filename, "r");
+    if(!f)
+        return false;
+
+    char line[1024];
+    double lastentryW = -1;
+
+    char *token, *saveptr;
+    if(!zu_gets(f, line, sizeof line))
+        goto failed; /* error here too */
+    token = strtok_r(line, ";", &saveptr);
+
+    /* chomp invisible bytes */
+    while(*token < 0) token++;
+
+    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
+        goto failed; /* unrecognized format */
+    
+    while((token = strtok_r(NULL, ";", &saveptr))) {
+        wind_speeds.push_back(SailingWindSpeed(strtod(token, 0)));
+        if(wind_speeds.size() > MAX_WINDSPEEDS_IN_TABLE)
+            goto failed;
+    }
+
+    wind_speed_step = (int)round(wind_speeds.back().VW / wind_speeds.size());
+
+    while(zu_gets(f, line, sizeof line)) {
+        token = strtok_r(line, ";", &saveptr);
+
+        double W = strtod(token, 0);
+        degree_steps.push_back(W);
+        if(W < 0 || W > 180)
+            goto failed;
+        if(W <= lastentryW)
+            goto failed;
+        lastentryW = W;
+
+        std::vector<double>boatspeed;
+        int VWi = 0;
+        while((token = strtok_r(NULL, ";", &saveptr)))
+            wind_speeds[VWi++].speeds.push_back(SailingWindSpeed::SailingSpeed(strtod(token, 0), W));
+    }
+
+    // make sure the table is correct
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+        if(wind_speeds[VWi].speeds.size() != degree_steps.size())
+            goto failed;
+
+    zu_close(f);
+
+    /* fill in port tack assuming symmetric */
+    {
+        int Win = degree_steps.size()-1;
+        if(degree_steps[Win] == 180) Win--;
+        for(; Win >= 0; Win--) {
+            if(degree_steps[Win] == 0)
+                break;
+            
+            degree_steps.push_back(DEGREES - degree_steps[Win]);
+            
+            for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+                wind_speeds[VWi].speeds.push_back(wind_speeds[VWi].speeds[Win]);
+        }
+    }
+        
+    UpdateDegreeStepLookup();
+
+    if(wind_degree_step < 2)
+        wind_degree_step = 2;
+    wind_degree_step = 180 / (wind_degree_step - 1);
+
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+        CalculateVMG(VWi);
+
+    csvFileName = wxString::FromUTF8(filename);
+    computed = false;
+    return true;
+    
+failed:
+    zu_close(f);
+    return false;
+}
+
+bool BoatPlan::Save(const char *filename)
+{
+    FILE *f = fopen(filename, "w");
+
+    if(!f)
+        return false;
+
+    fputs("twa/tws", f);
+    for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
+        fprintf(f, ";%.2g", wind_speeds[VWi].VW);
+    fputs("\n", f);
+
+    for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
+        if(degree_steps[Wi] > 180)
+            break;
+        fprintf(f, "%.2g", degree_steps[Wi]);
+        for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
+            fprintf(f, ";%.5g", wind_speeds[VWi].speeds[Wi].VB);
+        fputs("\n", f);
+    }
+    fclose(f);
+    return true;
+}
+
 /* start out with the boat stopped, and over time, iterate accelerating boat
    until it reaches steady state.  The speed of the boat is known already
    from apparent wind, this function finds it for true wind */
@@ -737,9 +761,9 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
             double W = Wi * computed_degree_step;
             double B, VB, A, VA;
             BoatSteadyState(deg2rad(W), VW, B, VB, A, VA, boat);
-            Set(Wi, VWi, VB);
+            Set(Wi, VWi, VB, W);
             if(W != 0) // assume symmetric performance
-                Set(computed_degree_count-Wi, VWi, VB);
+                Set(computed_degree_count-Wi, VWi, VB, DEGREES-W);
         }
 
         CalculateVMG(VWi);
@@ -774,7 +798,7 @@ void BoatPlan::OptimizeTackingSpeed()
             if(isnan(bt) || isnan(ct))
                 continue;
             
-            SailingSpeed &a = wind_speeds[VWi].speeds[Wi];
+            SailingWindSpeed::SailingSpeed &a = wind_speeds[VWi].speeds[Wi];
             double b = Speed(bt, wind_speeds[VWi].VW);
             double c = Speed(ct, wind_speeds[VWi].VW);
             
@@ -811,51 +835,14 @@ void BoatPlan::ResetOptimalTackingSpeed()
 {
     for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
         for(unsigned int Wi = 0; Wi <= degree_steps.size(); Wi++) {
-            SailingSpeed &a = wind_speeds[VWi].speeds[Wi];
+            SailingWindSpeed::SailingSpeed &a = wind_speeds[VWi].speeds[Wi];
             a.VB = a.origVB;
             a.b = Wi;
             a.w = 1;
         }
 }
 
-void BoatPlan::SetSpeedsFromTable(BoatSpeedTable &table)
-{
-    wind_speeds.clear();
-    degree_steps.clear();
-    
-    for(unsigned int VWi = 0; VWi < table.windspeeds.size(); VWi++)
-        wind_speeds.push_back(SailingWindSpeed(table.windspeeds[VWi]));
-
-    unsigned int Wi;
-    for(Wi = 0; Wi < table.table.size(); Wi++)
-        degree_steps.push_back(table.table[Wi].W);
-    int Win = table.table.size()-1;
-    if(degree_steps[Win] == 180) Win--;
-    for(; Win >= 0; Wi++, Win--) {
-        if(degree_steps[Win] == 0)
-            break;
-        degree_steps.push_back(DEGREES - degree_steps[Win]);
-    }
-    
-    UpdateDegreeStepLookup();
-
-    for(unsigned int VWi = 0; VWi < table.windspeeds.size(); VWi++) {
-        wind_speeds[VWi].speeds.resize(degree_steps.size());
-        for(unsigned int Wi = 0; Wi < table.table.size(); Wi++) {
-            double VB = table.table[Wi].boatspeed[VWi];
-                //InterpolateSpeed(wind_speeds[VWi], Wi*DEGREE_STEP);
-            Set(Wi, VWi, VB);
-            if(Wi != 0)
-                Set(degree_steps.size()-Wi, VWi, VB);
-        }
-    }
-
-    for(unsigned int VWi = 0; VWi < table.windspeeds.size(); VWi++)
-        CalculateVMG(VWi);
-
-    computed = false;
-}
-
+#if 0
 BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
 {
     BoatSpeedTable boatspeedtable;
@@ -876,6 +863,7 @@ BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
     }
     return boatspeedtable;
 }
+#endif
 
 // return index of wind speed in table which less than our wind speed,
 // or second from last (adding 1 to this value is a valid wind speed)
@@ -1071,18 +1059,13 @@ double BoatPlan::TrueWindSpeed(double VB, double W, double maxVW)
     return interp_value(VB, VBmin, VBmax, VWmin, VWmax);
 }
 
-void BoatPlan::Set(unsigned int Wi, unsigned int VWi, double VB)
+void BoatPlan::Set(unsigned int Wi, unsigned int VWi, double VB, double W)
 {
     if(Wi >= degree_steps.size() ||
        VWi > wind_speeds.size())
         return; /* maybe log warning here? */
     
-    SailingSpeed &s = wind_speeds[VWi].speeds[Wi];
-    s.VB = VB;
-    s.origVB = VB;
-    s.slipangle = 0;
-    s.b = Wi;
-    s.w = 1; /* weighted all on first course */
+    wind_speeds[VWi].speeds[Wi] = SailingWindSpeed::SailingSpeed(VB, W);
 }
 
 void BoatPlan::UpdateDegreeStepLookup()

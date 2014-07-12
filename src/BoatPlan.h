@@ -26,42 +26,10 @@
 
 #include <vector>
 
-struct SailingSpeed
-{
-    float VB; /* speed in knots */
-    float origVB; /* speed before VMG optimization */
-    float slipangle; /* angle of boat relative to its movement thru water */
-
-    float w; /* weight of time on each tack */
-    float b, c; /* tacks to sail relative to true wind */
-};
-
 struct SailingVMG
 {
     enum { STARBOARD_UPWIND, PORT_UPWIND, STARBOARD_DOWNWIND, PORT_DOWNWIND};
     float values[4];
-};
-
-class BoatSpeedTableEntry
-{
-public:
-    double W;
-    std::vector<double> boatspeed;
-};
-
-class BoatSpeedTable
-{
-public:
-    BoatSpeedTable();
-    ~BoatSpeedTable();
-
-    bool Open(const char *filename, int &wind_speed_step, int &wind_degree_step);
-    bool Save(const char *filename);
-
-    double InterpolateSpeed(double VW, double W);
-
-    std::vector<double> windspeeds;
-    std::vector<BoatSpeedTableEntry> table;
 };
 
 class SwitchPlan
@@ -93,6 +61,9 @@ public:
     static double DirectionApparentWind(double VB, double W, double VW);
     static double VelocityTrueWind(double VA, double VB, double W);
 
+    bool Open(const char *filename);
+    bool Save(const char *filename);
+
     void BoatSteadyState(double W, double VW, double &B, double &VB,
                          double &A, double &VA, Boat &boat);
     wxString TrySwitchBoatPlan(double VW, double H, double Swell,
@@ -117,8 +88,6 @@ public:
     void ComputeBoatSpeeds(Boat &boat, int speed = -1);
     void OptimizeTackingSpeed();
     void ResetOptimalTackingSpeed();
-    void SetSpeedsFromTable(BoatSpeedTable &table);
-    BoatSpeedTable CreateTable(int wind_speed_step, int wind_degree_step);
 
     int ClosestVWi(double VW);
 
@@ -131,7 +100,7 @@ public:
     SailingVMG GetVMGApparentWind(double VA);
 
     double TrueWindSpeed(double VB, double W, double maxVW);
-    void Set(unsigned int Wi, unsigned int VWi, double VB);
+    void Set(unsigned int Wi, unsigned int VWi, double VB, double W);
 
 private:
     void UpdateDegreeStepLookup();
@@ -145,6 +114,18 @@ private:
     double max_knots;
 
     struct SailingWindSpeed {
+        struct SailingSpeed {
+            SailingSpeed() {}
+            SailingSpeed(double nVB, double W) : VB(nVB), origVB(nVB), slipangle(0), w(1), b(W) {}
+
+            float VB; /* speed in knots */
+            float origVB; /* speed before VMG optimization */
+            float slipangle; /* angle of boat relative to its movement thru water */
+
+            float w; /* weight of time on each tack */
+            float b, c; /* tacks to sail relative to true wind */
+        };
+
         SailingWindSpeed(double nVW) : VW(nVW) {}
 
         double VW;
