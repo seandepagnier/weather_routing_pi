@@ -85,7 +85,6 @@ wxString Boat::OpenXML(wxString filename)
             if(plan.computed) {
                 plan.eta = AttributeDouble(e, "eta", .5);
                 plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
-                plan.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
                 plan.wing_wing_running = AttributeBool(e, "wing_wing_running", false);
                 plan.ComputeBoatSpeeds(*this);
             } else {
@@ -93,6 +92,10 @@ wxString Boat::OpenXML(wxString filename)
                 if(!plan.Open(plan.csvFileName.mb_str()))
                     return _("Failed to open file: ") + plan.csvFileName;
             }
+
+            plan.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
+            if(plan.optimize_tacking)
+                plan.OptimizeTackingSpeed();
 
             for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
                 if(!strcmp(e->Value(), "SwitchPlan")) {
@@ -165,11 +168,12 @@ wxString Boat::SaveXML(wxString filename)
             sprintf(str, "%.4f", Plans[i].luff_angle);
             plan->SetAttribute("luff_angle", str);
 
-            plan->SetAttribute("optimize_tacking", Plans[i].optimize_tacking);
             plan->SetAttribute("wing_wing_running", Plans[i].wing_wing_running);
         } else {
             plan->SetAttribute("csvFileName", Plans[i].csvFileName.mb_str());
         }
+
+        plan->SetAttribute("optimize_tacking", Plans[i].optimize_tacking);
 
         for(unsigned int j=0; j<Plans[i].SwitchPlans.size(); j++) {
             TiXmlElement *switchplan = new TiXmlElement( "SwitchPlan" );

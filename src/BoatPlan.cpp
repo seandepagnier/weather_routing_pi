@@ -585,10 +585,7 @@ bool BoatPlan::Open(const char *filename)
     }
         
     UpdateDegreeStepLookup();
-
-    if(wind_degree_step < 2)
-        wind_degree_step = 2;
-    wind_degree_step = 180 / (wind_degree_step - 1);
+    wind_degree_step = degree_steps.size() ? 360 / degree_steps.size() : 0;
 
     for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
         CalculateVMG(VWi);
@@ -1104,7 +1101,7 @@ void BoatPlan::CalculateVMG(int VWi)
             }
         }
 
-#if 1
+        // interpolate the best vmg (as it often lies between entries in the polar
         if(!isnan(maxW)) {
             unsigned int Wi1 = maxWi > 0 ? maxWi - 1 : degree_steps.size() - 1;
             unsigned int Wi2 = maxWi < degree_steps.size() - 1 ? maxWi + 1 : 0;
@@ -1113,7 +1110,7 @@ void BoatPlan::CalculateVMG(int VWi)
                                 fabsf(dsmaxWi - degree_steps[Wi2])) / 4;
 
             while(step > 2e-3) {
-                double W1 = maxW-step, W2 = maxW+step;
+                double W1 = wxMax(maxW-step, limits[i][0]), W2 = wxMin(maxW+step, limits[i][1]);
                 double VB1 = upwind*cos(deg2rad(W1))*Speed(W1, ws.VW);
                 double VB2 = upwind*cos(deg2rad(W2))*Speed(W2, ws.VW);
 
@@ -1125,7 +1122,7 @@ void BoatPlan::CalculateVMG(int VWi)
                 step /= 2;
             }
         }
-#endif
+
         ws.VMG.values[i] = maxW;
     }
 }
