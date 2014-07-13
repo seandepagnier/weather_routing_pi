@@ -740,7 +740,11 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
 
         for(unsigned int VWi = 0; VWi < num_computed_wind_speeds; VWi++) {
             wind_speeds.push_back(SailingWindSpeed(computed_wind_speeds[VWi]));
-            wind_speeds[VWi].speeds.resize(degree_steps.size());
+
+            wind_speeds[VWi].speeds.clear();
+            for(unsigned int Wi = 0; Wi < computed_degree_count; Wi++)
+                wind_speeds[VWi].speeds.push_back(SailingWindSpeed::SailingSpeed(0, degree_steps[Wi]));
+//            wind_speeds[VWi].speeds.resize(degree_steps.size());
         }
     }
 
@@ -777,7 +781,7 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
 void BoatPlan::OptimizeTackingSpeed()
 {
     for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++) {
-//        CalculateVMG(VWi);
+        CalculateVMG(VWi);
         for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
             double at = degree_steps[Wi];
             double bt, ct;
@@ -829,7 +833,7 @@ void BoatPlan::OptimizeTackingSpeed()
 void BoatPlan::ResetOptimalTackingSpeed()
 {
     for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
-        for(unsigned int Wi = 0; Wi <= degree_steps.size(); Wi++) {
+        for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
             SailingWindSpeed::SailingSpeed &a = wind_speeds[VWi].speeds[Wi];
             a.VB = a.origVB;
             a.b = Wi;

@@ -888,7 +888,6 @@ void BoatDialog::Compute()
                            ? m_sWindSpeed->GetValue() : -1);
 
     UpdateVMG();
-
     if(m_cbOptimizeTacking->IsChecked())
         m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();
 
