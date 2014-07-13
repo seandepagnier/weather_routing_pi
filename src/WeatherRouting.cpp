@@ -1186,7 +1186,7 @@ void WeatherRouting::SaveXML(wxString filename)
 
 void WeatherRouting::SetEnableConfigurationMenu()
 {
-    bool current = FirstCurrentRouteMap();
+    bool current = FirstCurrentRouteMap() != NULL;
     m_mBatch->Enable(current);
     m_mEdit->Enable(current);
     m_mGoTo->Enable(current);
@@ -1194,9 +1194,9 @@ void WeatherRouting::SetEnableConfigurationMenu()
     m_mCompute->Enable(current);
     m_mExport->Enable(current);
 
-    m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size());
+    m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size() > 0);
 
-    bool cnt = m_lWeatherRoutes->GetItemCount();
+    bool cnt = m_lWeatherRoutes->GetItemCount() > 0;
     m_mDeleteAll->Enable(cnt);
     m_mComputeAll->Enable(cnt);
     m_mExportAll->Enable(cnt);

@@ -2012,7 +2012,7 @@ void IsoChron::PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         bool propagated = false;
         
-        IsoRoute *x;
+        IsoRoute *x = NULL;
         /* if anchoring is allowed, then we can propagate a second time,
            so copy the list before clearing the propagate flag,
            when depth data is implemented we will need to flag positions as propagated

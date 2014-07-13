@@ -57,6 +57,23 @@ ADD_DEFINITIONS(-DTIXML_USE_STL)
 
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING} ${SRC_JSON} ${SRC_TINYXML})
 
+IF(NOT UNIX)
+    SET(SRC_BZIP
+            src/bzip2/bzlib.c 
+            src/bzip2/blocksort.c 
+            src/bzip2/compress.c 
+            src/bzip2/crctable.c 
+            src/bzip2/decompress.c 
+            src/bzip2/huffman.c 
+            src/bzip2/randtable.c
+    )
+    ADD_LIBRARY(LIB_BZIP STATIC ${SRC_BZIP})
+    TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP )
+
+    INCLUDE_DIRECTORIES(${PLUGIN_SOURCE_DIR}/src/zlib-1.2.3)
+    INCLUDE_DIRECTORIES(${PLUGIN_SOURCE_DIR}/src/bzip2)
+ENDIF(NOT UNIX)
+
 #IF(NOT UNIX)
 #    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
 #    INCLUDE_DIRECTORIES(src/bzip2)
