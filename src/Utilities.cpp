@@ -108,7 +108,7 @@ int AttributeInt(TiXmlElement *e, const char *name, int def)
 
 bool AttributeBool(TiXmlElement *e, const char *name, bool def)
 {
-    return AttributeInt(e, name, def);
+    return AttributeInt(e, name, def) != 0;
 }
 
 #ifdef __MINGW32__

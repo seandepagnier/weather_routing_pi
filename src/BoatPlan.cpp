@@ -691,7 +691,7 @@ static bool ComputeDayTime(const wxDateTime &gribtime, double lat, double lon, i
     double gha = 2*M_PI*(lon/15 - gribtime.GetHour() - gribtime.GetMinute()/60)/24;
     double suninc = 90*cos(deg2rad(lat))*sin(gha) + 23.45*cos(yearpos);    
 
-    return (daytime = (suninc > 0)); /* sun above horizon */
+    return (daytime = (suninc > 0)) != 0; /* sun above horizon */
 }
 
 wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
