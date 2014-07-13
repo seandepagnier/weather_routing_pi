@@ -48,8 +48,8 @@ class SkipPosition;
 class Position
 {
 public:
-    Position(double latitude, double longitude, Position *p=NULL, double pheading=NAN,
-             int sp=0, int t=0);
+    Position(double latitude, double longitude, Position *p=NULL,
+             double pheading=NAN, double pbearing=NAN, int sp=0, int t=0);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
@@ -67,6 +67,7 @@ public:
     double lat, lon;
 
     double parent_heading; /* angle relative to true wind we sailed from parent to this position */
+    double parent_bearing; /* angle relative to north */
     int sailplan; /* which sail plan in the boat we are using */
     int tacks; /* how many times we have tacked to get to this position */
 

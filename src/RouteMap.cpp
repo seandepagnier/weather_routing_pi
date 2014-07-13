@@ -266,8 +266,9 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 
 #define EPSILON (2e-10)
 Position::Position(double latitude, double longitude, Position *p,
-                   double pheading, int sp, int t)
-    : lat(latitude), lon(longitude), parent_heading(pheading), sailplan(sp), tacks(t),
+                   double pheading, double pbearing, int sp, int t)
+    : lat(latitude), lon(longitude), parent_heading(pheading), parent_bearing(pbearing),
+      sailplan(sp), tacks(t),
       parent(p), propagated(false), copied(false)
 {
     lat -= fmod(lat, EPSILON);
@@ -275,7 +276,7 @@ Position::Position(double latitude, double longitude, Position *p,
 }
 
 Position::Position(Position *p)
-    : lat(p->lat), lon(p->lon), parent_heading(p->parent_heading),
+    : lat(p->lat), lon(p->lon), parent_heading(p->parent_heading), parent_bearing(p->parent_bearing),
       sailplan(p->sailplan), tacks(p->tacks),
       parent(p->parent), propagated(p->propagated), copied(true)
 {
@@ -591,12 +592,8 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
     bool first_avoid = true;
     Position *rp;
 
-    double bearing1 = NAN, bearing2;
+    double bearing1 = NAN, bearing2 = NAN;
     if(parent && configuration.MaxSearchAngle < 180) {
-        // We could cache this in the position to avoid recalculating
-        double parent_bearing;
-        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &parent_bearing, 0);
-
         bearing1 = heading_resolve( parent_bearing - configuration.MaxSearchAngle);
         bearing2 = heading_resolve( parent_bearing + configuration.MaxSearchAngle);
     }
@@ -609,7 +606,6 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
         B = W + H; /* rotated relative to true wind */
 
-        bool current_propagated = false;
         /* test to avoid extra computations related to backtracking */
         if(!isnan(bearing1)) {
             double bearing3 = heading_resolve(B);
@@ -620,8 +616,9 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                        with the previous one to nicely merge the resulting graph */
                     first_avoid = false;
                     rp = new Position(this);
-                    rp->lat = (lat + parent->lat)/2;
-                    rp->lon = (lon + parent->lon)/2;
+                    double dp = .95;
+                    rp->lat = (1-dp)*lat + dp*parent->lat;
+                    rp->lon = (1-dp)*lon + dp*parent->lon;
                     rp->propagated = true; // not a "real" position so we don't propagate it either.
                     goto add_position;
                 } else
@@ -640,8 +637,8 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
         /* did we tack thru the wind? apply penalty */
         bool tacked = false;
         if(parent_heading*H < 0 && fabs(parent_heading - H) < 180) {
-                timeseconds -= configuration.TackingTime;
-                tacked = true;
+            timeseconds -= configuration.TackingTime;
+            tacked = true;
         }
 
         double dlat, dlon, nrdlon;
@@ -660,7 +657,16 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
 
             ll_gc_ll(lat, lon, BG, dist/6 + k2_dist/3 + k3_dist/3 + k4_dist/6, &dlat, &dlon);
         } else /* newtons method */
-            ll_gc_ll(lat, lon, BG, dist, &dlat, &dlon);
+#if 1
+            ll_gc_ll(lat, lon, heading_resolve(BG), dist, &dlat, &dlon);
+#else
+        {
+            double d = dist / 60;
+            dlat = lat + d * cos(deg2rad(BG));
+            dlon = lon + d * sin(deg2rad(BG));
+            dlon = heading_resolve(dlon);
+        }
+#endif
 
         nrdlon = dlon;
         if(configuration.positive_longitudes && dlon < 0)
@@ -709,8 +715,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
                 continue;
         }
 
-        rp = new Position(dlat, dlon, this, H, newsailplan, tacks + tacked);
-        rp->propagated = current_propagated;
+        rp = new Position(dlat, dlon, this, H, B, newsailplan, tacks + tacked);
     }
     add_position:
 

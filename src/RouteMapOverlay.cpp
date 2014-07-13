@@ -668,7 +668,7 @@ void RouteMapOverlay::UpdateDestination()
             goto not_able_to_propagate;
 
         destination_position = new Position(configuration.EndLat, configuration.EndLon,
-                                        endp, minH, endp->sailplan, endp->tacks + mintacked);
+                                            endp, minH, NAN, endp->sailplan, endp->tacks + mintacked);
 
         m_EndTime = isochron->time + wxTimeSpan::Milliseconds(1000*mindt);
 
