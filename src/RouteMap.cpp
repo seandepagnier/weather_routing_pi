@@ -676,6 +676,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             double bearing;
             // this is faster than gc distance, and actually works better in higher latitudes
             double d1 = dlat - configuration.StartLat, d2 = dlon - configuration.StartLon;
+            d2 *= cos(deg2rad(dlat))/2; // correct for latitude
             bearing = rad2deg(atan2(d2, d1));
 
             if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxCourseAngle)
@@ -687,6 +688,7 @@ bool Position::Propagate(IsoRouteList &routelist, GribRecordSet *grib,
             double bearing1, dist1;
 
             double d1 = dlat - configuration.EndLat, d2 = dlon - configuration.EndLon;
+            d2 *= cos(deg2rad(dlat))/2; // correct for latitude
             bearing = rad2deg(atan2(d2, d1));
             dist = sqrt(pow(d1, 2) + pow(d2, 2));
 

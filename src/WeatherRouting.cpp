@@ -912,7 +912,7 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         if(routemapoverlay->Start(error))
             m_RunningRouteMaps.push_back(routemapoverlay);
         else {
-            wxMessageDialog mdlg(this, _("Failed to start configuration: "),
+            wxMessageDialog mdlg(this, _("Failed to start configuration: ") + error,
                                  _("Weather Routing"), wxOK | wxICON_ERROR);
             mdlg.ShowModal();
         }
