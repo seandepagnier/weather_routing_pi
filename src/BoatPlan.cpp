@@ -685,7 +685,7 @@ static bool ComputeDayTime(const wxDateTime &gribtime, double lat, double lon, i
 
 {
     if(daytime != -1)
-        return daytime;
+        return daytime != 0;
 
     double yearpos = 2*M_PI*(gribtime.GetDay()-186)/365.24;
     double gha = 2*M_PI*(lon/15 - gribtime.GetHour() - gribtime.GetMinute()/60)/24;

@@ -343,7 +343,7 @@ void BoatDialog::PaintPolar(wxPaintDC &dc)
     PlotVMG(dc, vmg.values[SailingVMG::STARBOARD_DOWNWIND], s);
 
     /* boat speeds */
-    double values[DEGREES];
+    double values[DEGREES + 1];
     for(int H = 0; H<=DEGREES; H++) {
         switch(selection) {
         case 0: values[H] = plan.Speed(H, windspeed); break;
@@ -355,9 +355,9 @@ void BoatDialog::PaintPolar(wxPaintDC &dc)
 
     dc.SetPen(wxPen(wxColor(255, 0, 0), 2));
     if(m_cPlotType->GetSelection() == 0)
-        PlotPolarData(dc, values, DEGREES, m_PlotScale, w, h);
+        PlotPolarData(dc, values, DEGREES+1, m_PlotScale, w, h);
     else
-        PlotRectangularData(dc, values, DEGREES, 2*m_PlotScale, w, h);
+        PlotRectangularData(dc, values, DEGREES+1, 2*m_PlotScale, w, h);
 
 #if 0
         if(W == m_MouseW) {
