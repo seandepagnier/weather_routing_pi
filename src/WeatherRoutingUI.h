@@ -317,6 +317,24 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText212;
 		wxStaticText* m_stBoatKnots;
 		wxStaticText* m_staticText232;
+		wxPanel* m_panel17;
+		wxStaticText* m_staticText100;
+		wxChoice* m_cHullType;
+		wxStaticText* m_staticText58;
+		wxSpinCtrl* m_sDisplacement;
+		wxStaticText* m_staticText121;
+		wxStaticText* m_staticText128;
+		wxSpinCtrl* m_sSailArea;
+		wxStaticText* m_staticText129;
+		wxStaticText* m_staticText57;
+		wxSpinCtrl* m_sLWL;
+		wxStaticText* m_staticText122;
+		wxStaticText* m_staticText109;
+		wxSpinCtrl* m_sLOA;
+		wxStaticText* m_staticText127;
+		wxStaticText* m_staticText113;
+		wxSpinCtrl* m_sBeam;
+		wxStaticText* m_staticText126;
 		wxPanel* m_pPolarConfig;
 		wxRadioButton* m_rbComputed;
 		wxRadioButton* m_rbCSV;
@@ -333,12 +351,6 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText91;
 		wxSpinCtrl* m_sLuffAngle;
 		wxCheckBox* m_cbWingWingRunning;
-		wxStaticText* m_staticText100;
-		wxChoice* m_cHullType;
-		wxStaticText* m_staticText58;
-		wxSpinCtrl* m_sDisplacement;
-		wxStaticText* m_staticText57;
-		wxSpinCtrl* m_sLWL;
 		wxButton* m_bSaveCSV;
 		wxStaticBoxSizer* m_sbCSV;
 		wxStaticText* m_staticText93;
@@ -366,18 +378,16 @@ class BoatDialogBase : public wxDialog
 		wxButton* m_bEditSwitchBoatPlan;
 		wxButton* m_bDeleteSwitchBoatPlan;
 		wxPanel* m_panel5;
-		wxStaticText* m_staticText113;
-		wxSpinCtrl* m_sBeam;
-		wxStaticText* m_staticText109;
-		wxSpinCtrl* m_sLOA;
+		wxStaticText* m_staticText119;
+		wxStaticText* m_stSailAreaDisplacementRatio;
+		wxStaticText* m_staticText105;
+		wxStaticText* m_stDisplacementLengthRatio;
 		wxStaticText* m_staticText92;
 		wxStaticText* m_stHullSpeed;
 		wxStaticText* m_staticText94;
 		wxStaticText* m_stCapsizeRisk;
 		wxStaticText* m_staticText96;
 		wxStaticText* m_stComfortFactor;
-		wxStaticText* m_staticText105;
-		wxStaticText* m_stDisplacementLengthRatio;
 		wxButton* m_bOpen;
 		wxButton* m_bSaveAs;
 		wxButton* m_bSaveandClose;
@@ -393,15 +403,15 @@ class BoatDialogBase : public wxDialog
 		virtual void OnUpdatePlot( wxListbookEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdateStatisticsSpin( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnRecomputeSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnPolarMode( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEtaSlider( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnEta( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRecomputeSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecompute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdateStatisticsSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarCSVFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnUpdateVMG( wxSpinEvent& event ) { event.Skip(); }

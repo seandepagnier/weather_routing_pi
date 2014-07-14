@@ -58,6 +58,7 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
 
     if(curplan.computed) {
         m_sDisplacement->SetValue(m_Boat.displacement_tons);
+        m_sSailArea->SetValue(m_Boat.sail_area_ft2);
         m_sLWL->SetValue(m_Boat.lwl_ft);
         m_sLOA->SetValue(m_Boat.loa_ft);
 
@@ -830,6 +831,7 @@ void BoatDialog::StoreBoatParameters()
     m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
 
     m_Boat.displacement_tons = m_sDisplacement->GetValue();
+    m_Boat.sail_area_ft2 = m_sSailArea->GetValue();
     m_Boat.lwl_ft = m_sLWL->GetValue();
     m_Boat.loa_ft = m_sLOA->GetValue();
     m_Boat.beam_ft = m_sBeam->GetValue();
@@ -1020,8 +1022,26 @@ void BoatDialog::PopulatePlans()
     
 void BoatDialog::UpdateStats()
 {
+    double SADR = m_Boat.SailAreaDisplacementRatio();
+    wxString SADRs = wxString::Format(_T("%.2f"), SADR) + _T("\t");
+    if(SADR < 16) SADRs += _("Cruiser"); else
+    if(SADR < 20) SADRs += _("Cruiser/Racer"); else
+    if(SADR < 23) SADRs += _("Racer"); else
+       SADRs += _("High Peformance") + wxString(_("Racer"));
+
+    m_stSailAreaDisplacementRatio->SetLabel(SADRs);
+    
+    double DLR = m_Boat.DisplacementLengthRatio();
+    wxString DLRs = wxString::Format(_T("%.2f"), DLR) + _T("\t");
+    if(DLR < 100) DLRs += _("Ultra Light") + wxString(_("Racer")); else
+    if(DLR < 200) DLRs += _("Racer"); else
+    if(DLR < 300) DLRs += _("Cruiser/Racer"); else
+    if(DLR < 400) DLRs += _("Cruiser"); else
+       DLRs += _("Heavy Cruiser") + wxString(_("Cruiser"));
+        
+    m_stDisplacementLengthRatio->SetLabel(DLRs);
+
     m_stHullSpeed->SetLabel(wxString::Format(_T("%.3f"), m_Boat.HullSpeed()));
     m_stCapsizeRisk->SetLabel(wxString::Format(_T("%.3f"), m_Boat.CapsizeRisk()));
     m_stComfortFactor->SetLabel(wxString::Format(_T("%.3f"), m_Boat.ComfortFactor()));
-    m_stDisplacementLengthRatio->SetLabel(wxString::Format(_T("%.3f"), m_Boat.DisplacementLengthRatio()));
 }

@@ -57,7 +57,7 @@ public:
     enum HullType {MONO, CATAMARAN, TRIMARAN, PROA, SUBMARINE};
     HullType hulltype;
 
-    double displacement_tons, lwl_ft, loa_ft, beam_ft;
+    double displacement_tons, sail_area_ft2, lwl_ft, loa_ft, beam_ft;
     double frictional_drag, wake_drag;
 
 private:
