@@ -1634,7 +1634,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel17->SetSizer( fgSizer1022 );
 	m_panel17->Layout();
 	fgSizer1022->Fit( m_panel17 );
-	m_nNotebook->AddPage( m_panel17, _("Boat Configuration"), true );
+	m_nNotebook->AddPage( m_panel17, _("Boat Configuration"), false );
 	m_pPolarConfig = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* m_fgConfig;
 	m_fgConfig = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1643,20 +1643,20 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_fgConfig->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* fgSizer941;
-	fgSizer941 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer941 = new wxFlexGridSizer( 1, 0, 0, 0 );
 	fgSizer941->SetFlexibleDirection( wxBOTH );
 	fgSizer941->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_rbComputed = new wxRadioButton( m_pPolarConfig, wxID_ANY, _("Polar Computed"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer941->Add( m_rbComputed, 0, wxALL, 5 );
-	
-	m_rbCSV = new wxRadioButton( m_pPolarConfig, wxID_ANY, _("Polar From CSV"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer941->Add( m_rbCSV, 0, wxALL, 5 );
+	wxString m_cPolarMethodChoices[] = { _("Loaded from CSV Polar File"), _("Computed From Sailboat Transform"), _("Computed From IMS Formula") };
+	int m_cPolarMethodNChoices = sizeof( m_cPolarMethodChoices ) / sizeof( wxString );
+	m_cPolarMethod = new wxChoice( m_pPolarConfig, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPolarMethodNChoices, m_cPolarMethodChoices, 0 );
+	m_cPolarMethod->SetSelection( 0 );
+	fgSizer941->Add( m_cPolarMethod, 0, wxALL, 5 );
 	
 	
 	m_fgConfig->Add( fgSizer941, 1, wxEXPAND, 5 );
 	
-	m_sbComputation = new wxStaticBoxSizer( new wxStaticBox( m_pPolarConfig, wxID_ANY, _("Polar Computation Settings") ), wxVERTICAL );
+	m_sbComputationTransform = new wxStaticBoxSizer( new wxStaticBox( m_pPolarConfig, wxID_ANY, _("Polar Computation Sailboat Transform Settings") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer1811111;
 	fgSizer1811111 = new wxFlexGridSizer( 0, 3, 0, 0 );
@@ -1741,28 +1741,37 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_cbWingWingRunning = new wxCheckBox( m_pPolarConfig, wxID_ANY, _("Wing and Wing Running"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer541->Add( m_cbWingWingRunning, 0, wxALL, 5 );
 	
+	m_bSaveCSV = new wxButton( m_pPolarConfig, wxID_ANY, _("Save As CSV"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer541->Add( m_bSaveCSV, 0, wxALL, 5 );
+	
 	
 	fgSizer49->Add( fgSizer541, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer1811111->Add( fgSizer49, 1, wxEXPAND, 5 );
 	
-	wxFlexGridSizer* fgSizer46;
-	fgSizer46 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer46->SetFlexibleDirection( wxBOTH );
-	fgSizer46->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_bSaveCSV = new wxButton( m_pPolarConfig, wxID_ANY, _("Save As CSV"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer46->Add( m_bSaveCSV, 0, wxALL, 5 );
+	m_sbComputationTransform->Add( fgSizer1811111, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer1811111->Add( fgSizer46, 1, wxEXPAND, 5 );
+	m_fgConfig->Add( m_sbComputationTransform, 1, wxEXPAND, 5 );
+	
+	m_sbComputationIMF = new wxStaticBoxSizer( new wxStaticBox( m_pPolarConfig, wxID_ANY, _("Polar Computation IMF Settings") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer110;
+	fgSizer110 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer110->SetFlexibleDirection( wxBOTH );
+	fgSizer110->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText131 = new wxStaticText( m_pPolarConfig, wxID_ANY, _("Based on general formula\nSpeed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText131->Wrap( -1 );
+	fgSizer110->Add( m_staticText131, 0, wxALL, 5 );
 	
 	
-	m_sbComputation->Add( fgSizer1811111, 1, wxEXPAND, 5 );
+	m_sbComputationIMF->Add( fgSizer110, 1, wxEXPAND, 5 );
 	
 	
-	m_fgConfig->Add( m_sbComputation, 1, wxEXPAND, 5 );
+	m_fgConfig->Add( m_sbComputationIMF, 1, wxEXPAND, 5 );
 	
 	m_sbCSV = new wxStaticBoxSizer( new wxStaticBox( m_pPolarConfig, wxID_ANY, _("Polar CSV File Settings") ), wxVERTICAL );
 	
@@ -1805,7 +1814,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_pPolarConfig->SetSizer( m_fgConfig );
 	m_pPolarConfig->Layout();
 	m_fgConfig->Fit( m_pPolarConfig );
-	m_nNotebook->AddPage( m_pPolarConfig, _("Polar Configuration"), false );
+	m_nNotebook->AddPage( m_pPolarConfig, _("Polar Configuration"), true );
 	m_panel311 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer1811;
 	fgSizer1811 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -2011,8 +2020,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sLWL->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecomputeSpin ), NULL, this );
 	m_sLOA->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatisticsSpin ), NULL, this );
 	m_sBeam->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatisticsSpin ), NULL, this );
-	m_rbComputed->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
-	m_rbCSV->Connect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
+	m_cPolarMethod->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMethod ), NULL, this );
 	m_sEta->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
 	m_sEta->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
 	m_sEta->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
@@ -2075,8 +2083,7 @@ BoatDialogBase::~BoatDialogBase()
 	m_sLWL->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecomputeSpin ), NULL, this );
 	m_sLOA->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatisticsSpin ), NULL, this );
 	m_sBeam->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateStatisticsSpin ), NULL, this );
-	m_rbComputed->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
-	m_rbCSV->Disconnect( wxEVT_COMMAND_RADIOBUTTON_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMode ), NULL, this );
+	m_cPolarMethod->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnPolarMethod ), NULL, this );
 	m_sEta->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
 	m_sEta->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );
 	m_sEta->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( BoatDialogBase::OnEtaSlider ), NULL, this );

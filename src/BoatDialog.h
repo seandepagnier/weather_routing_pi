@@ -75,7 +75,7 @@ private:
     void OnRecomputeDrag( wxCommandEvent& event );
     void OnDragInfo( wxCommandEvent& event );
     void OnSailPlanSelected( wxListEvent& event );
-    void OnPolarMode( wxCommandEvent& event );
+    void OnPolarMethod( wxCommandEvent& event );
     void OnEtaSlider( wxScrollEvent& event );
     void OnEta( wxCommandEvent& event );
     void OnNewBoatPlan( wxCommandEvent& event );

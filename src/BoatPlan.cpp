@@ -591,7 +591,7 @@ bool BoatPlan::Open(const char *filename)
         CalculateVMG(VWi);
 
     csvFileName = wxString::FromUTF8(filename);
-    computed = false;
+    polarmethod = CSV;
     return true;
     
 failed:
@@ -725,10 +725,10 @@ BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
 
 /* eta is a measure of efficiency of the boat, from .01 for racing boats to .5 for
    heavy cruisers */
-void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
+void BoatPlan::ComputeBoatSpeeds(Boat &boat, PolarMethod method, int speed)
 {
 //    csvFileName = _T("");
-    if(!computed ||
+    if(polarmethod == CSV ||
        wind_speeds.size() != num_computed_wind_speeds ||
        degree_steps.size() != computed_degree_count) {
         wind_speeds.clear();
@@ -744,9 +744,13 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
             wind_speeds[VWi].speeds.clear();
             for(unsigned int Wi = 0; Wi < computed_degree_count; Wi++)
                 wind_speeds[VWi].speeds.push_back(SailingWindSpeed::SailingSpeed(0, degree_steps[Wi]));
-//            wind_speeds[VWi].speeds.resize(degree_steps.size());
         }
     }
+
+    // for IMF computation
+    double SADR = boat.SailAreaDisplacementRatio();
+    double lwl_ft = boat.lwl_ft;
+    double hull_speed = boat.HullSpeed();
 
     int min, max;
     if(speed == -1) // all speeds
@@ -758,8 +762,28 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
         for(unsigned int Wi = 0; Wi <= computed_degree_count/2; Wi++) {
             double VW = wind_speeds[VWi].VW;
             double W = Wi * computed_degree_step;
+
             double B, VB, A, VA;
-            BoatSteadyState(deg2rad(W), VW, B, VB, A, VA, boat);
+            switch(method) {
+            case TRANSFORM:
+                BoatSteadyState(deg2rad(W), VW, B, VB, A, VA, boat);
+                break;
+            case IMF:
+            {
+                if(fabsf(W) < 30)
+                    VB = 0;
+                else {
+                    double base_speed  = 2.62 + .066*SADR + .051*lwl_ft;
+                    double b = 1 / sqrt(VW + 3);
+                    VB = base_speed*(sin(deg2rad(W)/2) + b*cos(deg2rad(W))) * sqrt(20*VW) / 8;
+                    if(VB > hull_speed)
+                        VB = hull_speed;
+                }
+            }
+            default:
+                break;
+            }
+
             Set(Wi, VWi, VB, W);
             if(W != 0) // assume symmetric performance
                 Set(computed_degree_count-Wi, VWi, VB, DEGREES-W);
@@ -768,7 +792,7 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, int speed)
         CalculateVMG(VWi);
     }
 
-    computed = true;
+    polarmethod = method;
 }
 
 /* instead of traveling in the direction given, allow traveling at angles
@@ -878,7 +902,7 @@ int BoatPlan::ClosestVWi(double VW)
 /* compute boat speed from true wind angle and true wind speed */
 double BoatPlan::Speed(double W, double VW)
 {
-    if(VW < 0 || VW > computed_max_knots)
+    if(VW < 0 || VW > wind_speeds.back().VW)
         return NAN;
 
     W = positive_degrees(W);

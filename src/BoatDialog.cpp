@@ -55,8 +55,12 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
 
     m_SelectedSailPlan = 0;
     BoatPlan &curplan = m_Boat.Plans[m_SelectedSailPlan];
+    m_cPolarMethod->SetSelection(curplan.polarmethod);
 
-    if(curplan.computed) {
+    switch(curplan.polarmethod) {
+    case BoatPlan::CSV:
+        break;
+    case BoatPlan::TRANSFORM:
         m_sDisplacement->SetValue(m_Boat.displacement_tons);
         m_sSailArea->SetValue(m_Boat.sail_area_ft2);
         m_sLWL->SetValue(m_Boat.lwl_ft);
@@ -66,12 +70,14 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
         m_sWakeDrag->SetValue(m_Boat.wake_drag * 100.0);
 
         m_cbWingWingRunning->SetValue(curplan.wing_wing_running);
-        m_cbOptimizeTacking->SetValue(curplan.optimize_tacking);
 
         SetEta(curplan.eta);
-    } else
-        m_rbCSV->SetValue(true);
+        break;
+    case BoatPlan::IMF:
+        break;
+    }
 
+    m_cbOptimizeTacking->SetValue(curplan.optimize_tacking);
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
     UpdateVMG();
@@ -598,9 +604,9 @@ void BoatDialog::LoadCSV(bool switched)
 
             if( openDialog.ShowModal() == wxID_OK ) {
                 m_fpCSVPath->SetPath(openDialog.GetPath());
-                LoadCSV(false);
+                LoadCSV();
             } else
-                m_rbComputed->SetValue(true);
+                m_cPolarMethod->SetSelection(BoatPlan::TRANSFORM);
         } else {
 //            wxMessageDialog md(this, _("Failed reading csv: ") + filename,
 //                               _("OpenCPN Weather Routing Plugin"),
@@ -672,7 +678,7 @@ void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
         pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
 
         BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
-        plan.ComputeBoatSpeeds(m_Boat, -1);
+        plan.ComputeBoatSpeeds(m_Boat, plan.polarmethod);
         if(!plan.Save(saveDialog.GetPath().mb_str())) {
             wxMessageDialog md(this, _("Failed saving boat polar to csv"), _("OpenCPN Weather Routing Plugin"),
                                wxICON_ERROR | wxOK );
@@ -695,10 +701,10 @@ void BoatDialog::OnRecompute()
 
 void BoatDialog::OnUpdatePlot()
 {
-    if(m_Boat.Plans[m_SelectedSailPlan].computed)
-        OnRecompute();
-    else
+    if(m_Boat.Plans[m_SelectedSailPlan].polarmethod == BoatPlan::CSV)
         m_PlotWindow->Refresh();
+    else
+        OnRecompute();
 }
 
 void BoatDialog::OnOptimizeTacking ( wxCommandEvent& event )
@@ -740,9 +746,9 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
     m_SelectedSailPlan = event.GetIndex();
     
     BoatPlan &curplan = m_Boat.Plans[m_SelectedSailPlan];
-    bool c = curplan.computed;
-
-    if(c) {
+    switch(curplan.polarmethod) {
+    case BoatPlan::TRANSFORM:
+    {
         m_sLuffAngle->SetValue(curplan.luff_angle);
         m_cbOptimizeTacking->SetValue(curplan.optimize_tacking);
         m_cbWingWingRunning->SetValue(curplan.wing_wing_running);
@@ -750,28 +756,30 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
         SetEta(eta);
         m_sEta->SetValue(sqrt(eta) * 1000.0);
     }
+    default:
+        break;
+    }
 
-    m_sbComputation->ShowItems(c);
-    m_sbCSV->ShowItems(!c);
+    m_sbCSV->ShowItems(curplan.polarmethod == BoatPlan::CSV);
+    m_sbComputationTransform->ShowItems(curplan.polarmethod == BoatPlan::TRANSFORM);
+    m_sbComputationIMF->ShowItems(curplan.polarmethod == BoatPlan::IMF);
     m_pPolarConfig->Fit();
     Fit();
-
     m_PlotWindow->Refresh();
 }
 
-void BoatDialog::OnPolarMode( wxCommandEvent& event )
+void BoatDialog::OnPolarMethod( wxCommandEvent& event )
 {
-    bool c = m_rbComputed->GetValue();
+    BoatPlan::PolarMethod polarmethod = (BoatPlan::PolarMethod)m_cPolarMethod->GetSelection();
+    m_Boat.Plans[m_SelectedSailPlan].polarmethod = polarmethod;
+    m_sbComputationTransform->ShowItems(polarmethod == BoatPlan::TRANSFORM);
+    m_sbComputationIMF->ShowItems(polarmethod == BoatPlan::IMF);
+    m_sbCSV->ShowItems(polarmethod == BoatPlan::CSV);
 
-    m_Boat.Plans[m_SelectedSailPlan].computed = c;
-    m_sbComputation->ShowItems(c);
-    m_sbCSV->ShowItems(!c);
-
-    if(c)
-        OnRecompute();
-    else {
+    if(polarmethod == BoatPlan::CSV)
         LoadCSV(true);
-    }
+    else
+        OnRecompute();
 
     m_pPolarConfig->Fit();
     Fit();
@@ -796,6 +804,7 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
     m_SelectedSailPlan = m_lBoatPlans->InsertItem(m_lBoatPlans->GetItemCount(), np);
     m_Boat.Plans.push_back(BoatPlan(np, m_Boat));
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    m_cPolarMethod->SetSelection(BoatPlan::TRANSFORM);
     StoreBoatParameters();
     Compute();
     m_bDeleteBoatPlan->Enable();
@@ -824,21 +833,27 @@ void BoatDialog::StoreBoatParameters()
         return;
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-    m_tEta->GetValue().ToDouble(&plan.eta);
-    plan.luff_angle = m_sLuffAngle->GetValue();
     plan.optimize_tacking = m_cbOptimizeTacking->GetValue();
-    plan.wing_wing_running = m_cbWingWingRunning->GetValue();
 
-    m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
+    switch(plan.polarmethod) {
+    case BoatPlan::TRANSFORM:
+        m_tEta->GetValue().ToDouble(&plan.eta);
+        plan.luff_angle = m_sLuffAngle->GetValue();
+        plan.wing_wing_running = m_cbWingWingRunning->GetValue();
 
-    m_Boat.displacement_tons = m_sDisplacement->GetValue();
-    m_Boat.sail_area_ft2 = m_sSailArea->GetValue();
-    m_Boat.lwl_ft = m_sLWL->GetValue();
-    m_Boat.loa_ft = m_sLOA->GetValue();
-    m_Boat.beam_ft = m_sBeam->GetValue();
+        m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
 
-    m_Boat.frictional_drag = m_sFrictionalDrag->GetValue() / 1000.0;
-    m_Boat.wake_drag = m_sWakeDrag->GetValue() / 100.0;
+        m_Boat.displacement_tons = m_sDisplacement->GetValue();
+        m_Boat.sail_area_ft2 = m_sSailArea->GetValue();
+        m_Boat.lwl_ft = m_sLWL->GetValue();
+        m_Boat.loa_ft = m_sLOA->GetValue();
+        m_Boat.beam_ft = m_sBeam->GetValue();
+
+        m_Boat.frictional_drag = m_sFrictionalDrag->GetValue() / 1000.0;
+        m_Boat.wake_drag = m_sWakeDrag->GetValue() / 100.0;
+    default:
+        break;
+    }
 }
 
 void BoatDialog::RepopulatePlans()
@@ -847,7 +862,7 @@ void BoatDialog::RepopulatePlans()
 
     if(m_Boat.Plans.size() == 0) {
         m_Boat.Plans.push_back(BoatPlan(_("Initial Plan"), m_Boat));
-        m_Boat.Plans[0].ComputeBoatSpeeds(m_Boat, m_sWindSpeed->GetValue());
+        m_Boat.Plans[0].ComputeBoatSpeeds(m_Boat, m_Boat.Plans[0].polarmethod, m_sWindSpeed->GetValue());
     }
 
     for(unsigned int i=0; i<m_Boat.Plans.size(); i++) {
@@ -879,17 +894,14 @@ void BoatDialog::RepopulatePlans()
 
 void BoatDialog::Compute()
 {
-    if(m_SelectedSailPlan < 0 ||
-       m_SelectedSailPlan >= (int)m_Boat.Plans.size())
+    if(m_SelectedSailPlan < 0 || m_SelectedSailPlan >= (int)m_Boat.Plans.size())
         return;
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-
     int selection = m_cPlotVariable->GetSelection();
-
-    plan.ComputeBoatSpeeds(m_Boat, (selection < 2 && m_lPlotType->GetSelection() == 0)
+    plan.ComputeBoatSpeeds(m_Boat, (BoatPlan::PolarMethod)m_cPolarMethod->GetSelection(),
+                           (selection < 2 && m_lPlotType->GetSelection() == 0)
                            ? m_sWindSpeed->GetValue() : -1);
-
     UpdateVMG();
     if(m_cbOptimizeTacking->IsChecked())
         m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();

@@ -79,17 +79,22 @@ wxString Boat::OpenXML(wxString filename)
 
              BoatPlan plan(wxString::FromUTF8(e->Attribute("Name")), *this);
 
-             plan.computed = AttributeBool(e, "computed", true);
+             plan.polarmethod = (BoatPlan::PolarMethod)AttributeInt(e, "polarmethod", BoatPlan::TRANSFORM);
 
-             if(plan.computed) {
-                 plan.eta = AttributeDouble(e, "eta", .5);
-                 plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
-                 plan.wing_wing_running = AttributeBool(e, "wing_wing_running", false);
-                 plan.ComputeBoatSpeeds(*this);
-             } else {
+             switch(plan.polarmethod) {
+             case BoatPlan::CSV:
                  plan.csvFileName = wxString::FromUTF8(e->Attribute("csvFileName"));
                  if(!plan.Open(plan.csvFileName.mb_str()))
                      return _("Failed to open file: ") + plan.csvFileName;
+             case BoatPlan::TRANSFORM:
+                 plan.eta = AttributeDouble(e, "eta", .5);
+                 plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
+                 plan.wing_wing_running = AttributeBool(e, "wing_wing_running", false);
+                 plan.ComputeBoatSpeeds(*this, plan.polarmethod);
+                 break;
+             case BoatPlan::IMF:
+                 plan.ComputeBoatSpeeds(*this, plan.polarmethod);
+                 break;
              }
 
              plan.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
@@ -160,8 +165,12 @@ wxString Boat::OpenXML(wxString filename)
         
         plan->SetAttribute("Name", Plans[i].Name.mb_str());
 
-        plan->SetAttribute("computed", Plans[i].computed);
-        if(Plans[i].computed) {
+        plan->SetAttribute("polarmethod", Plans[i].polarmethod);
+        switch(Plans[i].polarmethod) {
+        case BoatPlan::CSV:
+            plan->SetAttribute("csvFileName", Plans[i].csvFileName.mb_str());
+            break;
+        case BoatPlan::TRANSFORM:
             sprintf(str, "%.4g", Plans[i].eta);
             plan->SetAttribute("eta", str);
 
@@ -169,8 +178,9 @@ wxString Boat::OpenXML(wxString filename)
             plan->SetAttribute("luff_angle", str);
 
             plan->SetAttribute("wing_wing_running", Plans[i].wing_wing_running);
-        } else {
-            plan->SetAttribute("csvFileName", Plans[i].csvFileName.mb_str());
+            break;
+        case BoatPlan::IMF:
+            break;
         }
 
         plan->SetAttribute("optimize_tacking", Plans[i].optimize_tacking);

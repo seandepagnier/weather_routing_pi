@@ -44,8 +44,8 @@
 #include <wx/listbox.h>
 #include <wx/scrolwin.h>
 #include <wx/listbook.h>
-#include <wx/radiobut.h>
 #include <wx/slider.h>
+#include <wx/radiobut.h>
 #include <wx/html/htmlwin.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -346,9 +346,8 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText96;
 		wxStaticText* m_stComfortFactor;
 		wxPanel* m_pPolarConfig;
-		wxRadioButton* m_rbComputed;
-		wxRadioButton* m_rbCSV;
-		wxStaticBoxSizer* m_sbComputation;
+		wxChoice* m_cPolarMethod;
+		wxStaticBoxSizer* m_sbComputationTransform;
 		wxStaticText* m_staticText961;
 		wxSlider* m_sEta;
 		wxTextCtrl* m_tEta;
@@ -362,6 +361,8 @@ class BoatDialogBase : public wxDialog
 		wxSpinCtrl* m_sLuffAngle;
 		wxCheckBox* m_cbWingWingRunning;
 		wxButton* m_bSaveCSV;
+		wxStaticBoxSizer* m_sbComputationIMF;
+		wxStaticText* m_staticText131;
 		wxStaticBoxSizer* m_sbCSV;
 		wxStaticText* m_staticText93;
 		wxFilePickerCtrl* m_fpCSVPath;
@@ -405,7 +406,7 @@ class BoatDialogBase : public wxDialog
 		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateStatisticsSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeSpin( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnPolarMode( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPolarMethod( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEtaSlider( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnEta( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
