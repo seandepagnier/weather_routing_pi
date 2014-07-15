@@ -96,6 +96,7 @@ void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
         m_stApparentWindKnots->SetLabel(_("N/A"));
         m_stBoatAngle->SetLabel(_("N/A"));
         m_stBoatKnots->SetLabel(_("N/A"));
+        return;
     }
 
     wxPoint p = event.GetPosition();
@@ -1028,7 +1029,6 @@ void BoatDialog::UpdateStats()
     if(SADR < 20) SADRs += _("Cruiser/Racer"); else
     if(SADR < 23) SADRs += _("Racer"); else
        SADRs += _("High Peformance") + wxString(_("Racer"));
-
     m_stSailAreaDisplacementRatio->SetLabel(SADRs);
     
     double DLR = m_Boat.DisplacementLengthRatio();
@@ -1038,10 +1038,19 @@ void BoatDialog::UpdateStats()
     if(DLR < 300) DLRs += _("Cruiser/Racer"); else
     if(DLR < 400) DLRs += _("Cruiser"); else
        DLRs += _("Heavy Cruiser") + wxString(_("Cruiser"));
-        
     m_stDisplacementLengthRatio->SetLabel(DLRs);
 
     m_stHullSpeed->SetLabel(wxString::Format(_T("%.3f"), m_Boat.HullSpeed()));
-    m_stCapsizeRisk->SetLabel(wxString::Format(_T("%.3f"), m_Boat.CapsizeRisk()));
-    m_stComfortFactor->SetLabel(wxString::Format(_T("%.3f"), m_Boat.ComfortFactor()));
+
+    double CR = m_Boat.CapsizeRisk();
+    wxString CRs = wxString::Format(_T("%.3f"), CR) + _T("\t");
+    if(CR < 2) CRs += _("Low"); else
+        CRs += _("High");
+    m_stCapsizeRisk->SetLabel(CRs);
+
+    double CF = m_Boat.ComfortFactor();
+    wxString CFs = wxString::Format(_T("%.3f"), CF) + _T("\t");
+    if(CF < 24) CFs += _("Rough"); else
+     CFs += _("Smooth");
+    m_stComfortFactor->SetLabel(CFs);
 }

@@ -1477,31 +1477,52 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_nNotebook->AddPage( m_panel3, _("Plot"), true );
+	m_nNotebook->AddPage( m_panel3, _("Plot"), false );
 	m_panel17 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer1022;
+	fgSizer1022 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1022->SetFlexibleDirection( wxBOTH );
+	fgSizer1022->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer52;
+	fgSizer52 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer52->SetFlexibleDirection( wxBOTH );
+	fgSizer52->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer103;
+	fgSizer103 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer103->SetFlexibleDirection( wxBOTH );
+	fgSizer103->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer104;
+	fgSizer104 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer104->AddGrowableCol( 0 );
+	fgSizer104->SetFlexibleDirection( wxBOTH );
+	fgSizer104->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText100 = new wxStaticText( m_panel17, wxID_ANY, _("Hull Type"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText100->Wrap( -1 );
+	fgSizer104->Add( m_staticText100, 0, wxALL, 5 );
+	
+	wxString m_cHullTypeChoices[] = { _("Mono"), _("Catamaran"), _("Trimaran"), _("Proa"), _("Submarine") };
+	int m_cHullTypeNChoices = sizeof( m_cHullTypeChoices ) / sizeof( wxString );
+	m_cHullType = new wxChoice( m_panel17, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), m_cHullTypeNChoices, m_cHullTypeChoices, 0 );
+	m_cHullType->SetSelection( 0 );
+	fgSizer104->Add( m_cHullType, 0, wxALL, 5 );
+	
+	
+	fgSizer103->Add( fgSizer104, 1, wxEXPAND, 5 );
+	
 	wxFlexGridSizer* fgSizer58;
 	fgSizer58 = new wxFlexGridSizer( 0, 3, 0, 0 );
 	fgSizer58->SetFlexibleDirection( wxBOTH );
 	fgSizer58->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText100 = new wxStaticText( m_panel17, wxID_ANY, _("Hull Type"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText100->Wrap( -1 );
-	fgSizer58->Add( m_staticText100, 0, wxALL, 5 );
-	
-	wxString m_cHullTypeChoices[] = { _("Mono"), _("Catamaran"), _("Trimaran"), _("Proa"), _("Submarine") };
-	int m_cHullTypeNChoices = sizeof( m_cHullTypeChoices ) / sizeof( wxString );
-	m_cHullType = new wxChoice( m_panel17, wxID_ANY, wxDefaultPosition, wxSize( 100,-1 ), m_cHullTypeNChoices, m_cHullTypeChoices, 0 );
-	m_cHullType->SetSelection( 0 );
-	fgSizer58->Add( m_cHullType, 0, wxALL, 5 );
-	
-	
-	fgSizer58->Add( 0, 0, 1, wxEXPAND, 5 );
-	
 	m_staticText58 = new wxStaticText( m_panel17, wxID_ANY, _("Displacement"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText58->Wrap( -1 );
 	fgSizer58->Add( m_staticText58, 0, wxALL, 5 );
 	
-	m_sDisplacement = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 100,-1 ), wxSP_ARROW_KEYS, 0, 100000, 4 );
+	m_sDisplacement = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100000, 4 );
 	fgSizer58->Add( m_sDisplacement, 0, wxALL, 5 );
 	
 	m_staticText121 = new wxStaticText( m_panel17, wxID_ANY, _("tons"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1512,21 +1533,21 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText128->Wrap( -1 );
 	fgSizer58->Add( m_staticText128, 0, wxALL, 5 );
 	
-	m_sSailArea = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 400, 10000, 0 );
+	m_sSailArea = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 400, 10000, 0 );
 	fgSizer58->Add( m_sSailArea, 0, wxALL, 5 );
 	
 	m_staticText129 = new wxStaticText( m_panel17, wxID_ANY, _("sq/ft"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText129->Wrap( -1 );
 	fgSizer58->Add( m_staticText129, 0, wxALL, 5 );
 	
-	m_staticText57 = new wxStaticText( m_panel17, wxID_ANY, _("Length Water Line (lwl)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText57 = new wxStaticText( m_panel17, wxID_ANY, _("Len Water Line (lwl)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText57->Wrap( -1 );
 	fgSizer58->Add( m_staticText57, 0, wxALL, 5 );
 	
 	m_sLWL = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 1000, 24 );
 	fgSizer58->Add( m_sLWL, 0, wxALL, 5 );
 	
-	m_staticText122 = new wxStaticText( m_panel17, wxID_ANY, _("feet"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText122 = new wxStaticText( m_panel17, wxID_ANY, _("ft"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText122->Wrap( -1 );
 	fgSizer58->Add( m_staticText122, 0, wxALL, 5 );
 	
@@ -1537,7 +1558,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sLOA = new wxSpinCtrl( m_panel17, wxID_ANY, wxT("27"), wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 1000, 0 );
 	fgSizer58->Add( m_sLOA, 0, wxALL, 5 );
 	
-	m_staticText127 = new wxStaticText( m_panel17, wxID_ANY, _("feet"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText127 = new wxStaticText( m_panel17, wxID_ANY, _("ft"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText127->Wrap( -1 );
 	fgSizer58->Add( m_staticText127, 0, wxALL, 5 );
 	
@@ -1548,15 +1569,72 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sBeam = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100, 8 );
 	fgSizer58->Add( m_sBeam, 0, wxALL, 5 );
 	
-	m_staticText126 = new wxStaticText( m_panel17, wxID_ANY, _("feet"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText126 = new wxStaticText( m_panel17, wxID_ANY, _("ft"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText126->Wrap( -1 );
 	fgSizer58->Add( m_staticText126, 0, wxALL, 5 );
 	
 	
-	m_panel17->SetSizer( fgSizer58 );
+	fgSizer103->Add( fgSizer58, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer52->Add( fgSizer103, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer43;
+	fgSizer43 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer43->SetFlexibleDirection( wxBOTH );
+	fgSizer43->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText119 = new wxStaticText( m_panel17, wxID_ANY, _("Sail Area Displacement Ratio"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText119->Wrap( -1 );
+	fgSizer43->Add( m_staticText119, 0, wxALL, 5 );
+	
+	m_stSailAreaDisplacementRatio = new wxStaticText( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stSailAreaDisplacementRatio->Wrap( -1 );
+	fgSizer43->Add( m_stSailAreaDisplacementRatio, 0, wxALL, 5 );
+	
+	m_staticText105 = new wxStaticText( m_panel17, wxID_ANY, _("Displacement Length Ratio"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText105->Wrap( -1 );
+	fgSizer43->Add( m_staticText105, 0, wxALL, 5 );
+	
+	m_stDisplacementLengthRatio = new wxStaticText( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stDisplacementLengthRatio->Wrap( -1 );
+	fgSizer43->Add( m_stDisplacementLengthRatio, 0, wxALL, 5 );
+	
+	m_staticText92 = new wxStaticText( m_panel17, wxID_ANY, _("Hull Speed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText92->Wrap( -1 );
+	fgSizer43->Add( m_staticText92, 0, wxALL, 5 );
+	
+	m_stHullSpeed = new wxStaticText( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stHullSpeed->Wrap( -1 );
+	fgSizer43->Add( m_stHullSpeed, 0, wxALL, 5 );
+	
+	m_staticText94 = new wxStaticText( m_panel17, wxID_ANY, _("Capsize Risk"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText94->Wrap( -1 );
+	fgSizer43->Add( m_staticText94, 0, wxALL, 5 );
+	
+	m_stCapsizeRisk = new wxStaticText( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stCapsizeRisk->Wrap( -1 );
+	fgSizer43->Add( m_stCapsizeRisk, 0, wxALL, 5 );
+	
+	m_staticText96 = new wxStaticText( m_panel17, wxID_ANY, _("Comfort Factor"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText96->Wrap( -1 );
+	fgSizer43->Add( m_staticText96, 0, wxALL, 5 );
+	
+	m_stComfortFactor = new wxStaticText( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stComfortFactor->Wrap( -1 );
+	fgSizer43->Add( m_stComfortFactor, 0, wxALL, 5 );
+	
+	
+	fgSizer52->Add( fgSizer43, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer1022->Add( fgSizer52, 1, wxEXPAND, 5 );
+	
+	
+	m_panel17->SetSizer( fgSizer1022 );
 	m_panel17->Layout();
-	fgSizer58->Fit( m_panel17 );
-	m_nNotebook->AddPage( m_panel17, _("Boat Configuration"), false );
+	fgSizer1022->Fit( m_panel17 );
+	m_nNotebook->AddPage( m_panel17, _("Boat Configuration"), true );
 	m_pPolarConfig = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* m_fgConfig;
 	m_fgConfig = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1853,65 +1931,6 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel10->Layout();
 	fgSizer45->Fit( m_panel10 );
 	m_nNotebook->AddPage( m_panel10, _("Switch Plan Rules"), false );
-	m_panel5 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxFlexGridSizer* fgSizer52;
-	fgSizer52 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer52->SetFlexibleDirection( wxBOTH );
-	fgSizer52->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxFlexGridSizer* fgSizer43;
-	fgSizer43 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer43->SetFlexibleDirection( wxBOTH );
-	fgSizer43->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText119 = new wxStaticText( m_panel5, wxID_ANY, _("Sail Area Displacement Ratio"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText119->Wrap( -1 );
-	fgSizer43->Add( m_staticText119, 0, wxALL, 5 );
-	
-	m_stSailAreaDisplacementRatio = new wxStaticText( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_stSailAreaDisplacementRatio->Wrap( -1 );
-	fgSizer43->Add( m_stSailAreaDisplacementRatio, 0, wxALL, 5 );
-	
-	m_staticText105 = new wxStaticText( m_panel5, wxID_ANY, _("Displacement Length Ratio"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText105->Wrap( -1 );
-	fgSizer43->Add( m_staticText105, 0, wxALL, 5 );
-	
-	m_stDisplacementLengthRatio = new wxStaticText( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_stDisplacementLengthRatio->Wrap( -1 );
-	fgSizer43->Add( m_stDisplacementLengthRatio, 0, wxALL, 5 );
-	
-	m_staticText92 = new wxStaticText( m_panel5, wxID_ANY, _("Hull Speed"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText92->Wrap( -1 );
-	fgSizer43->Add( m_staticText92, 0, wxALL, 5 );
-	
-	m_stHullSpeed = new wxStaticText( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_stHullSpeed->Wrap( -1 );
-	fgSizer43->Add( m_stHullSpeed, 0, wxALL, 5 );
-	
-	m_staticText94 = new wxStaticText( m_panel5, wxID_ANY, _("Capsize Risk"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText94->Wrap( -1 );
-	fgSizer43->Add( m_staticText94, 0, wxALL, 5 );
-	
-	m_stCapsizeRisk = new wxStaticText( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_stCapsizeRisk->Wrap( -1 );
-	fgSizer43->Add( m_stCapsizeRisk, 0, wxALL, 5 );
-	
-	m_staticText96 = new wxStaticText( m_panel5, wxID_ANY, _("Comfort Factor"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText96->Wrap( -1 );
-	fgSizer43->Add( m_staticText96, 0, wxALL, 5 );
-	
-	m_stComfortFactor = new wxStaticText( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	m_stComfortFactor->Wrap( -1 );
-	fgSizer43->Add( m_stComfortFactor, 0, wxALL, 5 );
-	
-	
-	fgSizer52->Add( fgSizer43, 1, wxEXPAND, 5 );
-	
-	
-	m_panel5->SetSizer( fgSizer52 );
-	m_panel5->Layout();
-	fgSizer52->Fit( m_panel5 );
-	m_nNotebook->AddPage( m_panel5, _("Statistics"), false );
 	
 	fgSizer12->Add( m_nNotebook, 1, wxEXPAND | wxALL, 5 );
 	
