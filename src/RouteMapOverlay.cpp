@@ -197,6 +197,11 @@ void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
         RenderAlternateRoute(*cit, each_parent, dc, vp);
 }
 
+static wxColour Darken(wxColour c)
+{
+    return wxColour(c.Red()*2/3, c.Green()*2/3, c.Blue()*2/3, c.Alpha());
+}
+
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                              ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute)
 {
@@ -334,11 +339,23 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         if(!justendroute) {
             SetColor(dc, CursorColor, true);
             SetWidth(dc, RouteThickness, true);
-            RenderCourse(last_cursor_position, time, SquaresAtSailChanges, dc, vp);
+            RenderCourse(last_cursor_position, time, false, dc, vp);
+
+            if(SquaresAtSailChanges) {
+                SetColor(dc, Darken(CursorColor), true);
+                SetWidth(dc, (RouteThickness+1)/2, true);
+                RenderCourse(last_cursor_position, time, true, dc, vp);
+            }
         }
         SetColor(dc, DestinationColor, true);
         SetWidth(dc, RouteThickness, true);
-        RenderCourse(last_destination_position, time, SquaresAtSailChanges, dc, vp);
+        RenderCourse(last_destination_position, time, false, dc, vp);
+        
+        if(SquaresAtSailChanges) {
+            SetColor(dc, Darken(DestinationColor), true);
+            SetWidth(dc, (RouteThickness+1)/2, true);
+            RenderCourse(last_destination_position, time, true, dc, vp);
+        }
     }
 }
 
@@ -357,16 +374,17 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool SquaresA
         glBegin(GL_LINES);
 
     for(p = pos; p && p->parent; p = p->parent) {
-        DrawLine(p, p->parent, dc, vp);
         if(SquaresAtSailChanges && p->sailplan != sailplan) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, p->lat, p->lon);
-            glVertex2i(r.x-5, r.y-5), glVertex2i(r.x+5, r.y-5);
-            glVertex2i(r.x+5, r.y-5), glVertex2i(r.x+5, r.y+5);
-            glVertex2i(r.x+5, r.y+5), glVertex2i(r.x-5, r.y+5);
-            glVertex2i(r.x-5, r.y+5), glVertex2i(r.x-5, r.y-5);
+            int s = 6;
+            glVertex2i(r.x-s, r.y-s), glVertex2i(r.x+s, r.y-s);
+            glVertex2i(r.x+s, r.y-s), glVertex2i(r.x+s, r.y+s);
+            glVertex2i(r.x+s, r.y+s), glVertex2i(r.x-s, r.y+s);
+            glVertex2i(r.x-s, r.y+s), glVertex2i(r.x-s, r.y-s);
             sailplan = p->sailplan;
-        }
+        } else
+            DrawLine(p, p->parent, dc, vp);
     }
     if(!dc.GetDC())
         glEnd();

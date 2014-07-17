@@ -86,6 +86,7 @@ wxString Boat::OpenXML(wxString filename)
                  plan.csvFileName = wxString::FromUTF8(e->Attribute("csvFileName"));
                  if(!plan.Open(plan.csvFileName.mb_str()))
                      return _("Failed to open file: ") + plan.csvFileName;
+                 break;
              case BoatPlan::TRANSFORM:
                  plan.eta = AttributeDouble(e, "eta", .5);
                  plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
@@ -102,7 +103,7 @@ wxString Boat::OpenXML(wxString filename)
                  plan.OptimizeTackingSpeed();
 
              for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
-                 if(!strcmp(e->Value(), "SwitchPlan")) {
+                 if(!strcmp(f->Value(), "SwitchPlan")) {
                      SwitchPlan switchplan;
                      switchplan.MaxWindSpeed = strtod(f->Attribute("MaxWindSpeed"), 0);
                      switchplan.MinWindSpeed = strtod(f->Attribute("MinWindSpeed"), 0);
@@ -187,12 +188,12 @@ wxString Boat::OpenXML(wxString filename)
 
         for(unsigned int j=0; j<Plans[i].SwitchPlans.size(); j++) {
             TiXmlElement *switchplan = new TiXmlElement( "SwitchPlan" );
-            switchplan->SetAttribute("MaxWindSpeed", Plans[i].SwitchPlans[j].MaxWindSpeed);
-            switchplan->SetAttribute("MinWindSpeed", Plans[i].SwitchPlans[j].MinWindSpeed);
-            switchplan->SetAttribute("MaxWindDirection", Plans[i].SwitchPlans[j].MaxWindDirection);
-            switchplan->SetAttribute("MinWindDirection", Plans[i].SwitchPlans[j].MinWindDirection);
-            switchplan->SetAttribute("MaxWaveHeight", Plans[i].SwitchPlans[j].MaxWaveHeight);
-            switchplan->SetAttribute("MinWaveHeight", Plans[i].SwitchPlans[j].MinWaveHeight);
+            switchplan->SetDoubleAttribute("MaxWindSpeed", Plans[i].SwitchPlans[j].MaxWindSpeed);
+            switchplan->SetDoubleAttribute("MinWindSpeed", Plans[i].SwitchPlans[j].MinWindSpeed);
+            switchplan->SetDoubleAttribute("MaxWindDirection", Plans[i].SwitchPlans[j].MaxWindDirection);
+            switchplan->SetDoubleAttribute("MinWindDirection", Plans[i].SwitchPlans[j].MinWindDirection);
+            switchplan->SetDoubleAttribute("MaxWaveHeight", Plans[i].SwitchPlans[j].MaxWaveHeight);
+            switchplan->SetDoubleAttribute("MinWaveHeight", Plans[i].SwitchPlans[j].MinWaveHeight);
             switchplan->SetAttribute("Name", Plans[i].SwitchPlans[j].Name.mb_str());
             plan->LinkEndChild(switchplan);
         }

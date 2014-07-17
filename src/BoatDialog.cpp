@@ -53,7 +53,6 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     m_lBoatPlans->InsertColumn(spETA, _("Eta"));
     RepopulatePlans();
 
-    m_SelectedSailPlan = 0;
     BoatPlan &curplan = m_Boat.Plans[m_SelectedSailPlan];
     m_cPolarMethod->SetSelection(curplan.polarmethod);
 
@@ -746,6 +745,7 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
     m_SelectedSailPlan = event.GetIndex();
     
     BoatPlan &curplan = m_Boat.Plans[m_SelectedSailPlan];
+    m_cPolarMethod->SetSelection(curplan.polarmethod);
     switch(curplan.polarmethod) {
     case BoatPlan::TRANSFORM:
     {
@@ -764,8 +764,9 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
     m_sbComputationTransform->ShowItems(curplan.polarmethod == BoatPlan::TRANSFORM);
     m_sbComputationIMF->ShowItems(curplan.polarmethod == BoatPlan::IMF);
     m_pPolarConfig->Fit();
-    Fit();
     m_PlotWindow->Refresh();
+    RepopulateSwitchPlans();
+    Fit();
 }
 
 void BoatDialog::OnPolarMethod( wxCommandEvent& event )
@@ -890,6 +891,8 @@ void BoatDialog::RepopulatePlans()
         (wxString::Format(_T("%d"), plan.wind_speed_step));
     m_stWindDegreeStep->SetLabel
         (wxString::Format(_T("%d"), plan.wind_degree_step));
+
+    RepopulateSwitchPlans();
 }
 
 void BoatDialog::Compute()
@@ -972,7 +975,7 @@ void BoatDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
     else
         boatplan.SwitchPlans.erase(boatplan.SwitchPlans.begin() + index);
 
-    PopulatePlans();
+    RepopulateSwitchPlans();
 }
 
 void BoatDialog::OnDeleteSwitchPlanRule( wxCommandEvent& event )
@@ -984,10 +987,10 @@ void BoatDialog::OnDeleteSwitchPlanRule( wxCommandEvent& event )
     BoatPlan &boatplan = m_Boat.Plans[m_SelectedSailPlan];
     SwitchPlan plan = boatplan.SwitchPlans[index];
     boatplan.SwitchPlans.erase(boatplan.SwitchPlans.begin() + index);
-    PopulatePlans();
+    RepopulateSwitchPlans();
 }
 
-void BoatDialog::PopulatePlans()
+void BoatDialog::RepopulateSwitchPlans()
 {
     BoatPlan &boatplan = m_Boat.Plans[m_SelectedSailPlan];
 

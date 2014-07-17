@@ -90,7 +90,7 @@ private:
     void OnNewSwitchPlanRule( wxCommandEvent& event );
     void OnEditSwitchPlanRule( wxCommandEvent& event );
     void OnDeleteSwitchPlanRule( wxCommandEvent& event );
-    void PopulatePlans();
+    void RepopulateSwitchPlans();
 
     wxString FormatVMG(double W, double VW);
     void UpdateVMG();

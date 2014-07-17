@@ -702,15 +702,15 @@ wxString BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
 
     for(unsigned int i=0; i<SwitchPlans.size(); i++) {
         SwitchPlan p = SwitchPlans[i];
-        if(!isnan(p.MaxWindSpeed) && p.MaxWindSpeed <= VW) continue;
-        if(!isnan(p.MinWindSpeed) && p.MinWindSpeed >= VW) continue;
-        if(!isnan(p.MaxWindDirection) && p.MaxWindDirection <=  H) continue;
-        if(!isnan(p.MinWindDirection) && p.MinWindDirection >=  H) continue;
-        if(!isnan(p.MaxWaveHeight) && p.MaxWaveHeight <=  H) continue;
-        if(!isnan(p.MinWaveHeight) && p.MinWaveHeight >=  H) continue;
+        if(!isnan(p.MaxWindSpeed) && p.MaxWindSpeed >= VW) continue;
+        if(!isnan(p.MinWindSpeed) && p.MinWindSpeed <= VW) continue;
+        if(!isnan(p.MaxWindDirection) && p.MaxWindDirection >=  H) continue;
+        if(!isnan(p.MinWindDirection) && p.MinWindDirection <=  H) continue;
+        if(!isnan(p.MaxWaveHeight) && p.MaxWaveHeight >=  H) continue;
+        if(!isnan(p.MinWaveHeight) && p.MinWaveHeight <=  H) continue;
         if(!p.DayTime) {
             if(ComputeDayTime(gribtime, lat, lon, daytime)) continue;
-        } else
+        } else if(!p.NightTime)
             if(!ComputeDayTime(gribtime, lat, lon, daytime)) continue;
         return p.Name;
     }
