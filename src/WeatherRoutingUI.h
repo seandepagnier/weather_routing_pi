@@ -417,6 +417,7 @@ class BoatDialogBase : public wxDialog
 		virtual void OnUpdateVMG( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdateVMG( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSwitchPlanRules( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnNewSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }

@@ -478,20 +478,21 @@ static inline bool ComputeBoatSpeed
  climatology_wind_atlas &atlas,
  double &B, double &VB, double &BG, double &VBG, double &dist, int newsailplan)
 {
+    BoatPlan &plan = configuration.boat.Plans[newsailplan];
     if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MAP ||
        configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS) {
         /* build map */
         VB = 0;
         int windatlas_count = 8;
         for(int i = 0; i<windatlas_count; i++) {
-            double VBc = configuration.boat.Plans[newsailplan].Speed(H-W+atlas.W[i], atlas.VW[i]);
+            double VBc = plan.Speed(H-W+atlas.W[i], atlas.VW[i]);
             VB += atlas.directions[i]*VBc;
         }
 
         if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)
             VB *= 1-atlas.calm;
     } else
-        VB = configuration.boat.Plans[newsailplan].Speed(H, VW);
+        VB = plan.Speed(H, VW);
 
     /* failed to determine speed.. */
     if(isnan(B) || isnan(VB))
@@ -505,7 +506,6 @@ static inline bool ComputeBoatSpeed
 
     /* distance over ground */
     dist = VBG * timeseconds / 3600.0;
-    
     return true;
 }
 

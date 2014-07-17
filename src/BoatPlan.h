@@ -66,8 +66,8 @@ public:
 
     void BoatSteadyState(double W, double VW, double &B, double &VB,
                          double &A, double &VA, Boat &boat);
-    wxString TrySwitchBoatPlan(double VW, double H, double Swell,
-                               const wxDateTime &gribtime, double lat, double lon, int &daytime);
+    int TrySwitchBoatPlan(double VW, double H, double S,
+                          const wxDateTime &gribtime, double lat, double lon, int &daytime);
 
     BoatPlan(wxString PlanName, Boat &boat);
 

@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2013 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2014 by Sean D'Epagnier                                 *
  *   sean@depagnier.com                                                    *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -86,37 +86,38 @@ void SwitchPlanDialog::OnDone( wxCommandEvent& event )
 {
     if(m_cbMaxWindSpeed->GetValue() && m_cbMinWindSpeed->GetValue()) {
         wxMessageDialog md(this, _("Cannot have min and max wind speed"),
-                           _("Switch Plan"), wxICON_INFORMATION | wxOK );
+                           _("Switch Plan"), wxICON_ERROR | wxOK );
         md.ShowModal();
         return;
     }
 
     if(m_cbMaxWindDirection->GetValue() && m_cbMinWindDirection->GetValue()) {
         wxMessageDialog md(this, _("Cannot have min and max wind direction"),
-                           _("Switch Plan"), wxICON_INFORMATION | wxOK );
+                           _("Switch Plan"), wxICON_ERROR | wxOK );
         md.ShowModal();
         return;
     }
 
     if(m_cbMaxWaveHeight->GetValue() && m_cbMinWaveHeight->GetValue()) {
         wxMessageDialog md(this, _("Cannot have min and max wave height"),
-                           _("Switch Plan"), wxICON_INFORMATION | wxOK );
+                           _("Switch Plan"), wxICON_ERROR | wxOK );
         md.ShowModal();
         return;
     }
 
     if(!m_cbMaxWindSpeed->GetValue() && !m_cbMinWindSpeed->GetValue() &&
        !m_cbMaxWindDirection->GetValue() && !m_cbMinWindDirection->GetValue() &&
-       !m_cbMaxWaveHeight->GetValue() && !m_cbMinWaveHeight->GetValue()) {
-        wxMessageDialog md(this, _("Cannot make a rule from nothing specified."),
-                           _("Switch Plan"), wxICON_INFORMATION | wxOK );
+       !m_cbMaxWaveHeight->GetValue() && !m_cbMinWaveHeight->GetValue() &&
+       m_cbDayTime->GetValue() && m_cbNightTime->GetValue()) {
+        wxMessageDialog md(this, _("Invalid constrains."),
+                           _("Switch Plan"), wxICON_ERROR | wxOK );
         md.ShowModal();
         return;
     }
 
-    if(!m_cbDayTime->GetValue() || !m_cbNightTime->GetValue()) {
+    if(!m_cbDayTime->GetValue() && !m_cbNightTime->GetValue()) {
         wxMessageDialog md(this, _("Cannot make a rule if neither daytime nor nighttime is specified."),
-                           _("Switch Plan"), wxICON_INFORMATION | wxOK );
+                           _("Switch Plan"), wxICON_ERROR | wxOK );
         md.ShowModal();
         return;
     }

@@ -808,6 +808,8 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
     m_cPolarMethod->SetSelection(BoatPlan::TRANSFORM);
     StoreBoatParameters();
     Compute();
+
+    m_bNewSwitchPlanRule->Enable();
     m_bDeleteBoatPlan->Enable();
 
     wxFileConfig *pConf = GetOCPNConfigObject();
@@ -823,8 +825,10 @@ void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
     m_lBoatPlans->DeleteItem(m_SelectedSailPlan);
     m_Boat.Plans.erase(m_Boat.Plans.begin() + m_SelectedSailPlan);
 
-    if(m_Boat.Plans.size() < 2)
+    if(m_Boat.Plans.size() < 2) {
         m_bDeleteBoatPlan->Disable();
+        m_bNewSwitchPlanRule->Disable();
+    }
 }
 
 void BoatDialog::StoreBoatParameters()
@@ -879,10 +883,9 @@ void BoatDialog::RepopulatePlans()
     m_lBoatPlans->SetColumnWidth(spNAME, 80);
     m_lBoatPlans->SetColumnWidth(spETA, 50);
 
-    if(m_Boat.Plans.size() > 1)
-        m_bDeleteBoatPlan->Enable();
-    else
-        m_bDeleteBoatPlan->Disable();
+    bool enable = m_Boat.Plans.size() > 1;
+    m_bDeleteBoatPlan->Enable(enable);
+    m_bNewSwitchPlanRule->Enable(enable);
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
 
@@ -935,33 +938,45 @@ void BoatDialog::UpdateVMG()
     m_stBestCourseDownWindStarboardTack->SetLabel(FormatVMG(vmg.values[SailingVMG::STARBOARD_DOWNWIND], windspeed));
 }
 
+void BoatDialog::OnSwitchPlanRules( wxCommandEvent& event )
+{
+    int index = m_lSwitchPlans->GetSelection();
+    bool enable = index >= 0;
+    m_bEditSwitchBoatPlan->Enable(enable);
+    m_bDeleteSwitchBoatPlan->Enable(enable);
+}
+
 void BoatDialog::OnNewSwitchPlanRule( wxCommandEvent& event )
 {
     SwitchPlan plan;
-    
-    plan.Name = m_Boat.Plans[0].Name;
-
+    plan.Name = m_Boat.Plans[!m_SelectedSailPlan].Name;
     m_Boat.Plans[m_SelectedSailPlan].SwitchPlans.push_back(plan);
 
     int index = m_lSwitchPlans->Append(wxString());
     m_lSwitchPlans->SetSelection(index, true);
 
-    m_bEditSwitchBoatPlan->Enable();
-    m_bDeleteSwitchBoatPlan->Enable();
-
-    OnEditSwitchPlanRule(event);
+    EditSwitchPlanRule(false);
 }
 
 void BoatDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
+{
+    EditSwitchPlanRule(true);
+}
+
+void BoatDialog::EditSwitchPlanRule( bool edit )
 {
     int index = m_lSwitchPlans->GetSelection();
     if(index < 0)
         return;
 
     BoatPlan &boatplan = m_Boat.Plans[m_SelectedSailPlan];
-    SwitchPlan plan = boatplan.SwitchPlans[index];
 
-    if(m_Boat.Plans.size() < 1) {
+    std::vector<BoatPlan> plans;
+    for(int i=0; i < (int)m_Boat.Plans.size(); i++)
+        if(i != m_SelectedSailPlan)
+            plans.push_back(m_Boat.Plans[i]);
+
+    if(plans.size() < 1) {
         wxMessageDialog md(this, _("Cannot edit switch plan since there is no other plan to switch to."),
                            _("Sail Plans"),
                            wxICON_ERROR | wxOK );
@@ -969,10 +984,11 @@ void BoatDialog::OnEditSwitchPlanRule( wxCommandEvent& event )
         return;
     }
 
-    SwitchPlanDialog dialog(this, plan, m_Boat.Plans);
+    SwitchPlan plan = boatplan.SwitchPlans[index];
+    SwitchPlanDialog dialog(this, plan, plans);
     if(dialog.ShowModal() == wxID_OK)
         boatplan.SwitchPlans[index] = plan;
-    else
+    else if(!edit)
         boatplan.SwitchPlans.erase(boatplan.SwitchPlans.begin() + index);
 
     RepopulateSwitchPlans();
@@ -994,10 +1010,8 @@ void BoatDialog::RepopulateSwitchPlans()
 {
     BoatPlan &boatplan = m_Boat.Plans[m_SelectedSailPlan];
 
-    if(boatplan.SwitchPlans.size() == 0) {
-        m_bEditSwitchBoatPlan->Disable();
-        m_bDeleteSwitchBoatPlan->Disable();
-    }
+    m_bEditSwitchBoatPlan->Disable();
+    m_bDeleteSwitchBoatPlan->Disable();
 
     m_lSwitchPlans->Clear();
 

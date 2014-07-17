@@ -87,8 +87,10 @@ private:
     void UpdateTrackingControls();
     void SetEta(double eta) { m_tEta->SetValue(wxString::Format(_T("%.5g"), eta)); }
 
+    void OnSwitchPlanRules( wxCommandEvent& event );
     void OnNewSwitchPlanRule( wxCommandEvent& event );
     void OnEditSwitchPlanRule( wxCommandEvent& event );
+    void EditSwitchPlanRule( bool edit );
     void OnDeleteSwitchPlanRule( wxCommandEvent& event );
     void RepopulateSwitchPlans();
 

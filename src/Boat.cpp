@@ -105,16 +105,14 @@ wxString Boat::OpenXML(wxString filename)
              for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
                  if(!strcmp(f->Value(), "SwitchPlan")) {
                      SwitchPlan switchplan;
-                     switchplan.MaxWindSpeed = strtod(f->Attribute("MaxWindSpeed"), 0);
-                     switchplan.MinWindSpeed = strtod(f->Attribute("MinWindSpeed"), 0);
-                     switchplan.MaxWindDirection = strtod(f->Attribute("MaxWindDirection"), 0);
-                     switchplan.MinWindDirection = strtod(f->Attribute("MinWindDirection"), 0);
-                     switchplan.MaxWaveHeight = strtod(f->Attribute("MaxWaveHeight"), 0);
-                     switchplan.MinWaveHeight = strtod(f->Attribute("MinWaveHeight"), 0);
-                     if(f->QueryBoolAttribute("DayTime", &switchplan.DayTime) != TIXML_SUCCESS)
-                         switchplan.DayTime = true;
-                     if(f->QueryBoolAttribute("NightTime", &switchplan.NightTime) != TIXML_SUCCESS)
-                         switchplan.NightTime = true;
+                     switchplan.MaxWindSpeed = AttributeDouble(f, "MaxWindSpeed", NAN);
+                     switchplan.MinWindSpeed = AttributeDouble(f, "MinWindSpeed", NAN);
+                     switchplan.MaxWindDirection = AttributeDouble(f, "MaxWindDirection", NAN);
+                     switchplan.MinWindDirection = AttributeDouble(f, "MinWindDirection", NAN);
+                     switchplan.MaxWaveHeight = AttributeDouble(f, "MaxWaveHeight", NAN);
+                     switchplan.MinWaveHeight = AttributeDouble(f, "MinWaveHeight", NAN);
+                     switchplan.DayTime = AttributeBool(f, "DayTime", true);
+                     switchplan.NightTime = AttributeBool(f, "NightTime", true);
                      switchplan.Name = wxString::FromUTF8(f->Attribute("Name"));
                      plan.SwitchPlans.push_back(switchplan);
                  }
@@ -162,43 +160,47 @@ wxString Boat::OpenXML(wxString filename)
     root->LinkEndChild(boatdrag);
 
     for(unsigned int i=0; i<Plans.size(); i++) {
-        TiXmlElement *plan = new TiXmlElement( "Plan" );
-        
-        plan->SetAttribute("Name", Plans[i].Name.mb_str());
+        TiXmlElement *e = new TiXmlElement( "Plan" );
+        BoatPlan &plan = Plans[i];
+        e->SetAttribute("Name", plan.Name.mb_str());
 
-        plan->SetAttribute("polarmethod", Plans[i].polarmethod);
-        switch(Plans[i].polarmethod) {
+        e->SetAttribute("polarmethod", plan.polarmethod);
+        switch(plan.polarmethod) {
         case BoatPlan::CSV:
-            plan->SetAttribute("csvFileName", Plans[i].csvFileName.mb_str());
+            e->SetAttribute("csvFileName", plan.csvFileName.mb_str());
             break;
         case BoatPlan::TRANSFORM:
-            sprintf(str, "%.4g", Plans[i].eta);
-            plan->SetAttribute("eta", str);
+            sprintf(str, "%.4g", plan.eta);
+            e->SetAttribute("eta", str);
 
-            sprintf(str, "%.4f", Plans[i].luff_angle);
-            plan->SetAttribute("luff_angle", str);
+            sprintf(str, "%.4f", plan.luff_angle);
+            e->SetAttribute("luff_angle", str);
 
-            plan->SetAttribute("wing_wing_running", Plans[i].wing_wing_running);
+            e->SetAttribute("wing_wing_running", plan.wing_wing_running);
             break;
         case BoatPlan::IMF:
             break;
         }
 
-        plan->SetAttribute("optimize_tacking", Plans[i].optimize_tacking);
+        e->SetAttribute("optimize_tacking", plan.optimize_tacking);
 
-        for(unsigned int j=0; j<Plans[i].SwitchPlans.size(); j++) {
-            TiXmlElement *switchplan = new TiXmlElement( "SwitchPlan" );
-            switchplan->SetDoubleAttribute("MaxWindSpeed", Plans[i].SwitchPlans[j].MaxWindSpeed);
-            switchplan->SetDoubleAttribute("MinWindSpeed", Plans[i].SwitchPlans[j].MinWindSpeed);
-            switchplan->SetDoubleAttribute("MaxWindDirection", Plans[i].SwitchPlans[j].MaxWindDirection);
-            switchplan->SetDoubleAttribute("MinWindDirection", Plans[i].SwitchPlans[j].MinWindDirection);
-            switchplan->SetDoubleAttribute("MaxWaveHeight", Plans[i].SwitchPlans[j].MaxWaveHeight);
-            switchplan->SetDoubleAttribute("MinWaveHeight", Plans[i].SwitchPlans[j].MinWaveHeight);
-            switchplan->SetAttribute("Name", Plans[i].SwitchPlans[j].Name.mb_str());
-            plan->LinkEndChild(switchplan);
+        for(unsigned int j=0; j<plan.SwitchPlans.size(); j++) {
+            TiXmlElement *f = new TiXmlElement( "SwitchPlan" );
+            SwitchPlan &switchplan = plan.SwitchPlans[j];
+#define SetAttr(NAME) if(!isnan(switchplan.NAME)) f->SetDoubleAttribute(#NAME, switchplan.NAME)
+            SetAttr(MinWindSpeed);
+            SetAttr(MaxWindSpeed);
+            SetAttr(MinWindDirection);
+            SetAttr(MaxWindDirection);
+            SetAttr(MinWaveHeight);
+            SetAttr(MaxWaveHeight);
+            if(switchplan.DayTime)   f->SetAttribute("DayTime", switchplan.DayTime);
+            if(switchplan.NightTime) f->SetAttribute("NightTime", switchplan.NightTime);
+            f->SetAttribute("Name", switchplan.Name.mb_str());
+            e->LinkEndChild(f);
         }
 
-        root->LinkEndChild(plan);
+        root->LinkEndChild(e);
     }
 
     if(!doc.SaveFile(filename.mb_str()))
@@ -209,13 +211,14 @@ wxString Boat::OpenXML(wxString filename)
 int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
                             const wxDateTime &gribtime, double lat, double lon, int &daytime)
 {
-    for(int rounds = 0; rounds < 10; rounds++) {
+    for(int rounds = 0; rounds < 5; rounds++) {
         BoatPlan &boatplan = Plans[curplan];
-        wxString Name = boatplan.TrySwitchBoatPlan(VW, H, Swell, gribtime,
-                                                   lat, lon, daytime);
-        if(Name.empty())
+        int index = boatplan.TrySwitchBoatPlan(VW, H, Swell, gribtime,
+                                               lat, lon, daytime);
+        if(index == -1)
             return curplan;
 
+        wxString &Name = boatplan.SwitchPlans[index].Name;
         unsigned int i;
         for(i=0; i<Plans.size(); i++)
             if(Name == Plans[i].Name) {
@@ -224,7 +227,7 @@ int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
             }
 
         if(i == Plans.size()) {
-            printf("error, failed to find plan: %s\n", (const char*)Name.mb_str());
+//            printf("error, failed to find plan: %s\n", (const char*)Name.mb_str());
             break;
         }
     }

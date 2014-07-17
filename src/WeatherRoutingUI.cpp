@@ -1477,7 +1477,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_nNotebook->AddPage( m_panel3, _("Plot"), false );
+	m_nNotebook->AddPage( m_panel3, _("Plot"), true );
 	m_panel17 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer1022;
 	fgSizer1022 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -1533,7 +1533,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText128->Wrap( -1 );
 	fgSizer58->Add( m_staticText128, 0, wxALL, 5 );
 	
-	m_sSailArea = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 400, 10000, 0 );
+	m_sSailArea = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 10000, 400 );
 	fgSizer58->Add( m_sSailArea, 0, wxALL, 5 );
 	
 	m_staticText129 = new wxStaticText( m_panel17, wxID_ANY, _("sq/ft"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1814,7 +1814,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_pPolarConfig->SetSizer( m_fgConfig );
 	m_pPolarConfig->Layout();
 	m_fgConfig->Fit( m_pPolarConfig );
-	m_nNotebook->AddPage( m_pPolarConfig, _("Polar Configuration"), true );
+	m_nNotebook->AddPage( m_pPolarConfig, _("Polar Configuration"), false );
 	m_panel311 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer1811;
 	fgSizer1811 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -2042,6 +2042,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sVMGWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cVMGTrueApparent->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cbOptimizeTacking->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );
+	m_lSwitchPlans->Connect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( BoatDialogBase::OnSwitchPlanRules ), NULL, this );
 	m_bNewSwitchPlanRule->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnNewSwitchPlanRule ), NULL, this );
 	m_bEditSwitchBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditSwitchPlanRule ), NULL, this );
 	m_bDeleteSwitchBoatPlan->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDeleteSwitchPlanRule ), NULL, this );
@@ -2105,6 +2106,7 @@ BoatDialogBase::~BoatDialogBase()
 	m_sVMGWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cVMGTrueApparent->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cbOptimizeTacking->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );
+	m_lSwitchPlans->Disconnect( wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler( BoatDialogBase::OnSwitchPlanRules ), NULL, this );
 	m_bNewSwitchPlanRule->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnNewSwitchPlanRule ), NULL, this );
 	m_bEditSwitchBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditSwitchPlanRule ), NULL, this );
 	m_bDeleteSwitchBoatPlan->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDeleteSwitchPlanRule ), NULL, this );
