@@ -10,6 +10,8 @@
 
 #ifdef __GNUG__
     #pragma implementation "jsonreader.cpp"
+    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+    #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
 #include "jsonreader.h"

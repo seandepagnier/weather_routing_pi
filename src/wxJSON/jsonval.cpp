@@ -10,6 +10,7 @@
 
 #ifdef __GNUG__
     #pragma implementation "jsonval.cpp"
+    #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
 
