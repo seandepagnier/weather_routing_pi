@@ -614,6 +614,9 @@ void BoatDialog::LoadCSV(bool switched)
         }
         return;
     }
+
+    if(m_cbOptimizeTacking->IsChecked())
+        m_Boat.Plans[m_SelectedSailPlan].OptimizeTackingSpeed();
     
     UpdateStats();
     UpdateVMG();
@@ -838,6 +841,15 @@ void BoatDialog::StoreBoatParameters()
         return;
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    
+    m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
+
+    m_Boat.displacement_tons = m_sDisplacement->GetValue();
+    m_Boat.sail_area_ft2 = m_sSailArea->GetValue();
+    m_Boat.lwl_ft = m_sLWL->GetValue();
+    m_Boat.loa_ft = m_sLOA->GetValue();
+    m_Boat.beam_ft = m_sBeam->GetValue();
+
     plan.optimize_tacking = m_cbOptimizeTacking->GetValue();
 
     switch(plan.polarmethod) {
@@ -845,14 +857,6 @@ void BoatDialog::StoreBoatParameters()
         m_tEta->GetValue().ToDouble(&plan.eta);
         plan.luff_angle = m_sLuffAngle->GetValue();
         plan.wing_wing_running = m_cbWingWingRunning->GetValue();
-
-        m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
-
-        m_Boat.displacement_tons = m_sDisplacement->GetValue();
-        m_Boat.sail_area_ft2 = m_sSailArea->GetValue();
-        m_Boat.lwl_ft = m_sLWL->GetValue();
-        m_Boat.loa_ft = m_sLOA->GetValue();
-        m_Boat.beam_ft = m_sBeam->GetValue();
 
         m_Boat.frictional_drag = m_sFrictionalDrag->GetValue() / 1000.0;
         m_Boat.wake_drag = m_sWakeDrag->GetValue() / 100.0;

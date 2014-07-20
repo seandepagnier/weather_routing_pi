@@ -54,7 +54,7 @@ public:
     ~RouteMapOverlay();
 
     bool SetCursorLatLon(double lat, double lon);
-    void RenderIsoRoute(IsoRoute *r, wxColour &color,
+    void RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
                         ocpnDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute);
@@ -92,7 +92,8 @@ private:
     wxMutex routemutex;
 
     void SetPointColor(ocpnDC &dc, Position *p);
-    void DrawLine(Position *p1, Position *p2,
+    void DrawLine(Position *p1, Position *p2, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
                   ocpnDC &dc, PlugIn_ViewPort &vp);
 
     double last_cursor_lat, last_cursor_lon;

@@ -70,8 +70,6 @@ private:
     void OnRecomputeSpin( wxSpinEvent& event ) { OnRecompute(); }
     void OnRecompute( wxCommandEvent& event ) { OnRecompute(); }
     void OnOptimizeTacking( wxCommandEvent& event );
-    void OnUpdateStatistics( wxCommandEvent& event ) { StoreBoatParameters(); UpdateStats(); }
-    void OnUpdateStatisticsSpin( wxSpinEvent& event ) { StoreBoatParameters(); UpdateStats(); }
     void OnRecomputeDrag( wxCommandEvent& event );
     void OnDragInfo( wxCommandEvent& event );
     void OnSailPlanSelected( wxListEvent& event );

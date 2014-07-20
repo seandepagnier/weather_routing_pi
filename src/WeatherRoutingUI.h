@@ -370,6 +370,7 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stWindSpeedStep;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_stWindDegreeStep;
+		wxPanel* m_panel171;
 		wxPanel* m_panel311;
 		wxStaticText* m_staticText118;
 		wxSpinCtrl* m_sVMGWindSpeed;
@@ -403,15 +404,13 @@ class BoatDialogBase : public wxDialog
 		virtual void OnUpdatePlot( wxListbookEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnUpdateStatistics( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdateStatisticsSpin( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnRecompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnPolarMethod( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEtaSlider( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnEta( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRecompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarCSVFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnUpdateVMG( wxSpinEvent& event ) { event.Skip(); }

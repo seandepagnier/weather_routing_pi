@@ -102,7 +102,7 @@ void RouteMapOverlay::DeleteThread()
 static void SetColor(ocpnDC &dc, wxColour c, bool penifgl = false)
 {
     if(!dc.GetDC()) {
-        glColor4ub(c.Red(), c.Green(), c.Blue(), 168);
+        glColor4ub(c.Red(), c.Green(), c.Blue(), c.Alpha());
         if(!penifgl)
             return;
     }
@@ -126,6 +126,22 @@ static void SetWidth(ocpnDC &dc, int w, bool penifgl = false)
 void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
                                ocpnDC &dc, PlugIn_ViewPort &vp)
 {
+    wxPoint p1p, p2p;
+    GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
+    GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
+
+    if(dc.GetDC())
+        dc.StrokeLine(p1p.x, p1p.y, p2p.x, p2p.y);
+    else {
+        glVertex2d(p1p.x, p1p.y);
+        glVertex2d(p2p.x, p2p.y);
+    }
+}
+
+void RouteMapOverlay::DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
+                               ocpnDC &dc, PlugIn_ViewPort &vp)
+{
+#if 0
     double p1plon, p2plon;
     if(fabs(vp.clon) > 90)
         p1plon = positive_degrees(p1->lon), p2plon = positive_degrees(p2->lon);
@@ -137,55 +153,96 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
        (p1plon-180 < vp.clon && p2plon-180 > vp.clon) ||
        (p1plon-180 > vp.clon && p2plon-180 < vp.clon))
         return;
+#endif
 
     wxPoint p1p, p2p;
     GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
     GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
 
+    SetColor(dc, color1);
     if(dc.GetDC())
         dc.DrawLine(p1p.x, p1p.y, p2p.x, p2p.y);
     else {
         glVertex2d(p1p.x, p1p.y);
+        SetColor(dc, color2);
         glVertex2d(p2p.x, p2p.y);
     }
 }
 
-void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &color,
+static inline wxColour &PositionColor(Position *p, wxColour &grib_color, wxColour &climatology_color,
+                                      wxColour &grib_deficient_color, wxColour &climatology_deficient_color)
+{
+    if(p->data_mask & Position::GRIB_WIND) {
+        if(p->data_mask & Position::DATA_DEFICIENT_WIND)
+           return grib_deficient_color;
+        else
+            return grib_color;
+    }
+
+    if(p->data_mask & Position::CLIMATOLOGY_WIND) {
+        if(p->data_mask & Position::DATA_DEFICIENT_WIND)
+            return climatology_deficient_color;
+        else
+            return climatology_color;
+    }
+
+    static wxColour black(0,0,0);
+    return black;
+}
+
+static wxColour TransparentColor(wxColor c)
+{
+    return wxColor(c.Red(), c.Green(), c.Blue(), c.Alpha()*7/24);
+}
+
+void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
                                      ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     SkipPosition *s = r->skippoints;
     if(!s)
         return;
 
+    wxColour grib_deficient_color = TransparentColor(grib_color);
+    wxColour climatology_deficient_color = TransparentColor(climatology_color);
+
     Position *p = s->point;
-    SetColor(dc, color);
+    wxColour *pcolor = &PositionColor(p, grib_color, climatology_color,
+                                      grib_deficient_color, climatology_deficient_color);
     if(!dc.GetDC())
         glBegin(GL_LINES);
     do {
+        wxColour &ncolor = PositionColor(p->next, grib_color, climatology_color,
+                                         grib_deficient_color, climatology_deficient_color);
         if(!p->copied || !p->next->copied)
-            DrawLine(p, p->next, dc, vp);
+            DrawLine(p, *pcolor, p->next, ncolor, dc, vp);
+        pcolor = &ncolor;
         p = p->next;
     } while(p != s->point);
     if(!dc.GetDC())
         glEnd();
 
     /* now render any children */
-    wxColour cyan(0, 255, 255);
+    wxColour cyan(0, 255, 255), magenta(255, 0, 255);
     for(IsoRouteList::iterator it = r->children.begin(); it != r->children.end(); ++it)
-        RenderIsoRoute(*it, cyan, dc, vp);
+        RenderIsoRoute(*it, cyan, magenta, dc, vp);
 }
 
 void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
                                            ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     Position *pos = r->skippoints->point;
+    wxColor black = wxColour(0, 0, 0, 192), tblack = TransparentColor(black);
     do {
+        wxColour *color = pos->data_mask & Position::DATA_DEFICIENT_WIND ? &tblack : &black;
         for(Position *p = pos; p && !p->drawn && p->parent; p = p->parent) {
+//            wxColour &color = p->data_mask & Position::DATA_DEFICIENT_WIND ? tblack : black;
+            wxColour &pcolor = p->parent->data_mask & Position::DATA_DEFICIENT_WIND ? tblack : black;
             if(!p->copied || each_parent)
-                DrawLine(p, p->parent, dc, vp);
+                DrawLine(p, *color, p->parent, pcolor, dc, vp);
             p->drawn = true;
             if(!each_parent)
                 break;
+            color = &pcolor;
         }
 
         pos = pos->next;
@@ -283,7 +340,6 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 for(; it != origin.end(); ++it)
                     for(IsoRouteList::iterator rit = (*it)->routes.begin();
                         rit != (*it)->routes.end(); ++rit) {
-                        SetColor(dc, *wxBLACK);
                         RenderAlternateRoute(*rit, !AlternatesForAll, dc, nvp);
                     }
 
@@ -293,7 +349,12 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             }
 
             unsigned char routecolors[][3] = {
-                {  0,   0, 127}, {  0,   0, 255},
+                {  0,   0, 128}, {  0, 192,   0}, {  0, 128, 192}, {  0, 255,   0},
+                {  0,   0, 255}, {  0, 128, 128}, {  0, 255,   0}, {  0, 192, 192},
+                {  0, 128, 255}, {  0, 255, 128}, {  0,   0, 255}, {  0, 192,   0},
+                {  0,   0, 128}, {  0, 255,   0}, {  0, 192, 128}, {  0, 128, 255}, 
+                {  0, 192,   0}, {  0, 128,   0}, {  0,   0, 255}, {  0, 192, 192}};
+#if 0
                 {255, 127,   0}, {255, 127, 127},
                 {  0, 255,   0}, {  0, 255, 127},
                 {127, 255,   0}, {127, 255, 127},
@@ -302,6 +363,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 {127,   0,   0}, {127,   0, 127}, {127,   0, 255},
                 {  0, 127,   0}, {  0, 127, 127}, {  0, 127, 255},
                 {255, 255,   0},                  };
+#endif
 
             int IsoChronThickness = settingsdialog.m_sIsoChronThickness->GetValue();
             if(IsoChronThickness) {
@@ -310,10 +372,12 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 int c = 0;
                 for(IsoChronList::iterator i = origin.begin(); i != origin.end(); ++i) {
                     Unlock();
-                    wxColor color(routecolors[c][0], routecolors[c][1], routecolors[c][2]);
+                    wxColor grib_color(routecolors[c][0], routecolors[c][1], routecolors[c][2], 224);
+                    wxColor climatology_color(255-routecolors[c][0], routecolors[c][2],
+                                              routecolors[c][1], 224);
                 
                     for(IsoRouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
-                        RenderIsoRoute(*j, color, dc, nvp);
+                        RenderIsoRoute(*j, grib_color, climatology_color, dc, nvp);
                 
                     if(++c == (sizeof routecolors) / (sizeof *routecolors))
                         c = 0;
@@ -475,7 +539,7 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 
         l = pos;
         for(p = pos; p; p = p->parent) {
-            GribRecordSet *grib = (*it)->m_Grib;
+            configuration.grib = (*it)->m_Grib;
 
             PlotData data;
             /* this omits the starting position */
@@ -488,7 +552,7 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
             }
             data.time = (*it)->time;
             data.lat = p->lat, data.lon = p->lon;
-            if(l->GetPlotData(grib, dt, configuration, data))
+            if(l->GetPlotData(dt, configuration, data))
                 plotdata.push_front(data);
 
             l = p;
@@ -677,16 +741,24 @@ void RouteMapOverlay::UpdateDestination()
         Position *endp;
         double minH;
         bool mintacked;
+        int mindata_mask;
 
-        for(IsoRouteList::iterator it = isochron->routes.begin(); it != isochron->routes.end(); ++it)
-            (*it)->PropagateToEnd(isochron->m_Grib, isochron->time, configuration, mindt, endp, minH, mintacked);
+        for(IsoRouteList::iterator it = isochron->routes.begin(); it != isochron->routes.end(); ++it) {
+            configuration.grib = isochron->m_Grib;
+            configuration.grib_is_data_deficient = isochron->m_Grib_is_data_deficient;
+            
+            configuration.time = isochron->time;
+            (*it)->PropagateToEnd(configuration, mindt, endp, minH,
+                                  mintacked, mindata_mask);
+        }
         Unlock();
 
         if(isinf(mindt))
             goto not_able_to_propagate;
 
         destination_position = new Position(configuration.EndLat, configuration.EndLon,
-                                            endp, minH, NAN, endp->sailplan, endp->tacks + mintacked);
+                                            endp, minH, NAN, endp->sailplan, endp->tacks + mintacked,
+                                            mindata_mask);
 
         m_EndTime = isochron->time + wxTimeSpan::Milliseconds(1000*mindt);
 

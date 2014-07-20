@@ -49,17 +49,15 @@ class Position
 {
 public:
     Position(double latitude, double longitude, Position *p=NULL,
-             double pheading=NAN, double pbearing=NAN, int sp=0, int t=0);
+             double pheading=NAN, double pbearing=NAN, int sp=0, int t=0, int dm=0);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
 
-    bool GetPlotData(GribRecordSet *grib, double dt,
+    bool GetPlotData(double dt,
                      RouteMapConfiguration &configuration, PlotData &data);
-    bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib, const wxDateTime &time,
-                   RouteMapConfiguration &configuration);
-    double PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
-                          RouteMapConfiguration &configuration, double &H);
+    bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
+    double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
 
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
@@ -76,6 +74,11 @@ public:
 
     bool propagated;
     bool drawn, copied;
+
+    // used for rendering
+    enum DataMask { GRIB_WIND=1, CLIMATOLOGY_WIND=2, DATA_DEFICIENT_WIND=4,
+                    GRIB_CURRENT=8, CLIMATOLOGY_CURRENT=16 };
+    int data_mask;
 };
 
 /* circular skip list of positions which point to where we
@@ -119,11 +122,9 @@ public:
 
     void RemovePosition(SkipPosition *s, Position *p);
     Position *ClosestPosition(double lat, double lon, double *dist=0);
-    bool Propagate(IsoRouteList &routelist, GribRecordSet *Grib,
-                   wxDateTime &time, RouteMapConfiguration &configuration);
-    void PropagateToEnd(GribRecordSet *grib, const wxDateTime &time,
-                        RouteMapConfiguration &configuration, double &mindt,
-                        Position *&endp, double &minH, bool &mintacked);
+    bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
+    void PropagateToEnd(RouteMapConfiguration &configuration, double &mindt,
+                        Position *&endp, double &minH, bool &mintacked, int &mindata_mask);
 
     int SkipCount();
     int Count();
@@ -142,11 +143,10 @@ public:
 class IsoChron
 {
 public:
-    IsoChron(IsoRouteList r, wxDateTime t, GribRecordSet *g);
+    IsoChron(IsoRouteList r, wxDateTime t, GribRecordSet *g, bool grib_is_data_deficient);
     ~IsoChron();
 
-    void PropagateIntoList(IsoRouteList &routelist, GribRecordSet *grib,
-                           wxDateTime &time, RouteMapConfiguration &configuration);
+    void PropagateIntoList(IsoRouteList &routelist, RouteMapConfiguration &configuration);
     bool Contains(Position &p);
     bool Contains(double lat, double lon);
     Position* ClosestPosition(double lat, double lon, double *dist=0);
@@ -155,6 +155,7 @@ public:
     IsoRouteList routes;
     wxDateTime time;
     GribRecordSet *m_Grib;
+    bool m_Grib_is_data_deficient;
 };
 
 typedef std::list<IsoChron*> IsoChronList;
@@ -204,6 +205,11 @@ struct RouteMapConfiguration {
     this means the map cannot cross both 0 and 180 longitude.
     To fully support this requires a lot more logic and would probably slow the algorithm
     by about 8%.  Is it even useful?  */
+
+    // parameters
+    GribRecordSet *grib;
+    bool grib_is_data_deficient;
+    wxDateTime time;
 };
 
 bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
