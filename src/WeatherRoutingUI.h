@@ -370,7 +370,6 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stWindSpeedStep;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_stWindDegreeStep;
-		wxPanel* m_panel171;
 		wxPanel* m_panel311;
 		wxStaticText* m_staticText118;
 		wxSpinCtrl* m_sVMGWindSpeed;

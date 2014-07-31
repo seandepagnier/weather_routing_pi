@@ -517,8 +517,8 @@ double BoatPlan::VelocityTrueWind(double VA, double VB, double W)
 #define MESSAGE(S) (S + wxString(_T("\n")) + wxString::FromUTF8(filename) \
                     + _(" line ") + wxString::Format(_T("%d"), linenum))
 #define WARNING(S) do { if(message.empty()) message = MESSAGE(S); } while (0)
-#define ERROR(S) if(message) do { message = MESSAGE(S); goto failed; } while (0)
-
+#define ERROR(S) if(message) do { message = _("Boat polar failed") + wxString(_T("\n")) \
+                                  + MESSAGE(S); goto failed; } while (0)
 bool BoatPlan::Open(const char *filename, wxString &message)
 {
     wind_speeds.clear();
@@ -559,29 +559,35 @@ bool BoatPlan::Open(const char *filename, wxString &message)
         token = strtok_r(line, ";", &saveptr);
 
         double W = strtod(token, 0);
+
+        if(W < 0 || W > 180) {
+            WARNING(_("Wind direction out of range."));
+            continue;
+        }
+
+        if(W <= lastentryW) {
+            WARNING(_("Wind direction out of order."));
+            continue;
+        }
+
         degree_steps.push_back(W);
-
-        if(W < 0 || W > 180)
-            ERROR(_("Wind direction out of range."));
-
-        if(W <= lastentryW)
-            ERROR(_("Wind direction out of order."));
-
         lastentryW = W;
 
         {
             std::vector<double>boatspeed;
-            int VWi = 0;
-            while((token = strtok_r(NULL, ";", &saveptr))) {
-                if(VWi == (int)wind_speeds.size()) {
-                    WARNING(_("Too many tokens."));
-                    break;
-                }
-                wind_speeds[VWi++].speeds.push_back
-                    (SailingWindSpeed::SailingSpeed(strtod(token, 0), W));
+            for(int VWi = 0; VWi < (int)wind_speeds.size(); VWi++) {
+                double s = 0;
+                if((token = strtok_r(NULL, ";", &saveptr)))
+                    s = strtod(token, 0);
+                else
+                    WARNING(_("Too few tokens."));
+
+                wind_speeds[VWi].speeds.push_back
+                    (SailingWindSpeed::SailingSpeed(s, W));
             }
-            if(VWi != (int)wind_speeds.size()-1)
-                WARNING(_("Too few tokens."));
+
+            if(strtok_r(NULL, ";", &saveptr))
+                WARNING(_("Too many tokens."));
         }
     }
 
@@ -613,6 +619,9 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     return true;
     
 failed:
+    wind_speeds.clear();
+    degree_steps.clear();
+
     zu_close(f);
     return false;
 }
