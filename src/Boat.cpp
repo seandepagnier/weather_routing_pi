@@ -83,10 +83,12 @@ wxString Boat::OpenXML(wxString filename)
 
              switch(plan.polarmethod) {
              case BoatPlan::CSV:
+             {
                  plan.csvFileName = wxString::FromUTF8(e->Attribute("csvFileName"));
-                 if(!plan.Open(plan.csvFileName.mb_str()))
-                     return _("Failed to open file: ") + plan.csvFileName;
-                 break;
+                 wxString message;
+                 if(!plan.Open(plan.csvFileName.mb_str(), message))
+                     return message;
+             } break;
              case BoatPlan::TRANSFORM:
                  plan.eta = AttributeDouble(e, "eta", .5);
                  plan.luff_angle = AttributeDouble(e, "luff_angle", 15);

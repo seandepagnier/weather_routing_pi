@@ -514,58 +514,76 @@ double BoatPlan::VelocityTrueWind(double VA, double VB, double W)
 }
 
 #define MAX_WINDSPEEDS_IN_TABLE 200
-bool BoatPlan::Open(const char *filename)
+#define MESSAGE(S) (S + wxString(_T("\n")) + wxString::FromUTF8(filename) \
+                    + _(" line ") + wxString::Format(_T("%d"), linenum))
+#define WARNING(S) do { if(message.empty()) message = MESSAGE(S); } while (0)
+#define ERROR(S) if(message) do { message = MESSAGE(S); goto failed; } while (0)
+
+bool BoatPlan::Open(const char *filename, wxString &message)
 {
     wind_speeds.clear();
     degree_steps.clear();
     
+    int linenum = 0;
     ZUFILE *f = zu_open(filename, "r");
-    if(!f)
-        return false;
-
     char line[1024];
     double lastentryW = -1;
-
     char *token, *saveptr;
+
+    if(!f)
+        ERROR(_("Failed to open."));
+
     if(!zu_gets(f, line, sizeof line))
-        goto failed; /* error here too */
+        ERROR(_("Failed to read."));
+
     token = strtok_r(line, ";", &saveptr);
+    linenum++;
 
     /* chomp invisible bytes */
     while(*token < 0) token++;
 
     if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
-        goto failed; /* unrecognized format */
+        ERROR(_("Unrecognized format."));
     
     while((token = strtok_r(NULL, ";", &saveptr))) {
         wind_speeds.push_back(SailingWindSpeed(strtod(token, 0)));
         if(wind_speeds.size() > MAX_WINDSPEEDS_IN_TABLE)
-            goto failed;
+            ERROR(_("Too many wind speeds."));
     }
 
     wind_speed_step = (int)round(wind_speeds.back().VW / wind_speeds.size());
 
     while(zu_gets(f, line, sizeof line)) {
+        linenum++;
+
         token = strtok_r(line, ";", &saveptr);
 
         double W = strtod(token, 0);
         degree_steps.push_back(W);
+
         if(W < 0 || W > 180)
-            goto failed;
+            ERROR(_("Wind direction out of range."));
+
         if(W <= lastentryW)
-            goto failed;
+            ERROR(_("Wind direction out of order."));
+
         lastentryW = W;
 
-        std::vector<double>boatspeed;
-        int VWi = 0;
-        while((token = strtok_r(NULL, ";", &saveptr)))
-            wind_speeds[VWi++].speeds.push_back(SailingWindSpeed::SailingSpeed(strtod(token, 0), W));
+        {
+            std::vector<double>boatspeed;
+            int VWi = 0;
+            while((token = strtok_r(NULL, ";", &saveptr))) {
+                if(VWi == (int)wind_speeds.size()) {
+                    WARNING(_("Too many tokens."));
+                    break;
+                }
+                wind_speeds[VWi++].speeds.push_back
+                    (SailingWindSpeed::SailingSpeed(strtod(token, 0), W));
+            }
+            if(VWi != (int)wind_speeds.size()-1)
+                WARNING(_("Too few tokens."));
+        }
     }
-
-    // make sure the table is correct
-    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
-        if(wind_speeds[VWi].speeds.size() != degree_steps.size())
-            goto failed;
 
     zu_close(f);
 

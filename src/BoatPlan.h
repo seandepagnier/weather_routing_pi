@@ -61,7 +61,7 @@ public:
     static double DirectionApparentWind(double VB, double W, double VW);
     static double VelocityTrueWind(double VA, double VB, double W);
 
-    bool Open(const char *filename);
+    bool Open(const char *filename, wxString &message);
     bool Save(const char *filename);
 
     void BoatSteadyState(double W, double VW, double &B, double &VB,

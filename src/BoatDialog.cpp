@@ -46,7 +46,14 @@ static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
 BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     : BoatDialogBase(parent), m_boatpath(boatpath), m_PlotScale(0)
 {
-    m_Boat.OpenXML(m_boatpath);
+    wxString error = m_Boat.OpenXML(m_boatpath);
+    if(error.size()) {
+        wxMessageDialog md(this, error,
+                           _("OpenCPN Weather Routing Plugin"),
+                            wxICON_ERROR | wxOK );
+        md.ShowModal();
+    }
+
     m_SelectedSailPlan = 0;
 
     m_lBoatPlans->InsertColumn(spNAME, _("Name"));
@@ -592,7 +599,17 @@ void BoatDialog::LoadCSV(bool switched)
 {
     wxString filename = m_fpCSVPath->GetPath();
     BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
-    if(plan.Open(filename.mb_str()))
+    wxString message;
+    bool success = plan.Open(filename.mb_str(), message);
+
+    if(message.size()) {
+        wxMessageDialog md(this, message,
+                           _("OpenCPN Weather Routing Plugin"),
+                           (success ? wxICON_WARNING : wxICON_ERROR) | wxOK );
+        md.ShowModal();
+    }
+
+    if(success)
         RepopulatePlans();
     else {
         if(switched) {
