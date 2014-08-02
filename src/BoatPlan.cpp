@@ -516,8 +516,8 @@ double BoatPlan::VelocityTrueWind(double VA, double VB, double W)
 #define MAX_WINDSPEEDS_IN_TABLE 200
 #define MESSAGE(S) (S + wxString(_T("\n")) + wxString::FromUTF8(filename) \
                     + _(" line ") + wxString::Format(_T("%d"), linenum))
-#define WARNING(S) do { if(message.empty()) message = MESSAGE(S); } while (0)
-#define ERROR(S) if(message) do { message = _("Boat polar failed") + wxString(_T("\n")) \
+#define PARSE_WARNING(S) do { if(message.empty()) message = MESSAGE(S); } while (0)
+#define PARSE_ERROR(S) if(message) do { message = _("Boat polar failed") + wxString(_T("\n")) \
                                   + MESSAGE(S); goto failed; } while (0)
 bool BoatPlan::Open(const char *filename, wxString &message)
 {
@@ -531,10 +531,10 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     char *token, *saveptr;
 
     if(!f)
-        ERROR(_("Failed to open."));
+        PARSE_ERROR(_("Failed to open."));
 
     if(!zu_gets(f, line, sizeof line))
-        ERROR(_("Failed to read."));
+        PARSE_ERROR(_("Failed to read."));
 
     token = strtok_r(line, ";", &saveptr);
     linenum++;
@@ -543,12 +543,12 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     while(*token < 0) token++;
 
     if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
-        ERROR(_("Unrecognized format."));
+        PARSE_ERROR(_("Unrecognized format."));
     
     while((token = strtok_r(NULL, ";", &saveptr))) {
         wind_speeds.push_back(SailingWindSpeed(strtod(token, 0)));
         if(wind_speeds.size() > MAX_WINDSPEEDS_IN_TABLE)
-            ERROR(_("Too many wind speeds."));
+            PARSE_ERROR(_("Too many wind speeds."));
     }
 
     wind_speed_step = (int)round(wind_speeds.back().VW / wind_speeds.size());
@@ -561,12 +561,12 @@ bool BoatPlan::Open(const char *filename, wxString &message)
         double W = strtod(token, 0);
 
         if(W < 0 || W > 180) {
-            WARNING(_("Wind direction out of range."));
+            PARSE_WARNING(_("Wind direction out of range."));
             continue;
         }
 
         if(W <= lastentryW) {
-            WARNING(_("Wind direction out of order."));
+            PARSE_WARNING(_("Wind direction out of order."));
             continue;
         }
 
@@ -580,14 +580,14 @@ bool BoatPlan::Open(const char *filename, wxString &message)
                 if((token = strtok_r(NULL, ";", &saveptr)))
                     s = strtod(token, 0);
                 else
-                    WARNING(_("Too few tokens."));
+                    PARSE_WARNING(_("Too few tokens."));
 
                 wind_speeds[VWi].speeds.push_back
                     (SailingWindSpeed::SailingSpeed(s, W));
             }
 
             if(strtok_r(NULL, ";", &saveptr))
-                WARNING(_("Too many tokens."));
+                PARSE_WARNING(_("Too many tokens."));
         }
     }
 
