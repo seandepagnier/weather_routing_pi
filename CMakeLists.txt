@@ -6,6 +6,7 @@
 
 # define minimum cmake version
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.2)
+#SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 PROJECT(weather_routing_pi)
 SET(PACKAGE_NAME weather_routing_pi)

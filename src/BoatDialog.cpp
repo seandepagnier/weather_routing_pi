@@ -22,7 +22,6 @@
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
- *
  */
 
 #include <wx/wx.h>
@@ -59,31 +58,8 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     m_lBoatPlans->InsertColumn(spNAME, _("Name"));
     m_lBoatPlans->InsertColumn(spETA, _("Eta"));
     RepopulatePlans();
+    LoadBoatParameters();
 
-    BoatPlan &curplan = m_Boat.Plans[m_SelectedSailPlan];
-    m_cPolarMethod->SetSelection(curplan.polarmethod);
-
-    switch(curplan.polarmethod) {
-    case BoatPlan::CSV:
-        break;
-    case BoatPlan::TRANSFORM:
-        m_sDisplacement->SetValue(m_Boat.displacement_tons);
-        m_sSailArea->SetValue(m_Boat.sail_area_ft2);
-        m_sLWL->SetValue(m_Boat.lwl_ft);
-        m_sLOA->SetValue(m_Boat.loa_ft);
-
-        m_sFrictionalDrag->SetValue(m_Boat.frictional_drag * 1000.0);
-        m_sWakeDrag->SetValue(m_Boat.wake_drag * 100.0);
-
-        m_cbWingWingRunning->SetValue(curplan.wing_wing_running);
-
-        SetEta(curplan.eta);
-        break;
-    case BoatPlan::IMF:
-        break;
-    }
-
-    m_cbOptimizeTacking->SetValue(curplan.optimize_tacking);
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
     UpdateVMG();
@@ -93,10 +69,6 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
 
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-}
-
-BoatDialog::~BoatDialog()
-{
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
@@ -580,9 +552,10 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
         pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
 
         wxString error = m_Boat.OpenXML(filename);
-        if(error.empty())
+        if(error.empty()) {
             RepopulatePlans();
-        else {
+            LoadBoatParameters();
+        } else {
             wxMessageDialog md(this, error, _("OpenCPN Weather Routing Plugin"),
                                wxICON_ERROR | wxOK );
             md.ShowModal();
@@ -714,7 +687,8 @@ void BoatDialog::OnPolarCSVFile( wxFileDirPickerEvent& event )
 void BoatDialog::OnRecompute()
 {
     StoreBoatParameters();
-    Compute();
+    if(m_Boat.Plans[m_SelectedSailPlan].polarmethod != BoatPlan::CSV)
+        Compute();
     UpdateStats();
 }
 
@@ -823,10 +797,9 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
 {
     wxString np = _("New Plan");
     m_SelectedSailPlan = m_lBoatPlans->InsertItem(m_lBoatPlans->GetItemCount(), np);
-    m_Boat.Plans.push_back(BoatPlan(np, m_Boat));
+    m_Boat.Plans.push_back(BoatPlan(np));
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-    m_cPolarMethod->SetSelection(BoatPlan::TRANSFORM);
-    StoreBoatParameters();
+
     Compute();
 
     m_bNewSwitchPlanRule->Enable();
@@ -851,6 +824,46 @@ void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
     }
 }
 
+void BoatDialog::LoadBoatParameters()
+{
+    if(m_SelectedSailPlan < 0 ||
+       m_SelectedSailPlan >= (int)m_Boat.Plans.size())
+        return;
+
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    
+    m_cHullType->SetSelection(m_Boat.hulltype);
+    m_sDisplacement->SetValue(m_Boat.displacement_tons);
+    m_sSailArea->SetValue(m_Boat.sail_area_ft2);
+    m_sLWL->SetValue(m_Boat.lwl_ft);
+    m_sLOA->SetValue(m_Boat.loa_ft);
+    m_sBeam->SetValue(m_Boat.beam_ft);
+
+    m_cbOptimizeTacking->SetValue(plan.optimize_tacking);
+
+    m_cPolarMethod->SetSelection(plan.polarmethod);
+
+    switch(plan.polarmethod) {
+    case BoatPlan::CSV:
+        break;
+    case BoatPlan::TRANSFORM:
+        m_sDisplacement->SetValue(m_Boat.displacement_tons);
+        m_sSailArea->SetValue(m_Boat.sail_area_ft2);
+        m_sLWL->SetValue(m_Boat.lwl_ft);
+        m_sLOA->SetValue(m_Boat.loa_ft);
+
+        m_sFrictionalDrag->SetValue(m_Boat.frictional_drag * 1000.0);
+        m_sWakeDrag->SetValue(m_Boat.wake_drag * 100.0);
+
+        m_cbWingWingRunning->SetValue(plan.wing_wing_running);
+
+        SetEta(plan.eta);
+        break;
+    case BoatPlan::IMF:
+        break;
+    }
+}
+
 void BoatDialog::StoreBoatParameters()
 {
     if(m_SelectedSailPlan < 0 ||
@@ -860,7 +873,6 @@ void BoatDialog::StoreBoatParameters()
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
     
     m_Boat.hulltype = (Boat::HullType)m_cHullType->GetSelection();
-
     m_Boat.displacement_tons = m_sDisplacement->GetValue();
     m_Boat.sail_area_ft2 = m_sSailArea->GetValue();
     m_Boat.lwl_ft = m_sLWL->GetValue();
@@ -887,7 +899,7 @@ void BoatDialog::RepopulatePlans()
     m_lBoatPlans->DeleteAllItems();
 
     if(m_Boat.Plans.size() == 0) {
-        m_Boat.Plans.push_back(BoatPlan(_("Initial Plan"), m_Boat));
+        m_Boat.Plans.push_back(BoatPlan(_("Initial Plan")));
         m_Boat.Plans[0].ComputeBoatSpeeds(m_Boat, m_Boat.Plans[0].polarmethod, m_sWindSpeed->GetValue());
     }
 

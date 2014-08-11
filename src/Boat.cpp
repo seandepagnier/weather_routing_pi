@@ -63,6 +63,7 @@ wxString Boat::OpenXML(wxString filename)
 
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
         if(!strcmp(e->Value(), "BoatCharacteristics")) {
+            hulltype = (Boat::HullType)AttributeInt(e, "hull_type", MONO);
             displacement_tons = AttributeDouble(e, "displacement_tons", 4);
             sail_area_ft2 = AttributeDouble(e, "sail_area_ft2", 400);
             lwl_ft = AttributeDouble(e, "lwl_ft", 24);
@@ -71,79 +72,80 @@ wxString Boat::OpenXML(wxString filename)
         } else if(!strcmp(e->Value(), "BoatDrag")) {
             frictional_drag = AttributeDouble(e, "frictional_drag", 0);
             wake_drag = AttributeDouble(e, "wake_drag", 0);
-         } else if(!strcmp(e->Value(), "Plan")) {
-             if(!cleared) {
-                 Plans.clear();
-                 cleared = true;
-             }
+        } else if(!strcmp(e->Value(), "Plan")) {
+            if(!cleared) {
+                Plans.clear();
+                cleared = true;
+            }
 
-             BoatPlan plan(wxString::FromUTF8(e->Attribute("Name")), *this);
+            BoatPlan plan(wxString::FromUTF8(e->Attribute("Name")));
 
-             plan.polarmethod = (BoatPlan::PolarMethod)AttributeInt(e, "polarmethod", BoatPlan::TRANSFORM);
+            plan.polarmethod = (BoatPlan::PolarMethod)AttributeInt(e, "polarmethod", BoatPlan::TRANSFORM);
 
-             switch(plan.polarmethod) {
-             case BoatPlan::CSV:
-             {
-                 plan.csvFileName = wxString::FromUTF8(e->Attribute("csvFileName"));
-                 wxString message;
-                 if(!plan.Open(plan.csvFileName.mb_str(), message))
-                     return message;
-             } break;
-             case BoatPlan::TRANSFORM:
-                 plan.eta = AttributeDouble(e, "eta", .5);
-                 plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
-                 plan.wing_wing_running = AttributeBool(e, "wing_wing_running", false);
-                 plan.ComputeBoatSpeeds(*this, plan.polarmethod);
-                 break;
-             case BoatPlan::IMF:
-                 plan.ComputeBoatSpeeds(*this, plan.polarmethod);
-                 break;
-             }
+            switch(plan.polarmethod) {
+            case BoatPlan::CSV:
+            {
+                plan.csvFileName = wxString::FromUTF8(e->Attribute("csvFileName"));
+                wxString message;
+                if(!plan.Open(plan.csvFileName.mb_str(), message))
+                    return message;
+            } break;
+            case BoatPlan::TRANSFORM:
+                plan.eta = AttributeDouble(e, "eta", .5);
+                plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
+                plan.wing_wing_running = AttributeBool(e, "wing_wing_running", false);
+                plan.ComputeBoatSpeeds(*this, plan.polarmethod);
+                break;
+            case BoatPlan::IMF:
+                plan.ComputeBoatSpeeds(*this, plan.polarmethod);
+                break;
+            }
 
-             plan.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
-             if(plan.optimize_tacking)
-                 plan.OptimizeTackingSpeed();
+            plan.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
+            if(plan.optimize_tacking)
+                plan.OptimizeTackingSpeed();
 
-             for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
-                 if(!strcmp(f->Value(), "SwitchPlan")) {
-                     SwitchPlan switchplan;
-                     switchplan.MaxWindSpeed = AttributeDouble(f, "MaxWindSpeed", NAN);
-                     switchplan.MinWindSpeed = AttributeDouble(f, "MinWindSpeed", NAN);
-                     switchplan.MaxWindDirection = AttributeDouble(f, "MaxWindDirection", NAN);
-                     switchplan.MinWindDirection = AttributeDouble(f, "MinWindDirection", NAN);
-                     switchplan.MaxWaveHeight = AttributeDouble(f, "MaxWaveHeight", NAN);
-                     switchplan.MinWaveHeight = AttributeDouble(f, "MinWaveHeight", NAN);
-                     switchplan.DayTime = AttributeBool(f, "DayTime", true);
-                     switchplan.NightTime = AttributeBool(f, "NightTime", true);
-                     switchplan.Name = wxString::FromUTF8(f->Attribute("Name"));
-                     plan.SwitchPlans.push_back(switchplan);
-                 }
-             }
+            for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
+                if(!strcmp(f->Value(), "SwitchPlan")) {
+                    SwitchPlan switchplan;
+                    switchplan.MaxWindSpeed = AttributeDouble(f, "MaxWindSpeed", NAN);
+                    switchplan.MinWindSpeed = AttributeDouble(f, "MinWindSpeed", NAN);
+                    switchplan.MaxWindDirection = AttributeDouble(f, "MaxWindDirection", NAN);
+                    switchplan.MinWindDirection = AttributeDouble(f, "MinWindDirection", NAN);
+                    switchplan.MaxWaveHeight = AttributeDouble(f, "MaxWaveHeight", NAN);
+                    switchplan.MinWaveHeight = AttributeDouble(f, "MinWaveHeight", NAN);
+                    switchplan.DayTime = AttributeBool(f, "DayTime", true);
+                    switchplan.NightTime = AttributeBool(f, "NightTime", true);
+                    switchplan.Name = wxString::FromUTF8(f->Attribute("Name"));
+                    plan.SwitchPlans.push_back(switchplan);
+                }
+            }
+             
+            Plans.push_back(plan);
+        }
+    }
+    
+    m_last_filename = filename;
+    m_last_filetime = last_filetime;
+    return _T("");
+}
 
-             Plans.push_back(plan);
-         }
-     }
+wxString Boat::SaveXML(wxString filename)
+{
+    TiXmlDocument doc;
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
+    doc.LinkEndChild( decl );
+    TiXmlElement * root = new TiXmlElement( "OpenCPNWeatherRoutingBoat" );
 
-     m_last_filename = filename;
-     m_last_filetime = last_filetime;
-     return _T("");
- }
+    doc.LinkEndChild( root );
+    char version[24];
+    sprintf(version, "%d.%d", PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR);
+    root->SetAttribute("version", version);
+    root->SetAttribute("creator", "Opencpn Weather Routing plugin");
 
- wxString Boat::SaveXML(wxString filename)
- {
-     TiXmlDocument doc;
-     TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
-     doc.LinkEndChild( decl );
-     TiXmlElement * root = new TiXmlElement( "OpenCPNWeatherRoutingBoat" );
-
-     doc.LinkEndChild( root );
-     char version[24];
-     sprintf(version, "%d.%d", PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR);
-     root->SetAttribute("version", version);
-     root->SetAttribute("creator", "Opencpn Weather Routing plugin");
-
-     TiXmlElement *boatcharacteristics = new TiXmlElement( "BoatCharacteristics" );
-     boatcharacteristics->SetAttribute("displacement_tons", displacement_tons);
+    TiXmlElement *boatcharacteristics = new TiXmlElement( "BoatCharacteristics" );
+    boatcharacteristics->SetAttribute("hull_type", hulltype);
+    boatcharacteristics->SetAttribute("displacement_tons", displacement_tons);
     boatcharacteristics->SetAttribute("sail_area_ft2", sail_area_ft2);
     boatcharacteristics->SetAttribute("lwl_ft", lwl_ft);
     boatcharacteristics->SetAttribute("loa_ft", loa_ft);
@@ -207,6 +209,7 @@ wxString Boat::OpenXML(wxString filename)
 
     if(!doc.SaveFile(filename.mb_str()))
         return _("Failed saving file: ") + filename;
+
     return wxString();
 }
 

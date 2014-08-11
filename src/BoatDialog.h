@@ -37,7 +37,6 @@ class BoatDialog : public BoatDialogBase
 {
 public:
     BoatDialog(wxWindow *parent, wxString boatpath);
-    ~BoatDialog();
 
     Boat m_Boat;
     wxString m_boatpath;
@@ -79,6 +78,7 @@ private:
     void OnNewBoatPlan( wxCommandEvent& event );
     void OnDeleteBoatPlan( wxCommandEvent& event );
 
+    void LoadBoatParameters();
     void StoreBoatParameters();
     void RepopulatePlans();
     void Compute();

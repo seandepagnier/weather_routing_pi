@@ -744,8 +744,8 @@ int BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
     return -1;
 }
 
-BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
-    : Name(PlanName), eta(.25), luff_angle(15),
+BoatPlan::BoatPlan(wxString PlanName)
+    : Name(PlanName), polarmethod(TRANSFORM), eta(.25), luff_angle(15),
       optimize_tacking(true), wing_wing_running(false)
 {
 }
@@ -755,7 +755,7 @@ BoatPlan::BoatPlan(wxString PlanName, Boat &boat)
 void BoatPlan::ComputeBoatSpeeds(Boat &boat, PolarMethod method, int speed)
 {
 //    csvFileName = _T("");
-    if(polarmethod == CSV ||
+    if(/*polarmethod == CSV ||*/
        wind_speeds.size() != num_computed_wind_speeds ||
        degree_steps.size() != computed_degree_count) {
         wind_speeds.clear();
@@ -808,7 +808,8 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, PolarMethod method, int speed)
                 }
             }
             default:
-                break;
+                printf("BoatPlan::ComputeBoatSpeeds called with invalid method: %d\n", method);
+                return;
             }
 
             Set(Wi, VWi, VB, W);

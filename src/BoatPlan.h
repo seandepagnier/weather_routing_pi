@@ -69,7 +69,7 @@ public:
     int TrySwitchBoatPlan(double VW, double H, double S,
                           const wxDateTime &gribtime, double lat, double lon, int &daytime);
 
-    BoatPlan(wxString PlanName, Boat &boat);
+    BoatPlan(wxString PlanName);
 
     std::vector<SwitchPlan> SwitchPlans;
 
