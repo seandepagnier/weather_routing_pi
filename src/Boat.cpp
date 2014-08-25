@@ -52,7 +52,10 @@ wxString Boat::OpenXML(wxString filename)
 
     bool cleared = false;
     Plans.clear();
-    
+
+    if(!wxFileName::FileExists(filename))
+        return _("Boat file does not exist, edit default settings.");
+   
     TiXmlDocument doc;
     if(!doc.LoadFile( filename.mb_str() ))
         return _("Failed to load file: ") + filename;

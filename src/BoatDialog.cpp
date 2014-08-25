@@ -45,20 +45,21 @@ static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
 BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     : BoatDialogBase(parent), m_boatpath(boatpath), m_PlotScale(0)
 {
+    m_SelectedSailPlan = 0;
+
+    m_lBoatPlans->InsertColumn(spNAME, _("Name"));
+    m_lBoatPlans->InsertColumn(spETA, _("Eta"));
+
     wxString error = m_Boat.OpenXML(m_boatpath);
+    RepopulatePlans();
+    LoadBoatParameters();
+
     if(error.size()) {
         wxMessageDialog md(this, error,
                            _("OpenCPN Weather Routing Plugin"),
                             wxICON_ERROR | wxOK );
         md.ShowModal();
     }
-
-    m_SelectedSailPlan = 0;
-
-    m_lBoatPlans->InsertColumn(spNAME, _("Name"));
-    m_lBoatPlans->InsertColumn(spETA, _("Eta"));
-    RepopulatePlans();
-    LoadBoatParameters();
 
     m_lBoatPlans->SetItemState(m_SelectedSailPlan, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 
@@ -594,8 +595,11 @@ void BoatDialog::LoadCSV(bool switched)
             if( openDialog.ShowModal() == wxID_OK ) {
                 m_fpCSVPath->SetPath(openDialog.GetPath());
                 LoadCSV();
-            } else
+            } else {
                 m_cPolarMethod->SetSelection(BoatPlan::TRANSFORM);
+                wxCommandEvent event;
+                OnPolarMethod(event);
+            }
         } else {
 //            wxMessageDialog md(this, _("Failed reading csv: ") + filename,
 //                               _("OpenCPN Weather Routing Plugin"),
