@@ -43,7 +43,7 @@
             <property name="name">WeatherRoutingBase</property>
             <property name="pos"></property>
             <property name="size">600,-1</property>
-            <property name="style">wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER</property>
+            <property name="style">wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSYSTEM_MENU</property>
             <property name="subclass"></property>
             <property name="title">Weather Routing</property>
             <property name="tooltip"></property>
