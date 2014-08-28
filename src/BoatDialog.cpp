@@ -589,7 +589,7 @@ void BoatDialog::LoadCSV(bool switched)
         if(switched) {
             wxFileDialog openDialog
                 ( this, _( "Select Polar CSV" ), m_fpCSVPath->GetPath(), wxT ( "" ),
-                  wxT ( "CSV (*.csv)|*.CSV;*.csv;*.csv.gz;*.csv.bz2|All files (*.*)|*.*" ),
+                  wxT ( "CSV and POL (*.csv, *.pol)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2|All files (*.*)|*.*" ),
                   wxFD_OPEN  );
 
             if( openDialog.ShowModal() == wxID_OK ) {

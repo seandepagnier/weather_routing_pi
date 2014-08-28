@@ -532,6 +532,7 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     char line[1024];
     double lastentryW = -1;
     char *token, *saveptr;
+    const char delim[] = ";, \t";
 
     if(!f)
         PARSE_ERROR(_("Failed to open."));
@@ -539,16 +540,17 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     if(!zu_gets(f, line, sizeof line))
         PARSE_ERROR(_("Failed to read."));
 
-    token = strtok_r(line, ";", &saveptr);
+    token = strtok_r(line, delim, &saveptr);
     linenum++;
 
     /* chomp invisible bytes */
     while(*token < 0) token++;
 
-    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws"))
+    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws") &&
+       strcasecmp(token, "twa"))
         PARSE_ERROR(_("Unrecognized format."));
     
-    while((token = strtok_r(NULL, ";", &saveptr))) {
+    while((token = strtok_r(NULL, delim, &saveptr))) {
         wind_speeds.push_back(SailingWindSpeed(strtod(token, 0)));
         if(wind_speeds.size() > MAX_WINDSPEEDS_IN_TABLE)
             PARSE_ERROR(_("Too many wind speeds."));
@@ -559,7 +561,12 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     while(zu_gets(f, line, sizeof line)) {
         linenum++;
 
-        token = strtok_r(line, ";", &saveptr);
+        /* strip newline/linefeed */
+        for(unsigned int i=0; i<strlen(line); i++)
+            if(line[i] == '\r' || line[i] == '\n')
+                line[i] = '\0';
+
+        token = strtok_r(line, delim, &saveptr);
 
         double W = strtod(token, 0);
 
@@ -573,14 +580,22 @@ bool BoatPlan::Open(const char *filename, wxString &message)
             continue;
         }
 
+        // add zero speed for all wind speeds going against wind if not specified
+        if(degree_steps.empty() && W > 0)
+        {
+            degree_steps.push_back(0);
+
+            for(int VWi = 0; VWi < (int)wind_speeds.size(); VWi++)
+                wind_speeds[VWi].speeds.push_back(SailingWindSpeed::SailingSpeed(0, 0));
+        }
+
         degree_steps.push_back(W);
         lastentryW = W;
 
         {
-            std::vector<double>boatspeed;
             for(int VWi = 0; VWi < (int)wind_speeds.size(); VWi++) {
                 double s = 0;
-                if((token = strtok_r(NULL, ";", &saveptr)))
+                if((token = strtok_r(NULL, delim, &saveptr)))
                     s = strtod(token, 0);
                 else
                     PARSE_WARNING(_("Too few tokens."));
@@ -589,7 +604,7 @@ bool BoatPlan::Open(const char *filename, wxString &message)
                     (SailingWindSpeed::SailingSpeed(s, W));
             }
 
-            if(strtok_r(NULL, ";", &saveptr))
+            if(strtok_r(NULL, delim, &saveptr))
                 PARSE_WARNING(_("Too many tokens."));
         }
     }
@@ -930,7 +945,11 @@ int BoatPlan::ClosestVWi(double VW)
     return wind_speeds.size()-2;
 }
 
-/* compute boat speed from true wind angle and true wind speed */
+/* compute boat speed from true wind angle and true wind speed
+
+   Maybe this should use rectangular coordinate interpolation when the speed
+   is outside the VMG zone.
+ */
 double BoatPlan::Speed(double W, double VW)
 {
     if(VW < 0 || VW > wind_speeds.back().VW)
@@ -1132,6 +1151,7 @@ void BoatPlan::UpdateDegreeStepLookup()
         for(Wi = 0; Wi < degree_steps.size(); Wi++)
             if(d < degree_steps[Wi])
                 break;
+
         degree_step_index[d] = Wi - 1;
     }
 }

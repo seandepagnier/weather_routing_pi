@@ -1477,7 +1477,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel3->SetSizer( fgSizer18 );
 	m_panel3->Layout();
 	fgSizer18->Fit( m_panel3 );
-	m_nNotebook->AddPage( m_panel3, _("Plot"), false );
+	m_nNotebook->AddPage( m_panel3, _("Plot"), true );
 	m_panel17 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer1022;
 	fgSizer1022 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -1785,7 +1785,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText93->Wrap( -1 );
 	fgSizer34->Add( m_staticText93, 0, wxALL, 5 );
 	
-	m_fpCSVPath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("CSV (*.csv)|*.CSV;*.csv;*.csv.gz;*.csv.bz2|All files (*.*)|*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
+	m_fpCSVPath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("CSV and POL (*.csv, *.pol)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2|All files (*.*)|*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
 	fgSizer34->Add( m_fpCSVPath, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText123 = new wxStaticText( m_pPolarConfig, wxID_ANY, _("Wind Speed Step"), wxDefaultPosition, wxDefaultSize, 0 );
