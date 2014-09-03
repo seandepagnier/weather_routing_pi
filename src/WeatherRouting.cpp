@@ -640,7 +640,7 @@ void WeatherRouting::OnSave( wxCommandEvent& event )
 {
     wxString error;
     wxFileDialog saveDialog
-        ( this, _( "Select Configuration" ), _(""), wxT ( "" ),
+        ( this, _( "Select Configuration" ), wxEmptyString, wxEmptyString,
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_SAVE  );
 
