@@ -5234,7 +5234,7 @@
                                                 <property name="gripper">0</property>
                                                 <property name="hidden">0</property>
                                                 <property name="id">wxID_ANY</property>
-                                                <property name="label">Runge Kutta</property>
+                                                <property name="label">Runge Kutta (slow)</property>
                                                 <property name="max_size"></property>
                                                 <property name="maximize_button">0</property>
                                                 <property name="maximum_size"></property>
@@ -14815,7 +14815,7 @@
                                                             <property name="caption"></property>
                                                             <property name="caption_visible">1</property>
                                                             <property name="center_pane">0</property>
-                                                            <property name="choices">&quot;Loaded from CSV Polar File&quot; &quot;Computed From Sailboat Transform&quot; &quot;Computed From IMS Formula&quot;</property>
+                                                            <property name="choices">&quot;From File&quot; &quot;Computed From Sailboat Transform&quot; &quot;Computed From IMS Formula&quot;</property>
                                                             <property name="close_button">1</property>
                                                             <property name="context_help"></property>
                                                             <property name="context_menu">1</property>
@@ -16094,7 +16094,7 @@
                                                                                     <property name="minimize_button">0</property>
                                                                                     <property name="minimum_size"></property>
                                                                                     <property name="moveable">1</property>
-                                                                                    <property name="name">m_bSaveCSV</property>
+                                                                                    <property name="name">m_bSaveFile</property>
                                                                                     <property name="pane_border">1</property>
                                                                                     <property name="pane_position"></property>
                                                                                     <property name="pane_size"></property>
@@ -16115,7 +16115,7 @@
                                                                                     <property name="window_extra_style"></property>
                                                                                     <property name="window_name"></property>
                                                                                     <property name="window_style"></property>
-                                                                                    <event name="OnButtonClick">OnSaveCSV</event>
+                                                                                    <event name="OnButtonClick">OnSaveFile</event>
                                                                                     <event name="OnChar"></event>
                                                                                     <event name="OnEnterWindow"></event>
                                                                                     <event name="OnEraseBackground"></event>
@@ -16270,9 +16270,9 @@
                                                 <property name="proportion">1</property>
                                                 <object class="wxStaticBoxSizer" expanded="0">
                                                     <property name="id">wxID_ANY</property>
-                                                    <property name="label">Polar CSV File Settings</property>
+                                                    <property name="label">Polar File Settings</property>
                                                     <property name="minimum_size"></property>
-                                                    <property name="name">m_sbCSV</property>
+                                                    <property name="name">m_sbFile</property>
                                                     <property name="orient">wxVERTICAL</property>
                                                     <property name="permission">protected</property>
                                                     <event name="OnUpdateUI"></event>
@@ -16415,7 +16415,7 @@
                                                                     <property name="minimize_button">0</property>
                                                                     <property name="minimum_size"></property>
                                                                     <property name="moveable">1</property>
-                                                                    <property name="name">m_fpCSVPath</property>
+                                                                    <property name="name">m_fpFilePath</property>
                                                                     <property name="pane_border">1</property>
                                                                     <property name="pane_position"></property>
                                                                     <property name="pane_size"></property>
@@ -16434,14 +16434,14 @@
                                                                     <property name="validator_type">wxDefaultValidator</property>
                                                                     <property name="validator_variable"></property>
                                                                     <property name="value"></property>
-                                                                    <property name="wildcard">CSV and POL (*.csv, *.pol)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2|All files (*.*)|*.*</property>
+                                                                    <property name="wildcard">CSV, POL, TXT (*.csv, *.pol *.txt)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2;*.TXT;*.txt;*.txt.gz;*.txt.bz2|All files (*.*)|*.*</property>
                                                                     <property name="window_extra_style"></property>
                                                                     <property name="window_name"></property>
                                                                     <property name="window_style"></property>
                                                                     <event name="OnChar"></event>
                                                                     <event name="OnEnterWindow"></event>
                                                                     <event name="OnEraseBackground"></event>
-                                                                    <event name="OnFileChanged">OnPolarCSVFile</event>
+                                                                    <event name="OnFileChanged">OnPolarFile</event>
                                                                     <event name="OnKeyDown"></event>
                                                                     <event name="OnKeyUp"></event>
                                                                     <event name="OnKillFocus"></event>

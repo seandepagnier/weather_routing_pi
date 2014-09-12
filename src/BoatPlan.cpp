@@ -532,23 +532,30 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     char line[1024];
     double lastentryW = -1;
     char *token, *saveptr;
-    const char delim[] = ";, \t";
+    const char delim[] = ";, \t\r\n";
 
     if(!f)
         PARSE_ERROR(_("Failed to open."));
 
-    if(!zu_gets(f, line, sizeof line))
-        PARSE_ERROR(_("Failed to read."));
+    // polar file has optional first line which is description
+    for(;;) {
+        if(!zu_gets(f, line, sizeof line))
+            PARSE_ERROR(_("Failed to read."));
 
-    token = strtok_r(line, delim, &saveptr);
-    linenum++;
+        token = strtok_r(line, delim, &saveptr);
+        linenum++;
 
-    /* chomp invisible bytes */
-    while(*token < 0) token++;
+        /* chomp invisible bytes */
+        while(*token < 0) token++;
 
-    if(strcasecmp(token, "twa/tws") && strcasecmp(token, "twa\\tws") &&
-       strcasecmp(token, "twa"))
-        PARSE_ERROR(_("Unrecognized format."));
+        if(!strcasecmp(token, "twa/tws") ||
+           !strcasecmp(token, "twa\\tws") ||
+           !strcasecmp(token, "twa"))
+            break;
+
+        if(linenum == 2)
+            PARSE_ERROR(_("Unrecognized format."));
+    }
     
     while((token = strtok_r(NULL, delim, &saveptr))) {
         wind_speeds.push_back(SailingWindSpeed(strtod(token, 0)));
@@ -561,12 +568,15 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     while(zu_gets(f, line, sizeof line)) {
         linenum++;
 
+#if 0
         /* strip newline/linefeed */
         for(unsigned int i=0; i<strlen(line); i++)
             if(line[i] == '\r' || line[i] == '\n')
                 line[i] = '\0';
+#endif
 
-        token = strtok_r(line, delim, &saveptr);
+        if(!(token = strtok_r(line, delim, &saveptr)))
+            break;
 
         double W = strtod(token, 0);
 
@@ -632,8 +642,8 @@ bool BoatPlan::Open(const char *filename, wxString &message)
     for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
         CalculateVMG(VWi);
 
-    csvFileName = wxString::FromUTF8(filename);
-    polarmethod = CSV;
+    fileFileName = wxString::FromUTF8(filename);
+    polarmethod = FROM_FILE;
     return true;
     
 failed:
@@ -764,7 +774,7 @@ int BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
 
 BoatPlan::BoatPlan(wxString PlanName)
     : Name(PlanName), polarmethod(TRANSFORM), eta(.25), luff_angle(15),
-      optimize_tacking(true), wing_wing_running(false)
+      optimize_tacking(false), wing_wing_running(false)
 {
 }
 
@@ -772,8 +782,8 @@ BoatPlan::BoatPlan(wxString PlanName)
    heavy cruisers */
 void BoatPlan::ComputeBoatSpeeds(Boat &boat, PolarMethod method, int speed)
 {
-//    csvFileName = _T("");
-    if(/*polarmethod == CSV ||*/
+//    fileFileName = _T("");
+    if(/*polarmethod == FROM_FILE ||*/
        wind_speeds.size() != num_computed_wind_speeds ||
        degree_steps.size() != computed_degree_count) {
         wind_speeds.clear();

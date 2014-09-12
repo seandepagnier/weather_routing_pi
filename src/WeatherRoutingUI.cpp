@@ -688,7 +688,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cbNewton = new wxCheckBox( this, wxID_ANY, _("Newton's Method"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer981->Add( m_cbNewton, 0, wxALL, 5 );
 	
-	m_cbRungeKutta = new wxCheckBox( this, wxID_ANY, _("Runge Kutta"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
+	m_cbRungeKutta = new wxCheckBox( this, wxID_ANY, _("Runge Kutta (slow)"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer981->Add( m_cbRungeKutta, 0, wxALL, 5 );
 	
 	
@@ -1647,7 +1647,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer941->SetFlexibleDirection( wxBOTH );
 	fgSizer941->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxString m_cPolarMethodChoices[] = { _("Loaded from CSV Polar File"), _("Computed From Sailboat Transform"), _("Computed From IMS Formula") };
+	wxString m_cPolarMethodChoices[] = { _("From File"), _("Computed From Sailboat Transform"), _("Computed From IMS Formula") };
 	int m_cPolarMethodNChoices = sizeof( m_cPolarMethodChoices ) / sizeof( wxString );
 	m_cPolarMethod = new wxChoice( m_pPolarConfig, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPolarMethodNChoices, m_cPolarMethodChoices, 0 );
 	m_cPolarMethod->SetSelection( 0 );
@@ -1741,8 +1741,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_cbWingWingRunning = new wxCheckBox( m_pPolarConfig, wxID_ANY, _("Wing and Wing Running"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer541->Add( m_cbWingWingRunning, 0, wxALL, 5 );
 	
-	m_bSaveCSV = new wxButton( m_pPolarConfig, wxID_ANY, _("Save As CSV"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer541->Add( m_bSaveCSV, 0, wxALL, 5 );
+	m_bSaveFile = new wxButton( m_pPolarConfig, wxID_ANY, _("Save As CSV"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer541->Add( m_bSaveFile, 0, wxALL, 5 );
 	
 	
 	fgSizer49->Add( fgSizer541, 1, wxEXPAND, 5 );
@@ -1773,7 +1773,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	m_fgConfig->Add( m_sbComputationIMF, 1, wxEXPAND, 5 );
 	
-	m_sbCSV = new wxStaticBoxSizer( new wxStaticBox( m_pPolarConfig, wxID_ANY, _("Polar CSV File Settings") ), wxVERTICAL );
+	m_sbFile = new wxStaticBoxSizer( new wxStaticBox( m_pPolarConfig, wxID_ANY, _("Polar File Settings") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer34;
 	fgSizer34 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -1785,8 +1785,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_staticText93->Wrap( -1 );
 	fgSizer34->Add( m_staticText93, 0, wxALL, 5 );
 	
-	m_fpCSVPath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("CSV and POL (*.csv, *.pol)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2|All files (*.*)|*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
-	fgSizer34->Add( m_fpCSVPath, 0, wxALL|wxEXPAND, 5 );
+	m_fpFilePath = new wxFilePickerCtrl( m_pPolarConfig, wxID_ANY, wxEmptyString, _("Select a file"), wxT("CSV, POL, TXT (*.csv, *.pol *.txt)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2;*.TXT;*.txt;*.txt.gz;*.txt.bz2|All files (*.*)|*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE|wxFLP_USE_TEXTCTRL );
+	fgSizer34->Add( m_fpFilePath, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText123 = new wxStaticText( m_pPolarConfig, wxID_ANY, _("Wind Speed Step"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText123->Wrap( -1 );
@@ -1805,10 +1805,10 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer34->Add( m_stWindDegreeStep, 0, wxALL, 5 );
 	
 	
-	m_sbCSV->Add( fgSizer34, 1, wxEXPAND, 5 );
+	m_sbFile->Add( fgSizer34, 1, wxEXPAND, 5 );
 	
 	
-	m_fgConfig->Add( m_sbCSV, 1, wxEXPAND, 5 );
+	m_fgConfig->Add( m_sbFile, 1, wxEXPAND, 5 );
 	
 	
 	m_pPolarConfig->SetSizer( m_fgConfig );
@@ -2037,8 +2037,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_bDragInfo->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDragInfo ), NULL, this );
 	m_sLuffAngle->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecomputeSpin ), NULL, this );
 	m_cbWingWingRunning->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_bSaveCSV->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSaveCSV ), NULL, this );
-	m_fpCSVPath->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( BoatDialogBase::OnPolarCSVFile ), NULL, this );
+	m_bSaveFile->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSaveFile ), NULL, this );
+	m_fpFilePath->Connect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( BoatDialogBase::OnPolarFile ), NULL, this );
 	m_sVMGWindSpeed->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cVMGTrueApparent->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cbOptimizeTacking->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );
@@ -2101,8 +2101,8 @@ BoatDialogBase::~BoatDialogBase()
 	m_bDragInfo->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDragInfo ), NULL, this );
 	m_sLuffAngle->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnRecomputeSpin ), NULL, this );
 	m_cbWingWingRunning->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRecompute ), NULL, this );
-	m_bSaveCSV->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSaveCSV ), NULL, this );
-	m_fpCSVPath->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( BoatDialogBase::OnPolarCSVFile ), NULL, this );
+	m_bSaveFile->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnSaveFile ), NULL, this );
+	m_fpFilePath->Disconnect( wxEVT_COMMAND_FILEPICKER_CHANGED, wxFileDirPickerEventHandler( BoatDialogBase::OnPolarFile ), NULL, this );
 	m_sVMGWindSpeed->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cVMGTrueApparent->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( BoatDialogBase::OnUpdateVMG ), NULL, this );
 	m_cbOptimizeTacking->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnOptimizeTacking ), NULL, this );

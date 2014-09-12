@@ -360,12 +360,12 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_staticText91;
 		wxSpinCtrl* m_sLuffAngle;
 		wxCheckBox* m_cbWingWingRunning;
-		wxButton* m_bSaveCSV;
+		wxButton* m_bSaveFile;
 		wxStaticBoxSizer* m_sbComputationIMF;
 		wxStaticText* m_staticText131;
-		wxStaticBoxSizer* m_sbCSV;
+		wxStaticBoxSizer* m_sbFile;
 		wxStaticText* m_staticText93;
-		wxFilePickerCtrl* m_fpCSVPath;
+		wxFilePickerCtrl* m_fpFilePath;
 		wxStaticText* m_staticText123;
 		wxStaticText* m_stWindSpeedStep;
 		wxStaticText* m_staticText125;
@@ -410,8 +410,8 @@ class BoatDialogBase : public wxDialog
 		virtual void OnEta( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveCSV( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPolarCSVFile( wxFileDirPickerEvent& event ) { event.Skip(); }
+		virtual void OnSaveFile( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPolarFile( wxFileDirPickerEvent& event ) { event.Skip(); }
 		virtual void OnUpdateVMG( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdateVMG( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }

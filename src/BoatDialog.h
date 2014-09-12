@@ -60,9 +60,9 @@ private:
     void OnSaveAs( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event ) { Save(); }
     void OnClose( wxCommandEvent& event );
-    void LoadCSV(bool switched = false);
-    void OnSaveCSV( wxCommandEvent& event );
-    void OnPolarCSVFile( wxFileDirPickerEvent& event );
+    void LoadFile(bool switched = false);
+    void OnSaveFile( wxCommandEvent& event );
+    void OnPolarFile( wxFileDirPickerEvent& event );
     void OnUpdateVMG( wxSpinEvent& event ) { UpdateVMG(); }
     void OnUpdateVMG( wxCommandEvent& event ) { UpdateVMG(); }
     void OnRecompute( );

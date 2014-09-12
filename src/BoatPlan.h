@@ -74,7 +74,7 @@ public:
     std::vector<SwitchPlan> SwitchPlans;
 
     wxString Name;
-    enum PolarMethod { CSV, TRANSFORM, IMF };
+    enum PolarMethod { FROM_FILE, TRANSFORM, IMF };
     PolarMethod polarmethod;
 
     /* if computed */
@@ -82,8 +82,8 @@ public:
     bool optimize_tacking;
     bool wing_wing_running;
 
-    /* if not computed (csv table) */
-    wxString csvFileName;
+    /* if not computed (file table) */
+    wxString fileFileName;
     int wind_speed_step, wind_degree_step;
 
     void ComputeBoatSpeeds(Boat &boat, PolarMethod method, int speed = -1);

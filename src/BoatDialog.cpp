@@ -543,8 +543,8 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
     pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
 
     wxFileDialog openDialog
-        ( this, _( "Select Polar" ), path, wxT ( "" ),
-          wxT ( "Boat polar files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
+        ( this, _( "Select Boat" ), path, wxT ( "" ),
+          wxT ( "Boat polar (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
@@ -569,9 +569,9 @@ void BoatDialog::OnOpen ( wxCommandEvent& event )
     }
 }
 
-void BoatDialog::LoadCSV(bool switched)
+void BoatDialog::LoadFile(bool switched)
 {
-    wxString filename = m_fpCSVPath->GetPath();
+    wxString filename = m_fpFilePath->GetPath();
     BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
     wxString message;
     bool success = plan.Open(filename.mb_str(), message);
@@ -587,21 +587,25 @@ void BoatDialog::LoadCSV(bool switched)
         RepopulatePlans();
     else {
         if(switched) {
+            wxString path = m_fpFilePath->GetPath();
+            if(path.empty()) // if not set, switch to installed polars directory
+                path = *GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/polars/");
+
             wxFileDialog openDialog
-                ( this, _( "Select Polar CSV" ), m_fpCSVPath->GetPath(), wxT ( "" ),
-                  wxT ( "CSV and POL (*.csv, *.pol)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2|All files (*.*)|*.*" ),
+                ( this, _( "Select Polar File" ), path, wxT ( "" ),
+                  wxT ( "CSV, POL, TXT (*.csv, *.pol, *.txt)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2;*.TXT;*.txt;*.txt.gz;*.txt.bz2|All files (*.*)|*.*" ),
                   wxFD_OPEN  );
 
             if( openDialog.ShowModal() == wxID_OK ) {
-                m_fpCSVPath->SetPath(openDialog.GetPath());
-                LoadCSV();
+                m_fpFilePath->SetPath(openDialog.GetPath());
+                LoadFile();
             } else {
                 m_cPolarMethod->SetSelection(BoatPlan::TRANSFORM);
                 wxCommandEvent event;
                 OnPolarMethod(event);
             }
         } else {
-//            wxMessageDialog md(this, _("Failed reading csv: ") + filename,
+//            wxMessageDialog md(this, _("Failed reading file: ") + filename,
 //                               _("OpenCPN Weather Routing Plugin"),
 //                               wxICON_ERROR | wxOK );
 //            md.ShowModal();
@@ -657,48 +661,48 @@ void BoatDialog::OnClose ( wxCommandEvent& event )
     EndModal(wxID_CANCEL);
 }
 
-void BoatDialog::OnSaveCSV ( wxCommandEvent& event )
+void BoatDialog::OnSaveFile ( wxCommandEvent& event )
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
     wxString path;
-    pConf->Read ( _T ( "CSVPath" ), &path, weather_routing_pi::StandardPath());
+    pConf->Read ( _T ( "FilePath" ), &path, weather_routing_pi::StandardPath());
 
     wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
-                             wxT ( "Boat Polar files (*.csv)|*.CSV;*.csv|All files (*.*)|*.*" ), wxFD_SAVE  );
+                             wxT ( "Boat Polar files (*.file)|*.FILE;*.file|All files (*.*)|*.*" ), wxFD_SAVE  );
 
     if( saveDialog.ShowModal() == wxID_OK ) {
         wxString filename = saveDialog.GetPath();
         pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-        pConf->Write ( _T ( "CSVPath" ), wxFileName(filename).GetPath() );
+        pConf->Write ( _T ( "FILEPath" ), wxFileName(filename).GetPath() );
 
         BoatPlan &plan = m_Boat.Plan(m_SelectedSailPlan);
         plan.ComputeBoatSpeeds(m_Boat, plan.polarmethod);
         if(!plan.Save(saveDialog.GetPath().mb_str())) {
-            wxMessageDialog md(this, _("Failed saving boat polar to csv"), _("OpenCPN Weather Routing Plugin"),
+            wxMessageDialog md(this, _("Failed saving boat polar to file"), _("OpenCPN Weather Routing Plugin"),
                                wxICON_ERROR | wxOK );
             md.ShowModal();
         }
     }
 }
 
-void BoatDialog::OnPolarCSVFile( wxFileDirPickerEvent& event )
+void BoatDialog::OnPolarFile( wxFileDirPickerEvent& event )
 {
-    LoadCSV();
+    LoadFile();
 }
 
 void BoatDialog::OnRecompute()
 {
     StoreBoatParameters();
-    if(m_Boat.Plans[m_SelectedSailPlan].polarmethod != BoatPlan::CSV)
+    if(m_Boat.Plans[m_SelectedSailPlan].polarmethod != BoatPlan::FROM_FILE)
         Compute();
     UpdateStats();
 }
 
 void BoatDialog::OnUpdatePlot()
 {
-    if(m_Boat.Plans[m_SelectedSailPlan].polarmethod == BoatPlan::CSV)
+    if(m_Boat.Plans[m_SelectedSailPlan].polarmethod == BoatPlan::FROM_FILE)
         m_PlotWindow->Refresh();
     else
         OnRecompute();
@@ -758,7 +762,7 @@ void BoatDialog::OnSailPlanSelected( wxListEvent& event )
         break;
     }
 
-    m_sbCSV->ShowItems(curplan.polarmethod == BoatPlan::CSV);
+    m_sbFile->ShowItems(curplan.polarmethod == BoatPlan::FROM_FILE);
     m_sbComputationTransform->ShowItems(curplan.polarmethod == BoatPlan::TRANSFORM);
     m_sbComputationIMF->ShowItems(curplan.polarmethod == BoatPlan::IMF);
     m_pPolarConfig->Fit();
@@ -773,10 +777,10 @@ void BoatDialog::OnPolarMethod( wxCommandEvent& event )
     m_Boat.Plans[m_SelectedSailPlan].polarmethod = polarmethod;
     m_sbComputationTransform->ShowItems(polarmethod == BoatPlan::TRANSFORM);
     m_sbComputationIMF->ShowItems(polarmethod == BoatPlan::IMF);
-    m_sbCSV->ShowItems(polarmethod == BoatPlan::CSV);
+    m_sbFile->ShowItems(polarmethod == BoatPlan::FROM_FILE);
 
-    if(polarmethod == BoatPlan::CSV)
-        LoadCSV(true);
+    if(polarmethod == BoatPlan::FROM_FILE)
+        LoadFile(true);
     else
         OnRecompute();
 
@@ -813,8 +817,8 @@ void BoatDialog::OnNewBoatPlan( wxCommandEvent& event )
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
     wxString path;
-    pConf->Read ( _T ( "CSVPath" ), &path, weather_routing_pi::StandardPath());
-    m_fpCSVPath->SetPath(path);
+    pConf->Read ( _T ( "FilePath" ), &path, weather_routing_pi::StandardPath());
+    m_fpFilePath->SetPath(path);
 }
 
 void BoatDialog::OnDeleteBoatPlan( wxCommandEvent& event )
@@ -848,7 +852,7 @@ void BoatDialog::LoadBoatParameters()
     m_cPolarMethod->SetSelection(plan.polarmethod);
 
     switch(plan.polarmethod) {
-    case BoatPlan::CSV:
+    case BoatPlan::FROM_FILE:
         break;
     case BoatPlan::TRANSFORM:
         m_sDisplacement->SetValue(m_Boat.displacement_tons);
@@ -926,7 +930,7 @@ void BoatDialog::RepopulatePlans()
 
     BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
 
-    m_fpCSVPath->SetPath(plan.csvFileName);
+    m_fpFilePath->SetPath(plan.fileFileName);
     m_stWindSpeedStep->SetLabel
         (wxString::Format(_T("%d"), plan.wind_speed_step));
     m_stWindDegreeStep->SetLabel

@@ -86,11 +86,11 @@ wxString Boat::OpenXML(wxString filename)
             plan.polarmethod = (BoatPlan::PolarMethod)AttributeInt(e, "polarmethod", BoatPlan::TRANSFORM);
 
             switch(plan.polarmethod) {
-            case BoatPlan::CSV:
+            case BoatPlan::FROM_FILE:
             {
-                plan.csvFileName = wxString::FromUTF8(e->Attribute("csvFileName"));
+                plan.fileFileName = wxString::FromUTF8(e->Attribute("fileFileName"));
                 wxString message;
-                if(!plan.Open(plan.csvFileName.mb_str(), message))
+                if(!plan.Open(plan.fileFileName.mb_str(), message))
                     return message;
             } break;
             case BoatPlan::TRANSFORM:
@@ -173,8 +173,8 @@ wxString Boat::SaveXML(wxString filename)
 
         e->SetAttribute("polarmethod", plan.polarmethod);
         switch(plan.polarmethod) {
-        case BoatPlan::CSV:
-            e->SetAttribute("csvFileName", plan.csvFileName.mb_str());
+        case BoatPlan::FROM_FILE:
+            e->SetAttribute("fileFileName", plan.fileFileName.mb_str());
             break;
         case BoatPlan::TRANSFORM:
             sprintf(str, "%.4g", plan.eta);
