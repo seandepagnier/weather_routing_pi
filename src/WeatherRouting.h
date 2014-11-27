@@ -148,6 +148,7 @@ private:
     void OnStatistics( wxCommandEvent& event );
     void OnReport( wxCommandEvent& event );
     void OnPlot( wxCommandEvent& event );
+    void OnManual( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
 

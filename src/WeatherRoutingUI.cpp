@@ -203,6 +203,10 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	m_mInformation = new wxMenuItem( m_mHelp, wxID_ANY, wxString( _("&Information") ) + wxT('\t') + wxT("F1"), wxEmptyString, wxITEM_NORMAL );
 	m_mHelp->Append( m_mInformation );
 	
+	wxMenuItem* m_mManual;
+	m_mManual = new wxMenuItem( m_mHelp, wxID_ANY, wxString( _("&Manual") ) , wxEmptyString, wxITEM_NORMAL );
+	m_mHelp->Append( m_mManual );
+	
 	wxMenuItem* m_mAbout;
 	m_mAbout = new wxMenuItem( m_mHelp, wxID_ANY, wxString( _("&About") ) , wxEmptyString, wxITEM_NORMAL );
 	m_mHelp->Append( m_mAbout );
@@ -250,6 +254,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	this->Connect( m_mReport->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnReport ) );
 	this->Connect( m_mPlot->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnPlot ) );
 	this->Connect( m_mInformation->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
+	this->Connect( m_mManual->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnManual ) );
 	this->Connect( m_mAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
 }
 
@@ -291,6 +296,7 @@ WeatherRoutingBase::~WeatherRoutingBase()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnReport ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnPlot ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnManual ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
 	
 }

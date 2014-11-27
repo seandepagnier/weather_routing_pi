@@ -115,6 +115,7 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnReport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnManual( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
 		
 	

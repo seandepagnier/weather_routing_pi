@@ -855,6 +855,11 @@ void WeatherRouting::OnPlot ( wxCommandEvent& event )
     m_PlotDialog.Show();
 }
 
+void WeatherRouting::OnManual ( wxCommandEvent& event )
+{
+    wxLaunchDefaultBrowser(_T("http://opencpn.org/ocpn/weather_routing_plugin"));
+}
+
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
 {
     wxString infolocation = *GetpSharedDataLocation()
