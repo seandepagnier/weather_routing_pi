@@ -594,6 +594,7 @@ void WeatherRouting::UpdateComputeState()
     m_gProgress->SetValue(0);
     
     m_mCompute->Enable();
+    m_bCompute->Enable();
     m_StartTime = wxDateTime::Now();
     m_tCompute.Start(0, true);
 
@@ -1192,7 +1193,9 @@ void WeatherRouting::SetEnableConfigurationMenu()
     m_mGoTo->Enable(current);
     m_mDelete->Enable(current);
     m_mCompute->Enable(current);
+    m_bCompute->Enable(current);
     m_mExport->Enable(current);
+    m_bExport->Enable(current);
 
     m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size() > 0);
 

@@ -20,6 +20,7 @@
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
+#include <wx/button.h>
 #include <wx/gauge.h>
 #include <wx/splitter.h>
 #include <wx/bitmap.h>
@@ -32,7 +33,6 @@
 #include <wx/spinctrl.h>
 #include <wx/checkbox.h>
 #include <wx/checklst.h>
-#include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/combobox.h>
 #include <wx/datectrl.h>
@@ -64,6 +64,8 @@ class WeatherRoutingBase : public wxFrame
 		wxListCtrl* m_lPositions;
 		wxPanel* m_panel12;
 		wxListCtrl* m_lWeatherRoutes;
+		wxButton* m_bCompute;
+		wxButton* m_bExport;
 		wxMenuBar* m_menubar3;
 		wxMenu* m_mFile;
 		wxMenu* m_mPosition;
@@ -88,6 +90,8 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRouteKeyDown( wxListEvent& event ) { event.Skip(); }
+		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
@@ -101,11 +105,9 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnGoTo( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteAll( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnComputeAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStop( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetAll( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
