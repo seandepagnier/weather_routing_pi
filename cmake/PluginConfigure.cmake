@@ -15,13 +15,13 @@ ENDIF (COMMAND cmake_policy)
 
 MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
-configure_file(cmake/version.h.in ${CMAKE_SOURCE_DIR}/src/version.h)
+configure_file(cmake/version.h.in ${PROJECT_SOURCE_DIR}/src/version.h)
 SET(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}" )
 
 #SET(CMAKE_BUILD_TYPE Debug)
 #SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
 #SET(PROFILING 1)
 

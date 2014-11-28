@@ -1,6 +1,6 @@
 ##---------------------------------------------------------------------------
-## Author:      Sean D'Epagnier 
-## Copyright:   
+## Author:      Sean D'Epagnier
+## Copyright:
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ SET(SRC_WEATHER_ROUTING
 
             src/zuFile.cpp
             src/georef.c
-            src/GribRecord.cpp  
+            src/GribRecord.cpp
 )
 
 IF(WIN32)
@@ -48,7 +48,7 @@ SET(SRC_JSON
             src/wxJSON/jsonval.cpp
             src/wxJSON/jsonreader.cpp
             src/wxJSON/jsonwriter.cpp)
-SET(SRC_TINYXML
+SET(SRC_LTINYXML
             src/tinyxml/tinyxml.cpp
             src/tinyxml/tinyxmlparser.cpp
             src/tinyxml/tinyxmlerror.cpp
@@ -56,16 +56,16 @@ SET(SRC_TINYXML
 ENDIF(WIN32)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
 
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING} ${SRC_JSON} ${SRC_TINYXML})
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING} ${SRC_JSON} ${SRC_LTINYXML})
 
 IF(NOT UNIX)
     SET(SRC_BZIP
-            src/bzip2/bzlib.c 
-            src/bzip2/blocksort.c 
-            src/bzip2/compress.c 
-            src/bzip2/crctable.c 
-            src/bzip2/decompress.c 
-            src/bzip2/huffman.c 
+            src/bzip2/bzlib.c
+            src/bzip2/blocksort.c
+            src/bzip2/compress.c
+            src/bzip2/crctable.c
+            src/bzip2/decompress.c
+            src/bzip2/huffman.c
             src/bzip2/randtable.c
     )
     ADD_LIBRARY(LIB_BZIP STATIC ${SRC_BZIP})
