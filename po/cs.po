@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-27 16:01-0600\n"
-"PO-Revision-Date: 2014-11-27 17:02-0500\n"
+"POT-Creation-Date: 2014-12-04 09:36-0600\n"
+"PO-Revision-Date: 2014-12-04 12:38-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -16,23 +16,23 @@ msgstr ""
 
 #: src/Boat.cpp:57
 msgid "Boat file does not exist, edit default settings."
-msgstr ""
+msgstr "Soubor lodi neexistuje, upravit výchozí nastavení."
 
 #: src/Boat.cpp:61
 msgid "Failed to load file: "
-msgstr ""
+msgstr "Nepodařilo se načíst soubor: "
 
 #: src/Boat.cpp:65
 msgid "Invalid xml file (no OCPWeatherRoutingBoat node): "
-msgstr ""
+msgstr "Neplatný xml soubor (bez uzlu OCPWeatherRoutingBoat): "
 
 #: src/Boat.cpp:214
 msgid "Failed saving file: "
-msgstr ""
+msgstr "Nemohu uložit soubor: "
 
 #: src/BoatDialog.cpp:50 src/WeatherRouting.cpp:127
 msgid "Name"
-msgstr ""
+msgstr "Jméno"
 
 #: src/BoatDialog.cpp:51 src/WeatherRoutingUI.cpp:1698
 msgid "Eta"
@@ -41,7 +41,7 @@ msgstr ""
 #: src/BoatDialog.cpp:59 src/BoatDialog.cpp:560 src/BoatDialog.cpp:581
 #: src/BoatDialog.cpp:630 src/BoatDialog.cpp:683
 msgid "OpenCPN Weather Routing Plugin"
-msgstr ""
+msgstr "Doplněk Weather Routing pro OpenCPN"
 
 #: src/BoatDialog.cpp:78 src/BoatDialog.cpp:79 src/BoatDialog.cpp:80
 #: src/BoatDialog.cpp:81 src/BoatDialog.cpp:82 src/BoatDialog.cpp:83
@@ -52,20 +52,20 @@ msgstr ""
 
 #: src/BoatDialog.cpp:546
 msgid "Select Boat"
-msgstr ""
+msgstr "Vybrat loď"
 
 #: src/BoatDialog.cpp:595
 msgid "Select Polar File"
-msgstr ""
+msgstr "Vyberat soubor polárů"
 
 #: src/BoatDialog.cpp:644 src/BoatDialog.cpp:672
 #: src/ConfigurationBatchDialog.cpp:251
 msgid "Select Polar"
-msgstr ""
+msgstr "Vybrat polár"
 
 #: src/BoatDialog.cpp:683
 msgid "Failed saving boat polar to file"
-msgstr ""
+msgstr "Chyba při ukládání polárů lodě do souboru"
 
 #: src/BoatDialog.cpp:733
 msgid "Drag is both frictional and wave based\nThis can be computed based on boat values above then modified manually.\nWith proper settings hull speed will be achieved, but also break into planing mode possible.\nA value 0 zero means no wake, where 100 is heaviest displacement.\nThis also takes into account the different harmonics of wakes before hull speed is reached, so resulting boat polar may appear bumpy.\n"
@@ -73,63 +73,63 @@ msgstr ""
 
 #: src/BoatDialog.cpp:740
 msgid "Drag Computation"
-msgstr ""
+msgstr "Výpočet snosu"
 
 #: src/BoatDialog.cpp:806
 msgid "New Plan"
-msgstr ""
+msgstr "Nový plán"
 
 #: src/BoatDialog.cpp:910
 msgid "Initial Plan"
-msgstr ""
+msgstr "Výchozí plán"
 
 #: src/BoatDialog.cpp:1021
 msgid "Cannot edit switch plan since there is no other plan to switch to."
-msgstr ""
+msgstr "Nelze upravovat přepínač konfigurací, protože neexistuje žádná konfigurace na kterou přepnout."
 
 #: src/BoatDialog.cpp:1022 src/WeatherRoutingUI.cpp:1255
 msgid "Sail Plans"
-msgstr ""
+msgstr "Konfigurace plachet"
 
 #: src/BoatDialog.cpp:1062
 msgid "and"
-msgstr ""
+msgstr "a"
 
 #: src/BoatDialog.cpp:1064
 msgid "Wind Speed > "
-msgstr ""
+msgstr "Rychlost větru > "
 
 #: src/BoatDialog.cpp:1067
 msgid "Wind Speed < "
-msgstr ""
+msgstr "Rychlost větru < "
 
 #: src/BoatDialog.cpp:1070
 msgid "Wind Direction > "
-msgstr ""
+msgstr "Směr větru > "
 
 #: src/BoatDialog.cpp:1073
 msgid "Wind Direction < "
-msgstr ""
+msgstr "Směr větru < "
 
 #: src/BoatDialog.cpp:1076
 msgid "Wave Height > "
-msgstr ""
+msgstr "Výška vln > "
 
 #: src/BoatDialog.cpp:1079
 msgid "Wave Height < "
-msgstr ""
+msgstr "Výška vln < "
 
 #: src/BoatDialog.cpp:1082 src/WeatherRoutingUI.cpp:2217
 msgid "Night Time"
-msgstr ""
+msgstr "Noc"
 
 #: src/BoatDialog.cpp:1084 src/WeatherRoutingUI.cpp:2213
 msgid "Day Time"
-msgstr ""
+msgstr "Den"
 
 #: src/BoatDialog.cpp:1087
 msgid " switch to "
-msgstr ""
+msgstr " přepnout na "
 
 #: src/BoatDialog.cpp:1098 src/BoatDialog.cpp:1109 src/BoatDialog.cpp:1110
 msgid "Cruiser"
@@ -158,63 +158,63 @@ msgstr ""
 
 #: src/BoatDialog.cpp:1117
 msgid "Low"
-msgstr ""
+msgstr "Nízký"
 
 #: src/BoatDialog.cpp:1118
 msgid "High"
-msgstr ""
+msgstr "Vysoký"
 
 #: src/BoatDialog.cpp:1123
 msgid "Rough"
-msgstr ""
+msgstr "Drsné"
 
 #: src/BoatDialog.cpp:1124
 msgid "Smooth"
-msgstr ""
+msgstr "Hladké"
 
 #: src/BoatPlan.cpp:518
 msgid " line "
-msgstr ""
+msgstr " čára "
 
 #: src/BoatPlan.cpp:520
 msgid "Boat polar failed"
-msgstr ""
+msgstr "Polár lodi selhal"
 
 #: src/BoatPlan.cpp:538
 msgid "Failed to open."
-msgstr ""
+msgstr "Nepodařilo se otevřít."
 
 #: src/BoatPlan.cpp:543
 msgid "Failed to read."
-msgstr ""
+msgstr "Nepodařilo se načíst."
 
 #: src/BoatPlan.cpp:557
 msgid "Unrecognized format."
-msgstr ""
+msgstr "Neznámý formát."
 
 #: src/BoatPlan.cpp:563
 msgid "Too many wind speeds."
-msgstr ""
+msgstr "Příliš mnoho rychlostí větru."
 
 #: src/BoatPlan.cpp:584
 msgid "Wind direction out of range."
-msgstr ""
+msgstr "Směr větru mimo rozsah."
 
 #: src/BoatPlan.cpp:589
 msgid "Wind direction out of order."
-msgstr ""
+msgstr "Směr větru je mimo pořadí."
 
 #: src/BoatPlan.cpp:611
 msgid "Too few tokens."
-msgstr ""
+msgstr "Příliš málo tokenů."
 
 #: src/BoatPlan.cpp:618
 msgid "Too many tokens."
-msgstr ""
+msgstr "Příliš mnoho tokenů."
 
 #: src/ConfigurationBatchDialog.cpp:273
 msgid "Batch mode generates multiple configurations based on the selected configuration."
-msgstr ""
+msgstr "Dávkový režim generuje více konfigurací na základě vybrané konfigurace."
 
 #: src/ConfigurationBatchDialog.cpp:275 src/ConfigurationDialog.cpp:163
 #: src/ConfigurationDialog.cpp:307 src/ConfigurationDialog.cpp:428
@@ -232,34 +232,34 @@ msgstr ""
 
 #: src/ConfigurationDialog.cpp:162
 msgid "Invalid settings, nothing will be done."
-msgstr ""
+msgstr "Neplatné nastavení, nebudu dělat nic."
 
 #: src/ConfigurationDialog.cpp:306
 msgid "Invalid Date Time."
-msgstr ""
+msgstr "Neplatné datum a čas."
 
 #: src/ConfigurationDialog.cpp:427
 msgid "Zero Time Step is invalid"
-msgstr ""
+msgstr "Nulový časový krok je neplatný"
 
 #: src/ConfigurationDialog.cpp:433
 msgid "Warning: less than 4 different degree steps specified\n"
-msgstr ""
+msgstr "Varování: specifikovány méně než 4 různé kroky pro stupně\n"
 
 #: src/FilterRoutesDialog.cpp:43 src/WeatherRouting.h:61
 #: src/WeatherRoutingUI.cpp:490
 msgid "Start"
-msgstr ""
+msgstr "Počátek"
 
 #: src/FilterRoutesDialog.cpp:43 src/WeatherRouting.h:61
 #: src/WeatherRoutingUI.cpp:2915
 msgid "Start Time"
-msgstr ""
+msgstr "Čas zahájení"
 
 #: src/FilterRoutesDialog.cpp:43 src/WeatherRouting.h:62
 #: src/WeatherRoutingUI.cpp:544
 msgid "End"
-msgstr ""
+msgstr "Konec"
 
 #: src/FilterRoutesDialog.cpp:43
 msgid "BoatFileName"
@@ -268,151 +268,151 @@ msgstr ""
 #: src/FilterRoutesDialog.cpp:43 src/WeatherRouting.h:69
 #: src/WeatherRoutingUI.cpp:2588
 msgid "State"
-msgstr ""
+msgstr "Stav"
 
 #: src/ReportDialog.cpp:57
 msgid "No Configuration selected."
-msgstr ""
+msgstr "Žádná konfigurace není vybrána."
 
 #: src/ReportDialog.cpp:67
 msgid "Destination not yet reached."
-msgstr ""
+msgstr "Cíl zatím nedosažen."
 
 #: src/ReportDialog.cpp:74
 msgid "Route from "
-msgstr ""
+msgstr "Trasa z "
 
 #: src/ReportDialog.cpp:74 src/ReportDialog.cpp:276 src/ReportDialog.cpp:314
 msgid " to "
-msgstr ""
+msgstr " do "
 
 #: src/ReportDialog.cpp:75
 msgid "Leaving "
-msgstr ""
+msgstr "Odplutí "
 
 #: src/ReportDialog.cpp:76
 msgid "Arriving "
-msgstr ""
+msgstr "Připlutí "
 
 #: src/ReportDialog.cpp:77
 msgid "Duration "
-msgstr ""
+msgstr "Doba trvání "
 
 #: src/ReportDialog.cpp:81
 msgid "Distance sailed: "
-msgstr ""
+msgstr "Uplutá vzdálenost: "
 
 #: src/ReportDialog.cpp:84
 msgid "longer than great circle route"
-msgstr ""
+msgstr "delší než trasa po velké kružnici"
 
 #: src/ReportDialog.cpp:88
 msgid "Average Water Speed"
-msgstr ""
+msgstr "Průměrná rychlost proti vodě"
 
 #: src/ReportDialog.cpp:90
 msgid "Average Ground Speed"
-msgstr ""
+msgstr "Průměrná rychlost proti dnu"
 
 #: src/ReportDialog.cpp:92
 msgid "Average Wind"
-msgstr ""
+msgstr "Průměrný vítr"
 
 #: src/ReportDialog.cpp:94
 msgid "Average Swell"
-msgstr ""
+msgstr "Průměrné vlnění"
 
 #: src/ReportDialog.cpp:96
 msgid "Upwind"
-msgstr ""
+msgstr "Proti větru"
 
 #: src/ReportDialog.cpp:99
 msgid "Port/Starboard"
-msgstr ""
+msgstr "Zleva/Zprava"
 
 #: src/ReportDialog.cpp:105
 msgid "Number of tacks"
-msgstr ""
+msgstr "Počet obratů"
 
 #: src/ReportDialog.cpp:114
 msgid "speed change due to "
-msgstr ""
+msgstr "Změna rychlosti kvůli "
 
 #: src/ReportDialog.cpp:116
 msgid "favorable"
-msgstr ""
+msgstr "příznivé"
 
 #: src/ReportDialog.cpp:118
 msgid "unfavorable"
-msgstr ""
+msgstr "nepříznivé"
 
 #: src/ReportDialog.cpp:119
 msgid " currents."
-msgstr ""
+msgstr " proudy."
 
 #: src/ReportDialog.cpp:149
 msgid "No routes to report yet."
-msgstr ""
+msgstr "Ještě nnejsou trasy pro report."
 
 #: src/ReportDialog.cpp:160 src/ReportDialog.cpp:220
 msgid "to"
-msgstr ""
+msgstr "do"
 
 #: src/ReportDialog.cpp:161
 msgid "configurations"
-msgstr ""
+msgstr "konfigurace"
 
 #: src/ReportDialog.cpp:173
 msgid "<dt>Fastest configuration "
-msgstr ""
+msgstr "<dt>Nejrychlejší konfigurace "
 
 #: src/ReportDialog.cpp:174
 msgid "avg speed"
-msgstr ""
+msgstr "prům. rychlost"
 
 #: src/ReportDialog.cpp:179
 msgid "Best Times (mostly downwind)"
-msgstr ""
+msgstr "Nejlepší časy (většinou po větru)"
 
 #: src/ReportDialog.cpp:218 src/ReportDialog.cpp:273 src/ReportDialog.cpp:301
 msgid " and "
-msgstr ""
+msgstr "  a  "
 
 #: src/ReportDialog.cpp:232
 msgid "any"
-msgstr ""
+msgstr "jakýkoli"
 
 #: src/ReportDialog.cpp:234 src/ReportDialog.cpp:284
 msgid "none"
-msgstr ""
+msgstr "nic"
 
 #: src/ReportDialog.cpp:237 src/WeatherRoutingUI.cpp:867
 msgid "Cyclones"
-msgstr ""
+msgstr "Cyklóny"
 
 #: src/ReportDialog.cpp:239
 msgid "Calculating Cyclone Crossings"
-msgstr ""
+msgstr "Výpočet přechodů cyklon"
 
 #: src/ReportDialog.cpp:249
 msgid "Climatology data unavailable."
-msgstr ""
+msgstr "Klimatologická data nejsou k dispozici."
 
 #: src/ReportDialog.cpp:282
 msgid "all months"
-msgstr ""
+msgstr "všechny měsíce"
 
 #: src/ReportDialog.cpp:290
 msgid "All routes are safe from cyclones."
-msgstr ""
+msgstr "Všechny trasy jsou v bezpečí před cyklonami."
 
 #: src/ReportDialog.cpp:292
 msgid "No routes found to be safe from cyclones."
-msgstr ""
+msgstr "Nenelezena žádná trasa v bezpečí před cyklonami."
 
 #: src/ReportDialog.cpp:294
 msgid "Start times for cyclone safe routes: "
-msgstr ""
+msgstr "Počáteční časy pro trasy bezpečné řed cyklonami: "
 
 #: src/ReportDialog.cpp:325
 msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\nFor example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
@@ -420,15 +420,15 @@ msgstr ""
 
 #: src/ReportDialog.cpp:332
 msgid "Weather Routing Report"
-msgstr ""
+msgstr "Report Weather routingu"
 
 #: src/RouteMapOverlay.cpp:78
 msgid "error, thread already created\n"
-msgstr ""
+msgstr "chyba, vlákno již existuje\n"
 
 #: src/SettingsDialog.cpp:90
 msgid "Visible"
-msgstr ""
+msgstr "Viditelný"
 
 #: src/SettingsDialog.cpp:157
 msgid "Cursor Route -- optimal route closest to the cursor\nDestination Route -- optimal route to the desired destination\nRoute Thickness -- thickness to draw Cursor and Destination Routes\nIso Chron Thickness -- thickness for isochrons on map\nAlternate Routes Thickness -- thickness for alternate routes\nNote: All thicknesses can be set to 0 to disable their display\nAlternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\nSquares At Sail Changes -- render squares along Routes whenever a sail change is made\nFilter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\nNumber of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
@@ -436,46 +436,46 @@ msgstr ""
 
 #: src/StatisticsDialog.cpp:63
 msgid "No Route"
-msgstr ""
+msgstr "Žádná trasa"
 
 #: src/StatisticsDialog.cpp:64
 msgid "Running"
-msgstr ""
+msgstr "Probíhá"
 
 #: src/StatisticsDialog.cpp:64 src/WeatherRoutingUI.cpp:2592
 msgid "Stopped"
-msgstr ""
+msgstr "Zastaveno"
 
 #: src/SwitchPlanDialog.cpp:73
 msgid "Failed to find plan name to switch to in list"
-msgstr ""
+msgstr "Nepodařilo se najít název konfigurace na kterou přejít v seznamu"
 
 #: src/SwitchPlanDialog.cpp:74 src/SwitchPlanDialog.cpp:89
 #: src/SwitchPlanDialog.cpp:96 src/SwitchPlanDialog.cpp:103
 #: src/SwitchPlanDialog.cpp:113 src/SwitchPlanDialog.cpp:120
 #: src/SwitchPlanDialog.cpp:147
 msgid "Switch Plan"
-msgstr ""
+msgstr "Přepnout konfiguraci"
 
 #: src/SwitchPlanDialog.cpp:88
 msgid "Cannot have min and max wind speed"
-msgstr ""
+msgstr "Nelze mít min a max rychlosti větru"
 
 #: src/SwitchPlanDialog.cpp:95
 msgid "Cannot have min and max wind direction"
-msgstr ""
+msgstr "Nelze mít min a max směru větru"
 
 #: src/SwitchPlanDialog.cpp:102
 msgid "Cannot have min and max wave height"
-msgstr ""
+msgstr "Nelze mít min a max výšky vln"
 
 #: src/SwitchPlanDialog.cpp:112
 msgid "Invalid constrains."
-msgstr ""
+msgstr "Neplatná omezení."
 
 #: src/SwitchPlanDialog.cpp:119
 msgid "Cannot make a rule if neither daytime nor nighttime is specified."
-msgstr ""
+msgstr "Nelze vytvořit pravidlo bez specifikace dne nebo noci."
 
 #: src/SwitchPlanDialog.cpp:141
 msgid "Specify conditions where we should change to a different plan.\nIf conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
@@ -491,42 +491,42 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:242
 msgid "Enter Name"
-msgstr ""
+msgstr "Zadej jméno"
 
 #: src/WeatherRouting.cpp:242 src/WeatherRouting.cpp:310
 #: src/WeatherRouting.cpp:314
 msgid "New Position"
-msgstr ""
+msgstr "Nová pozice"
 
 #: src/WeatherRouting.cpp:248
 msgid "This name already exists, replace?\n"
-msgstr ""
+msgstr "Tento název již existuje, nahradit? \n"
 
 #: src/WeatherRouting.cpp:310
 msgid "Enter Latitude"
-msgstr ""
+msgstr "Zadej zem. šířku"
 
 #: src/WeatherRouting.cpp:314
 msgid "Enter Longitude"
-msgstr ""
+msgstr "Zadej zem. délku"
 
 #: src/WeatherRouting.cpp:334 src/WeatherRouting.cpp:343
 #: src/WeatherRoutingUI.cpp:588 src/WeatherRoutingUI.cpp:1460
 #: src/WeatherRoutingUI.h:433
 msgid "Boat"
-msgstr ""
+msgstr "Loď"
 
 #: src/WeatherRouting.cpp:628 src/WeatherRouting.cpp:644
 msgid "Select Configuration"
-msgstr ""
+msgstr "Vybrat konfiguraci"
 
 #: src/WeatherRouting.cpp:710
 msgid "Zero time span forbidden, aborting."
-msgstr ""
+msgstr "Nulový časový rozsah nepovolen, končím."
 
 #: src/WeatherRouting.cpp:733
 msgid "Batch configuration"
-msgstr ""
+msgstr "Dávková konfigurace"
 
 #: src/WeatherRouting.cpp:866
 msgid "WeatherRoutingInformation.html"
@@ -534,43 +534,43 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:921
 msgid "Failed to start configuration: "
-msgstr ""
+msgstr "Nepodařilo se spustit konfiguraci: "
 
 #: src/WeatherRouting.cpp:981
 msgid "Failed to load file."
-msgstr ""
+msgstr "Nepodařilo se načíst soubor."
 
 #: src/WeatherRouting.cpp:986
 msgid "Invalid xml file"
-msgstr ""
+msgstr "Neplatný xml soubor"
 
 #: src/WeatherRouting.cpp:1004
 msgid "Load"
-msgstr ""
+msgstr "Nahrát"
 
 #: src/WeatherRouting.cpp:1020
 msgid "File contains duplicate position name, discaring\n"
-msgstr ""
+msgstr "Soubor obsahuje duplicitní jméno pozice, zahazuji\n"
 
 #: src/WeatherRouting.cpp:1097
 msgid "Unrecognized xml node"
-msgstr ""
+msgstr "Nerozpoznaný xml uzel"
 
 #: src/WeatherRouting.cpp:1187
 msgid "Failed to save xml file: "
-msgstr ""
+msgstr "Uložení souboru xml se nezdařilo: "
 
 #: src/WeatherRouting.cpp:1354
 msgid "Invalid Start/End"
-msgstr ""
+msgstr "Neplatný začátek/konec"
 
 #: src/WeatherRouting.cpp:1357
 msgid "Computing..."
-msgstr ""
+msgstr "Výpočet..."
 
 #: src/WeatherRouting.cpp:1361
 msgid "Complete"
-msgstr ""
+msgstr "Hotovo"
 
 #: src/WeatherRouting.cpp:1365 src/WeatherRoutingUI.cpp:621
 msgid "Grib"
@@ -578,31 +578,31 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:1369 src/WeatherRoutingUI.cpp:626
 msgid "Climatology"
-msgstr ""
+msgstr "Klimatologie"
 
 #: src/WeatherRouting.cpp:1373
 msgid "No Data"
-msgstr ""
+msgstr "Žádná data"
 
 #: src/WeatherRouting.cpp:1376
 msgid "Failed"
-msgstr ""
+msgstr "Nezdařilo se"
 
 #: src/WeatherRouting.cpp:1382
 msgid "Waiting..."
-msgstr ""
+msgstr "Čekejte..."
 
 #: src/WeatherRouting.cpp:1385
 msgid "Not Computed"
-msgstr ""
+msgstr "Není vypočítaný"
 
 #: src/WeatherRouting.cpp:1548
 msgid "No Weather Route selected"
-msgstr ""
+msgstr "Žádná trasa není vybrána"
 
 #: src/WeatherRouting.cpp:1580
 msgid "Empty Route, nothing to export\n"
-msgstr ""
+msgstr "Prázdná trasa, nic na export\n"
 
 #: src/WeatherRouting.cpp:1587
 msgid "Weather Route"
@@ -614,68 +614,68 @@ msgstr ""
 
 #: src/WeatherRouting.h:62
 msgid "End Time"
-msgstr ""
+msgstr "Konečný čas"
 
 #: src/WeatherRouting.h:62
 msgid "Time"
-msgstr ""
+msgstr "Čas"
 
 #: src/WeatherRouting.h:62
 msgid "Distance"
-msgstr ""
+msgstr "Vzdálenost"
 
 #: src/WeatherRouting.h:63
 msgid "Avg Speed"
-msgstr ""
+msgstr "Prům. rychlost"
 
 #: src/WeatherRouting.h:63
 msgid "Max Speed"
-msgstr ""
+msgstr "Max rychlost"
 
 #: src/WeatherRouting.h:64
 msgid "Avg Speed Ground"
-msgstr ""
+msgstr "Prům. rychlost proti dnu"
 
 #: src/WeatherRouting.h:64
 msgid "Max Speed Ground"
-msgstr ""
+msgstr "Max rychlost proti dnu"
 
 #: src/WeatherRouting.h:65
 msgid "Avg Wind"
-msgstr ""
+msgstr "Prům. vítr"
 
 #: src/WeatherRouting.h:65 src/WeatherRoutingUI.cpp:759
 msgid "Max Wind"
-msgstr ""
+msgstr "Max vítr"
 
 #: src/WeatherRouting.h:66
 msgid "Avg Current"
-msgstr ""
+msgstr "Prům. proud"
 
 #: src/WeatherRouting.h:66
 msgid "Max Current"
-msgstr ""
+msgstr "Max proud"
 
 #: src/WeatherRouting.h:67
 msgid "Avg Swell"
-msgstr ""
+msgstr "Prům. vlnění"
 
 #: src/WeatherRouting.h:67 src/WeatherRoutingUI.cpp:781
 msgid "Max Swell"
-msgstr ""
+msgstr "Max vlnění"
 
 #: src/WeatherRouting.h:68
 msgid "Upwind Percentage"
-msgstr ""
+msgstr "Procenta proti větru"
 
 #: src/WeatherRouting.h:69
 msgid "Port Starboard"
-msgstr ""
+msgstr "Zleva Zprava"
 
 #: src/WeatherRouting.h:69 src/WeatherRoutingUI.cpp:2338
 #: src/WeatherRoutingUI.cpp:2354 src/WeatherRoutingUI.cpp:2370
 msgid "Tacks"
-msgstr ""
+msgstr "Obraty"
 
 #: src/weather_routing_pi.cpp:79
 msgid "Weather_Routing"
@@ -691,7 +691,7 @@ msgstr ""
 
 #: src/weather_routing_pi.cpp:143
 msgid "Compute optimal routes based on weather and constraints."
-msgstr ""
+msgstr "Výpočet optimální trasy založený na počasí a omezeních."
 
 #: src/weather_routing_pi.cpp:148
 msgid "Weather Routing features include:\n  optimal routing subject to various constraints based on weather data\n  automatic boat polar computation\n"
@@ -699,203 +699,203 @@ msgstr ""
 
 #: src/weather_routing_pi.cpp:204
 msgid "Grib plugin version not supported."
-msgstr ""
+msgstr "Nepodporovaná verze doplňku Grib."
 
 #: src/weather_routing_pi.cpp:243
 msgid "Climatology plugin version not supported, no climatology data."
-msgstr ""
+msgstr "Nepodporovaná verze doplňku Klimatologie, žádná klimatologická data."
 
 #: src/weather_routing_pi.cpp:251
 msgid "Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"
-msgstr ""
+msgstr "Doplněk Klimatologie je zastaralý, musíš ho aktualizovat jinak mohou být výsledné trasy chybné.\n"
 
 #: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:2628
 msgid "Positions"
-msgstr ""
+msgstr "Pozice"
 
 #: src/WeatherRoutingUI.cpp:50
 msgid "Configurations"
-msgstr ""
+msgstr "Konfigurace"
 
 #: src/WeatherRoutingUI.cpp:68 src/WeatherRoutingUI.cpp:153
 msgid "&Compute"
-msgstr ""
+msgstr "Vypočítat"
 
 #: src/WeatherRoutingUI.cpp:71
 msgid "&Export"
-msgstr ""
+msgstr "&Exportovat"
 
 #: src/WeatherRoutingUI.cpp:97
 msgid "&Open"
-msgstr ""
+msgstr "&Otevřít"
 
 #: src/WeatherRoutingUI.cpp:101
 msgid "&Save"
-msgstr ""
+msgstr "&Uložit"
 
 #: src/WeatherRoutingUI.cpp:107 src/WeatherRoutingUI.cpp:2720
 msgid "&Close"
-msgstr ""
+msgstr "&Zavřít"
 
 #: src/WeatherRoutingUI.cpp:110
 msgid "&File"
-msgstr ""
+msgstr "&Soubor"
 
 #: src/WeatherRoutingUI.cpp:114
 msgid "&New Position"
-msgstr ""
+msgstr "&Nová pozice"
 
 #: src/WeatherRoutingUI.cpp:118
 msgid "&Update Boat Position"
-msgstr ""
+msgstr "&Aktualizovat pozici lodi"
 
 #: src/WeatherRoutingUI.cpp:122 src/WeatherRoutingUI.cpp:145
 msgid "&Delete"
-msgstr ""
+msgstr "&Smazat"
 
 #: src/WeatherRoutingUI.cpp:126
 msgid "Delete &All"
-msgstr ""
+msgstr "Smazat vše"
 
 #: src/WeatherRoutingUI.cpp:129
 msgid "&Position"
-msgstr ""
+msgstr "&Pozice"
 
 #: src/WeatherRoutingUI.cpp:133
 msgid "&New"
-msgstr ""
+msgstr "&Nový"
 
 #: src/WeatherRoutingUI.cpp:136
 msgid "&Batch"
-msgstr ""
+msgstr "&Dávkově"
 
 #: src/WeatherRoutingUI.cpp:139
 msgid "&Edit"
-msgstr ""
+msgstr "&Upravit"
 
 #: src/WeatherRoutingUI.cpp:142
 msgid "&GoTo"
-msgstr ""
+msgstr "&Jít na"
 
 #: src/WeatherRoutingUI.cpp:148
 msgid "Delete All"
-msgstr ""
+msgstr "Smazat vše"
 
 #: src/WeatherRoutingUI.cpp:156
 msgid "Compute &All"
-msgstr ""
+msgstr "Vypočít&at vše"
 
 #: src/WeatherRoutingUI.cpp:159
 msgid "&Stop"
-msgstr ""
+msgstr "&Stop"
 
 #: src/WeatherRoutingUI.cpp:163
 msgid "&Reset All"
-msgstr ""
+msgstr "&Resetovat vše"
 
 #: src/WeatherRoutingUI.cpp:168
 msgid "E&xport"
-msgstr ""
+msgstr "E&xport"
 
 #: src/WeatherRoutingUI.cpp:171
 msgid "Export All"
-msgstr ""
+msgstr "Exportovat vše"
 
 #: src/WeatherRoutingUI.cpp:177
 msgid "&Filter"
-msgstr ""
+msgstr "&Filtr"
 
 #: src/WeatherRoutingUI.cpp:180
 msgid "&Configuration"
-msgstr ""
+msgstr "Konfigura&ce"
 
 #: src/WeatherRoutingUI.cpp:184
 msgid "&Settings"
-msgstr ""
+msgstr "&Nastavení"
 
 #: src/WeatherRoutingUI.cpp:188
 msgid "S&tatistics"
-msgstr ""
+msgstr "S&tatistiky"
 
 #: src/WeatherRoutingUI.cpp:192
 msgid "&Report"
-msgstr ""
+msgstr "&Report"
 
 #: src/WeatherRoutingUI.cpp:196
 msgid "&Plot"
-msgstr ""
+msgstr "Vykreslit"
 
 #: src/WeatherRoutingUI.cpp:199
 msgid "&View"
-msgstr ""
+msgstr "&Zobrazit"
 
 #: src/WeatherRoutingUI.cpp:203
 msgid "&Information"
-msgstr ""
+msgstr "&Informace"
 
 #: src/WeatherRoutingUI.cpp:207
 msgid "&Manual"
-msgstr ""
+msgstr "&Manuál"
 
 #: src/WeatherRoutingUI.cpp:211
 msgid "&About"
-msgstr ""
+msgstr "O &aplikaci"
 
 #: src/WeatherRoutingUI.cpp:214
 msgid "&Help"
-msgstr ""
+msgstr "&Pomoc"
 
 #: src/WeatherRoutingUI.cpp:323
 msgid "Display"
-msgstr ""
+msgstr "Zobrazení"
 
 #: src/WeatherRoutingUI.cpp:335
 msgid "Cursor Route Color"
-msgstr ""
+msgstr "Barva kurzorové trasy"
 
 #: src/WeatherRoutingUI.cpp:342
 msgid "Destination Route Color"
-msgstr ""
+msgstr "Barva cíloví trasy"
 
 #: src/WeatherRoutingUI.cpp:349
 msgid "Route Thickness"
-msgstr ""
+msgstr "Tloušťka trasy"
 
 #: src/WeatherRoutingUI.cpp:356
 msgid "Iso Chron Thickness"
-msgstr ""
+msgstr "Tloušťka izochrony"
 
 #: src/WeatherRoutingUI.cpp:363
 msgid "Alternate Routes Thickness"
-msgstr ""
+msgstr "Tloušťka alternativní trasy"
 
 #: src/WeatherRoutingUI.cpp:378
 msgid "Alternates for all IsoChrons"
-msgstr ""
+msgstr "Alternativy pro všechny izochrony"
 
 #: src/WeatherRoutingUI.cpp:381
 msgid "Squares at Sail Changes"
-msgstr ""
+msgstr "Čtverce na změnách plachet"
 
 #: src/WeatherRoutingUI.cpp:402
 msgid "Computation"
-msgstr ""
+msgstr "Výpočet"
 
 #: src/WeatherRoutingUI.cpp:409
 msgid "Number of Concurrent threads"
-msgstr ""
+msgstr "Počet souběžných podprocesů"
 
 #: src/WeatherRoutingUI.cpp:514
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: src/WeatherRoutingUI.cpp:521
 msgid "Grib Time"
-msgstr ""
+msgstr "Čas gribu"
 
 #: src/WeatherRoutingUI.cpp:524
 msgid "Hour"
-msgstr ""
+msgstr "Hodina"
 
 #: src/WeatherRoutingUI.cpp:528 src/WeatherRoutingUI.cpp:949
 #: src/WeatherRoutingUI.cpp:1407 src/WeatherRoutingUI.cpp:1415
@@ -911,11 +911,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:531
 msgid "Current Time"
-msgstr ""
+msgstr "Aktuální čas"
 
 #: src/WeatherRoutingUI.cpp:553
 msgid "Time Step"
-msgstr ""
+msgstr "Časový krok"
 
 #: src/WeatherRoutingUI.cpp:563
 msgid "h"
@@ -931,148 +931,148 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:596 src/WeatherRoutingUI.cpp:1804
 msgid "Select a file"
-msgstr ""
+msgstr "Vyber soubor"
 
 #: src/WeatherRoutingUI.cpp:599 src/WeatherRoutingUI.cpp:1936
 msgid "Edit"
-msgstr ""
+msgstr "Upravit"
 
 #: src/WeatherRoutingUI.cpp:609
 msgid "Data Source"
-msgstr ""
+msgstr "Zdroj dat"
 
 #: src/WeatherRoutingUI.cpp:634
 msgid "Disable"
-msgstr ""
+msgstr "Zakázat"
 
 #: src/WeatherRoutingUI.cpp:634
 msgid "Currents Only"
-msgstr ""
+msgstr "Jen proudy"
 
 #: src/WeatherRoutingUI.cpp:634
 msgid "Cumulative Map"
-msgstr ""
+msgstr "Kumulativní mapa"
 
 #: src/WeatherRoutingUI.cpp:634
 msgid "Cumulative - Calms"
-msgstr ""
+msgstr "Kumulativní - tišiny"
 
 #: src/WeatherRoutingUI.cpp:634
 msgid "Most Likely"
-msgstr ""
+msgstr "Nejspíše"
 
 #: src/WeatherRoutingUI.cpp:634
 msgid "Average"
-msgstr ""
+msgstr "Průměrně"
 
 #: src/WeatherRoutingUI.cpp:651
 msgid "Last Valid if Data Deficient"
-msgstr ""
+msgstr "Poslední platné, pokud údaje nedostačují"
 
 #: src/WeatherRoutingUI.cpp:661
 msgid "Options"
-msgstr ""
+msgstr "Nastavení"
 
 #: src/WeatherRoutingUI.cpp:668
 msgid "Detect Land"
-msgstr ""
+msgstr "Detekovat pevninu"
 
 #: src/WeatherRoutingUI.cpp:672
 msgid "Currents"
-msgstr ""
+msgstr "Proudy"
 
 #: src/WeatherRoutingUI.cpp:676
 msgid "Inverted Regions"
-msgstr ""
+msgstr "Invertované regiony"
 
 #: src/WeatherRoutingUI.cpp:679
 msgid "Anchoring"
-msgstr ""
+msgstr "Kotvení"
 
 #: src/WeatherRoutingUI.cpp:697
 msgid "Integrator"
-msgstr ""
+msgstr "Integrátor"
 
 #: src/WeatherRoutingUI.cpp:704
 msgid "Newton's Method"
-msgstr ""
+msgstr "Newtonova metoda"
 
 #: src/WeatherRoutingUI.cpp:707
 msgid "Runge Kutta (slow)"
-msgstr ""
+msgstr "Runge Kutta (pomalé)"
 
 #: src/WeatherRoutingUI.cpp:717
 msgid "Constraints"
-msgstr ""
+msgstr "Omezení"
 
 #: src/WeatherRoutingUI.cpp:726
 msgid "Max Diverted Course"
-msgstr ""
+msgstr "Max odklon kursu"
 
 #: src/WeatherRoutingUI.cpp:733 src/WeatherRoutingUI.cpp:744
 #: src/WeatherRoutingUI.cpp:755 src/WeatherRoutingUI.cpp:799
 msgid "degrees"
-msgstr ""
+msgstr "stupně"
 
 #: src/WeatherRoutingUI.cpp:737
 msgid "Max Course Angle"
-msgstr ""
+msgstr "Max úhel kursu"
 
 #: src/WeatherRoutingUI.cpp:748
 msgid "Max Search Angle"
-msgstr ""
+msgstr "Max úhel hledání"
 
 #: src/WeatherRoutingUI.cpp:766
 msgid "knots"
-msgstr ""
+msgstr "uzly"
 
 #: src/WeatherRoutingUI.cpp:774
 msgid "Common"
-msgstr ""
+msgstr "Společné"
 
 #: src/WeatherRoutingUI.cpp:788
 msgid "meters"
-msgstr ""
+msgstr "metry"
 
 #: src/WeatherRoutingUI.cpp:792
 msgid "Max Latitude +-"
-msgstr ""
+msgstr "Max zem. šířka +-"
 
 #: src/WeatherRoutingUI.cpp:803
 msgid "Tacking Time"
-msgstr ""
+msgstr "Čas na obrat"
 
 #: src/WeatherRoutingUI.cpp:810
 msgid "(0 to disable)"
-msgstr ""
+msgstr "(0 = zakázat)"
 
 #: src/WeatherRoutingUI.cpp:814
 msgid "Wind vs Current"
-msgstr ""
+msgstr "Vítr vs proud"
 
 #: src/WeatherRoutingUI.cpp:825
 msgid "Additional"
-msgstr ""
+msgstr "Další"
 
 #: src/WeatherRoutingUI.cpp:834
 msgid "Avoid crossing cyclone tracks"
-msgstr ""
+msgstr "Vyhnout se trasám cyklón"
 
 #: src/WeatherRoutingUI.cpp:842
 msgid "within"
-msgstr ""
+msgstr "mezi"
 
 #: src/WeatherRoutingUI.cpp:849
 msgid "Months"
-msgstr ""
+msgstr "Měsíce"
 
 #: src/WeatherRoutingUI.cpp:856
 msgid "Days"
-msgstr ""
+msgstr "Dny"
 
 #: src/WeatherRoutingUI.cpp:875
 msgid "Courses (relative to true wind)"
-msgstr ""
+msgstr "Kursy (relativní ke skutešnému větru)"
 
 #: src/WeatherRoutingUI.cpp:897
 msgid "-45"
@@ -1116,34 +1116,34 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:922 src/WeatherRoutingUI.cpp:3035
 msgid "Add"
-msgstr ""
+msgstr "Přidat"
 
 #: src/WeatherRoutingUI.cpp:925 src/WeatherRoutingUI.cpp:3038
 msgid "Remove"
-msgstr ""
+msgstr "Odebrat"
 
 #: src/WeatherRoutingUI.cpp:928
 msgid "Clear"
-msgstr ""
+msgstr "Vyčistit"
 
 #: src/WeatherRoutingUI.cpp:938 src/WeatherRoutingUI.cpp:981
 #: src/WeatherRoutingUI.cpp:3063
 msgid "Generate"
-msgstr ""
+msgstr "Generovat"
 
 #: src/WeatherRoutingUI.cpp:945
 msgid "From"
-msgstr ""
+msgstr "z"
 
 #: src/WeatherRoutingUI.cpp:952 src/WeatherRoutingUI.cpp:963
 #: src/WeatherRoutingUI.cpp:974 src/WeatherRoutingUI.cpp:2179
 #: src/WeatherRoutingUI.cpp:2189
 msgid "Degrees"
-msgstr ""
+msgstr "Stupně"
 
 #: src/WeatherRoutingUI.cpp:956
 msgid "To"
-msgstr ""
+msgstr "Do"
 
 #: src/WeatherRoutingUI.cpp:960
 msgid "180"
@@ -1159,40 +1159,40 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:999
 msgid " Close"
-msgstr ""
+msgstr " Zavřít"
 
 #: src/WeatherRoutingUI.cpp:1271 src/WeatherRoutingUI.cpp:1933
 msgid "New"
-msgstr ""
+msgstr "Nové"
 
 #: src/WeatherRoutingUI.cpp:1274 src/WeatherRoutingUI.cpp:1939
 msgid "Delete"
-msgstr ""
+msgstr "Smazat"
 
 #: src/WeatherRoutingUI.cpp:1323
 msgid "Coordinates"
-msgstr ""
+msgstr "Souřadnice"
 
 #: src/WeatherRoutingUI.cpp:1325 src/WeatherRoutingUI.cpp:1347
 msgid "Polar"
-msgstr ""
+msgstr "Polár"
 
 #: src/WeatherRoutingUI.cpp:1325
 msgid "Rect"
-msgstr ""
+msgstr "Obdélník"
 
 #: src/WeatherRoutingUI.cpp:1335
 msgid "Wind Kts"
-msgstr ""
+msgstr "Vítr Kts"
 
 #: src/WeatherRoutingUI.cpp:1355 src/WeatherRoutingUI.cpp:2338
 #: src/WeatherRoutingUI.cpp:2354 src/WeatherRoutingUI.cpp:2370
 msgid "Wind Direction"
-msgstr ""
+msgstr "Směr větru"
 
 #: src/WeatherRoutingUI.cpp:1367
 msgid "Speed"
-msgstr ""
+msgstr "Rychlost"
 
 #: src/WeatherRoutingUI.cpp:1369 src/WeatherRoutingUI.cpp:1916
 msgid "VMG"
@@ -1200,27 +1200,27 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1380
 msgid "Plot Type"
-msgstr ""
+msgstr "Typ grafu"
 
 #: src/WeatherRoutingUI.cpp:1382
 msgid "True Wind Dir / True Wind Speed"
-msgstr ""
+msgstr "Skutečný směr a rychlost větru"
 
 #: src/WeatherRoutingUI.cpp:1382
 msgid "Apparent Wind Dir / True Wind Speed"
-msgstr ""
+msgstr "Zdánlivý směr / Skutečná rychlost větru"
 
 #: src/WeatherRoutingUI.cpp:1382
 msgid "True Wind Dir / Apparent Wind Speed"
-msgstr ""
+msgstr "Skutečný směr / Zdánlivá rychlost větru"
 
 #: src/WeatherRoutingUI.cpp:1382
 msgid "Apparent Wind Dir / Apparent Wind Speed"
-msgstr ""
+msgstr "Zdánlivý směr a rychlost větru"
 
 #: src/WeatherRoutingUI.cpp:1400
 msgid "True Wind"
-msgstr ""
+msgstr "Skutečný vítr"
 
 #: src/WeatherRoutingUI.cpp:1411 src/WeatherRoutingUI.cpp:1441
 #: src/WeatherRoutingUI.cpp:1471
@@ -1231,19 +1231,19 @@ msgstr ""
 #: src/WeatherRoutingUI.cpp:1479 src/WeatherRoutingUI.cpp:2159
 #: src/WeatherRoutingUI.cpp:2169
 msgid "Knots"
-msgstr ""
+msgstr "Uzlů"
 
 #: src/WeatherRoutingUI.cpp:1430
 msgid "Apparent Wind"
-msgstr ""
+msgstr "Zdánlivý vítr"
 
 #: src/WeatherRoutingUI.cpp:1496
 msgid "Plot"
-msgstr ""
+msgstr "Graf"
 
 #: src/WeatherRoutingUI.cpp:1519
 msgid "Hull Type"
-msgstr ""
+msgstr "Typ trupu"
 
 #: src/WeatherRoutingUI.cpp:1523
 msgid "Mono"
@@ -1267,15 +1267,15 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1537
 msgid "Displacement"
-msgstr ""
+msgstr "Výtlak"
 
 #: src/WeatherRoutingUI.cpp:1544
 msgid "tons"
-msgstr ""
+msgstr "tun"
 
 #: src/WeatherRoutingUI.cpp:1548
 msgid "Sail Area"
-msgstr ""
+msgstr "Plocha plachet"
 
 #: src/WeatherRoutingUI.cpp:1555
 msgid "sq/ft"
@@ -1283,7 +1283,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1559
 msgid "Len Water Line (lwl)"
-msgstr ""
+msgstr "Délka na vodorysce (lwl)"
 
 #: src/WeatherRoutingUI.cpp:1566 src/WeatherRoutingUI.cpp:1577
 #: src/WeatherRoutingUI.cpp:1588
@@ -1292,51 +1292,51 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1570
 msgid "Length Over All (loa)"
-msgstr ""
+msgstr "Celková délka (loa)"
 
 #: src/WeatherRoutingUI.cpp:1581
 msgid "Beam"
-msgstr ""
+msgstr "Šířka"
 
 #: src/WeatherRoutingUI.cpp:1603
 msgid "Sail Area Displacement Ratio"
-msgstr ""
+msgstr "Poměr plochy plachet k výtlaku"
 
 #: src/WeatherRoutingUI.cpp:1611
 msgid "Displacement Length Ratio"
-msgstr ""
+msgstr "Poměr výtlaku k délce"
 
 #: src/WeatherRoutingUI.cpp:1619
 msgid "Hull Speed"
-msgstr ""
+msgstr "Rychlost trupu"
 
 #: src/WeatherRoutingUI.cpp:1627
 msgid "Capsize Risk"
-msgstr ""
+msgstr "Ryziko převržení"
 
 #: src/WeatherRoutingUI.cpp:1635
 msgid "Comfort Factor"
-msgstr ""
+msgstr "Faktor pohodlí"
 
 #: src/WeatherRoutingUI.cpp:1653
 msgid "Boat Configuration"
-msgstr ""
+msgstr "Konfigurace lodi"
 
 #: src/WeatherRoutingUI.cpp:1666
 msgid "From File"
-msgstr ""
+msgstr "Ze souboru"
 
 #: src/WeatherRoutingUI.cpp:1666
 msgid "Computed From Sailboat Transform"
-msgstr ""
+msgstr "Vypočítáno ze Sailboat Transform"
 
 #: src/WeatherRoutingUI.cpp:1666
 msgid "Computed From IMS Formula"
-msgstr ""
+msgstr "Vypočítáno ze vzorce IMS"
 
 #: src/WeatherRoutingUI.cpp:1675
 msgid "Polar Computation Sailboat Transform Settings"
-msgstr ""
+msgstr "Nastavení výpočtu Sailboat Transform"
 
 #: src/WeatherRoutingUI.cpp:1705
 msgid "0.25"
@@ -1344,7 +1344,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1712
 msgid "Drag"
-msgstr ""
+msgstr "Snos"
 
 #: src/WeatherRoutingUI.cpp:1719
 msgid "Frictional"
@@ -1356,236 +1356,236 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1733
 msgid "Recompute"
-msgstr ""
+msgstr "Přepočítat"
 
 #: src/WeatherRoutingUI.cpp:1736
 msgid "Info"
-msgstr ""
+msgstr "Info"
 
 #: src/WeatherRoutingUI.cpp:1750
 msgid "Max Pointing Angle Apparent WInd"
-msgstr ""
+msgstr "Maximální úhel stoupání na zdánlivý vítr"
 
 #: src/WeatherRoutingUI.cpp:1757
 msgid "Wing and Wing Running"
-msgstr ""
+msgstr "Na motýla"
 
 #: src/WeatherRoutingUI.cpp:1760
 msgid "Save As CSV"
-msgstr ""
+msgstr "Uložit jako CSV"
 
 #: src/WeatherRoutingUI.cpp:1775
 msgid "Polar Computation IMF Settings"
-msgstr ""
+msgstr "Nastavení polárního výpočtu IMF"
 
 #: src/WeatherRoutingUI.cpp:1782
 msgid "Based on general formula\nSpeed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
-msgstr ""
+msgstr "Založeno na obecném vzorci\nRychlost = 2.62 + 0.066*SA/D poměr + 0.51*LWL stop"
 
 #: src/WeatherRoutingUI.cpp:1792
 msgid "Polar File Settings"
-msgstr ""
+msgstr "Nastavení souboru polárů"
 
 #: src/WeatherRoutingUI.cpp:1800
 msgid "FileName"
-msgstr ""
+msgstr "Název souboru"
 
 #: src/WeatherRoutingUI.cpp:1807
 msgid "Wind Speed Step"
-msgstr ""
+msgstr "Krok rychlosti větru"
 
 #: src/WeatherRoutingUI.cpp:1815
 msgid "Wind Degree Step"
-msgstr ""
+msgstr "Krok úhlu větru"
 
 #: src/WeatherRoutingUI.cpp:1833
 msgid "Sail Plan Polar"
-msgstr ""
+msgstr "Polár konfigurace plachet"
 
 #: src/WeatherRoutingUI.cpp:1845
 msgid "Wind Speed"
-msgstr ""
+msgstr "Rychlost větru"
 
 #: src/WeatherRoutingUI.cpp:1852
 msgid "True"
-msgstr ""
+msgstr "Skutečný"
 
 #: src/WeatherRoutingUI.cpp:1852
 msgid "Apparent"
-msgstr ""
+msgstr "Zdánlivý"
 
 #: src/WeatherRoutingUI.cpp:1866
 msgid "Best Course Up Wind Port Tack"
-msgstr ""
+msgstr "Nejlepší kurs proti větru zleva"
 
 #: src/WeatherRoutingUI.cpp:1874
 msgid "Best Course Up Wind Starboard Tack"
-msgstr ""
+msgstr "Nejlepší kurs proti větru zprava"
 
 #: src/WeatherRoutingUI.cpp:1882
 msgid "Best Course Down Wind Port Tack"
-msgstr ""
+msgstr "Nejlepší kurs po větru zleva"
 
 #: src/WeatherRoutingUI.cpp:1890
 msgid "Best Course Down Wind Starboard Tack"
-msgstr ""
+msgstr "Nejlepší kurs po větru zprava"
 
 #: src/WeatherRoutingUI.cpp:1906
 msgid "Optimize Tacking"
-msgstr ""
+msgstr "Optimalizovat obraty"
 
 #: src/WeatherRoutingUI.cpp:1958
 msgid "Switch Plan Rules"
-msgstr ""
+msgstr "Pravidla změn plachet"
 
 #: src/WeatherRoutingUI.cpp:1976
 msgid "Open"
-msgstr ""
+msgstr "Otevřít"
 
 #: src/WeatherRoutingUI.cpp:1979
 msgid "Save As"
-msgstr ""
+msgstr "Uložit jako"
 
 #: src/WeatherRoutingUI.cpp:1990
 msgid "Save and Close"
-msgstr ""
+msgstr "Uložit a zavřít"
 
 #: src/WeatherRoutingUI.cpp:1993 src/WeatherRoutingUI.cpp:2523
 #: src/WeatherRoutingUI.cpp:3066
 msgid "Close"
-msgstr ""
+msgstr "Zavřít"
 
 #: src/WeatherRoutingUI.cpp:2146
 msgid "Conditions"
-msgstr ""
+msgstr "Podmínky"
 
 #: src/WeatherRoutingUI.cpp:2153
 msgid "Wind Speed >"
-msgstr ""
+msgstr "Rychlost větru >"
 
 #: src/WeatherRoutingUI.cpp:2163
 msgid "Wind Speed <"
-msgstr ""
+msgstr "Rychlost větru <"
 
 #: src/WeatherRoutingUI.cpp:2173
 msgid "Wind Direction >"
-msgstr ""
+msgstr "Směr větru >"
 
 #: src/WeatherRoutingUI.cpp:2183
 msgid "Wind Direction <"
-msgstr ""
+msgstr "Směr větru <"
 
 #: src/WeatherRoutingUI.cpp:2193
 msgid "Wave Height >"
-msgstr ""
+msgstr "Výška vln >"
 
 #: src/WeatherRoutingUI.cpp:2199 src/WeatherRoutingUI.cpp:2209
 msgid "Meters"
-msgstr ""
+msgstr "Metry"
 
 #: src/WeatherRoutingUI.cpp:2203
 msgid "Wave Height <"
-msgstr ""
+msgstr "Výška vln <"
 
 #: src/WeatherRoutingUI.cpp:2232
 msgid "Then Switch to"
-msgstr ""
+msgstr "Pak se přepnout na"
 
 #: src/WeatherRoutingUI.cpp:2244 src/WeatherRoutingUI.cpp:2717
 #: src/WeatherRoutingUI.cpp:3057
 msgid "Information"
-msgstr ""
+msgstr "Informace"
 
 #: src/WeatherRoutingUI.cpp:2247
 msgid "Cancel"
-msgstr ""
+msgstr "Zrušit"
 
 #: src/WeatherRoutingUI.cpp:2250 src/WeatherRoutingUI.cpp:2782
 msgid "Done"
-msgstr ""
+msgstr "Hotovo"
 
 #: src/WeatherRoutingUI.cpp:2305
 msgid "Position"
-msgstr ""
+msgstr "Pozice"
 
 #: src/WeatherRoutingUI.cpp:2312
 msgid "Scale"
-msgstr ""
+msgstr "Měřítko"
 
 #: src/WeatherRoutingUI.cpp:2332 src/WeatherRoutingUI.cpp:2348
 #: src/WeatherRoutingUI.cpp:2364
 msgid "Variable"
-msgstr ""
+msgstr "Proměnná"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Boat Velocity Ground"
-msgstr ""
+msgstr "Rychlost lodi proti dnu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Boat Course Ground"
-msgstr ""
+msgstr "Kurs lodi proti dnu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Boat Velocity Water"
-msgstr ""
+msgstr "Rychlost lodi proti vodě"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Boat Course Water"
-msgstr ""
+msgstr "Kurs lodi proti dnu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Wind Velocity"
-msgstr ""
+msgstr "Rychlost větru"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Wind Course"
-msgstr ""
+msgstr "Kurs větru"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Wind Velocity Ground"
-msgstr ""
+msgstr "Rychlost větru proti dnu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Wind Direction Ground"
-msgstr ""
+msgstr "Směr větru proti dnu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Wind Course Ground"
-msgstr ""
+msgstr "Kurs větru proti dnu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Apparent Wind Velocity"
-msgstr ""
+msgstr "Zdánlivá rychlost větru"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Apparent Wind Direction"
-msgstr ""
+msgstr "Zdánlivý směr větru"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Current Velocity"
-msgstr ""
+msgstr "Rychlost proudu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Current Direction"
-msgstr ""
+msgstr "Směr proudu"
 
 #: src/WeatherRoutingUI.cpp:2338 src/WeatherRoutingUI.cpp:2354
 #: src/WeatherRoutingUI.cpp:2370
 msgid "Sig Wave Height"
-msgstr ""
+msgstr "Signifikantní výška vln"
 
 #: src/WeatherRoutingUI.cpp:2344 src/WeatherRoutingUI.cpp:2360
 #: src/WeatherRoutingUI.cpp:2376
@@ -1594,11 +1594,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2388 src/WeatherRoutingUI.cpp:2581
 msgid "Current Route"
-msgstr ""
+msgstr "Současná trasa"
 
 #: src/WeatherRoutingUI.cpp:2391
 msgid "Cursor Route"
-msgstr ""
+msgstr "Kurzorová trasa"
 
 #: src/WeatherRoutingUI.cpp:2511
 msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\nThis also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\nLicense: GPLv3+\n\nSource Code:\nhttps://github.com/seandepagnier/weather_routing_pi\n\nAuthor:\nSean D'Epagnier\n\nMany thanks to all of the translators and testers."
@@ -1606,24 +1606,24 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2520
 msgid "About Author"
-msgstr ""
+msgstr "O autorovi"
 
 #: src/WeatherRoutingUI.cpp:2559
 msgid "Overall"
-msgstr ""
+msgstr "Celkově"
 
 #: src/WeatherRoutingUI.cpp:2566
 msgid "Run Time"
-msgstr ""
+msgstr "Doba zpracování"
 
 #: src/WeatherRoutingUI.cpp:2596
 msgid "Iso Chrons"
-msgstr ""
+msgstr "Izochrony"
 
 #: src/WeatherRoutingUI.cpp:2604 src/WeatherRoutingUI.cpp:2693
 #: src/WeatherRoutingUI.cpp:3018
 msgid "Routes"
-msgstr ""
+msgstr "Trasy"
 
 #: src/WeatherRoutingUI.cpp:2612
 msgid "InvRoutes"
@@ -1631,133 +1631,133 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2620
 msgid "Skip Positions"
-msgstr ""
+msgstr "Přeskočit pozice"
 
 #: src/WeatherRoutingUI.cpp:2674
 msgid "Current Configuration"
-msgstr ""
+msgstr "Konfigurace proudu"
 
 #: src/WeatherRoutingUI.cpp:2755
 msgid "Category"
-msgstr ""
+msgstr "Kategorie"
 
 #: src/WeatherRoutingUI.cpp:2766
 msgid "Filter"
-msgstr ""
+msgstr "Filtr"
 
 #: src/WeatherRoutingUI.cpp:2779
 msgid "Reset All"
-msgstr ""
+msgstr "Resetovat vše"
 
 #: src/WeatherRoutingUI.cpp:2835
 msgid "Starting"
-msgstr ""
+msgstr "Spouštění"
 
 #: src/WeatherRoutingUI.cpp:2846
 msgid "For"
-msgstr ""
+msgstr "pro"
 
 #: src/WeatherRoutingUI.cpp:2853 src/WeatherRoutingUI.cpp:2874
 msgid "day(s)"
-msgstr ""
+msgstr "dny"
 
 #: src/WeatherRoutingUI.cpp:2863
 msgid "hour(s)"
-msgstr ""
+msgstr "hodin(y)"
 
 #: src/WeatherRoutingUI.cpp:2867
 msgid "Spaced"
-msgstr ""
+msgstr "Rozložený"
 
 #: src/WeatherRoutingUI.cpp:2884
 msgid "Hour(s)"
-msgstr ""
+msgstr "Hodin(y)"
 
 #: src/WeatherRoutingUI.cpp:2896
 msgid "Once"
-msgstr ""
+msgstr "Jednou"
 
 #: src/WeatherRoutingUI.cpp:2899
 msgid "Daily"
-msgstr ""
+msgstr "Denně"
 
 #: src/WeatherRoutingUI.cpp:2902
 msgid "Weekly"
-msgstr ""
+msgstr "Týdně"
 
 #: src/WeatherRoutingUI.cpp:2905
 msgid "Monthly"
-msgstr ""
+msgstr "Měsíčně"
 
 #: src/WeatherRoutingUI.cpp:2925
 msgid "Sources"
-msgstr ""
+msgstr "Zdroje"
 
 #: src/WeatherRoutingUI.cpp:2949
 msgid "Destinations"
-msgstr ""
+msgstr "Destinace"
 
 #: src/WeatherRoutingUI.cpp:2970
 msgid "Auto Connect"
-msgstr ""
+msgstr "Automatické připojení"
 
 #: src/WeatherRoutingUI.cpp:2977
 msgid "Within"
-msgstr ""
+msgstr "Mezi"
 
 #: src/WeatherRoutingUI.cpp:2984
 msgid "Nautical Miles"
-msgstr ""
+msgstr "Námořní míle"
 
 #: src/WeatherRoutingUI.cpp:2988
 msgid "Connect"
-msgstr ""
+msgstr "Připojit"
 
 #: src/WeatherRoutingUI.cpp:3002
 msgid "Disconnect All"
-msgstr ""
+msgstr "Odpojit všechny"
 
 #: src/WeatherRoutingUI.cpp:3048
 msgid "Boats"
-msgstr ""
+msgstr "Lodě"
 
 #: src/WeatherRoutingUI.cpp:3060
 msgid "Reset"
-msgstr ""
+msgstr "Obnovit výchozí"
 
 #: src/WeatherRoutingUI.h:175
 msgid "Weather Routing Settings"
-msgstr ""
+msgstr "Nastavení Weather routingu"
 
 #: src/WeatherRoutingUI.h:284
 msgid "Weather Routing Configuration"
-msgstr ""
+msgstr "Nastavení Weather routingu"
 
 #: src/WeatherRoutingUI.h:480
 msgid "Switch Sail Plan Configuration"
-msgstr ""
+msgstr "Nastavení změn konfigurace plachet"
 
 #: src/WeatherRoutingUI.h:523
 msgid "Weather Route Plot"
-msgstr ""
+msgstr "Vykresleni trasy"
 
 #: src/WeatherRoutingUI.h:547
 msgid "About Weather Routing"
-msgstr ""
+msgstr "O Weather routingu"
 
 #: src/WeatherRoutingUI.h:579
 msgid "Weather Routing Statistics"
-msgstr ""
+msgstr "Statistiky Weather routingu"
 
 #: src/WeatherRoutingUI.h:604
 msgid "Weather Route Report"
-msgstr ""
+msgstr "Report naplánované trasy"
 
 #: src/WeatherRoutingUI.h:631
 msgid "Filter Routes"
-msgstr ""
+msgstr "Filtrovat trasy"
 
 #: src/WeatherRoutingUI.h:698
 msgid "Weather Routing Configuration Batch"
-msgstr ""
+msgstr "Dávka nastavení Weather routingu"
 

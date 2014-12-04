@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-27 16:01-0600\n"
-"PO-Revision-Date: 2014-11-27 17:02-0500\n"
+"POT-Creation-Date: 2014-12-04 09:36-0600\n"
+"PO-Revision-Date: 2014-12-04 10:38-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -723,7 +723,7 @@ msgstr "Compiler"
 
 #: src/WeatherRoutingUI.cpp:71
 msgid "&Export"
-msgstr ""
+msgstr "Exporter"
 
 #: src/WeatherRoutingUI.cpp:97
 msgid "&Open"
@@ -835,7 +835,7 @@ msgstr "Information"
 
 #: src/WeatherRoutingUI.cpp:207
 msgid "&Manual"
-msgstr ""
+msgstr "Manuel"
 
 #: src/WeatherRoutingUI.cpp:211
 msgid "&About"
