@@ -147,31 +147,35 @@ INCLUDE(CPack)
 
 
 IF(APPLE)
-#  SET(CPACK_GENERATOR "Bundle")
-#  SET(CPACK_PACKAGE_FILE_NAME "${PACKAGE_NAME}_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
-#  SET(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/buildosx/opencpn.icns")
-#  SET(CPACK_BUNDLE_NAME "${PACKAGE_NAME}_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" )
-#  SET(CPACK_BUNDLE_ICON "${PROJECT_SOURCE_DIR}/buildosx/opencpn.icns")
-#  SET(CPACK_BUNDLE_PLIST "${PROJECT_SOURCE_DIR}/buildosx/Info.plist")
 
-#  SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/buildosx/README.txt")
-#  SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/buildosx/README.txt")
+ #  Copy a bunch of files so the Packages installer builder can find them
+ #  relative to ${CMAKE_CURRENT_BINARY_DIR}
+ #  This avoids absolute paths in the wmm.pkgproj file
 
-#  SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
+configure_file(${PROJECT_SOURCE_DIR}/cmake/gpl.txt
+            ${CMAKE_CURRENT_BINARY_DIR}/license.txt COPYONLY)
 
-ENDIF(APPLE)
+configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/pkg_background.jpg
+            ${CMAKE_CURRENT_BINARY_DIR}/pkg_background.jpg COPYONLY)
 
+ # Patch the pkgproj.in file to make the output package name conform to Xxx-Plugin_x.x.pkg format
+ #  Key is:
+ #  <key>NAME</key>
+ #  <string>${VERBOSE_NAME}-Plugin_${VERSION_MAJOR}.${VERSION_MINOR}</string>
 
-IF(APPLE)
+ configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/${PACKAGE_NAME}.pkgproj.in
+            ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}.pkgproj)
 
  ADD_CUSTOM_COMMAND(
-   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.dmg
-   COMMAND ${PROJECT_SOURCE_DIR}/buildosx/create-dmg ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.dmg ${CMAKE_INSTALL_PREFIX}/${PACKAGE_NAME}/
-   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-   COMMENT "create-dmg [${PACKAGE_NAME}]: Generated dmg file."
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}-Plugin.pkg
+   COMMAND /usr/local/bin/packagesbuild -F ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}.pkgproj
+   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+   DEPENDS ${PACKAGE_NAME}
+   COMMENT "create-pkg [${PACKAGE_NAME}]: Generating pkg file."
 )
 
- ADD_CUSTOM_TARGET(create-dmg COMMENT "create-dmg: Done."
- DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.dmg)
+ ADD_CUSTOM_TARGET(create-pkg COMMENT "create-pkg: Done."
+ DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}-Plugin.pkg )
+
 
 ENDIF(APPLE)
