@@ -90,6 +90,60 @@ if(GETTEXT_MSGFMT_EXECUTABLE)
   ADD_DEPENDENCIES(${PACKAGE_NAME} ${I18N_NAME}-i18n)
 ENDIF(GETTEXT_MSGFMT_EXECUTABLE)
 
+IF(APPLE)
+SET(_txtFiles)
+MACRO(GETTEXT_BUILD_TXT)
+  FOREACH (_txtFile ${ARGN})
+    GET_FILENAME_COMPONENT(_absFile ${_txtFile} ABSOLUTE)
+    GET_FILENAME_COMPONENT(_txtBasename ${_absFile} NAME)
+    SET(_txtFile ${CMAKE_CURRENT_BINARY_DIR}/${_txtBasename})
+
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${_txtFile}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_absFile} "SharedSupport/plugins/${PACKAGE_NAME}/data/${_txtBasename}"
+      DEPENDS ${_absFile}
+      COMMENT "Textfile [${_txtBasename}]: Created data file."
+      )
+
+
+    SET(_txtFiles ${_txtFiles} ${_txtFile})
+  ENDFOREACH (_txtFile )
+ENDMACRO(GETTEXT_BUILD_TXT)
+
+if(GETTEXT_MSGFMT_EXECUTABLE)
+  FILE(GLOB PACKAGE_TXT_FILES data/*)
+  GETTEXT_BUILD_TXT(${PACKAGE_TXT_FILES})
+  ADD_CUSTOM_TARGET(${I18N_NAME}-txt COMMENT "${PACKAGE_NAME}-txt: Done." DEPENDS ${_txtFiles})
+  ADD_DEPENDENCIES(${PACKAGE_NAME} ${I18N_NAME}-txt)
+ENDIF(GETTEXT_MSGFMT_EXECUTABLE)
+
+SET(_txt2Files)
+MACRO(GETTEXT_BUILD_TXT2)
+  FOREACH (_txt2File ${ARGN})
+    GET_FILENAME_COMPONENT(_abs2File ${_txt2File} ABSOLUTE)
+    GET_FILENAME_COMPONENT(_txt2Basename ${_abs2File} NAME)
+    SET(_txt2File ${CMAKE_CURRENT_BINARY_DIR}/${_txt2Basename})
+
+    ADD_CUSTOM_COMMAND(
+      OUTPUT ${_txt2File}
+      COMMAND ${CMAKE_COMMAND} -E copy ${_abs2File} "SharedSupport/plugins/${PACKAGE_NAME}/data/polars/${_txt2Basename}"
+      DEPENDS ${_abs2File}
+      COMMENT "Textfile [${_txt2Basename}]: Created data file."
+      )
+
+
+    SET(_txt2Files ${_txt2Files} ${_txt2File})
+  ENDFOREACH (_txt2File )
+ENDMACRO(GETTEXT_BUILD_TXT2)
+
+if(GETTEXT_MSGFMT_EXECUTABLE)
+  FILE(GLOB PACKAGE_TXT2_FILES data/polars/*)
+  GETTEXT_BUILD_TXT2(${PACKAGE_TXT2_FILES})
+  ADD_CUSTOM_TARGET(${I18N_NAME}-txt2 COMMENT "${PACKAGE_NAME}-txt2: Done." DEPENDS ${_txt2Files})
+  ADD_DEPENDENCIES(${PACKAGE_NAME} ${I18N_NAME}-txt2)
+ENDIF(GETTEXT_MSGFMT_EXECUTABLE)
+ENDIF(APPLE)
+
 IF(WIN32)
   FIND_PROGRAM(ZIP_EXECUTABLE wzzip PATHS "$ENV{ProgramFiles}/WinZip")
   IF(ZIP_EXECUTABLE)
