@@ -27,14 +27,12 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
 #  IF NOT DEBUGGING CFLAGS="-O2 -march=native"
 IF(NOT MSVC)
-#    ADD_DEFINITIONS( " -pg " )
-#    SET(CMAKE_EXE_LINKER_FLAGS -pg) # must build opencpn with -pg
-   # SET(CMAKE_SHARED_LINKER_FLAGS -pg) # must build opencpn with -pg
-
  IF(PROFILING)
-  ADD_DEFINITIONS( "-fprofile-arcs -ftest-coverage" )
+  ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
+ ELSE(PROFILING)
+#  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
+ ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -O2 -fexceptions" )
  ENDIF(PROFILING)
- ADD_DEFINITIONS( "-Wall -g -O0 -fexceptions" )
 
  IF(NOT APPLE)
   SET(CMAKE_SHARED_LINKER_FLAGS "-Wl,-Bsymbolic")

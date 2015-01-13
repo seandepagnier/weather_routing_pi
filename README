@@ -18,6 +18,13 @@ Build as normally:
 * make
 * make install
 
+For OSX standalone build in weather_routing_pi directory:
+* mkdir build
+* cd build
+* cmake ..
+* make
+* make create-pkg
+
 License
 =======
 The plugin code is licensed under the terms of the GPL v3+
