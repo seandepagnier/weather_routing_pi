@@ -770,7 +770,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ft_mono.pol</string>
+																							<string>../data/polars/60ft_mono.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -786,7 +786,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ft_multi_1.pol</string>
+																							<string>../data/polars/60ft_multi_1.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -802,7 +802,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ft_multi_2.pol</string>
+																							<string>../data/polars/60ft_multi_2.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -818,7 +818,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ft_multi_3.pol</string>
+																							<string>../data/polars/60ft_multi_3.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -834,7 +834,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ftmono.pol</string>
+																							<string>../data/polars/60ftmono.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -850,7 +850,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ftmulti_1.pol</string>
+																							<string>../data/polars/60ftmulti_1.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -866,7 +866,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ftmulti_2.pol</string>
+																							<string>../data/polars/60ftmulti_2.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -882,7 +882,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/60ftmulti_3.pol</string>
+																							<string>../data/polars/60ftmulti_3.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -898,7 +898,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Alberg35.pol</string>
+																							<string>../data/polars/Alberg35.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -914,7 +914,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Albin_Express.txt</string>
+																							<string>../data/polars/Albin_Express.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -930,7 +930,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Alden52.pol</string>
+																							<string>../data/polars/Alden52.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -946,7 +946,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/arcona400.txt</string>
+																							<string>../data/polars/arcona400.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -962,7 +962,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/arcona460.txt</string>
+																							<string>../data/polars/arcona460.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -978,7 +978,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/BAVARIA_38_MATCH.txt</string>
+																							<string>../data/polars/BAVARIA_38_MATCH.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -994,7 +994,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Beneteau375.pol</string>
+																							<string>../data/polars/Beneteau375.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1010,7 +1010,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Beneteau421.pol</string>
+																							<string>../data/polars/Beneteau421.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1026,7 +1026,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/BENETEAU_44.7.txt</string>
+																							<string>../data/polars/BENETEAU_44.7.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1042,7 +1042,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Beowulf78.pol</string>
+																							<string>../data/polars/Beowulf78.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1058,7 +1058,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/beowulf_78.pol</string>
+																							<string>../data/polars/beowulf_78.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1074,7 +1074,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/BlockIsland40.pol</string>
+																							<string>../data/polars/BlockIsland40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1090,7 +1090,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Boat-C5.pol</string>
+																							<string>../data/polars/Boat-C5.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1106,7 +1106,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_A35.csv</string>
+																							<string>../data/polars/boat_A35.csv</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1122,7 +1122,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_A35.pol</string>
+																							<string>../data/polars/boat_A35.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1138,7 +1138,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_Bristol32-140Jib-Spin.csv</string>
+																							<string>../data/polars/boat_Bristol32-140Jib-Spin.csv</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1154,7 +1154,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_Bristol32-140Jib.csv</string>
+																							<string>../data/polars/boat_Bristol32-140Jib.csv</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1170,7 +1170,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_Bristol32.csv</string>
+																							<string>../data/polars/boat_Bristol32.csv</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1186,7 +1186,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_Class40.pol</string>
+																							<string>../data/polars/boat_Class40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1202,7 +1202,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_figaro2.pol</string>
+																							<string>../data/polars/boat_figaro2.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1218,7 +1218,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_Hi5.pol</string>
+																							<string>../data/polars/boat_Hi5.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1234,7 +1234,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_Imoca.pol</string>
+																							<string>../data/polars/boat_Imoca.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1250,7 +1250,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_imoca2007.pol</string>
+																							<string>../data/polars/boat_imoca2007.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1266,7 +1266,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/boat_Imoca_2008.pol</string>
+																							<string>../data/polars/boat_Imoca_2008.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1282,7 +1282,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Boat_OceanExpress.pol</string>
+																							<string>../data/polars/Boat_OceanExpress.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1298,7 +1298,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/BountyII.pol</string>
+																							<string>../data/polars/BountyII.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1314,7 +1314,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/C_C34.pol</string>
+																							<string>../data/polars/C_C34.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1330,7 +1330,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/C_C372.pol</string>
+																							<string>../data/polars/C_C372.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1346,7 +1346,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/C_C402.pol</string>
+																							<string>../data/polars/C_C402.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1362,7 +1362,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/C_C44.pol</string>
+																							<string>../data/polars/C_C44.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1378,7 +1378,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Cal2-46.pol</string>
+																							<string>../data/polars/Cal2-46.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1394,7 +1394,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Cal239.pol</string>
+																							<string>../data/polars/Cal239.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1410,7 +1410,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Cal36.pol</string>
+																							<string>../data/polars/Cal36.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1426,7 +1426,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Cal40.pol</string>
+																							<string>../data/polars/Cal40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1442,7 +1442,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Catalina36.pol</string>
+																							<string>../data/polars/Catalina36.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1458,7 +1458,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Catalina36a.pol</string>
+																							<string>../data/polars/Catalina36a.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1474,7 +1474,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Centurion47.pol</string>
+																							<string>../data/polars/Centurion47.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1490,7 +1490,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/centurion_47.pol</string>
+																							<string>../data/polars/centurion_47.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1506,7 +1506,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Cheoy_Lee44.pol</string>
+																							<string>../data/polars/Cheoy_Lee44.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1522,7 +1522,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Colombia43.pol</string>
+																							<string>../data/polars/Colombia43.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1538,7 +1538,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Colombia50.pol</string>
+																							<string>../data/polars/Colombia50.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1554,7 +1554,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/COMFORTINA_38.txt</string>
+																							<string>../data/polars/COMFORTINA_38.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1570,7 +1570,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Contessa33.pol</string>
+																							<string>../data/polars/Contessa33.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1586,7 +1586,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Crealock34.pol</string>
+																							<string>../data/polars/Crealock34.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1602,7 +1602,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Deerfoot2_62.pol</string>
+																							<string>../data/polars/Deerfoot2_62.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1618,7 +1618,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Deerfoot62.pol</string>
+																							<string>../data/polars/Deerfoot62.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1634,7 +1634,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Deerfoot64K.pol</string>
+																							<string>../data/polars/Deerfoot64K.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1650,7 +1650,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/deerfoot_2_62.pol</string>
+																							<string>../data/polars/deerfoot_2_62.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1666,7 +1666,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/deerfoot_62.pol</string>
+																							<string>../data/polars/deerfoot_62.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1682,7 +1682,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/deerfoot_64k.pol</string>
+																							<string>../data/polars/deerfoot_64k.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1698,7 +1698,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Deerfoot_74.pol</string>
+																							<string>../data/polars/Deerfoot_74.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1714,7 +1714,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/DEHLER_33.txt</string>
+																							<string>../data/polars/DEHLER_33.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1730,7 +1730,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/DEHLER_36.txt</string>
+																							<string>../data/polars/DEHLER_36.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1746,7 +1746,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/DEHLER_44.txt</string>
+																							<string>../data/polars/DEHLER_44.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1762,7 +1762,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/DIVA_35.txt</string>
+																							<string>../data/polars/DIVA_35.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1778,7 +1778,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/DUFOUR_34.txt</string>
+																							<string>../data/polars/DUFOUR_34.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1794,7 +1794,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/dynamic_3000.txt</string>
+																							<string>../data/polars/dynamic_3000.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1810,7 +1810,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Endeavor40.pol</string>
+																							<string>../data/polars/Endeavor40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1826,7 +1826,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Erickson29.pol</string>
+																							<string>../data/polars/Erickson29.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1842,7 +1842,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Express37.pol</string>
+																							<string>../data/polars/Express37.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1858,7 +1858,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/FACIL_30.txt</string>
+																							<string>../data/polars/FACIL_30.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1874,7 +1874,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Farr40.pol</string>
+																							<string>../data/polars/Farr40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1890,7 +1890,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Farr_39CR.pol</string>
+																							<string>../data/polars/Farr_39CR.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1906,7 +1906,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/FARR_40.txt</string>
+																							<string>../data/polars/FARR_40.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1922,7 +1922,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Figaro1.pol</string>
+																							<string>../data/polars/Figaro1.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1938,7 +1938,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Figaro2.pol</string>
+																							<string>../data/polars/Figaro2.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1954,7 +1954,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/figaro_1.pol</string>
+																							<string>../data/polars/figaro_1.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1970,7 +1970,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/figaro_2.pol</string>
+																							<string>../data/polars/figaro_2.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -1986,7 +1986,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/FINNGULF_33.txt</string>
+																							<string>../data/polars/FINNGULF_33.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2002,7 +2002,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Freedom44CB.pol</string>
+																							<string>../data/polars/Freedom44CB.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2018,7 +2018,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/GRAND_SOLEiL_341.txt</string>
+																							<string>../data/polars/GRAND_SOLEiL_341.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2034,7 +2034,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/GRAND_SOLEIL_37.txt</string>
+																							<string>../data/polars/GRAND_SOLEIL_37.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2050,7 +2050,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/GRAND_SOLEiL_40.txt</string>
+																							<string>../data/polars/GRAND_SOLEiL_40.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2066,7 +2066,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Gulfstar44.pol</string>
+																							<string>../data/polars/Gulfstar44.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2082,7 +2082,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Gulfstar50.pol</string>
+																							<string>../data/polars/Gulfstar50.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2098,7 +2098,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/hanse_400.txt</string>
+																							<string>../data/polars/hanse_400.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2114,7 +2114,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Hinckley50.pol</string>
+																							<string>../data/polars/Hinckley50.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2130,7 +2130,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/HR382_v1.pol</string>
+																							<string>../data/polars/HR382_v1.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2146,7 +2146,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Hunter375.pol</string>
+																							<string>../data/polars/Hunter375.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2162,7 +2162,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Hylas54.pol</string>
+																							<string>../data/polars/Hylas54.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2178,7 +2178,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/IMX_38.txt</string>
+																							<string>../data/polars/IMX_38.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2194,7 +2194,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Irwin40.pol</string>
+																							<string>../data/polars/Irwin40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2210,7 +2210,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Irwin54.pol</string>
+																							<string>../data/polars/Irwin54.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2226,7 +2226,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Islander36.pol</string>
+																							<string>../data/polars/Islander36.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2242,7 +2242,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/J130.pol</string>
+																							<string>../data/polars/J130.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2258,7 +2258,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/J34C.pol</string>
+																							<string>../data/polars/J34C.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2274,7 +2274,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/J40.pol</string>
+																							<string>../data/polars/J40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2290,7 +2290,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Jeanceau41.pol</string>
+																							<string>../data/polars/Jeanceau41.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2306,7 +2306,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Linjett_33.txt</string>
+																							<string>../data/polars/Linjett_33.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2322,7 +2322,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Linjett_40.txt</string>
+																							<string>../data/polars/Linjett_40.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2338,7 +2338,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Little_Hrb50.pol</string>
+																							<string>../data/polars/Little_Hrb50.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2354,7 +2354,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Little_Hrb63.pol</string>
+																							<string>../data/polars/Little_Hrb63.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2370,7 +2370,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Little_Hrb_48.pol</string>
+																							<string>../data/polars/Little_Hrb_48.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2386,7 +2386,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Morgan41.pol</string>
+																							<string>../data/polars/Morgan41.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2402,7 +2402,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Mumm30.pol</string>
+																							<string>../data/polars/Mumm30.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2418,7 +2418,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/mumm_30.pol</string>
+																							<string>../data/polars/mumm_30.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2434,7 +2434,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Mumm_30.txt</string>
+																							<string>../data/polars/Mumm_30.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2450,7 +2450,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Mumm_36.txt</string>
+																							<string>../data/polars/Mumm_36.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2466,7 +2466,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Navy44.pol</string>
+																							<string>../data/polars/Navy44.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2482,7 +2482,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Newport41.pol</string>
+																							<string>../data/polars/Newport41.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2498,7 +2498,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Norseman447.pol</string>
+																							<string>../data/polars/Norseman447.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2514,7 +2514,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/omega34.txt</string>
+																							<string>../data/polars/omega34.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2530,7 +2530,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Passport41.pol</string>
+																							<string>../data/polars/Passport41.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2546,7 +2546,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Pearson33.pol</string>
+																							<string>../data/polars/Pearson33.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2562,7 +2562,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Peterson44.pol</string>
+																							<string>../data/polars/Peterson44.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2578,26 +2578,10 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/polars</string>
+																							<string>../data/polars/Ranger37.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
-																							<integer>493</integer>
-																							<key>TYPE</key>
-																							<integer>3</integer>
-																							<key>UID</key>
-																							<integer>0</integer>
-																						</dict>
-																						<dict>
-																							<key>CHILDREN</key>
-																							<array/>
-																							<key>GID</key>
-																							<integer>80</integer>
-																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Ranger37.pol</string>
-																							<key>PATH_TYPE</key>
-																							<integer>3</integer>
-																							<key>PERMISSIONS</key>
 																							<integer>420</integer>
 																							<key>TYPE</key>
 																							<integer>3</integer>
@@ -2610,7 +2594,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Sabre362.pol</string>
+																							<string>../data/polars/Sabre362.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2626,7 +2610,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Sabre402.pol</string>
+																							<string>../data/polars/Sabre402.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2642,7 +2626,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/SantaCruz70.pol</string>
+																							<string>../data/polars/SantaCruz70.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2658,7 +2642,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Santana35.pol</string>
+																							<string>../data/polars/Santana35.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2674,7 +2658,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/scanmar_33.txt</string>
+																							<string>../data/polars/scanmar_33.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2690,7 +2674,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Shannon38-Rick.pol</string>
+																							<string>../data/polars/Shannon38-Rick.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2706,7 +2690,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Shock35.pol</string>
+																							<string>../data/polars/Shock35.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2722,7 +2706,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/small_polar.pol</string>
+																							<string>../data/polars/small_polar.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2738,7 +2722,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Sundeer64K.pol</string>
+																							<string>../data/polars/Sundeer64K.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2754,7 +2738,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Swan391.pol</string>
+																							<string>../data/polars/Swan391.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2770,7 +2754,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Swan46.pol</string>
+																							<string>../data/polars/Swan46.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2786,7 +2770,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Swan46CB.pol</string>
+																							<string>../data/polars/Swan46CB.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2802,7 +2786,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Swan60.pol</string>
+																							<string>../data/polars/Swan60.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2818,7 +2802,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Swan_37.txt</string>
+																							<string>../data/polars/Swan_37.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2834,7 +2818,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Tartan37.pol</string>
+																							<string>../data/polars/Tartan37.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2850,7 +2834,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Tartan40.pol</string>
+																							<string>../data/polars/Tartan40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2866,7 +2850,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Tartan41.pol</string>
+																							<string>../data/polars/Tartan41.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2882,7 +2866,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Tayana37.pol</string>
+																							<string>../data/polars/Tayana37.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2898,7 +2882,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Tayana42.pol</string>
+																							<string>../data/polars/Tayana42.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2914,7 +2898,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Tayana52.pol</string>
+																							<string>../data/polars/Tayana52.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2930,7 +2914,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Valiant40.pol</string>
+																							<string>../data/polars/Valiant40.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2946,7 +2930,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Valiant47.pol</string>
+																							<string>../data/polars/Valiant47.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2962,7 +2946,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Volvo_70.txt</string>
+																							<string>../data/polars/Volvo_70.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2978,7 +2962,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/X41.txt</string>
+																							<string>../data/polars/X41.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -2994,7 +2978,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/X_332.txt</string>
+																							<string>../data/polars/X_332.txt</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -3010,7 +2994,7 @@
 																							<key>GID</key>
 																							<integer>80</integer>
 																							<key>PATH</key>
-																							<string>SharedSupport/plugins/${PACKAGE_NAME}/data/polars/Yankee38.pol</string>
+																							<string>../data/polars/Yankee38.pol</string>
 																							<key>PATH_TYPE</key>
 																							<integer>3</integer>
 																							<key>PERMISSIONS</key>
@@ -3040,7 +3024,7 @@
 																					<key>GID</key>
 																					<integer>80</integer>
 																					<key>PATH</key>
-																					<string>SharedSupport/plugins/${PACKAGE_NAME}/data/WeatherRoutingInformation.html</string>
+																					<string>../data/WeatherRoutingInformation.html</string>
 																					<key>PATH_TYPE</key>
 																					<integer>3</integer>
 																					<key>PERMISSIONS</key>
