@@ -378,7 +378,7 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_cbAlternatesForAll = new wxCheckBox( this, wxID_ANY, _("Alternates for all IsoChrons"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_cbAlternatesForAll, 0, wxALL, 5 );
 	
-	m_cbSquaresAtSailChanges = new wxCheckBox( this, wxID_ANY, _("Squares at Sail Changes"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbSquaresAtSailChanges = new wxCheckBox( this, wxID_ANY, _("Display mark when Sail Plan changes"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_cbSquaresAtSailChanges->SetValue(true); 
 	fgSizer82->Add( m_cbSquaresAtSailChanges, 0, wxALL, 5 );
 	
@@ -1235,12 +1235,22 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 
 BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxSize( -1,-1 ), wxDefaultSize );
+	this->SetSizeHints( wxSize( 640,800 ), wxDefaultSize );
 	
+	wxFlexGridSizer* fgSizer105;
+	fgSizer105 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer105->AddGrowableCol( 0 );
+	fgSizer105->AddGrowableRow( 0 );
+	fgSizer105->SetFlexibleDirection( wxBOTH );
+	fgSizer105->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_scrolledWindow4 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxVSCROLL );
+	m_scrolledWindow4->SetScrollRate( 5, 5 );
 	wxFlexGridSizer* fgSizer3;
 	fgSizer3 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer3->AddGrowableCol( 0 );
 	fgSizer3->AddGrowableRow( 0 );
+	fgSizer3->AddGrowableRow( 1 );
 	fgSizer3->SetFlexibleDirection( wxBOTH );
 	fgSizer3->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -1252,7 +1262,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* sbSizer31;
-	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Sail Plans") ), wxVERTICAL );
+	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow4, wxID_ANY, _("Sail Plans") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer92;
 	fgSizer92 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1260,7 +1270,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer92->SetFlexibleDirection( wxBOTH );
 	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_lBoatPlans = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxLC_EDIT_LABELS|wxLC_REPORT|wxLC_SINGLE_SEL );
+	m_lBoatPlans = new wxListCtrl( m_scrolledWindow4, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxLC_EDIT_LABELS|wxLC_REPORT|wxLC_SINGLE_SEL );
 	fgSizer92->Add( m_lBoatPlans, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer40;
@@ -1268,10 +1278,10 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer40->SetFlexibleDirection( wxBOTH );
 	fgSizer40->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_bNewBoatPlan = new wxButton( this, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bNewBoatPlan = new wxButton( m_scrolledWindow4, wxID_ANY, _("New"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer40->Add( m_bNewBoatPlan, 0, wxALL, 5 );
 	
-	m_bDeleteBoatPlan = new wxButton( this, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bDeleteBoatPlan = new wxButton( m_scrolledWindow4, wxID_ANY, _("Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer40->Add( m_bDeleteBoatPlan, 0, wxALL, 5 );
 	
 	
@@ -1283,9 +1293,9 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer91->Add( sbSizer31, 1, wxEXPAND, 5 );
 	
-	m_PlotWindow = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_PlotWindow = new wxScrolledWindow( m_scrolledWindow4, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
 	m_PlotWindow->SetScrollRate( 5, 5 );
-	m_PlotWindow->SetMinSize( wxSize( -1,300 ) );
+	m_PlotWindow->SetMinSize( wxSize( -1,250 ) );
 	
 	fgSizer91->Add( m_PlotWindow, 1, wxEXPAND | wxALL, 5 );
 	
@@ -1295,10 +1305,23 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	wxFlexGridSizer* fgSizer12;
 	fgSizer12 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer12->AddGrowableCol( 0 );
+	fgSizer12->AddGrowableRow( 0 );
 	fgSizer12->SetFlexibleDirection( wxBOTH );
 	fgSizer12->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_nNotebook = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_scrolledWindow5 = new wxScrolledWindow( m_scrolledWindow4, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxVSCROLL );
+	m_scrolledWindow5->SetScrollRate( 5, 5 );
+	m_scrolledWindow5->SetMinSize( wxSize( -1,180 ) );
+	m_scrolledWindow5->SetMaxSize( wxSize( -1,360 ) );
+	
+	wxFlexGridSizer* fgSizer107;
+	fgSizer107 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer107->AddGrowableCol( 0 );
+	fgSizer107->AddGrowableRow( 0 );
+	fgSizer107->SetFlexibleDirection( wxBOTH );
+	fgSizer107->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_nNotebook = new wxNotebook( m_scrolledWindow5, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_panel3 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer18;
 	fgSizer18 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1957,7 +1980,13 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer45->Fit( m_panel10 );
 	m_nNotebook->AddPage( m_panel10, _("Switch Plan Rules"), false );
 	
-	fgSizer12->Add( m_nNotebook, 1, wxEXPAND | wxALL, 5 );
+	fgSizer107->Add( m_nNotebook, 1, wxEXPAND | wxALL, 5 );
+	
+	
+	m_scrolledWindow5->SetSizer( fgSizer107 );
+	m_scrolledWindow5->Layout();
+	fgSizer107->Fit( m_scrolledWindow5 );
+	fgSizer12->Add( m_scrolledWindow5, 1, wxEXPAND | wxALL, 5 );
 	
 	
 	fgSizer3->Add( fgSizer12, 1, wxEXPAND, 5 );
@@ -1973,10 +2002,10 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer88->SetFlexibleDirection( wxBOTH );
 	fgSizer88->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_bOpen = new wxButton( this, wxID_ANY, _("Open"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bOpen = new wxButton( m_scrolledWindow4, wxID_ANY, _("Open"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer88->Add( m_bOpen, 0, wxALL, 5 );
 	
-	m_bSaveAs = new wxButton( this, wxID_ANY, _("Save As"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bSaveAs = new wxButton( m_scrolledWindow4, wxID_ANY, _("Save As"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer88->Add( m_bSaveAs, 0, wxALL, 5 );
 	
 	
@@ -1987,10 +2016,10 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer89->SetFlexibleDirection( wxBOTH );
 	fgSizer89->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_bSaveandClose = new wxButton( this, wxID_ANY, _("Save and Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bSaveandClose = new wxButton( m_scrolledWindow4, wxID_ANY, _("Save and Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer89->Add( m_bSaveandClose, 0, wxALL, 5 );
 	
-	m_bClose = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bClose = new wxButton( m_scrolledWindow4, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer89->Add( m_bClose, 0, wxALL, 5 );
 	
 	
@@ -2000,9 +2029,15 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer3->Add( fgSizer94, 1, wxEXPAND, 5 );
 	
 	
-	this->SetSizer( fgSizer3 );
+	m_scrolledWindow4->SetSizer( fgSizer3 );
+	m_scrolledWindow4->Layout();
+	fgSizer3->Fit( m_scrolledWindow4 );
+	fgSizer105->Add( m_scrolledWindow4, 1, wxEXPAND | wxALL, 5 );
+	
+	
+	this->SetSizer( fgSizer105 );
 	this->Layout();
-	fgSizer3->Fit( this );
+	fgSizer105->Fit( this );
 	
 	this->Centre( wxBOTH );
 	

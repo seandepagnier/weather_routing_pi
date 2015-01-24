@@ -294,10 +294,12 @@ class BoatDialogBase : public wxDialog
 	private:
 	
 	protected:
+		wxScrolledWindow* m_scrolledWindow4;
 		wxListCtrl* m_lBoatPlans;
 		wxButton* m_bNewBoatPlan;
 		wxButton* m_bDeleteBoatPlan;
 		wxScrolledWindow* m_PlotWindow;
+		wxScrolledWindow* m_scrolledWindow5;
 		wxNotebook* m_nNotebook;
 		wxPanel* m_panel3;
 		wxListbook* m_lPlotType;

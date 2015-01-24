@@ -45,6 +45,14 @@ static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
 BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     : BoatDialogBase(parent), m_boatpath(boatpath), m_PlotScale(0)
 {
+    // for small screens: don't let boat dialog be larger than screen
+    int w,h;
+    wxDisplaySize( &w, &h );
+    w = wxMin(w, GetMinWidth());
+    h = wxMin(h-32, GetMinHeight());
+    SetMinSize(wxSize(w/2, h/2)); // allow to half normal dimensions
+    SetSize(wxSize(w, h));
+
     m_SelectedSailPlan = 0;
 
     m_lBoatPlans->InsertColumn(spNAME, _("Name"));
@@ -66,10 +74,11 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     UpdateVMG();
     UpdateStats();
 
-    Fit();
-
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+
+    // hack to adjust items
+    SetSize(wxSize(w, h));
 }
 
 void BoatDialog::OnMouseEventsPlot( wxMouseEvent& event )
