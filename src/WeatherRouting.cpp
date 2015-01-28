@@ -596,7 +596,11 @@ void WeatherRouting::UpdateComputeState()
     m_mCompute->Enable();
     m_bCompute->Enable();
     m_StartTime = wxDateTime::Now();
+#ifdef __WXOSX__
+    m_tCompute.Start(1, true);
+#else
     m_tCompute.Start(0, true);
+#endif
 
 }
 

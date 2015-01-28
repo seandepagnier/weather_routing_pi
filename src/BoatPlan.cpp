@@ -517,7 +517,7 @@ double BoatPlan::VelocityTrueWind(double VA, double VB, double W)
 #define MESSAGE(S) (S + wxString(_T("\n")) + wxString::FromUTF8(filename) \
                     + (line > 0 ? (_(" line ") + wxString::Format(_T("%d"), linenum)) : _T("")))
 #define PARSE_WARNING(S) do { if(message.empty()) message = MESSAGE(S); } while (0)
-#define PARSE_ERROR(S) if(message) do { message = _("Boat polar failed") + wxString(_T("\n")) \
+#define PARSE_ERROR(S) if(message.empty()) do { message = _("Boat polar failed") + wxString(_T("\n")) \
                                   + MESSAGE(S); goto failed; } while (0)
 bool BoatPlan::Open(const char *filename, wxString &message)
 {
