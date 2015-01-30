@@ -493,12 +493,13 @@ bool Position::GetPlotData(double dt, RouteMapConfiguration &configuration, Plot
 static inline bool ComputeBoatSpeed
 (RouteMapConfiguration &configuration, double timeseconds,
  double WG, double VWG, double W, double VW, double C, double VC, double &H,
- climatology_wind_atlas &atlas,
+ climatology_wind_atlas &atlas, int data_mask,
  double &B, double &VB, double &BG, double &VBG, double &dist, int newsailplan)
 {
     BoatPlan &plan = configuration.boat.Plans[newsailplan];
-    if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MAP ||
-       configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS) {
+    if((data_mask & Position::CLIMATOLOGY_WIND) &&
+       (configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MAP ||
+        configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)) {
         /* build map */
         VB = 0;
         int windatlas_count = 8;
@@ -545,7 +546,7 @@ bool rk_step(Position *p, double timeseconds, double BG, double dist, double H,
     double B = W + H; /* rotated relative to true wind */
 
     double VB, VBG; // outputs
-    if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas,
+    if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
                          B, VB, rk_BG, VBG, rk_dist, newsailplan))
         return false;
 
@@ -648,7 +649,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
                                                                configuration.time, lat, lon, daytime);
         
-        if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas,
+        if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
                              B, VB, BG, VBG, dist, newsailplan))
             continue;
         
@@ -792,7 +793,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
         B = W + H; /* rotated relative to true wind */
 
         double dummy_dist; // not used
-        if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas,
+        if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
                              B, VB, BG, VBG, dummy_dist, sailplan))
             return NAN;
 
