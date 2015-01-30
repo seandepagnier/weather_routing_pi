@@ -278,10 +278,10 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(InvertedRegions);
     SET_CHECKBOX(Anchoring);
 
-    SET_CHECKBOX(AllowDataDeficient);
     SET_CHECKBOX(UseGrib);
-
     SET_CONTROL(ClimatologyType, m_cClimatologyType, SetSelection, int, -1);
+    SET_CHECKBOX(AllowDataDeficient);
+    SET_SPIN_VALUE(WindStrength, (int)((*it).WindStrength * 100));
 
     m_bBlockUpdate = false;
 }
@@ -394,13 +394,13 @@ void ConfigurationDialog::Update()
         GET_CHECKBOX(InvertedRegions);
         GET_CHECKBOX(Anchoring);
 
-        GET_CHECKBOX(AllowDataDeficient);
-
         GET_CHECKBOX(UseGrib);
-
         if(m_cClimatologyType->GetSelection() != -1)
             configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
                 m_cClimatologyType->GetSelection();
+        GET_CHECKBOX(AllowDataDeficient);
+        if(m_sWindStrength->IsEnabled())                     \
+            configuration.WindStrength = m_sWindStrength->GetValue() / 100.0;
 
         if(m_lDegreeSteps->IsEnabled()) {
             configuration.DegreeSteps.clear();

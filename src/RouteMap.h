@@ -193,6 +193,7 @@ struct RouteMapConfiguration {
     enum ClimatologyDataType {DISABLED, CURRENTS_ONLY, CUMULATIVE_MAP, CUMULATIVE_MINUS_CALMS, MOST_LIKELY, AVERAGE};
     enum ClimatologyDataType ClimatologyType;
     bool AllowDataDeficient;
+    double WindStrength; // wind speed multiplier
 
     bool DetectLand, Currents, InvertedRegions, Anchoring;
 

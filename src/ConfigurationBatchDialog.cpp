@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -263,6 +262,19 @@ void ConfigurationBatchDialog::OnRemoveBoat( wxCommandEvent& event )
         m_lBoats->Delete(index);
 }
 
+void ConfigurationBatchDialog::On100( wxCommandEvent& event )
+{
+    m_sWindStrengthMin->SetValue(100);
+    m_sWindStrengthMax->SetValue(100);
+}
+
+void ConfigurationBatchDialog::On80to120( wxCommandEvent& event )
+{
+    m_sWindStrengthMin->SetValue(80);
+    m_sWindStrengthMax->SetValue(120);
+    m_sWindStrengthStep->SetValue(10);
+}
+
 void ConfigurationBatchDialog::OnReset( wxCommandEvent& event )
 {
     Reset();
@@ -288,7 +300,7 @@ void ConfigurationBatchDialog::OnGenerate( wxCommandEvent& event )
 
 void ConfigurationBatchDialog::Reset()
 {
-    m_tStartDays->SetValue(_T("365"));
+    m_tStartDays->SetValue(_T("0"));
     m_tStartHours->SetValue(_T("0"));
     m_tStartSpacingDays->SetValue(_T("1"));
     m_tStartSpacingHours->SetValue(_T("0"));
@@ -322,4 +334,8 @@ void ConfigurationBatchDialog::Reset()
         m_lBoats->Clear();
         m_lBoats->Append(configuration.boatFileName);
     }
+
+    m_sWindStrengthMin->SetValue(100);
+    m_sWindStrengthMax->SetValue(100);
+    m_sWindStrengthStep->SetValue(10);
 }

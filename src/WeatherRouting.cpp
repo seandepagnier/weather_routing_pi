@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -757,12 +756,20 @@ void WeatherRouting::GenerateBatch()
 
                     for(unsigned int boatindex = 0; boatindex < dlg.m_lBoats->GetCount(); boatindex++) {
                         configuration.boatFileName = dlg.m_lBoats->GetString(boatindex);
-                        AddConfiguration(configuration);
-                        m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
-                        configuration = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration();
 
-                        if(progressdialog && !progressdialog->Update(c++))
-                            goto abort;
+                        for(int windstrength = dlg.m_sWindStrengthMin->GetValue();
+                            windstrength <= dlg.m_sWindStrengthMax->GetValue();
+                            windstrength += dlg.m_sWindStrengthStep->GetValue()) {
+
+                            configuration.WindStrength = windstrength / 100.0;
+
+                            AddConfiguration(configuration);
+                            m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
+                            configuration = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration();
+
+                            if(progressdialog && !progressdialog->Update(c++))
+                                goto abort;
+                        }
                     }
                 }
             }
@@ -1080,6 +1087,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
                         AttributeInt(e, "ClimatologyType", RouteMapConfiguration::CUMULATIVE_MAP);
                     configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
+                    configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
+
                     configuration.DetectLand = AttributeBool(e, "DetectLand", true);
                     configuration.Currents = AttributeBool(e, "Currents", true);
                     configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
@@ -1176,6 +1185,7 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("UseGrib", configuration.UseGrib);
         c->SetAttribute("ClimatologyType", configuration.ClimatologyType);
         c->SetAttribute("AllowDataDeficient", configuration.AllowDataDeficient);
+        c->SetAttribute("WindStrength", configuration.WindStrength);
 
         c->SetAttribute("DetectLand", configuration.DetectLand);
         c->SetAttribute("Currents", configuration.Currents);
@@ -1808,6 +1818,7 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.UseGrib = true;
     configuration.ClimatologyType = RouteMapConfiguration::MOST_LIKELY;
     configuration.AllowDataDeficient = false;
+    configuration.WindStrength = 1;
     configuration.DetectLand = true;
     configuration.Currents = false;
     configuration.InvertedRegions = false;

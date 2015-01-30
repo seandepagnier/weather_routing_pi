@@ -55,6 +55,7 @@ can be viewed during grib playback.
     is the fastest to compute, but not very realistic (it may be close in prevailing conditions).</li></ul>
   <li><b>Allow Data Deficient</b> Continue to navigate on last valid wind data
     even if there is no more valid wind data in the area/time.</li>
+  <li><b>Wind Strength Percentage</b> Multiply wind strength from data source by this percentage to allow computation of possible "what if" scenarios of greater or lesser wind strength.</li>
   <li><b>Integrator</b> Newton's method is default and fastest, but doesn't take into account changes
     in wind/current along each step.  Rutta Kunge (4th order) is much more accurate taking 4 samples, but a lot slower.  Generally Newton's method with a smaller time step is recommended for more accuracy.</li>
   <li><b>Detect Land</b> Use GSHHS coastline data to avoid sailing through land.  This check is quite slow and should be optimized in the future.  It is recommended to upgrade to the high resolution background map <a href="http://opencpn.org/ocpn/chart_sources">available here</a>.</li>

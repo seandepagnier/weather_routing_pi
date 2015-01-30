@@ -654,6 +654,25 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, _("Last Valid if Data Deficient"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer58->Add( m_cbAllowDataDeficient, 0, wxALL, 5 );
 	
+	wxFlexGridSizer* fgSizer1071;
+	fgSizer1071 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer1071->SetFlexibleDirection( wxBOTH );
+	fgSizer1071->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText1292 = new wxStaticText( this, wxID_ANY, _("Wind strength is"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1292->Wrap( -1 );
+	fgSizer1071->Add( m_staticText1292, 0, wxALL, 5 );
+	
+	m_sWindStrength = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 50,-1 ), wxSP_ARROW_KEYS, 0, 999, 100 );
+	fgSizer1071->Add( m_sWindStrength, 0, wxALL, 5 );
+	
+	m_staticText1301 = new wxStaticText( this, wxID_ANY, _("percent"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1301->Wrap( -1 );
+	fgSizer1071->Add( m_staticText1301, 0, wxALL, 5 );
+	
+	
+	fgSizer58->Add( fgSizer1071, 1, wxEXPAND, 5 );
+	
 	
 	sbSizer15->Add( fgSizer58, 1, wxEXPAND, 5 );
 	
@@ -993,14 +1012,11 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	fgSizer112->Add( sbSizer7, 1, wxEXPAND, 5 );
 	
+	m_bClose = new wxButton( this, wxID_ANY, _(" Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer112->Add( m_bClose, 0, wxALIGN_RIGHT|wxALL, 5 );
+	
 	
 	fgSizer95->Add( fgSizer112, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer95->Add( 0, 0, 1, wxEXPAND, 5 );
-	
-	m_bClose = new wxButton( this, wxID_ANY, _(" Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer95->Add( m_bClose, 0, wxALIGN_RIGHT|wxALL, 5 );
 	
 	
 	this->SetSizer( fgSizer95 );
@@ -1027,6 +1043,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cbUseGrib->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cClimatologyType->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbAllowDataDeficient->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_sWindStrength->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbDetectLand->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbCurrents->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbInvertedRegions->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
@@ -1141,6 +1158,7 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_cbUseGrib->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cClimatologyType->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbAllowDataDeficient->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_sWindStrength->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbDetectLand->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbCurrents->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cbInvertedRegions->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
@@ -2849,7 +2867,7 @@ FilterRoutesDialogBase::~FilterRoutesDialogBase()
 
 ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxSize( -1,300 ), wxDefaultSize );
 	
 	wxFlexGridSizer* fgSizer76;
 	fgSizer76 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -3084,6 +3102,72 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_panel9->Layout();
 	fgSizer81->Fit( m_panel9 );
 	m_notebookConfigurations->AddPage( m_panel9, _("Boats"), false );
+	m_panel17 = new wxPanel( m_notebookConfigurations, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxFlexGridSizer* fgSizer109;
+	fgSizer109 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer109->SetFlexibleDirection( wxBOTH );
+	fgSizer109->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer108;
+	fgSizer108 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer108->SetFlexibleDirection( wxBOTH );
+	fgSizer108->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText131 = new wxStaticText( m_panel17, wxID_ANY, _("From"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText131->Wrap( -1 );
+	fgSizer108->Add( m_staticText131, 0, wxALL, 5 );
+	
+	m_sWindStrengthMin = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 999, 100 );
+	fgSizer108->Add( m_sWindStrengthMin, 0, wxALL, 5 );
+	
+	m_staticText134 = new wxStaticText( m_panel17, wxID_ANY, _("percent"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText134->Wrap( -1 );
+	fgSizer108->Add( m_staticText134, 0, wxALL, 5 );
+	
+	m_staticText132 = new wxStaticText( m_panel17, wxID_ANY, _("To"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText132->Wrap( -1 );
+	fgSizer108->Add( m_staticText132, 0, wxALL, 5 );
+	
+	m_sWindStrengthMax = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 999, 100 );
+	fgSizer108->Add( m_sWindStrengthMax, 0, wxALL, 5 );
+	
+	m_staticText1341 = new wxStaticText( m_panel17, wxID_ANY, _("percent"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1341->Wrap( -1 );
+	fgSizer108->Add( m_staticText1341, 0, wxALL, 5 );
+	
+	m_staticText133 = new wxStaticText( m_panel17, wxID_ANY, _("By"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText133->Wrap( -1 );
+	fgSizer108->Add( m_staticText133, 0, wxALL, 5 );
+	
+	m_sWindStrengthStep = new wxSpinCtrl( m_panel17, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999, 10 );
+	fgSizer108->Add( m_sWindStrengthStep, 0, wxALL, 5 );
+	
+	m_staticText1342 = new wxStaticText( m_panel17, wxID_ANY, _("percent"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1342->Wrap( -1 );
+	fgSizer108->Add( m_staticText1342, 0, wxALL, 5 );
+	
+	
+	fgSizer109->Add( fgSizer108, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer111;
+	fgSizer111 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer111->SetFlexibleDirection( wxBOTH );
+	fgSizer111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_button46 = new wxButton( m_panel17, wxID_ANY, _("100"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer111->Add( m_button46, 0, wxALL, 5 );
+	
+	m_button47 = new wxButton( m_panel17, wxID_ANY, _("80 to 120"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer111->Add( m_button47, 0, wxALL, 5 );
+	
+	
+	fgSizer109->Add( fgSizer111, 1, wxEXPAND, 5 );
+	
+	
+	m_panel17->SetSizer( fgSizer109 );
+	m_panel17->Layout();
+	fgSizer109->Fit( m_panel17 );
+	m_notebookConfigurations->AddPage( m_panel17, _("Wind Strength"), false );
 	
 	fgSizer76->Add( m_notebookConfigurations, 1, wxEXPAND | wxALL, 5 );
 	
@@ -3110,6 +3194,7 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	
 	this->SetSizer( fgSizer76 );
 	this->Layout();
+	fgSizer76->Fit( this );
 	
 	this->Centre( wxBOTH );
 	
@@ -3124,6 +3209,8 @@ ConfigurationBatchDialogBase::ConfigurationBatchDialogBase( wxWindow* parent, wx
 	m_bDisconnectAll->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDisconnectAll ), NULL, this );
 	m_bAddBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
 	m_bRemoveBoat->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
+	m_button46->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::On100 ), NULL, this );
+	m_button47->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::On80to120 ), NULL, this );
 	m_bInformation->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnInformation ), NULL, this );
 	m_bReset->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReset ), NULL, this );
 	m_bGenerate->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnGenerate ), NULL, this );
@@ -3143,6 +3230,8 @@ ConfigurationBatchDialogBase::~ConfigurationBatchDialogBase()
 	m_bDisconnectAll->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnDisconnectAll ), NULL, this );
 	m_bAddBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnAddBoat ), NULL, this );
 	m_bRemoveBoat->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnRemoveBoat ), NULL, this );
+	m_button46->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::On100 ), NULL, this );
+	m_button47->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::On80to120 ), NULL, this );
 	m_bInformation->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnInformation ), NULL, this );
 	m_bReset->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnReset ), NULL, this );
 	m_bGenerate->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationBatchDialogBase::OnGenerate ), NULL, this );

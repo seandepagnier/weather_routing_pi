@@ -202,6 +202,9 @@ class ConfigurationDialogBase : public wxDialog
 		wxButton* m_bBoatFilename;
 		wxButton* m_bEditBoat;
 		wxCheckBox* m_cbAllowDataDeficient;
+		wxStaticText* m_staticText1292;
+		wxSpinCtrl* m_sWindStrength;
+		wxStaticText* m_staticText1301;
 		wxCheckBox* m_cbDetectLand;
 		wxCheckBox* m_cbInvertedRegions;
 		wxCheckBox* m_cbAnchoring;
@@ -265,6 +268,7 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnBoatFilename( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdateIntegratorNewton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateIntegratorRungeKutta( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
@@ -669,6 +673,15 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxPanel* m_panel9;
 		wxButton* m_bAddBoat;
 		wxButton* m_bRemoveBoat;
+		wxPanel* m_panel17;
+		wxStaticText* m_staticText131;
+		wxStaticText* m_staticText134;
+		wxStaticText* m_staticText132;
+		wxStaticText* m_staticText1341;
+		wxStaticText* m_staticText133;
+		wxStaticText* m_staticText1342;
+		wxButton* m_button46;
+		wxButton* m_button47;
 		wxButton* m_bInformation;
 		wxButton* m_bReset;
 		wxButton* m_bGenerate;
@@ -685,6 +698,8 @@ class ConfigurationBatchDialogBase : public wxDialog
 		virtual void OnDisconnectAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemoveBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void On100( wxCommandEvent& event ) { event.Skip(); }
+		virtual void On80to120( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReset( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnGenerate( wxCommandEvent& event ) { event.Skip(); }
@@ -697,8 +712,11 @@ class ConfigurationBatchDialogBase : public wxDialog
 		wxTextCtrl* m_tStartSpacingDays;
 		wxTextCtrl* m_tStartSpacingHours;
 		wxListBox* m_lBoats;
+		wxSpinCtrl* m_sWindStrengthMin;
+		wxSpinCtrl* m_sWindStrengthMax;
+		wxSpinCtrl* m_sWindStrengthStep;
 		
-		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,400 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		ConfigurationBatchDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration Batch"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~ConfigurationBatchDialogBase();
 	
 };

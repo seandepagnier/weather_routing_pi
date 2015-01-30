@@ -407,7 +407,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
                 /* compute wind speeds over water with the given current */
                 for(int i=0; i<windatlas_count; i++) {
                     double WG = i*360/windatlas_count;
-                    double VWG = speeds[i];
+                    double VWG = speeds[i]*configuration.WindStrength;
                     OverWater(WG, VWG, C, VC, atlas.W[i], atlas.VW[i]);
                 }
 
@@ -460,6 +460,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
         if(!p)
             return false;
     }
+    VWG *= configuration.WindStrength;
 
     OverWater(WG, VWG, C, VC, W, VW);
     return true;
