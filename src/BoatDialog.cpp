@@ -632,6 +632,28 @@ void BoatDialog::LoadFile(bool switched)
 
 void BoatDialog::Save()
 {
+    if(m_boatpath.empty()) {
+        wxFileConfig *pConf = GetOCPNConfigObject();
+        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+
+        wxString path;
+        pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
+
+        wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
+                                 wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
+                                 wxFD_SAVE | wxFD_OVERWRITE_PROMPT );
+
+        if( saveDialog.ShowModal() == wxID_OK ) {
+            wxString filename = wxFileDialog::AppendExtension(saveDialog.GetPath(), _T("*.xml"));
+
+            pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+            pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
+
+            m_boatpath = filename;
+        } else
+            return;
+    }
+
     wxString error = m_Boat.SaveXML(m_boatpath);
     if(error.empty())
         EndModal(wxID_OK);
@@ -644,25 +666,8 @@ void BoatDialog::Save()
 
 void BoatDialog::OnSaveAs ( wxCommandEvent& event )
 {
-    wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-
-    wxString path;
-    pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
-
-    wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
-                             wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
-                             wxFD_SAVE | wxFD_OVERWRITE_PROMPT );
-
-    if( saveDialog.ShowModal() == wxID_OK ) {
-        wxString filename = wxFileDialog::AppendExtension(saveDialog.GetPath(), _T("*.xml"));
-
-        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-        pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
-
-        m_boatpath = filename;
-        Save();
-    }
+    m_boatpath.clear();
+    Save();
 }
 
 void BoatDialog::OnClose ( wxCommandEvent& event )

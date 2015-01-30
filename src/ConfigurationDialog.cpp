@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -68,14 +67,14 @@ ConfigurationDialog::~ConfigurationDialog( )
 
 void ConfigurationDialog::EditBoat( )
 {
-    BoatDialog boatdlg(this, m_fpBoat->GetPath());
+    BoatDialog boatdlg(this, m_tBoat->GetValue());
 
     wxIcon icon;
     icon.CopyFromBitmap(*_img_WeatherRouting);
     boatdlg.SetIcon(icon);
 
     int updated = boatdlg.ShowModal();
-    m_fpBoat->SetPath(boatdlg.m_boatpath);
+    m_tBoat->SetValue(boatdlg.m_boatpath);
 
     if(updated == wxID_OK) {
         /* update any configurations that use this boat */
@@ -99,6 +98,18 @@ void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
 void ConfigurationDialog::OnAvoidCyclones( wxCommandEvent& event )
 {
     Update();
+}
+
+void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
+{
+    wxFileDialog openDialog
+        ( this, _( "Select Boat File" ), wxFileName(m_tBoat->GetValue()).GetPath(), wxT ( "" ),
+          wxT ( "xml (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ), wxFD_OPEN  );
+
+    if( openDialog.ShowModal() == wxID_OK ) {
+        m_tBoat->SetValue(openDialog.GetPath());
+
+    }
 }
 
 // ensure mutually exclusive
@@ -229,7 +240,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_SPIN_VALUE(TimeStepMinutes, ((int)(*it).dt / 60) % 60);
     SET_SPIN_VALUE(TimeStepSeconds, (int)(*it).dt%60);
 
-    SET_CONTROL(boatFileName, m_fpBoat, SetPath, wxString, _T(""));
+    SET_CONTROL(boatFileName, m_tBoat, SetValue, wxString, _T(""));
 
     SET_CHOICE(End);
 
@@ -347,8 +358,8 @@ void ConfigurationDialog::Update()
             configuration.StartTime.SetMinute((int)(60*hour)%60);
         }
 
-        if(!m_fpBoat->GetPath().empty())
-            configuration.boatFileName = m_fpBoat->GetPath();
+        if(!m_tBoat->GetValue().empty())
+            configuration.boatFileName = m_tBoat->GetValue();
 
         if(m_sTimeStepHours->IsEnabled()) {
             configuration.dt = 60*(60*m_sTimeStepHours->GetValue()

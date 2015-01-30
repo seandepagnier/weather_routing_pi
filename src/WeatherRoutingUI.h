@@ -38,13 +38,13 @@
 #include <wx/datectrl.h>
 #include <wx/dateevt.h>
 #include <wx/textctrl.h>
-#include <wx/filepicker.h>
 #include <wx/choice.h>
 #include <wx/notebook.h>
 #include <wx/listbox.h>
 #include <wx/scrolwin.h>
 #include <wx/listbook.h>
 #include <wx/slider.h>
+#include <wx/filepicker.h>
 #include <wx/radiobut.h>
 #include <wx/html/htmlwin.h>
 
@@ -198,6 +198,8 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText111;
 		wxSpinCtrl* m_sTimeStepSeconds;
 		wxStaticText* m_staticText112;
+		wxTextCtrl* m_tBoat;
+		wxButton* m_bBoatFilename;
 		wxButton* m_bEditBoat;
 		wxCheckBox* m_cbAllowDataDeficient;
 		wxCheckBox* m_cbDetectLand;
@@ -261,7 +263,7 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnUpdateFile( wxFileDirPickerEvent& event ) { event.Skip(); }
+		virtual void OnBoatFilename( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateIntegratorNewton( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateIntegratorRungeKutta( wxCommandEvent& event ) { event.Skip(); }
@@ -275,7 +277,6 @@ class ConfigurationDialogBase : public wxDialog
 	
 	public:
 		wxDatePickerCtrl* m_dpStartDate;
-		wxFilePickerCtrl* m_fpBoat;
 		wxCheckBox* m_cbUseGrib;
 		wxChoice* m_cClimatologyType;
 		wxCheckBox* m_cbCurrents;

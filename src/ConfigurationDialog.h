@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -59,6 +58,7 @@ protected:
     void OnCurrentTime( wxCommandEvent& event );
     void OnUpdateSpin( wxSpinEvent& event ) { Update(); }
     void OnUpdateFile( wxFileDirPickerEvent& event ) { Update(); }
+    void OnBoatFilename( wxCommandEvent& event );
     void OnEditBoat( wxCommandEvent& event ) { EditBoat(); }
     void OnUpdateIntegratorNewton( wxCommandEvent& event );
     void OnUpdateIntegratorRungeKutta( wxCommandEvent& event );

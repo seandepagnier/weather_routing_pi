@@ -426,10 +426,12 @@ void WeatherRouting::OnEditConfiguration()
 
     m_ConfigurationDialog.Show();
 
+#if 0
     /* if boat filename doesn't exist open boat dialog immediately */
     wxString boatfilename = m_ConfigurationDialog.m_fpBoat->GetPath();
     if(!boatfilename.empty() && !wxFileName::FileExists(boatfilename))
         m_ConfigurationDialog.EditBoat();
+#endif
 }
 
 void WeatherRouting::OnGoTo( wxCommandEvent& event )
@@ -1054,6 +1056,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.dt = AttributeDouble(e, "dt", 0);
             
                     configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
+                    if(!wxFileName::FileExists(configuration.boatFileName))
+                        configuration.boatFileName = _T("");
             
                     configuration.Integrator = (RouteMapConfiguration::IntegratorType)
                         AttributeInt(e, "Integrator", 0);
