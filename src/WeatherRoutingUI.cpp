@@ -1791,7 +1791,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer541->SetFlexibleDirection( wxBOTH );
 	fgSizer541->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText91 = new wxStaticText( m_pPolarConfig, wxID_ANY, _("Max Pointing Angle Apparent WInd"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText91 = new wxStaticText( m_pPolarConfig, wxID_ANY, _("Max Pointing Angle Apparent Wind"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText91->Wrap( -1 );
 	fgSizer541->Add( m_staticText91, 0, wxALL, 5 );
 	
@@ -2391,7 +2391,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer78->Add( m_staticText140, 0, wxALL, 5 );
 	
-	wxString m_cVariable1Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
+	wxString m_cVariable1Choices[] = { _("Speed Over Ground (SOG)"), _("Course Over Ground (COG)"), _("Speed Over Water (SOW)"), _("Course Over Water (COW)"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Speed (AWS)"), _("Apparent Wind Angle (AWA)"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable1NChoices = sizeof( m_cVariable1Choices ) / sizeof( wxString );
 	m_cVariable1 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable1NChoices, m_cVariable1Choices, 0 );
 	m_cVariable1->SetSelection( 3 );
@@ -2407,7 +2407,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer78->Add( m_staticText1401, 0, wxALL, 5 );
 	
-	wxString m_cVariable2Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
+	wxString m_cVariable2Choices[] = { _("Speed Over Ground (SOG)"), _("Course Over Ground (COG)"), _("Speed Over Water (SOW)"), _("Course Over Water (COW)"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Speed (AWS)"), _("Apparent Wind Angle (AWA)"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable2NChoices = sizeof( m_cVariable2Choices ) / sizeof( wxString );
 	m_cVariable2 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable2NChoices, m_cVariable2Choices, 0 );
 	m_cVariable2->SetSelection( 5 );
@@ -2423,7 +2423,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer78->Add( m_staticText14011, 0, wxALL, 5 );
 	
-	wxString m_cVariable3Choices[] = { _("Boat Velocity Ground"), _("Boat Course Ground"), _("Boat Velocity Water"), _("Boat Course Water"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Velocity"), _("Apparent Wind Direction"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
+	wxString m_cVariable3Choices[] = { _("Speed Over Ground (SOG)"), _("Course Over Ground (COG)"), _("Speed Over Water (SOW)"), _("Course Over Water (COW)"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Speed (AWS)"), _("Apparent Wind Angle (AWA)"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable3NChoices = sizeof( m_cVariable3Choices ) / sizeof( wxString );
 	m_cVariable3 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable3NChoices, m_cVariable3Choices, 0 );
 	m_cVariable3->SetSelection( 11 );

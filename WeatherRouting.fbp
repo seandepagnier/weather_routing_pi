@@ -16553,7 +16553,7 @@
                                                                                                             <property name="gripper">0</property>
                                                                                                             <property name="hidden">0</property>
                                                                                                             <property name="id">wxID_ANY</property>
-                                                                                                            <property name="label">Max Pointing Angle Apparent WInd</property>
+                                                                                                            <property name="label">Max Pointing Angle Apparent Wind</property>
                                                                                                             <property name="max_size"></property>
                                                                                                             <property name="maximize_button">0</property>
                                                                                                             <property name="maximum_size"></property>
@@ -22593,7 +22593,7 @@
                                                         <property name="caption"></property>
                                                         <property name="caption_visible">1</property>
                                                         <property name="center_pane">0</property>
-                                                        <property name="choices">&quot;Boat Velocity Ground&quot; &quot;Boat Course Ground&quot; &quot;Boat Velocity Water&quot; &quot;Boat Course Water&quot; &quot;Wind Velocity&quot; &quot;Wind Direction&quot; &quot;Wind Course&quot; &quot;Wind Velocity Ground&quot; &quot;Wind Direction Ground&quot; &quot;Wind Course Ground&quot; &quot;Apparent Wind Velocity&quot; &quot;Apparent Wind Direction&quot; &quot;Current Velocity&quot; &quot;Current Direction&quot; &quot;Sig Wave Height&quot; &quot;Tacks&quot;</property>
+                                                        <property name="choices">&quot;Speed Over Ground (SOG)&quot; &quot;Course Over Ground (COG)&quot; &quot;Speed Over Water (SOW)&quot; &quot;Course Over Water (COW)&quot; &quot;Wind Velocity&quot; &quot;Wind Direction&quot; &quot;Wind Course&quot; &quot;Wind Velocity Ground&quot; &quot;Wind Direction Ground&quot; &quot;Wind Course Ground&quot; &quot;Apparent Wind Speed (AWS)&quot; &quot;Apparent Wind Angle (AWA)&quot; &quot;Current Velocity&quot; &quot;Current Direction&quot; &quot;Sig Wave Height&quot; &quot;Tacks&quot;</property>
                                                         <property name="close_button">1</property>
                                                         <property name="context_help"></property>
                                                         <property name="context_menu">1</property>
@@ -22847,7 +22847,7 @@
                                                         <property name="caption"></property>
                                                         <property name="caption_visible">1</property>
                                                         <property name="center_pane">0</property>
-                                                        <property name="choices">&quot;Boat Velocity Ground&quot; &quot;Boat Course Ground&quot; &quot;Boat Velocity Water&quot; &quot;Boat Course Water&quot; &quot;Wind Velocity&quot; &quot;Wind Direction&quot; &quot;Wind Course&quot; &quot;Wind Velocity Ground&quot; &quot;Wind Direction Ground&quot; &quot;Wind Course Ground&quot; &quot;Apparent Wind Velocity&quot; &quot;Apparent Wind Direction&quot; &quot;Current Velocity&quot; &quot;Current Direction&quot; &quot;Sig Wave Height&quot; &quot;Tacks&quot;</property>
+                                                        <property name="choices">&quot;Speed Over Ground (SOG)&quot; &quot;Course Over Ground (COG)&quot; &quot;Speed Over Water (SOW)&quot; &quot;Course Over Water (COW)&quot; &quot;Wind Velocity&quot; &quot;Wind Direction&quot; &quot;Wind Course&quot; &quot;Wind Velocity Ground&quot; &quot;Wind Direction Ground&quot; &quot;Wind Course Ground&quot; &quot;Apparent Wind Speed (AWS)&quot; &quot;Apparent Wind Angle (AWA)&quot; &quot;Current Velocity&quot; &quot;Current Direction&quot; &quot;Sig Wave Height&quot; &quot;Tacks&quot;</property>
                                                         <property name="close_button">1</property>
                                                         <property name="context_help"></property>
                                                         <property name="context_menu">1</property>
@@ -23101,7 +23101,7 @@
                                                         <property name="caption"></property>
                                                         <property name="caption_visible">1</property>
                                                         <property name="center_pane">0</property>
-                                                        <property name="choices">&quot;Boat Velocity Ground&quot; &quot;Boat Course Ground&quot; &quot;Boat Velocity Water&quot; &quot;Boat Course Water&quot; &quot;Wind Velocity&quot; &quot;Wind Direction&quot; &quot;Wind Course&quot; &quot;Wind Velocity Ground&quot; &quot;Wind Direction Ground&quot; &quot;Wind Course Ground&quot; &quot;Apparent Wind Velocity&quot; &quot;Apparent Wind Direction&quot; &quot;Current Velocity&quot; &quot;Current Direction&quot; &quot;Sig Wave Height&quot; &quot;Tacks&quot;</property>
+                                                        <property name="choices">&quot;Speed Over Ground (SOG)&quot; &quot;Course Over Ground (COG)&quot; &quot;Speed Over Water (SOW)&quot; &quot;Course Over Water (COW)&quot; &quot;Wind Velocity&quot; &quot;Wind Direction&quot; &quot;Wind Course&quot; &quot;Wind Velocity Ground&quot; &quot;Wind Direction Ground&quot; &quot;Wind Course Ground&quot; &quot;Apparent Wind Speed (AWS)&quot; &quot;Apparent Wind Angle (AWA)&quot; &quot;Current Velocity&quot; &quot;Current Direction&quot; &quot;Sig Wave Height&quot; &quot;Tacks&quot;</property>
                                                         <property name="close_button">1</property>
                                                         <property name="context_help"></property>
                                                         <property name="context_menu">1</property>

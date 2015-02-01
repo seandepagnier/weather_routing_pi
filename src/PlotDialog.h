@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -46,10 +45,10 @@ public:
     void SetRouteMapOverlay(RouteMapOverlay *routemapoverlay);
 
 private:
-    enum Variable { BOAT_VELOCITY_GROUND, BOAT_COURSE_GROUND, BOAT_VELOCITY_WATER, BOAT_COURSE_WATER,
-                    WIND_VELOCITY, WIND_DIRECTION, WIND_COURSE,
+    enum Variable { SPEED_OVER_GROUND, COURSE_OVER_GROUND, SPEED_OVER_WATER,
+                    COURSE_OVER_WATER, WIND_VELOCITY, WIND_DIRECTION, WIND_COURSE,
                     WIND_VELOCITY_GROUND, WIND_DIRECTION_GROUND, WIND_COURSE_GROUND,
-                    APPARENT_WIND_VELOCITY, APPARENT_WIND_DIRECTION,
+                    APPARENT_WIND_SPEED, APPARENT_WIND_ANGLE,
                     CURRENT_VELOCITY, CURRENT_DIRECTION, SIG_WAVE_HEIGHT, TACKS };
 
     void OnMouseEventsPlot( wxMouseEvent& event );
@@ -58,7 +57,6 @@ private:
     void OnUpdatePlot( wxScrollEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlotVariable( wxCommandEvent& event ) { GetScale(); m_PlotWindow->Refresh(); }
     void OnUpdateRoute( wxCommandEvent& event );
-
 
 private:
     double GetValue(PlotData &data, int var);

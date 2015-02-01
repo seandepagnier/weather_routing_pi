@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -85,9 +84,9 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
 
         double avgspeed = (*it)->RouteInfo(RouteMapOverlay::AVGSPEED);
         double avgspeedground = (*it)->RouteInfo(RouteMapOverlay::AVGSPEEDGROUND);
-        page += _("Average Water Speed") + wxString(_T(": ")) + wxString::Format
+        page += _("Average Speed Over Water (SOW)") + wxString(_T(": ")) + wxString::Format
             (_T(" %.2f"), avgspeed) + _T(" knots<dt>");
-        page += _("Average Ground Speed") + wxString(_T(": ")) + wxString::Format
+        page += _("Average Speed Over Ground (SOG)") + wxString(_T(": ")) + wxString::Format
             (_T(" %.2f"), avgspeedground) + _T(" knots<dt>");
         page += _("Average Wind") + wxString(_T(": ")) + wxString::Format
             (_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::AVGWIND)) + _T(" knots<dt>");

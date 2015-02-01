@@ -82,21 +82,21 @@ void PlotDialog::OnMouseEventsPlot( wxMouseEvent& event )
 double PlotDialog::GetValue(PlotData &data, int var)
 {
     switch(var) {
-    case BOAT_VELOCITY_GROUND:         return data.VBG;
-    case BOAT_COURSE_GROUND:           return data.BG;
-    case BOAT_VELOCITY_WATER:          return data.VB;
-    case BOAT_COURSE_WATER:            return data.B;
+    case SPEED_OVER_GROUND:            return data.VBG;
+    case COURSE_OVER_GROUND:           return data.BG;
+    case SPEED_OVER_WATER:             return data.VB;
+    case COURSE_OVER_WATER:            return data.B;
     case WIND_VELOCITY:                return data.VW;
     case WIND_DIRECTION:               return heading_resolve(data.B - data.W);
     case WIND_COURSE:                  return data.W;
     case WIND_VELOCITY_GROUND:         return data.VWG;
     case WIND_DIRECTION_GROUND:        return heading_resolve(data.BG - data.WG);
     case WIND_COURSE_GROUND:           return data.WG;
-    case APPARENT_WIND_VELOCITY:
+    case APPARENT_WIND_SPEED:
         return BoatPlan::VelocityApparentWind(data.VB, deg2rad(GetValue(data, WIND_DIRECTION)), data.VW);
-    case APPARENT_WIND_DIRECTION: {
+    case APPARENT_WIND_ANGLE: {
         return rad2deg(BoatPlan::DirectionApparentWind
-                       (GetValue(data, APPARENT_WIND_VELOCITY), data.VB,
+                       (GetValue(data, APPARENT_WIND_SPEED), data.VB,
                         deg2rad(GetValue(data, WIND_DIRECTION)), data.VW));
     }
     case CURRENT_VELOCITY: return data.VC;
