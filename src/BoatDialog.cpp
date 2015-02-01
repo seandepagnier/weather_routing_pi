@@ -50,7 +50,7 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     wxDisplaySize( &w, &h );
     w = wxMin(w, GetMinWidth());
     h = wxMin(h-32, GetMinHeight());
-    SetMinSize(wxSize(w/2, h/2)); // allow to half normal dimensions
+    SetMinSize(wxSize(w, h));
     SetSize(wxSize(w, h));
 
     m_SelectedSailPlan = 0;
