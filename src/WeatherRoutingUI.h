@@ -168,7 +168,8 @@ class SettingsDialogBase : public wxDialog
 		wxSpinCtrl* m_sIsoChronThickness;
 		wxSpinCtrl* m_sAlternateRouteThickness;
 		wxCheckBox* m_cbAlternatesForAll;
-		wxCheckBox* m_cbSquaresAtSailChanges;
+		wxCheckBox* m_cbMarkAtSailChange;
+		wxCheckBox* m_cbDisplayWindBarbs;
 		wxSpinCtrl* m_sConcurrentThreads;
 		wxCheckListBox* m_cblFields;
 		

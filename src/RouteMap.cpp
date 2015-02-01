@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -489,6 +488,13 @@ bool Position::GetPlotData(double dt, RouteMapConfiguration &configuration, Plot
     }
 
     return false;
+}
+
+void Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
+{
+    double WG, VWG, C, VC;
+    climatology_wind_atlas atlas;
+    ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
 }
 
 static inline bool ComputeBoatSpeed

@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -72,9 +71,13 @@ void SettingsDialog::LoadSettings()
     pConf->Read( _T("AlternatesForAll"), &AlternatesForAll, AlternatesForAll);
     m_cbAlternatesForAll->SetValue(AlternatesForAll);
 
-    bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
-    pConf->Read( _T("SquaresAtSailChanges"), &SquaresAtSailChanges, SquaresAtSailChanges);
-    m_cbSquaresAtSailChanges->SetValue(SquaresAtSailChanges);
+    bool MarkAtSailChange = m_cbMarkAtSailChange->GetValue();
+    pConf->Read( _T("MarkAtSailChange"), &MarkAtSailChange, MarkAtSailChange);
+    m_cbMarkAtSailChange->SetValue(MarkAtSailChange);
+    
+    bool DisplayWindBarbs = m_cbDisplayWindBarbs->GetValue();
+    pConf->Read( _T("DisplayWindBarbs"), &DisplayWindBarbs, DisplayWindBarbs);
+    m_cbDisplayWindBarbs->SetValue(DisplayWindBarbs);
 
     int ConcurrentThreads = wxThread::GetCPUCount();
     pConf->Read( _T("ConcurrentThreads"), &ConcurrentThreads, ConcurrentThreads);
@@ -124,8 +127,11 @@ void SettingsDialog::SaveSettings( )
     bool AlternatesForAll = m_cbAlternatesForAll->GetValue();
     pConf->Write( _T("AlternatesForAll"), AlternatesForAll);
 
-    bool SquaresAtSailChanges = m_cbSquaresAtSailChanges->GetValue();
-    pConf->Write( _T("SquaresAtSailChanges"), SquaresAtSailChanges);
+    bool MarkAtSailChange = m_cbMarkAtSailChange->GetValue();
+    pConf->Write( _T("MarkAtSailChange"), MarkAtSailChange);
+
+    bool DisplayWindBarbs = m_cbDisplayWindBarbs->GetValue();
+    pConf->Write( _T("DisplayWindBarbs"), DisplayWindBarbs);
 
     int ConcurrentThreads = m_sConcurrentThreads->GetValue();
     pConf->Write( _T("ConcurrentThreads"), ConcurrentThreads);

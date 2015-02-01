@@ -56,6 +56,8 @@ public:
 
     bool GetPlotData(double dt,
                      RouteMapConfiguration &configuration, PlotData &data);
+    void GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
+
     bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
     double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
 

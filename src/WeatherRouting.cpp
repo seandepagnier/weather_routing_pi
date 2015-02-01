@@ -216,8 +216,13 @@ void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
 
     std::list<RouteMapOverlay *>currentroutemaps = CurrentRouteMaps();
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
-        it != currentroutemaps.end(); it++)
+        it != currentroutemaps.end(); it++) {
         (*it)->Render(time, m_SettingsDialog, dc, vp, false);
+
+        if(it == currentroutemaps.begin() &&
+           m_SettingsDialog.m_cbDisplayWindBarbs->GetValue())
+            (*it)->RenderWindBarbs(dc, vp);
+    }
 
     m_ConfigurationBatchDialog.Render(dc, vp);
 

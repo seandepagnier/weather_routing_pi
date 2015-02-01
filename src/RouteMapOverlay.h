@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -58,8 +57,9 @@ public:
                         ocpnDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute);
-    void RenderCourse(Position *pos, wxDateTime time, bool SquaresAtSailChanges,
+    void RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
                       ocpnDC &dc, PlugIn_ViewPort &vp);
+    void RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp);
     void RequestGrib(wxDateTime time);
     std::list<PlotData> &GetPlotData(bool cursor_route=false);
     double RouteInfo(enum RouteInfoType type, bool cursor_route=false);

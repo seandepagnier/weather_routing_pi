@@ -4,8 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2014 by Sean D'Epagnier                                 *
- *   sean@depagnier.com                                                    *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -398,14 +397,14 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     if(RouteThickness) {
         wxColour CursorColor = settingsdialog.m_cpCursorRoute->GetColour(),
             DestinationColor = settingsdialog.m_cpDestinationRoute->GetColour();
-        bool SquaresAtSailChanges = settingsdialog.m_cbSquaresAtSailChanges->GetValue();
+        bool MarkAtSailChange = settingsdialog.m_cbMarkAtSailChange->GetValue();
 
         if(!justendroute) {
             SetColor(dc, CursorColor, true);
             SetWidth(dc, RouteThickness, true);
             RenderCourse(last_cursor_position, time, false, dc, vp);
 
-            if(SquaresAtSailChanges) {
+            if(MarkAtSailChange) {
                 SetColor(dc, Darken(CursorColor), true);
                 SetWidth(dc, (RouteThickness+1)/2, true);
                 RenderCourse(last_cursor_position, time, true, dc, vp);
@@ -415,7 +414,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         SetWidth(dc, RouteThickness, true);
         RenderCourse(last_destination_position, time, false, dc, vp);
         
-        if(SquaresAtSailChanges) {
+        if(MarkAtSailChange) {
             SetColor(dc, Darken(DestinationColor), true);
             SetWidth(dc, (RouteThickness+1)/2, true);
             RenderCourse(last_destination_position, time, true, dc, vp);
@@ -423,7 +422,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     }
 }
 
-void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool SquaresAtSailChanges,
+void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
                                    ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     if(!pos)
@@ -438,7 +437,7 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool SquaresA
         glBegin(GL_LINES);
 
     for(p = pos; p && p->parent; p = p->parent) {
-        if(SquaresAtSailChanges && p->sailplan != sailplan) {
+        if(MarkAtSailChange && p->sailplan != sailplan) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, p->lat, p->lon);
             int s = 6;
@@ -494,6 +493,172 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool SquaresA
         dc.DrawCircle( r.x, r.y, 7 );
         break;
     }
+    Unlock();
+}
+
+static void drawTransformedLine( ocpnDC &dc, double si, double co, int di, int dj,
+                                 int i, int j, int k, int l )
+{
+    double fi, fj, fk, fl; // For Hi Def Graphics.
+
+    fi = ( i * co - j * si + 0.5 ) + di;
+    fj = ( i * si + j * co + 0.5 ) + dj;
+    fk = ( k * co - l * si + 0.5 ) + di;
+    fl = ( k * si + l * co + 0.5 ) + dj;
+
+    dc.StrokeLine( fi, fj, fk, fl );
+}
+
+static void drawPetiteBarbule( ocpnDC &dc, double si, double co, int di, int dj, int b )
+{
+    drawTransformedLine( dc, si, co, di, dj, b, 0, b + 2, 5 );
+}
+
+static void drawGrandeBarbule( ocpnDC &dc, double si, double co, int di, int dj, int b )
+{
+    drawTransformedLine( dc, si, co, di, dj, b, 0, b + 4, 10 );
+}
+
+static void drawTriangle( ocpnDC &dc, double si, double co, int di, int dj, int b )
+{
+    drawTransformedLine( dc, si, co, di, dj, b, 0, b + 4, 10 );
+    drawTransformedLine( dc, si, co, di, dj, b + 8, 0, b + 4, 10 );
+}
+
+static void drawWindArrowWithBarbs(ocpnDC &dc, int x, int y, double vkn, double ang, double rotate_angle)
+{
+    ang += rotate_angle;
+    double si = -cos( ang ), co = sin( ang );
+
+    if( vkn < 1 ) {
+        dc.DrawCircle( x, y, 5 ); // wind is very light, draw a circle
+        return;
+    }
+
+    // Arrange for arrows to be centered on origin
+    int windBarbuleSize = 26;
+    int dec = -windBarbuleSize / 2;
+    drawTransformedLine( dc, si, co, x, y, dec, 0, dec + windBarbuleSize, 0 );   // hampe
+    drawTransformedLine( dc, si, co, x, y, dec, 0, dec + 5, 2 );    // flèche
+    drawTransformedLine( dc, si, co, x, y, dec, 0, dec + 5, -2 );   // flèche
+    
+    int b1 = dec + windBarbuleSize - 4;  // position de la 1ère barbule
+    if( vkn >= 7.5 && vkn < 45 ) {
+        b1 = dec + windBarbuleSize;  // position de la 1ère barbule si >= 10 noeuds
+    }
+
+    if( vkn < 7.5 ) {  // 5 ktn
+        drawPetiteBarbule( dc, si, co, x, y, b1 );
+    } else if( vkn < 12.5 ) { // 10 ktn
+        drawGrandeBarbule( dc, si, co, x, y, b1 );
+    } else if( vkn < 17.5 ) { // 15 ktn
+        drawGrandeBarbule( dc, si, co, x, y, b1 );
+        drawPetiteBarbule( dc, si, co, x, y, b1 - 4 );
+    } else if( vkn < 22.5 ) { // 20 ktn
+        drawGrandeBarbule( dc, si, co, x, y, b1 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
+    } else if( vkn < 27.5 ) { // 25 ktn
+        drawGrandeBarbule( dc, si, co, x, y, b1 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
+        drawPetiteBarbule( dc, si, co, x, y, b1 - 8 );
+    } else if( vkn < 32.5 ) { // 30 ktn
+        drawGrandeBarbule( dc, si, co, x, y, b1 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
+    } else if( vkn < 37.5 ) { // 35 ktn
+        drawGrandeBarbule( dc, si, co, x, y, b1 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
+        drawPetiteBarbule( dc, si, co, x, y, b1 - 12 );
+    } else if( vkn < 45 ) { // 40 ktn
+        drawGrandeBarbule( dc, si, co, x, y, b1 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 12 );
+    } else if( vkn < 55 ) { // 50 ktn
+        drawTriangle( dc, si, co, x, y, b1 - 4 );
+    } else if( vkn < 65 ) { // 60 ktn
+        drawTriangle( dc, si, co, x, y, b1 - 4 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
+    } else if( vkn < 75 ) { // 70 ktn
+        drawTriangle( dc, si, co, x, y, b1 - 4 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 12 );
+    } else if( vkn < 85 ) { // 80 ktn
+        drawTriangle( dc, si, co, x, y, b1 - 4 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 12 );
+        drawGrandeBarbule( dc, si, co, x, y, b1 - 16 );
+    } else { // > 90 ktn
+        drawTriangle( dc, si, co, x, y, b1 - 4 );
+        drawTriangle( dc, si, co, x, y, b1 - 12 );
+    }
+}
+
+void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
+{
+    RouteMapConfiguration configuration = GetConfiguration();
+
+    if(origin.size() < 2) // no map to work with
+        return;
+
+    wxColour colour(180, 140, 14);
+
+    wxPen pen( colour, 2 );
+
+    dc.SetPen( pen );
+    dc.SetBrush( *wxTRANSPARENT_BRUSH);
+
+    Lock();
+    
+    double step = 36;
+    for(double x = vp.rv_rect.x; x<vp.rv_rect.width; x+=step)
+        for(double y = vp.rv_rect.y; y<vp.rv_rect.height; y+=step) {
+            double lat, lon;
+            GetCanvasLLPix( &vp, wxPoint(x, y), &lat, &lon );
+
+            Position p(lat, configuration.positive_longitudes ? positive_degrees(lon) : lon);
+
+            IsoChronList::iterator it = origin.end();
+            it--;
+            if(!(*it)->Contains(p)) // don't plot outside map
+                continue;
+
+            for(it--; it != origin.begin(); it--)
+                if(!(*it)->Contains(p))
+                    break;
+
+            double W1, VW1, W2, VW2;
+            int data_mask1, data_mask2; // can be used to colorize barbs based on data type
+
+            // now it is the isochron before p, so we find the two closest postions
+            Position *p1 = (*it)->ClosestPosition(lat, lon);
+            configuration.grib = (*it)->m_Grib;
+            p1->GetWindData(configuration, W1, VW1, data_mask1);
+
+            it++;
+            Position *p2 = (*it)->ClosestPosition(lat, lon);
+            configuration.grib = (*it)->m_Grib;
+            p2->GetWindData(configuration, W2, VW2, data_mask2);
+
+            // now polar interpolation of the two wind positions
+            double d1 = p.Distance(p1), d2 = p.Distance(p2);
+            double d = d1 / (d1+d2);
+#if 0
+            double W1r = deg2rad(W1), W2r = deg2rad(W2);
+            double W1x = VW1*cos(W1r), W1y = VW1*sin(W1r);
+            double W2x = VW2*cos(W2r), W2y = VW2*sin(W2r);
+            double Wx = d*W1x + (1-d)*W2x, Wy = d*W1y + (1-d)*W2y;
+            double W = rad2deg(atan2(Wy, Wx));
+#else
+            while(W1 - W2 > 180) W1 -= 360;
+            while(W2 - W1 > 180) W2 -= 360;
+            double W = d*W1 + (1-d)*W2;
+#endif
+            double VW = d*VW1 + (1-d)*VW2;
+
+            drawWindArrowWithBarbs( dc, x, y, VW, deg2rad(W), vp.rotation );
+        }
     Unlock();
 }
 
