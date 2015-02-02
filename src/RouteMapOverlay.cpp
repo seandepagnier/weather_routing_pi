@@ -597,8 +597,6 @@ static void drawWindArrowWithBarbs(ocpnDC &dc, int x, int y, double vkn, double 
 
 void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
-    RouteMapConfiguration configuration = GetConfiguration();
-
     if(origin.size() < 2) // no map to work with
         return;
 
@@ -609,11 +607,19 @@ void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
     dc.SetPen( pen );
     dc.SetBrush( *wxTRANSPARENT_BRUSH);
 
+    RouteMapConfiguration configuration = GetConfiguration();
+
     Lock();
+
+    int step = 36;
+
+    // ensure windbarb positions remain fixed with panning
+    wxPoint p;
+    GetCanvasPixLL( &vp, &p, configuration.StartLat, configuration.StartLon );
+    int xoff = p.x%step, yoff = p.y%step;
     
-    double step = 36;
-    for(double x = vp.rv_rect.x; x<vp.rv_rect.width; x+=step)
-        for(double y = vp.rv_rect.y; y<vp.rv_rect.height; y+=step) {
+    for(double x = vp.rv_rect.x + xoff; x<vp.rv_rect.width; x+=step)
+        for(double y = vp.rv_rect.y + yoff; y<vp.rv_rect.height; y+=step) {
             double lat, lon;
             GetCanvasLLPix( &vp, wxPoint(x, y), &lat, &lon );
 
@@ -634,12 +640,14 @@ void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
             // now it is the isochron before p, so we find the two closest postions
             Position *p1 = (*it)->ClosestPosition(lat, lon);
             configuration.grib = (*it)->m_Grib;
-            p1->GetWindData(configuration, W1, VW1, data_mask1);
+            configuration.time = (*it)->time;
+            p.GetWindData(configuration, W1, VW1, data_mask1);
 
             it++;
             Position *p2 = (*it)->ClosestPosition(lat, lon);
             configuration.grib = (*it)->m_Grib;
-            p2->GetWindData(configuration, W2, VW2, data_mask2);
+            configuration.time = (*it)->time;
+            p.GetWindData(configuration, W2, VW2, data_mask2);
 
             // now polar interpolation of the two wind positions
             double d1 = p.Distance(p1), d2 = p.Distance(p2);
