@@ -986,7 +986,12 @@ double BoatPlan::Speed(double W, double VW)
     double VB1 = interp_value(VW, VW1, VW2, VB11, VB21);
     double VB2 = interp_value(VW, VW1, VW2, VB12, VB22);
 
-    return       interp_value(W, W1, W2, VB1, VB2);
+    double VB  = interp_value(W, W1, W2, VB1, VB2);
+
+    if(VB < 0) // with faulty polars, extrapolation, sometimes results in negative boat speed
+        return 0;
+
+    return VB;
 }
 
 double BoatPlan::SpeedAtApparentWindDirection(double A, double VW, double *pW)
