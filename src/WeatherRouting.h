@@ -111,6 +111,8 @@ public:
     void CursorRouteChanged();
     void UpdateColumns();
 
+    SettingsDialog m_SettingsDialog;
+
 private:
 
     void OnNewPosition( wxCommandEvent& event );
@@ -126,7 +128,8 @@ private:
     void OnNew( wxCommandEvent& event );
     void OnEditConfigurationClick( wxMouseEvent& event ) { OnEditConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );
-    void OnWeatherRouteSelected( wxListEvent& event );
+    void OnWeatherRouteSelected();
+    void OnWeatherRouteSelected( wxListEvent& event ) { OnWeatherRouteSelected(); }
     void OnWeatherRouteKeyDown( wxListEvent& event );
     void OnWeatherRoutesListLeftDown(wxMouseEvent &event);
     void UpdateComputeState();
@@ -176,7 +179,6 @@ private:
     void DeleteRouteMaps(std::list<RouteMapOverlay *>routemapoverlays);
     RouteMapConfiguration DefaultConfiguration();
 
-    SettingsDialog m_SettingsDialog;
     StatisticsDialog m_StatisticsDialog;
     ReportDialog m_ReportDialog;
     PlotDialog m_PlotDialog;

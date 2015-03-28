@@ -96,6 +96,9 @@ void SettingsDialog::LoadSettings()
         pConf->Read( wxString::Format(_T("Column%d"), i), &columns[i], columns[i]);
         m_cblFields->Check(i, columns[i]);
     }
+
+    m_cbUseLocalTime->SetValue(pConf->Read( _T("UseLocalTime"), 0L));
+
     Fit();
     
     wxPoint p = GetPosition();
@@ -109,35 +112,21 @@ void SettingsDialog::SaveSettings( )
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
-    wxString CursorColorStr = m_cpCursorRoute->GetColour().GetAsString();
-    pConf->Write( _T("CursorColor"), CursorColorStr);
+    pConf->Write( _T("CursorColor"), m_cpCursorRoute->GetColour().GetAsString());
+    pConf->Write( _T("DestinationColor"), m_cpDestinationRoute->GetColour().GetAsString());
+    pConf->Write( _T("RouteThickness"), m_sRouteThickness->GetValue());
+    pConf->Write( _T("IsoChronThickness"), m_sIsoChronThickness->GetValue());
+    pConf->Write( _T("AlternateRouteThickness"), m_sAlternateRouteThickness->GetValue());
+    pConf->Write( _T("AlternatesForAll"), m_cbAlternatesForAll->GetValue());
+    pConf->Write( _T("MarkAtSailChange"), m_cbMarkAtSailChange->GetValue());
+    pConf->Write( _T("DisplayWindBarbs"), m_cbDisplayWindBarbs->GetValue());
 
-    wxString DestinationColorStr = m_cpDestinationRoute->GetColour().GetAsString();
-    pConf->Write( _T("DestinationColor"), DestinationColorStr);
-
-    int RouteThickness = m_sRouteThickness->GetValue();
-    pConf->Write( _T("RouteThickness"), RouteThickness);
-
-    int IsoChronThickness = m_sIsoChronThickness->GetValue();
-    pConf->Write( _T("IsoChronThickness"), IsoChronThickness);
-
-    int AlternateRouteThickness = m_sAlternateRouteThickness->GetValue();
-    pConf->Write( _T("AlternateRouteThickness"), AlternateRouteThickness);
-
-    bool AlternatesForAll = m_cbAlternatesForAll->GetValue();
-    pConf->Write( _T("AlternatesForAll"), AlternatesForAll);
-
-    bool MarkAtSailChange = m_cbMarkAtSailChange->GetValue();
-    pConf->Write( _T("MarkAtSailChange"), MarkAtSailChange);
-
-    bool DisplayWindBarbs = m_cbDisplayWindBarbs->GetValue();
-    pConf->Write( _T("DisplayWindBarbs"), DisplayWindBarbs);
-
-    int ConcurrentThreads = m_sConcurrentThreads->GetValue();
-    pConf->Write( _T("ConcurrentThreads"), ConcurrentThreads);
+    pConf->Write( _T("ConcurrentThreads"), m_sConcurrentThreads->GetValue());
 
     for(int i=0; i<WeatherRouting::NUM_COLS; i++)
         pConf->Write( wxString::Format(_T("Column%d"), i), m_cblFields->IsChecked(i));
+
+    pConf->Write( _T("UseLocalTime"), m_cbUseLocalTime->GetValue());
 
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "SettingsDialogX" ), p.x);

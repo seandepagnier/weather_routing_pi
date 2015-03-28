@@ -297,7 +297,18 @@ void WeatherRouting::UpdateColumns()
     for(int i=0; i<NUM_COLS; i++) {
         if(m_SettingsDialog.m_cblFields->IsChecked(i)) {
             columns[i] = m_lWeatherRoutes->GetColumnCount();
-            m_lWeatherRoutes->InsertColumn(columns[i], column_names[i]);
+            wxString name = column_names[i];
+
+            if(i == STARTTIME || i == ENDTIME) {
+                name += _T(" (");
+                if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
+                    name += _("local");
+                else
+                    name += _T("UTC");
+                name += _T(")");
+            }
+
+            m_lWeatherRoutes->InsertColumn(columns[i], name);
         } else
             columns[i] = -1;
     }
@@ -305,8 +316,11 @@ void WeatherRouting::UpdateColumns()
     std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++, it++) {
         m_lWeatherRoutes->SetItemPtrData(i, (wxUIntPtr)*it); // somehow this gets lost
+        (*it)->Update(this); // update utc/local switch to strings of start/end time
         UpdateItem(i);
     }
+
+    OnWeatherRouteSelected(); // update utc/local switch if configuration dialog is visible
 }
 
 void WeatherRouting::OnNewPosition( wxCommandEvent& event )
@@ -522,7 +536,7 @@ void WeatherRouting::OnWeatherRouteSort( wxListEvent& event )
         m_lWeatherRoutes->SortItems(SortWeatherRoutes, (long)m_lWeatherRoutes);
 }
 
-void WeatherRouting::OnWeatherRouteSelected( wxListEvent& event )
+void WeatherRouting::OnWeatherRouteSelected( )
 {
     GetParent()->Refresh();
 
@@ -602,12 +616,7 @@ void WeatherRouting::UpdateComputeState()
     m_mCompute->Enable();
     m_bCompute->Enable();
     m_StartTime = wxDateTime::Now();
-#ifdef __WXOSX__
     m_tCompute.Start(1, true);
-#else
-    m_tCompute.Start(0, true);
-#endif
-
 }
 
 void WeatherRouting::OnCompute( wxCommandEvent& event )
@@ -1304,15 +1313,25 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
 
         BoatFilename = configuration.boatFileName;
         Start = configuration.Start;
-        StartTime = configuration.StartTime.Format(_T("%x %H:%M"));
+
+        wxDateTime starttime = configuration.StartTime;
+
+        wxASSERT(starttime == routemapoverlay->StartTime());
+
+        if(wr->m_SettingsDialog.m_cbUseLocalTime->GetValue())
+            starttime = starttime.FromUTC();
+        StartTime = starttime.Format(_T("%x %H:%M"));
+
         End = configuration.End;
+
         wxDateTime endtime = routemapoverlay->EndTime();
-        if(endtime.IsValid())
+        if(endtime.IsValid()) {
+            if(wr->m_SettingsDialog.m_cbUseLocalTime->GetValue())
+                endtime = endtime.FromUTC();
             EndTime = endtime.Format(_T("%x %H:%M"));
-        else
+        } else
             EndTime = _T("N/A");
         
-        wxDateTime starttime = routemapoverlay->StartTime();
         if(starttime.IsValid() && endtime.IsValid()) {
             wxTimeSpan span = endtime - starttime;
             int days = span.GetDays();

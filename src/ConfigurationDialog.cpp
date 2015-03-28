@@ -91,7 +91,7 @@ void ConfigurationDialog::OnGribTime( wxCommandEvent& event )
 
 void ConfigurationDialog::OnCurrentTime( wxCommandEvent& event )
 {
-    SetStartDateTime(wxDateTime::Now());
+    SetStartDateTime(wxDateTime::Now().ToUTC());
     Update();
 }
 
@@ -231,9 +231,13 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     m_bBlockUpdate = true;
 
     SET_CHOICE(Start);
-    SET_CONTROL(StartTime, m_dpStartDate, SetValue, wxDateTime, wxDateTime());
-    SET_CONTROL_VALUE(wxString::Format(_T("%.2f"), (*it).StartTime.GetHour()
-                                            + (double)(*it).StartTime.GetMinute()/60.0),
+
+    bool ult = m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue();
+#define STARTTIME (ult ? it->StartTime.FromUTC() : it->StartTime)
+
+    SET_CONTROL_VALUE(STARTTIME, m_dpStartDate, SetValue, wxDateTime, wxDateTime());
+    SET_CONTROL_VALUE(wxString::Format(_T("%.2f"), STARTTIME.GetHour()
+                                            + (double)STARTTIME.GetMinute()/60.0),
                 m_tStartHour, SetValue, wxString, _T(""));
 
     SET_SPIN_VALUE(TimeStepHours, (int)((*it).dt / 3600));
@@ -310,6 +314,9 @@ void ConfigurationDialog::ClearSources()
 void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 {
     if(datetime.IsValid()) {
+        if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+            datetime = datetime.FromUTC();
+
         m_dpStartDate->SetValue(datetime);
         m_tStartHour->SetValue(wxString::Format(_T("%.3f"), datetime.GetHour()
                                                 +datetime.GetMinute() / 60.0));
@@ -357,6 +364,9 @@ void ConfigurationDialog::Update()
             configuration.StartTime.SetHour((int)hour);
             configuration.StartTime.SetMinute((int)(60*hour)%60);
         }
+
+        if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+            configuration.StartTime = configuration.StartTime.ToUTC();
 
         if(!m_tBoat->GetValue().empty())
             configuration.boatFileName = m_tBoat->GetValue();
