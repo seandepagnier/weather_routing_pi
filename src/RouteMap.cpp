@@ -217,8 +217,8 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 
 #undef EPS
 #undef EPS2
-#define EPS 2e-14
-#define EPS2 2e-7 // should be half the exponent of EPS
+#define EPS 2e-16
+#define EPS2 2e-8 // should be half the exponent of EPS
     if(fabs(denom) < EPS) { /* parallel or really close to parallel */
 #if 1
 #define EPS3 1e-5
@@ -235,7 +235,7 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
         /* we already know from initial test we are overlapping,
            for parallel line segments, there is no way to tell
            which direction the intersection occurs */
-#define PEPS 2e-11
+#define PEPS 2e-14
         if(fabs((y1*ax - ay*x1)*bx - (y3*bx - by*x3)*ax) > PEPS)
             return 0; /* different intercepts, no intersection */
 
@@ -267,7 +267,7 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
     return denom < 0 ? -1 : 1;
 }
 
-#define EPSILON (2e-10)
+#define EPSILON (2e-11)
 Position::Position(double latitude, double longitude, Position *p,
                    double pheading, double pbearing, int sp, int t, int dm)
     : lat(latitude), lon(longitude), parent_heading(pheading), parent_bearing(pbearing),
