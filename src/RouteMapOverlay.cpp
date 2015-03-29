@@ -692,49 +692,48 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
     std::list<PlotData> &plotdata = cursor_route ? last_cursor_plotdata : last_destination_plotdata;
     if(plotdata.empty()) {
         Position *pos = cursor_route ? last_cursor_position : last_destination_position;
+
         if(!pos)
             return plotdata;
 
+        // omit destination position.  This is because we don't have grib
+        // data for the exact endtime to use and the constraints aren't applied
+        // for the end position anyway, so statistics for max wind may exceed the constraints
+        if(pos == destination_position)
+            pos = pos->parent;
+
         RouteMapConfiguration configuration = GetConfiguration();
         Lock();
-        IsoChronList::iterator it = origin.begin(), itn;
+        IsoChronList::iterator it = origin.begin(), itp;
 
-        /* get route iso for this position */
-        Position *p, *l;
-        p=pos->parent;
-        if(last_destination_position == destination_position)
-            p=p->parent;
+        // get route iso for this position
+        Position *p = pos->parent;
         for(; p; p=p->parent)
             if(++it == origin.end())
                 return plotdata;
 
-        itn = it;
-
-        l = pos;
         for(p = pos; p; p = p->parent) {
+            itp = it;
+            itp--;
+
             configuration.grib = (*it)->m_Grib;
 
             PlotData data;
-            /* this omits the starting position */
-            double dt = 0;
-            if(p != destination_position) {
-                wxDateTime endtime = itn==it ? EndTime() : (*itn)->time;
-                wxDateTime starttime = (*it)->time;
+
+            double dt = configuration.dt;
+            if(p == destination_position) {
+                wxDateTime starttime = (*itp)->time, endtime = EndTime();
                 if(starttime.IsValid() && endtime.IsValid())
                     dt = (endtime - starttime).GetSeconds().ToDouble();
-            }
-            data.time = (*it)->time;
+                data.time = endtime;
+            } else
+                data.time = (*it)->time;
+
             data.lat = p->lat, data.lon = p->lon;
-            if(l->GetPlotData(dt, configuration, data))
+            if(p->GetPlotData(dt, configuration, data))
                 plotdata.push_front(data);
 
-            l = p;
-            itn = it;
-
-            if(it == origin.begin())
-                break;
-            if(p != destination_position)
-                it--;
+            it = itp;
         }
 
         Unlock();

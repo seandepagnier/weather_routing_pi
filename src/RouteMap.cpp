@@ -590,7 +590,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
 
     if(fabs(lat) > configuration.MaxLatitude)
         return false;
-
+ 
     double WG, VWG, W, VW, C, VC;
     climatology_wind_atlas atlas;
     int data_mask = 0;
@@ -773,10 +773,20 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
 /* propagate to the end position in the configuration, and return the number of seconds it takes */
 double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask)
 {
+    double S = Swell(configuration.grib, lat, lon);
+    if(S > configuration.MaxSwellMeters)
+        return NAN;
+
+    if(fabs(lat) > configuration.MaxLatitude)
+        return NAN;
+
     double WG, VWG, W, VW, C, VC;
     climatology_wind_atlas atlas;
     if(!ReadWindAndCurrents(configuration, this,
                             WG, VWG, W, VW, C, VC, atlas, data_mask))
+        return NAN;
+
+    if(VW > configuration.MaxWindKnots)
         return NAN;
 
     /* todo: we should make sure we don't tack if we are already at the max tacks,
@@ -2233,59 +2243,16 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
 bool RouteMap::Propagate()
 {
     Lock();
-    if(!m_bValid) {
+
+    if(m_bNeedsGrib) {
+        Unlock();
+        return false;
+    }
+
+    if(!m_bValid /*|| m_bFinished*/) {
         Unlock();
         m_bFinished = true;
         return false;
-    }
-
-    bool notready = m_bFinished || m_bNeedsGrib;
-
-    if(notready) {
-        Unlock();
-        return false;
-    }
-
-    if(m_Configuration.UseGrib &&
-       (!m_NewGrib ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&
-       !m_Configuration.AllowDataDeficient) {
-        m_bFinished = true;
-        m_bGribFailed = true;
-        Unlock();
-        return false;
-    }
-
-    // reset grib data deficient flag
-    m_Configuration.grib_is_data_deficient = false;
-
-    if((!m_NewGrib ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY])) {
-        if(m_Configuration.ClimatologyType > RouteMapConfiguration::CURRENTS_ONLY) {
-#if 0
-            if(ClimatologyData) {
-                double WG, VWG;
-                wxDateTime time = wxDateTime::Now();
-                /* replace when climatology supports detecting if data is loaded
-                   without querying */
-                if(!ClimatologyData(WIND, time, 0, 0, WG, VWG)) {
-                    m_bFinished = true;
-                    m_bClimatologyFailed = true;
-                    Unlock();
-                    return false;
-                }
-            }
-#endif
-        } else
-            if(m_Configuration.AllowDataDeficient) {
-                if(m_Configuration.UseGrib) {
-                    SetNewGrib(origin.back()->m_Grib);
-                    m_Configuration.grib_is_data_deficient = true;
-                }
-        }
     }
 
     /* test for cyclone data if needed */
@@ -2307,34 +2274,48 @@ bool RouteMap::Propagate()
     }
 
     RouteMapConfiguration configuration = m_Configuration;
-    configuration.grib = m_NewGrib;
-    configuration.time = m_NewTime;
 
-    IsoRouteList routelist;
+    GribRecordSet *grib = m_NewGrib;
+    wxDateTime time = m_NewTime;
+
+    // request the next grib
+    // in a different thread (grib record averaging going in parallel)
+    m_NewGrib = NULL;
+    m_NewTime += wxTimeSpan(0, 0, configuration.dt);
+    m_bNeedsGrib = configuration.UseGrib;
+
     Unlock();
 
+    IsoRouteList routelist;
     if(origin.empty()) {
         Position *np = new Position(configuration.StartLat, configuration.StartLon);
         np->prev = np->next = np;
         routelist.push_back(new IsoRoute(np->BuildSkipList()));
-    } else
-        origin.back()->PropagateIntoList(routelist, configuration);
+    } else {
+        configuration.grib = origin.back()->m_Grib;
+        configuration.time = origin.back()->time;
+        configuration.grib_is_data_deficient = origin.back()->m_Grib_is_data_deficient;
 
-    Lock();
-    m_NewGrib = NULL;
-    m_NewTime = configuration.time + wxTimeSpan(0, 0, configuration.dt);
-    m_bNeedsGrib = configuration.UseGrib;
-    Unlock();
+        // will the grib data work for us?
+        if((!configuration.grib ||
+            !configuration.grib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+            !configuration.grib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
+           m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&
+           m_Configuration.UseGrib) {
+            Lock();
+            m_bFinished = true;
+            m_bGribFailed = true;
+            Unlock();
+            return false;
+        }
+
+        origin.back()->PropagateIntoList(routelist, configuration);
+    }
 
     IsoChron* update;
-    if(routelist.empty()) {
+    if(routelist.empty())
         update = NULL;
-        if(configuration.grib) {
-            for(int i=0; i<Idx_COUNT; i++)
-                delete configuration.grib->m_GribRecordPtrArray[i];
-            delete configuration.grib;
-        }
-    } else {
+    else {
         IsoRouteList merged;
         if(!ReduceList(merged, routelist, configuration)) {
             Unlock();
@@ -2344,8 +2325,24 @@ bool RouteMap::Propagate()
         for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
             (*it)->ReduceClosePoints();
 
-        update = new IsoChron(merged, configuration.time,
-                              configuration.grib, configuration.grib_is_data_deficient);
+        // wait for updated grib        
+        while(NeedsGrib())
+            wxThread::Sleep(5);
+
+        // reset grib data deficient flag
+        configuration.grib_is_data_deficient = false;
+        
+        if(m_Configuration.AllowDataDeficient &&
+           (!m_NewGrib ||
+            !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+            !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
+           /*m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&*/
+           m_Configuration.UseGrib) {
+            SetNewGrib(configuration.grib);
+            configuration.grib_is_data_deficient = true;
+        }
+
+        update = new IsoChron(merged, time, grib, configuration.grib_is_data_deficient);
     }
 
     Lock();
@@ -2357,8 +2354,8 @@ bool RouteMap::Propagate()
         }
     } else
         m_bFinished = true;
-
     Unlock();
+
     return true;
 }
 
