@@ -521,8 +521,10 @@ static inline bool ComputeBoatSpeed
         VB = plan.Speed(H, VW);
 
     /* failed to determine speed.. */
-    if(isnan(B) || isnan(VB))
+    if(isnan(B) || isnan(VB)) {
+        configuration.polar_failed = true;
         return false; //B = VB = 0;
+    }
 
     /* compound boatspeed with current */
     OverGround(B, VB, C, VC, BG, VBG);
@@ -2295,6 +2297,7 @@ bool RouteMap::Propagate()
         configuration.grib = origin.back()->m_Grib;
         configuration.time = origin.back()->time;
         configuration.grib_is_data_deficient = origin.back()->m_Grib_is_data_deficient;
+        configuration.polar_failed = false;
 
         // will the grib data work for us?
         if((!configuration.grib ||
@@ -2310,12 +2313,25 @@ bool RouteMap::Propagate()
         }
 
         origin.back()->PropagateIntoList(routelist, configuration);
+
+        if(configuration.polar_failed) {
+            Lock();
+            m_bFinished = true;
+            m_bPolarFailed = true;
+            Unlock();
+            return false;
+        }
     }
 
     IsoChron* update;
-    if(routelist.empty())
+    if(routelist.empty()) {
         update = NULL;
-    else {
+        if(grib) { // grib data isn't used after all
+            for(int i=0; i<Idx_COUNT; i++)
+                delete grib->m_GribRecordPtrArray[i];
+            delete grib;
+        }
+    } else {
         IsoRouteList merged;
         if(!ReduceList(merged, routelist, configuration)) {
             Unlock();
@@ -2324,10 +2340,6 @@ bool RouteMap::Propagate()
 
         for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
             (*it)->ReduceClosePoints();
-
-        // wait for updated grib        
-        while(NeedsGrib())
-            wxThread::Sleep(5);
 
         // reset grib data deficient flag
         configuration.grib_is_data_deficient = false;
@@ -2407,6 +2419,7 @@ void RouteMap::Reset()
     m_bReachedDestination = false;
     m_bGribFailed = false;
     m_bClimatologyFailed = false;
+    m_bPolarFailed = false;
     m_bNoData = false;
     m_bFinished = false;
 

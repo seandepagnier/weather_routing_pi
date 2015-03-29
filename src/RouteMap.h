@@ -210,8 +210,8 @@ struct RouteMapConfiguration {
 
     // parameters
     GribRecordSet *grib;
-    bool grib_is_data_deficient;
     wxDateTime time;
+    bool grib_is_data_deficient, polar_failed;
 };
 
 bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
@@ -232,6 +232,7 @@ public:
     LOCKING_ACCESSOR(Valid, m_bValid)
     LOCKING_ACCESSOR(GribFailed, m_bGribFailed)
     LOCKING_ACCESSOR(ClimatologyFailed, m_bClimatologyFailed)
+    LOCKING_ACCESSOR(PolarFailed, m_bPolarFailed)
     LOCKING_ACCESSOR(NoData, m_bNoData)
 
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
@@ -280,7 +281,7 @@ private:
 
     RouteMapConfiguration m_Configuration;
     bool m_bFinished, m_bValid;
-    bool m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bNoData;
+    bool m_bReachedDestination, m_bGribFailed, m_bClimatologyFailed, m_bPolarFailed, m_bNoData;
 
     wxDateTime m_NewTime;
 };

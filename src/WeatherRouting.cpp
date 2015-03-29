@@ -1411,6 +1411,10 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
                     State = _("Climatology");
                     State += _T(": ");
                 }
+                if(routemapoverlay->PolarFailed()) {
+                    State = _("Polar");
+                    State += _T(": ");
+                }
                 if(routemapoverlay->NoData()) {
                     State = _("No Data");
                     State += _T(": ");
