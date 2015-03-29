@@ -2277,6 +2277,20 @@ bool RouteMap::Propagate()
 
     RouteMapConfiguration configuration = m_Configuration;
 
+    // reset grib data deficient flag
+    bool grib_is_data_deficient = false;
+        
+    if(m_Configuration.AllowDataDeficient &&
+       (!m_NewGrib ||
+        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
+       origin.size() &&
+       /*m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&*/
+       m_Configuration.UseGrib) {
+        SetNewGrib(origin.back()->m_Grib);
+        grib_is_data_deficient = true;
+    }
+
     GribRecordSet *grib = m_NewGrib;
     wxDateTime time = m_NewTime;
 
@@ -2293,6 +2307,7 @@ bool RouteMap::Propagate()
         Position *np = new Position(configuration.StartLat, configuration.StartLon);
         np->prev = np->next = np;
         routelist.push_back(new IsoRoute(np->BuildSkipList()));
+        configuration.grib = NULL;
     } else {
         configuration.grib = origin.back()->m_Grib;
         configuration.time = origin.back()->time;
@@ -2341,20 +2356,7 @@ bool RouteMap::Propagate()
         for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
             (*it)->ReduceClosePoints();
 
-        // reset grib data deficient flag
-        configuration.grib_is_data_deficient = false;
-        
-        if(m_Configuration.AllowDataDeficient &&
-           (!m_NewGrib ||
-            !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
-            !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-           /*m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&*/
-           m_Configuration.UseGrib) {
-            SetNewGrib(configuration.grib);
-            configuration.grib_is_data_deficient = true;
-        }
-
-        update = new IsoChron(merged, time, grib, configuration.grib_is_data_deficient);
+        update = new IsoChron(merged, time, grib, grib_is_data_deficient);
     }
 
     Lock();
