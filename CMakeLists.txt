@@ -44,6 +44,7 @@ SET(SRC_WEATHER_ROUTING
             src/RouteMap.cpp
             src/RouteMapOverlay.cpp
             src/Utilities.cpp
+            src/LineBufferOverlay.cpp
             src/WeatherRoutingUI.cpp
             src/icons.cpp
 

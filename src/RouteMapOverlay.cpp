@@ -34,6 +34,7 @@
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "SettingsDialog.h"
+
 RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
     : wxThread(wxTHREAD_JOINABLE), m_RouteMapOverlay(routemapoverlay)
 {
@@ -496,178 +497,180 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSa
     Unlock();
 }
 
-static void drawTransformedLine( ocpnDC &dc, double si, double co, int di, int dj,
-                                 int i, int j, int k, int l )
-{
-    double fi, fj, fk, fl; // For Hi Def Graphics.
-
-    fi = ( i * co - j * si + 0.5 ) + di;
-    fj = ( i * si + j * co + 0.5 ) + dj;
-    fk = ( k * co - l * si + 0.5 ) + di;
-    fl = ( k * si + l * co + 0.5 ) + dj;
-
-    dc.StrokeLine( fi, fj, fk, fl );
-}
-
-static void drawPetiteBarbule( ocpnDC &dc, double si, double co, int di, int dj, int b )
-{
-    drawTransformedLine( dc, si, co, di, dj, b, 0, b + 2, 5 );
-}
-
-static void drawGrandeBarbule( ocpnDC &dc, double si, double co, int di, int dj, int b )
-{
-    drawTransformedLine( dc, si, co, di, dj, b, 0, b + 4, 10 );
-}
-
-static void drawTriangle( ocpnDC &dc, double si, double co, int di, int dj, int b )
-{
-    drawTransformedLine( dc, si, co, di, dj, b, 0, b + 4, 10 );
-    drawTransformedLine( dc, si, co, di, dj, b + 8, 0, b + 4, 10 );
-}
-
-static void drawWindArrowWithBarbs(ocpnDC &dc, int x, int y, double vkn, double ang, double rotate_angle)
-{
-    ang += rotate_angle;
-    double si = -cos( ang ), co = sin( ang );
-
-    if( vkn < 1 ) {
-        dc.DrawCircle( x, y, 5 ); // wind is very light, draw a circle
-        return;
-    }
-
-    // Arrange for arrows to be centered on origin
-    int windBarbuleSize = 26;
-    int dec = -windBarbuleSize / 2;
-    drawTransformedLine( dc, si, co, x, y, dec, 0, dec + windBarbuleSize, 0 );   // hampe
-    drawTransformedLine( dc, si, co, x, y, dec, 0, dec + 5, 2 );    // flèche
-    drawTransformedLine( dc, si, co, x, y, dec, 0, dec + 5, -2 );   // flèche
-    
-    int b1 = dec + windBarbuleSize - 4;  // position de la 1ère barbule
-    if( vkn >= 7.5 && vkn < 45 ) {
-        b1 = dec + windBarbuleSize;  // position de la 1ère barbule si >= 10 noeuds
-    }
-
-    if( vkn < 7.5 ) {  // 5 ktn
-        drawPetiteBarbule( dc, si, co, x, y, b1 );
-    } else if( vkn < 12.5 ) { // 10 ktn
-        drawGrandeBarbule( dc, si, co, x, y, b1 );
-    } else if( vkn < 17.5 ) { // 15 ktn
-        drawGrandeBarbule( dc, si, co, x, y, b1 );
-        drawPetiteBarbule( dc, si, co, x, y, b1 - 4 );
-    } else if( vkn < 22.5 ) { // 20 ktn
-        drawGrandeBarbule( dc, si, co, x, y, b1 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
-    } else if( vkn < 27.5 ) { // 25 ktn
-        drawGrandeBarbule( dc, si, co, x, y, b1 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
-        drawPetiteBarbule( dc, si, co, x, y, b1 - 8 );
-    } else if( vkn < 32.5 ) { // 30 ktn
-        drawGrandeBarbule( dc, si, co, x, y, b1 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
-    } else if( vkn < 37.5 ) { // 35 ktn
-        drawGrandeBarbule( dc, si, co, x, y, b1 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
-        drawPetiteBarbule( dc, si, co, x, y, b1 - 12 );
-    } else if( vkn < 45 ) { // 40 ktn
-        drawGrandeBarbule( dc, si, co, x, y, b1 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 4 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 12 );
-    } else if( vkn < 55 ) { // 50 ktn
-        drawTriangle( dc, si, co, x, y, b1 - 4 );
-    } else if( vkn < 65 ) { // 60 ktn
-        drawTriangle( dc, si, co, x, y, b1 - 4 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
-    } else if( vkn < 75 ) { // 70 ktn
-        drawTriangle( dc, si, co, x, y, b1 - 4 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 12 );
-    } else if( vkn < 85 ) { // 80 ktn
-        drawTriangle( dc, si, co, x, y, b1 - 4 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 8 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 12 );
-        drawGrandeBarbule( dc, si, co, x, y, b1 - 16 );
-    } else { // > 90 ktn
-        drawTriangle( dc, si, co, x, y, b1 - 4 );
-        drawTriangle( dc, si, co, x, y, b1 - 12 );
-    }
-}
-
 void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
 {
     if(origin.size() < 2) // no map to work with
         return;
 
-    wxColour colour(180, 140, 14);
-
-    wxPen pen( colour, 2 );
-
-    dc.SetPen( pen );
-    dc.SetBrush( *wxTRANSPARENT_BRUSH);
-
     RouteMapConfiguration configuration = GetConfiguration();
 
-    Lock();
+    // if zoomed way in, don't cache the arrows for panning, instead we just
+    // render what's onscreen
+    double latmin, latmax, lonmin, lonmax;
+    GetLLBounds(latmin, latmax, lonmin, lonmax);
 
-    int step = 36;
+    PlugIn_ViewPort nvp = vp;
+    nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
+    nvp.pix_width = nvp.pix_height = 0;
+    nvp.rotation = nvp.skew = 0;
 
-    // ensure windbarb positions remain fixed with panning
-    wxPoint p;
-    GetCanvasPixLL( &vp, &p, configuration.StartLat, configuration.StartLon );
-    int xoff = p.x%step, yoff = p.y%step;
-    
-    for(double x = vp.rv_rect.x + xoff; x<vp.rv_rect.width; x+=step)
-        for(double y = vp.rv_rect.y + yoff; y<vp.rv_rect.height; y+=step) {
-            double lat, lon;
-            GetCanvasLLPix( &vp, wxPoint(x, y), &lat, &lon );
+    wxPoint p1, p2, p3, p4;
+    GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
+    GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
+    GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
+    GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
 
-            Position p(lat, configuration.positive_longitudes ? positive_degrees(lon) : lon);
+    wxRect r;
+    r.x = wxMin(wxMin(p1.x, p2.x), wxMin(p3.x, p4.x));
+    r.y = wxMin(wxMin(p1.y, p2.y), wxMin(p3.y, p4.y));
+    r.width = wxMax(wxMax(p1.x, p2.x), wxMax(p3.x, p4.x)) - r.x;
+    r.height = wxMax(wxMax(p1.y, p2.y), wxMax(p3.y, p4.y)) - r.y;
 
-            IsoChronList::iterator it = origin.end();
-            it--;
-            if(!(*it)->Contains(p)) // don't plot outside map
-                continue;
+    // we could somehow "append" to the cache as passing occurs when zoomed really far
+    // in rather than making a complete cache... but how complex does it need to be?
+    bool nocache = r.width*r.height > vp.rv_rect.width*vp.rv_rect.height*9;
 
-            for(it--; it != origin.begin(); it--)
-                if(!(*it)->Contains(p))
-                    break;
+    if(origin.size() != wind_barb_cache_origin_size ||
+       vp.view_scale_ppm != wind_barb_cache_scale ||
+        nocache) {
 
-            double W1, VW1, W2, VW2;
-            int data_mask1, data_mask2; // can be used to colorize barbs based on data type
+        wind_barb_cache_origin_size = origin.size();
+        wind_barb_cache_scale = vp.view_scale_ppm;
 
-            // now it is the isochron before p, so we find the two closest postions
-            Position *p1 = (*it)->ClosestPosition(lat, lon);
-            configuration.grib = (*it)->m_Grib;
-            configuration.time = (*it)->time;
-            p.GetWindData(configuration, W1, VW1, data_mask1);
-
-            it++;
-            Position *p2 = (*it)->ClosestPosition(lat, lon);
-            configuration.grib = (*it)->m_Grib;
-            configuration.time = (*it)->time;
-            p.GetWindData(configuration, W2, VW2, data_mask2);
-
-            // now polar interpolation of the two wind positions
-            double d1 = p.Distance(p1), d2 = p.Distance(p2);
-            double d = d1 / (d1+d2);
-#if 0
-            double W1r = deg2rad(W1), W2r = deg2rad(W2);
-            double W1x = VW1*cos(W1r), W1y = VW1*sin(W1r);
-            double W2x = VW2*cos(W2r), W2y = VW2*sin(W2r);
-            double Wx = d*W1x + (1-d)*W2x, Wy = d*W1y + (1-d)*W2y;
-            double W = rad2deg(atan2(Wy, Wx));
-#else
-            while(W1 - W2 > 180) W1 -= 360;
-            while(W2 - W1 > 180) W2 -= 360;
-            double W = d*W1 + (1-d)*W2;
-#endif
-            double VW = d*VW1 + (1-d)*VW2;
-
-            drawWindArrowWithBarbs( dc, x, y, VW, deg2rad(W), vp.rotation );
+        if(nocache) {
+            r = vp.rv_rect;
+            nvp = vp;
         }
-    Unlock();
+
+        Lock();
+
+        int step = 36;
+
+        wxPoint p;
+        GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
+        int xoff = p.x%step, yoff = p.y%step;
+    
+        for(double x = r.x + xoff; x<r.x+r.width; x+=step)
+            for(double y = r.y + yoff; y<r.y+r.height; y+=step) {
+                double lat, lon;
+                GetCanvasLLPix( &nvp, wxPoint(x, y), &lat, &lon );
+
+                Position p(lat, configuration.positive_longitudes ? positive_degrees(lon) : lon);
+
+                IsoChronList::iterator it = origin.end();
+                it--;
+                if(!(*it)->Contains(p)) // don't plot outside map
+                    continue;
+
+                for(it--; it != origin.begin(); it--)
+                    if(!(*it)->Contains(p))
+                        break;
+
+                double W1, VW1, W2, VW2;
+                int data_mask1, data_mask2; // can be used to colorize barbs based on data type
+
+                // now it is the isochron before p, so we find the two closest postions
+                Position *p1 = (*it)->ClosestPosition(lat, lon);
+                configuration.grib = (*it)->m_Grib;
+                configuration.time = (*it)->time;
+                p.GetWindData(configuration, W1, VW1, data_mask1);
+
+                it++;
+                Position *p2 = (*it)->ClosestPosition(lat, lon);
+                configuration.grib = (*it)->m_Grib;
+                configuration.time = (*it)->time;
+                p.GetWindData(configuration, W2, VW2, data_mask2);
+
+                // now polar interpolation of the two wind positions
+                double d1 = p.Distance(p1), d2 = p.Distance(p2);
+                double d = d1 / (d1+d2);
+#if 0
+                double W1r = deg2rad(W1), W2r = deg2rad(W2);
+                double W1x = VW1*cos(W1r), W1y = VW1*sin(W1r);
+                double W2x = VW2*cos(W2r), W2y = VW2*sin(W2r);
+                double Wx = d*W1x + (1-d)*W2x, Wy = d*W1y + (1-d)*W2y;
+                double W = rad2deg(atan2(Wy, Wx));
+#else
+                while(W1 - W2 > 180) W1 -= 360;
+                while(W2 - W1 > 180) W2 -= 360;
+                double W = d*W1 + (1-d)*W2;
+#endif
+                double VW = d*VW1 + (1-d)*VW2;
+
+                g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW, deg2rad(W) );
+            }
+        Unlock();
+
+        wind_barb_cache.Finalize();
+    }
+
+    wxColour colour(180, 140, 14);
+
+    wxPoint point;
+    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+
+    if(dc.GetDC()) {
+        dc.SetPen( wxPen( colour, 2 ) );
+        dc.SetBrush( *wxTRANSPARENT_BRUSH);
+    } 
+#ifdef ocpnUSE_GL
+    else {
+        if(!nocache) {
+            glPushMatrix();
+            glTranslated(point.x, point.y, 0);
+            glRotated(vp.rotation*180/M_PI, 0, 0, 1);
+        }
+
+        glColor3ub(colour.Red(), colour.Green(), colour.Blue());
+        //      Enable anti-aliased lines, at best quality
+        glEnable( GL_LINE_SMOOTH );
+        glEnable( GL_BLEND );
+        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+        glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+        glLineWidth( 2 );
+        glEnableClientState(GL_VERTEX_ARRAY);
+    }
+#endif
+
+    if(dc.GetDC()) {
+        if(nocache)
+            wind_barb_cache.draw(dc.GetDC());
+        else {
+            LineBuffer tb;
+            tb.pushTransformedBuffer(wind_barb_cache, point.x, dc.GetDC()->GetSize().y-point.y, vp.rotation);
+            tb.Finalize();
+            tb.draw(dc.GetDC());
+        }
+    } else
+        wind_barb_cache.draw(NULL);
+
+#ifdef ocpnUSE_GL
+    if( !dc.GetDC() ) {
+        glDisableClientState(GL_VERTEX_ARRAY);
+
+        if(!nocache)
+            glPopMatrix();
+    }
+#endif
+}
+
+void RouteMapOverlay::GetLLBounds(double &latmin, double &latmax, double &lonmin, double &lonmax)
+{
+    latmin = INFINITY, lonmin = INFINITY;
+    latmax = -INFINITY, lonmax = -INFINITY;
+
+    wxASSERT(origin.size())
+    IsoChron *last = origin.back();    
+    for(IsoRouteList::iterator it = last->routes.begin(); it != last->routes.end(); ++it) {
+        Position *pos = (*it)->skippoints->point;
+        do {
+            latmin = wxMin(latmin, pos->lat);
+            latmax = wxMax(latmax, pos->lat);
+            lonmin = wxMin(lonmin, pos->lon);
+            lonmax = wxMax(lonmax, pos->lon);
+            pos = pos->next;
+        } while(pos != (*it)->skippoints->point);
+    }
 }
 
 void RouteMapOverlay::RequestGrib(wxDateTime time)

@@ -24,6 +24,7 @@
  */
 
 #include "RouteMap.h"
+#include "LineBufferOverlay.h"
 
 class PlugIn_ViewPort;
 
@@ -60,6 +61,7 @@ public:
     void RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
                       ocpnDC &dc, PlugIn_ViewPort &vp);
     void RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp);
+    void GetLLBounds(double &latmin, double &latmax, double &lonmin, double &lonmax);
     void RequestGrib(wxDateTime time);
     std::list<PlotData> &GetPlotData(bool cursor_route=false);
     double RouteInfo(enum RouteInfoType type, bool cursor_route=false);
@@ -104,4 +106,8 @@ private:
     int m_overlaylist;
 
     std::list<PlotData> last_destination_plotdata, last_cursor_plotdata;
+
+    LineBuffer wind_barb_cache;
+    double wind_barb_cache_scale;
+    size_t wind_barb_cache_origin_size;
 };
