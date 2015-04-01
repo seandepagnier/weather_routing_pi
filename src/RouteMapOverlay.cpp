@@ -659,7 +659,6 @@ void RouteMapOverlay::GetLLBounds(double &latmin, double &latmax, double &lonmin
     latmin = INFINITY, lonmin = INFINITY;
     latmax = -INFINITY, lonmax = -INFINITY;
 
-    wxASSERT(origin.size())
     IsoChron *last = origin.back();    
     for(IsoRouteList::iterator it = last->routes.begin(); it != last->routes.end(); ++it) {
         Position *pos = (*it)->skippoints->point;

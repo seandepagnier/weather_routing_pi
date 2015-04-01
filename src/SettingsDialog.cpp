@@ -97,7 +97,7 @@ void SettingsDialog::LoadSettings()
         m_cblFields->Check(i, columns[i]);
     }
 
-    m_cbUseLocalTime->SetValue(pConf->Read( _T("UseLocalTime"), 0L));
+    m_cbUseLocalTime->SetValue((bool)pConf->Read( _T("UseLocalTime"), 0L));
 
     Fit();
     
