@@ -1,6 +1,6 @@
 ##---------------------------------------------------------------------------
-## Author:      Sean D'Epagnier
-## Copyright:   
+## Author:      Pavel Kalian (Based on the work of Sean D'Epagnier)
+## Copyright:   2014
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ IF(WIN32)
   IF(MINGW)
 # assuming wxwidgets is compiled with unicode, this is needed for mingw headers
     ADD_DEFINITIONS( " -DUNICODE" )
-    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${OPENGL_LIBRARIES} "-lz")
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${OPENGL_LIBRARIES})
     SET(OPENCPN_IMPORT_LIB "${PARENT}.dll")
     SET( CMAKE_SHARED_LINKER_FLAGS "-L../buildwin" )
   ENDIF(MINGW)
@@ -37,11 +37,10 @@ IF(UNIX)
     NAMES
     gcov
     PATHS
-    /usr/lib/gcc/x86_64-linux-gnu/4.8.1
+    /usr/lib/gcc/i686-pc-linux-gnu/4.7
     )
 
   SET(EXTRA_LIBS ${EXTRA_LIBS} ${GCOV_LIBRARY})
-
  ENDIF(PROFILING)
 ENDIF(UNIX)
 
@@ -76,9 +75,9 @@ IF(WIN32)
     SET(INSTALL_DIRECTORY "plugins\\\\${PACKAGE_NAME}")
   ENDIF(CMAKE_CROSSCOMPILING)
 
-  IF(${BUNDLE_DATA} AND EXISTS ${PROJECT_SOURCE_DIR}/data)
+  IF(EXISTS ${PROJECT_SOURCE_DIR}/data)
     INSTALL(DIRECTORY data DESTINATION "${INSTALL_DIRECTORY}")
-  ENDIF(${BUNDLE_DATA} AND EXISTS ${PROJECT_SOURCE_DIR}/data)
+  ENDIF(EXISTS ${PROJECT_SOURCE_DIR}/data)
 ENDIF(WIN32)
 
 IF(UNIX AND NOT APPLE)
@@ -86,7 +85,7 @@ IF(UNIX AND NOT APPLE)
   SET(PREFIX_PARENTLIB ${PREFIX_LIB}/${PARENT})
   INSTALL(TARGETS ${PACKAGE_NAME} RUNTIME LIBRARY DESTINATION ${PREFIX_PARENTLIB})
 
- IF(${BUNDLE_DATA} AND EXISTS ${PROJECT_SOURCE_DIR}/data)
+  IF(EXISTS ${PROJECT_SOURCE_DIR}/data)
     INSTALL(DIRECTORY data DESTINATION ${PREFIX_PARENTDATA}/plugins/${PACKAGE_NAME})
-  ENDIF(${BUNDLE_DATA} AND EXISTS ${PROJECT_SOURCE_DIR}/data)
+  ENDIF()
 ENDIF(UNIX AND NOT APPLE)

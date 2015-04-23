@@ -52,7 +52,6 @@ MACRO(GETTEXT_BUILD_MO)
     GET_FILENAME_COMPONENT(_poBasename ${_absFile} NAME_WE)
     SET(_gmoFile ${CMAKE_CURRENT_BINARY_DIR}/${_poBasename}.mo)
 
-IF(APPLE)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_gmoFile}
       COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --check -o ${_gmoFile} ${_absFile}
@@ -60,18 +59,6 @@ IF(APPLE)
       DEPENDS ${_absFile}
       COMMENT "${I18N_NAME}-i18n [${_poBasename}]: Created mo file."
       )
-ELSE(APPLE)
-    ADD_CUSTOM_COMMAND(
-      OUTPUT ${_gmoFile}
-      COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --check -o ${_gmoFile} ${_absFile}
-      COMMAND ${CMAKE_COMMAND} -E copy ${_gmoFile} "Resources/${_poBasename}/LC_MESSAGES/opencpn-${PACKAGE_NAME}.mo"
-      DEPENDS ${_absFile}
-      COMMENT "${I18N_NAME}-i18n [${_poBasename}]: Created mo file."
-      )
-ENDIF(APPLE)
-
-## Why are we copying files to “/use/local/bin/OpenCPN.app” under OSX? Shouldn’t we copy to “/Applications/OpenCPN.app”?
-## Now the languages files will never be used when we do make install.
 
     IF(APPLE)
       INSTALL(FILES ${_gmoFile} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/OpenCPN.app/Contents/Resources/${_poBasename}.lproj RENAME opencpn-${PACKAGE_NAME}.mo )
@@ -89,35 +76,3 @@ if(GETTEXT_MSGFMT_EXECUTABLE)
   ADD_CUSTOM_TARGET(${I18N_NAME}-i18n COMMENT "${PACKAGE_NAME}-i18n: Done." DEPENDS ${_gmoFiles})
   ADD_DEPENDENCIES(${PACKAGE_NAME} ${I18N_NAME}-i18n)
 ENDIF(GETTEXT_MSGFMT_EXECUTABLE)
-
-IF(WIN32)
-  FIND_PROGRAM(ZIP_EXECUTABLE wzzip PATHS "$ENV{ProgramFiles}/WinZip")
-  IF(ZIP_EXECUTABLE)
-    SET(ZIP_COMMAND "${ZIP_EXECUTABLE} -P")
-  ENDIF(ZIP_EXECUTABLE)
-ENDIF(WIN32)
-
-IF(UNIX)
-  FIND_PROGRAM(ZIP_EXECUTABLE zip)
-  IF(ZIP_EXECUTABLE)
-    SET(ZIP_COMMAND "${ZIP_EXECUTABLE} -r")
-  ENDIF(ZIP_EXECUTABLE)
-ENDIF(UNIX)
-
-##
-## This doesn't seem to work -- does everything, sets the variables, but doesn't
-## actually build the zip file.  Does anyone have any idea how to do this?
-##
-MACRO(BUILD_LANGUAGES_ZIP zipFile)
-  ADD_CUSTOM_COMMAND(
-    OUTPUT "${zipFile}"
-    COMMAND ${ZIP_COMMAND} "${zipFile}" "Resources/*"
-    COMMENT "Created zip file ${zipFile} using ${ZIP_COMMAND}"
-  )
-ENDMACRO(BUILD_LANGUAGES_ZIP)
-
-IF(ZIP_COMMAND)
-  BUILD_LANGUAGES_ZIP(${PACKAGE_NAME}_Languages.zip)
-  ADD_CUSTOM_TARGET(${PACKAGE_NAME}_Languages.zip COMMENT "${PACKAGE_NAME}_Languages.zip: Done." DEPENDS ${_gmoFiles})
-  ADD_DEPENDENCIES(${PACKAGE_NAME} ${PACKAGE_NAME}_Languages.zip)
-ENDIF(ZIP_COMMAND)
