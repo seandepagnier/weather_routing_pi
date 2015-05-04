@@ -224,8 +224,11 @@ class ConfigurationDialogBase : public wxDialog
 		wxSpinCtrl* m_sMaxSearchAngle;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_staticText23;
-		wxSpinCtrl* m_sMaxWindKnots;
+		wxSpinCtrl* m_sMaxTrueWindKnots;
 		wxStaticText* m_staticText128;
+		wxStaticText* m_staticText136;
+		wxSpinCtrl* m_sMaxApparentWindKnots;
+		wxStaticText* m_staticText1282;
 		wxPanel* m_panel12;
 		wxStaticText* m_staticText27;
 		wxSpinCtrl* m_sMaxSwellMeters;

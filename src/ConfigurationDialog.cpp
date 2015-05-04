@@ -266,7 +266,8 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_SPIN(MaxDivertedCourse);
     SET_SPIN(MaxCourseAngle);
     SET_SPIN(MaxSearchAngle);
-    SET_SPIN(MaxWindKnots);
+    SET_SPIN(MaxTrueWindKnots);
+    SET_SPIN(MaxApparentWindKnots);
 
     SET_SPIN(MaxSwellMeters);
     SET_SPIN(MaxLatitude);
@@ -388,7 +389,8 @@ void ConfigurationDialog::Update()
         GET_SPIN(MaxDivertedCourse);
         GET_SPIN(MaxCourseAngle);
         GET_SPIN(MaxSearchAngle);
-        GET_SPIN(MaxWindKnots);
+        GET_SPIN(MaxTrueWindKnots);
+        GET_SPIN(MaxApparentWindKnots);
 
         GET_SPIN(MaxSwellMeters);
         GET_SPIN(MaxLatitude);

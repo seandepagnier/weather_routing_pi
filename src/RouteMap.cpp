@@ -600,7 +600,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                             WG, VWG, W, VW, C, VC, atlas, data_mask))
         return false;
 
-    if(VW > configuration.MaxWindKnots)
+    if(VW > configuration.MaxTrueWindKnots)
         return false;
 
     if(configuration.WindVSCurrent) {
@@ -731,6 +731,11 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 continue;
         }
 
+        /* quick test first to avoid slower calculation */
+        if(VB + VW > configuration.MaxApparentWindKnots &&
+           BoatPlan::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
+            continue;
+
         /* landfall test */
         if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
             continue;
@@ -788,7 +793,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
                             WG, VWG, W, VW, C, VC, atlas, data_mask))
         return NAN;
 
-    if(VW > configuration.MaxWindKnots)
+    if(VW > configuration.MaxTrueWindKnots)
         return NAN;
 
     /* todo: we should make sure we don't tack if we are already at the max tacks,
@@ -819,6 +824,11 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
         if(++iters == 10) // give up
             return NAN;
     } while((bearing - BG) > 1e-3);
+
+    /* quick test first to avoid slower calculation */
+    if(VB + VW > configuration.MaxApparentWindKnots &&
+       BoatPlan::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
+        return NAN;
 
     /* landfall test if we are within 60 miles (otherwise it's very slow) */
     if(configuration.DetectLand && dist < 60
