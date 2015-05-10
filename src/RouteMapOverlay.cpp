@@ -597,7 +597,7 @@ void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
 #endif
                 double VW = d*VW1 + (1-d)*VW2;
 
-                g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW, deg2rad(W) );
+                g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW, deg2rad(W), lat < 0 );
             }
         Unlock();
 

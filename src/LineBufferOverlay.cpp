@@ -87,18 +87,18 @@ void LineBuffer::draw(wxDC *dc)
 
 void WindBarbLineBuffer::pushPetiteBarbule( int b )
 {
-    pushLine( b, 0, b + 2, 5 );
+    pushLine( 0, b, -5, b + 2 );
 }
 
 void WindBarbLineBuffer::pushGrandeBarbule( int b )
 {
-    pushLine( b, 0, b + 4, 10 );
+    pushLine( 0, b, -10, b + 4 );
 }
 
 void WindBarbLineBuffer::pushTriangle( int b )
 {
-    pushLine( b, 0, b + 4, 10 );
-    pushLine( b + 8, 0, b + 4, 10 );
+    pushLine( 0, b,     -10, b + 4 );
+    pushLine( 0, b + 8, -10, b + 4 );
 }
 
 LineBufferOverlay g_LineBufferOverlay;
@@ -120,9 +120,9 @@ LineBufferOverlay::LineBufferOverlay()
     for(i=1; i<14; i++) {
         LineBuffer &arrow = m_WindArrowCache[i];
 
-        arrow.pushLine( dec, 0, dec + windArrowSize, 0 );   // hampe
-        arrow.pushLine( dec, 0, dec + 5, 2 );    // flèche
-        arrow.pushLine( dec, 0, dec + 5, -2 );   // flèche
+        arrow.pushLine( 0, dec, 0, dec + windArrowSize );   // hampe
+        arrow.pushLine( 0, dec, 2, dec + 5 );    // flèche
+        arrow.pushLine( 0, dec, -2, dec + 5 );   // flèche
     }
 
     int b1 = dec + windArrowSize - 4;  // position de la 1ère barbule
