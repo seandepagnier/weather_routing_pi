@@ -28,7 +28,7 @@
 
 class PlugIn_ViewPort;
 
-class ocpnDC;
+class wrDC;
 class RouteMapOverlay;
 class SettingsDialog;
 
@@ -55,12 +55,12 @@ public:
 
     bool SetCursorLatLon(double lat, double lon);
     void RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
-                        ocpnDC &dc, PlugIn_ViewPort &vp);
+                        wrDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
-                ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute);
+                wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
     void RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
-                      ocpnDC &dc, PlugIn_ViewPort &vp);
-    void RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp);
+                      wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp);
     void GetLLBounds(double &latmin, double &latmax, double &lonmin, double &lonmax);
     void RequestGrib(wxDateTime time);
     std::list<PlotData> &GetPlotData(bool cursor_route=false);
@@ -87,16 +87,16 @@ public:
 
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent,
-                              ocpnDC &dc, PlugIn_ViewPort &vp);
+                              wrDC &dc, PlugIn_ViewPort &vp);
     virtual bool TestAbort() { return Finished(); }
 
     RouteMapOverlayThread *m_Thread;
     wxMutex routemutex;
 
-    void SetPointColor(ocpnDC &dc, Position *p);
-    void DrawLine(Position *p1, Position *p2, ocpnDC &dc, PlugIn_ViewPort &vp);
+    void SetPointColor(wrDC &dc, Position *p);
+    void DrawLine(Position *p1, Position *p2, wrDC &dc, PlugIn_ViewPort &vp);
     void DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
-                  ocpnDC &dc, PlugIn_ViewPort &vp);
+                  wrDC &dc, PlugIn_ViewPort &vp);
 
     double last_cursor_lat, last_cursor_lon;
     Position *last_cursor_position, *destination_position, *last_destination_position;

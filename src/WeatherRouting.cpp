@@ -193,7 +193,7 @@ WeatherRouting::~WeatherRouting( )
         delete *it;
 }
 
-void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
+void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
 {
     if(!dc.GetDC()) {
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_HINT_BIT ); //Save state

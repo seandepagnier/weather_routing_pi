@@ -311,8 +311,8 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
 bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
-        ocpnDC odc(dc);
-        m_pWeather_Routing->Render(odc, *vp);
+        wrDC wrdc(dc);
+        m_pWeather_Routing->Render(wrdc, *vp);
         return true;
     }
     return false;
@@ -321,8 +321,8 @@ bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
-        ocpnDC odc;
-        m_pWeather_Routing->Render(odc, *vp);
+        wrDC wrdc;
+        m_pWeather_Routing->Render(wrdc, *vp);
         return true;
     }
     return false;
