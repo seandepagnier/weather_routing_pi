@@ -103,11 +103,12 @@ private:
     wxDateTime m_EndTime;
     bool m_bUpdated;
 
-    int m_overlaylist;
+    int m_overlaylist, m_overlaylist_projection;
 
     std::list<PlotData> last_destination_plotdata, last_cursor_plotdata;
 
     LineBuffer wind_barb_cache;
     double wind_barb_cache_scale;
     size_t wind_barb_cache_origin_size;
+    int wind_barb_cache_projection;
 };

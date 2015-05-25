@@ -280,7 +280,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
 
         static const double NORM_FACTOR = 16;
-        const bool use_dl = true;
+        bool use_dl = vp.m_projection_type == PI_PROJECTION_MERCATOR;
         if(!dc.GetDC() && use_dl) {
             glPushMatrix();
 
@@ -294,7 +294,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             glRotated(vp.rotation*180/M_PI, 0, 0, 1);
         }
 
-        if(!dc.GetDC() && !m_UpdateOverlay && use_dl) {
+        if(!dc.GetDC() && !m_UpdateOverlay && use_dl && vp.m_projection_type == m_overlaylist_projection) {
             glCallList(m_overlaylist);
             glPopMatrix();
 
@@ -313,6 +313,8 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 nvp.pix_width = nvp.pix_height = 0;
                 nvp.view_scale_ppm = NORM_FACTOR;
                 nvp.rotation = nvp.skew = 0;
+
+                m_overlaylist_projection = vp.m_projection_type;
             }
 
             /* draw alternate routes first */
@@ -528,14 +530,17 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 
     // we could somehow "append" to the cache as passing occurs when zoomed really far
     // in rather than making a complete cache... but how complex does it need to be?
-    bool nocache = r.width*r.height > vp.rv_rect.width*vp.rv_rect.height*9;
+    bool nocache = r.width*r.height > vp.rv_rect.width*vp.rv_rect.height*9 ||
+        vp.m_projection_type != PI_PROJECTION_MERCATOR;
 
     if(origin.size() != wind_barb_cache_origin_size ||
        vp.view_scale_ppm != wind_barb_cache_scale ||
+       vp.m_projection_type != wind_barb_cache_projection ||
         nocache) {
 
         wind_barb_cache_origin_size = origin.size();
         wind_barb_cache_scale = vp.view_scale_ppm;
+        wind_barb_cache_projection = vp.m_projection_type;
 
         if(nocache) {
             r = vp.rv_rect;
