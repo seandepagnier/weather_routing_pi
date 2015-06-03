@@ -514,12 +514,27 @@ static inline bool ComputeBoatSpeed
             double VBc = plan.Speed(H-W+atlas.W[i], atlas.VW[i]);
             VB += atlas.directions[i]*VBc;
         }
-
+	
         if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)
             VB *= 1-atlas.calm;
-    } else
-        VB = plan.Speed(H, VW);
-
+        } else {
+            // If there's no defined speed for this heading, maybe the wind strength is
+            // more than what's modeled. Search for polar data at a lower wind velocity
+            double c = VW;
+            while (c > 0) {
+                VB = plan.Speed(H, c);
+                if (!isnan(VB)) break;
+                c -= 0.25;
+            }
+            if (isnan(VB))
+               printf("RouteMap:ComputeBoatSpeed: No Polar for wind %f kts @ %f degrees\n", VW, H);
+            else 
+                if (c != VW) {
+                    // Should log a message here instead of silently estimating speed - but it spews too much
+                    // wxLogMessage("RouteMap:ComputeBoatSpeed: Estimating speed with wind %f kts @ %f to wind %f kts speed %f\n", VW, H, c, VB);
+                }
+       }
+    
     /* failed to determine speed.. */
     if(isnan(B) || isnan(VB)) {
         configuration.polar_failed = true;
