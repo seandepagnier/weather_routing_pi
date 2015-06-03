@@ -379,13 +379,28 @@ wxString weather_routing_pi::StandardPath()
 #ifdef __WXGTK__
     wxString stdPath  = std_path.GetUserDataDir();
 #endif
+
 #ifdef __WXOSX__
-    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
+    wxString stdPath  = std_path.GetUserConfigDir() +   // should be ~/Library/Preferences/opencpn
+        wxFileName::GetPathSeparator() + _T("opencpn");
 #endif
 
-    return stdPath + wxFileName::GetPathSeparator() +
+    stdPath = stdPath + wxFileName::GetPathSeparator() +
         _T("plugins") + wxFileName::GetPathSeparator() +
         _T("weather_routing") +  wxFileName::GetPathSeparator();
+
+#ifdef __WXOSX__
+    wxString oldPath = std_path.GetUserConfigDir();
+    oldPath = oldPath + wxFileName::GetPathSeparator() +
+      _T("plugins") + wxFileName::GetPathSeparator() +
+      _T("weather_routing") +  wxFileName::GetPathSeparator();
+    if (wxDirExists(oldPath) && !wxDirExists(stdPath)) {
+	wxLogMessage("weather_routing_pi: moving config dir %s to %s\n", oldPath, stdPath);
+	wxRenameFile(oldPath, stdPath);
+    }
+#endif
+
+    return stdPath;
 }
 
 void weather_routing_pi::ShowMenuItems(bool show)
