@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-04-23 12:10-0500\n"
-"PO-Revision-Date: 2015-04-23 13:12-0400\n"
+"PO-Revision-Date: 2015-06-02 20:34-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: src/Boat.cpp:56
 msgid "Boat file does not exist."
-msgstr ""
+msgstr "Veneen tiedostoa ei ole."
 
 #: src/Boat.cpp:60
 msgid "Failed to load file: "
@@ -70,8 +70,16 @@ msgid "Failed saving boat polar to file"
 msgstr "Tallennus ei onnistunut veneen polar tiedostoon"
 
 #: src/BoatDialog.cpp:746
-msgid "Drag is both frictional and wave based\nThis can be computed based on boat values above then modified manually.\nWith proper settings hull speed will be achieved, but also break into planing mode possible.\nA value 0 zero means no wake, where 100 is heaviest displacement.\nThis also takes into account the different harmonics of wakes before hull speed is reached, so resulting boat polar may appear bumpy.\n"
-msgstr "Vastus on sekä kitka- että aaltopohjainen\nTämä voidaan laskea ylläolevien veneen arvojen avulla ja sitten muuttaa manuaalisesti.\nOikeilla asetuksila runkonopeus saavutetaan, mutta myös liukutila on mahdollinen.\nArvo 0 nolla tarkoittaa ei vanavettä, jossa 100 on raskain uppouma. \nTämä myös ottaa huomioon eritasoiset peräaallot ennenkuin runkonopeus saavutetaan, jonka tuloksena veneen polar vaikuttaa kuoppaiselta.\n"
+msgid "Drag is both frictional and wave based\n"
+"This can be computed based on boat values above then modified manually.\n"
+"With proper settings hull speed will be achieved, but also break into planing mode possible.\n"
+"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
+"This also takes into account the different harmonics of wakes before hull speed is reached, so resulting boat polar may appear bumpy.\n"
+msgstr "Vastus on sekä kitka- että aaltopohjainen\n"
+"Tämä voidaan laskea ylläolevien veneen arvojen avulla ja sitten muuttaa manuaalisesti.\n"
+"Oikeilla asetuksila runkonopeus saavutetaan, mutta myös liukutila on mahdollinen.\n"
+"Arvo 0 nolla tarkoittaa ei vanavettä, jossa 100 on raskain uppouma. \n"
+"Tämä myös ottaa huomioon eritasoiset peräaallot ennenkuin runkonopeus saavutetaan, jonka tuloksena veneen polar vaikuttaa kuoppaiselta.\n"
 
 #: src/BoatDialog.cpp:753
 msgid "Drag Computation"
@@ -234,7 +242,7 @@ msgstr "Sää reititys"
 
 #: src/ConfigurationDialog.cpp:106
 msgid "Select Boat File"
-msgstr ""
+msgstr "Valitse veneen tiedosto"
 
 #: src/ConfigurationDialog.cpp:173
 msgid "Invalid settings, nothing will be done."
@@ -314,11 +322,11 @@ msgstr "pitempi kuin isoympyrä reitti"
 
 #: src/ReportDialog.cpp:87
 msgid "Average Speed Over Water (SOW)"
-msgstr ""
+msgstr "Keskinopeus veden halki (SOW)"
 
 #: src/ReportDialog.cpp:89
 msgid "Average Speed Over Ground (SOG)"
-msgstr ""
+msgstr "Keskimääräinen nopeus pohjan yli (SOG)"
 
 #: src/ReportDialog.cpp:91
 msgid "Average Wind"
@@ -421,8 +429,10 @@ msgid "Start times for cyclone safe routes: "
 msgstr "Aika, josta alkaen on pyörremyrskyturvallisia reittejä: "
 
 #: src/ReportDialog.cpp:324
-msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\nFor example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
-msgstr "Weather Routing raportit antavat yleisnäkymän annettuun reittiiin useiden  koosteiden perusteella.\n\nEsimerkiksi käyttäen kokoonpanon eräajo valintaa, voidaan helposti luoda useita muuten samanlaisia kokoonpanoja, joilla on eri alkamisajat. Kun kaikki nämä asetukset lasketaan ne tulevat saataville raporttigeneraattoriin. Yhteenvetona voidaan antaa parhaat ajat, odotetut nopeudet ja sääolosuhteet. Jos ilmasto-olot on käytettävissä, sykloni riski ja muut sääolosuhteet voidaan kuvata."
+msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\n"
+"For example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
+msgstr "Weather Routing raportit antavat yleisnäkymän annettuun reittiiin useiden  koosteiden perusteella.\n\n"
+"Esimerkiksi käyttäen kokoonpanon eräajo valintaa, voidaan helposti luoda useita muuten samanlaisia kokoonpanoja, joilla on eri alkamisajat. Kun kaikki nämä asetukset lasketaan ne tulevat saataville raporttigeneraattoriin. Yhteenvetona voidaan antaa parhaat ajat, odotetut nopeudet ja sääolosuhteet. Jos ilmasto-olot on käytettävissä, sykloni riski ja muut sääolosuhteet voidaan kuvata."
 
 #: src/ReportDialog.cpp:331
 msgid "Weather Routing Report"
@@ -437,8 +447,26 @@ msgid "Visible"
 msgstr "Näkyvä"
 
 #: src/SettingsDialog.cpp:152
-msgid "Cursor Route -- optimal route closest to the cursor\nDestination Route -- optimal route to the desired destination\nRoute Thickness -- thickness to draw Cursor and Destination Routes\nIso Chron Thickness -- thickness for isochrons on map\nAlternate Routes Thickness -- thickness for alternate routes\nNote: All thicknesses can be set to 0 to disable their display\nAlternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\nSquares At Sail Changes -- render squares along Routes whenever a sail change is made\nFilter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\nNumber of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
-msgstr "Kohdistinreitti--optimaalinen reitti lähimpänä kursoria\nKohdereitti--optimaalinen reitti haluttuun kohteeseen\nVakioaikaero paksuus--aikaeroviivan paksuus kartalla\nVaihtoehtoreittipaksuus--vaihtoehtoisen reittiviivan paksuus\nReittipaksuus--kursorin Kohdereitin viivan piirtopaksuus\nHuomaa: Kaikki paksuudet voidaan asettaa 0 ja estää niiden näkyminen\nVaihtoehdot kaikille aikaerokäyrille--näyttää kaikki vaihtoehtoiset reitit eikä vain niitä,jotka yltävät viimeiseen aikaerokäyrään\nPurjeneliöiden muutokset - mitä tekevät neliöt reiteillä kun tehdään muutoksia purjeisiin\nSuodatetaan reittejä ilmasto-olojen mukaan--tämä ei vielä tee mitään, mutta aioin tehdä Sää reittikartat, jotka jakavat tietoja grib- ja ilmastotiedosta tekevät selväksi, mitä tietoja käytettiin missäkin \n\nLukuisia rinnakkaisia säikeitä--jos on useita kokoonpanoja, ne voidaan laskea eri säikeissä, jonka antaa lisää nopeutta, jos on olemassa useita prosessoreja\n"
+msgid "Cursor Route -- optimal route closest to the cursor\n"
+"Destination Route -- optimal route to the desired destination\n"
+"Route Thickness -- thickness to draw Cursor and Destination Routes\n"
+"Iso Chron Thickness -- thickness for isochrons on map\n"
+"Alternate Routes Thickness -- thickness for alternate routes\n"
+"Note: All thicknesses can be set to 0 to disable their display\n"
+"Alternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\n"
+"Squares At Sail Changes -- render squares along Routes whenever a sail change is made\n"
+"Filter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\n"
+"Number of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
+msgstr "Kohdistinreitti--optimaalinen reitti lähimpänä kursoria\n"
+"Kohdereitti--optimaalinen reitti haluttuun kohteeseen\n"
+"Vakioaikaero paksuus--aikaeroviivan paksuus kartalla\n"
+"Vaihtoehtoreittipaksuus--vaihtoehtoisen reittiviivan paksuus\n"
+"Reittipaksuus--kursorin Kohdereitin viivan piirtopaksuus\n"
+"Huomaa: Kaikki paksuudet voidaan asettaa 0 ja estää niiden näkyminen\n"
+"Vaihtoehdot kaikille aikaerokäyrille--näyttää kaikki vaihtoehtoiset reitit eikä vain niitä,jotka yltävät viimeiseen aikaerokäyrään\n"
+"Purjeneliöiden muutokset - mitä tekevät neliöt reiteillä kun tehdään muutoksia purjeisiin\n"
+"Suodatetaan reittejä ilmasto-olojen mukaan--tämä ei vielä tee mitään, mutta aioin tehdä Sää reittikartat, jotka jakavat tietoja grib- ja ilmastotiedosta tekevät selväksi, mitä tietoja käytettiin missäkin \n\n"
+"Lukuisia rinnakkaisia säikeitä--jos on useita kokoonpanoja, ne voidaan laskea eri säikeissä, jonka antaa lisää nopeutta, jos on olemassa useita prosessoreja\n"
 
 #: src/StatisticsDialog.cpp:62
 msgid "No Route"
@@ -484,8 +512,10 @@ msgid "Cannot make a rule if neither daytime nor nighttime is specified."
 msgstr "Sääntöä ei voi tehdä, jos päivää eikä yötä ole määritetty."
 
 #: src/SwitchPlanDialog.cpp:140
-msgid "Specify conditions where we should change to a different plan.\nIf conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
-msgstr "Määritä edellytykset joissa on siirryttävä eri suunnitelmaan. \nJos olosuhteet muuttuvat dramaattisesti, niin ohjelma katsoo suunnitelmaa joka juuri muutetiin nähdäkseen tarvitseeko sitä muuttaa uudelleen, joten on vain tarve määrittää säännöt seuraavalle lähimmälle toimintasuunnitelmalle."
+msgid "Specify conditions where we should change to a different plan.\n"
+"If conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
+msgstr "Määritä edellytykset joissa on siirryttävä eri suunnitelmaan. \n"
+"Jos olosuhteet muuttuvat dramaattisesti, niin ohjelma katsoo suunnitelmaa joka juuri muutetiin nähdäkseen tarvitseeko sitä muuttaa uudelleen, joten on vain tarve määrittää säännöt seuraavalle lähimmälle toimintasuunnitelmalle."
 
 #: src/WeatherRouting.cpp:127
 msgid "Lat"
@@ -510,7 +540,7 @@ msgstr "Nimi on jo käytössä, korvaa?\n"
 
 #: src/WeatherRouting.cpp:305
 msgid "local"
-msgstr ""
+msgstr "paikallinen"
 
 #: src/WeatherRouting.cpp:328
 msgid "Enter Latitude"
@@ -709,8 +739,12 @@ msgid "Compute optimal routes based on weather and constraints."
 msgstr "Laskee optimaaliset reitit säähän ja rajoituksiin perustuen."
 
 #: src/weather_routing_pi.cpp:147
-msgid "Weather Routing features include:\n  optimal routing subject to various constraints based on weather data\n  automatic boat polar computation\n"
-msgstr "Sää reitityksen ominaisuuksiin kuuluu:\n optimaalinen reititys säädatan eri rajoituksiin perustuva\n automaattinen veneen polarkäyrälaskenta\n"
+msgid "Weather Routing features include:\n"
+"  optimal routing subject to various constraints based on weather data\n"
+"  automatic boat polar computation\n"
+msgstr "Sää reitityksen ominaisuuksiin kuuluu:\n"
+" optimaalinen reititys säädatan eri rajoituksiin perustuva\n"
+" automaattinen veneen polarkäyrälaskenta\n"
 
 #: src/weather_routing_pi.cpp:203
 msgid "Grib plugin version not supported."
@@ -890,11 +924,11 @@ msgstr "Vaihtoehto kaikkille vakioaikakäyrille"
 
 #: src/WeatherRoutingUI.cpp:381
 msgid "Display mark when Sail Plan changes"
-msgstr ""
+msgstr "Näytä merkki purjehdussuunnitelman muuttuessa"
 
 #: src/WeatherRoutingUI.cpp:385
 msgid "Display Wind Barbs"
-msgstr ""
+msgstr "Näytä tuuli väkäset"
 
 #: src/WeatherRoutingUI.cpp:405
 msgid "Computation"
@@ -906,7 +940,7 @@ msgstr "Samanaikaisten säikeiden määrä"
 
 #: src/WeatherRoutingUI.cpp:429
 msgid "Use Local Time"
-msgstr ""
+msgstr "Käytä paikallista aikaa"
 
 #: src/WeatherRoutingUI.cpp:524
 msgid "Date"
@@ -954,7 +988,7 @@ msgstr "s"
 
 #: src/WeatherRoutingUI.cpp:609
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: src/WeatherRoutingUI.cpp:612 src/WeatherRoutingUI.cpp:1990
 msgid "Edit"
@@ -994,12 +1028,12 @@ msgstr "Viimeinen voimassa oleva, jos tiedot puutteellisia"
 
 #: src/WeatherRoutingUI.cpp:672
 msgid "Wind strength is"
-msgstr ""
+msgstr "Tuulen voimakkuus on"
 
 #: src/WeatherRoutingUI.cpp:679 src/WeatherRoutingUI.cpp:3133
 #: src/WeatherRoutingUI.cpp:3144 src/WeatherRoutingUI.cpp:3155
 msgid "percent"
-msgstr ""
+msgstr "prosenttia"
 
 #: src/WeatherRoutingUI.cpp:693
 msgid "Options"
@@ -1392,7 +1426,7 @@ msgstr "Tietoa"
 
 #: src/WeatherRoutingUI.cpp:1804
 msgid "Max Pointing Angle Apparent Wind"
-msgstr ""
+msgstr "Suhteellisen tuulen maks. osoitinkulma"
 
 #: src/WeatherRoutingUI.cpp:1811
 msgid "Wing and Wing Running"
@@ -1407,8 +1441,10 @@ msgid "Polar Computation IMF Settings"
 msgstr "IMF-polarlaskenta asetukset"
 
 #: src/WeatherRoutingUI.cpp:1836
-msgid "Based on general formula\nSpeed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
-msgstr "Perustuu yleisen kaavaan\nnopeus = 2.62 + 0.066 * SA/D suhde + 0,51 * LWL jalat"
+msgid "Based on general formula\n"
+"Speed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
+msgstr "Perustuu yleisen kaavaan\n"
+"nopeus = 2.62 + 0.066 * SA/D suhde + 0,51 * LWL jalat"
 
 #: src/WeatherRoutingUI.cpp:1846
 msgid "Polar File Settings"
@@ -1552,22 +1588,22 @@ msgstr "Muuttuja"
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Speed Over Ground (SOG)"
-msgstr ""
+msgstr "Nopeus pohjan yli (SOG)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Course Over Ground (COG)"
-msgstr ""
+msgstr "Kurssi pohjan yli (COG)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Speed Over Water (SOW)"
-msgstr ""
+msgstr "Nopeus veden yli (SOW)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Course Over Water (COW)"
-msgstr ""
+msgstr "Kurssin veden yli (COW)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
@@ -1597,12 +1633,12 @@ msgstr "Tuulen kurssi maahannähden"
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Apparent Wind Speed (AWS)"
-msgstr ""
+msgstr "Suhteellinen tuulennopeus (AWS)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Apparent Wind Angle (AWA)"
-msgstr ""
+msgstr "Suhteellinen tuulikulma (AWA)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
@@ -1633,8 +1669,22 @@ msgid "Cursor Route"
 msgstr "Kohdistinreitti"
 
 #: src/WeatherRoutingUI.cpp:2577
-msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\nThis also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\nLicense: GPLv3+\n\nSource Code:\nhttps://github.com/seandepagnier/weather_routing_pi\n\nAuthor:\nSean D'Epagnier\n\nMany thanks to all of the translators and testers."
-msgstr "Sään mukaan reitittävä lisäosa opencpn:lle on tarkoitettu suunnitteluvälineeksi, joka pohjaa tietokoneessa olevaan säädataan ja veneen purjehdusominaisuuksiin.\n\nTämä tarkoittaa myös käyttäjien säätrendikoulutusta, jotta uudet kruisailureitit \"keksitään\", vältetään nurjat olot.\n\nLisenssi: GPLv3+\n\nLähdekoodi:\nhttps://github.com/seandepagnier/weather_routing_pi\n\nTekijä:\nSean D'Epagnier\n\nSuurkiitokset kaikille kääntäjille ja testaajille."
+msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\n"
+"This also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\n"
+"License: GPLv3+\n\n"
+"Source Code:\n"
+"https://github.com/seandepagnier/weather_routing_pi\n\n"
+"Author:\n"
+"Sean D'Epagnier\n\n"
+"Many thanks to all of the translators and testers."
+msgstr "Sään mukaan reitittävä lisäosa opencpn:lle on tarkoitettu suunnitteluvälineeksi, joka pohjaa tietokoneessa olevaan säädataan ja veneen purjehdusominaisuuksiin.\n\n"
+"Tämä tarkoittaa myös käyttäjien säätrendikoulutusta, jotta uudet kruisailureitit \"keksitään\", vältetään nurjat olot.\n\n"
+"Lisenssi: GPLv3+\n\n"
+"Lähdekoodi:\n"
+"https://github.com/seandepagnier/weather_routing_pi\n\n"
+"Tekijä:\n"
+"Sean D'Epagnier\n\n"
+"Suurkiitokset kaikille kääntäjille ja testaajille."
 
 #: src/WeatherRoutingUI.cpp:2586
 msgid "About Author"
@@ -1755,15 +1805,15 @@ msgstr "Veneet"
 
 #: src/WeatherRoutingUI.cpp:3167
 msgid "100"
-msgstr ""
+msgstr "100"
 
 #: src/WeatherRoutingUI.cpp:3170
 msgid "80 to 120"
-msgstr ""
+msgstr "80-120"
 
 #: src/WeatherRoutingUI.cpp:3180
 msgid "Wind Strength"
-msgstr ""
+msgstr "Tuulen voimakkuus"
 
 #: src/WeatherRoutingUI.cpp:3192
 msgid "Reset"

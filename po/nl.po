@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-04-23 12:10-0500\n"
-"PO-Revision-Date: 2015-04-23 13:12-0400\n"
+"PO-Revision-Date: 2015-06-02 20:34-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: src/Boat.cpp:56
 msgid "Boat file does not exist."
-msgstr ""
+msgstr "Boot bestand bestaat niet."
 
 #: src/Boat.cpp:60
 msgid "Failed to load file: "
@@ -70,8 +70,16 @@ msgid "Failed saving boat polar to file"
 msgstr "Opslaan van polairbestand mislukt"
 
 #: src/BoatDialog.cpp:746
-msgid "Drag is both frictional and wave based\nThis can be computed based on boat values above then modified manually.\nWith proper settings hull speed will be achieved, but also break into planing mode possible.\nA value 0 zero means no wake, where 100 is heaviest displacement.\nThis also takes into account the different harmonics of wakes before hull speed is reached, so resulting boat polar may appear bumpy.\n"
-msgstr "Weerstand is gevolg van zowel wrijving als van golven.\nWeerstand kan worden berekend op basis van de vaartuigwaarden hierboven en kan vervolgens handmatig worden bewerkt. \nMet de juiste instellingen zal het vaartuig de 'rompsnelheid' kunnen bereiken, maar mogelijk kan het ook gaan planeren. \nEen waarde van 0 (nul) betekent dat er geen hekgolf is, en een waarde 100 betekent de grootste waterverplaatsing. \nDit houdt rekening met de verschillende harmonischen van hekgolven voordat de 'rompsnelheid' is bereikt. Hierdoor kan het diagram onregelmatig overkomen.\n"
+msgid "Drag is both frictional and wave based\n"
+"This can be computed based on boat values above then modified manually.\n"
+"With proper settings hull speed will be achieved, but also break into planing mode possible.\n"
+"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
+"This also takes into account the different harmonics of wakes before hull speed is reached, so resulting boat polar may appear bumpy.\n"
+msgstr "Weerstand is gevolg van zowel wrijving als van golven.\n"
+"Weerstand kan worden berekend op basis van de vaartuigwaarden hierboven en kan vervolgens handmatig worden bewerkt. \n"
+"Met de juiste instellingen zal het vaartuig de 'rompsnelheid' kunnen bereiken, maar mogelijk kan het ook gaan planeren. \n"
+"Een waarde van 0 (nul) betekent dat er geen hekgolf is, en een waarde 100 betekent de grootste waterverplaatsing. \n"
+"Dit houdt rekening met de verschillende harmonischen van hekgolven voordat de 'rompsnelheid' is bereikt. Hierdoor kan het diagram onregelmatig overkomen.\n"
 
 #: src/BoatDialog.cpp:753
 msgid "Drag Computation"
@@ -234,7 +242,7 @@ msgstr "Weerroutering"
 
 #: src/ConfigurationDialog.cpp:106
 msgid "Select Boat File"
-msgstr ""
+msgstr "Selecteer boot bestand"
 
 #: src/ConfigurationDialog.cpp:173
 msgid "Invalid settings, nothing will be done."
@@ -314,11 +322,11 @@ msgstr "langer dan grootcirkelroute"
 
 #: src/ReportDialog.cpp:87
 msgid "Average Speed Over Water (SOW)"
-msgstr ""
+msgstr "Gemiddelde snelheid Over Water (SOW)"
 
 #: src/ReportDialog.cpp:89
 msgid "Average Speed Over Ground (SOG)"
-msgstr ""
+msgstr "Gemiddelde snelheid Over de grond (SOG)"
 
 #: src/ReportDialog.cpp:91
 msgid "Average Wind"
@@ -421,8 +429,10 @@ msgid "Start times for cyclone safe routes: "
 msgstr "Starttijden voor orkaanvrije routes: "
 
 #: src/ReportDialog.cpp:324
-msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\nFor example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
-msgstr "Weerroutering Rapport geeft een overzicht van verschillende mogelijkheden om een bepaald traject af te leggen.\n\nMet de Configuratie Dialoog kunt u bijvoorbeeld verschillende starttijden te genereren voor verder identieke routemogelijkheden.  Als al deze mogelijkheden zijn berekend , zijn deze beschikbaar voor de rapportgenerator. Hiermee kan een overzicht worden gegeven van snelste tijden, verwachte vaarten en weersomstandigheden. Als de plugin Climatology beschikbaar is, kunnen ook orkaankans en aanvullende weersomstandigheden in het rapport worden opgenomen."
+msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\n"
+"For example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
+msgstr "Weerroutering Rapport geeft een overzicht van verschillende mogelijkheden om een bepaald traject af te leggen.\n\n"
+"Met de Configuratie Dialoog kunt u bijvoorbeeld verschillende starttijden te genereren voor verder identieke routemogelijkheden.  Als al deze mogelijkheden zijn berekend , zijn deze beschikbaar voor de rapportgenerator. Hiermee kan een overzicht worden gegeven van snelste tijden, verwachte vaarten en weersomstandigheden. Als de plugin Climatology beschikbaar is, kunnen ook orkaankans en aanvullende weersomstandigheden in het rapport worden opgenomen."
 
 #: src/ReportDialog.cpp:331
 msgid "Weather Routing Report"
@@ -437,8 +447,26 @@ msgid "Visible"
 msgstr "Zichtbaar"
 
 #: src/SettingsDialog.cpp:152
-msgid "Cursor Route -- optimal route closest to the cursor\nDestination Route -- optimal route to the desired destination\nRoute Thickness -- thickness to draw Cursor and Destination Routes\nIso Chron Thickness -- thickness for isochrons on map\nAlternate Routes Thickness -- thickness for alternate routes\nNote: All thicknesses can be set to 0 to disable their display\nAlternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\nSquares At Sail Changes -- render squares along Routes whenever a sail change is made\nFilter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\nNumber of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
-msgstr "Cursorroute -- optimale route dichtst langs de cursor\nBestemmingroute -- optimale route naar de gewenste bestemming\nRoutedikte -- lijndikte van te tekenen lijn voor cursor- en bestemmingroutes\nIso Chron-dikte -- lijndikte van isochronen op kaart\nAlternatieve routedikte -- lijndikte voor alternatieve routes\nOpmerking: alle lijndiktes kunnen worden ingesteld op 0 om weergave te voorkomen\nAlternatieven voor alle isochronen -- toon alle alternatieve routes en niet alleen de routes die de laatste isochron bereiken\nVierkantjes bij zeilwijzigingen -- teken vierkantjes langs routes wanneer een zeilwijziging is gedaan\nFilter routes door Klimatologie PlugIn -- (de koppeling met deze plugin werkt nog niet)\n\nAantal gelijktijdige threads -- bij meerdere configuraties kunnen deze in aparte threads worden berekend; dat gaat sneller als er meerdere processoren beschikbaar zijn\n"
+msgid "Cursor Route -- optimal route closest to the cursor\n"
+"Destination Route -- optimal route to the desired destination\n"
+"Route Thickness -- thickness to draw Cursor and Destination Routes\n"
+"Iso Chron Thickness -- thickness for isochrons on map\n"
+"Alternate Routes Thickness -- thickness for alternate routes\n"
+"Note: All thicknesses can be set to 0 to disable their display\n"
+"Alternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\n"
+"Squares At Sail Changes -- render squares along Routes whenever a sail change is made\n"
+"Filter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\n"
+"Number of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
+msgstr "Cursorroute -- optimale route dichtst langs de cursor\n"
+"Bestemmingroute -- optimale route naar de gewenste bestemming\n"
+"Routedikte -- lijndikte van te tekenen lijn voor cursor- en bestemmingroutes\n"
+"Iso Chron-dikte -- lijndikte van isochronen op kaart\n"
+"Alternatieve routedikte -- lijndikte voor alternatieve routes\n"
+"Opmerking: alle lijndiktes kunnen worden ingesteld op 0 om weergave te voorkomen\n"
+"Alternatieven voor alle isochronen -- toon alle alternatieve routes en niet alleen de routes die de laatste isochron bereiken\n"
+"Vierkantjes bij zeilwijzigingen -- teken vierkantjes langs routes wanneer een zeilwijziging is gedaan\n"
+"Filter routes door Klimatologie PlugIn -- (de koppeling met deze plugin werkt nog niet)\n\n"
+"Aantal gelijktijdige threads -- bij meerdere configuraties kunnen deze in aparte threads worden berekend; dat gaat sneller als er meerdere processoren beschikbaar zijn\n"
 
 #: src/StatisticsDialog.cpp:62
 msgid "No Route"
@@ -484,8 +512,10 @@ msgid "Cannot make a rule if neither daytime nor nighttime is specified."
 msgstr "Kan geen regel maken als overdag of 's-nachts niet is gespecificeerd."
 
 #: src/SwitchPlanDialog.cpp:140
-msgid "Specify conditions where we should change to a different plan.\nIf conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
-msgstr "Geef voorwaarden voor waar veranderd moet worden naar een ander plan.\nAls de voorwaarden in grote mate wijzigen, zal de plugin beoordelen of het juist aangepaste plan opnieuw aangepast dient te worden; het is dus alleen nodig om regels te specificeren voor het volgende, dichtstbijzijnde plan."
+msgid "Specify conditions where we should change to a different plan.\n"
+"If conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
+msgstr "Geef voorwaarden voor waar veranderd moet worden naar een ander plan.\n"
+"Als de voorwaarden in grote mate wijzigen, zal de plugin beoordelen of het juist aangepaste plan opnieuw aangepast dient te worden; het is dus alleen nodig om regels te specificeren voor het volgende, dichtstbijzijnde plan."
 
 #: src/WeatherRouting.cpp:127
 msgid "Lat"
@@ -510,7 +540,7 @@ msgstr "Deze naam bestaat al; vervangen?\n"
 
 #: src/WeatherRouting.cpp:305
 msgid "local"
-msgstr ""
+msgstr "lokale"
 
 #: src/WeatherRouting.cpp:328
 msgid "Enter Latitude"
@@ -709,8 +739,12 @@ msgid "Compute optimal routes based on weather and constraints."
 msgstr "Berekenen van de optimale routes op basis van weergegevens en grenswaarden."
 
 #: src/weather_routing_pi.cpp:147
-msgid "Weather Routing features include:\n  optimal routing subject to various constraints based on weather data\n  automatic boat polar computation\n"
-msgstr "De Weerroutering PlugIn heeft de volgende functies: \n  - berekenen van optimale vaarroute met verschillende beperkingen en gebaseerd op weergegevens\n  - automatisch berekenen van polairdiagram voor vaartuig.\n"
+msgid "Weather Routing features include:\n"
+"  optimal routing subject to various constraints based on weather data\n"
+"  automatic boat polar computation\n"
+msgstr "De Weerroutering PlugIn heeft de volgende functies: \n"
+"  - berekenen van optimale vaarroute met verschillende beperkingen en gebaseerd op weergegevens\n"
+"  - automatisch berekenen van polairdiagram voor vaartuig.\n"
 
 #: src/weather_routing_pi.cpp:203
 msgid "Grib plugin version not supported."
@@ -718,7 +752,8 @@ msgstr "GRIB plugin-versie wordt niet ondersteund."
 
 #: src/weather_routing_pi.cpp:242
 msgid "Climatology plugin version not supported, no climatology data."
-msgstr "De aanwezige versie van de Klimatologie PlugIn wordt niet ondersteund; geen klimatologiegegevens beschikbaar\n."
+msgstr "De aanwezige versie van de Klimatologie PlugIn wordt niet ondersteund; geen klimatologiegegevens beschikbaar\n"
+"."
 
 #: src/weather_routing_pi.cpp:250
 msgid "Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"
@@ -890,11 +925,11 @@ msgstr "Alternatieven voor alle isochronen"
 
 #: src/WeatherRoutingUI.cpp:381
 msgid "Display mark when Sail Plan changes"
-msgstr ""
+msgstr "Mark weergeven wanneer Zeil Plan veranderd"
 
 #: src/WeatherRoutingUI.cpp:385
 msgid "Display Wind Barbs"
-msgstr ""
+msgstr "Weergave Wind weerhaken"
 
 #: src/WeatherRoutingUI.cpp:405
 msgid "Computation"
@@ -906,7 +941,7 @@ msgstr "Aantal gelijktijdige threads"
 
 #: src/WeatherRoutingUI.cpp:429
 msgid "Use Local Time"
-msgstr ""
+msgstr "Lokale tijd gebruiken"
 
 #: src/WeatherRoutingUI.cpp:524
 msgid "Date"
@@ -954,7 +989,7 @@ msgstr "s"
 
 #: src/WeatherRoutingUI.cpp:609
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: src/WeatherRoutingUI.cpp:612 src/WeatherRoutingUI.cpp:1990
 msgid "Edit"
@@ -994,12 +1029,12 @@ msgstr "Laatste geldig als gegevens ontbreken"
 
 #: src/WeatherRoutingUI.cpp:672
 msgid "Wind strength is"
-msgstr ""
+msgstr "Windkracht is"
 
 #: src/WeatherRoutingUI.cpp:679 src/WeatherRoutingUI.cpp:3133
 #: src/WeatherRoutingUI.cpp:3144 src/WeatherRoutingUI.cpp:3155
 msgid "percent"
-msgstr ""
+msgstr "procent"
 
 #: src/WeatherRoutingUI.cpp:693
 msgid "Options"
@@ -1392,7 +1427,7 @@ msgstr "Info"
 
 #: src/WeatherRoutingUI.cpp:1804
 msgid "Max Pointing Angle Apparent Wind"
-msgstr ""
+msgstr "Max. zeilhoek schijnbare wind"
 
 #: src/WeatherRoutingUI.cpp:1811
 msgid "Wing and Wing Running"
@@ -1407,8 +1442,10 @@ msgid "Polar Computation IMF Settings"
 msgstr "IMF-instellingen voor berekening polairdiagram "
 
 #: src/WeatherRoutingUI.cpp:1836
-msgid "Based on general formula\nSpeed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
-msgstr "Gebaseerd op algemen formule\nVaart = 2.62 + 0.066 * (ratio zeiloppervlak_waterverplaatsing) + 0.51 * LWLvoet"
+msgid "Based on general formula\n"
+"Speed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
+msgstr "Gebaseerd op algemen formule\n"
+"Vaart = 2.62 + 0.066 * (ratio zeiloppervlak_waterverplaatsing) + 0.51 * LWLvoet"
 
 #: src/WeatherRoutingUI.cpp:1846
 msgid "Polar File Settings"
@@ -1552,22 +1589,22 @@ msgstr "Variabele"
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Speed Over Ground (SOG)"
-msgstr ""
+msgstr "Snelheid Over de grond (SOG)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Course Over Ground (COG)"
-msgstr ""
+msgstr "Koers Over grond (COG)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Speed Over Water (SOW)"
-msgstr ""
+msgstr "Snelheid Over Water (SOW)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Course Over Water (COW)"
-msgstr ""
+msgstr "Koers Over Water (COW)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
@@ -1597,12 +1634,12 @@ msgstr "Windkoers over grond"
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Apparent Wind Speed (AWS)"
-msgstr ""
+msgstr "Schijnbare windsnelheid (AWS)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
 msgid "Apparent Wind Angle (AWA)"
-msgstr ""
+msgstr "Schijnbare Wind Hoek (AWA)"
 
 #: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
 #: src/WeatherRoutingUI.cpp:2436
@@ -1633,8 +1670,21 @@ msgid "Cursor Route"
 msgstr "Cursorroute"
 
 #: src/WeatherRoutingUI.cpp:2577
-msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\nThis also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\nLicense: GPLv3+\n\nSource Code:\nhttps://github.com/seandepagnier/weather_routing_pi\n\nAuthor:\nSean D'Epagnier\n\nMany thanks to all of the translators and testers."
-msgstr "De Weerroutering PlugIn voor OpenCPN helpt bij de planning van vaarroutes gebaseerd op geautomatiseerde weergegevens en de zeileigenschappen van het vaartuig.\n\nOok informeert de plugin de gebruikers over weertrends, over nieuwe vaarroutes en over het voorkomen van slechte vaaromstandigheden.\n\nLicentie: GPLv3 + \n\nBroncode: \\ nhttps://github.com/seandepagnier/weather_routing_pi \n\nAuteur:\nSean D'Epagnier\n\nVeel dank aan alle vertalers en testers."
+msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\n"
+"This also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\n"
+"License: GPLv3+\n\n"
+"Source Code:\n"
+"https://github.com/seandepagnier/weather_routing_pi\n\n"
+"Author:\n"
+"Sean D'Epagnier\n\n"
+"Many thanks to all of the translators and testers."
+msgstr "De Weerroutering PlugIn voor OpenCPN helpt bij de planning van vaarroutes gebaseerd op geautomatiseerde weergegevens en de zeileigenschappen van het vaartuig.\n\n"
+"Ook informeert de plugin de gebruikers over weertrends, over nieuwe vaarroutes en over het voorkomen van slechte vaaromstandigheden.\n\n"
+"Licentie: GPLv3 + \n\n"
+"Broncode: \\ nhttps://github.com/seandepagnier/weather_routing_pi \n\n"
+"Auteur:\n"
+"Sean D'Epagnier\n\n"
+"Veel dank aan alle vertalers en testers."
 
 #: src/WeatherRoutingUI.cpp:2586
 msgid "About Author"
@@ -1755,15 +1805,15 @@ msgstr "Vaartuigen"
 
 #: src/WeatherRoutingUI.cpp:3167
 msgid "100"
-msgstr ""
+msgstr "100"
 
 #: src/WeatherRoutingUI.cpp:3170
 msgid "80 to 120"
-msgstr ""
+msgstr "80 tot 120"
 
 #: src/WeatherRoutingUI.cpp:3180
 msgid "Wind Strength"
-msgstr ""
+msgstr "Windkracht"
 
 #: src/WeatherRoutingUI.cpp:3192
 msgid "Reset"

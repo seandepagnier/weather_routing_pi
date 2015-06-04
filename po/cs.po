@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-04-23 12:10-0500\n"
-"PO-Revision-Date: 2015-04-23 13:12-0400\n"
+"PO-Revision-Date: 2015-05-23 05:01-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -70,7 +70,11 @@ msgid "Failed saving boat polar to file"
 msgstr "Chyba při ukládání polárů lodě do souboru"
 
 #: src/BoatDialog.cpp:746
-msgid "Drag is both frictional and wave based\nThis can be computed based on boat values above then modified manually.\nWith proper settings hull speed will be achieved, but also break into planing mode possible.\nA value 0 zero means no wake, where 100 is heaviest displacement.\nThis also takes into account the different harmonics of wakes before hull speed is reached, so resulting boat polar may appear bumpy.\n"
+msgid "Drag is both frictional and wave based\n"
+"This can be computed based on boat values above then modified manually.\n"
+"With proper settings hull speed will be achieved, but also break into planing mode possible.\n"
+"A value 0 zero means no wake, where 100 is heaviest displacement.\n"
+"This also takes into account the different harmonics of wakes before hull speed is reached, so resulting boat polar may appear bumpy.\n"
 msgstr ""
 
 #: src/BoatDialog.cpp:753
@@ -421,7 +425,8 @@ msgid "Start times for cyclone safe routes: "
 msgstr "Počáteční časy pro trasy bezpečné řed cyklonami: "
 
 #: src/ReportDialog.cpp:324
-msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\nFor example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
+msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\n"
+"For example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
 msgstr ""
 
 #: src/ReportDialog.cpp:331
@@ -437,7 +442,16 @@ msgid "Visible"
 msgstr "Viditelný"
 
 #: src/SettingsDialog.cpp:152
-msgid "Cursor Route -- optimal route closest to the cursor\nDestination Route -- optimal route to the desired destination\nRoute Thickness -- thickness to draw Cursor and Destination Routes\nIso Chron Thickness -- thickness for isochrons on map\nAlternate Routes Thickness -- thickness for alternate routes\nNote: All thicknesses can be set to 0 to disable their display\nAlternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\nSquares At Sail Changes -- render squares along Routes whenever a sail change is made\nFilter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\nNumber of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
+msgid "Cursor Route -- optimal route closest to the cursor\n"
+"Destination Route -- optimal route to the desired destination\n"
+"Route Thickness -- thickness to draw Cursor and Destination Routes\n"
+"Iso Chron Thickness -- thickness for isochrons on map\n"
+"Alternate Routes Thickness -- thickness for alternate routes\n"
+"Note: All thicknesses can be set to 0 to disable their display\n"
+"Alternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\n"
+"Squares At Sail Changes -- render squares along Routes whenever a sail change is made\n"
+"Filter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\n"
+"Number of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
 msgstr ""
 
 #: src/StatisticsDialog.cpp:62
@@ -484,7 +498,8 @@ msgid "Cannot make a rule if neither daytime nor nighttime is specified."
 msgstr "Nelze vytvořit pravidlo bez specifikace dne nebo noci."
 
 #: src/SwitchPlanDialog.cpp:140
-msgid "Specify conditions where we should change to a different plan.\nIf conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
+msgid "Specify conditions where we should change to a different plan.\n"
+"If conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
 msgstr ""
 
 #: src/WeatherRouting.cpp:127
@@ -709,7 +724,9 @@ msgid "Compute optimal routes based on weather and constraints."
 msgstr "Výpočet optimální trasy založený na počasí a omezeních."
 
 #: src/weather_routing_pi.cpp:147
-msgid "Weather Routing features include:\n  optimal routing subject to various constraints based on weather data\n  automatic boat polar computation\n"
+msgid "Weather Routing features include:\n"
+"  optimal routing subject to various constraints based on weather data\n"
+"  automatic boat polar computation\n"
 msgstr ""
 
 #: src/weather_routing_pi.cpp:203
@@ -1407,8 +1424,10 @@ msgid "Polar Computation IMF Settings"
 msgstr "Nastavení polárního výpočtu IMF"
 
 #: src/WeatherRoutingUI.cpp:1836
-msgid "Based on general formula\nSpeed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
-msgstr "Založeno na obecném vzorci\nRychlost = 2.62 + 0.066*SA/D poměr + 0.51*LWL stop"
+msgid "Based on general formula\n"
+"Speed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
+msgstr "Založeno na obecném vzorci\n"
+"Rychlost = 2.62 + 0.066*SA/D poměr + 0.51*LWL stop"
 
 #: src/WeatherRoutingUI.cpp:1846
 msgid "Polar File Settings"
@@ -1633,7 +1652,14 @@ msgid "Cursor Route"
 msgstr "Kurzorová trasa"
 
 #: src/WeatherRoutingUI.cpp:2577
-msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\nThis also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\nLicense: GPLv3+\n\nSource Code:\nhttps://github.com/seandepagnier/weather_routing_pi\n\nAuthor:\nSean D'Epagnier\n\nMany thanks to all of the translators and testers."
+msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\n"
+"This also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\n"
+"License: GPLv3+\n\n"
+"Source Code:\n"
+"https://github.com/seandepagnier/weather_routing_pi\n\n"
+"Author:\n"
+"Sean D'Epagnier\n\n"
+"Many thanks to all of the translators and testers."
 msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2586
