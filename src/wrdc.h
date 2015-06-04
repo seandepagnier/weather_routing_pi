@@ -5,8 +5,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2011 by Sean D'Epagnier                                 *
- *   sean at depagnier dot com                                             *
+ *   Copyright (C) 2015 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -28,10 +27,12 @@
  */
 
 
-#ifndef __OCPNDC_H__
-#define __OCPNDC_H__
+#ifndef __WRDC_H__
+#define __WRDC_H__
 
 #include <vector>
+
+#include "TexFont.h"
 
 #ifndef DECL_EXP
 #ifdef __WXMSW__
@@ -47,28 +48,32 @@
 #define DECL_EXP       __attribute__((visibility("default")))
 #endif
 
+void DrawGLThickLine( float x1, float y1, float x2, float y2, wxPen pen, bool b_hiqual );
+
 //----------------------------------------------------------------------------
-// ocpnDC
+// wrDC
 //----------------------------------------------------------------------------
 
 class wxGLCanvas;
 
-class DECL_EXP ocpnDC
+class DECL_EXP wrDC
 {
 public:
-     ocpnDC(wxGLCanvas &canvas);
-     ocpnDC(wxDC &pdc);
-     ocpnDC();
+     wrDC(wxGLCanvas &canvas);
+     wrDC(wxDC &pdc);
+     wrDC();
 
-     ~ocpnDC();
+     ~wrDC();
 
      void SetBackground( const wxBrush &brush );
      void SetPen( const wxPen &pen);
      void SetBrush( const wxBrush &brush);
      void SetTextForeground(const wxColour &colour);
      void SetFont(const wxFont& font);
-     static void SetGLAttrs( bool highQuality );
-     void SetGLStipple() const;
+     static void SetGLStipple(int mode, bool needs_blend=false);
+     static void ClearGLStipple();
+
+     static bool s_pushed_blend;
 
      const wxPen& GetPen() const;
      const wxBrush& GetBrush() const;
@@ -92,7 +97,6 @@ public:
 
      void DrawEllipse(wxCoord x, wxCoord y, wxCoord width, wxCoord height);
      void DrawPolygon(int n, wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0);
-     void DrawPolygonTessellated(int n, wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0);
      void StrokePolygon(int n, wxPoint points[], wxCoord xoffset = 0, wxCoord yoffset = 0);
 
      void DrawBitmap(const wxBitmap &bitmap, wxCoord x, wxCoord y, bool usemask);
@@ -121,6 +125,7 @@ protected:
      wxBrush m_brush;
      wxColour m_textforegroundcolour;
      wxFont m_font;
+     TexFont m_texfont;
 
 #if  wxUSE_GRAPHICS_CONTEXT
      wxGraphicsContext *pgc;

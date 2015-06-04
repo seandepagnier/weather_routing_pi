@@ -193,7 +193,7 @@ WeatherRouting::~WeatherRouting( )
         delete *it;
 }
 
-void WeatherRouting::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
+void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
 {
     if(!dc.GetDC()) {
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_HINT_BIT ); //Save state
@@ -1086,7 +1086,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 90);
                     configuration.MaxCourseAngle = AttributeDouble(e, "MaxCourseAngle", 180);
                     configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 120);
-                    configuration.MaxWindKnots = AttributeDouble(e, "MaxWindKnots", 100);
+                    configuration.MaxTrueWindKnots = AttributeDouble(e, "MaxTrueWindKnots", 100);
+                    configuration.MaxApparentWindKnots = AttributeDouble(e, "MaxApparentWindKnots", 100);
 
                     configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
                     configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
@@ -1185,7 +1186,8 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("MaxDivertedCourse", configuration.MaxDivertedCourse);
         c->SetAttribute("MaxCourseAngle", configuration.MaxCourseAngle);
         c->SetAttribute("MaxSearchAngle", configuration.MaxSearchAngle);
-        c->SetAttribute("MaxWindKnots", configuration.MaxWindKnots);
+        c->SetAttribute("MaxTrueWindKnots", configuration.MaxTrueWindKnots);
+        c->SetAttribute("MaxApparentWindKnots", configuration.MaxApparentWindKnots);
 
         c->SetAttribute("MaxSwellMeters", configuration.MaxSwellMeters);
         c->SetAttribute("MaxLatitude", configuration.MaxLatitude);
@@ -1832,7 +1834,8 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.MaxDivertedCourse = 90;
     configuration.MaxCourseAngle = 180;
     configuration.MaxSearchAngle = 120;
-    configuration.MaxWindKnots = 100;
+    configuration.MaxTrueWindKnots = 100;
+    configuration.MaxApparentWindKnots = 100;
 
     configuration.MaxSwellMeters = 20;
     configuration.MaxLatitude = 90;

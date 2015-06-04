@@ -48,6 +48,9 @@ SET(SRC_WEATHER_ROUTING
             src/WeatherRoutingUI.cpp
             src/icons.cpp
 
+            src/wrdc.cpp
+            src/TexFont.cpp
+
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp

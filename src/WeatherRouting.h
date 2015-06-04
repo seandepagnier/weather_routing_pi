@@ -83,7 +83,7 @@ public:
 
     void Reset();
 
-    void Render(ocpnDC &dc, PlugIn_ViewPort &vp);
+    void Render(wrDC &dc, PlugIn_ViewPort &vp);
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
 

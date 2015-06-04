@@ -184,7 +184,7 @@ struct RouteMapConfiguration {
     enum IntegratorType { NEWTON, RUNGE_KUTTA };
     IntegratorType Integrator;
 
-    double MaxDivertedCourse, MaxCourseAngle, MaxSearchAngle, MaxWindKnots;
+    double MaxDivertedCourse, MaxCourseAngle, MaxSearchAngle, MaxTrueWindKnots, MaxApparentWindKnots;
     double MaxSwellMeters, MaxLatitude, TackingTime, WindVSCurrent;
 
     bool AvoidCycloneTracks;

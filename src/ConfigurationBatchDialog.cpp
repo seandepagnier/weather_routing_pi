@@ -45,7 +45,7 @@ ConfigurationBatchDialog::ConfigurationBatchDialog(WeatherRouting *parent)
     Reset();
 }
 
-void ConfigurationBatchDialog::Render(ocpnDC &dc, PlugIn_ViewPort &vp)
+void ConfigurationBatchDialog::Render(wrDC &dc, PlugIn_ViewPort &vp)
 {
     if(!IsShown() ||
        m_notebookConfigurations->GetCurrentPage() != m_pRoutes)

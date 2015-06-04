@@ -26,7 +26,7 @@
 #include <wx/wx.h>
 
 #include "ocpn_plugin.h"
-#include "ocpndc.h"
+#include "wrdc.h"
 #include "wxJSON/jsonreader.h"
 #include "wxJSON/jsonwriter.h"
 
@@ -99,7 +99,7 @@ void RouteMapOverlay::DeleteThread()
     m_Thread = NULL;
 }
 
-static void SetColor(ocpnDC &dc, wxColour c, bool penifgl = false)
+static void SetColor(wrDC &dc, wxColour c, bool penifgl = false)
 {
     if(!dc.GetDC()) {
         glColor4ub(c.Red(), c.Green(), c.Blue(), c.Alpha());
@@ -111,7 +111,7 @@ static void SetColor(ocpnDC &dc, wxColour c, bool penifgl = false)
     dc.SetPen(pen);
 }
 
-static void SetWidth(ocpnDC &dc, int w, bool penifgl = false)
+static void SetWidth(wrDC &dc, int w, bool penifgl = false)
 {
     if(!dc.GetDC()) {
         glLineWidth(w);
@@ -124,7 +124,7 @@ static void SetWidth(ocpnDC &dc, int w, bool penifgl = false)
 }
 
 void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
-                               ocpnDC &dc, PlugIn_ViewPort &vp)
+                               wrDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint p1p, p2p;
     GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
@@ -139,7 +139,7 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
 }
 
 void RouteMapOverlay::DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
-                               ocpnDC &dc, PlugIn_ViewPort &vp)
+                               wrDC &dc, PlugIn_ViewPort &vp)
 {
 #if 0
     double p1plon, p2plon;
@@ -196,7 +196,7 @@ static wxColour TransparentColor(wxColor c)
 }
 
 void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
-                                     ocpnDC &dc, PlugIn_ViewPort &vp)
+                                     wrDC &dc, PlugIn_ViewPort &vp)
 {
     SkipPosition *s = r->skippoints;
     if(!s)
@@ -228,7 +228,7 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour
 }
 
 void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
-                                           ocpnDC &dc, PlugIn_ViewPort &vp)
+                                           wrDC &dc, PlugIn_ViewPort &vp)
 {
     Position *pos = r->skippoints->point;
     wxColor black = wxColour(0, 0, 0, 192), tblack = TransparentColor(black);
@@ -260,7 +260,7 @@ static wxColour Darken(wxColour c)
 }
 
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
-                             ocpnDC &dc, PlugIn_ViewPort &vp, bool justendroute)
+                             wrDC &dc, PlugIn_ViewPort &vp, bool justendroute)
 {
     if(!justendroute) {
         RouteMapConfiguration configuration = GetConfiguration();
@@ -424,7 +424,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 }
 
 void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
-                                   ocpnDC &dc, PlugIn_ViewPort &vp)
+                                   wrDC &dc, PlugIn_ViewPort &vp)
 {
     if(!pos)
         return;
@@ -497,7 +497,7 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSa
     Unlock();
 }
 
-void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 {
     if(origin.size() < 2) // no map to work with
         return;
@@ -597,7 +597,7 @@ void RouteMapOverlay::RenderWindBarbs(ocpnDC &dc, PlugIn_ViewPort &vp)
 #endif
                 double VW = d*VW1 + (1-d)*VW2;
 
-                g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW, deg2rad(W) );
+                g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW, deg2rad(W), lat < 0 );
             }
         Unlock();
 
