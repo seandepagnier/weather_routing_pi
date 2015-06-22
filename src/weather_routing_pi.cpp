@@ -237,7 +237,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             int major = v[_T("ClimatologyVersionMajor")].AsInt();
             int minor = v[_T("ClimatologyVersionMinor")].AsInt();
 
-            if(major > 1 || (major == 1 && minor > 0)) {
+            if(major > CLIMATOLOGY_MAX_MAJOR || (major == CLIMATOLOGY_MAX_MAJOR && minor > CLIMATOLOGY_MAX_MINOR)) {
                 wxMessageDialog mdlg(m_parent_window,
                                      _("Climatology plugin version not supported, no climatology data."),
                                      _("Weather Routing"), wxOK | wxICON_WARNING);
@@ -245,7 +245,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
                 return;
             }
                         
-            if(major == 0 && minor < 10) {
+            if(major == CLIMATOLOGY_MIN_MAJOR && minor < CLIMATOLOGY_MIN_MINOR) {
                 wxMessageDialog mdlg(m_parent_window,
                                      _("Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"),
                                      _("Weather Routing"), wxOK | wxICON_WARNING);
