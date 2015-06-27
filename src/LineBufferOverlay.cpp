@@ -51,11 +51,12 @@ void LineBuffer::Finalize()
 void LineBuffer::pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south)
 {
     // transform vertexes by angle
-    float six = sinf( ang ), cox = cosf( ang ), siy, coy;
+    float six, cox, siy = sinf( ang ), coy = cosf( ang );
+
     if(south)
-        siy = -six, coy = -cox;
+        six = -siy, cox = -coy;
     else
-        siy = six, coy = cox;
+        six =  siy, cox =  coy;
 
     for(int i=0; i < 2*buffer.count; i+=2) {
         float *k = buffer.lines + 2*i;
