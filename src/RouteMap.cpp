@@ -2159,8 +2159,10 @@ bool RouteMapConfiguration::Update()
         }
     }
 
-    if(!havestart || !haveend)
+    if(!havestart || !haveend) {
+        StartLat = StartLon = EndLat = EndLon = NAN;
         return false;
+    }
 
     if((positive_longitudes = fabs(average_longitude(StartLon, EndLon)) > 90)) {
         StartLon = positive_degrees(StartLon);

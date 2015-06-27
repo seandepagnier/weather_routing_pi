@@ -265,19 +265,24 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     if(!justendroute) {
         RouteMapConfiguration configuration = GetConfiguration();
 
-        wxPoint r;
-        GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
-        SetColor(dc, *wxBLUE, true);
-        SetWidth(dc, 3, true);
-        dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
-        dc.DrawLine(r.x, r.y-10, r.x-10, r.y+7);
-        dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
+        if(!isnan(configuration.StartLat)) {
+            wxPoint r;
+            GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
+            SetColor(dc, *wxBLUE, true);
+            SetWidth(dc, 3, true);
+            dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
+            dc.DrawLine(r.x, r.y-10, r.x-10, r.y+7);
+            dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
+        }
 
-        GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
-        SetColor(dc, *wxRED, true);
-        SetWidth(dc, 3, true);
-        dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
-        dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
+        if(!isnan(configuration.StartLon)) {
+            wxPoint r;
+            GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
+            SetColor(dc, *wxRED, true);
+            SetWidth(dc, 3, true);
+            dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
+            dc.DrawLine(r.x-10, r.y+10, r.x+10, r.y-10);
+        }
 
         static const double NORM_FACTOR = 16;
         bool use_dl = vp.m_projection_type == PI_PROJECTION_MERCATOR;
