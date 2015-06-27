@@ -250,7 +250,7 @@ void WeatherRouting::AddPosition(double lat, double lon)
             it != RouteMap::Positions.end(); it++) {
             if((*it).Name == name) {
                 wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),
-                                     _("Weather Routing"), wxYES | wxNO | wxICON_ERROR);
+                                     _("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
                 if(mdlg.ShowModal() == wxID_YES) {
                     long index = m_lPositions->FindItem(0, name);
                     (*it).lat = lat;
