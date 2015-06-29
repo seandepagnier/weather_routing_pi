@@ -1,6 +1,6 @@
 ##---------------------------------------------------------------------------
-## Author:      Sean D'Epagnier
-## Copyright:   
+## Author:      Pavel Kalian (Based on the work of Sean D'Epagnier)
+## Copyright:   2014
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ IF(WIN32)
 
 #  These lines set the name of the Windows Start Menu shortcut and the icon that goes with it
 #  SET(CPACK_NSIS_INSTALLED_ICON_NAME "${PACKAGE_NAME}")
-#  SET(CPACK_NSIS_DISPLAY_NAME "OpenCPN ${PACKAGE_NAME}")
+SET(CPACK_NSIS_DISPLAY_NAME "OpenCPN ${PACKAGE_NAME}")
 
 #  SET(CPACK_PACKAGE_FILE_NAME "${PACKAGE_NAME}_${VERSION_MAJOR}.${VERSION_MINOR}_setup" )
 
@@ -77,11 +77,13 @@ IF(UNIX AND NOT APPLE)
     SET(PACKAGE_DEPS "opencpn, bzip2, gzip")
     SET(PACKAGE_RELEASE 1)
 
-    SET(CPACK_GENERATOR "DEB;RPM;TBZ2")
 
   IF (CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
     SET (ARCH "armhf")
+    # don't bother with rpm on armhf
+    SET(CPACK_GENERATOR "DEB;RPM;TBZ2")
   ELSE ()
+    SET(CPACK_GENERATOR "DEB;RPM;TBZ2")
 
     IF (CMAKE_SIZEOF_VOID_P MATCHES "8")
       SET (ARCH "amd64")
@@ -98,7 +100,7 @@ IF(UNIX AND NOT APPLE)
     SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE ${ARCH})
     SET(CPACK_DEBIAN_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}")
     SET(CPACK_DEBIAN_PACKAGE_SECTION "misc")
-    SET(CPACK_DEBIAN_COMPRESSION_TYPE "xz")
+    SET(CPACK_DEBIAN_COMPRESSION_TYPE "xz") # requires my patches to cmake
 
     SET(CPACK_RPM_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}")
     SET(CPACK_RPM_PACKAGE_REQUIRES  ${PACKAGE_DEPS})
@@ -150,7 +152,7 @@ IF(APPLE)
 
  #  Copy a bunch of files so the Packages installer builder can find them
  #  relative to ${CMAKE_CURRENT_BINARY_DIR}
- #  This avoids absolute paths in the wmm.pkgproj file
+ #  This avoids absolute paths in the chartdldr_pi.pkgproj file
 
 configure_file(${PROJECT_SOURCE_DIR}/cmake/gpl.txt
             ${CMAKE_CURRENT_BINARY_DIR}/license.txt COPYONLY)
