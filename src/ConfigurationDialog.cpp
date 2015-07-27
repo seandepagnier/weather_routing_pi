@@ -446,12 +446,6 @@ void ConfigurationDialog::Update()
             refresh = true; // update drawing X
     }
 
-    if(configuration.dt == 0) {
-        wxMessageDialog mdlg(this, _("Zero Time Step is invalid"),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
-        mdlg.ShowModal();
-    }
-
     if(m_lDegreeSteps->GetCount() < 4) {
         wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
                              wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
