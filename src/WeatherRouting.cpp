@@ -1663,6 +1663,14 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
         return;
 
     RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
+
+    if(configuration.dt == 0) {
+        wxMessageDialog mdlg(this, _("Zero Time Step is invalid"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+        return;
+    }
+
     /* initialize crossing land routine from main thread as it is
        not re-entrant, and cannot be done by worker-threads later */
     if(configuration.DetectLand)

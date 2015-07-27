@@ -89,6 +89,7 @@ private:
     void OnEditSwitchPlanRule( wxCommandEvent& event );
     void EditSwitchPlanRule( bool edit );
     void OnDeleteSwitchPlanRule( wxCommandEvent& event );
+    void SetupCurrentPlanPolar();
     void RepopulateSwitchPlans();
 
     wxString FormatVMG(double W, double VW);

@@ -37,7 +37,8 @@ public:
     SwitchPlan() :
         MaxWindSpeed(NAN), MinWindSpeed(NAN),
         MaxWindDirection(NAN), MinWindDirection(NAN),
-        MaxWaveHeight(NAN), MinWaveHeight(NAN) {}
+        MaxWaveHeight(NAN), MinWaveHeight(NAN),
+        DayTime(true), NightTime(true) {}
 
     double MaxWindSpeed, MinWindSpeed;
     double MaxWindDirection, MinWindDirection;

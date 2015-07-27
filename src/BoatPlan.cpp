@@ -756,12 +756,12 @@ int BoatPlan::TrySwitchBoatPlan(double VW, double H, double Swell,
 
     for(unsigned int i=0; i<SwitchPlans.size(); i++) {
         SwitchPlan &p = SwitchPlans[i];
-        if(!isnan(p.MaxWindSpeed)     && p.MaxWindSpeed >= VW)     continue;
-        if(!isnan(p.MaxWindSpeed)     && p.MaxWindSpeed <= VW)     continue;
-        if(!isnan(p.MaxWindDirection) && p.MaxWindDirection >= H)  continue;
-        if(!isnan(p.MinWindDirection) && p.MinWindDirection <= H)  continue;
-        if(!isnan(p.MaxWaveHeight)    && p.MaxWaveHeight >= Swell) continue;
-        if(!isnan(p.MinWaveHeight)    && p.MinWaveHeight <= Swell) continue;
+        if(p.MaxWindSpeed >= VW)     continue;
+        if(p.MinWindSpeed <= VW)     continue;
+        if(p.MaxWindDirection >= H)  continue;
+        if(p.MinWindDirection <= H)  continue;
+        if(p.MaxWaveHeight >= Swell) continue;
+        if(p.MinWaveHeight <= Swell) continue;
         if(!p.DayTime) {
             if(ComputeDayTime(gribtime, lat, lon, daytime)) continue;
         } else if(!p.NightTime)

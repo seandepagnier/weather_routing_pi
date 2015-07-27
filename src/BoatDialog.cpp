@@ -758,30 +758,7 @@ so resulting boat polar may appear bumpy.\n"),
 void BoatDialog::OnSailPlanSelected( wxListEvent& event )
 {
     m_SelectedSailPlan = event.GetIndex();
-    
-    BoatPlan &curplan = m_Boat.Plans[m_SelectedSailPlan];
-    m_cPolarMethod->SetSelection(curplan.polarmethod);
-    switch(curplan.polarmethod) {
-    case BoatPlan::TRANSFORM:
-    {
-        m_sLuffAngle->SetValue(curplan.luff_angle);
-        m_cbOptimizeTacking->SetValue(curplan.optimize_tacking);
-        m_cbWingWingRunning->SetValue(curplan.wing_wing_running);
-        double eta = curplan.eta;
-        SetEta(eta);
-        m_sEta->SetValue(sqrt(eta) * 1000.0);
-    }
-    default:
-        break;
-    }
-
-    m_sbFile->ShowItems(curplan.polarmethod == BoatPlan::FROM_FILE);
-    m_sbComputationTransform->ShowItems(curplan.polarmethod == BoatPlan::TRANSFORM);
-    m_sbComputationIMF->ShowItems(curplan.polarmethod == BoatPlan::IMF);
-    m_pPolarConfig->Fit();
-    m_PlotWindow->Refresh();
-    RepopulateSwitchPlans();
-    Fit();
+    SetupCurrentPlanPolar();
 }
 
 void BoatDialog::OnPolarMethod( wxCommandEvent& event )
@@ -941,15 +918,7 @@ void BoatDialog::RepopulatePlans()
     m_bDeleteBoatPlan->Enable(enable);
     m_bNewSwitchPlanRule->Enable(enable);
 
-    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
-
-    m_fpFilePath->SetPath(plan.fileFileName);
-    m_stWindSpeedStep->SetLabel
-        (wxString::Format(_T("%d"), plan.wind_speed_step));
-    m_stWindDegreeStep->SetLabel
-        (wxString::Format(_T("%d"), plan.wind_degree_step));
-
-    RepopulateSwitchPlans();
+    SetupCurrentPlanPolar();
 }
 
 void BoatDialog::Compute()
@@ -1058,6 +1027,40 @@ void BoatDialog::OnDeleteSwitchPlanRule( wxCommandEvent& event )
     SwitchPlan plan = boatplan.SwitchPlans[index];
     boatplan.SwitchPlans.erase(boatplan.SwitchPlans.begin() + index);
     RepopulateSwitchPlans();
+}
+
+void BoatDialog::SetupCurrentPlanPolar()
+{
+    BoatPlan &plan = m_Boat.Plans[m_SelectedSailPlan];
+    m_cPolarMethod->SetSelection(plan.polarmethod);
+    switch(plan.polarmethod) {
+    case BoatPlan::TRANSFORM:
+    {
+        m_sLuffAngle->SetValue(plan.luff_angle);
+        m_cbOptimizeTacking->SetValue(plan.optimize_tacking);
+        m_cbWingWingRunning->SetValue(plan.wing_wing_running);
+        double eta = plan.eta;
+        SetEta(eta);
+        m_sEta->SetValue(sqrt(eta) * 1000.0);
+    }
+    case BoatPlan::FROM_FILE:
+        m_fpFilePath->SetPath(plan.fileFileName);
+        m_stWindSpeedStep->SetLabel
+            (wxString::Format(_T("%d"), plan.wind_speed_step));
+        m_stWindDegreeStep->SetLabel
+            (wxString::Format(_T("%d"), plan.wind_degree_step));
+
+    default:
+        break;
+    }
+
+    m_sbFile->ShowItems(plan.polarmethod == BoatPlan::FROM_FILE);
+    m_sbComputationTransform->ShowItems(plan.polarmethod == BoatPlan::TRANSFORM);
+    m_sbComputationIMF->ShowItems(plan.polarmethod == BoatPlan::IMF);
+    m_pPolarConfig->Fit();
+    m_PlotWindow->Refresh();
+    RepopulateSwitchPlans();
+    Fit();
 }
 
 void BoatDialog::RepopulateSwitchPlans()
