@@ -23,12 +23,13 @@ SET(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}" )
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
-# SET(PROFILING 1)
+#SET(PROFILING 1)
 
 #  IF NOT DEBUGGING CFLAGS="-O2 -march=native"
 IF(NOT MSVC)
  IF(PROFILING)
   ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions" )
+    SET(EXTRA_LIBS ${EXTRA_LIBS} "gcov")
  ELSE(PROFILING)
   IF(DEBUG)
     ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -fexceptions" )

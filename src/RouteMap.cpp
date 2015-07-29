@@ -220,17 +220,12 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 #define EPS 2e-16
 #define EPS2 2e-8 // should be half the exponent of EPS
     if(fabs(denom) < EPS) { /* parallel or really close to parallel */
-#if 1
 #define EPS3 1e-5
         if(fabs(ax) < EPS3 && fabs(ay) < EPS3) /* first segment is a zero segment */
             return -2;
 
         if(fabs(bx) < EPS3 && fabs(by) < EPS3) /* second segment is a zero segment */
             return 2;
-#else
-        if(ax == 0 && ay == 0) /* first segment is a zero segment */
-            return -2;
-#endif
 
         /* we already know from initial test we are overlapping,
            for parallel line segments, there is no way to tell
@@ -294,7 +289,7 @@ static int ComputeQuadrantFast(Position *p, Position *q)
     else
         quadrant = 2;
 
-    if(p->lon  < q->lon)
+    if(p->lon < q->lon)
         quadrant++;
 
     return quadrant;
@@ -996,39 +991,53 @@ int IsoRoute::IntersectionCount(Position &pos)
     double lat = pos.lat, lon = pos.lon;
 
     SkipPosition *s1 = skippoints;
+
+    double s1plon = s1->point->lon;
+    int state1 = (lon < s1plon);
     do {
         SkipPosition *s2 = s1->next;
-        double s1plon = s1->point->lon, s2plon = s2->point->lon;
-
-        /* we could avoid completely recomputing the state every time,
-           and use all 9 states, cutting comparison tests and switches
-           in half (nearly double the speed of this routine)
-           but it would complicate things, and this routine tends to
-           take less than 1% of the total runtime */
-        int state = (lon < s1plon) + (lon < s2plon);
-        if(state == 1) {
+        double s2plon = s2->point->lon;
+        int state0 = state1;
+        state1 = (lon < s2plon);
+        if(state0 != state1) {
             double s1plat = s1->point->lat, s2plat = s2->point->lat;
-            state = (lat < s1plat) + (lat < s2plat);
+            int state = (lat < s1plat) + (lat < s2plat);
 
             switch(state) {
             case 1: /* must test every point in this case as point falls in boundaries of skip list */
             {
                 Position *p1 = s1->point;
+                double p1lon = p1->lon;
+                int pstate1 = lon < p1lon;
                 do {
                     Position *p2 = p1->next;
-                    double p1lon = p1->lon, p2lon = p2->lon;
-                    state = (lon < p1lon) + (lon < p2lon);
-                    if(state == 1) {
+                    double p2lon = p2->lon;
+                    int pstate0 = pstate1;
+                    pstate1 = lon < p2lon;
+                    if(pstate0 != pstate1) {
                         double p1lat = p1->lat, p2lat = p2->lat;
                         state = (lat < p1lat) + (lat < p2lat);
                         switch(state) {
                         case 1: /* must perform exact intersection test */
                         {
+                            double p1lon = p1->lon;
+#if 0
                             int dir = TestIntersectionXY(p1lon, p1lat, p2lon, p2lat, lon, lat, lon, 91);
                             switch(dir) {
                             case -2: case -3: case 2: case 3: return -1;
                             case 1: case -1: goto intersects;
                             }
+#else
+                            double m1 = (lat - p1lat) * (p2lon - p1lon);
+                            double m2 = (lon - p1lon) * (p2lat - p1lat);
+
+                            if(s1->quadrant & 1) {
+                                if(m1 < m2)
+                                    goto intersects;
+                            } else
+                                if(m1 > m2)
+                                    goto intersects;
+#endif
                         } break;
                         case 2: /* must intersect, we are below */
                             goto intersects;
@@ -1873,14 +1882,6 @@ bool Merge(IsoRouteList &rl, IsoRoute *route1, IsoRoute *route2, int level, bool
     return false;
 }
 
-/* much faster than "a->Distance(b);" */
-static double SimpleDistance(Position *a, Position *b)
-{
-    double dlat = a->lat - b->lat, dlon = fabs(a->lon - b->lon);
-    while(dlon > 180) dlon -= 360;
-    return dlat*dlat + dlon*dlon;
-}
-
 /* find closest position in the routemap */
 Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
 {
@@ -1888,23 +1889,19 @@ Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
 
     /* first find closest skip position */
     SkipPosition *s = skippoints;
-    Position pos(lat, lon), *minpos = s->point;
-    int lq = -1;
+    Position *minpos = s->point;
+#if 0
+    Position pos(lat, lon);
+    int q1 = ComputeQuadrant(&pos, s->point);
     do {
-        int q1 = ComputeQuadrant(&pos, s->point);
-
-        bool dotest = true;
-        if(q1 == s->quadrant)
-            dotest = false;
-        /* tangent, maybe we can avoid testing in rabbit cases */
-        else if(lq == s->quadrant && q1 != (lq^3) && q1 == s->prev->quadrant)
-            dotest = false;
-        lq = q1;
-
-        if(dotest) {
+        int q2 = ComputeQuadrant(&pos, s->next->point);
+        if(q1 != s->quadrant || q2 != (s->quadrant^3)) {
             Position *p = s->point, *e = s->next->point;
+
             do {
-                double dist = SimpleDistance(&pos, p);
+                double dlat = lat - p->lat, dlon = lon - p->lon;
+                double dist = dlat*dlat + dlon*dlon;
+
                 if(dist < mindist) {
                     minpos = p;
                     mindist = dist;
@@ -1913,10 +1910,24 @@ Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
             } while(p != e);
         }
 
+        q1 = q2;
         s = s->next;
     } while(s != skippoints);
 
-    mindist = pos.Distance(minpos);
+#else
+    // somehow this is faster??
+    Position *p = s->point;
+    do {
+        double dlat = lat - p->lat, dlon = lon - p->lon;
+        double dist = dlat*dlat + dlon*dlon;
+
+        if(dist < mindist) {
+            minpos = p;
+            mindist = dist;
+        }
+        p = p->next;
+    } while(p != s->point);
+#endif
 
     /* now try children */
     for(IsoRouteList::iterator it = children.begin(); it != children.end();  it++) {
@@ -1927,8 +1938,10 @@ Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
             mindist = dist;
         }
     }
+
     if(dist)
         *dist = mindist;
+
     return minpos;
 }
 
@@ -2379,7 +2392,7 @@ bool RouteMap::Propagate()
     return true;
 }
 
-Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool before_last)
+Position *RouteMap::ClosestPosition(double lat, double lon, double *dist)
 {
     if(origin.empty())
         return NULL;
@@ -2389,8 +2402,6 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
     Lock();
 
     IsoChronList::iterator it = origin.end();
-    if(before_last)
-        it--;
 
     Position p(lat, m_Configuration.positive_longitudes ? positive_degrees(lon) : lon);
     do {
@@ -2401,11 +2412,13 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist, bool b
         if(pos && dist < mindist) {
             minpos = pos;
             mindist = dist;
-        }
+        } else if(dist > mindist)
+            break;
 
         /* bail if we don't contain because obviously we aren't getting any closer */
         if(!(*it)->Contains(p))
             break;
+
     } while(it != origin.begin());
 
     Unlock();
