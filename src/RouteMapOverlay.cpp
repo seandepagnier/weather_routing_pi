@@ -703,28 +703,24 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 {
     std::list<PlotData> &plotdata = cursor_route ? last_cursor_plotdata : last_destination_plotdata;
     if(plotdata.empty()) {
-        Position *pos = cursor_route ? last_cursor_position : last_destination_position;
+        Position *next = cursor_route ? last_cursor_position : last_destination_position;
 
-        if(!pos)
+        if(!next)
             return plotdata;
 
-        // omit destination position.  This is because we don't have grib
-        // data for the exact endtime to use and the constraints aren't applied
-        // for the end position anyway, so statistics for max wind may exceed the constraints
-        if(pos == destination_position)
-            pos = pos->parent;
+        Position *pos = next->parent;
 
         RouteMapConfiguration configuration = GetConfiguration();
         Lock();
         IsoChronList::iterator it = origin.begin(), itp;
 
-        // get route iso for this position
-        Position *p = pos->parent;
-        for(; p; p=p->parent)
+
+        
+        for(Position *p = pos; p; p=p->parent)
             if(++it == origin.end())
                 return plotdata;
 
-        for(p = pos; p; p = p->parent) {
+        while(pos) {
             itp = it;
             itp--;
 
@@ -733,19 +729,15 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
             PlotData data;
 
             double dt = configuration.dt;
-            if(p == destination_position) {
-                wxDateTime starttime = (*itp)->time, endtime = EndTime();
-                if(starttime.IsValid() && endtime.IsValid())
-                    dt = (endtime - starttime).GetSeconds().ToDouble();
-                data.time = endtime;
-            } else
-                data.time = (*it)->time;
+            data.time = (*it)->time;
 
-            data.lat = p->lat, data.lon = p->lon;
-            if(p->GetPlotData(dt, configuration, data))
-                plotdata.push_front(data);
+            data.lat = pos->lat, data.lon = pos->lon;
+            pos->GetPlotData(next, dt, configuration, data);
+            plotdata.push_front(data);
 
             it = itp;
+            next = pos;
+            pos = pos->parent;
         }
 
         Unlock();
@@ -763,11 +755,9 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
         switch(type) {
         case DISTANCE:
         {
-            if(it != plotdata.begin()) {
-                double dist;
-                DistanceBearingMercator_Plugin(lat0, lon0, it->lat, it->lon, 0, &dist);
-                total += dist;
-            }
+            if(it != plotdata.begin())
+                total += DistGreatCircle_Plugin(lat0, lon0, it->lat, it->lon);
+
             lat0 = it->lat;
             lon0 = it->lon;
         } break;
@@ -827,6 +817,10 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
     case DISTANCE:
         if(total == 0)
             total = NAN;
+        else if(Finished()) {
+            RouteMapConfiguration configuration = GetConfiguration();
+            total += DistGreatCircle_Plugin(lat0, lon0, configuration.EndLat, configuration.EndLon);
+        }
         return total;
     case PERCENTAGE_UPWIND:
     case PORT_STARBOARD:

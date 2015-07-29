@@ -402,7 +402,6 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
             double speeds[8];
             if(RouteMap::ClimatologyWindAtlasData(configuration.time, p->lat, p->lon, windatlas_count,
                                                   atlas.directions, speeds, atlas.storm, atlas.calm)) {
-
                 /* compute wind speeds over water with the given current */
                 for(int i=0; i<windatlas_count; i++) {
                     double WG = i*360/windatlas_count;
@@ -466,28 +465,23 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
 }
 
 /* get data from a position for plotting */
-bool Position::GetPlotData(double dt, RouteMapConfiguration &configuration, PlotData &data)
+void Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(configuration.grib, lat, lon);
     data.tacks = tacks;
 
     climatology_wind_atlas atlas;
     int data_mask = 0; // not used for plotting yet
-    ReadWindAndCurrents(configuration, this,
-                        data.WG, data.VWG, data.W, data.VW, data.C, data.VC, atlas, data_mask);
+    ReadWindAndCurrents(configuration, this, data.WG, data.VWG,
+                        data.W, data.VW, data.C, data.VC, atlas, data_mask);
 
-    if(parent) {
-        ll_gc_ll_reverse(parent->lat, parent->lon, lat, lon, &data.BG, &data.VBG);
-        if(dt == 0)
-            data.VBG = 0;
-        else
-            data.VBG *= 3600 / dt;
-        OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
+    ll_gc_ll_reverse(lat, lon, next->lat, next->lon, &data.BG, &data.VBG);
+    if(dt == 0)
+        data.VBG = 0;
+    else
+        data.VBG *= 3600 / dt;
 
-        return true;
-    }
-
-    return false;
+    OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
 }
 
 void Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)

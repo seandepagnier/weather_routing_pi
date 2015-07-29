@@ -53,7 +53,7 @@ public:
 
     SkipPosition *BuildSkipList();
 
-    bool GetPlotData(double dt,
+    void GetPlotData(Position *next, double dt,
                      RouteMapConfiguration &configuration, PlotData &data);
     void GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
 
