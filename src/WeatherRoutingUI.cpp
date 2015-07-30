@@ -661,7 +661,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	fgSizer58->Add( fgSizer59, 1, wxEXPAND, 5 );
 	
-	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, _("Last Valid if Data Deficient"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
+	m_cbAllowDataDeficient = new wxCheckBox( this, wxID_ANY, _("Last Valid Wind Data if Deficient"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer58->Add( m_cbAllowDataDeficient, 0, wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer1071;

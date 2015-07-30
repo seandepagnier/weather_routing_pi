@@ -78,7 +78,7 @@ public:
 
     // used for rendering
     enum DataMask { GRIB_WIND=1, CLIMATOLOGY_WIND=2, DATA_DEFICIENT_WIND=4,
-                    GRIB_CURRENT=8, CLIMATOLOGY_CURRENT=16 };
+                    GRIB_CURRENT=8, CLIMATOLOGY_CURRENT=16, DATA_DEFICIENT_CURRENT=32 };
     int data_mask;
 };
 

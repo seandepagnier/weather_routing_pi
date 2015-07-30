@@ -134,7 +134,8 @@ static bool Current(GribRecordSet *grib, RouteMapConfiguration::ClimatologyDataT
                     const wxDateTime &time, double lat, double lon,
                     double &C, double &VC, int &data_mask)
 {
-    if(GribCurrent(grib, lat, lon, C, VC)) {
+    if(!configuration.grib_is_data_deficient &&
+       GribCurrent(grib, lat, lon, C, VC)) {
         data_mask |= Position::GRIB_CURRENT;
         return true;
     }
@@ -146,8 +147,20 @@ static bool Current(GribRecordSet *grib, RouteMapConfiguration::ClimatologyDataT
         return true;
     }
 
+#if 0  // for now disable deficient current data as it's usefulness is not known
+    // use deficient grib current if climatology is not available
+    // unlike wind, we don't use current data from a different location
+    // so only current data from a different time is allowed
+    if(configuration.AllowDataDeficient &&
+       configuration.grib_is_data_deficient &&
+       GribCurrent(grib, lat, lon, C, VC)) {
+        data_mask |= Position::GRIB_CURRENT | Position::DATA_DEFICIENT_CURRENT;
+        return true;
+    }
+#endif
+
     return false;
-}                    
+}
 
 /* Sometimes localized currents can be strong enough to create
    a breeze which can be sailed off even if there is no wind.
@@ -375,7 +388,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
  climatology_wind_atlas &atlas, int &data_mask)
 {
     /* read current data */
-    if(!configuration.Currents || /*configuration.grib_is_data_deficient ||*/
+    if(!configuration.Currents ||
        !Current(configuration.grib, configuration.ClimatologyType,
                 configuration.time, p->lat, p->lon, C, VC, data_mask))
         C = VC = 0;
@@ -456,6 +469,15 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
             return false;
     }
     VWG *= configuration.WindStrength;
+
+
+
+
+
+
+
+
+
 
     OverWater(WG, VWG, C, VC, W, VW);
     return true;

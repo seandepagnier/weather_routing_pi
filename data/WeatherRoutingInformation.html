@@ -53,8 +53,8 @@ can be viewed during grib playback.
       <li><b>Most Likely</b> Use the interpolated most likely wind data from the wind atlas, with the most likely wind speed.</li>
       <li><b>Average</b> Use wind vector average for wind direction, and wind magnitude average for wind speed.  This
     is the fastest to compute, but not very realistic (it may be close in prevailing conditions).</li></ul>
-  <li><b>Allow Data Deficient</b> Continue to navigate on last valid wind data
-    even if there is no more valid wind data in the area/time.</li>
+  <li><b>Last Valid Wind Data if Deficient</b> Continue to navigate on last valid wind data
+    even if there is no more valid wind data in the area/time.  Currents will be assumed to be zero if data is deficient.  Cases with deficient data include navigating outside the space or time of the grib file without climatology data, or into an area also not covered by climatology.</li>
   <li><b>Wind Strength Percentage</b> Multiply wind strength from data source by this percentage to allow computation of possible "what if" scenarios of greater or lesser wind strength.</li>
   <li><b>Integrator</b> Newton's method is default and fastest, but doesn't take into account changes
     in wind/current along each step.  Rutta Kunge (4th order) is much more accurate taking 4 samples, but a lot slower.  Generally Newton's method with a smaller time step is recommended for more accuracy.</li>
