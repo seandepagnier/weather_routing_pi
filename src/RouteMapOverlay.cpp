@@ -543,6 +543,9 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
        vp.m_projection_type != wind_barb_cache_projection ||
         nocache) {
 
+        wxStopWatch timer;
+        static float step = 36;
+
         wind_barb_cache_origin_size = origin.size();
         wind_barb_cache_scale = vp.view_scale_ppm;
         wind_barb_cache_projection = vp.m_projection_type;
@@ -554,28 +557,35 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 
         Lock();
 
-        int step = 36;
-
         wxPoint p;
         GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
-        int xoff = p.x%step, yoff = p.y%step;
+        int xoff = p.x%(int)step, yoff = p.y%(int)step;
     
+        IsoChronList::iterator it = origin.end();
+        it--;
         for(double x = r.x + xoff; x<r.x+r.width; x+=step)
             for(double y = r.y + yoff; y<r.y+r.height; y+=step) {
                 double lat, lon;
                 GetCanvasLLPix( &nvp, wxPoint(x, y), &lat, &lon );
 
                 Position p(lat, configuration.positive_longitudes ? positive_degrees(lon) : lon);
+                
+                // find the first isochron we are outside of using the isochron from
+                // the last point as an initial guess to reduce the amount of expensive Contains calls
+                if(!(*it)->Contains(p)) {
+                    do {
+                        if(++it == origin.end())  { // don't plot outside map
+                            it--;
+                            goto skip;
+                        }
+                    } while(!(*it)->Contains(p));
+                    it--;
+                } else
+                    for(it--; it != origin.begin(); it--)
+                        if(!(*it)->Contains(p))
+                            break;
 
-                IsoChronList::iterator it = origin.end();
-                it--;
-                if(!(*it)->Contains(p)) // don't plot outside map
-                    continue;
-
-                for(it--; it != origin.begin(); it--)
-                    if(!(*it)->Contains(p))
-                        break;
-
+                {
                 double W1, VW1, W2, VW2;
                 int data_mask1, data_mask2; // can be used to colorize barbs based on data type
 
@@ -583,12 +593,14 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
                 Position *p1 = (*it)->ClosestPosition(lat, lon);
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
+                configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
                 p.GetWindData(configuration, W1, VW1, data_mask1);
 
                 it++;
                 Position *p2 = (*it)->ClosestPosition(lat, lon);
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
+                configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
                 p.GetWindData(configuration, W2, VW2, data_mask2);
 
                 // now polar interpolation of the two wind positions
@@ -608,8 +620,20 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
                 double VW = d*VW1 + (1-d)*VW2;
 
                 g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW, deg2rad(W), lat < 0 );
+
+                }
+            skip:;
             }
+
         Unlock();
+
+        // evaluate performance, and "cheat" by spacing the barbes more in subsequent frames if
+        // peformance is inadequate
+        long time = timer.Time();
+        if(nocache && time > 100 && step < 300) // 100 milliseconds is unacceptable per frame
+            step *= 1.5;
+        else if(time < 10 && step > 40) // reset step
+            step /= 1.5;
 
         wind_barb_cache.Finalize();
     }
@@ -633,10 +657,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 
         glColor3ub(colour.Red(), colour.Green(), colour.Blue());
         //      Enable anti-aliased lines, at best quality
-        glEnable( GL_LINE_SMOOTH );
         glEnable( GL_BLEND );
-        glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-        glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
         glLineWidth( 2 );
         glEnableClientState(GL_VERTEX_ARRAY);
     }
