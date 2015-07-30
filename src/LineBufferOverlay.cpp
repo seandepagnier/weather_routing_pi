@@ -51,24 +51,24 @@ void LineBuffer::Finalize()
 void LineBuffer::pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south)
 {
     // transform vertexes by angle
-    float six, cox, siy = sinf( ang ), coy = cosf( ang );
+    float sa = sinf( ang ), ca = cosf( ang );
+
+    float m[2][2] = {{ ca, -sa},
+                     { sa,  ca}};
 
     if(south)
-        six = -siy, cox = -coy;
-    else
-        six =  siy, cox =  coy;
+        m[0][0] = -m[0][0], m[1][0] = -m[1][0];
 
     for(int i=0; i < 2*buffer.count; i+=2) {
         float *k = buffer.lines + 2*i;
-        pushLine(k[0]*cox + k[1]*siy + x, k[0]*six - k[1]*coy + y,
-                 k[2]*cox + k[3]*siy + x, k[2]*six - k[3]*coy + y);
+        pushLine(k[0]*m[0][0] + k[1]*m[0][1] + x, k[0]*m[1][0] + k[1]*m[1][1] + y,
+                 k[2]*m[0][0] + k[3]*m[0][1] + x, k[2]*m[1][0] + k[3]*m[1][1] + y);
     }
 }
 
 void LineBuffer::draw(wxDC *dc)
 {
     if( dc ) {
-        wxSize s = dc->GetSize();
         for(int i=0; i < count; i++) {
             float *l = lines + 4*i;
 #if wxUSE_GRAPHICS_CONTEXT && 0
@@ -76,7 +76,7 @@ void LineBuffer::draw(wxDC *dc)
                 m_gdc->StrokeLine( l[0], l[1], l[2], l[3] );
             else
 #endif
-                dc->DrawLine( l[0], s.y-l[1], l[2], s.y-l[3] );
+                dc->DrawLine( l[0], l[1], l[2], l[3] );
         }
     } else {                       // OpenGL mode
 #ifdef ocpnUSE_GL
@@ -88,18 +88,18 @@ void LineBuffer::draw(wxDC *dc)
 
 void WindBarbLineBuffer::pushPetiteBarbule( int b )
 {
-    pushLine( 0, b, -5, b + 2 );
+    pushLine( 0, b, -5, b - 2 );
 }
 
 void WindBarbLineBuffer::pushGrandeBarbule( int b )
 {
-    pushLine( 0, b, -10, b + 4 );
+    pushLine( 0, b, -10, b - 4 );
 }
 
 void WindBarbLineBuffer::pushTriangle( int b )
 {
-    pushLine( 0, b,     -10, b + 4 );
-    pushLine( 0, b + 8, -10, b + 4 );
+    pushLine( 0, b,     -10, b - 4 );
+    pushLine( 0, b - 8, -10, b - 4 );
 }
 
 LineBufferOverlay g_LineBufferOverlay;
@@ -115,19 +115,19 @@ LineBufferOverlay::LineBufferOverlay()
     for( double a = 0; a < 2 * M_PI; a += s )
         m_WindArrowCache[0].pushLine(r*sin(a), r*cos(a), r*sin(a+s), r*cos(a+s));
 
-    int dec = -windArrowSize / 2;
+    int dec = windArrowSize / 2;
 
     // the barbed arrows
     for(i=1; i<14; i++) {
         LineBuffer &arrow = m_WindArrowCache[i];
 
-        arrow.pushLine( 0, dec, 0, dec + windArrowSize );   // hampe
-        arrow.pushLine( 0, dec, 2, dec + 5 );    // flèche
-        arrow.pushLine( 0, dec, -2, dec + 5 );   // flèche
+        arrow.pushLine( 0, dec,  0, dec - windArrowSize );   // hampe
+        arrow.pushLine( 0, dec,  2, dec - 5 );    // flèche
+        arrow.pushLine( 0, dec, -2, dec - 5 );   // flèche
     }
 
-    int b1 = dec + windArrowSize - 4;  // position de la 1ère barbule
-    int b2 = dec + windArrowSize;  // position de la 1ère barbule si >= 10 noeuds
+    int b1 = dec - windArrowSize + 4;  // position de la 1ère barbule
+    int b2 = dec - windArrowSize;  // position de la 1ère barbule si >= 10 noeuds
 
     // 5 ktn
     m_WindArrowCache[1].pushPetiteBarbule( b1 );
@@ -135,45 +135,45 @@ LineBufferOverlay::LineBufferOverlay()
     m_WindArrowCache[2].pushGrandeBarbule( b2 );
     // 15 ktn
     m_WindArrowCache[3].pushGrandeBarbule( b2 );
-    m_WindArrowCache[3].pushPetiteBarbule( b2 - 4 );
+    m_WindArrowCache[3].pushPetiteBarbule( b2 + 4 );
     // 20 ktn
     m_WindArrowCache[4].pushGrandeBarbule( b2 );
-    m_WindArrowCache[4].pushGrandeBarbule( b2 - 4 );
+    m_WindArrowCache[4].pushGrandeBarbule( b2 + 4 );
     // 25 ktn
     m_WindArrowCache[5].pushGrandeBarbule( b2 );
-    m_WindArrowCache[5].pushGrandeBarbule( b2 - 4 );
-    m_WindArrowCache[5].pushPetiteBarbule( b2 - 8 );
+    m_WindArrowCache[5].pushGrandeBarbule( b2 + 4 );
+    m_WindArrowCache[5].pushPetiteBarbule( b2 + 8 );
     // 30 ktn
     m_WindArrowCache[6].pushGrandeBarbule( b2 );
-    m_WindArrowCache[6].pushGrandeBarbule( b2 - 4 );
-    m_WindArrowCache[6].pushGrandeBarbule( b2 - 8 );
+    m_WindArrowCache[6].pushGrandeBarbule( b2 + 4 );
+    m_WindArrowCache[6].pushGrandeBarbule( b2 + 8 );
     // 35 ktn
     m_WindArrowCache[7].pushGrandeBarbule( b2 );
-    m_WindArrowCache[7].pushGrandeBarbule( b2 - 4 );
-    m_WindArrowCache[7].pushGrandeBarbule( b2 - 8 );
-    m_WindArrowCache[7].pushPetiteBarbule( b2 - 12 );
+    m_WindArrowCache[7].pushGrandeBarbule( b2 + 4 );
+    m_WindArrowCache[7].pushGrandeBarbule( b2 + 8 );
+    m_WindArrowCache[7].pushPetiteBarbule( b2 + 12 );
     // 40 ktn
     m_WindArrowCache[8].pushGrandeBarbule( b2 );
-    m_WindArrowCache[8].pushGrandeBarbule( b2 - 4 );
-    m_WindArrowCache[8].pushGrandeBarbule( b2 - 8 );
-    m_WindArrowCache[8].pushGrandeBarbule( b2 - 12 );
+    m_WindArrowCache[8].pushGrandeBarbule( b2 + 4 );
+    m_WindArrowCache[8].pushGrandeBarbule( b2 + 8 );
+    m_WindArrowCache[8].pushGrandeBarbule( b2 + 12 );
     // 50 ktn
-    m_WindArrowCache[9].pushTriangle( b1 - 4 );
+    m_WindArrowCache[9].pushTriangle( b1 + 4 );
     // 60 ktn
-    m_WindArrowCache[10].pushTriangle( b1 - 4 );
-    m_WindArrowCache[10].pushGrandeBarbule( b1 - 8 );
+    m_WindArrowCache[10].pushTriangle( b1 + 4 );
+    m_WindArrowCache[10].pushGrandeBarbule( b1 + 8 );
     // 70 ktn
-    m_WindArrowCache[11].pushTriangle( b1 - 4 );
-    m_WindArrowCache[11].pushGrandeBarbule( b1 - 8 );
-    m_WindArrowCache[11].pushGrandeBarbule( b1 - 12 );
+    m_WindArrowCache[11].pushTriangle( b1 + 4 );
+    m_WindArrowCache[11].pushGrandeBarbule( b1 + 8 );
+    m_WindArrowCache[11].pushGrandeBarbule( b1 + 12 );
     // 80 ktn
-    m_WindArrowCache[12].pushTriangle( b1 - 4 );
-    m_WindArrowCache[12].pushGrandeBarbule( b1 - 8 );
-    m_WindArrowCache[12].pushGrandeBarbule( b1 - 12 );
-    m_WindArrowCache[12].pushGrandeBarbule( b1 - 16 );
+    m_WindArrowCache[12].pushTriangle( b1 + 4 );
+    m_WindArrowCache[12].pushGrandeBarbule( b1 + 8 );
+    m_WindArrowCache[12].pushGrandeBarbule( b1 + 12 );
+    m_WindArrowCache[12].pushGrandeBarbule( b1 + 16 );
     // > 90 ktn
-    m_WindArrowCache[13].pushTriangle( b1 - 4 );
-    m_WindArrowCache[13].pushTriangle( b1 - 12 );
+    m_WindArrowCache[13].pushTriangle( b1 + 4 );
+    m_WindArrowCache[13].pushTriangle( b1 + 12 );
 
     for(i=0; i<14; i++)
         m_WindArrowCache[i].Finalize();

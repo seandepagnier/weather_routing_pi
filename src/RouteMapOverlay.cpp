@@ -535,7 +535,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 
     // we could somehow "append" to the cache as passing occurs when zoomed really far
     // in rather than making a complete cache... but how complex does it need to be?
-    bool nocache = r.width*r.height > vp.rv_rect.width*vp.rv_rect.height*9 ||
+    bool nocache = r.width*r.height > vp.rv_rect.width*vp.rv_rect.height*4 ||
         vp.m_projection_type != PI_PROJECTION_MERCATOR;
 
     if(origin.size() != wind_barb_cache_origin_size ||
@@ -619,7 +619,8 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 #endif
                 double VW = d*VW1 + (1-d)*VW2;
 
-                g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW, deg2rad(W), lat < 0 );
+                g_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_cache, x, y, VW,
+                                                           deg2rad(W) + nvp.rotation, lat < 0 );
 
                 }
             skip:;
@@ -668,7 +669,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
             wind_barb_cache.draw(dc.GetDC());
         else {
             LineBuffer tb;
-            tb.pushTransformedBuffer(wind_barb_cache, point.x, dc.GetDC()->GetSize().y-point.y, vp.rotation);
+            tb.pushTransformedBuffer(wind_barb_cache, point.x, point.y, vp.rotation);
             tb.Finalize();
             tb.draw(dc.GetDC());
         }
