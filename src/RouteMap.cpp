@@ -295,6 +295,7 @@ static int ComputeQuadrantFast(Position *p, Position *q)
     return quadrant;
 }
 
+#if 0
 /* works for all ranges */
 static int ComputeQuadrant(Position *p, Position *q)
 {
@@ -313,6 +314,7 @@ static int ComputeQuadrant(Position *p, Position *q)
 
     return quadrant;
 }
+#endif
 
 SkipPosition *Position::BuildSkipList()
 {
@@ -373,7 +375,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
  climatology_wind_atlas &atlas, int &data_mask)
 {
     /* read current data */
-    if(!configuration.Currents || configuration.grib_is_data_deficient ||
+    if(!configuration.Currents || /*configuration.grib_is_data_deficient ||*/
        !Current(configuration.grib, configuration.ClimatologyType,
                 configuration.time, p->lat, p->lon, C, VC, data_mask))
         C = VC = 0;
