@@ -130,19 +130,19 @@ static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
     return true;
 }
 
-static bool Current(GribRecordSet *grib, RouteMapConfiguration::ClimatologyDataType climatology,
-                    const wxDateTime &time, double lat, double lon,
-                    double &C, double &VC, int &data_mask)
+static inline bool Current(RouteMapConfiguration &configuration,
+                           double lat, double lon,
+                           double &C, double &VC, int &data_mask)
 {
     if(!configuration.grib_is_data_deficient &&
-       GribCurrent(grib, lat, lon, C, VC)) {
+       GribCurrent(configuration.grib, lat, lon, C, VC)) {
         data_mask |= Position::GRIB_CURRENT;
         return true;
     }
 
-    if(climatology != RouteMapConfiguration::DISABLED &&
+    if(configuration.ClimatologyType != RouteMapConfiguration::DISABLED &&
        RouteMap::ClimatologyData &&
-       RouteMap::ClimatologyData(CURRENT, time, lat, lon, C, VC)) {
+       RouteMap::ClimatologyData(CURRENT, configuration.time, lat, lon, C, VC)) {
         data_mask |= Position::CLIMATOLOGY_CURRENT;
         return true;
     }
@@ -389,8 +389,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
 {
     /* read current data */
     if(!configuration.Currents ||
-       !Current(configuration.grib, configuration.ClimatologyType,
-                configuration.time, p->lat, p->lon, C, VC, data_mask))
+       !Current(configuration, p->lat, p->lon, C, VC, data_mask))
         C = VC = 0;
 
     for(;;) {
