@@ -294,7 +294,7 @@ Position::Position(Position *p)
 }
 
 /* sufficient for routemap uses only.. is this faster than below? if not, remove it */
-static int ComputeQuadrantFast(Position *p, Position *q)
+static inline int ComputeQuadrantFast(Position *p, Position *q)
 {
     int quadrant;
     if(q->lat < p->lat)
@@ -1913,32 +1913,60 @@ Position *IsoRoute::ClosestPosition(double lat, double lon, double *dist)
     /* first find closest skip position */
     SkipPosition *s = skippoints;
     Position *minpos = s->point;
-#if 0
-    Position pos(lat, lon);
-    int q1 = ComputeQuadrant(&pos, s->point);
+#if 1
     do {
-        int q2 = ComputeQuadrant(&pos, s->next->point);
-        if(q1 != s->quadrant || q2 != (s->quadrant^3)) {
-            Position *p = s->point, *e = s->next->point;
+        Position *p = s->point;
 
-            do {
+        double dlat = lat - p->lat, dlon = lon - p->lon;
+        double dist = dlat*dlat + dlon*dlon;
+            
+        if(dist < mindist) {
+            minpos = p;
+            mindist = dist;
+        }
+
+        Position *q = s->next->point;
+        switch(s->quadrant) {
+        case 0:
+            if((lon > p->lon && lat > p->lat) ||
+               (lon < q->lon && lat < q->lat))
+                goto skip;
+            break;
+        case 1:
+            if((lon < p->lon && lat > p->lat) ||
+               (lon > q->lon && lat < q->lat))
+                goto skip;
+            break;
+        case 2:
+            if((lat < p->lat && lon > p->lon) ||
+               (lat > q->lat && lon < q->lon))
+                goto skip;
+            break;
+        case 3:
+            if((lat < p->lat && lon < p->lon) ||
+               (lat > q->lat && lon > q->lon))
+                goto skip;
+            break;
+        }
+
+        {
+            Position *e = s->next->point;
+            for(p = p->next; p != e; p = p->next) {
                 double dlat = lat - p->lat, dlon = lon - p->lon;
                 double dist = dlat*dlat + dlon*dlon;
-
+                
                 if(dist < mindist) {
                     minpos = p;
                     mindist = dist;
                 }
-                p = p->next;
-            } while(p != e);
         }
-
-        q1 = q2;
+    }
+    skip:
         s = s->next;
     } while(s != skippoints);
 
 #else
-    // somehow this is faster??
+    // this is a lot easier to understand but not as fast as above
     Position *p = s->point;
     do {
         double dlat = lat - p->lat, dlon = lon - p->lon;
