@@ -205,7 +205,7 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
 
     wxDateTime time = m_ConfigurationDialog.m_GribTimelineTime;
     if(!time.IsValid())
-        time = wxDateTime::Now();
+        time = wxDateTime::UNow();
 
     for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =

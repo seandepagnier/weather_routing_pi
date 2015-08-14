@@ -183,7 +183,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
              v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
 
         if(m_pWeather_Routing) {
-            m_pWeather_Routing->m_ConfigurationDialog.m_GribTimelineTime = time;
+            m_pWeather_Routing->m_ConfigurationDialog.m_GribTimelineTime = time.ToUTC();
 //            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseGrib->Enable();
             RequestRefresh(m_parent_window);
         }

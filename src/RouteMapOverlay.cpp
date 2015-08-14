@@ -707,6 +707,7 @@ void RouteMapOverlay::GetLLBounds(double &latmin, double &latmax, double &lonmin
 void RouteMapOverlay::RequestGrib(wxDateTime time)
 {
     wxJSONValue v;
+    time = time.FromUTC();
     v[_T("Day")] = time.GetDay();
     v[_T("Month")] = time.GetMonth();
     v[_T("Year")] = time.GetYear();
