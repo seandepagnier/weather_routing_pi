@@ -39,7 +39,7 @@ void LineBuffer::pushLine( float x0, float y0, float x1, float y1 )
 void LineBuffer::Finalize()
 {
     count = buffer.size() / 4;
-    delete lines;
+    delete [] lines;
     lines = new float[buffer.size()];
     int i = 0;
     for(std::list <float>::iterator it = buffer.begin(); it != buffer.end(); it++)
