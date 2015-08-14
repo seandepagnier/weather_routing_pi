@@ -170,7 +170,7 @@ struct RouteMapPosition {
 };
 
 struct RouteMapConfiguration {
-    RouteMapConfiguration () : StartLon(0), EndLon(0) {} /* avoid waiting forever in update longitudes */
+    RouteMapConfiguration () : StartLon(0), EndLon(0), grib_is_data_deficient(false) {} /* avoid waiting forever in update longitudes */
     bool Update();
 
     wxString Start, End;
