@@ -433,7 +433,6 @@ GribRecord *GribRecord::Interpolated2DRecord(GribRecord *&rety,
     /* should maybe update strCurDate ? */
 
     GribRecord *ret = new GribRecord;
-    rety = new GribRecord;
     *ret = rec1x;
 
     ret->Ni = Ni, ret->Nj = Nj;
