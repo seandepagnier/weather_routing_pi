@@ -65,7 +65,7 @@ private:
     wxDateTime m_StartTime;
 
     double m_mintime, m_maxtime;
-    double m_minvalue, m_maxvalue;
+    double m_minvalue[3], m_maxvalue[3];
 
     std::list<PlotData> m_PlotData;
 

@@ -73,7 +73,7 @@ void PlotDialog::OnMouseEventsPlot( wxMouseEvent& event )
 #endif
 
     for(int i=0; i<3; i++) {
-        double value = (1.0 - (double)p.y / h) * (m_maxvalue - m_minvalue) + m_minvalue;
+        double value = (1.0 - (double)p.y / h) * (m_maxvalue[i] - m_minvalue[i]) + m_minvalue[i];
         stMousePosition[i]->SetLabel(wxString::Format(_T(" %.3f"), value));
     }
 }
@@ -109,21 +109,21 @@ double PlotDialog::GetValue(PlotData &data, int var)
 void PlotDialog::GetScale()
 {
     wxChoice *cVariable[3] = {m_cVariable1, m_cVariable2, m_cVariable3};
-    bool first = true;
     for(int i=0; i<3; i++) {
+        bool first = true;
         for(std::list<PlotData>::iterator it = m_PlotData.begin(); it != m_PlotData.end(); it++) {
             double value = GetValue(*it, cVariable[i]->GetSelection());
             if(first) {
                 m_StartTime = (*it).time;
-                m_mintime = m_maxtime = 0;
-                m_minvalue = m_maxvalue = value;
+                m_mintime = m_maxtime = 0.;
+                m_minvalue[i] = m_maxvalue[i] = value;
                 first = false;
             } else {
                 double time = ((*it).time - m_StartTime).GetSeconds().ToDouble();
                 m_mintime = MIN(time, m_mintime);
                 m_maxtime = MAX(time, m_maxtime);
-                m_minvalue = MIN(value, m_minvalue);
-                m_maxvalue = MAX(value, m_maxvalue);
+                m_minvalue[i] = MIN(value, m_minvalue[i]);
+                m_maxvalue[i] = MAX(value, m_maxvalue[i]);
             }
         }
     }
@@ -158,7 +158,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
             double value = GetValue(*it, cVariable[i]->GetSelection());
 
             int x = w * (scale * ((time - m_mintime) / (m_maxtime - m_mintime) - position) + position);
-            int y = h * (1 - (value - m_minvalue) / (m_maxvalue - m_minvalue));
+            int y = h * (1 - (value - m_minvalue[i]) / (m_maxvalue[i] - m_minvalue[i]));
             if(first)
                 first = false;
             else
@@ -175,7 +175,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
         wxSize s = dc.GetTextExtent(time);
         dc.DrawText(time, x*w-s.x/2, 0);
 
-        wxString value = wxString::Format(_T("%.1f"), (1-x)*(m_maxvalue - m_minvalue) + m_minvalue);
+        wxString value = wxString::Format(_T("%.1f"), (1-x)*(m_maxvalue[0] - m_minvalue[0]) + m_minvalue[0]);
         s = dc.GetTextExtent(value);
         dc.DrawText(value, 0, x*h - s.y/2);
     }
