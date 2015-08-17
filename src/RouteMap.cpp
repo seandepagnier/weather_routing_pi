@@ -2516,11 +2516,20 @@ void RouteMap::SetNewGrib(GribRecordSet *grib)
         m_NewGrib = new GribRecordSet;
         m_NewGrib->m_Reference_Time = grib->m_Reference_Time;
         for(int i=0; i<Idx_COUNT; i++) {
-            if(grib->m_GribRecordPtrArray[i])
-                m_NewGrib->m_GribRecordPtrArray[i] = new GribRecord
-                    (*grib->m_GribRecordPtrArray[i]);
-            else
-                m_NewGrib->m_GribRecordPtrArray[i] = NULL;
+            m_NewGrib->m_GribRecordPtrArray[i] = NULL;
+            switch (i) {
+            case Idx_HTSIGW:
+            case Idx_WIND_VX:
+            case Idx_WIND_VY:
+            case Idx_SEACURRENT_VX:
+            case Idx_SEACURRENT_VY:
+                if(grib->m_GribRecordPtrArray[i]) {
+                    m_NewGrib->m_GribRecordPtrArray[i] = new GribRecord (*grib->m_GribRecordPtrArray[i]);
+                }
+                break;
+            default:
+                break;
+            }
         }
     }
 }
