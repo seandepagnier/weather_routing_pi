@@ -63,6 +63,10 @@ public:
     void RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp);
     void GetLLBounds(double &latmin, double &latmax, double &lonmin, double &lonmax);
     void RequestGrib(wxDateTime time);
+    void ReceivedGrib(GribRecordSet *grib) {
+          SetNewGrib(grib); 
+          m_bNeedsGrib = false;
+    };
     std::list<PlotData> &GetPlotData(bool cursor_route=false);
     double RouteInfo(enum RouteInfoType type, bool cursor_route=false);
     int Cyclones(int *months);

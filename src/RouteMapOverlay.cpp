@@ -719,8 +719,9 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
     wxJSONWriter w;
     wxString out;
     w.Write(v, out);
+
     SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
-    m_bNeedsGrib = false;
+
 }
 
 std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
