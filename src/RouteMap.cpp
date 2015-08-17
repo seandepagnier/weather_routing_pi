@@ -2034,7 +2034,7 @@ void IsoRoute::PropagateToEnd(RouteMapConfiguration &configuration, double &mind
 
         /* did we tack thru the wind? apply penalty */
         bool tacked = false;
-        if(p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
+        if(!isnan(dt) && p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
             tacked = true;
             dt += configuration.TackingTime;
 #if 0        
