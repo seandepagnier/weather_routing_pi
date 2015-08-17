@@ -465,9 +465,10 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSa
 
     /* get route iso for this position */
     for(p=pos->parent; p; p=p->parent)
-        if(++it == origin.end())
+        if(++it == origin.end()) {
+            Unlock();
             return;
-
+        }
     if(it != origin.begin())
         it--;
 
@@ -740,8 +741,10 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 
         
         for(Position *p = pos; p; p=p->parent)
-            if(++it == origin.end())
+            if(++it == origin.end()) {
+                Unlock();
                 return plotdata;
+            }
 
         while(pos) {
             itp = it;
