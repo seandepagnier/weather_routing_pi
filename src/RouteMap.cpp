@@ -2322,8 +2322,10 @@ bool RouteMap::Propagate()
     }
 
     if(!m_bValid /*|| m_bFinished*/) {
-        Unlock();
+        /* config change */
+        m_bNeedsGrib = false;
         m_bFinished = true;
+        Unlock();
         return false;
     }
 
@@ -2332,6 +2334,7 @@ bool RouteMap::Propagate()
        (!ClimatologyCycloneTrackCrossings ||
         ClimatologyCycloneTrackCrossings(0, 0, 0, 0, wxDateTime(), 0)==-1)) {
         m_bFinished = true;
+        m_bNeedsGrib = false;
         m_bClimatologyFailed = true;
         Unlock();
         return false;
@@ -2340,6 +2343,7 @@ bool RouteMap::Propagate()
     if(!m_Configuration.UseGrib &&
        m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY) {
         m_bFinished = true;
+        m_bNeedsGrib = false;
         m_bNoData = true;
         Unlock();
         return false;
@@ -2392,6 +2396,7 @@ bool RouteMap::Propagate()
            m_Configuration.UseGrib) {
             Lock();
             m_bFinished = true;
+            m_bNeedsGrib = false;
             m_bGribFailed = true;
             Unlock();
             return false;
@@ -2402,6 +2407,7 @@ bool RouteMap::Propagate()
         if(configuration.polar_failed) {
             Lock();
             m_bFinished = true;
+            m_bNeedsGrib = false;
             m_bPolarFailed = true;
             Unlock();
             return false;
@@ -2434,10 +2440,13 @@ bool RouteMap::Propagate()
         origin.push_back(update);
         if(update->Contains(m_Configuration.EndLat, m_Configuration.EndLon)) {
             m_bFinished = true;
+            m_bNeedsGrib = false;
             m_bReachedDestination = true;
         }
-    } else
+    } else {
         m_bFinished = true;
+        m_bNeedsGrib = false;
+    }
     Unlock();
 
     return true;
