@@ -2425,7 +2425,7 @@ bool RouteMap::Propagate()
     } else {
         IsoRouteList merged;
         if(!ReduceList(merged, routelist, configuration)) {
-            Unlock();
+
             return false;
         }
 
