@@ -510,6 +510,8 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
     if(origin.size() < 2) // no map to work with
         return;
 
+    if (vp.bValid == false)
+        return;
     RouteMapConfiguration configuration = GetConfiguration();
 
     // if zoomed way in, don't cache the arrows for panning, instead we just
@@ -536,7 +538,8 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 
     // we could somehow "append" to the cache as passing occurs when zoomed really far
     // in rather than making a complete cache... but how complex does it need to be?
-    bool nocache = r.width*r.height > vp.rv_rect.width*vp.rv_rect.height*4 ||
+    // quick an dirty, convert to double or integer may overflow 
+    bool nocache = (double)r.width*(double)r.height > (double)(vp.rv_rect.width*vp.rv_rect.height*4) ||
         vp.m_projection_type != PI_PROJECTION_MERCATOR;
 
     if(origin.size() != wind_barb_cache_origin_size ||
@@ -545,7 +548,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
         nocache) {
 
         wxStopWatch timer;
-        static float step = 36;
+        static double step = 36.0;
 
         wind_barb_cache_origin_size = origin.size();
         wind_barb_cache_scale = vp.view_scale_ppm;
@@ -564,7 +567,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
     
         IsoChronList::iterator it = origin.end();
         it--;
-        for(double x = r.x + xoff; x<r.x+r.width; x+=step)
+        for(double x = r.x + xoff; x<r.x+r.width; x+=step) {
             for(double y = r.y + yoff; y<r.y+r.height; y+=step) {
                 double lat, lon;
                 GetCanvasLLPix( &nvp, wxPoint(x, y), &lat, &lon );
@@ -626,6 +629,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
                 }
             skip:;
             }
+        }
 
         Unlock();
 
