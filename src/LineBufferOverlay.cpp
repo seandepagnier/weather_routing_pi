@@ -191,8 +191,9 @@ void LineBufferOverlay::pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y,
         cacheidx = (int)(vkn + 2.5) / 5;
     else if( vkn < 90 )
         cacheidx = (int)(vkn + 5) / 10 + 4;
-    else
+    else if (vkn < 400 ) 
         cacheidx = 13;
-
+    else 
+        return;
     buffer.pushTransformedBuffer(m_WindArrowCache[cacheidx], x, y, ang, south);
 }
