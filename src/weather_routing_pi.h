@@ -45,8 +45,8 @@
 #undef MAX
 #endif
 
-#include "wxJSON/jsonreader.h"
-#include "wxJSON/jsonwriter.h"
+#include "wx/jsonreader.h"
+#include "wx/jsonwriter.h"
 
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition

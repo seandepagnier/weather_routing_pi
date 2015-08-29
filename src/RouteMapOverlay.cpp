@@ -27,8 +27,8 @@
 
 #include "ocpn_plugin.h"
 #include "wrdc.h"
-#include "wxJSON/jsonreader.h"
-#include "wxJSON/jsonwriter.h"
+#include "wx/jsonreader.h"
+#include "wx/jsonwriter.h"
 
 #include "Utilities.h"
 #include "Boat.h"

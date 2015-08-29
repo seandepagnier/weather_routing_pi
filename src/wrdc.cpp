@@ -1047,7 +1047,13 @@ bool wrDC::ConfigurePen()
 
 bool wrDC::ConfigureBrush()
 {
-    if( m_brush == wxNullBrush || m_brush.GetStyle() == wxBRUSHSTYLE_TRANSPARENT )
+    if( m_brush == wxNullBrush || m_brush.GetStyle() ==
+#if wxCHECK_VERSION(3, 0, 0)
+        wxBRUSHSTYLE_TRANSPARENT
+#else
+        wxTRANSPARENT
+#endif
+        )
         return false;
 #ifdef ocpnUSE_GL
     wxColour c = m_brush.GetColour();
