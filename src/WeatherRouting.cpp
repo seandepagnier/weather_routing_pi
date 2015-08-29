@@ -1325,8 +1325,6 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
 
         wxDateTime starttime = configuration.StartTime;
 
-        wxASSERT(starttime == routemapoverlay->StartTime());
-
         if(wr->m_SettingsDialog.m_cbUseLocalTime->GetValue())
             starttime = starttime.FromUTC();
         StartTime = starttime.Format(_T("%x %H:%M"));
