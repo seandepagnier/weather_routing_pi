@@ -106,6 +106,38 @@ double PlotDialog::GetValue(PlotData &data, int var)
     return NAN;
 }
 
+enum Type {SPEED, COURSE, WIND_SPEED, WIND_DIRECTION, CURRENT_SPEED, CURRENT_DIRECTION, WAVE_HEIGHT, TACKS, INVALID};
+int PlotDialog::GetType(int var)
+{
+    switch(var) {
+    case SPEED_OVER_GROUND:
+    case SPEED_OVER_WATER:
+        return SPEED;
+    case COURSE_OVER_GROUND:
+    case COURSE_OVER_WATER:
+        return COURSE;
+    case WIND_VELOCITY:
+    case WIND_VELOCITY_GROUND:
+    case APPARENT_WIND_SPEED:
+        return WIND_SPEED;
+    case WIND_DIRECTION:
+    case WIND_DIRECTION_GROUND:
+    case APPARENT_WIND_ANGLE:
+        return WIND_DIRECTION;
+    case WIND_COURSE:
+    case WIND_COURSE_GROUND:
+    case CURRENT_VELOCITY:
+        return CURRENT_SPEED;
+    case CURRENT_DIRECTION:
+        return CURRENT_DIRECTION;
+    case SIG_WAVE_HEIGHT:
+        return WAVE_HEIGHT;
+    case TACKS:
+        return TACKS;
+    }
+    return INVALID;
+}
+
 void PlotDialog::GetScale()
 {
     wxChoice *cVariable[3] = {m_cVariable1, m_cVariable2, m_cVariable3};
@@ -127,6 +159,28 @@ void PlotDialog::GetScale()
             }
         }
     }
+
+    // force same scales for comparible datatypes
+    for(int i=0; i<2; i++)
+        for(int j=i+1; j<3; j++)
+            if(GetType(cVariable[i]->GetSelection()) == GetType(cVariable[j]->GetSelection())) {
+                m_minvalue[i] = m_minvalue[j] = wxMin(m_minvalue[i], m_minvalue[j]);
+                m_maxvalue[i] = m_maxvalue[j] = wxMax(m_maxvalue[i], m_maxvalue[j]);
+            }
+}
+
+static wxString ReadableTime(int seconds)
+{
+    if(seconds < 60)
+        return wxString::Format(_T("%02ds"), seconds);
+
+    if(seconds < 3600)
+        return wxString::Format(_T("%02d.%02d"), seconds / 60, seconds % 60);
+
+    if(seconds < 86400)
+        return wxString::Format(_T("%02d:%02d"), seconds / 3600, (seconds / 60) % 60);
+
+    return wxString::Format(_T("%dd %02dh"), seconds / 86400, seconds / 3600);
 }
 
 void PlotDialog::OnPaintPlot(wxPaintEvent& event)
@@ -147,7 +201,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
 
     wxChoice *cVariable[3] = {m_cVariable1, m_cVariable2, m_cVariable3};
-    wxColour colors[3] = {wxColour(255, 0, 0), wxColour(0, 255, 0), wxColour(0, 0, 255)};
+    wxColour colors[3] = {wxColour(200, 0, 0), wxColour(0, 200, 0), wxColour(0, 0, 200)};
     for(int i=0; i<3; i++) {
         dc.SetPen(wxPen(colors[i], 3));
 
@@ -167,17 +221,39 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
         }
     }
 
-    dc.SetTextForeground(wxColour(0, 0, 0));
-    const double steps = 10;
-    for(double x=1/steps; x<1-1/steps; x+=1/steps) {
-        wxString time = wxString::Format
-            (_T("%.0f"), ((x - position)/scale + position) * (m_maxtime - m_mintime) + m_mintime);
-        wxSize s = dc.GetTextExtent(time);
-        dc.DrawText(time, x*w-s.x/2, 0);
+    dc.SetTextForeground(*wxBLACK);
+    dc.SetPen(wxPen(*wxBLACK, 1, wxPENSTYLE_DOT));
 
-        wxString value = wxString::Format(_T("%.1f"), (1-x)*(m_maxvalue[0] - m_minvalue[0]) + m_minvalue[0]);
-        s = dc.GetTextExtent(value);
-        dc.DrawText(value, 0, x*h - s.y/2);
+    const double steps = 10;
+    bool grid = true;
+    for(double i=1/steps; i<1-1/steps; i+=1/steps) {
+        int x = i*w, y = i*h;
+        if(grid) {
+            dc.DrawLine(x, 0, x, h);
+            dc.DrawLine(0, y, w, y);
+        }
+
+        wxString time = ReadableTime(((i - position)/scale + position) * (m_maxtime - m_mintime) + m_mintime);
+        wxSize s = dc.GetTextExtent(time);
+        dc.DrawText(time, x-s.x/2, 0);
+    }
+
+    int x = 0;
+    for(int ci=0; ci<3; ci++) {
+        wxColour c = colors[ci];
+        dc.SetTextForeground(wxColour(c.Red()*3/4, c.Green()*3/4, c.Blue()*3/4));
+        int maxx = 0;
+        for(double i=1/steps; i<1-1/steps; i+=1/steps) {
+            wxString value = wxString::Format(_T("%.1f"), (1-i)*(m_maxvalue[ci] - m_minvalue[ci]) + m_minvalue[ci]);
+            wxSize s = dc.GetTextExtent(value);
+            int y = i*h; 
+            dc.DrawText(value, x, y - s.y/2);
+
+            if(s.x > maxx)
+                maxx = s.x;
+        }
+
+        x += maxx + 5;
     }
 }
 

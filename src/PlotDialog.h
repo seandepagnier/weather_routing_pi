@@ -59,7 +59,9 @@ private:
     void OnUpdateRoute( wxCommandEvent& event );
 
 private:
+
     double GetValue(PlotData &data, int var);
+    int GetType(int var);
     void GetScale();
 
     wxDateTime m_StartTime;
