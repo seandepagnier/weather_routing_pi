@@ -1208,7 +1208,7 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("UseGrib", configuration.UseGrib);
         c->SetAttribute("ClimatologyType", configuration.ClimatologyType);
         c->SetAttribute("AllowDataDeficient", configuration.AllowDataDeficient);
-        c->SetAttribute("WindStrength", configuration.WindStrength);
+        c->SetDoubleAttribute("WindStrength", configuration.WindStrength);
 
         c->SetAttribute("DetectLand", configuration.DetectLand);
         c->SetAttribute("Currents", configuration.Currents);
