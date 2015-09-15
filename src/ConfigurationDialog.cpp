@@ -108,7 +108,7 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 
     if( openDialog.ShowModal() == wxID_OK ) {
         m_tBoat->SetValue(openDialog.GetPath());
-
+        Update();
     }
 }
 
