@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Aug 18 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -1436,10 +1436,13 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_lPlotType->AddPage( m_panel16, _("Speed"), false );
 	m_panel161 = new wxPanel( m_lPlotType, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	m_lPlotType->AddPage( m_panel161, _("VMG"), false );
-	#ifndef __WXGTK__ // Small icon style not supported in GTK
+	#ifdef __WXGTK__ // Small icon style not supported in GTK
 	wxListView* m_lPlotTypeListView = m_lPlotType->GetListView();
 	long m_lPlotTypeFlags = m_lPlotTypeListView->GetWindowStyleFlag();
-	m_lPlotTypeFlags = ( m_lPlotTypeFlags & ~wxLC_ICON ) | wxLC_SMALL_ICON;
+	if( m_lPlotTypeFlags & wxLC_SMALL_ICON )
+	{
+		m_lPlotTypeFlags = ( m_lPlotTypeFlags & ~wxLC_SMALL_ICON ) | wxLC_ICON;
+	}
 	m_lPlotTypeListView->SetWindowStyleFlag( m_lPlotTypeFlags );
 	#endif
 	
