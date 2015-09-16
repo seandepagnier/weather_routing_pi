@@ -170,6 +170,7 @@ class SettingsDialogBase : public wxDialog
 		wxCheckBox* m_cbAlternatesForAll;
 		wxCheckBox* m_cbMarkAtSailChange;
 		wxCheckBox* m_cbDisplayWindBarbs;
+		wxCheckBox* m_cbDisplayCurrent;
 		wxSpinCtrl* m_sConcurrentThreads;
 		wxCheckListBox* m_cblFields;
 		wxCheckBox* m_cbUseLocalTime;
