@@ -90,7 +90,7 @@ public:
     void OptimizeTackingSpeed();
     void ResetOptimalTackingSpeed();
 
-    int ClosestVWi(double VW);
+    void ClosestVWi(double VW, int &VW1i, int &VW2i);
 
     double Speed(double W, double VW);
     double SpeedAtApparentWindDirection(double A, double VW, double *pW=0);

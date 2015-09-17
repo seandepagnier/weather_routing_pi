@@ -806,13 +806,13 @@ void BoatPlan::ComputeBoatSpeeds(Boat &boat, PolarMethod method, int speed)
     double lwl_ft = boat.lwl_ft;
     double hull_speed = boat.HullSpeed();
 
-    int min, max;
+    int VW1i, VW2i;
     if(speed == -1) // all speeds
-        min = 0, max = wind_speeds.size() - 1;
+        VW1i = 0, VW2i = wind_speeds.size() - 1;
     else
-        min = ClosestVWi(speed), max = min + 1;
+        ClosestVWi(speed, VW1i, VW2i);
 
-    for(int VWi = min; VWi <= max; VWi++) {
+    for(int VWi = VW1i; VWi <= VW2i; VWi++) {
         for(unsigned int Wi = 0; Wi <= computed_degree_count/2; Wi++) {
             double VW = wind_speeds[VWi].VW;
             double W = Wi * computed_degree_step;
@@ -943,15 +943,17 @@ BoatSpeedTable BoatPlan::CreateTable(int wind_speed_step, int wind_degree_step)
 }
 #endif
 
-// return index of wind speed in table which less than our wind speed,
-// or second from last (adding 1 to this value is a valid wind speed)
-int BoatPlan::ClosestVWi(double VW)
+// return index of wind speed in table which less than our wind speed
+void BoatPlan::ClosestVWi(double VW, int &VW1i, int &VW2i)
 {
     for(unsigned int VWi = 1; VWi < wind_speeds.size()-1; VWi++)
-        if(wind_speeds[VWi].VW > VW)
-            return VWi - 1;
+        if(wind_speeds[VWi].VW > VW) {
+            VW1i = VWi - 1;
+            VW2i = VWi;
+            return;
+        }
 
-    return wind_speeds.size()-2;
+    VW1i = VW2i = wind_speeds.size()-1;
 }
 
 /* compute boat speed from true wind angle and true wind speed
@@ -961,7 +963,7 @@ int BoatPlan::ClosestVWi(double VW)
  */
 double BoatPlan::Speed(double W, double VW)
 {
-    if(VW < 0 || VW > wind_speeds.back().VW)
+    if(VW < 0)
         return NAN;
 
     W = positive_degrees(W);
@@ -975,7 +977,13 @@ double BoatPlan::Speed(double W, double VW)
         W2 = degree_steps[W2i];
     }
 
-    int VW1i = ClosestVWi(VW), VW2i = VW1i + 1;
+    int VW1i, VW2i;
+    ClosestVWi(VW, VW1i, VW2i);
+    if(VW1i == wind_speeds.size() - 1)
+        VW2i = VW1i;
+    else
+        VW2i = VW1i + 1;
+
     SailingWindSpeed &ws1 = wind_speeds[VW1i], &ws2 = wind_speeds[VW2i];
     double VW1 = ws1.VW, VW2 = ws2.VW;
 
@@ -1071,7 +1079,9 @@ double BoatPlan::SpeedAtApparentWind(double A, double VA, double *pW)
 
 SailingVMG BoatPlan::GetVMGTrueWind(double VW)
 {
-    int VW1i = ClosestVWi(VW), VW2i = VW1i + 1;
+    int VW1i, VW2i;
+    ClosestVWi(VW, VW1i, VW2i);
+
     SailingWindSpeed &ws1 = wind_speeds[VW1i], &ws2 = wind_speeds[VW2i];
     double VW1 = ws1.VW, VW2 = ws2.VW;
     SailingVMG vmg, vmg1 = ws1.VMG, vmg2 = ws2.VMG;
