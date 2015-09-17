@@ -61,6 +61,8 @@ public:
     void RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
                       wrDC &dc, PlugIn_ViewPort &vp);
     void RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp);
+
     void GetLLBounds(double &latmin, double &latmax, double &lonmin, double &lonmax);
     void RequestGrib(wxDateTime time);
     void ReceivedGrib(GribRecordSet *grib) {
@@ -115,4 +117,9 @@ private:
     double wind_barb_cache_scale;
     size_t wind_barb_cache_origin_size;
     int wind_barb_cache_projection;
+
+    LineBuffer current_cache;
+    double current_cache_scale;
+    size_t current_cache_origin_size;
+    int current_cache_projection;
 };

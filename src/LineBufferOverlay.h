@@ -59,10 +59,11 @@ class LineBufferOverlay
 public:
     LineBufferOverlay();
     void pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y, double vkn, double ang, bool south=false);
-
+    void pushSingleArrow( LineBuffer &buffer, int x, int y, double vkn, double ang, bool south=false);
 private:
 
     WindBarbLineBuffer m_WindArrowCache[14];
+    LineBuffer m_SingleArrow[14];
 };
 
 extern LineBufferOverlay g_LineBufferOverlay;

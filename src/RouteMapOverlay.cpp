@@ -60,7 +60,7 @@ RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_overlaylist(0), wind_barb_cache_origin_size(0)
+      m_bUpdated(false), m_overlaylist(0), wind_barb_cache_origin_size(0), current_cache_origin_size(0)
 {
 }
 
@@ -680,6 +680,198 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
         }
     } else
         wind_barb_cache.draw(NULL);
+
+#ifdef ocpnUSE_GL
+    if( !dc.GetDC() ) {
+        glDisableClientState(GL_VERTEX_ARRAY);
+
+        if(!nocache)
+            glPopMatrix();
+    }
+#endif
+}
+
+void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
+{
+    if(origin.size() < 2) // no map to work with
+        return;
+
+    if (vp.bValid == false)
+        return;
+
+    RouteMapConfiguration configuration = GetConfiguration();
+
+    // if zoomed way in, don't cache the arrows for panning, instead we just
+    // render what's onscreen
+    double latmin, latmax, lonmin, lonmax;
+    GetLLBounds(latmin, latmax, lonmin, lonmax);
+
+    PlugIn_ViewPort nvp = vp;
+    nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
+    nvp.pix_width = nvp.pix_height = 0;
+    nvp.rotation = nvp.skew = 0;
+
+    wxPoint p1, p2, p3, p4;
+    GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
+    GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
+    GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
+    GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
+
+    wxRect r;
+    r.x = wxMin(wxMin(p1.x, p2.x), wxMin(p3.x, p4.x));
+    r.y = wxMin(wxMin(p1.y, p2.y), wxMin(p3.y, p4.y));
+    r.width = wxMax(wxMax(p1.x, p2.x), wxMax(p3.x, p4.x)) - r.x;
+    r.height = wxMax(wxMax(p1.y, p2.y), wxMax(p3.y, p4.y)) - r.y;
+
+    // we could somehow "append" to the cache as passing occurs when zoomed really far
+    // in rather than making a complete cache... but how complex does it need to be?
+    // quick an dirty, convert to double or integer may overflow 
+    bool nocache = (double)r.width*(double)r.height > (double)(vp.rv_rect.width*vp.rv_rect.height*9) ||
+        vp.m_projection_type != PI_PROJECTION_MERCATOR;
+
+    if(origin.size() != current_cache_origin_size ||
+       vp.view_scale_ppm != current_cache_scale ||
+       vp.m_projection_type != current_cache_projection ||
+        nocache) {
+
+        wxStopWatch timer;
+        static double step = 80.0;
+
+        current_cache_origin_size = origin.size();
+        current_cache_scale = vp.view_scale_ppm;
+        current_cache_projection = vp.m_projection_type;
+
+        if(nocache) {
+            r = vp.rv_rect;
+            nvp = vp;
+        }
+
+        Lock();
+
+        wxPoint p;
+        GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
+        int xoff = p.x%(int)step, yoff = p.y%(int)step;
+    
+        IsoChronList::iterator it = origin.end();
+        it--;
+        for(double x = r.x + xoff; x<r.x+r.width; x+=step) {
+            for(double y = r.y + yoff; y<r.y+r.height; y+=step) {
+                double lat, lon;
+                GetCanvasLLPix( &nvp, wxPoint(x, y), &lat, &lon );
+
+                Position p(lat, configuration.positive_longitudes ? positive_degrees(lon) : lon);
+                
+                // find the first isochron we are outside of using the isochron from
+                // the last point as an initial guess to reduce the amount of expensive Contains calls
+                if(!(*it)->Contains(p)) {
+                    do {
+                        if(++it == origin.end())  { // don't plot outside map
+                            it--;
+                            goto skip;
+                        }
+                    } while(!(*it)->Contains(p));
+                    it--;
+                } else
+                    for(it--; it != origin.begin(); it--)
+                        if(!(*it)->Contains(p))
+                            break;
+
+                {
+                double W1, VW1, W2, VW2;
+                int data_mask1, data_mask2; // can be used to colorize barbs based on data type
+
+                // now it is the isochron before p, so we find the two closest postions
+                Position *p1 = (*it)->ClosestPosition(lat, lon);
+                configuration.grib = (*it)->m_Grib;
+                configuration.time = (*it)->time;
+                configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
+                p.GetCurrentData(configuration, W1, VW1, data_mask1);
+
+                it++;
+                Position *p2 = (*it)->ClosestPosition(lat, lon);
+                configuration.grib = (*it)->m_Grib;
+                configuration.time = (*it)->time;
+                configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
+                p.GetCurrentData(configuration, W2, VW2, data_mask2);
+
+                // XX climatology angle is to not from 
+                if ((data_mask1 & Position::CLIMATOLOGY_CURRENT))
+                    W1 += 180.0;
+                if ((data_mask2 & Position::CLIMATOLOGY_CURRENT)) 
+                    W2 += 180.0;
+
+                // now polar interpolation of the two wind positions
+                double d1 = p.Distance(p1), d2 = p.Distance(p2);
+                double d = d1 / (d1+d2);
+#if 0
+                double W1r = deg2rad(W1), W2r = deg2rad(W2);
+                double W1x = VW1*cos(W1r), W1y = VW1*sin(W1r);
+                double W2x = VW2*cos(W2r), W2y = VW2*sin(W2r);
+                double Wx = d*W1x + (1-d)*W2x, Wy = d*W1y + (1-d)*W2y;
+                double W = rad2deg(atan2(Wy, Wx));
+#else
+                while(W1 - W2 > 180) W1 -= 360;
+                while(W2 - W1 > 180) W2 -= 360;
+                double W = d*W1 + (1-d)*W2;
+#endif
+                double VW = d*VW1 + (1-d)*VW2;
+
+                g_LineBufferOverlay.pushSingleArrow(current_cache, x, y, VW, deg2rad(W), lat < 0 );
+
+                }
+            skip:;
+            }
+        }
+
+        Unlock();
+
+        // evaluate performance, and "cheat" by spacing the barbes more in subsequent frames if
+        // peformance is inadequate
+        long time = timer.Time();
+        if(nocache && time > 100 && step < 600.) // 100 milliseconds is unacceptable per frame
+            step *= 1.5;
+        else if(time < 10 && step > 90.) // reset step
+            step /= 1.5;
+
+        current_cache.Finalize();
+    }
+
+    wxColour colour(0, 0, 0);
+
+    wxPoint point;
+    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+
+    if(dc.GetDC()) {
+        dc.SetPen( wxPen( colour, 2 ) );
+        dc.SetBrush( *wxTRANSPARENT_BRUSH);
+    } 
+#ifdef ocpnUSE_GL
+    else {
+        if(!nocache) {
+            glPushMatrix();
+            glTranslated(point.x, point.y, 0);
+            glRotated(vp.rotation*180/M_PI, 0, 0, 1);
+        }
+
+        glColor3ub(colour.Red(), colour.Green(), colour.Blue());
+        //      Enable anti-aliased lines, at best quality
+        glEnable( GL_BLEND );
+        glLineWidth( 2 );
+        glEnableClientState(GL_VERTEX_ARRAY);
+    }
+#endif
+
+    if(dc.GetDC()) {
+        if(nocache)
+            current_cache.draw(dc.GetDC());
+        else {
+            LineBuffer tb;
+            tb.pushTransformedBuffer(current_cache, point.x, dc.GetDC()->GetSize().y-point.y, vp.rotation);
+            tb.Finalize();
+            tb.draw(dc.GetDC());
+        }
+    } else
+        current_cache.draw(NULL);
 
 #ifdef ocpnUSE_GL
     if( !dc.GetDC() ) {
