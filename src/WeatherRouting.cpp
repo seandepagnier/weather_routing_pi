@@ -222,6 +222,9 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
         if(it == currentroutemaps.begin() &&
            m_SettingsDialog.m_cbDisplayWindBarbs->GetValue())
             (*it)->RenderWindBarbs(dc, vp);
+        if(it == currentroutemaps.begin() &&
+           m_SettingsDialog.m_cbDisplayCurrent->GetValue())
+            (*it)->RenderCurrent(dc, vp);
     }
 
     m_ConfigurationBatchDialog.Render(dc, vp);

@@ -177,6 +177,27 @@ LineBufferOverlay::LineBufferOverlay()
 
     for(i=0; i<14; i++)
         m_WindArrowCache[i].Finalize();
+
+    for(i=0; i< 14; i++) {
+        int arrowSize = 10  +i;
+        dec = arrowSize / 2;
+        int h = (i > 7)?6:4 ;
+        if (i >= 10) {
+            m_SingleArrow[i].pushLine( 0, dec, /* */ dec, dec - arrowSize );
+            m_SingleArrow[i].pushLine( 0, dec, /* */ -dec, dec - arrowSize );
+            m_SingleArrow[i].pushLine( dec, dec -arrowSize, /* */ 0, dec -arrowSize +h);
+            m_SingleArrow[i].pushLine( -dec, dec -arrowSize, /* */ 0, dec -arrowSize +h);
+        }
+        else {
+            m_SingleArrow[i].pushLine( 0, dec, 0, dec - arrowSize );
+            m_SingleArrow[i].pushLine( 0, dec,  h, dec - (h -1) );    // flèche
+            m_SingleArrow[i].pushLine( 0, dec, -h, dec - (h -1) );   // flèche
+        }
+    }
+
+    for(i=0; i<14; i++)
+        m_SingleArrow[i].Finalize();
+
 }
 
 void LineBufferOverlay::pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y, double vkn, double ang, bool south)
@@ -197,3 +218,18 @@ void LineBufferOverlay::pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y,
         return;
     buffer.pushTransformedBuffer(m_WindArrowCache[cacheidx], x, y, ang, south);
 }
+
+void LineBufferOverlay::pushSingleArrow( LineBuffer &buffer, int x, int y, double vkn, double ang, bool south)
+{
+    int cacheidx = 13;
+    int v = (int)(vkn*2. +0.5);
+    
+    if( v <= 0 )
+        return;
+    else if( v <= 13 )
+        cacheidx = v;
+    else if (v > 40)
+        return;
+    buffer.pushTransformedBuffer(m_SingleArrow[cacheidx], x, y, ang, south);
+}
+

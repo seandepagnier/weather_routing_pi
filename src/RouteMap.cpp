@@ -509,6 +509,13 @@ void Position::GetWindData(RouteMapConfiguration &configuration, double &W, doub
     ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
 }
 
+void Position::GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask)
+{
+    double WG, VWG, W, VW;
+    climatology_wind_atlas atlas;
+    ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
+}
+
 static inline bool ComputeBoatSpeed
 (RouteMapConfiguration &configuration, double timeseconds,
  double WG, double VWG, double W, double VW, double C, double VC, double &H,

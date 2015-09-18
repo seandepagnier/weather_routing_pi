@@ -79,6 +79,10 @@ void SettingsDialog::LoadSettings()
     pConf->Read( _T("DisplayWindBarbs"), &DisplayWindBarbs, DisplayWindBarbs);
     m_cbDisplayWindBarbs->SetValue(DisplayWindBarbs);
 
+    bool DisplayCurrent = m_cbDisplayCurrent->GetValue();
+    pConf->Read( _T("DisplayCurrent"), &DisplayCurrent, DisplayCurrent);
+    m_cbDisplayCurrent->SetValue(DisplayCurrent);
+
     int ConcurrentThreads = wxThread::GetCPUCount();
     pConf->Read( _T("ConcurrentThreads"), &ConcurrentThreads, ConcurrentThreads);
     m_sConcurrentThreads->SetValue(ConcurrentThreads);
@@ -120,6 +124,7 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("AlternatesForAll"), m_cbAlternatesForAll->GetValue());
     pConf->Write( _T("MarkAtSailChange"), m_cbMarkAtSailChange->GetValue());
     pConf->Write( _T("DisplayWindBarbs"), m_cbDisplayWindBarbs->GetValue());
+    pConf->Write( _T("DisplayCurrent"), m_cbDisplayCurrent->GetValue());
 
     pConf->Write( _T("ConcurrentThreads"), m_sConcurrentThreads->GetValue());
 

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Aug 18 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -385,6 +385,10 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_cbDisplayWindBarbs = new wxCheckBox( this, wxID_ANY, _("Display Wind Barbs"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_cbDisplayWindBarbs, 0, wxALL, 5 );
 	
+	m_cbDisplayCurrent = new wxCheckBox( this, wxID_ANY, _("Display current"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbDisplayCurrent->SetValue(true); 
+	fgSizer82->Add( m_cbDisplayCurrent, 0, wxALL, 5 );
+	
 	
 	fgSizer18->Add( fgSizer82, 1, wxEXPAND, 5 );
 	
@@ -460,6 +464,7 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_cbAlternatesForAll->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbMarkAtSailChange->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayWindBarbs->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbDisplayCurrent->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cblFields->Connect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_cbUseLocalTime->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_sdbSizer1Help->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
@@ -476,6 +481,7 @@ SettingsDialogBase::~SettingsDialogBase()
 	m_cbAlternatesForAll->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbMarkAtSailChange->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayWindBarbs->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbDisplayCurrent->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cblFields->Disconnect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_cbUseLocalTime->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_sdbSizer1Help->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnHelp ), NULL, this );
@@ -1436,10 +1442,13 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_lPlotType->AddPage( m_panel16, _("Speed"), false );
 	m_panel161 = new wxPanel( m_lPlotType, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	m_lPlotType->AddPage( m_panel161, _("VMG"), false );
-	#ifndef __WXGTK__ // Small icon style not supported in GTK
+	#ifdef __WXGTK__ // Small icon style not supported in GTK
 	wxListView* m_lPlotTypeListView = m_lPlotType->GetListView();
 	long m_lPlotTypeFlags = m_lPlotTypeListView->GetWindowStyleFlag();
-	m_lPlotTypeFlags = ( m_lPlotTypeFlags & ~wxLC_ICON ) | wxLC_SMALL_ICON;
+	if( m_lPlotTypeFlags & wxLC_SMALL_ICON )
+	{
+		m_lPlotTypeFlags = ( m_lPlotTypeFlags & ~wxLC_SMALL_ICON ) | wxLC_ICON;
+	}
 	m_lPlotTypeListView->SetWindowStyleFlag( m_lPlotTypeFlags );
 	#endif
 	
