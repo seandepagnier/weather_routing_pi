@@ -979,7 +979,7 @@ double BoatPlan::Speed(double W, double VW)
 
     int VW1i, VW2i;
     ClosestVWi(VW, VW1i, VW2i);
-    if(VW1i == wind_speeds.size() - 1)
+    if(VW1i == (int)wind_speeds.size() - 1)
         VW2i = VW1i;
     else
         VW2i = VW1i + 1;

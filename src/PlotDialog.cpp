@@ -35,6 +35,7 @@
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "WeatherRouting.h"
+#include "wx28compat.h"
 
 //---------------------------------------------------------------------------------------
 //          Weather Routing Dialog Implementation

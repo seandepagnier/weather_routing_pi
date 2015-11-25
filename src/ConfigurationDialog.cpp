@@ -175,7 +175,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_SPIN(FromDegree);
     SET_SPIN(ToDegree);
-    SET_CONTROL_VALUE(wxString::FromDouble((*it).ByDegrees), m_tByDegrees, SetValue, wxString, _T(""));
+    SET_CONTROL_VALUE(wxString::Format(_T("%f"), (*it).ByDegrees), m_tByDegrees, SetValue, wxString, _T(""));
 
     SET_CONTROL_VALUE(((*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA ?
                        _T("Runge Kutta") : _T("Newton")), m_cIntegrator, SetValue, wxString, _T(""));
@@ -299,9 +299,9 @@ void ConfigurationDialog::Update()
                 + m_sTimeStepSeconds->GetValue();
         }
 
-        if(m_cIntegrator->GetValue() == "Newton")
+        if(m_cIntegrator->GetValue() == _T("Newton"))
             configuration.Integrator = RouteMapConfiguration::NEWTON;
-        else if(m_cIntegrator->GetValue() == "Runge Kutta")
+        else if(m_cIntegrator->GetValue() == _T("Runge Kutta"))
             configuration.Integrator = RouteMapConfiguration::RUNGE_KUTTA;
 
         GET_SPIN(MaxDivertedCourse);
