@@ -182,8 +182,7 @@ struct RouteMapConfiguration {
     Boat boat;
     wxString boatFileName;
     
-    enum IntegratorType { NEWTON, RUNGE_KUTTA };
-    IntegratorType Integrator;
+    enum IntegratorType { NEWTON, RUNGE_KUTTA } Integrator;
 
     double MaxDivertedCourse, MaxCourseAngle, MaxSearchAngle, MaxTrueWindKnots, MaxApparentWindKnots;
     double MaxSwellMeters, MaxLatitude, TackingTime, WindVSCurrent;
@@ -199,9 +198,11 @@ struct RouteMapConfiguration {
 
     bool DetectLand, Currents, InvertedRegions, Anchoring;
 
-    std::list<double> DegreeSteps;
+    double FromDegree, ToDegree, ByDegrees;
 
-    double StartLat, StartLon, EndLat, EndLon; /* computed values */
+    /* computed values */
+    std::list<double> DegreeSteps;
+    double StartLat, StartLon, EndLat, EndLon;
 
     double StartEndBearing; /* calculated from start and end */
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,

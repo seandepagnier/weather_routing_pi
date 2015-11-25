@@ -112,81 +112,6 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
     }
 }
 
-// ensure mutually exclusive
-void ConfigurationDialog::OnUpdateIntegratorNewton( wxCommandEvent& event )
-{
-    m_cbNewton->Set3StateValue(wxCHK_CHECKED);
-    m_cbRungeKutta->Set3StateValue(wxCHK_UNCHECKED);
-    Update();
-}
-
-void ConfigurationDialog::OnUpdateIntegratorRungeKutta( wxCommandEvent& event )
-{
-    m_cbRungeKutta->Set3StateValue(wxCHK_CHECKED);
-    m_cbNewton->Set3StateValue(wxCHK_UNCHECKED);
-    Update();
-}
-
-void ConfigurationDialog::OnAddDegreeStep( wxCommandEvent& event )
-{
-    m_lDegreeSteps->Enable();
-    int s = m_lDegreeSteps->GetSelection();
-    if(s == -1)
-        s = m_lDegreeSteps->GetCount();
-
-    double step;
-    m_tDegreeStep->GetValue().ToDouble(&step);
-    m_lDegreeSteps->Insert(wxString::Format(_T("%f"), step), s);
-    m_tDegreeStep->Clear();
-    Update();
-}
-
-void ConfigurationDialog::OnRemoveDegreeStep( wxCommandEvent& event )
-{
-    int s = m_lDegreeSteps->GetSelection();
-    if(s == -1)
-        return;
-
-    m_lDegreeSteps->Delete(s);
-    m_lDegreeSteps->SetSelection(s);
-    Update();
-}
-
-void ConfigurationDialog::OnClearDegreeSteps( wxCommandEvent& event )
-{
-    m_lDegreeSteps->Enable();
-    m_lDegreeSteps->Clear();
-    Update();
-}
-
-void ConfigurationDialog::OnGenerateDegreeSteps( wxCommandEvent& event )
-{
-    m_lDegreeSteps->Enable();
-    m_lDegreeSteps->Clear();
-
-    double from, to, by;
-    m_tFromDegrees->GetValue().ToDouble(&from);
-    m_tToDegrees->GetValue().ToDouble(&to);
-    m_tByDegrees->GetValue().ToDouble(&by);
-
-    if(from < 0 || from >= 180 || to <= 0 || to > 180 || from >= to || by <= 0 || by >= 180) {
-        wxMessageDialog mdlg(this, _("Invalid settings, nothing will be done."),
-                             wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
-        mdlg.ShowModal();
-        return;
-    }
-
-    double v;
-    for(v = from; v <= to; v+=by)
-        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), v));
-
-    if(v == to) v -= by;
-    for(; v >= from; v-=by)
-        if(v > 0 && v < 180)
-            m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), 360-v));
-
-    Update();
-}
 
 #define SET_CHECKBOX_FIELD(FIELD, VALUE)              \
     do { \
@@ -237,7 +162,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_CONTROL_VALUE(STARTTIME, m_dpStartDate, SetValue, wxDateTime, wxDateTime());
     SET_CONTROL_VALUE(wxString::Format(_T("%.2f"), STARTTIME.GetHour()
-                                            + (double)STARTTIME.GetMinute()/60.0),
+                                       + (double)STARTTIME.GetMinute()/60.0),
                 m_tStartHour, SetValue, wxString, _T(""));
 
     SET_SPIN_VALUE(TimeStepHours, (int)((*it).dt / 3600));
@@ -248,20 +173,12 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_CHOICE(End);
 
-    m_lDegreeSteps->Clear();
-    m_lDegreeSteps->Enable();
-    std::list<RouteMapConfiguration>::iterator it = configurations.begin();
-    std::list<double> firstDegreeSteps = it->DegreeSteps;
-    for(it++; it != configurations.end(); it++)
-        if(firstDegreeSteps != it->DegreeSteps)
-            m_lDegreeSteps->Disable();
+    SET_SPIN(FromDegree);
+    SET_SPIN(ToDegree);
+    SET_CONTROL_VALUE(wxString::FromDouble((*it).ByDegrees), m_tByDegrees, SetValue, wxString, _T(""));
 
-    for(std::list<double>::iterator it = firstDegreeSteps.begin();
-        it != firstDegreeSteps.end(); it++)
-        m_lDegreeSteps->Append(wxString::Format(_T("%.1f"), *it));
-
-    SET_CHECKBOX_FIELD(Newton, (*it).Integrator == RouteMapConfiguration::NEWTON);
-    SET_CHECKBOX_FIELD(RungeKutta, (*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA);
+    SET_CONTROL_VALUE(((*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA ?
+                       _T("Runge Kutta") : _T("Newton")), m_cIntegrator, SetValue, wxString, _T(""));
 
     SET_SPIN(MaxDivertedCourse);
     SET_SPIN(MaxCourseAngle);
@@ -340,6 +257,10 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
     if(m_s##FIELD->IsEnabled())                                      \
         configuration.FIELD = m_s##FIELD->GetValue()
 
+#define GET_CHOICE(FIELD) \
+    if(!m_c##FIELD->GetValue().empty()) \
+        configuration.FIELD = m_c##FIELD->GetValue();
+
 void ConfigurationDialog::Update()
 {
     if(m_bBlockUpdate)
@@ -353,8 +274,8 @@ void ConfigurationDialog::Update()
 
         configuration = (*it)->GetConfiguration();
 
-        if(!m_cStart->GetValue().empty())
-            configuration.Start = m_cStart->GetValue();
+        GET_CHOICE(Start);
+        GET_CHOICE(End);
 
         if(m_dpStartDate->GetValue().IsValid())
             configuration.StartTime = m_dpStartDate->GetValue();
@@ -378,12 +299,9 @@ void ConfigurationDialog::Update()
                 + m_sTimeStepSeconds->GetValue();
         }
 
-        if(!m_cEnd->GetValue().empty())
-            configuration.End = m_cEnd->GetValue();
-
-        if(m_cbNewton->Get3StateValue() == wxCHK_CHECKED)
+        if(m_cIntegrator->GetValue() == "Newton")
             configuration.Integrator = RouteMapConfiguration::NEWTON;
-        else if(m_cbRungeKutta->Get3StateValue() == wxCHK_CHECKED)
+        else if(m_cIntegrator->GetValue() == "Runge Kutta")
             configuration.Integrator = RouteMapConfiguration::RUNGE_KUTTA;
 
         GET_SPIN(MaxDivertedCourse);
@@ -414,26 +332,10 @@ void ConfigurationDialog::Update()
         if(m_sWindStrength->IsEnabled())                     \
             configuration.WindStrength = m_sWindStrength->GetValue() / 100.0;
 
-        if(m_lDegreeSteps->IsEnabled()) {
-            configuration.DegreeSteps.clear();
-            for(unsigned int i=0; i<m_lDegreeSteps->GetCount(); i++) {
-                double step;
-                m_lDegreeSteps->GetString(i).ToDouble(&step);
-                configuration.DegreeSteps.push_back(positive_degrees(step));
-            }
-            configuration.DegreeSteps.sort();
-
-            /* delete duplicates */
-            double last = NAN;
-            for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
-                it != configuration.DegreeSteps.end();)
-                if(!isnan(last) && last == *it)
-                    configuration.DegreeSteps.erase(it);
-                else {
-                    last = *it;
-                    it++;
-                }
-        }
+        GET_SPIN(FromDegree);
+        GET_SPIN(ToDegree);
+        if(!m_tByDegrees->GetValue().empty())
+            m_tByDegrees->GetValue().ToDouble(&configuration.ByDegrees);
 
         (*it)->SetConfiguration(configuration);
 
@@ -443,10 +345,12 @@ void ConfigurationDialog::Update()
             (*it)->Reset();
             refresh = true;
         } else if(newc.EndLat != configuration.EndLat || newc.EndLon != configuration.EndLon)
-            refresh = true; // update drawing X
+            refresh = true; // update drawing
     }
 
-    if(m_lDegreeSteps->GetCount() < 4) {
+    double by;
+    m_tByDegrees->GetValue().ToDouble(&by);
+    if(m_sToDegree->GetValue() - m_sFromDegree->GetValue() < 2*by) {
         wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
                              wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
         mdlg.ShowModal();

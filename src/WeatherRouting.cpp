@@ -328,19 +328,23 @@ void WeatherRouting::UpdateColumns()
 
 void WeatherRouting::OnNewPosition( wxCommandEvent& event )
 {
-    wxTextEntryDialog pd( this, _("Enter Latitude"), _("New Position") );
-    if(pd.ShowModal() == wxID_OK) {
-        wxString latitude = pd.GetValue();
+    NewPositionDialog dlg(this);
+    if(dlg.ShowModal() == wxID_OK) {
+        double lat, lon, minutes;
 
-        wxTextEntryDialog pd( this, _("Enter Longitude"), _("New Position") );
-        if(pd.ShowModal() == wxID_OK) {
-            wxString longitude = pd.GetValue();
+        wxString latitude_degrees = dlg.m_tLatitudeDegrees->GetValue();
+        wxString latitude_minutes = dlg.m_tLatitudeMinutes->GetValue();
+        latitude_degrees.ToDouble(&lat);
+        latitude_minutes.ToDouble(&minutes);
+        lat += minutes / 60;
 
-            double lat, lon;
-            latitude.ToDouble(&lat);
-            longitude.ToDouble(&lon);
-            AddPosition(lat, lon);
-        }
+        wxString longitude_degrees = dlg.m_tLongitudeDegrees->GetValue();
+        wxString longitude_minutes = dlg.m_tLongitudeMinutes->GetValue();
+        longitude_degrees.ToDouble(&lon);
+        longitude_minutes.ToDouble(&minutes);
+        lon += minutes / 60;
+
+        AddPosition(lat, lon, dlg.m_tName->GetValue());
     }
 }
 
@@ -1118,14 +1122,10 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.Currents = AttributeBool(e, "Currents", true);
                     configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
                     configuration.Anchoring = AttributeBool(e, "Anchoring", false);
-            
-                    wxString degreesteps = wxString::FromUTF8(e->Attribute("DegreeSteps"));
-                    while(degreesteps.size()) {
-                        double step;
-                        if(degreesteps.BeforeFirst(';').ToDouble(&step))
-                            configuration.DegreeSteps.push_back(step);
-                        degreesteps = degreesteps.AfterFirst(';');
-                    }
+
+                    configuration.FromDegree = AttributeDouble(e, "FromDegree", 0);
+                    configuration.ToDegree = AttributeDouble(e, "ToDegree", 180);
+                    configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5);
 
                     if(configuration.boatFileName == lastboatFileName)
                         configuration.boat = lastboat;
@@ -1218,12 +1218,10 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("InvertedRegions", configuration.InvertedRegions);
         c->SetAttribute("Anchoring", configuration.Anchoring);
 
-        wxString degreesteps;
-        for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
-            it != configuration.DegreeSteps.end(); it++)
-            degreesteps += wxString::Format(_T("%.1f;"), *it);
-        c->SetAttribute("DegreeSteps", degreesteps.mb_str());
-        
+        c->SetDoubleAttribute("FromDegree", configuration.FromDegree);
+        c->SetDoubleAttribute("ToDegree", configuration.ToDegree);
+        c->SetDoubleAttribute("ByDegrees", configuration.ByDegrees);
+
         root->LinkEndChild(c);
     }
 
@@ -1871,13 +1869,9 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.InvertedRegions = false;
     configuration.Anchoring = false;
 
-    configuration.DegreeSteps.clear();
-    for(double v = 0; v <= 180; v+=5) {
-        configuration.DegreeSteps.push_back(v);
-        if(v > 0 && v < 180)
-            configuration.DegreeSteps.push_back(360-v);
-    }
-    configuration.DegreeSteps.sort();
+    configuration.FromDegree = 0;
+    configuration.ToDegree = 180;
+    configuration.ByDegrees = 5;
 
     return configuration;
 }

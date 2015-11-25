@@ -638,7 +638,7 @@ void BoatDialog::Save()
         wxString path;
         pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
 
-        wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
+        wxFileDialog saveDialog( this, _( "Select Boat" ), path, wxT ( "" ),
                                  wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
                                  wxFD_SAVE | wxFD_OVERWRITE_PROMPT );
 

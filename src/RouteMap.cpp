@@ -2235,6 +2235,22 @@ bool RouteMapConfiguration::Update()
     }
 
     ll_gc_ll_reverse(StartLat, StartLon, EndLat, EndLon, &StartEndBearing, 0);
+
+    DegreeSteps.clear();
+
+    // ensure validity
+    FromDegree = wxMax(wxMin(FromDegree, 180), 0);
+    ToDegree = wxMax(wxMin(ToDegree, 180), 0);
+    if(FromDegree > ToDegree) FromDegree = ToDegree;
+    ByDegrees = wxMax(wxMin(ByDegrees, 60), .1);
+    
+    for(double step=FromDegree; step <= ToDegree; step += ByDegrees) {
+        DegreeSteps.push_back(step);
+        if(step > 0 && step < 180)
+            DegreeSteps.push_back(360-step);
+    }
+    DegreeSteps.sort();
+
     return true;
 }
 
