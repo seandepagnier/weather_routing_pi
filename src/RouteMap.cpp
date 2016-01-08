@@ -127,6 +127,9 @@ static inline bool GribCurrent(GribRecordSet *grib, double lat, double lon,
         return false;
 
     VC *= 3.6 / 1.852; // knots
+    C += 180;
+    if(C > 360)
+        C -= 360;
     return true;
 }
 
@@ -468,15 +471,6 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
             return false;
     }
     VWG *= configuration.WindStrength;
-
-
-
-
-
-
-
-
-
 
     OverWater(WG, VWG, C, VC, W, VW);
     return true;

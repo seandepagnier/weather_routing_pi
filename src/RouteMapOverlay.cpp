@@ -794,11 +794,13 @@ void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
                 p.GetCurrentData(configuration, W2, VW2, data_mask2);
 
-                // XX climatology angle is to not from 
+#if 0
+                // XX climatology angle is to not from
                 if ((data_mask1 & Position::CLIMATOLOGY_CURRENT))
                     W1 += 180.0;
                 if ((data_mask2 & Position::CLIMATOLOGY_CURRENT)) 
                     W2 += 180.0;
+#endif
 
                 // now polar interpolation of the two wind positions
                 double d1 = p.Distance(p1), d2 = p.Distance(p2);
@@ -816,7 +818,7 @@ void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
 #endif
                 double VW = d*VW1 + (1-d)*VW2;
 
-                g_LineBufferOverlay.pushSingleArrow(current_cache, x, y, VW, deg2rad(W), lat < 0 );
+                g_LineBufferOverlay.pushSingleArrow(current_cache, x, y, VW, deg2rad(W+180), lat < 0 );
 
                 }
             skip:;
@@ -948,6 +950,7 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
             itp--;
 
             configuration.grib = (*it)->m_Grib;
+            configuration.time = (*it)->time;
 
             PlotData data;
 
