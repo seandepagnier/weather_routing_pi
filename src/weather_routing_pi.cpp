@@ -374,6 +374,7 @@ void weather_routing_pi::SetColorScheme(PI_ColorScheme cs)
 wxString weather_routing_pi::StandardPath()
 {
     wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
+    wxString s = wxFileName::GetPathSeparator();
 #ifdef __WXMSW__
     wxString stdPath  = std_path.GetConfigDir();
 #endif
@@ -381,12 +382,34 @@ wxString weather_routing_pi::StandardPath()
     wxString stdPath  = std_path.GetUserDataDir();
 #endif
 #ifdef __WXOSX__
-    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
+    wxString stdPath  = (std_path.GetUserConfigDir() + s + _T("opencpn"));   // should be ~/Library/Preferences/opencpn
 #endif
 
     return stdPath + wxFileName::GetPathSeparator() +
         _T("plugins") + wxFileName::GetPathSeparator() +
         _T("weather_routing") +  wxFileName::GetPathSeparator();
+
+    stdPath += s + _T("plugins");
+    if (!wxDirExists(stdPath))
+      wxMkdir(stdPath);
+
+    stdPath += s + _T("weather_routing");
+
+#ifdef __WXOSX__
+    // Compatibility with pre-OCPN-4.2; move config dir to
+    // ~/Library/Preferences/opencpn if it exists
+    wxString oldPath = (std_path.GetUserConfigDir() + s + _T("plugins") + s + _T("weather_routing"));
+    if (wxDirExists(oldPath) && !wxDirExists(stdPath)) {
+		wxLogMessage("weather_routing_pi: moving config dir %s to %s", oldPath, stdPath);
+		wxRenameFile(oldPath, stdPath);
+    }
+#endif
+
+    if (!wxDirExists(stdPath))
+      wxMkdir(stdPath);
+
+    stdPath += s;
+    return stdPath;
 }
 
 void weather_routing_pi::ShowMenuItems(bool show)
