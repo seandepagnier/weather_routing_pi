@@ -71,9 +71,9 @@ void SettingsDialog::LoadSettings()
     pConf->Read( _T("AlternatesForAll"), &AlternatesForAll, AlternatesForAll);
     m_cbAlternatesForAll->SetValue(AlternatesForAll);
 
-    bool MarkAtSailChange = m_cbMarkAtSailChange->GetValue();
-    pConf->Read( _T("MarkAtSailChange"), &MarkAtSailChange, MarkAtSailChange);
-    m_cbMarkAtSailChange->SetValue(MarkAtSailChange);
+    bool MarkAtPolarChange = m_cbMarkAtPolarChange->GetValue();
+    pConf->Read( _T("MarkAtPolarChange"), &MarkAtPolarChange, MarkAtPolarChange);
+    m_cbMarkAtPolarChange->SetValue(MarkAtPolarChange);
     
     bool DisplayWindBarbs = m_cbDisplayWindBarbs->GetValue();
     pConf->Read( _T("DisplayWindBarbs"), &DisplayWindBarbs, DisplayWindBarbs);
@@ -122,7 +122,7 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("IsoChronThickness"), m_sIsoChronThickness->GetValue());
     pConf->Write( _T("AlternateRouteThickness"), m_sAlternateRouteThickness->GetValue());
     pConf->Write( _T("AlternatesForAll"), m_cbAlternatesForAll->GetValue());
-    pConf->Write( _T("MarkAtSailChange"), m_cbMarkAtSailChange->GetValue());
+    pConf->Write( _T("MarkAtPolarChange"), m_cbMarkAtPolarChange->GetValue());
     pConf->Write( _T("DisplayWindBarbs"), m_cbDisplayWindBarbs->GetValue());
     pConf->Write( _T("DisplayCurrent"), m_cbDisplayCurrent->GetValue());
 

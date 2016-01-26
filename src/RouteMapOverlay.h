@@ -58,7 +58,7 @@ public:
                         wrDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
-    void RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
+    void RenderCourse(Position *pos, wxDateTime time, bool MarkAtPolarChange,
                       wrDC &dc, PlugIn_ViewPort &vp);
     void RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp);
     void RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp);

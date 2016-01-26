@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -41,17 +41,17 @@ public:
     wxString m_boatpath;
 
 private:
-    void OnMouseEventsPlot( wxMouseEvent& event );
-    void PlotVMG(wxPaintDC &dc, double W, double s);
-
-    void PaintPolar(wxPaintDC &dc);
-    void PaintSpeed(wxPaintDC &dc);
-    void PaintVMG(wxPaintDC &dc);
+    void OnMouseEventsPolarPlot( wxMouseEvent& event );
+    
+    void PaintPolar(wxPaintDC &dc, long index);
+    void PaintSpeed(wxPaintDC &dc, long index);
 
     void OnPaintPlot( wxPaintEvent& event );
-    void OnSizePlot( wxSizeEvent& event ) { m_PlotWindow->Refresh(); }
+    void OnUpdatePlot( wxSizeEvent& event ) { RefreshPlots(); }
+    void OnPaintCrossOverChart( wxPaintEvent& event );
+    void OnGenerateCrossOverChart( wxCommandEvent& event );
+    void OnSizePlot( wxSizeEvent& event ) { RefreshPlots(); }
     void OnUpdatePlot();
-    void OnUpdatePlot( wxListbookEvent& event ) { OnUpdatePlot(); }
     void OnUpdatePlot( wxCommandEvent& event ) { OnUpdatePlot(); }
     void OnUpdatePlot( wxSpinEvent& event ) { OnUpdatePlot(); }
     void OnOpen( wxCommandEvent& event );
@@ -61,45 +61,24 @@ private:
     void OnClose( wxCommandEvent& event );
     void LoadFile(bool switched = false);
     void OnSaveFile( wxCommandEvent& event );
-    void OnPolarFile( wxFileDirPickerEvent& event );
-    void OnUpdateVMG( wxSpinEvent& event ) { UpdateVMG(); }
-    void OnUpdateVMG( wxCommandEvent& event ) { UpdateVMG(); }
-    void OnRecompute( );
-    void OnRecomputeSpin( wxSpinEvent& event ) { OnRecompute(); }
-    void OnRecompute( wxCommandEvent& event ) { OnRecompute(); }
-    void OnOptimizeTacking( wxCommandEvent& event );
-    void OnRecomputeDrag( wxCommandEvent& event );
-    void OnDragInfo( wxCommandEvent& event );
-    void OnSailPlanSelected( wxListEvent& event );
-    void OnPolarMethod( wxCommandEvent& event );
-    void OnEtaSlider( wxScrollEvent& event );
-    void OnEta( wxCommandEvent& event );
-    void OnNewBoatPlan( wxCommandEvent& event );
-    void OnDeleteBoatPlan( wxCommandEvent& event );
+    void OnPolarSelected( wxListEvent& event ) { OnPolarSelected(); }
+    void OnPolarSelected();
 
-    void LoadBoatParameters();
-    void StoreBoatParameters();
-    void RepopulatePlans();
-    void Compute();
-    void UpdateTrackingControls();
-    void SetEta(double eta) { m_tEta->SetValue(wxString::Format(_T("%.5g"), eta)); }
+    void OnEditPolar( wxCommandEvent& event );
+    void OnAddPolar( wxCommandEvent& event );
+    void OnRemovePolar( wxCommandEvent& event );
 
-    void OnSwitchPlanRules( wxCommandEvent& event );
-    void OnNewSwitchPlanRule( wxCommandEvent& event );
-    void OnEditSwitchPlanRule( wxCommandEvent& event );
-    void EditSwitchPlanRule( bool edit );
-    void OnDeleteSwitchPlanRule( wxCommandEvent& event );
-    void SetupCurrentPlanPolar();
-    void RepopulateSwitchPlans();
+    void RepopulatePolars();
+
+    void RefreshPlots() { m_PlotWindow->Refresh(); m_CrossOverChart->Refresh(); }
 
     wxString FormatVMG(double W, double VW);
     void UpdateVMG();
-    void UpdateStats();
+
+    long SelectedPolar() { return m_lPolars->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED); }
 
     double m_PlotScale;
     int m_MouseW;
-
-    int m_SelectedSailPlan;
 };
 
 #endif

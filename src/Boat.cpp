@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -33,8 +33,6 @@
 #include "Boat.h"
 
 Boat::Boat()
-    : displacement_tons(4), lwl_ft(24), loa_ft(27), beam_ft(8),
-      frictional_drag(0), wake_drag(0)
 {
 }
 
@@ -50,7 +48,7 @@ wxString Boat::OpenXML(wxString filename)
         return _T("");
 
     bool cleared = false;
-    Plans.clear();
+    Polars.clear();
 
     if(!wxFileName::FileExists(filename))
         return _("Boat file does not exist.");
@@ -64,66 +62,24 @@ wxString Boat::OpenXML(wxString filename)
         return _("Invalid xml file (no OCPWeatherRoutingBoat node): " + filename);
 
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
-        if(!strcmp(e->Value(), "BoatCharacteristics")) {
-            hulltype = (Boat::HullType)AttributeInt(e, "hull_type", MONO);
-            displacement_tons = AttributeDouble(e, "displacement_tons", 4);
-            sail_area_ft2 = AttributeDouble(e, "sail_area_ft2", 400);
-            lwl_ft = AttributeDouble(e, "lwl_ft", 24);
-            loa_ft = AttributeDouble(e, "loa_ft", 27);
-            beam_ft = AttributeDouble(e, "beam_ft", 8);
-        } else if(!strcmp(e->Value(), "BoatDrag")) {
-            frictional_drag = AttributeDouble(e, "frictional_drag", 0);
-            wake_drag = AttributeDouble(e, "wake_drag", 0);
-        } else if(!strcmp(e->Value(), "Plan")) {
+        if(!strcmp(e->Value(), "Polar")) {
             if(!cleared) {
-                Plans.clear();
+                Polars.clear();
                 cleared = true;
             }
 
-            BoatPlan plan(wxString::FromUTF8(e->Attribute("Name")));
+            Polar polar; //(wxString::FromUTF8(e->Attribute("Name")));
 
-            plan.polarmethod = (BoatPlan::PolarMethod)AttributeInt(e, "polarmethod", BoatPlan::TRANSFORM);
+            polar.FileName = wxString::FromUTF8(e->Attribute("FileName"));
+            wxString message;
+            if(!polar.Open(polar.FileName, message))
+                return message;
 
-            switch(plan.polarmethod) {
-            case BoatPlan::FROM_FILE:
-            {
-                plan.fileFileName = wxString::FromUTF8(e->Attribute("fileFileName"));
-                wxString message;
-                if(!plan.Open(plan.fileFileName.mb_str(), message))
-                    return message;
-            } break;
-            case BoatPlan::TRANSFORM:
-                plan.eta = AttributeDouble(e, "eta", .5);
-                plan.luff_angle = AttributeDouble(e, "luff_angle", 15);
-                plan.wing_wing_running = AttributeBool(e, "wing_wing_running", false);
-                plan.ComputeBoatSpeeds(*this, plan.polarmethod);
-                break;
-            case BoatPlan::IMF:
-                plan.ComputeBoatSpeeds(*this, plan.polarmethod);
-                break;
-            }
-
-            plan.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
-            if(plan.optimize_tacking)
-                plan.OptimizeTackingSpeed();
-
-            for(TiXmlElement* f = e->FirstChildElement(); f; f = f->NextSiblingElement()) {
-                if(!strcmp(f->Value(), "SwitchPlan")) {
-                    SwitchPlan switchplan;
-                    switchplan.MaxWindSpeed = AttributeDouble(f, "MaxWindSpeed", NAN);
-                    switchplan.MinWindSpeed = AttributeDouble(f, "MinWindSpeed", NAN);
-                    switchplan.MaxWindDirection = AttributeDouble(f, "MaxWindDirection", NAN);
-                    switchplan.MinWindDirection = AttributeDouble(f, "MinWindDirection", NAN);
-                    switchplan.MaxWaveHeight = AttributeDouble(f, "MaxWaveHeight", NAN);
-                    switchplan.MinWaveHeight = AttributeDouble(f, "MinWaveHeight", NAN);
-                    switchplan.DayTime = AttributeBool(f, "DayTime", true);
-                    switchplan.NightTime = AttributeBool(f, "NightTime", true);
-                    switchplan.Name = wxString::FromUTF8(f->Attribute("Name"));
-                    plan.SwitchPlans.push_back(switchplan);
-                }
-            }
+//            polar.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
+//            if(polar.optimize_tacking)
+//                polar.OptimizeTackingSpeed();
              
-            Plans.push_back(plan);
+            Polars.push_back(polar);
         }
     }
     
@@ -145,66 +101,14 @@ wxString Boat::SaveXML(wxString filename)
     root->SetAttribute("version", version);
     root->SetAttribute("creator", "Opencpn Weather Routing plugin");
 
-    TiXmlElement *boatcharacteristics = new TiXmlElement( "BoatCharacteristics" );
-    boatcharacteristics->SetAttribute("hull_type", hulltype);
-    boatcharacteristics->SetAttribute("displacement_tons", displacement_tons);
-    boatcharacteristics->SetAttribute("sail_area_ft2", sail_area_ft2);
-    boatcharacteristics->SetAttribute("lwl_ft", lwl_ft);
-    boatcharacteristics->SetAttribute("loa_ft", loa_ft);
-    boatcharacteristics->SetAttribute("beam_ft", beam_ft);
-    root->LinkEndChild(boatcharacteristics);
+    for(unsigned int i=0; i<Polars.size(); i++) {
+        TiXmlElement *e = new TiXmlElement( "Polar" );
+        Polar &polar = Polars[i];
+//        e->SetAttribute("Name", polar.Name.mb_str());
 
-    TiXmlElement *boatdrag = new TiXmlElement( "BoatDrag" );
-    char str[24];
+        e->SetAttribute("FileName", polar.FileName.mb_str());
 
-    sprintf(str, "%.4f", frictional_drag);
-    boatdrag->SetAttribute("frictional_drag", str);
-
-    sprintf(str, "%.4f", wake_drag);
-    boatdrag->SetAttribute("wake_drag", str);
-
-    root->LinkEndChild(boatdrag);
-
-    for(unsigned int i=0; i<Plans.size(); i++) {
-        TiXmlElement *e = new TiXmlElement( "Plan" );
-        BoatPlan &plan = Plans[i];
-        e->SetAttribute("Name", plan.Name.mb_str());
-
-        e->SetAttribute("polarmethod", plan.polarmethod);
-        switch(plan.polarmethod) {
-        case BoatPlan::FROM_FILE:
-            e->SetAttribute("fileFileName", plan.fileFileName.mb_str());
-            break;
-        case BoatPlan::TRANSFORM:
-            sprintf(str, "%.4g", plan.eta);
-            e->SetAttribute("eta", str);
-
-            sprintf(str, "%.4f", plan.luff_angle);
-            e->SetAttribute("luff_angle", str);
-
-            e->SetAttribute("wing_wing_running", plan.wing_wing_running);
-            break;
-        case BoatPlan::IMF:
-            break;
-        }
-
-        e->SetAttribute("optimize_tacking", plan.optimize_tacking);
-
-        for(unsigned int j=0; j<plan.SwitchPlans.size(); j++) {
-            TiXmlElement *f = new TiXmlElement( "SwitchPlan" );
-            SwitchPlan &switchplan = plan.SwitchPlans[j];
-#define SetAttr(NAME) if(!isnan(switchplan.NAME)) f->SetDoubleAttribute(#NAME, switchplan.NAME)
-            SetAttr(MinWindSpeed);
-            SetAttr(MaxWindSpeed);
-            SetAttr(MinWindDirection);
-            SetAttr(MaxWindDirection);
-            SetAttr(MinWaveHeight);
-            SetAttr(MaxWaveHeight);
-            if(switchplan.DayTime)   f->SetAttribute("DayTime", switchplan.DayTime);
-            if(switchplan.NightTime) f->SetAttribute("NightTime", switchplan.NightTime);
-            f->SetAttribute("Name", switchplan.Name.mb_str());
-            e->LinkEndChild(f);
-        }
+//        e->SetAttribute("optimize_tacking", polar.optimize_tacking);
 
         root->LinkEndChild(e);
     }
@@ -215,178 +119,152 @@ wxString Boat::SaveXML(wxString filename)
     return wxString();
 }
 
-int Boat::TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
-                            const wxDateTime &gribtime, double lat, double lon, int &daytime)
+int Boat::TrySwitchPolar(int curpolar, double VW, double H, double Swell)
 {
-    for(int rounds = 0; rounds < 5; rounds++) {
-        BoatPlan &boatplan = Plans[curplan];
-        int index = boatplan.TrySwitchBoatPlan(VW, H, Swell, gribtime,
-                                               lat, lon, daytime);
-        if(index == -1)
-            return curplan;
+    Polar &boatpolar = Polars[curpolar];
 
-        wxString &Name = boatplan.SwitchPlans[index].Name;
-        unsigned int i;
-        for(i=0; i<Plans.size(); i++)
-            if(Name == Plans[i].Name) {
-                curplan = i;
-                break;
+    if(boatpolar.InsideCrossOverContour(H, VW))
+        return curpolar;
+
+    // the current polar must change; select the first polar we can use
+    for(int i=0; i<(int)Polars.size(); i++)
+        if(i != curpolar && Polars[i].InsideCrossOverContour(H, VW))
+            return i;
+
+    return -1; // no valid polar
+}
+
+static Point
+FindNextSegmentPoint(std::list<Segment> &segments, Point p, bool greater)
+{
+    Point best;
+    bool nobest = true;
+    for(std::list<Segment>::iterator it = segments.begin();
+        it != segments.end(); it++)
+        if(it->p[0].x == p.x)
+            if((greater &&
+                (it->p[0].y > p.y) && (nobest || it->p[0].y < best.y)) ||
+               (!greater &&
+                (it->p[0].y < p.y) && (nobest || it->p[0].y > best.y))) {
+                best = it->p[0];
+                nobest = false;
             }
+    if(nobest)
+        printf("warning, failed to find matching segment");
+    return best;
+}
 
-        if(i == Plans.size()) {
-//            printf("error, failed to find plan: %s\n", (const char*)Name.mb_str());
-            break;
+int Boat::FastestPolar(float H, float VW)
+{
+    int maxi = -1;
+    float max = 0;
+    for(unsigned int i=0; i<Polars.size(); i++) {
+        float speed = Polars[i].Speed(VW, H);
+        if(speed > max) {
+            max = speed;
+            maxi = i;
         }
     }
-
-    return curplan;
+    return maxi;
 }
 
-double Boat::Hulls()
+void Boat::GenerateCrossOverChart()
 {
-    switch(hulltype) {
-    case CATAMARAN: return 2;
-    case TRIMARAN: return 3;
-    case PROA: return 2;
-    default: return 1;
-    }
-}
+    int buffer[2][40];
+    int bi = 0;
+    std::list<Segment> segments[Polars.size()];
+    for(double H = 0; H <= 180; H++) {
+        for(int VW = 0; VW < 40; VW++) {
+            if(VW == 0 || VW == 39)
+                buffer[bi][VW] = -1;
+            else
+                buffer[bi][VW] = FastestPolar(H, VW);
 
-/* values greater than 2 are a danger, less than 2 is "good" */
-double Boat::CapsizeRisk()
-{
-    return beam_ft/pow(1.1*DisplacementPounds()/64, 1.0/3);
-}
+            if(VW > 0 && H > 0) {
+                int p0 = buffer[!bi][VW-1], p1 = buffer[bi][VW-1];
+                int p2 = buffer[!bi][VW],   p3 = buffer[bi][VW];
 
-double Boat::SailAreaDisplacementRatio()
-{
-    return sail_area_ft2 / pow(DisplacementPounds() / 64, 2.0/3.0);
-}
+                float H0 = H-1, H_5 = H - .5;
+                float VW0 = VW-1, VW_5 = VW - .5;
+                Point a(H_5, VW0), b(H0, VW_5), c(H, VW_5), d(H_5, VW);
 
-/* values of 30-40 for cruisers, 20 or less for racers, higher for
-   heavy boats */
-double Boat::ComfortFactor()
-{
-    return DisplacementPounds() / (.65 * (.7*lwl_ft + .3*loa_ft) * pow(beam_ft, 1.33));
-}
-
-double Boat::DisplacementLengthRatio()
-{
-    return DisplacementLongTons() / cube(.01 * lwl_ft) / Hulls();
-}
-
-double Boat::DisplacementLongTons()
-{
-    return DisplacementPounds() / 2240.0;
-}
-
-double Boat::DisplacementPounds()
-{
-    return displacement_tons * 2000.0;
-}
-
-/* to calculate power required to move the boat:
-
-   SL = 8.26 / (Disp / (.01 lwl)^3 )^.311
-   lwl - length at water line
-   Ship Horse Power = Disp.lwl / ((2.3-SL)*8.11)^3
-
-1.34 = knots/sqrt(lwl)
-   Ship Horse Power = Disp.lwl / ((2.3-SL)*8.11)^3
-
-*/
-
-double Boat::HullSLRatio()
-{
-    double SL = 8.26 / pow(DisplacementLengthRatio(), .311);
-    if(SL < 1.34)
-        SL = 1.34;
-    return SL;
-}
-
-double Boat::HullSpeed()
-{
-    return HullSLRatio() * sqrt(lwl_ft);
-}
-
-/* assume frictional drag is related to speed squared */
-double Boat::FrictionDrag(double VB)
-{
-    return 10*frictional_drag*VB*VB;
-}
-
-/* wave drag in terms of froude number
-                                       2
-           /      sin(Pi - F^-2)      \
-   Drag = |  -----------------------   |
-           \ (Pi - F^-2) (1 + Pi F^2) /
-
-              ___
-    V = F * \/g l
-
-    F = sqrt(g * l) / V;
-
-    g = 9.8 (gravity constant)
-    l is length of vessel in meters
-    V is meters per second
-
-    Reaches a peak at F=Pi^-.5 which is about .56
-
-    The huge increase starts at F = .4  (normal hull speed setting)
+                /*        2 --- d --- 3
+                          |           |
+                          b           c
+                          |           |
+                          0 --- a --- 1         */
+                
+                for(int p = 0; p < (int)Polars.size(); p++) {
+                    if(p == p0) {
+                        if(p == p1) {
+                            if(p == p2) {
+                                if(p != p3)
+                                    segments[p].push_back(Segment(c, d));
+                            } else {
+                                if(p == p3)
+                                    segments[p].push_back(Segment(d, b));
+                                else
+                                    segments[p].push_back(Segment(c, b));
+                            }
+                        } else {
+                            if(p == p2) {
+                                if(p == p3)
+                                    segments[p].push_back(Segment(a, c));
+                                else
+                                    segments[p].push_back(Segment(a, d));
+                            } else {
+                                segments[p].push_back(Segment(a, b));
+                                if(p == p3)
+                                    segments[p].push_back(Segment(d, c));
+                            }
+                        }
+                    } else {
+                        if(p == p1) {
+                            if(p == p2) {
+                                segments[p].push_back(Segment(b, a));
+                                if(p != p3)
+                                    segments[p].push_back(Segment(c, d));
+                            } else {
+                                if(p == p3)
+                                    segments[p].push_back(Segment(d, a));
+                                else
+                                    segments[p].push_back(Segment(c, a));
+                            }
+                        } else {
+                            if(p == p2) {
+                                if(p == p3)
+                                    segments[p].push_back(Segment(b, c));
+                                else
+                                    segments[p].push_back(Segment(b, d));
+                            } else {
+                                if(p == p3)
+                                    segments[p].push_back(Segment(d, c));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        bi = !bi;
+    }    
     
-    Also interesting to note that at 80% of normal hull speed, the wave
-    drag is zero as well, but the first hump occurs from .32 to .4
+    for(unsigned int p = 0; p < Polars.size(); p++) {
+        /* insert wrapping segments for 0 and 180 */
+        std::list<Segment> wrapped_segments;
+        for(std::list<Segment>::iterator it = segments[p].begin();
+            it != segments[p].end(); it++) {
+            if(it->p[1].x == 0) {
+                // find next segment starting at 0 with greater y
+                wrapped_segments.push_back
+                    (Segment(it->p[1], FindNextSegmentPoint(segments[p], it->p[1], false)));
+            } else if(it->p[1].x == 180) {
+                // find next segment starting at 180 with lesser y
+                wrapped_segments.push_back
+                    (Segment(it->p[1], FindNextSegmentPoint(segments[p], it->p[1], true)));
+            }
+        }
 
-    This works for the full range from displacement to planing mode.
- */
-double Boat::WakeDrag(double VB)
-{
-#if 0 // this may be theoretically correct in flat water, but is complex and not practical
-    if(VB == 0) return 0;
-
-    const double G = 9.8;
-    double L = ft2m(lwl_ft);
-    double F = knots2m_s(VB) / sqrt(G * L);
-
-    double F2 = square(F), invF2 = 1/F2;
-    double D = square(sin(M_PI - invF2) / (M_PI - invF2) / (1 + M_PI * F2));
-
-    return wake_drag * wake_drag * D * VB * VB; /* D is max of .25 (at F=.56) so normalize to 1 */
-
-#else
-    // classic hull speed exponential without planing possible
-//    double hull_speed = 1.34*sqrt(lwl_ft);
-//    double our_wave_drag = 2 * wake_drag * (pow(8, VB / sqrt(lwl_ft)) - 1);
-
-    double coeff = VB / 1.34 / sqrt(lwl_ft);
-    if(coeff < 1)
-        return 0;
-
-    double drag = (pow(32, coeff - 1) - 1) * wake_drag * 10;
-
-    if(drag > VB)
-        drag = VB;
-
-    return drag;
-#endif
-}
-
-void Boat::RecomputeDrag()
-{
-    /* for frictional drag, assume related to wetted surface area,
-       I pulled this out of my ass so please fix it. */
-    frictional_drag = .001 * (pow(DisplacementLengthRatio(), .5));
-
-    if(hulltype == SUBMARINE) {
-        frictional_drag *= 2.5; /* subs have high surface area */
-        wake_drag = 0; /* assuming submerged to depth of more than sqrt(2) length */
-    } else {
-        /* for wake drag..this really depends on hull type, but we will relate
-           displacement here  */
-        double froude = HullSLRatio() * .4 / 1.34;
-        double maxdrag = 1.2;//pow(M_PI, -.5);
-        wake_drag = (maxdrag-froude) / (maxdrag - .4);
-        wake_drag = square(wake_drag);
-        if(wake_drag < 0) wake_drag = 0; else if(wake_drag > 1) wake_drag = 1;
+        segments[p].splice(segments[p].end(), wrapped_segments);
+        Polars[p].CrossOverRegion = PolygonRegion(segments[p]);
     }
 }

@@ -405,14 +405,14 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     if(RouteThickness) {
         wxColour CursorColor = settingsdialog.m_cpCursorRoute->GetColour(),
             DestinationColor = settingsdialog.m_cpDestinationRoute->GetColour();
-        bool MarkAtSailChange = settingsdialog.m_cbMarkAtSailChange->GetValue();
+        bool MarkAtPolarChange = settingsdialog.m_cbMarkAtPolarChange->GetValue();
 
         if(!justendroute) {
             SetColor(dc, CursorColor, true);
             SetWidth(dc, RouteThickness, true);
             RenderCourse(last_cursor_position, time, false, dc, vp);
 
-            if(MarkAtSailChange) {
+            if(MarkAtPolarChange) {
                 SetColor(dc, Darken(CursorColor), true);
                 SetWidth(dc, (RouteThickness+1)/2, true);
                 RenderCourse(last_cursor_position, time, true, dc, vp);
@@ -422,7 +422,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         SetWidth(dc, RouteThickness, true);
         RenderCourse(last_destination_position, time, false, dc, vp);
         
-        if(MarkAtSailChange) {
+        if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
             SetWidth(dc, (RouteThickness+1)/2, true);
             RenderCourse(last_destination_position, time, true, dc, vp);
@@ -430,7 +430,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     }
 }
 
-void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSailChange,
+void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtPolarChange,
                                    wrDC &dc, PlugIn_ViewPort &vp)
 {
     if(!pos)
@@ -440,12 +440,12 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSa
 
     /* draw lines to this route */
     Position *p;
-    int sailplan = pos->sailplan;
+    int polar = pos->polar;
     if(!dc.GetDC())
         glBegin(GL_LINES);
 
     for(p = pos; p && p->parent; p = p->parent) {
-        if(MarkAtSailChange && p->sailplan != sailplan) {
+        if(MarkAtPolarChange && p->polar != polar) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, p->lat, p->lon);
             int s = 6;
@@ -453,7 +453,7 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtSa
             glVertex2i(r.x+s, r.y-s), glVertex2i(r.x+s, r.y+s);
             glVertex2i(r.x+s, r.y+s), glVertex2i(r.x-s, r.y+s);
             glVertex2i(r.x-s, r.y+s), glVertex2i(r.x-s, r.y-s);
-            sailplan = p->sailplan;
+            polar = p->polar;
         } else
             DrawLine(p, p->parent, dc, vp);
     }
@@ -1161,7 +1161,7 @@ void RouteMapOverlay::UpdateDestination()
             goto not_able_to_propagate;
 
         destination_position = new Position(configuration.EndLat, configuration.EndLon,
-                                            endp, minH, NAN, endp->sailplan, endp->tacks + mintacked,
+                                            endp, minH, NAN, endp->polar, endp->tacks + mintacked,
                                             mindata_mask);
 
         m_EndTime = isochron->time + wxTimeSpan::Milliseconds(1000*mindt);

@@ -57,7 +57,6 @@ protected:
     void OnGribTime( wxCommandEvent& event );
     void OnCurrentTime( wxCommandEvent& event );
     void OnUpdateSpin( wxSpinEvent& event ) { Update(); }
-    void OnUpdateFile( wxFileDirPickerEvent& event ) { Update(); }
     void OnBoatFilename( wxCommandEvent& event );
     void OnEditBoat( wxCommandEvent& event ) { EditBoat(); }
     void OnUpdateIntegratorNewton( wxCommandEvent& event );

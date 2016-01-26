@@ -269,7 +269,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             m_pWeather_Routing->m_ConfigurationDialog.m_pCyclones->Enable
                 (RouteMap::ClimatologyCycloneTrackCrossings!=NULL);
         }
-    }
+     }
 }
 
 void weather_routing_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)

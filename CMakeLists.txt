@@ -40,18 +40,18 @@ SET(SRC_WEATHER_ROUTING
             src/SettingsDialog.cpp
             src/PlotDialog.cpp
             src/BoatDialog.cpp
-            src/SwitchPlanDialog.cpp
             src/StatisticsDialog.cpp
             src/ReportDialog.cpp
             src/FilterRoutesDialog.cpp
             src/ConfigurationBatchDialog.cpp
             src/AboutDialog.cpp
-            src/BoatPlan.cpp
+            src/Polar.cpp
             src/Boat.cpp
             src/RouteMap.cpp
             src/RouteMapOverlay.cpp
             src/Utilities.cpp
             src/LineBufferOverlay.cpp
+            src/PolygonRegion.cpp
             src/WeatherRoutingUI.cpp
             src/icons.cpp
 
@@ -70,15 +70,26 @@ SET(SRC_JSON
             src/wxJSON/jsonwriter.cpp)
 ENDIF(WIN32)
 
+SET(SRC_LIBTESS2
+  src/libtess2/bucketalloc.c
+  src/libtess2/dict.c
+  src/libtess2/geom.c
+  src/libtess2/mesh.c
+  src/libtess2/priorityq.c
+  src/libtess2/sweep.c
+  src/libtess2/tess.c)
+
 IF(UNIX)
  INCLUDE("cmake/FindTinyXML.cmake")
  FIND_PACKAGE(TinyXML QUIET)
 ENDIF(UNIX)
 
+SET(SRC ${SRC_WEATHER_ROUTING} ${SRC_JSON} ${SRC_LIBTESS2})
+
 IF(TINYXML_FOUND)
  message (STATUS "Building with system tinyxml")
  INCLUDE_DIRECTORIES(${TINYXML_INCLUDE_DIR})
- ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING} ${SRC_JSON})
+ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
  TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${TINYXML_LIBRARIES})
 ELSE(TINYXML_FOUND)
  message (STATUS "Building with embedded tinyxml")
@@ -88,7 +99,7 @@ ELSE(TINYXML_FOUND)
             src/tinyxml/tinyxmlparser.cpp
             src/tinyxml/tinyxmlerror.cpp
  )
- ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_WEATHER_ROUTING} ${SRC_JSON} ${SRC_LTINYXML})
+ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC} ${SRC_LTINYXML})
 ENDIF(TINYXML_FOUND)
 ADD_DEFINITIONS(-DTIXML_USE_STL)
 

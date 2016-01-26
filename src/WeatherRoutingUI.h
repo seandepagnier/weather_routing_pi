@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct 12 2015)
+// C++ code generated with wxFormBuilder (version Dec  8 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -41,13 +41,12 @@
 #include <wx/valtext.h>
 #include <wx/notebook.h>
 #include <wx/choice.h>
+#include <wx/grid.h>
 #include <wx/scrolwin.h>
-#include <wx/listbook.h>
 #include <wx/slider.h>
-#include <wx/filepicker.h>
-#include <wx/listbox.h>
 #include <wx/radiobut.h>
 #include <wx/html/htmlwin.h>
+#include <wx/listbox.h>
 #include <wx/valgen.h>
 
 ///////////////////////////////////////////////////////////////////////////
@@ -170,7 +169,7 @@ class SettingsDialogBase : public wxDialog
 		wxSpinCtrl* m_sIsoChronThickness;
 		wxSpinCtrl* m_sAlternateRouteThickness;
 		wxCheckBox* m_cbAlternatesForAll;
-		wxCheckBox* m_cbMarkAtSailChange;
+		wxCheckBox* m_cbMarkAtPolarChange;
 		wxCheckBox* m_cbDisplayWindBarbs;
 		wxCheckBox* m_cbDisplayCurrent;
 		wxSpinCtrl* m_sConcurrentThreads;
@@ -289,41 +288,13 @@ class ConfigurationDialogBase : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class BoatDialogBase
+/// Class MyFrame2
 ///////////////////////////////////////////////////////////////////////////////
-class BoatDialogBase : public wxDialog 
+class MyFrame2 : public wxFrame 
 {
 	private:
 	
 	protected:
-		wxScrolledWindow* m_scrolledWindow4;
-		wxListCtrl* m_lBoatPlans;
-		wxButton* m_bNewBoatPlan;
-		wxButton* m_bDeleteBoatPlan;
-		wxScrolledWindow* m_PlotWindow;
-		wxScrolledWindow* m_scrolledWindow5;
-		wxNotebook* m_nNotebook;
-		wxPanel* m_panel3;
-		wxListbook* m_lPlotType;
-		wxPanel* m_panel14;
-		wxChoice* m_cPlotType;
-		wxSpinCtrl* m_sWindSpeed;
-		wxPanel* m_panel16;
-		wxSpinCtrl* m_sWindDirection;
-		wxPanel* m_panel161;
-		wxChoice* m_cPlotVariable;
-		wxStaticText* m_stTrueWindAngle;
-		wxStaticText* m_staticText21;
-		wxStaticText* m_stTrueWindKnots;
-		wxStaticText* m_staticText23;
-		wxStaticText* m_stApparentWindAngle;
-		wxStaticText* m_staticText211;
-		wxStaticText* m_stApparentWindKnots;
-		wxStaticText* m_staticText231;
-		wxStaticText* m_stBoatAngle;
-		wxStaticText* m_staticText212;
-		wxStaticText* m_stBoatKnots;
-		wxStaticText* m_staticText232;
 		wxPanel* m_panel17;
 		wxStaticText* m_staticText100;
 		wxChoice* m_cHullType;
@@ -352,89 +323,83 @@ class BoatDialogBase : public wxDialog
 		wxStaticText* m_stCapsizeRisk;
 		wxStaticText* m_staticText96;
 		wxStaticText* m_stComfortFactor;
-		wxPanel* m_pPolarConfig;
-		wxChoice* m_cPolarMethod;
-		wxStaticBoxSizer* m_sbComputationTransform;
-		wxStaticText* m_staticText961;
-		wxSlider* m_sEta;
-		wxTextCtrl* m_tEta;
-		wxStaticText* m_staticText35;
-		wxSpinCtrl* m_sFrictionalDrag;
-		wxStaticText* m_staticText112;
-		wxSpinCtrl* m_sWakeDrag;
-		wxButton* m_bRecomputeDrag;
-		wxButton* m_bDragInfo;
-		wxStaticText* m_staticText91;
-		wxSpinCtrl* m_sLuffAngle;
-		wxCheckBox* m_cbWingWingRunning;
-		wxButton* m_bSaveFile;
-		wxStaticBoxSizer* m_sbComputationIMF;
-		wxStaticText* m_staticText131;
-		wxStaticBoxSizer* m_sbFile;
-		wxStaticText* m_staticText93;
-		wxFilePickerCtrl* m_fpFilePath;
-		wxStaticText* m_staticText123;
-		wxStaticText* m_stWindSpeedStep;
-		wxStaticText* m_staticText125;
-		wxStaticText* m_stWindDegreeStep;
-		wxPanel* m_panel311;
-		wxStaticText* m_staticText118;
-		wxSpinCtrl* m_sVMGWindSpeed;
-		wxChoice* m_cVMGTrueApparent;
-		wxStaticText* m_staticText3511;
-		wxStaticText* m_stBestCourseUpWindPortTack;
-		wxStaticText* m_staticText35111;
-		wxStaticText* m_stBestCourseUpWindStarboardTack;
-		wxStaticText* m_staticText35112;
-		wxStaticText* m_stBestCourseDownWindPortTack;
-		wxStaticText* m_staticText35113;
-		wxStaticText* m_stBestCourseDownWindStarboardTack;
-		wxCheckBox* m_cbOptimizeTacking;
-		wxPanel* m_panel10;
-		wxListBox* m_lSwitchPlans;
-		wxButton* m_bNewSwitchPlanRule;
-		wxButton* m_bEditSwitchBoatPlan;
-		wxButton* m_bDeleteSwitchBoatPlan;
-		wxButton* m_bOpen;
-		wxButton* m_bSaveAs;
-		wxButton* m_bSaveandClose;
-		wxButton* m_bClose;
+		wxPanel* m_panel22;
+		wxGrid* m_grid1;
+		wxButton* m_button42;
+		wxButton* m_button43;
+		wxButton* m_button44;
+		wxButton* m_button45;
+		wxButton* m_button46;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void OnSailPlanSelected( wxListEvent& event ) { event.Skip(); }
-		virtual void OnNewBoatPlan( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDeleteBoatPlan( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnMouseEventsPlot( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
-		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
-		virtual void OnUpdatePlot( wxListbookEvent& event ) { event.Skip(); }
-		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdatePlot( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnRecompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRecomputeSpin( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnPolarMethod( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEtaSlider( wxScrollEvent& event ) { event.Skip(); }
-		virtual void OnEta( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnRecomputeDrag( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDragInfo( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveFile( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPolarFile( wxFileDirPickerEvent& event ) { event.Skip(); }
-		virtual void OnUpdateVMG( wxSpinEvent& event ) { event.Skip(); }
-		virtual void OnUpdateVMG( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnOptimizeTacking( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSwitchPlanRules( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnNewSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnEditSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDeleteSwitchPlanRule( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSaveAs( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		MyFrame2( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
+		
+		~MyFrame2();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class BoatDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class BoatDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxNotebook* m_nNotebook;
+		wxPanel* m_plot;
+		wxScrolledWindow* m_PlotWindow;
+		wxPanel* m_panel10;
+		wxScrolledWindow* m_CrossOverChart;
+		wxButton* m_bGenerate;
+		wxPanel* m_panel24;
+		wxStaticText* m_staticText125;
+		wxStaticText* m_stBestCourseUpWindPortTack;
+		wxStaticText* m_staticText1251;
+		wxStaticText* m_stBestCourseUpWindStarboardTack;
+		wxStaticText* m_staticText1252;
+		wxStaticText* m_stBestCourseDownWindPortTack;
+		wxStaticText* m_staticText12511;
+		wxStaticText* m_stBestCourseDownWindStarboardTack;
+		wxStaticText* m_staticText133;
+		wxSpinCtrl* m_sVMGWindSpeed;
+		wxChoice* m_cPlotType;
+		wxChoice* m_cPlotVariable;
+		wxCheckBox* m_cbFullPlot;
+		wxListCtrl* m_lPolars;
+		wxButton* m_bUp;
+		wxButton* m_bDown;
+		wxButton* m_bEditPolar;
+		wxButton* m_bAddPolar;
+		wxButton* m_bRemovePolar;
+		wxButton* m_bSave;
+		wxScrolledWindow* m_scrolledWindow4;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnMouseEventsPolarPlot( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
+		virtual void OnUpdatePlot( wxSizeEvent& event ) { event.Skip(); }
+		virtual void OnPaintCrossOverChart( wxPaintEvent& event ) { event.Skip(); }
+		virtual void OnGenerateCrossOverChart( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPolarSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnPolarUp( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPolarDown( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnEditPolar( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddPolar( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemovePolar( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,500 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BoatDialogBase();
 	
 };

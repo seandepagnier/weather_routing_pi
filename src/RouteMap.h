@@ -68,7 +68,7 @@ public:
 
     double parent_heading; /* angle relative to true wind we sailed from parent to this position */
     double parent_bearing; /* angle relative to north */
-    int sailplan; /* which sail plan in the boat we are using */
+    int polar; /* which polar in the boat we are using */
     int tacks; /* how many times we have tacked to get to this position */
 
     Position *parent; /* previous position in time */

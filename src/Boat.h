@@ -23,7 +23,7 @@
  ***************************************************************************
  */
 
-#include "BoatPlan.h"
+#include "Polar.h"
 
 class Boat
 {
@@ -34,30 +34,11 @@ public:
     wxString OpenXML(wxString filename);
     wxString SaveXML(wxString filename);
 
-    BoatPlan &Plan(int plan) { return Plans[plan]; }
+    std::vector<Polar> Polars;
 
-    std::vector<BoatPlan> Plans;
-
-    int TrySwitchBoatPlan(int curplan, double VW, double H, double Swell,
-                          const wxDateTime &gribtime, double lat, double lon, int &daytime);
-    double Hulls();
-    double CapsizeRisk();
-    double ComfortFactor();
-    double DisplacementLengthRatio();
-    double SailAreaDisplacementRatio();
-    double DisplacementLongTons();
-    double DisplacementPounds();
-    double HullSLRatio();
-    double HullSpeed();
-    double FrictionDrag(double VB);
-    double WakeDrag(double VB);
-    void RecomputeDrag();
-
-    enum HullType {MONO, CATAMARAN, TRIMARAN, PROA, SUBMARINE};
-    HullType hulltype;
-
-    double displacement_tons, sail_area_ft2, lwl_ft, loa_ft, beam_ft;
-    double frictional_drag, wake_drag;
+    int TrySwitchPolar(int curpolar, double VW, double H, double Swell);
+    int FastestPolar(float H, float VW);
+    void GenerateCrossOverChart();
 
 private:
     wxString   m_last_filename;

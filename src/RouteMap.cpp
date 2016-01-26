@@ -282,7 +282,7 @@ inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 Position::Position(double latitude, double longitude, Position *p,
                    double pheading, double pbearing, int sp, int t, int dm)
     : lat(latitude), lon(longitude), parent_heading(pheading), parent_bearing(pbearing),
-      sailplan(sp), tacks(t),
+      polar(sp), tacks(t),
       parent(p), propagated(false), copied(false), data_mask(dm)
 {
     lat -= fmod(lat, EPSILON);
@@ -291,7 +291,7 @@ Position::Position(double latitude, double longitude, Position *p,
 
 Position::Position(Position *p)
     : lat(p->lat), lon(p->lon), parent_heading(p->parent_heading), parent_bearing(p->parent_bearing),
-      sailplan(p->sailplan), tacks(p->tacks),
+      polar(p->polar), tacks(p->tacks),
       parent(p->parent), propagated(p->propagated), copied(true), data_mask(p->data_mask)
 {
 }
@@ -514,9 +514,9 @@ static inline bool ComputeBoatSpeed
 (RouteMapConfiguration &configuration, double timeseconds,
  double WG, double VWG, double W, double VW, double C, double VC, double &H,
  climatology_wind_atlas &atlas, int data_mask,
- double &B, double &VB, double &BG, double &VBG, double &dist, int newsailplan)
+ double &B, double &VB, double &BG, double &VBG, double &dist, int newpolar)
 {
-    BoatPlan &plan = configuration.boat.Plans[newsailplan];
+    Polar &polar = configuration.boat.Polars[newpolar];
     if((data_mask & Position::CLIMATOLOGY_WIND) &&
        (configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MAP ||
         configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)) {
@@ -524,14 +524,14 @@ static inline bool ComputeBoatSpeed
         VB = 0;
         int windatlas_count = 8;
         for(int i = 0; i<windatlas_count; i++) {
-            double VBc = plan.Speed(H-W+atlas.W[i], atlas.VW[i]);
+            double VBc = polar.Speed(H-W+atlas.W[i], atlas.VW[i]);
             VB += atlas.directions[i]*VBc;
         }
 
         if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)
             VB *= 1-atlas.calm;
     } else
-        VB = plan.Speed(H, VW);
+        VB = polar.Speed(H, VW);
 
     /* failed to determine speed.. */
     if(isnan(B) || isnan(VB)) {
@@ -552,7 +552,7 @@ static inline bool ComputeBoatSpeed
 
 bool rk_step(Position *p, double timeseconds, double BG, double dist, double H,
              RouteMapConfiguration &configuration, GribRecordSet *grib,
-             const wxDateTime &time, int newsailplan,
+             const wxDateTime &time, int newpolar,
              double &rk_BG, double &rk_dist, int &data_mask)
 {
     double k1_lat, k1_lon;
@@ -569,7 +569,7 @@ bool rk_step(Position *p, double timeseconds, double BG, double dist, double H,
 
     double VB, VBG; // outputs
     if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
-                         B, VB, rk_BG, VBG, rk_dist, newsailplan))
+                         B, VB, rk_BG, VBG, rk_dist, newpolar))
         return false;
 
     return true;
@@ -625,8 +625,6 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             return false;
     }
 
-    int daytime = -1; /* unknown */
-
     double timeseconds = configuration.dt;
     double dist;
 
@@ -668,11 +666,12 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         }
 
         {
-        int newsailplan = configuration.boat.TrySwitchBoatPlan(sailplan, VW, H, S,
-                                                               configuration.time, lat, lon, daytime);
+        int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S);
+        if(newpolar == -1)
+            continue;
         
         if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
-                             B, VB, BG, VBG, dist, newsailplan))
+                             B, VB, BG, VBG, dist, newpolar))
             continue;
         
         /* did we tack thru the wind? apply penalty */
@@ -689,11 +688,11 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             wxDateTime rk_time_2 = configuration.time + wxTimeSpan::Seconds(timeseconds/2);
             wxDateTime rk_time = configuration.time + wxTimeSpan::Seconds(timeseconds);
             if(!rk_step(this, timeseconds, BG,    dist/2, H,
-                        configuration, configuration.grib, rk_time_2, newsailplan, k2_BG, k2_dist, data_mask) ||
+                        configuration, configuration.grib, rk_time_2, newpolar, k2_BG, k2_dist, data_mask) ||
                !rk_step(this, timeseconds, BG, k2_dist/2, H + k2_BG - BG,
-                        configuration, configuration.grib, rk_time_2, newsailplan, k3_BG, k3_dist, data_mask) ||
+                        configuration, configuration.grib, rk_time_2, newpolar, k3_BG, k3_dist, data_mask) ||
                !rk_step(this, timeseconds, BG, k3_dist,   H + k3_BG - BG,
-                        configuration, configuration.grib, rk_time, newsailplan, k4_BG, k4_dist, data_mask))
+                        configuration, configuration.grib, rk_time, newpolar, k4_BG, k4_dist, data_mask))
                 continue;
 
             ll_gc_ll(lat, lon, BG, dist/6 + k2_dist/3 + k3_dist/3 + k4_dist/6, &dlat, &dlon);
@@ -746,7 +745,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
 
         /* quick test first to avoid slower calculation */
         if(VB + VW > configuration.MaxApparentWindKnots &&
-           BoatPlan::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
+           Polar::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
             continue;
 
         /* landfall test */
@@ -763,7 +762,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 continue;
         }
 
-        rp = new Position(dlat, dlon, this, H, B, newsailplan, tacks + tacked, data_mask);
+        rp = new Position(dlat, dlon, this, H, B, newpolar, tacks + tacked, data_mask);
     }
     add_position:
 
@@ -810,7 +809,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
         return NAN;
 
     /* todo: we should make sure we don't tack if we are already at the max tacks,
-       possibly perform other tests and/or switch sail plan? */
+       possibly perform other tests and/or switch sail polar? */
     double bearing, dist;
     ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
 
@@ -831,7 +830,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
 
         double dummy_dist; // not used
         if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
-                             B, VB, BG, VBG, dummy_dist, sailplan))
+                             B, VB, BG, VBG, dummy_dist, polar))
             return NAN;
 
         if(++iters == 10) // give up
@@ -840,7 +839,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
 
     /* quick test first to avoid slower calculation */
     if(VB + VW > configuration.MaxApparentWindKnots &&
-       BoatPlan::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
+       Polar::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
         return NAN;
 
     /* landfall test if we are within 60 miles (otherwise it's very slow) */
@@ -1026,7 +1025,7 @@ int IsoRoute::IntersectionCount(Position &pos)
         if(state0 != state1) {
             double s1plat = s1->point->lat, s2plat = s2->point->lat;
             int state = (lat < s1plat) + (lat < s2plat);
-
+            
             switch(state) {
             case 1: /* must test every point in this case as point falls in boundaries of skip list */
             {
@@ -1038,6 +1037,12 @@ int IsoRoute::IntersectionCount(Position &pos)
                     double p2lon = p2->lon;
                     int pstate0 = pstate1;
                     pstate1 = lon < p2lon;
+
+#if 1
+                    if(lon == p1lon && lon == p2lon)
+                        printf("degenerate case not handled properly\n");
+#endif 
+                    
                     if(pstate0 != pstate1) {
                         double p1lat = p1->lat, p2lat = p2->lat;
                         state = (lat < p1lat) + (lat < p2lat);

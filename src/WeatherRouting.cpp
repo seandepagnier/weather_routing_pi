@@ -103,8 +103,9 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(*this),
-      m_ConfigurationBatchDialog(this), m_SettingsDialog(this), m_StatisticsDialog(this),
-      m_ReportDialog(*this), m_PlotDialog(*this), m_FilterRoutesDialog(this),
+      m_ConfigurationBatchDialog(this), m_SettingsDialog(this),
+      m_StatisticsDialog(this), m_ReportDialog(*this), m_PlotDialog(*this),
+      m_FilterRoutesDialog(this),
       m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItems(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
       m_bShowSettings(false), m_bShowStatistics(false),
