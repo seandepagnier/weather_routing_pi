@@ -64,6 +64,8 @@ private:
     void OnPolarSelected( wxListEvent& event ) { OnPolarSelected(); }
     void OnPolarSelected();
 
+    void OnUpPolar( wxCommandEvent& event );
+    void OnDownPolar( wxCommandEvent& event );
     void OnEditPolar( wxCommandEvent& event );
     void OnAddPolar( wxCommandEvent& event );
     void OnRemovePolar( wxCommandEvent& event );

@@ -1493,15 +1493,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	wxFlexGridSizer* fgSizer105;
-	fgSizer105 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer105->AddGrowableCol( 0 );
-	fgSizer105->AddGrowableRow( 0 );
-	fgSizer105->SetFlexibleDirection( wxBOTH );
-	fgSizer105->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
 	wxFlexGridSizer* fgSizer1071;
-	fgSizer1071 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1071 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer1071->AddGrowableCol( 0 );
 	fgSizer1071->AddGrowableRow( 0 );
 	fgSizer1071->SetFlexibleDirection( wxBOTH );
@@ -1638,18 +1631,18 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	wxStaticBoxSizer* sbSizer31;
 	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Polars") ), wxVERTICAL );
 	
-	wxFlexGridSizer* m_fgConfig;
-	m_fgConfig = new wxFlexGridSizer( 0, 2, 0, 0 );
-	m_fgConfig->AddGrowableCol( 0 );
-	m_fgConfig->AddGrowableRow( 0 );
-	m_fgConfig->SetFlexibleDirection( wxBOTH );
-	m_fgConfig->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* fgSizer92;
+	fgSizer92 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer92->AddGrowableCol( 0 );
+	fgSizer92->AddGrowableRow( 0 );
+	fgSizer92->SetFlexibleDirection( wxBOTH );
+	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	m_lPolars = new wxListCtrl( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT );
-	m_fgConfig->Add( m_lPolars, 0, wxALL|wxEXPAND, 5 );
+	fgSizer92->Add( m_lPolars, 0, wxALL|wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer114;
-	fgSizer114 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer114 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer114->SetFlexibleDirection( wxBOTH );
 	fgSizer114->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -1672,23 +1665,16 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer114->Add( m_bSave, 0, wxALL, 5 );
 	
 	
-	m_fgConfig->Add( fgSizer114, 1, 0, 5 );
+	fgSizer92->Add( fgSizer114, 1, 0, 5 );
 	
 	
-	sbSizer31->Add( m_fgConfig, 1, 0, 5 );
+	sbSizer31->Add( fgSizer92, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer1071->Add( sbSizer31, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer105->Add( fgSizer1071, 1, wxEXPAND, 5 );
-	
-	m_scrolledWindow4 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxSize( 600,400 ), wxHSCROLL|wxVSCROLL );
-	m_scrolledWindow4->SetScrollRate( 5, 5 );
-	fgSizer105->Add( m_scrolledWindow4, 1, wxEXPAND | wxALL, 5 );
-	
-	
-	this->SetSizer( fgSizer105 );
+	this->SetSizer( fgSizer1071 );
 	this->Layout();
 	
 	this->Centre( wxBOTH );
@@ -1716,8 +1702,8 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_cbFullPlot->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_lPolars->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( BoatDialogBase::OnPolarSelected ), NULL, this );
 	m_lPolars->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( BoatDialogBase::OnPolarSelected ), NULL, this );
-	m_bUp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnPolarUp ), NULL, this );
-	m_bDown->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnPolarDown ), NULL, this );
+	m_bUp->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnUpPolar ), NULL, this );
+	m_bDown->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDownPolar ), NULL, this );
 	m_bEditPolar->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditPolar ), NULL, this );
 	m_bAddPolar->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnAddPolar ), NULL, this );
 	m_bRemovePolar->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRemovePolar ), NULL, this );
@@ -1749,8 +1735,8 @@ BoatDialogBase::~BoatDialogBase()
 	m_cbFullPlot->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( BoatDialogBase::OnUpdatePlot ), NULL, this );
 	m_lPolars->Disconnect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( BoatDialogBase::OnPolarSelected ), NULL, this );
 	m_lPolars->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( BoatDialogBase::OnPolarSelected ), NULL, this );
-	m_bUp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnPolarUp ), NULL, this );
-	m_bDown->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnPolarDown ), NULL, this );
+	m_bUp->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnUpPolar ), NULL, this );
+	m_bDown->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnDownPolar ), NULL, this );
 	m_bEditPolar->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnEditPolar ), NULL, this );
 	m_bAddPolar->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnAddPolar ), NULL, this );
 	m_bRemovePolar->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( BoatDialogBase::OnRemovePolar ), NULL, this );

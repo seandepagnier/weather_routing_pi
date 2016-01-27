@@ -254,7 +254,21 @@ static void poolFree( void* userData, void* ptr )
 	TESS_NOTUSED(ptr);
 }
 
-TESStesselator* PolygonRegion::Tesselate()
+static void* stdAlloc(void* userData, unsigned int size)
+{
+	int* allocated = ( int*)userData;
+	TESS_NOTUSED(userData);
+	*allocated += (int)size;
+	return malloc(size);
+}
+
+static void stdFree(void* userData, void* ptr)
+{
+	TESS_NOTUSED(userData);
+	free(ptr);
+}
+
+TESStesselator* PolygonRegion::Tesselate(bool triangles)
 {
     TESSalloc ma;
 
@@ -264,16 +278,34 @@ TESStesselator* PolygonRegion::Tesselate()
     pool.cap = memsize;
     pool.buf = mem;
     memset(&ma, 0, sizeof(ma));
+#if 0
     ma.memalloc = poolAlloc;
     ma.memfree = poolFree;
     ma.userData = (void*)&pool;
+#else
+    int allocated = 0;
+    ma.memalloc = stdAlloc;
+    ma.memfree = stdFree;
+    ma.userData = (void*)&allocated;
+#endif
     ma.extraVertices = 256; // realloc not provided, allow 256 extra vertic
 
     TESStesselator *tess = tessNewTess(&ma);
     
     PutContours(tess, false);
-    if (!tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_POLYGONS, 3, 2, 0))
-        printf("failed to tesselate\n");
+    bool success;
+    if(triangles)
+        success = tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_POLYGONS, 3, 2, 0);
+    else
+        success = tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_BOUNDARY_CONTOURS, 0, 0, 0);
+    if(!success) {
+//        printf("failed to tesselate\n");
+        tessDeleteTess(tess);
+        return NULL;
+    }
+
+//    printf("Memory used: %.1f kB\n", allocated/1024.0f);
+
     return tess;
 }
 
@@ -332,6 +364,8 @@ void PolygonRegion::PutContours(TESStesselator *tess, bool reverse) const
 
 void PolygonRegion::AllocateMem()
 {
+    return;
+
     if(mem)
         return;
     memsize = 1024*1024;

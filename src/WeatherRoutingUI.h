@@ -379,7 +379,6 @@ class BoatDialogBase : public wxDialog
 		wxButton* m_bAddPolar;
 		wxButton* m_bRemovePolar;
 		wxButton* m_bSave;
-		wxScrolledWindow* m_scrolledWindow4;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMouseEventsPolarPlot( wxMouseEvent& event ) { event.Skip(); }
@@ -389,8 +388,8 @@ class BoatDialogBase : public wxDialog
 		virtual void OnGenerateCrossOverChart( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarSelected( wxListEvent& event ) { event.Skip(); }
-		virtual void OnPolarUp( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnPolarDown( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnUpPolar( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDownPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemovePolar( wxCommandEvent& event ) { event.Skip(); }

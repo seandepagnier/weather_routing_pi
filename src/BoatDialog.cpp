@@ -562,21 +562,21 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
         }
     }
     
-    wxColour colors[] = {*wxRED, *wxGREEN, *wxBLUE};
+    wxColour colors[] = {*wxRED, *wxGREEN, *wxBLUE, *wxCYAN, *wxYELLOW, *wxWHITE};
     int c = 0;
     for(unsigned int i=0; i<m_Boat.Polars.size(); i++) {
-        dc.SetPen(colors[c]);
-        if(i == index)
-            dc.SetBrush(colors[c]);
-        else
-            dc.SetBrush(wxColour(colors[c].Red()*3/4,
-                                 colors[c].Green()*3/4,
-                                 colors[c].Blue()*3/4));
+        bool tri = i == index;
+
+        dc.SetPen(wxPen(colors[c], tri ? 1 : 3));
+        dc.SetBrush(colors[c]);
         if(++c == (sizeof colors) / (sizeof *colors))
             c = 0;
 
-        TESStesselator *tess = m_Boat.Polars[i].CrossOverRegion.Tesselate();
+        TESStesselator *tess = m_Boat.Polars[i].CrossOverRegion.Tesselate(tri);
 
+        if(!tess)
+            continue;
+          
         const float* verts = tessGetVertices(tess);
 //        const int* vinds = tessGetVertexIndices(tess);
         const int* elems = tessGetElements(tess);
@@ -586,18 +586,39 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
         // Draw polygons.
         for (int i = 0; i < nelems; ++i)
         {
-            const int* p = &elems[i*3];
-            wxPoint points[3];
-            for (unsigned j = 0; j < 3 && p[j] != TESS_UNDEF; ++j) {
-                double H = verts[p[j]*2+0];
-                double VW = verts[p[j]*2+1];
-                if(polar)
-                    points[j] = wxPoint(xc + scale*VW*sin(deg2rad(H)),
-                                        h/2 - scale*VW*cos(deg2rad(H)));
-                else
-                    points[j] = wxPoint(H * w / 180, VW * h / 60);
+            if(tri) {
+                const int* p = &elems[i*3];
+                wxPoint points[3];
+                for (unsigned j = 0; j < 3 && p[j] != TESS_UNDEF; ++j) {
+                    double H = verts[p[j]*2+0];
+                    double VW = verts[p[j]*2+1];
+                    if(polar)
+                        points[j] = wxPoint(xc + scale*VW*sin(deg2rad(H)),
+                                            h/2 - scale*VW*cos(deg2rad(H)));
+                    else
+                        points[j] = wxPoint(H * w / 180, h - VW * h / 40);
+                }
+                dc.DrawPolygon(3, points);
+            } else {
+                int b = elems[i*2];
+                int n = elems[i*2+1];
+
+                wxPoint pl;
+                for(int j = 0; j<=n; j++) {
+                    int k = j < n ? j : 0;
+                    float H = verts[2*(b + k)+0], VW = verts[2*(b + k)+1];
+                    wxPoint p0;
+                    if(polar)
+                        p0 = wxPoint(xc + scale*VW*sin(deg2rad(H)),
+                                            h/2 - scale*VW*cos(deg2rad(H)));
+                    else
+                        p0 = wxPoint(H * w / 180, h - VW * h / 40);
+
+                    if(j > 0)
+                        dc.DrawLine(pl, p0);
+                    pl = p0;
+                }
             }
-            dc.DrawPolygon(3, points);
         }
 
         tessDeleteTess(tess);
@@ -731,6 +752,36 @@ void BoatDialog::OnUpdatePlot()
     RefreshPlots();
 }
 
+void BoatDialog::OnUpPolar( wxCommandEvent& event )
+{
+    long index = SelectedPolar();
+    if(index < 1)
+        return;
+
+    m_Boat.Polars.insert(m_Boat.Polars.begin() + index - 1,
+                         m_Boat.Polars.at(index));
+    m_Boat.Polars.erase(m_Boat.Polars.begin() + index + 1);
+
+    RepopulatePolars();
+
+    m_lPolars->SetItemState( index - 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
+}
+
+void BoatDialog::OnDownPolar( wxCommandEvent& event )
+{
+    long index = SelectedPolar();
+    if(index < 0 || index + 1 >= (long)m_Boat.Polars.size())
+        return;
+
+    m_Boat.Polars.insert(m_Boat.Polars.begin() + index + 2,
+                         m_Boat.Polars.at(index));
+    m_Boat.Polars.erase(m_Boat.Polars.begin() + index);
+
+    RepopulatePolars();
+
+    m_lPolars->SetItemState( index + 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
+}
+
 void BoatDialog::OnEditPolar( wxCommandEvent& event )
 {
 }
@@ -743,6 +794,7 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
     wxString path;
     pConf->Read ( _T ( "FilePath" ), &path, *GetpSharedDataLocation()
                   + _T("plugins/weather_routing_pi/data/polars"));
+    path = wxFileName(path).GetPath();
 
     wxFileDialog openDialog
         ( this, _( "Select Polar File" ), path, wxT ( "" ),
@@ -760,7 +812,7 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
 
     if(success) {
         m_Boat.Polars.push_back(polar);
-//        m_lPolars->SetItemState(m_SelectedSailPolar, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+        RepopulatePolars();
         RefreshPlots();
     }
 }
@@ -773,13 +825,14 @@ void BoatDialog::OnRemovePolar( wxCommandEvent& event )
 
     m_Boat.Polars.erase(m_Boat.Polars.begin() + index);
     RepopulatePolars();
+    RefreshPlots();
     m_bRemovePolar->Disable();
 }
 
 void BoatDialog::RepopulatePolars()
 {
     m_lPolars->DeleteAllItems();
-
+#if 0
     if(m_Boat.Polars.size() == 0) {
         Polar generic_polar;
         wxString message, generic_polar_path = *GetpSharedDataLocation()
@@ -791,18 +844,19 @@ void BoatDialog::RepopulatePolars()
             wxLogMessage(wxT("weather_routing_pi: ") + wxString(success ? _T("warning") : _T("error")) +
                          _T(" loading generic polar \"") + generic_polar_path + _T("\""));
     }
-
+#endif
     for(unsigned int i=0; i<m_Boat.Polars.size(); i++) {
         wxListItem info;
         info.SetId(i);
         info.SetData(i);
         long idx = m_lPolars->InsertItem(info);
         Polar &polar = m_Boat.Polars[i];
-        m_lPolars->SetItem(idx, spFILENAME, polar.FileName);
+        m_lPolars->SetItem(idx, spFILENAME, wxFileName(polar.FileName).GetFullName());
         m_lPolars->SetItem(idx, spWAVEPOLARFILENAME, polar.WavePolarFileName);
     }
 
-    m_lPolars->SetColumnWidth(spFILENAME, 80);
+//        m_lPolars->SetColumnWidth(spFILENAME, wxLIST_AUTOSIZE);
+//    m_lPolars->SetColumnWidth(spFILENAME, 80);
 
     bool enable = m_Boat.Polars.size();
     m_bRemovePolar->Enable(enable);
