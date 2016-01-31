@@ -77,6 +77,7 @@
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
+#include "weather_routing_pi.h"
 
 #include "georef.h"
 #include "wx/jsonreader.h"
@@ -898,8 +899,8 @@ bool Position::EntersBoundary(double dlat, double dlon)
     jMsg[wxT("Type")] = wxT("Request");
     jMsg[wxT("Msg")] = wxS("FindPointInAnyBoundary");
     jMsg[wxT("MsgId")] = wxS("enter");
-    jMsg[wxS("lat")] = lat;
-    jMsg[wxS("lon")] = lon;
+    jMsg[wxS("lat")] = dlat;
+    jMsg[wxS("lon")] = dlon;
     jMsg[wxS("BoundaryType")] = wxT("Exclusion");
     writer.Write( jMsg, MsgString );
     SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
