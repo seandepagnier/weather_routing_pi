@@ -63,7 +63,8 @@ public:
 
     double Distance(Position *p);
     bool CrossesLand(double dlat, double dlon);
-
+    bool EntersBoundary(double dlat, double dlon);
+    
     double lat, lon;
 
     double parent_heading; /* angle relative to true wind we sailed from parent to this position */
@@ -196,7 +197,7 @@ struct RouteMapConfiguration {
     bool AllowDataDeficient;
     double WindStrength; // wind speed multiplier
 
-    bool DetectLand, Currents, InvertedRegions, Anchoring;
+    bool DetectLand, DetectBoundary, Currents, InvertedRegions, Anchoring;
 
     double FromDegree, ToDegree, ByDegrees;
 

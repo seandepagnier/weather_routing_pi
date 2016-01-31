@@ -79,8 +79,13 @@
 #include "RouteMap.h"
 
 #include "georef.h"
+#include "wx/jsonreader.h"
+#include "wx/jsonwriter.h"
 
 #define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
+
+extern wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
+extern wxString    g_ReceivedBoundaryEnterMessage;
 
 static double Swell(GribRecordSet *grib, double lat, double lon)
 {
@@ -758,6 +763,10 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         /* landfall test */
         if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
             continue;
+        
+        /* Bounary test */
+        if(configuration.DetectBoundary && EntersBoundary(dlat, nrdlon))
+            continue;
 
         /* crosses cyclone track(s)? */
         if(configuration.AvoidCycloneTracks &&
@@ -877,6 +886,30 @@ double Position::Distance(Position *p)
 bool Position::CrossesLand(double dlat, double dlon)
 {
     return PlugIn_GSHHS_CrossesLand(lat, lon, dlat, dlon);
+}
+
+bool Position::EntersBoundary(double dlat, double dlon)
+{
+    // Do JSON message to OD Plugin to check if boundary m_crossinglat
+    wxJSONValue jMsg;
+    wxJSONWriter writer;
+    wxString    MsgString;
+    jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
+    jMsg[wxT("Type")] = wxT("Request");
+    jMsg[wxT("Msg")] = wxS("FindPointInAnyBoundary");
+    jMsg[wxT("MsgId")] = wxS("enter");
+    jMsg[wxS("lat")] = lat;
+    jMsg[wxS("lon")] = lon;
+    jMsg[wxS("BoundaryType")] = wxT("Exclusion");
+    writer.Write( jMsg, MsgString );
+    SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+    if(g_ReceivedBoundaryEnterMessage != wxEmptyString &&
+        g_ReceivedBoundaryEnterJSONMsg[wxS("MsgId")].AsString() == wxS("enter") &&
+        g_ReceivedBoundaryEnterJSONMsg[wxS("Found")].AsBool() == true ) {
+        // This is our message
+        return true;
+    }
+    return false;
 }
 
 SkipPosition::SkipPosition(Position *p, int q)
