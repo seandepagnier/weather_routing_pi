@@ -898,7 +898,7 @@ void WeatherRouting::OnPlot ( wxCommandEvent& event )
 
 void WeatherRouting::OnManual ( wxCommandEvent& event )
 {
-    wxLaunchDefaultBrowser(_T("http://opencpn.org/ocpn/weather_routing_plugin"));
+    wxLaunchDefaultBrowser(_T("http://opencpn.org/ocpn/Plugins_external_weather_routing"));
 }
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
