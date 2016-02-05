@@ -24,6 +24,7 @@
  */
 
 #include <wx/wx.h>
+#include <wx/dcgraph.h>
 
 #include <stdlib.h>
 #include <math.h>
@@ -513,7 +514,7 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
     if(!window)
         return;
 
-    wxPaintDC dc(window);
+    wxGCDC dc(window);
     dc.SetBackgroundMode(wxTRANSPARENT);
 
     long index = SelectedPolar();
@@ -565,13 +566,18 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
     wxColour colors[] = {*wxRED, *wxGREEN, *wxBLUE, *wxCYAN, *wxYELLOW, *wxWHITE};
     int c = 0;
     for(unsigned int i=0; i<m_Boat.Polars.size(); i++) {
-        bool tri = i == index;
+        bool bold = i == index;
 
-        dc.SetPen(wxPen(colors[c], tri ? 1 : 3));
-        dc.SetBrush(colors[c]);
+//        dc.SetPen(wxPen(colors[c], bold ? 1 : 3));
+        dc.SetPen(*wxTRANSPARENT_PEN);
+        dc.SetBrush(wxColour(colors[c].Red(),
+                             colors[c].Green(),
+                             colors[c].Blue(),
+                             bold ? 220 : 140));
         if(++c == (sizeof colors) / (sizeof *colors))
             c = 0;
 
+        bool tri = true;
         TESStesselator *tess = m_Boat.Polars[i].CrossOverRegion.Tesselate(tri);
 
         if(!tess)
