@@ -898,7 +898,7 @@ void WeatherRouting::OnPlot ( wxCommandEvent& event )
 
 void WeatherRouting::OnManual ( wxCommandEvent& event )
 {
-    wxLaunchDefaultBrowser(_T("http://opencpn.org/ocpn/weather_routing_plugin"));
+    wxLaunchDefaultBrowser(_T("http://opencpn.org/ocpn/Plugins_external_weather_routing"));
 }
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
@@ -1119,6 +1119,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
 
                     configuration.DetectLand = AttributeBool(e, "DetectLand", true);
+                    configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
                     configuration.Currents = AttributeBool(e, "Currents", true);
                     configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
                     configuration.Anchoring = AttributeBool(e, "Anchoring", false);
@@ -1214,6 +1215,7 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetDoubleAttribute("WindStrength", configuration.WindStrength);
 
         c->SetAttribute("DetectLand", configuration.DetectLand);
+        c->SetAttribute("DetectBoundary", configuration.DetectBoundary);
         c->SetAttribute("Currents", configuration.Currents);
         c->SetAttribute("InvertedRegions", configuration.InvertedRegions);
         c->SetAttribute("Anchoring", configuration.Anchoring);
@@ -1865,6 +1867,7 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.AllowDataDeficient = false;
     configuration.WindStrength = 1;
     configuration.DetectLand = true;
+    configuration.DetectBoundary = false;
     configuration.Currents = false;
     configuration.InvertedRegions = false;
     configuration.Anchoring = false;

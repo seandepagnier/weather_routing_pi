@@ -22,6 +22,32 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
  */
+#ifdef DEBUG_BUILD
+#  define DEBUGSL(x) do { \
+time_t now = time(0); \
+tm* localtm = localtime(&now); \
+char *stime = asctime(localtm); \
+stime[strlen(stime) - 1 ] = 0; \
+std::cout << stime << " : " << x << std::endl; } while (0)
+
+#  define DEBUGST(x) do { \
+time_t now = time(0); \
+tm* localtm = localtime(&now); \
+char *stime = asctime(localtm); \
+stime[strlen(stime) - 1 ] = 0; \
+std::cout << stime << " : " << x; } while (0)
+
+#  define DEBUGCONT(x) do { \
+std::cout << x ; } while (0)
+
+#  define DEBUGEND(x) do { \
+std::cout << x << std::endl; } while (0)
+#else
+#  define DEBUGSL(x) do {} while (0)
+#  define DEBUGST(x) do {} while (0)
+#  define DEBUGCONT(x) do {} while (0)
+#  define DEBUGEND(x) do {} while (0)
+#endif
 
 #ifndef _WEATHER_ROUTINGPI_H_
 #define _WEATHER_ROUTINGPI_H_

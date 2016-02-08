@@ -34,6 +34,10 @@
 #include "WeatherRouting.h"
 #include "weather_routing_pi.h"
 
+wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
+wxString    g_ReceivedBoundaryEnterMessage;
+
+
 extern "C" DECL_EXP opencpn_plugin* create_pi(void *ppimgr)
 {
     return new weather_routing_pi(ppimgr);
@@ -270,6 +274,68 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
                 (RouteMap::ClimatologyCycloneTrackCrossings!=NULL);
         }
     }
+    if(message_id == wxS("WEATHER_ROUTING_PI")) {
+        // construct the JSON root object
+        wxJSONValue  root;
+        // construct a JSON parser
+        wxJSONReader reader;
+        wxString    sLogMessage;
+        bool        bFail = false;
+        // now read the JSON text and store it in the 'root' structure
+        // check for errors before retreiving values...
+        int numErrors = reader.Parse( message_body, &root );
+        if ( numErrors > 0 )  {
+            const wxArrayString& errors = reader.GetErrors();
+            for(int i = 0; i < (int)errors.GetCount(); i++)
+            {
+                if(i == 0) {
+                    sLogMessage.clear();
+                    sLogMessage.Append(wxT("weather_routing_pi: Error parsing JSON message - "));
+                    sLogMessage.Append( message_id );
+                    sLogMessage.Append(wxT(", error text: "));
+                } else sLogMessage.Append(wxT("\n"));
+                sLogMessage.append( errors.Item( i ) );
+                wxLogMessage( sLogMessage );
+            }
+            return;
+        }
+        
+        if(!root.HasMember( wxS("Source"))) {
+            // Originator
+            wxLogMessage( wxS("No Source found in message") );
+            bFail = true;
+        }
+        
+        if(!root.HasMember( wxS("Msg"))) {
+            // Message identifier
+            wxLogMessage( wxS("No Msg found in message") );
+            bFail = true;
+        }
+        
+        if(!root.HasMember( wxS("Type"))) {
+            // Message type, orig or resp
+            wxLogMessage( wxS("No Type found in message") );
+            bFail = true;
+        }
+        
+        if(!root.HasMember( wxS("MsgId"))) {
+            // Unique (?) Msg number/identifier
+            wxLogMessage( wxS("No MsgNo found in message") );
+            bFail = true;
+        }
+        
+        if(!bFail) {
+            if(root[wxS("Type")].AsString() == wxS("Response") && root[wxS("Source")].AsString() == wxS("OCPN_DRAW_PI")) {
+                if(root[wxS("Msg")].AsString() == wxS("FindPointInAnyBoundary") ) {
+                    if(root[wxS("MsgId")].AsString() == wxS("enter")) {
+                        g_ReceivedBoundaryEnterJSONMsg = root;
+                        g_ReceivedBoundaryEnterMessage = message_body;
+                    } 
+                }
+            }
+        }
+    }
+        
 }
 
 void weather_routing_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
