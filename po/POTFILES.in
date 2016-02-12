@@ -13,6 +13,13 @@ src/ConfigurationDialog.cpp
 src/ConfigurationDialog.h
 src/FilterRoutesDialog.cpp
 src/FilterRoutesDialog.h
+src/georef.c
+src/georef.h
+src/GribRecord.cpp
+src/GribRecord.h
+src/GribRecordSet.h
+src/LineBufferOverlay.cpp
+src/LineBufferOverlay.h
 src/PlotDialog.cpp
 src/PlotDialog.h
 src/ReportDialog.cpp
@@ -29,9 +36,10 @@ src/SwitchPlanDialog.cpp
 src/SwitchPlanDialog.h
 src/Utilities.cpp
 src/Utilities.h
-src/WeatherRouting.cpp
-src/WeatherRouting.h
 src/weather_routing_pi.cpp
 src/weather_routing_pi.h
+src/WeatherRouting.cpp
+src/WeatherRouting.h
 src/WeatherRoutingUI.cpp
 src/WeatherRoutingUI.h
+src/wrdc.h
