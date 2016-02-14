@@ -25,7 +25,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
+
+#include <wx/wx.h>
 
 #include "PolygonRegion.h"
 
@@ -68,6 +71,30 @@ void Contour::Reverse()
     }
 }
 
+void Contour::Simplify(float epsilon)
+{
+    int p = 0;
+    float lx = points[2*(n-1)], ly = points[2*(n-1)+1];
+    float x = points[0], y = points[1];
+    for(int i=0; i<2*n; i+=2) {
+        int j = i + 2 < 2*n ? i + 2 : 0;
+        float nx = points[j], ny = points[j+1];
+
+        float x0 = lx - x, y0 = ly - y;
+        float x1 = nx - x, y1 = ny - y;
+        float c = x0 * y1 - x1 * y0;
+        if(fabsf(c) >= epsilon) {
+            points[p] = x;
+            points[p+1] = y;
+            lx = x, ly = y;
+            p+=2;
+        }
+        
+        x = nx, y = ny;
+    }
+    n = p/2;
+}
+
 /* for convex or concave polygons but not self-intersecting */
 PolygonRegion::PolygonRegion(int n, float *points)
 {
@@ -96,33 +123,37 @@ PolygonRegion::PolygonRegion(std::list<Segment> &segments)
     }
 #endif
     
-    std::list<IncompleteContour> icontours;
+    std::list<IncompleteContour*> icontours;
 fullreset:
     while(segments.size()) {
         Segment a = segments.front();
         segments.pop_front();
-        IncompleteContour ic(a);
+        IncompleteContour *ic = new IncompleteContour(a);
 
     reset:
-        for(std::list<IncompleteContour>::iterator it = icontours.begin();
+        for(std::list<IncompleteContour*>::iterator it = icontours.begin();
             it != icontours.end(); it++) {
-            if(it->points.front() == ic.points.back()) {
-                if(it->points.back() == ic.points.front()) {
+            if((*it)->points.front() == ic->points.back()) {
+                if((*it)->points.back() == ic->points.front()) {
                     // completed contour
-                    it->points.pop_front();
-                    it->points.pop_back();
-                    ic.points.splice(ic.points.end(), it->points);
-                    contours.push_back(Contour(ic.points));
+                    (*it)->points.pop_front();
+                    (*it)->points.pop_back();
+                    ic->points.splice(ic->points.end(), (*it)->points);
+                    contours.push_back(Contour(ic->points));
+                    delete *it;
+                    delete ic;
                     icontours.erase(it);
                     goto fullreset;
                 }
-                it->points.pop_front();
-                ic.points.splice(ic.points.end(), it->points);
+                (*it)->points.pop_front();
+                ic->points.splice(ic->points.end(), (*it)->points);
+                delete *it;
                 icontours.erase(it);
                 goto reset;
-            } else if(it->points.back() == ic.points.front()) {
-                ic.points.pop_front();
-                it->points.splice(it->points.end(), ic.points);
+            } else if((*it)->points.back() == ic->points.front()) {
+                ic->points.pop_front();
+                (*it)->points.splice((*it)->points.end(), ic->points);
+                delete ic;
                 ic = *it;
                 icontours.erase(it);
                 goto reset;
@@ -134,7 +165,7 @@ fullreset:
     if(icontours.size())
         printf("PolygonRegion: incomplete contours discarded\n");
 
-    for(std::list<IncompleteContour>::iterator it = icontours.begin();
+    for(std::list<IncompleteContour*>::iterator it = icontours.begin();
         it != icontours.end(); it++)
 #if 0
         if(it->points.front() == it->points.back()) {
@@ -144,13 +175,46 @@ fullreset:
         } else
 #endif
         {
-            for(std::list<Point>::iterator it2 = it->points.begin();
-                it2 != it->points.end(); it2++)
+            for(std::list<Point>::iterator it2 = (*it)->points.begin();
+                it2 != (*it)->points.end(); it2++)
                 printf("%f %f\n", it2->x, it2->y);
             printf("\n");
         }
 
     InitMem();
+
+//    PolygonRegion empty;
+//    Union(empty); // merge overlapping contours
+}
+
+std::list<std::string> Split(const std::string str, char c)
+{
+    std::list<std::string> l;
+    unsigned int lpos = 0;
+    while(lpos < str.size()) {
+        unsigned int pos = str.find(c, lpos);
+        l.push_back(std::string(str, lpos, pos - lpos));
+        lpos = pos + 1;
+    }
+    return l;
+}
+
+PolygonRegion::PolygonRegion(const std::string &str)
+{
+    std::list<std::string> scontours = Split(str, ';');
+    for(std::list<std::string>::iterator it = scontours.begin();
+        it != scontours.end(); it++) {
+        std::list<std::string> coords = Split(*it, ',');
+        int n = coords.size(), i = 0;
+        float *points = new float[n];
+        for(std::list<std::string>::iterator it2 = coords.begin();
+            it2 != coords.end(); it2++)
+            points[i++] = strtod(it2->c_str(), 0);
+
+        contours.push_back(Contour(points, n/2));
+        delete [] points;
+    }
+    
 }
 
 void PolygonRegion::Print()
@@ -161,6 +225,24 @@ void PolygonRegion::Print()
             printf("%f %f\n", it->points[2*i+0], it->points[2*i+1]);
         printf("\n");
     }
+}
+
+std::string PolygonRegion::toString()
+{
+    wxStopWatch sw;
+    std::string str;
+    for(std::list<Contour>::iterator it = contours.begin();
+        it != contours.end(); it++) {
+        for(int i = 0; i<it->n; i++) {
+            float xc = it->points[2*i+0], yc = it->points[2*i+1];
+            char coords[100];
+            snprintf(coords, sizeof coords, "%12f,%12f,", xc, yc);
+            str += coords;
+        }
+        str += ";";
+    }
+    printf("time: %ld\n", sw.Time());
+    return str;
 }
 
 bool PolygonRegion::Contains(float x, float y)
@@ -226,39 +308,60 @@ void PolygonRegion::Subtract(PolygonRegion &region)
     Put(region, TESS_WINDING_POSITIVE, true);
 }
 
+void PolygonRegion::Simplify(float epsilon)
+{
+    for(std::list<Contour>::iterator it = contours.begin();
+        it != contours.end(); it++)
+        it->Simplify(epsilon);
+}
+
+#if 0
 struct MemPool
 {
-	unsigned char* buf;
-	unsigned int cap;
-	unsigned int size;
+    unsigned char* buf;
+    unsigned int bufsize, size;
+
+    struct MemPool *next;
 };
 
 static void* poolAlloc( void* userData, unsigned int size )
 {
-	struct MemPool* pool = (struct MemPool*)userData;
-	size = (size+0x7) & ~0x7;
-	if (pool->size + size < pool->cap)
-	{
-		unsigned char* ptr = pool->buf + pool->size;
-		pool->size += size;
-		return ptr;
-	}
-	printf("out of mem: %d < %d!\n", pool->size + size, pool->cap);
-	return 0;
+    size = (size+0x7) & ~0x7;
+
+    const int bufsize = 64*1024;
+    struct MemPool** pool = (struct MemPool**)userData;
+    if(!*pool || (*pool)->size + size >= (*pool)->bufsize) {
+        MemPool *new_pool = new MemPool;
+        new_pool->bufsize = size > bufsize ? size : bufsize;
+        new_pool->buf = new unsigned char [new_pool->bufsize];
+        new_pool->next = *pool;
+        *pool = new_pool;
+    }
+    
+    unsigned char* ptr = (*pool)->buf + (*pool)->size;
+    (*pool)->size += size;
+    return ptr;
+}
+
+static void FreeMemPool( MemPool* pool )
+{
+    if(pool) {
+        delete [] pool->buf;
+        FreeMemPool(pool->next);
+    }
 }
 
 static void poolFree( void* userData, void* ptr )
 {
-	// empty
-	TESS_NOTUSED(userData);
-	TESS_NOTUSED(ptr);
+    if(ptr == userData)
+        FreeMemPool((MemPool*)userData);
 }
-
+#endif
 static void* stdAlloc(void* userData, unsigned int size)
 {
-	int* allocated = ( int*)userData;
+//	int* allocated = ( int*)userData;
 	TESS_NOTUSED(userData);
-	*allocated += (int)size;
+//	*allocated += (int)size;
 	return malloc(size);
 }
 
@@ -272,22 +375,10 @@ TESStesselator* PolygonRegion::Tesselate(bool triangles)
 {
     TESSalloc ma;
 
-    AllocateMem();
-    MemPool pool;
-    pool.size = 0;
-    pool.cap = memsize;
-    pool.buf = mem;
-    memset(&ma, 0, sizeof(ma));
-#if 0
-    ma.memalloc = poolAlloc;
-    ma.memfree = poolFree;
-    ma.userData = (void*)&pool;
-#else
-    int allocated = 0;
+//    ma.memalloc = poolAlloc;
+//    ma.memfree = poolFree;
     ma.memalloc = stdAlloc;
     ma.memfree = stdFree;
-    ma.userData = (void*)&allocated;
-#endif
     ma.extraVertices = 256; // realloc not provided, allow 256 extra vertic
 
     TESStesselator *tess = tessNewTess(&ma);
@@ -298,8 +389,8 @@ TESStesselator* PolygonRegion::Tesselate(bool triangles)
         success = tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_POLYGONS, 3, 2, 0);
     else
         success = tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_BOUNDARY_CONTOURS, 0, 0, 0);
+
     if(!success) {
-//        printf("failed to tesselate\n");
         tessDeleteTess(tess);
         return NULL;
     }
@@ -312,15 +403,11 @@ TESStesselator* PolygonRegion::Tesselate(bool triangles)
 void PolygonRegion::Put( const PolygonRegion& region, int winding_rule, bool reverse)
 {
     TESSalloc ma;
-    MemPool pool;
-    unsigned char mem[1024*1024];
-    pool.size = 0;
-    pool.cap = sizeof(mem);
-    pool.buf = mem;
-    memset(&ma, 0, sizeof(ma));
-    ma.memalloc = poolAlloc;
-    ma.memfree = poolFree;
-    ma.userData = (void*)&pool;
+//    ma.memalloc = poolAlloc;
+//    ma.memfree = poolFree;
+//    ma.userData = (void*)&pool;
+    ma.memalloc = stdAlloc;
+    ma.memfree = stdFree;
     ma.extraVertices = 256; // realloc not provided, allow 256 extra vertic
 
     TESStesselator *tess = tessNewTess(&ma);
@@ -364,8 +451,6 @@ void PolygonRegion::PutContours(TESStesselator *tess, bool reverse) const
 
 void PolygonRegion::AllocateMem()
 {
-    return;
-
     if(mem)
         return;
     memsize = 1024*1024;

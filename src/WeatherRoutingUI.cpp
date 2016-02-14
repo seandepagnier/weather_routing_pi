@@ -1493,12 +1493,11 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	
-	wxFlexGridSizer* fgSizer1071;
-	fgSizer1071 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer1071->AddGrowableCol( 0 );
-	fgSizer1071->AddGrowableRow( 0 );
-	fgSizer1071->SetFlexibleDirection( wxBOTH );
-	fgSizer1071->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	m_fgSizer = new wxFlexGridSizer( 1, 0, 0, 0 );
+	m_fgSizer->AddGrowableCol( 0 );
+	m_fgSizer->AddGrowableRow( 0 );
+	m_fgSizer->SetFlexibleDirection( wxBOTH );
+	m_fgSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* fgSizer106;
 	fgSizer106 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1526,7 +1525,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_plot->SetSizer( fgSizer18 );
 	m_plot->Layout();
 	fgSizer18->Fit( m_plot );
-	m_nNotebook->AddPage( m_plot, _("Plot"), false );
+	m_nNotebook->AddPage( m_plot, _("Plot"), true );
 	m_panel10 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer45;
 	fgSizer45 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1546,7 +1545,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel10->SetSizer( fgSizer45 );
 	m_panel10->Layout();
 	fgSizer45->Fit( m_panel10 );
-	m_nNotebook->AddPage( m_panel10, _("Cross Over Chart"), true );
+	m_nNotebook->AddPage( m_panel10, _("Cross Over Chart"), false );
 	m_panel24 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer117;
 	fgSizer117 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -1620,13 +1619,14 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer1021->Add( m_cPlotVariable, 0, wxALL, 5 );
 	
 	m_cbFullPlot = new wxCheckBox( this, wxID_ANY, _("Full Plot"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbFullPlot->SetValue(true); 
 	fgSizer1021->Add( m_cbFullPlot, 0, wxALL, 5 );
 	
 	
 	fgSizer106->Add( fgSizer1021, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer1071->Add( fgSizer106, 1, wxEXPAND, 5 );
+	m_fgSizer->Add( fgSizer106, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer31;
 	sbSizer31 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Polars") ), wxVERTICAL );
@@ -1671,10 +1671,10 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	sbSizer31->Add( fgSizer92, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer1071->Add( sbSizer31, 1, wxEXPAND, 5 );
+	m_fgSizer->Add( sbSizer31, 1, wxEXPAND, 5 );
 	
 	
-	this->SetSizer( fgSizer1071 );
+	this->SetSizer( m_fgSizer );
 	this->Layout();
 	
 	this->Centre( wxBOTH );

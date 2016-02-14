@@ -352,6 +352,7 @@ class BoatDialogBase : public wxDialog
 	private:
 	
 	protected:
+		wxFlexGridSizer* m_fgSizer;
 		wxNotebook* m_nNotebook;
 		wxPanel* m_plot;
 		wxScrolledWindow* m_PlotWindow;

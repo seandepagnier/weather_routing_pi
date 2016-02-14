@@ -78,7 +78,7 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
 
 void BoatDialog::OnMouseEventsPolarPlot( wxMouseEvent& event )
 {
-    #if 0
+#if 0
     if(event.Leaving()) {
         m_stTrueWindAngle->SetLabel(_("N/A"));
         m_stTrueWindKnots->SetLabel(_("N/A"));
@@ -173,7 +173,7 @@ void BoatDialog::OnMouseEventsPolarPlot( wxMouseEvent& event )
     m_stApparentWindAngle->SetLabel(wxString::Format(_T("%03.0f"), A));
 
     m_stApparentWindKnots->SetLabel(wxString::Format(_T("%.1f"), VA));
-    #endif
+#endif
 }
 
 #if 0
@@ -755,6 +755,10 @@ void BoatDialog::OnPolarSelected()
 
 void BoatDialog::OnUpdatePlot()
 {
+    m_fgSizer->SetCols(m_cPlotType->GetSelection());
+    m_fgSizer->SetRows(!m_cPlotType->GetSelection());
+//    m_fgSizer->Fit();
+    Fit();
     RefreshPlots();
 }
 
@@ -790,6 +794,7 @@ void BoatDialog::OnDownPolar( wxCommandEvent& event )
 
 void BoatDialog::OnEditPolar( wxCommandEvent& event )
 {
+    
 }
 
 void BoatDialog::OnAddPolar( wxCommandEvent& event )

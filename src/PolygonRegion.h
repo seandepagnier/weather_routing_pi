@@ -23,6 +23,7 @@
  ***************************************************************************
  */
 
+#include <string>
 #include <list>
 #include "libtess2/tess.h"
 
@@ -47,7 +48,7 @@ struct Segment
 struct Contour
 {
     Contour(const Contour &contour) { Init(contour.points, contour.n); }
-    Contour(const float *p, int c) { Init(p, n); }
+    Contour(const float *p, int n) { Init(p, n); }
     Contour(const std::list<Point> &points);
     ~Contour() { delete [] points; }
 
@@ -56,6 +57,8 @@ struct Contour
     void Init(const float *p, int c);
     bool CCW();
     void Reverse();
+
+    void Simplify(float epsilon=1e-6);
     
     float *points;
     int n;
@@ -67,17 +70,22 @@ public:
     PolygonRegion() { InitMem(); }
     PolygonRegion(int n, float *points);
     PolygonRegion(std::list<Segment> &segments);
+    PolygonRegion(const std::string &str);
     ~PolygonRegion() { FreeMem(); }
 
     void Clear() { contours.clear(); }
     bool Empty() const { return contours.empty(); }
     void Print();
 
+    std::string toString();
+
     bool Contains(float x, float y);
 
     void Intersect(PolygonRegion &region);
     void Union(PolygonRegion &region);
     void Subtract(PolygonRegion &region);
+
+    void Simplify(float epsilon=1e-6);
 
     TESStesselator* Tesselate(bool triangles);
     

@@ -41,6 +41,12 @@ public:
     void GenerateCrossOverChart();
 
 private:
+    Point Interp(const Point &p0, const Point &p1, int q, int q0, int q1);
+    void NewSegment(int q, Point &p0, Point &p1,
+                    std::list<Segment> segments[]);
+    void GenerateSegments(float H, float VW, float step, int q[4],
+                          std::list<Segment> segments[]);
+
     wxString   m_last_filename;
     wxDateTime m_last_filetime;
 };
