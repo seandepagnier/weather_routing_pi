@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-23 12:10-0500\n"
-"PO-Revision-Date: 2015-05-31 23:22-0400\n"
+"POT-Creation-Date: 2016-02-09 07:49-0500\n"
+"PO-Revision-Date: 2016-02-12 17:05-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Danish\n"
 "Language: da_DK\n"
@@ -36,7 +36,7 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: src/BoatDialog.cpp:58 src/WeatherRoutingUI.cpp:1752
+#: src/BoatDialog.cpp:58 src/WeatherRoutingUI.cpp:1726
 msgid "Eta"
 msgstr ""
 
@@ -47,12 +47,12 @@ msgstr ""
 
 #: src/BoatDialog.cpp:86 src/BoatDialog.cpp:87 src/BoatDialog.cpp:88
 #: src/BoatDialog.cpp:89 src/BoatDialog.cpp:90 src/BoatDialog.cpp:91
-#: src/PlotDialog.cpp:58 src/WeatherRouting.cpp:1349
-#: src/WeatherRoutingUI.cpp:2905
+#: src/PlotDialog.cpp:59 src/WeatherRouting.cpp:1359
+#: src/WeatherRoutingUI.cpp:2879
 msgid "N/A"
 msgstr ""
 
-#: src/BoatDialog.cpp:554
+#: src/BoatDialog.cpp:554 src/BoatDialog.cpp:641
 msgid "Select Boat"
 msgstr ""
 
@@ -60,8 +60,7 @@ msgstr ""
 msgid "Select Polar File"
 msgstr ""
 
-#: src/BoatDialog.cpp:641 src/BoatDialog.cpp:685
-#: src/ConfigurationBatchDialog.cpp:250
+#: src/BoatDialog.cpp:685 src/ConfigurationBatchDialog.cpp:250
 msgid "Select Polar"
 msgstr ""
 
@@ -81,100 +80,100 @@ msgstr ""
 msgid "Drag Computation"
 msgstr ""
 
-#: src/BoatDialog.cpp:819
+#: src/BoatDialog.cpp:796
 msgid "New Plan"
 msgstr ""
 
-#: src/BoatDialog.cpp:923
+#: src/BoatDialog.cpp:900
 msgid "Initial Plan"
 msgstr ""
 
-#: src/BoatDialog.cpp:1034
+#: src/BoatDialog.cpp:1003
 msgid "Cannot edit switch plan since there is no other plan to switch to."
 msgstr ""
 
-#: src/BoatDialog.cpp:1035 src/WeatherRoutingUI.cpp:1296
+#: src/BoatDialog.cpp:1004 src/WeatherRoutingUI.cpp:1267
 msgid "Sail Plans"
 msgstr ""
 
-#: src/BoatDialog.cpp:1075
+#: src/BoatDialog.cpp:1078
 msgid "and"
 msgstr ""
 
-#: src/BoatDialog.cpp:1077
+#: src/BoatDialog.cpp:1080
 msgid "Wind Speed > "
 msgstr ""
 
-#: src/BoatDialog.cpp:1080
+#: src/BoatDialog.cpp:1083
 msgid "Wind Speed < "
 msgstr ""
 
-#: src/BoatDialog.cpp:1083
+#: src/BoatDialog.cpp:1086
 msgid "Wind Direction > "
 msgstr ""
 
-#: src/BoatDialog.cpp:1086
+#: src/BoatDialog.cpp:1089
 msgid "Wind Direction < "
 msgstr ""
 
-#: src/BoatDialog.cpp:1089
+#: src/BoatDialog.cpp:1092
 msgid "Wave Height > "
 msgstr ""
 
-#: src/BoatDialog.cpp:1092
+#: src/BoatDialog.cpp:1095
 msgid "Wave Height < "
 msgstr ""
 
-#: src/BoatDialog.cpp:1095 src/WeatherRoutingUI.cpp:2283
+#: src/BoatDialog.cpp:1098 src/WeatherRoutingUI.cpp:2257
 msgid "Night Time"
 msgstr ""
 
-#: src/BoatDialog.cpp:1097 src/WeatherRoutingUI.cpp:2279
+#: src/BoatDialog.cpp:1100 src/WeatherRoutingUI.cpp:2253
 msgid "Day Time"
 msgstr ""
 
-#: src/BoatDialog.cpp:1100
+#: src/BoatDialog.cpp:1103
 msgid " switch to "
 msgstr ""
 
-#: src/BoatDialog.cpp:1111 src/BoatDialog.cpp:1122 src/BoatDialog.cpp:1123
+#: src/BoatDialog.cpp:1114 src/BoatDialog.cpp:1125 src/BoatDialog.cpp:1126
 msgid "Cruiser"
 msgstr ""
 
-#: src/BoatDialog.cpp:1112 src/BoatDialog.cpp:1121
+#: src/BoatDialog.cpp:1115 src/BoatDialog.cpp:1124
 msgid "Cruiser/Racer"
 msgstr ""
 
-#: src/BoatDialog.cpp:1113 src/BoatDialog.cpp:1114 src/BoatDialog.cpp:1119
-#: src/BoatDialog.cpp:1120
+#: src/BoatDialog.cpp:1116 src/BoatDialog.cpp:1117 src/BoatDialog.cpp:1122
+#: src/BoatDialog.cpp:1123
 msgid "Racer"
 msgstr ""
 
-#: src/BoatDialog.cpp:1114
+#: src/BoatDialog.cpp:1117
 msgid "High Peformance"
 msgstr ""
 
-#: src/BoatDialog.cpp:1119
+#: src/BoatDialog.cpp:1122
 msgid "Ultra Light"
 msgstr ""
 
-#: src/BoatDialog.cpp:1123
+#: src/BoatDialog.cpp:1126
 msgid "Heavy Cruiser"
 msgstr ""
 
-#: src/BoatDialog.cpp:1130
+#: src/BoatDialog.cpp:1133
 msgid "Low"
 msgstr ""
 
-#: src/BoatDialog.cpp:1131
+#: src/BoatDialog.cpp:1134
 msgid "High"
 msgstr ""
 
-#: src/BoatDialog.cpp:1136
+#: src/BoatDialog.cpp:1139
 msgid "Rough"
 msgstr ""
 
-#: src/BoatDialog.cpp:1137
+#: src/BoatDialog.cpp:1140
 msgid "Smooth"
 msgstr ""
 
@@ -222,17 +221,17 @@ msgstr ""
 msgid "Batch mode generates multiple configurations based on the selected configuration."
 msgstr ""
 
-#: src/ConfigurationBatchDialog.cpp:287 src/ConfigurationDialog.cpp:174
-#: src/ConfigurationDialog.cpp:325 src/ConfigurationDialog.cpp:449
-#: src/ConfigurationDialog.cpp:455 src/ReportDialog.cpp:238
-#: src/SettingsDialog.cpp:168 src/WeatherRouting.cpp:253
-#: src/WeatherRouting.cpp:730 src/WeatherRouting.cpp:752
-#: src/WeatherRouting.cpp:949 src/WeatherRouting.cpp:999
-#: src/WeatherRouting.cpp:1031 src/WeatherRouting.cpp:1048
-#: src/WeatherRouting.cpp:1137 src/WeatherRouting.cpp:1220
-#: src/WeatherRouting.cpp:1595 src/WeatherRouting.cpp:1627
-#: src/weather_routing_pi.cpp:204 src/weather_routing_pi.cpp:243
-#: src/weather_routing_pi.cpp:251 src/WeatherRoutingUI.h:126
+#: src/ConfigurationBatchDialog.cpp:287 src/ConfigurationDialog.cpp:244
+#: src/ConfigurationDialog.cpp:357 src/ReportDialog.cpp:238
+#: src/SettingsDialog.cpp:173 src/weather_routing_pi.cpp:209
+#: src/weather_routing_pi.cpp:248 src/weather_routing_pi.cpp:256
+#: src/WeatherRouting.cpp:256 src/WeatherRouting.cpp:503
+#: src/WeatherRouting.cpp:744 src/WeatherRouting.cpp:766
+#: src/WeatherRouting.cpp:963 src/WeatherRouting.cpp:1013
+#: src/WeatherRouting.cpp:1045 src/WeatherRouting.cpp:1062
+#: src/WeatherRouting.cpp:1149 src/WeatherRouting.cpp:1232
+#: src/WeatherRouting.cpp:1605 src/WeatherRouting.cpp:1637
+#: src/WeatherRouting.cpp:1670 src/WeatherRoutingUI.h:128
 msgid "Weather Routing"
 msgstr ""
 
@@ -240,34 +239,26 @@ msgstr ""
 msgid "Select Boat File"
 msgstr ""
 
-#: src/ConfigurationDialog.cpp:173
-msgid "Invalid settings, nothing will be done."
-msgstr ""
-
-#: src/ConfigurationDialog.cpp:324
+#: src/ConfigurationDialog.cpp:243
 msgid "Invalid Date Time."
 msgstr ""
 
-#: src/ConfigurationDialog.cpp:448
-msgid "Zero Time Step is invalid"
-msgstr ""
-
-#: src/ConfigurationDialog.cpp:454
+#: src/ConfigurationDialog.cpp:356
 msgid "Warning: less than 4 different degree steps specified\n"
 msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:60
-#: src/WeatherRoutingUI.cpp:500
+#: src/WeatherRoutingUI.cpp:506
 msgid "Start"
 msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:60
-#: src/WeatherRoutingUI.cpp:2981
+#: src/WeatherRoutingUI.cpp:2955
 msgid "Start Time"
 msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:61
-#: src/WeatherRoutingUI.cpp:554
+#: src/WeatherRoutingUI.cpp:776
 msgid "End"
 msgstr ""
 
@@ -276,7 +267,7 @@ msgid "BoatFileName"
 msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:68
-#: src/WeatherRoutingUI.cpp:2654
+#: src/WeatherRoutingUI.cpp:2628
 msgid "State"
 msgstr ""
 
@@ -396,7 +387,7 @@ msgstr ""
 msgid "none"
 msgstr ""
 
-#: src/ReportDialog.cpp:236 src/WeatherRoutingUI.cpp:899
+#: src/ReportDialog.cpp:236 src/WeatherRoutingUI.cpp:760
 msgid "Cyclones"
 msgstr ""
 
@@ -437,11 +428,11 @@ msgstr ""
 msgid "error, thread already created\n"
 msgstr ""
 
-#: src/SettingsDialog.cpp:93
+#: src/SettingsDialog.cpp:97
 msgid "Visible"
 msgstr ""
 
-#: src/SettingsDialog.cpp:152
+#: src/SettingsDialog.cpp:157
 msgid "Cursor Route -- optimal route closest to the cursor\n"
 "Destination Route -- optimal route to the desired destination\n"
 "Route Thickness -- thickness to draw Cursor and Destination Routes\n"
@@ -462,7 +453,7 @@ msgstr ""
 msgid "Running"
 msgstr ""
 
-#: src/StatisticsDialog.cpp:63 src/WeatherRoutingUI.cpp:2658
+#: src/StatisticsDialog.cpp:63 src/WeatherRoutingUI.cpp:2632
 msgid "Stopped"
 msgstr ""
 
@@ -502,6 +493,40 @@ msgid "Specify conditions where we should change to a different plan.\n"
 "If conditions change dramatically, then the program will look at the plan we just changed to and see if it needs to change again, so there is only need to specify rules for the next closest plan."
 msgstr ""
 
+#: src/weather_routing_pi.cpp:82
+msgid "Weather_Routing"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:87
+msgid "Weather Route Position"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:141
+msgid "WeatherRouting"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:146
+msgid "Compute optimal routes based on weather and constraints."
+msgstr ""
+
+#: src/weather_routing_pi.cpp:151
+msgid "Weather Routing features include:\n"
+"  optimal routing subject to various constraints based on weather data\n"
+"  automatic boat polar computation\n"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:208
+msgid "Grib plugin version not supported."
+msgstr ""
+
+#: src/weather_routing_pi.cpp:247
+msgid "Climatology plugin version not supported, no climatology data."
+msgstr ""
+
+#: src/weather_routing_pi.cpp:255
+msgid "Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"
+msgstr ""
+
 #: src/WeatherRouting.cpp:127
 msgid "Lat"
 msgstr ""
@@ -510,136 +535,135 @@ msgstr ""
 msgid "Lon"
 msgstr ""
 
-#: src/WeatherRouting.cpp:246
+#: src/WeatherRouting.cpp:249
 msgid "Enter Name"
 msgstr ""
 
-#: src/WeatherRouting.cpp:246 src/WeatherRouting.cpp:328
-#: src/WeatherRouting.cpp:332
+#: src/WeatherRouting.cpp:249
 msgid "New Position"
 msgstr ""
 
-#: src/WeatherRouting.cpp:252
+#: src/WeatherRouting.cpp:255
 msgid "This name already exists, replace?\n"
 msgstr ""
 
-#: src/WeatherRouting.cpp:305
+#: src/WeatherRouting.cpp:308
 msgid "local"
 msgstr ""
 
-#: src/WeatherRouting.cpp:328
-msgid "Enter Latitude"
-msgstr ""
-
-#: src/WeatherRouting.cpp:332
-msgid "Enter Longitude"
-msgstr ""
-
-#: src/WeatherRouting.cpp:352 src/WeatherRouting.cpp:361
-#: src/WeatherRoutingUI.cpp:598 src/WeatherRoutingUI.cpp:1514
-#: src/WeatherRoutingUI.h:442
+#: src/WeatherRouting.cpp:359 src/WeatherRouting.cpp:368
+#: src/WeatherRoutingUI.cpp:921 src/WeatherRoutingUI.cpp:1488
+#: src/WeatherRoutingUI.h:438
 msgid "Boat"
 msgstr ""
 
-#: src/WeatherRouting.cpp:647 src/WeatherRouting.cpp:663
+#: src/WeatherRouting.cpp:502
+msgid "Cannot goto invalid route(s)."
+msgstr ""
+
+#: src/WeatherRouting.cpp:661 src/WeatherRouting.cpp:677
 msgid "Select Configuration"
 msgstr ""
 
-#: src/WeatherRouting.cpp:729
+#: src/WeatherRouting.cpp:743
 msgid "Zero time span forbidden, aborting."
 msgstr ""
 
-#: src/WeatherRouting.cpp:752
+#: src/WeatherRouting.cpp:766
 msgid "Batch configuration"
 msgstr ""
 
-#: src/WeatherRouting.cpp:893
+#: src/WeatherRouting.cpp:907
 msgid "WeatherRoutingInformation.html"
 msgstr ""
 
-#: src/WeatherRouting.cpp:948
+#: src/WeatherRouting.cpp:962
 msgid "Failed to start configuration: "
 msgstr ""
 
-#: src/WeatherRouting.cpp:1008
+#: src/WeatherRouting.cpp:1022
 msgid "Failed to load file."
 msgstr ""
 
-#: src/WeatherRouting.cpp:1013
+#: src/WeatherRouting.cpp:1027
 msgid "Invalid xml file"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1031
+#: src/WeatherRouting.cpp:1045
 msgid "Load"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1047
+#: src/WeatherRouting.cpp:1061
 msgid "File contains duplicate position name, discaring\n"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1128
+#: src/WeatherRouting.cpp:1140
 msgid "Unrecognized xml node"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1219
+#: src/WeatherRouting.cpp:1231
 msgid "Failed to save xml file: "
 msgstr ""
 
-#: src/WeatherRouting.cpp:1396
+#: src/WeatherRouting.cpp:1406
 msgid "Invalid Start/End"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1399
+#: src/WeatherRouting.cpp:1409
 msgid "Computing..."
 msgstr ""
 
-#: src/WeatherRouting.cpp:1403
+#: src/WeatherRouting.cpp:1413
 msgid "Complete"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1407 src/WeatherRoutingUI.cpp:634
+#: src/WeatherRouting.cpp:1417 src/WeatherRoutingUI.cpp:957
 msgid "Grib"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1411 src/WeatherRoutingUI.cpp:639
+#: src/WeatherRouting.cpp:1421 src/WeatherRoutingUI.cpp:962
 msgid "Climatology"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1415 src/WeatherRoutingUI.cpp:1379
-#: src/WeatherRoutingUI.cpp:1401
+#: src/WeatherRouting.cpp:1425 src/WeatherRoutingUI.cpp:1350
+#: src/WeatherRoutingUI.cpp:1372
 msgid "Polar"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1419
+#: src/WeatherRouting.cpp:1429
 msgid "No Data"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1422
+#: src/WeatherRouting.cpp:1432
 msgid "Failed"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1428
+#: src/WeatherRouting.cpp:1438
 msgid "Waiting..."
 msgstr ""
 
-#: src/WeatherRouting.cpp:1431
+#: src/WeatherRouting.cpp:1441
 msgid "Not Computed"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1594
+#: src/WeatherRouting.cpp:1604
 msgid "No Weather Route selected"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1626
+#: src/WeatherRouting.cpp:1636
 msgid "Empty Route, nothing to export\n"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1633
+#: src/WeatherRouting.cpp:1643
 msgid "Weather Route"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1637
+#: src/WeatherRouting.cpp:1647
 msgid "Weather Route Point"
+msgstr ""
+
+#: src/WeatherRouting.cpp:1669
+msgid "Zero Time Step is invalid"
 msgstr ""
 
 #: src/WeatherRouting.h:61
@@ -674,7 +698,7 @@ msgstr ""
 msgid "Avg Wind"
 msgstr ""
 
-#: src/WeatherRouting.h:64 src/WeatherRoutingUI.cpp:791
+#: src/WeatherRouting.h:64
 msgid "Max Wind"
 msgstr ""
 
@@ -690,7 +714,7 @@ msgstr ""
 msgid "Avg Swell"
 msgstr ""
 
-#: src/WeatherRouting.h:66 src/WeatherRoutingUI.cpp:813
+#: src/WeatherRouting.h:66 src/WeatherRoutingUI.cpp:674
 msgid "Max Swell"
 msgstr ""
 
@@ -702,46 +726,12 @@ msgstr ""
 msgid "Port Starboard"
 msgstr ""
 
-#: src/WeatherRouting.h:68 src/WeatherRoutingUI.cpp:2404
-#: src/WeatherRoutingUI.cpp:2420 src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRouting.h:68 src/WeatherRoutingUI.cpp:2378
+#: src/WeatherRoutingUI.cpp:2394 src/WeatherRoutingUI.cpp:2410
 msgid "Tacks"
 msgstr ""
 
-#: src/weather_routing_pi.cpp:78
-msgid "Weather_Routing"
-msgstr ""
-
-#: src/weather_routing_pi.cpp:83
-msgid "Weather Route Position"
-msgstr ""
-
-#: src/weather_routing_pi.cpp:137
-msgid "WeatherRouting"
-msgstr ""
-
-#: src/weather_routing_pi.cpp:142
-msgid "Compute optimal routes based on weather and constraints."
-msgstr ""
-
-#: src/weather_routing_pi.cpp:147
-msgid "Weather Routing features include:\n"
-"  optimal routing subject to various constraints based on weather data\n"
-"  automatic boat polar computation\n"
-msgstr ""
-
-#: src/weather_routing_pi.cpp:203
-msgid "Grib plugin version not supported."
-msgstr ""
-
-#: src/weather_routing_pi.cpp:242
-msgid "Climatology plugin version not supported, no climatology data."
-msgstr ""
-
-#: src/weather_routing_pi.cpp:250
-msgid "Climatology plugin out of date, it must be upgraded or resulting routings may be incorrect.\n"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:2694
+#: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:2668
 msgid "Positions"
 msgstr ""
 
@@ -765,7 +755,7 @@ msgstr ""
 msgid "&Save"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:107 src/WeatherRoutingUI.cpp:2786
+#: src/WeatherRoutingUI.cpp:107 src/WeatherRoutingUI.cpp:2760
 msgid "&Close"
 msgstr ""
 
@@ -913,744 +903,707 @@ msgstr ""
 msgid "Display Wind Barbs"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:405
+#: src/WeatherRoutingUI.cpp:388
+msgid "Display current"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:409
 msgid "Computation"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:412
+#: src/WeatherRoutingUI.cpp:416
 msgid "Number of Concurrent threads"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:429
+#: src/WeatherRoutingUI.cpp:433
 msgid "Use Local Time"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:524
+#: src/WeatherRoutingUI.cpp:530
 msgid "Date"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:531
+#: src/WeatherRoutingUI.cpp:537
 msgid "Grib Time"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:534
+#: src/WeatherRoutingUI.cpp:540
 msgid "Hour"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:538 src/WeatherRoutingUI.cpp:981
-#: src/WeatherRoutingUI.cpp:1461 src/WeatherRoutingUI.cpp:1469
-#: src/WeatherRoutingUI.cpp:1491 src/WeatherRoutingUI.cpp:1499
-#: src/WeatherRoutingUI.cpp:1521 src/WeatherRoutingUI.cpp:1529
-#: src/WeatherRoutingUI.cpp:1924 src/WeatherRoutingUI.cpp:1932
-#: src/WeatherRoutingUI.cpp:1940 src/WeatherRoutingUI.cpp:1948
-#: src/WeatherRoutingUI.cpp:2636 src/WeatherRoutingUI.cpp:2666
-#: src/WeatherRoutingUI.cpp:2674 src/WeatherRoutingUI.cpp:2682
-#: src/WeatherRoutingUI.cpp:2690 src/WeatherRoutingUI.cpp:2698
+#: src/WeatherRoutingUI.cpp:544 src/WeatherRoutingUI.cpp:1435
+#: src/WeatherRoutingUI.cpp:1443 src/WeatherRoutingUI.cpp:1465
+#: src/WeatherRoutingUI.cpp:1473 src/WeatherRoutingUI.cpp:1495
+#: src/WeatherRoutingUI.cpp:1503 src/WeatherRoutingUI.cpp:1898
+#: src/WeatherRoutingUI.cpp:1906 src/WeatherRoutingUI.cpp:1914
+#: src/WeatherRoutingUI.cpp:1922 src/WeatherRoutingUI.cpp:2610
+#: src/WeatherRoutingUI.cpp:2640 src/WeatherRoutingUI.cpp:2648
+#: src/WeatherRoutingUI.cpp:2656 src/WeatherRoutingUI.cpp:2664
+#: src/WeatherRoutingUI.cpp:2672
 msgid "0"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:541
+#: src/WeatherRoutingUI.cpp:547
 msgid "Current Time"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:563
-msgid "Time Step"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:573
-msgid "h"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:580
-msgid "m"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:587
-msgid "s"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:609
-msgid "..."
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:612 src/WeatherRoutingUI.cpp:1990
-msgid "Edit"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:622
-msgid "Data Source"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:647
-msgid "Disable"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:647
-msgid "Currents Only"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:647
-msgid "Cumulative Map"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:647
-msgid "Cumulative - Calms"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:647
-msgid "Most Likely"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:647
-msgid "Average"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:664
-msgid "Last Valid if Data Deficient"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:672
-msgid "Wind strength is"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:679 src/WeatherRoutingUI.cpp:3133
-#: src/WeatherRoutingUI.cpp:3144 src/WeatherRoutingUI.cpp:3155
-msgid "percent"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:693
-msgid "Options"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:700
-msgid "Detect Land"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:704
-msgid "Currents"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:708
-msgid "Inverted Regions"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:711
-msgid "Anchoring"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:729
-msgid "Integrator"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:736
-msgid "Newton's Method"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:739
-msgid "Runge Kutta (slow)"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:749
-msgid "Constraints"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:758
-msgid "Max Diverted Course"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:765 src/WeatherRoutingUI.cpp:776
-#: src/WeatherRoutingUI.cpp:787 src/WeatherRoutingUI.cpp:831
-msgid "degrees"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:769
-msgid "Max Course Angle"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:780
-msgid "Max Search Angle"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:798
-msgid "knots"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:806
-msgid "Common"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:820
-msgid "meters"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:824
-msgid "Max Latitude +-"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:835
-msgid "Tacking Time"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:842
-msgid "(0 to disable)"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:846
-msgid "Wind vs Current"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:857
-msgid "Additional"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:866
-msgid "Avoid crossing cyclone tracks"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:874
-msgid "within"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:881
-msgid "Months"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:888
-msgid "Days"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:907
+#: src/WeatherRoutingUI.cpp:560
 msgid "Courses (relative to true wind)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:929
-msgid "-45"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:930
-msgid "45"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:931
-msgid "-60"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:932
-msgid "60"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:933
-msgid "-90"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:934
-msgid "90"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:935
-msgid "-120"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:936
-msgid "120"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:937
-msgid "-150"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:938
-msgid "150"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:954 src/WeatherRoutingUI.cpp:3101
-msgid "Add"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:957 src/WeatherRoutingUI.cpp:3104
-msgid "Remove"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:960
-msgid "Clear"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:970 src/WeatherRoutingUI.cpp:1013
-#: src/WeatherRoutingUI.cpp:3195
-msgid "Generate"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:977 src/WeatherRoutingUI.cpp:3126
+#: src/WeatherRoutingUI.cpp:567 src/WeatherRoutingUI.cpp:3100
 msgid "From"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:984 src/WeatherRoutingUI.cpp:995
-#: src/WeatherRoutingUI.cpp:1006 src/WeatherRoutingUI.cpp:2245
-#: src/WeatherRoutingUI.cpp:2255
-msgid "Degrees"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:988 src/WeatherRoutingUI.cpp:3137
+#: src/WeatherRoutingUI.cpp:574 src/WeatherRoutingUI.cpp:3111
 msgid "To"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:992
-msgid "180"
-msgstr ""
-
-#: src/WeatherRoutingUI.cpp:999 src/WeatherRoutingUI.cpp:3148
+#: src/WeatherRoutingUI.cpp:581 src/WeatherRoutingUI.cpp:3122
 msgid "By"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1003
+#: src/WeatherRoutingUI.cpp:585
 msgid "5"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1025
+#: src/WeatherRoutingUI.cpp:588 src/WeatherRoutingUI.cpp:2219
+#: src/WeatherRoutingUI.cpp:2229
+msgid "Degrees"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:599
+msgid "Constraints"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:608
+msgid "Max Diverted Course"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:615 src/WeatherRoutingUI.cpp:626
+#: src/WeatherRoutingUI.cpp:637 src/WeatherRoutingUI.cpp:692
+#: src/WeatherRoutingUI.cpp:3263 src/WeatherRoutingUI.cpp:3281
+msgid "degrees"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:619
+msgid "Max Course Angle"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:630
+msgid "Max Search Angle"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:641
+msgid "Max True Wind"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:648 src/WeatherRoutingUI.cpp:659
+msgid "knots"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:652
+msgid "Max Apparent Wind"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:667
+msgid "Common"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:681
+msgid "meters"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:685
+msgid "Max Latitude +-"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:696
+msgid "Tacking Time"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:703
+msgid "(0 to disable)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:707
+msgid "Wind vs Current"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:718
+msgid "Additional"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:727
+msgid "Avoid crossing cyclone tracks"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:735
+msgid "within"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:742
+msgid "Months"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:749
+msgid "Days"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:785
+msgid "Time Step"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:795
+msgid "h"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:802
+msgid "m"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:809
+msgid "s"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:820
+msgid "Options"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:834
+msgid "Detect Land"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:838
+msgid "Currents"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:842
+msgid "Detect Boundary"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:853
+msgid "Wind strength is"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:860 src/WeatherRoutingUI.cpp:3107
+#: src/WeatherRoutingUI.cpp:3118 src/WeatherRoutingUI.cpp:3129
+msgid "percent"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:871
+msgid "Basic"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:883
+msgid "Inverted Regions"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:886
+msgid "Anchoring"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:897
+msgid "Integrator"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:902
+msgid "Newton"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:903
+msgid "Runge Kutta"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:913
+msgid "Advanced"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:932
+msgid "..."
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:935 src/WeatherRoutingUI.cpp:1964
+msgid "Edit"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:945
+msgid "Data Source"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:970
+msgid "Disable"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:970
+msgid "Currents Only"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:970
+msgid "Cumulative Map"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:970
+msgid "Cumulative - Calms"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:970
+msgid "Most Likely"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:970
+msgid "Average"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:987
+msgid "Last Valid Wind Data if Deficient"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:996
 msgid " Close"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1312 src/WeatherRoutingUI.cpp:1987
+#: src/WeatherRoutingUI.cpp:1283 src/WeatherRoutingUI.cpp:1961
 msgid "New"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1315 src/WeatherRoutingUI.cpp:1993
+#: src/WeatherRoutingUI.cpp:1286 src/WeatherRoutingUI.cpp:1967
 msgid "Delete"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1377
+#: src/WeatherRoutingUI.cpp:1348
 msgid "Coordinates"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1379
+#: src/WeatherRoutingUI.cpp:1350
 msgid "Rect"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1389
+#: src/WeatherRoutingUI.cpp:1360
 msgid "Wind Kts"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1409 src/WeatherRoutingUI.cpp:2404
-#: src/WeatherRoutingUI.cpp:2420 src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:1380 src/WeatherRoutingUI.cpp:2378
+#: src/WeatherRoutingUI.cpp:2394 src/WeatherRoutingUI.cpp:2410
 msgid "Wind Direction"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1421
+#: src/WeatherRoutingUI.cpp:1392
 msgid "Speed"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1423 src/WeatherRoutingUI.cpp:1970
+#: src/WeatherRoutingUI.cpp:1394 src/WeatherRoutingUI.cpp:1944
 msgid "VMG"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1434
+#: src/WeatherRoutingUI.cpp:1408
 msgid "Plot Type"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1436
+#: src/WeatherRoutingUI.cpp:1410
 msgid "True Wind Dir / True Wind Speed"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1436
+#: src/WeatherRoutingUI.cpp:1410
 msgid "Apparent Wind Dir / True Wind Speed"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1436
+#: src/WeatherRoutingUI.cpp:1410
 msgid "True Wind Dir / Apparent Wind Speed"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1436
+#: src/WeatherRoutingUI.cpp:1410
 msgid "Apparent Wind Dir / Apparent Wind Speed"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1454
+#: src/WeatherRoutingUI.cpp:1428
 msgid "True Wind"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1465 src/WeatherRoutingUI.cpp:1495
-#: src/WeatherRoutingUI.cpp:1525
+#: src/WeatherRoutingUI.cpp:1439 src/WeatherRoutingUI.cpp:1469
+#: src/WeatherRoutingUI.cpp:1499
 msgid "Deg"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1473 src/WeatherRoutingUI.cpp:1503
-#: src/WeatherRoutingUI.cpp:1533 src/WeatherRoutingUI.cpp:2225
-#: src/WeatherRoutingUI.cpp:2235
+#: src/WeatherRoutingUI.cpp:1447 src/WeatherRoutingUI.cpp:1477
+#: src/WeatherRoutingUI.cpp:1507 src/WeatherRoutingUI.cpp:2199
+#: src/WeatherRoutingUI.cpp:2209
 msgid "Knots"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1484
+#: src/WeatherRoutingUI.cpp:1458
 msgid "Apparent Wind"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1550
+#: src/WeatherRoutingUI.cpp:1524
 msgid "Plot"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1573
+#: src/WeatherRoutingUI.cpp:1547
 msgid "Hull Type"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1577
+#: src/WeatherRoutingUI.cpp:1551
 msgid "Mono"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1577
+#: src/WeatherRoutingUI.cpp:1551
 msgid "Catamaran"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1577
+#: src/WeatherRoutingUI.cpp:1551
 msgid "Trimaran"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1577
+#: src/WeatherRoutingUI.cpp:1551
 msgid "Proa"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1577
+#: src/WeatherRoutingUI.cpp:1551
 msgid "Submarine"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1591
+#: src/WeatherRoutingUI.cpp:1565
 msgid "Displacement"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1598
+#: src/WeatherRoutingUI.cpp:1572
 msgid "tons"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1602
+#: src/WeatherRoutingUI.cpp:1576
 msgid "Sail Area"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1609
+#: src/WeatherRoutingUI.cpp:1583
 msgid "sq/ft"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1613
+#: src/WeatherRoutingUI.cpp:1587
 msgid "Len Water Line (lwl)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1620 src/WeatherRoutingUI.cpp:1631
-#: src/WeatherRoutingUI.cpp:1642
+#: src/WeatherRoutingUI.cpp:1594 src/WeatherRoutingUI.cpp:1605
+#: src/WeatherRoutingUI.cpp:1616
 msgid "ft"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1624
+#: src/WeatherRoutingUI.cpp:1598
 msgid "Length Over All (loa)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1635
+#: src/WeatherRoutingUI.cpp:1609
 msgid "Beam"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1657
+#: src/WeatherRoutingUI.cpp:1631
 msgid "Sail Area Displacement Ratio"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1665
+#: src/WeatherRoutingUI.cpp:1639
 msgid "Displacement Length Ratio"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1673
+#: src/WeatherRoutingUI.cpp:1647
 msgid "Hull Speed"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1681
+#: src/WeatherRoutingUI.cpp:1655
 msgid "Capsize Risk"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1689
+#: src/WeatherRoutingUI.cpp:1663
 msgid "Comfort Factor"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1707
+#: src/WeatherRoutingUI.cpp:1681
 msgid "Boat Configuration"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1720
+#: src/WeatherRoutingUI.cpp:1694
 msgid "From File"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1720
+#: src/WeatherRoutingUI.cpp:1694
 msgid "Computed From Sailboat Transform"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1720
+#: src/WeatherRoutingUI.cpp:1694
 msgid "Computed From IMS Formula"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1729
+#: src/WeatherRoutingUI.cpp:1703
 msgid "Polar Computation Sailboat Transform Settings"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1759
+#: src/WeatherRoutingUI.cpp:1733
 msgid "0.25"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1766
+#: src/WeatherRoutingUI.cpp:1740
 msgid "Drag"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1773
+#: src/WeatherRoutingUI.cpp:1747
 msgid "Frictional"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1780
+#: src/WeatherRoutingUI.cpp:1754
 msgid "Wake"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1787
+#: src/WeatherRoutingUI.cpp:1761
 msgid "Recompute"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1790
+#: src/WeatherRoutingUI.cpp:1764
 msgid "Info"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1804
+#: src/WeatherRoutingUI.cpp:1778
 msgid "Max Pointing Angle Apparent Wind"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1811
+#: src/WeatherRoutingUI.cpp:1785
 msgid "Wing and Wing Running"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1814
+#: src/WeatherRoutingUI.cpp:1788
 msgid "Save As CSV"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1829
+#: src/WeatherRoutingUI.cpp:1803
 msgid "Polar Computation IMF Settings"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1836
+#: src/WeatherRoutingUI.cpp:1810
 msgid "Based on general formula\n"
 "Speed = 2.62 + 0.066*SA/D ratio + 0.51*LWL feet"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1846
+#: src/WeatherRoutingUI.cpp:1820
 msgid "Polar File Settings"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1854
+#: src/WeatherRoutingUI.cpp:1828
 msgid "FileName"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1858
+#: src/WeatherRoutingUI.cpp:1832
 msgid "Select a file"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1861
+#: src/WeatherRoutingUI.cpp:1835
 msgid "Wind Speed Step"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1869
+#: src/WeatherRoutingUI.cpp:1843
 msgid "Wind Degree Step"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1887
+#: src/WeatherRoutingUI.cpp:1861
 msgid "Sail Plan Polar"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1899
+#: src/WeatherRoutingUI.cpp:1873
 msgid "Wind Speed"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1906
+#: src/WeatherRoutingUI.cpp:1880
 msgid "True"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1906
+#: src/WeatherRoutingUI.cpp:1880
 msgid "Apparent"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1920
+#: src/WeatherRoutingUI.cpp:1894
 msgid "Best Course Up Wind Port Tack"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1928
+#: src/WeatherRoutingUI.cpp:1902
 msgid "Best Course Up Wind Starboard Tack"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1936
+#: src/WeatherRoutingUI.cpp:1910
 msgid "Best Course Down Wind Port Tack"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1944
+#: src/WeatherRoutingUI.cpp:1918
 msgid "Best Course Down Wind Starboard Tack"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:1960
+#: src/WeatherRoutingUI.cpp:1934
 msgid "Optimize Tacking"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2012
+#: src/WeatherRoutingUI.cpp:1986
 msgid "Switch Plan Rules"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2036
+#: src/WeatherRoutingUI.cpp:2010
 msgid "Open"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2039
+#: src/WeatherRoutingUI.cpp:2013
 msgid "Save As"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2050
+#: src/WeatherRoutingUI.cpp:2024
 msgid "Save and Close"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2053 src/WeatherRoutingUI.cpp:2589
-#: src/WeatherRoutingUI.cpp:3198
+#: src/WeatherRoutingUI.cpp:2027 src/WeatherRoutingUI.cpp:2563
+#: src/WeatherRoutingUI.cpp:3172
 msgid "Close"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2212
+#: src/WeatherRoutingUI.cpp:2186
 msgid "Conditions"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2219
+#: src/WeatherRoutingUI.cpp:2193
 msgid "Wind Speed >"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2229
+#: src/WeatherRoutingUI.cpp:2203
 msgid "Wind Speed <"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2239
+#: src/WeatherRoutingUI.cpp:2213
 msgid "Wind Direction >"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2249
+#: src/WeatherRoutingUI.cpp:2223
 msgid "Wind Direction <"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2259
+#: src/WeatherRoutingUI.cpp:2233
 msgid "Wave Height >"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2265 src/WeatherRoutingUI.cpp:2275
+#: src/WeatherRoutingUI.cpp:2239 src/WeatherRoutingUI.cpp:2249
 msgid "Meters"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2269
+#: src/WeatherRoutingUI.cpp:2243
 msgid "Wave Height <"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2298
+#: src/WeatherRoutingUI.cpp:2272
 msgid "Then Switch to"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2310 src/WeatherRoutingUI.cpp:2783
-#: src/WeatherRoutingUI.cpp:3189
+#: src/WeatherRoutingUI.cpp:2284 src/WeatherRoutingUI.cpp:2757
+#: src/WeatherRoutingUI.cpp:3163
 msgid "Information"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2313
+#: src/WeatherRoutingUI.cpp:2287
 msgid "Cancel"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2316 src/WeatherRoutingUI.cpp:2848
+#: src/WeatherRoutingUI.cpp:2290 src/WeatherRoutingUI.cpp:2822
 msgid "Done"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2371
+#: src/WeatherRoutingUI.cpp:2345
 msgid "Position"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2378
+#: src/WeatherRoutingUI.cpp:2352
 msgid "Scale"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2398 src/WeatherRoutingUI.cpp:2414
-#: src/WeatherRoutingUI.cpp:2430
+#: src/WeatherRoutingUI.cpp:2372 src/WeatherRoutingUI.cpp:2388
+#: src/WeatherRoutingUI.cpp:2404
 msgid "Variable"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Speed Over Ground (SOG)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Course Over Ground (COG)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Speed Over Water (SOW)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Course Over Water (COW)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Wind Velocity"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Wind Course"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Wind Velocity Ground"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Wind Direction Ground"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Wind Course Ground"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Apparent Wind Speed (AWS)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Apparent Wind Angle (AWA)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Current Velocity"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Current Direction"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2404 src/WeatherRoutingUI.cpp:2420
-#: src/WeatherRoutingUI.cpp:2436
+#: src/WeatherRoutingUI.cpp:2378 src/WeatherRoutingUI.cpp:2394
+#: src/WeatherRoutingUI.cpp:2410
 msgid "Sig Wave Height"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2410 src/WeatherRoutingUI.cpp:2426
-#: src/WeatherRoutingUI.cpp:2442
+#: src/WeatherRoutingUI.cpp:2384 src/WeatherRoutingUI.cpp:2400
+#: src/WeatherRoutingUI.cpp:2416
 msgid "        N/A         "
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2454 src/WeatherRoutingUI.cpp:2647
+#: src/WeatherRoutingUI.cpp:2428 src/WeatherRoutingUI.cpp:2621
 msgid "Current Route"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2457
+#: src/WeatherRoutingUI.cpp:2431
 msgid "Cursor Route"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2577
+#: src/WeatherRoutingUI.cpp:2551
 msgid "The weather routing plugin for opencpn is intended to aid in planning sailing routes based on computerized weather data and boat sailing ability.\n\n"
 "This also means to educate users about weather trends, to \"discover\" new cruising routes, and to avoid adverse conditions.\n\n"
 "License: GPLv3+\n\n"
@@ -1661,172 +1614,204 @@ msgid "The weather routing plugin for opencpn is intended to aid in planning sai
 "Many thanks to all of the translators and testers."
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2586
+#: src/WeatherRoutingUI.cpp:2560
 msgid "About Author"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2625
+#: src/WeatherRoutingUI.cpp:2599
 msgid "Overall"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2632
+#: src/WeatherRoutingUI.cpp:2606
 msgid "Run Time"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2662
+#: src/WeatherRoutingUI.cpp:2636
 msgid "Iso Chrons"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2670 src/WeatherRoutingUI.cpp:2759
-#: src/WeatherRoutingUI.cpp:3084
+#: src/WeatherRoutingUI.cpp:2644 src/WeatherRoutingUI.cpp:2733
+#: src/WeatherRoutingUI.cpp:3058
 msgid "Routes"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2678
+#: src/WeatherRoutingUI.cpp:2652
 msgid "InvRoutes"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2686
+#: src/WeatherRoutingUI.cpp:2660
 msgid "Skip Positions"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2740
+#: src/WeatherRoutingUI.cpp:2714
 msgid "Current Configuration"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2821
+#: src/WeatherRoutingUI.cpp:2795
 msgid "Category"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2832
+#: src/WeatherRoutingUI.cpp:2806
 msgid "Filter"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2845
+#: src/WeatherRoutingUI.cpp:2819
 msgid "Reset All"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2901
+#: src/WeatherRoutingUI.cpp:2875
 msgid "Starting"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2912
+#: src/WeatherRoutingUI.cpp:2886
 msgid "For"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2919 src/WeatherRoutingUI.cpp:2940
+#: src/WeatherRoutingUI.cpp:2893 src/WeatherRoutingUI.cpp:2914
 msgid "day(s)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2929
+#: src/WeatherRoutingUI.cpp:2903
 msgid "hour(s)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2933
+#: src/WeatherRoutingUI.cpp:2907
 msgid "Spaced"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2950
+#: src/WeatherRoutingUI.cpp:2924
 msgid "Hour(s)"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2962
+#: src/WeatherRoutingUI.cpp:2936
 msgid "Once"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2965
+#: src/WeatherRoutingUI.cpp:2939
 msgid "Daily"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2968
+#: src/WeatherRoutingUI.cpp:2942
 msgid "Weekly"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2971
+#: src/WeatherRoutingUI.cpp:2945
 msgid "Monthly"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:2991
+#: src/WeatherRoutingUI.cpp:2965
 msgid "Sources"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3015
+#: src/WeatherRoutingUI.cpp:2989
 msgid "Destinations"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3036
+#: src/WeatherRoutingUI.cpp:3010
 msgid "Auto Connect"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3043
+#: src/WeatherRoutingUI.cpp:3017
 msgid "Within"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3050
+#: src/WeatherRoutingUI.cpp:3024
 msgid "Nautical Miles"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3054
+#: src/WeatherRoutingUI.cpp:3028
 msgid "Connect"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3068
+#: src/WeatherRoutingUI.cpp:3042
 msgid "Disconnect All"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3114
+#: src/WeatherRoutingUI.cpp:3075
+msgid "Add"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3078
+msgid "Remove"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3088
 msgid "Boats"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3167
+#: src/WeatherRoutingUI.cpp:3141
 msgid "100"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3170
+#: src/WeatherRoutingUI.cpp:3144
 msgid "80 to 120"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3180
+#: src/WeatherRoutingUI.cpp:3154
 msgid "Wind Strength"
 msgstr ""
 
-#: src/WeatherRoutingUI.cpp:3192
+#: src/WeatherRoutingUI.cpp:3166
 msgid "Reset"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:177
+#: src/WeatherRoutingUI.cpp:3169
+msgid "Generate"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3241
+msgid "name"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3256
+msgid "latitude"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3270 src/WeatherRoutingUI.cpp:3288
+msgid "minutes"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3274
+msgid "longitude"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:180
 msgid "Weather Routing Settings"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:291
+#: src/WeatherRoutingUI.h:287
 msgid "Weather Routing Configuration"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:489
+#: src/WeatherRoutingUI.h:485
 msgid "Switch Sail Plan Configuration"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:532
+#: src/WeatherRoutingUI.h:528
 msgid "Weather Route Plot"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:556
+#: src/WeatherRoutingUI.h:552
 msgid "About Weather Routing"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:588
+#: src/WeatherRoutingUI.h:584
 msgid "Weather Routing Statistics"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:613
+#: src/WeatherRoutingUI.h:609
 msgid "Weather Route Report"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:640
+#: src/WeatherRoutingUI.h:636
 msgid "Filter Routes"
 msgstr ""
 
-#: src/WeatherRoutingUI.h:721
+#: src/WeatherRoutingUI.h:717
 msgid "Weather Routing Configuration Batch"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:748
+msgid "New Weather Routing Position"
 msgstr ""
 
