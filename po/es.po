@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 07:49-0500\n"
-"PO-Revision-Date: 2016-02-12 17:05-0500\n"
+"PO-Revision-Date: 2016-02-18 16:08-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -576,7 +576,7 @@ msgstr "Barco"
 
 #: src/WeatherRouting.cpp:502
 msgid "Cannot goto invalid route(s)."
-msgstr ""
+msgstr "No se puede ir a ruta(s) no válidas."
 
 #: src/WeatherRouting.cpp:661 src/WeatherRouting.cpp:677
 msgid "Select Configuration"
@@ -922,7 +922,7 @@ msgstr "Mostrar flechas barbadas en viento"
 
 #: src/WeatherRoutingUI.cpp:388
 msgid "Display current"
-msgstr ""
+msgstr "Mostrar actual"
 
 #: src/WeatherRoutingUI.cpp:409
 msgid "Computation"
@@ -1097,7 +1097,7 @@ msgstr "Corrientes"
 
 #: src/WeatherRoutingUI.cpp:842
 msgid "Detect Boundary"
-msgstr ""
+msgstr "Detectar límite"
 
 #: src/WeatherRoutingUI.cpp:853
 msgid "Wind strength is"
@@ -1110,7 +1110,7 @@ msgstr "por ciento"
 
 #: src/WeatherRoutingUI.cpp:871
 msgid "Basic"
-msgstr ""
+msgstr "Básico"
 
 #: src/WeatherRoutingUI.cpp:883
 msgid "Inverted Regions"
@@ -1126,15 +1126,15 @@ msgstr "Integrador"
 
 #: src/WeatherRoutingUI.cpp:902
 msgid "Newton"
-msgstr ""
+msgstr "Newton"
 
 #: src/WeatherRoutingUI.cpp:903
 msgid "Runge Kutta"
-msgstr ""
+msgstr "Runge Kutta"
 
 #: src/WeatherRoutingUI.cpp:913
 msgid "Advanced"
-msgstr ""
+msgstr "Avanzado"
 
 #: src/WeatherRoutingUI.cpp:932
 msgid "..."
@@ -1174,7 +1174,7 @@ msgstr "Promedio"
 
 #: src/WeatherRoutingUI.cpp:987
 msgid "Last Valid Wind Data if Deficient"
-msgstr ""
+msgstr "Últimos datos válidos de viento si deficiente"
 
 #: src/WeatherRoutingUI.cpp:996
 msgid " Close"
@@ -1786,19 +1786,19 @@ msgstr "Generado"
 
 #: src/WeatherRoutingUI.cpp:3241
 msgid "name"
-msgstr ""
+msgstr "nombre"
 
 #: src/WeatherRoutingUI.cpp:3256
 msgid "latitude"
-msgstr ""
+msgstr "Latitud"
 
 #: src/WeatherRoutingUI.cpp:3270 src/WeatherRoutingUI.cpp:3288
 msgid "minutes"
-msgstr ""
+msgstr "minutos"
 
 #: src/WeatherRoutingUI.cpp:3274
 msgid "longitude"
-msgstr ""
+msgstr "longitud"
 
 #: src/WeatherRoutingUI.h:180
 msgid "Weather Routing Settings"
@@ -1838,5 +1838,5 @@ msgstr "Configuración por lotes del enrutamiento meteorológico"
 
 #: src/WeatherRoutingUI.h:748
 msgid "New Weather Routing Position"
-msgstr ""
+msgstr "Nueva posición de enrutamiento climatológico"
 
