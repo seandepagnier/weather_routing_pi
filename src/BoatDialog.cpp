@@ -72,8 +72,20 @@ BoatDialog::BoatDialog(wxWindow *parent, wxString boatpath)
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
+    m_orientation[0] = pConf->Read ( _T ( "Orientation0" ), 1L );
+    m_orientation[1] = pConf->Read ( _T ( "Orientation1" ), 1L );
+
     // hack to adjust items
     SetSize(wxSize(w, h));
+}
+
+BoatDialog::~BoatDialog()
+{
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
+
+    pConf->Read ( _T ( "Orientation0" ), m_orientation[0] );
+    pConf->Write ( _T ( "Orientation1" ), m_orientation[1] );
 }
 
 void BoatDialog::OnMouseEventsPolarPlot( wxMouseEvent& event )
@@ -508,6 +520,11 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     }
 }
 
+static int CalcPolarPoints(wxPoint p0, wxPoint p1)
+{
+    return floor(fabs(p0.x - p1.x) / 5) + 1;
+}
+
 void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
 {
     wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
@@ -598,13 +615,36 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
                 for (unsigned j = 0; j < 3 && p[j] != TESS_UNDEF; ++j) {
                     double H = verts[p[j]*2+0];
                     double VW = verts[p[j]*2+1];
-                    if(polar)
-                        points[j] = wxPoint(xc + scale*VW*sin(deg2rad(H)),
-                                            h/2 - scale*VW*cos(deg2rad(H)));
-                    else
-                        points[j] = wxPoint(H * w / 180, h - VW * h / 40);
+                    points[j] = wxPoint(H * w / 180, h - VW * h / 40);
                 }
-                dc.DrawPolygon(3, points);
+                if(polar) {
+                    int count[3] = {CalcPolarPoints(points[0], points[1]),
+                                    CalcPolarPoints(points[1], points[2]),
+                                    CalcPolarPoints(points[2], points[0])};
+                    wxPoint *pts = new wxPoint[count[0] + count[1] + count[2]];
+                    int c = 0;
+                    for(int j = 0; j<3; j++) {
+                        int jp1 = j+1 == 3 ? 0 : j+1;
+                        for(int k=0; k<count[j]; k++) {
+                            double d = (double)k / count[j];
+                            double px = points[j].x * (1-d) + points[jp1].x * d;
+                            double py = points[j].y * (1-d) + points[jp1].y * d;
+                            double H = px / w * 180;
+                            double VW = (h - py) / h * 40;
+                            pts[c++] = wxPoint(xc + scale*VW*sin(deg2rad(H)),
+                                               h/2 - scale*VW*cos(deg2rad(H)));
+                        }
+                    }
+                    dc.DrawPolygon(c, pts);
+                    if(full) {
+                        for(int j = 0; j<c; j++)
+                            pts[j].x = 2*xc - pts[j].x;
+                        dc.DrawPolygon(c, pts);
+                    }
+                    delete [] pts;
+                } else {
+                    dc.DrawPolygon(3, points);
+                }
             } else {
                 int b = elems[i*2];
                 int n = elems[i*2+1];
@@ -755,11 +795,20 @@ void BoatDialog::OnPolarSelected()
 
 void BoatDialog::OnUpdatePlot()
 {
-    m_fgSizer->SetCols(m_cPlotType->GetSelection());
-    m_fgSizer->SetRows(!m_cPlotType->GetSelection());
-//    m_fgSizer->Fit();
-    Fit();
+    bool vert = m_orientation[m_cPlotType->GetSelection()];
+    m_cbOrientation->SetValue(vert);
+    if(m_fgSizer->GetRows() != vert) {
+        m_fgSizer->SetRows(vert);
+        m_fgSizer->SetCols(!vert);
+        Fit();
+    }
     RefreshPlots();
+}
+
+void BoatDialog::OnOrientation( wxCommandEvent& event )
+{
+    m_orientation[m_cPlotType->GetSelection()] = m_cbOrientation->GetValue();
+    OnUpdatePlot();
 }
 
 void BoatDialog::OnUpPolar( wxCommandEvent& event )

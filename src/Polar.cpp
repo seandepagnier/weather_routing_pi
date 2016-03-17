@@ -565,7 +565,7 @@ void Polar::UpdateDegreeStepLookup()
 // Determine if our current state is satisfied by the current cross over contour
 bool Polar::InsideCrossOverContour(float H, float VW)
 {
-    return CrossOverRegion.Contains(H, VW);
+    return CrossOverRegion.Contains(fabs(H), VW);
 }
 
 void Polar::CalculateVMG(int VWi)

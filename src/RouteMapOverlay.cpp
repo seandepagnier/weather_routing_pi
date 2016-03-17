@@ -440,12 +440,11 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtPo
 
     /* draw lines to this route */
     Position *p;
-    int polar = pos->polar;
     if(!dc.GetDC())
         glBegin(GL_LINES);
 
     for(p = pos; p && p->parent; p = p->parent) {
-        if(MarkAtPolarChange && p->polar != polar) {
+        if(MarkAtPolarChange && p->polar != p->parent->polar) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, p->lat, p->lon);
             int s = 6;
@@ -453,7 +452,6 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtPo
             glVertex2i(r.x+s, r.y-s), glVertex2i(r.x+s, r.y+s);
             glVertex2i(r.x+s, r.y+s), glVertex2i(r.x-s, r.y+s);
             glVertex2i(r.x-s, r.y+s), glVertex2i(r.x-s, r.y-s);
-            polar = p->polar;
         } else
             DrawLine(p, p->parent, dc, vp);
     }

@@ -36,6 +36,7 @@ class BoatDialog : public BoatDialogBase
 {
 public:
     BoatDialog(wxWindow *parent, wxString boatpath);
+    ~BoatDialog();
 
     Boat m_Boat;
     wxString m_boatpath;
@@ -47,7 +48,8 @@ private:
     void PaintSpeed(wxPaintDC &dc, long index);
 
     void OnPaintPlot( wxPaintEvent& event );
-    void OnUpdatePlot( wxSizeEvent& event ) { RefreshPlots(); }
+    void OnUpdatePlot( wxSizeEvent& event ) { OnUpdatePlot(); }
+    void OnOrientation( wxCommandEvent& event );
     void OnPaintCrossOverChart( wxPaintEvent& event );
     void OnGenerateCrossOverChart( wxCommandEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { RefreshPlots(); }
@@ -81,6 +83,8 @@ private:
 
     double m_PlotScale;
     int m_MouseW;
+
+    bool m_orientation[2];
 };
 
 #endif

@@ -373,6 +373,7 @@ class BoatDialogBase : public wxDialog
 		wxChoice* m_cPlotType;
 		wxChoice* m_cPlotVariable;
 		wxCheckBox* m_cbFullPlot;
+		wxCheckBox* m_cbOrientation;
 		wxListCtrl* m_lPolars;
 		wxButton* m_bUp;
 		wxButton* m_bDown;
@@ -388,6 +389,7 @@ class BoatDialogBase : public wxDialog
 		virtual void OnPaintCrossOverChart( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnGenerateCrossOverChart( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnOrientation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnUpPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDownPolar( wxCommandEvent& event ) { event.Skip(); }

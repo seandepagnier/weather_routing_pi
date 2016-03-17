@@ -229,7 +229,6 @@ void PolygonRegion::Print()
 
 std::string PolygonRegion::toString()
 {
-    wxStopWatch sw;
     std::string str;
     for(std::list<Contour>::iterator it = contours.begin();
         it != contours.end(); it++) {
@@ -241,7 +240,6 @@ std::string PolygonRegion::toString()
         }
         str += ";";
     }
-    printf("time: %ld\n", sw.Time());
     return str;
 }
 
@@ -310,9 +308,14 @@ void PolygonRegion::Subtract(PolygonRegion &region)
 
 void PolygonRegion::Simplify(float epsilon)
 {
-    for(std::list<Contour>::iterator it = contours.begin();
-        it != contours.end(); it++)
+    std::list<Contour>::iterator it = contours.begin();
+    while(it != contours.end()) {
         it->Simplify(epsilon);
+        if(it->n < 3)
+            it = contours.erase(it);
+        else
+            it++;
+    }
 }
 
 #if 0
