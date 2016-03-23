@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -31,7 +31,7 @@
 class AboutDialog : public AboutDialogBase
 {
 public:
-    AboutDialog( wxWindow *parent ) : AboutDialogBase(parent) { }
+    AboutDialog( wxWindow *parent );
     void OnAboutAuthor( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event ) { EndModal(wxID_OK); }   
 };

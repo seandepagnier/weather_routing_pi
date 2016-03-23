@@ -93,11 +93,11 @@ double PlotDialog::GetValue(PlotData &data, int var)
     case WIND_DIRECTION_GROUND:        return heading_resolve(data.BG - data.WG);
     case WIND_COURSE_GROUND:           return data.WG;
     case APPARENT_WIND_SPEED:
-        return Polar::VelocityApparentWind(data.VB, deg2rad(GetValue(data, WIND_DIRECTION)), data.VW);
+        return Polar::VelocityApparentWind(data.VB, GetValue(data, WIND_DIRECTION), data.VW);
     case APPARENT_WIND_ANGLE: {
         return rad2deg(Polar::DirectionApparentWind
                        (GetValue(data, APPARENT_WIND_SPEED), data.VB,
-                        deg2rad(GetValue(data, WIND_DIRECTION)), data.VW));
+                        GetValue(data, WIND_DIRECTION), data.VW));
     }
     case CURRENT_VELOCITY: return data.VC;
     case CURRENT_DIRECTION: return data.C;

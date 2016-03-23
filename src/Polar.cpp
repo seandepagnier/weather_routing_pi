@@ -51,7 +51,7 @@ double interp_value(double x, double x1, double x2, double y1, double y2)
 /* compute apparent wind speed from boat speed and true wind */
 double Polar::VelocityApparentWind(double VB, double W, double VW)
 {
-  return sqrt(VW*VW + VB*VB + 2*VW*VB*cos(W)); /* law of cosines, W is flipped by 180 */
+    return sqrt(VW*VW + VB*VB + 2*VW*VB*cos(deg2rad(W))); /* law of cosines, W is flipped by 180 */
 }
 
 /*
@@ -78,9 +78,9 @@ double Polar::DirectionApparentWind(double VA, double VB, double W, double VW)
   double cosA = (VA*VA + VB*VB - VW*VW) / (2*VA*VB);
   if(cosA > 1) cosA = 1; else if(cosA < -1) cosA = -1; /* slight arithmatic errors */
   double ac = acos(cosA);
-  while(W > M_PI) W-=2*M_PI;
-  while(W < -M_PI) W+=2*M_PI;
-  return W > 0 ? ac : -ac;
+  while(W > 180)  W-=360;
+  while(W < -180) W+=360;
+  return rad2deg(W > 0 ? ac : -ac);
 }
 
 double Polar::DirectionApparentWind(double VB, double W, double VW)
@@ -95,20 +95,29 @@ double Polar::DirectionApparentWind(double VB, double W, double VW)
 
      2                        2    2
    VW + 2 VW VB cos(W) + VB - VA  = 0
-
-   a = 1
-   b = 2 * VB * cos(W)
-   c = VB^2 - VA^2
 */
+
 double Polar::VelocityTrueWind(double VA, double VB, double W)
 {
-    double a = 1, b = 2 * VB * cos(W), c = VB*VB - VA*VA;
+    double a = 1, b = 2 * VB * cos(deg2rad(W)), c = VB*VB - VA*VA;
     double det = b*b - 4*a*c;
 
-    if(-b - sqrt(det) > 0)
+    if(-b - sqrt(det) > 0) // sometimes there are 2 possible true winds
         printf("ambiguous true wind.\n");
 
     return (-b + sqrt(det)) / (2 * a);
+}
+
+/*
+            Law of cosines;
+           ________________________
+          /  2    2
+   VW =  / VA + VB - 2 VA VB cos(A)
+       \/
+*/
+double Polar::VelocityTrueWind2(double VA, double VB, double A)
+{
+    return sqrt(VA*VA + VB*VB - 2*VA*VB*cos(deg2rad(A)));
 }
 
 Polar::Polar()
@@ -220,6 +229,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
 
     zu_close(f);
 
+#if 0
     /* fill in port tack assuming symmetric */
     {
         int Win = degree_steps.size()-1;
@@ -234,6 +244,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
                 wind_speeds[VWi].speeds.push_back(wind_speeds[VWi].speeds[Win]);
         }
     }
+#endif
         
     UpdateDegreeStepLookup();
     
@@ -348,25 +359,25 @@ void Polar::ClosestVWi(double VW, int &VW1i, int &VW2i)
 }
 
 /* compute boat speed from true wind angle and true wind speed
-
-   Maybe this should use rectangular coordinate interpolation when the speed
-   is outside the VMG zone.
  */
 double Polar::Speed(double W, double VW)
 {
     if(VW < 0)
         return NAN;
 
+    if(!degree_steps.size())
+        return NAN;
+    
     W = positive_degrees(W);
-    unsigned int W1i = degree_step_index[(int)floor(W)], W2i;
-    double W1 = degree_steps[W1i], W2;
-    if(W1i == degree_steps.size()-1) {
-        W2i = 0;
-        W2 = 360 + degree_steps[0];
-    } else {
-        W2i = W1i+1;
-        W2 = degree_steps[W2i];
-    }
+
+    // assume symmetric
+    if(W > 180)
+        W = 360 - W;
+
+    unsigned int W1i = degree_step_index[(int)floor(W)];
+    unsigned int W2i = degree_steps.size() == 1 ? 0 : W1i+1;
+
+    double W1 = degree_steps[W1i], W2 = degree_steps[W2i];
 
     int VW1i, VW2i;
     ClosestVWi(VW, VW1i, VW2i);
@@ -401,8 +412,8 @@ double Polar::SpeedAtApparentWindDirection(double A, double VW, double *pW)
         double cVB = Speed(W, VW);
         VB -= (VB - cVB) * lp;
 
-        double VA = VelocityApparentWind(VB, deg2rad(W), VW);
-        double cA = rad2posdeg(DirectionApparentWind(VA, VB, deg2rad(W), VW));
+        double VA = VelocityApparentWind(VB, W, VW);
+        double cA = positive_degrees(DirectionApparentWind(VA, VB, W, VW));
 
         if(isnan(cA) || iters++ > 256) {
             if(pW) *pW = NAN;
@@ -428,7 +439,7 @@ double Polar::SpeedAtApparentWindSpeed(double W, double VA)
         double cVB = Speed(W, VW);
         VB -= (VB - cVB) * lp;
 
-        double cVA = VelocityApparentWind(VB, deg2rad(W), VW);
+        double cVA = VelocityApparentWind(VB, W, VW);
         if(isnan(cVA) || iters++ > 256)
             return NAN;
 
@@ -449,8 +460,8 @@ double Polar::SpeedAtApparentWind(double A, double VA, double *pW)
         double cVB = Speed(W, VW);
         VB -= (VB - cVB) * lp;
 
-        double cVA = VelocityApparentWind(VB, deg2rad(W), VW);
-        double cA = rad2posdeg(DirectionApparentWind(cVA, VB, deg2rad(W), VW));
+        double cVA = VelocityApparentWind(VB, W, VW);
+        double cA = positive_degrees(DirectionApparentWind(cVA, VB, W, VW));
 
         if(isnan(cVA) || isnan(cA) || iters++ > 256) {
             if(pW) *pW = NAN;
@@ -499,7 +510,7 @@ SailingVMG Polar::GetVMGApparentWind(double VA)
             }
 
             double VB = Speed(W, VW);
-            double cVA = VelocityApparentWind(VB, deg2rad(W), VW);            
+            double cVA = VelocityApparentWind(VB, W, VW);            
             if(fabsf(cVA - VA) < 2e-1) {
                 avmg.values[i] = W;
                 break;
@@ -517,12 +528,17 @@ SailingVMG Polar::GetVMGApparentWind(double VA)
    winds the polar inverts and boat speed is lower, we can specify the max VW to search */
 double Polar::TrueWindSpeed(double VB, double W, double maxVW)
 {
+    if(!degree_steps.size())
+        return NAN;
+
     W = positive_degrees(W);
-    unsigned int W1i = degree_step_index[(int)floor(W)], W2i;
-    if(W1i == degree_steps.size()-1)
-        W2i = 0;
-    else
-        W2i = W1i++;
+    // assume symmetric
+    if(W > 180)
+        W = 360 - W;
+
+    unsigned int W1i = degree_step_index[(int)floor(W)];
+    unsigned int W2i = degree_steps.size() == 1 ? 0 : W1i+1;
+
     double W1 = degree_steps[W1i], W2 = degree_steps[W2i];
 
     double VB1min = INFINITY, VW1min = NAN, VB1max = 0, VW1max = NAN;
@@ -552,13 +568,15 @@ double Polar::TrueWindSpeed(double VB, double W, double maxVW)
 
 void Polar::UpdateDegreeStepLookup()
 {
+    unsigned int Wi = 0;
     for(int d = 0; d < DEGREES; d++) {
-        unsigned int Wi;
-        for(Wi = 0; Wi < degree_steps.size(); Wi++)
-            if(d < degree_steps[Wi])
+        while(Wi < degree_steps.size()-1) {
+            if(d < degree_steps[Wi+1])
                 break;
+            Wi++;
+        }
 
-        degree_step_index[d] = Wi - 1;
+        degree_step_index[d] = Wi;
     }
 }
 
@@ -566,6 +584,79 @@ void Polar::UpdateDegreeStepLookup()
 bool Polar::InsideCrossOverContour(float H, float VW)
 {
     return CrossOverRegion.Contains(fabs(H), VW);
+}
+
+float SailboatTransformSpeed(double W, double VW, double eta)
+{
+    /* starting out not moving */
+    double VB = 0, A = W, VA = VW;
+    double lp = .1;
+
+    const int count = 128;
+    double bucket = 0;
+    int bcount = 0;
+
+    for(;;) {
+        double v = sin(deg2rad(A/2)) * sqrt(VA / eta);
+
+        if(v == 0) // we cannot sail this way
+            return 0;
+
+        double a = v - VB;
+
+        if(bcount == count) {
+            VB = bucket / count;
+            a = 0;
+        }
+
+        if(fabs(a) < 1e-2 || lp < 1e-2) {
+            if(VB < 0) // not allowing backwards sailing
+                VB = 0;
+            return VB; /* reached steady state */
+        }
+
+        if(a < 0) {
+            bucket += VB;
+            bcount++;
+//            lp *= .97;
+        }
+
+        VB = (1-lp)*VB + lp*(VB+a); /* lowpass to get a smooth update */
+        VA = Polar::VelocityApparentWind(VB, W, VW);
+        A =  Polar::DirectionApparentWind(VA, VB, W, VW);
+    }
+}
+
+float BoatSpeedFromMeasurements(const std::list<PolarMeasurement> &measurements,
+                                double W, double VW)
+{
+    double bestVW = INFINITY, besteta = 1;
+    for(std::list<PolarMeasurement>::const_iterator it = measurements.begin();
+        it != measurements.end(); it++) {
+        // eta = VA/VB^2*(1-cos(A))/2
+        
+        double mVA = it->VA, mA = it->A, mVB = it->VB;
+        double mVW = sqrt(mVA*mVA + mVB*mVB - 2*mVA*mVB*cos(deg2rad(mA)));
+
+        if(fabs(VW-mVW) < fabs(VW-bestVW)) {
+            besteta = mVA*(1-cos(deg2rad(mA)))/(2*mVB*mVB);
+            bestVW = mVW;
+        }
+    }
+
+    return SailboatTransformSpeed(W, VW, besteta);
+}
+    
+void Polar::Generate(const std::list<PolarMeasurement> &measurements)
+{
+    for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
+        double W = degree_steps[Wi];
+        for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++) {
+            double VW = wind_speeds[VWi].VW;
+            wind_speeds[VWi].speeds[Wi] = BoatSpeedFromMeasurements(measurements,
+                                                                    W, VW);
+        }
+    }
 }
 
 void Polar::CalculateVMG(int VWi)
@@ -616,4 +707,44 @@ void Polar::CalculateVMG(int VWi)
 
         ws.VMG.values[i] = maxW;
     }
+}
+
+void Polar::AddDegreeStep(double twa)
+{
+    unsigned int Wi;
+    for(Wi = 0; Wi < degree_steps.size(); Wi++)
+        if(twa < degree_steps[Wi])
+            break;
+
+    degree_steps.insert(degree_steps.begin()+Wi, twa);
+    for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
+        wind_speeds[VWi].speeds.insert(wind_speeds[VWi].speeds.begin()+Wi, 0);
+
+    UpdateDegreeStepLookup();
+}
+
+void Polar::RemoveDegreeStep(int index)
+{
+    degree_steps.erase(degree_steps.begin()+index);
+    for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
+        wind_speeds[VWi].speeds.erase(wind_speeds[VWi].speeds.begin()+index);
+
+    UpdateDegreeStepLookup();
+}
+
+void Polar::AddWindSpeed(double tws)
+{
+    unsigned int VWi;
+    for(VWi = 0; VWi<wind_speeds.size(); VWi++)
+        if(tws < wind_speeds[VWi].VW)
+            break;
+
+    wind_speeds.insert(wind_speeds.begin()+VWi, SailingWindSpeed(tws));
+    for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++)
+        wind_speeds[VWi].speeds.push_back(0);
+}
+
+void Polar::RemoveWindSpeed(int index)
+{
+    wind_speeds.erase(wind_speeds.begin()+index);
 }

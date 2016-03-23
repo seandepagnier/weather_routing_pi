@@ -229,7 +229,7 @@ DF(t) = DC VB(t)
 
         int(BF, 0..t) - DC int(VB, 0..t) = VB(t)
 
-F(t) = BF(A(t), VA(t)) - DF(t)
+pF(t) = BF(A(t), VA(t)) - DF(t)
 F(t) = BF(A(t), VA(t)) - DC VB(t)
 
                       /                 /
@@ -593,3 +593,25 @@ void Boat::RecomputeDrag()
         if(wake_drag < 0) wake_drag = 0; else if(wake_drag > 1) wake_drag = 1;
     }
 }
+
+/*
+          
+
+           2          2
+     VA sin (A/2) = VB eta
+
+eta = VA*sin^2 (A/2)/VB^2
+
+
+        2        1 - cos(A)
+     sin (A/2) = ----------
+                     2
+
+eta = VA/VB^2*(1-cos(A))/2
+
+                 __
+           A    /VA
+VB =  sin (-)  /---
+           2 \/ eta
+
+*/

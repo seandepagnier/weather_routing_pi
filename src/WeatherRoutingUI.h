@@ -67,8 +67,8 @@ class WeatherRoutingBase : public wxFrame
 		wxListCtrl* m_lWeatherRoutes;
 		wxButton* m_bCompute;
 		wxButton* m_bExport;
-		wxMenuBar* m_menubar3;
 		wxMenu* m_mFile;
+		wxMenuBar* m_menubar3;
 		wxMenu* m_mPosition;
 		wxMenu* m_mConfiguration;
 		wxMenuItem* m_mBatch;
@@ -115,6 +115,7 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnReport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPlot( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCursorPosition( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnManual( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAbout( wxCommandEvent& event ) { event.Skip(); }
@@ -132,6 +133,11 @@ class WeatherRoutingBase : public wxFrame
 		{
 			m_splitter1->SetSashPosition( 120 );
 			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( WeatherRoutingBase::m_splitter1OnIdle ), NULL, this );
+		}
+		
+		void WeatherRoutingBaseOnContextMenu( wxMouseEvent &event )
+		{
+			this->PopupMenu( m_mFile, event.GetPosition() );
 		}
 	
 };
@@ -358,7 +364,6 @@ class BoatDialogBase : public wxDialog
 		wxScrolledWindow* m_PlotWindow;
 		wxPanel* m_panel10;
 		wxScrolledWindow* m_CrossOverChart;
-		wxButton* m_bGenerate;
 		wxPanel* m_panel24;
 		wxStaticText* m_staticText125;
 		wxStaticText* m_stBestCourseUpWindPortTack;
@@ -380,14 +385,15 @@ class BoatDialogBase : public wxDialog
 		wxButton* m_bEditPolar;
 		wxButton* m_bAddPolar;
 		wxButton* m_bRemovePolar;
-		wxButton* m_bSave;
+		wxButton* m_bSaveBoat;
+		wxButton* m_bSaveAsBoat;
+		wxButton* m_bDiscard;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMouseEventsPolarPlot( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnPaintCrossOverChart( wxPaintEvent& event ) { event.Skip(); }
-		virtual void OnGenerateCrossOverChart( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOrientation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarSelected( wxListEvent& event ) { event.Skip(); }
@@ -396,7 +402,9 @@ class BoatDialogBase : public wxDialog
 		virtual void OnEditPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAddPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnRemovePolar( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSaveAsBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
@@ -504,6 +512,8 @@ class AboutDialogBase : public wxDialog
 	private:
 	
 	protected:
+		wxStaticText* m_staticText135;
+		wxStaticText* m_stVersion;
 		wxStaticText* m_staticText110;
 		wxButton* m_bAboutAuthor;
 		wxButton* m_bClose;
@@ -713,6 +723,88 @@ class NewPositionDialog : public wxDialog
 		
 		NewPositionDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("New Weather Routing Position"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~NewPositionDialog();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class CursorPositionDialog
+///////////////////////////////////////////////////////////////////////////////
+class CursorPositionDialog : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText128;
+		wxStaticText* m_staticText124;
+		wxStaticText* m_staticText130;
+		wxStaticText* m_staticText126;
+		wxStaticText* m_staticText122;
+		wxStdDialogButtonSizer* m_sdbSizer5;
+		wxButton* m_sdbSizer5OK;
+	
+	public:
+		wxStaticText* m_stPosition;
+		wxStaticText* m_stPolar;
+		wxStaticText* m_stSailChanges;
+		wxStaticText* m_stTacks;
+		wxStaticText* m_stWeatherData;
+		
+		CursorPositionDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cursor Position"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~CursorPositionDialog();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class EditPolarDialogBase
+///////////////////////////////////////////////////////////////////////////////
+class EditPolarDialogBase : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxNotebook* m_notebook6;
+		wxPanel* m_panel19;
+		wxGrid* m_gPolar;
+		wxPanel* m_panel20;
+		wxTextCtrl* m_tTrueWindAngle;
+		wxListBox* m_lTrueWindAngles;
+		wxButton* m_bAddTrueWindAngle;
+		wxButton* m_bRemoveTrueWindAngle;
+		wxTextCtrl* m_tTrueWindSpeed;
+		wxListBox* m_lTrueWindSpeeds;
+		wxButton* m_bAddTrueWindSpeed;
+		wxButton* m_bRemoveTrueWindSpeed;
+		wxPanel* m_panel21;
+		wxRadioButton* m_radioBtn5;
+		wxRadioButton* m_radioBtn6;
+		wxStaticText* m_staticText133;
+		wxTextCtrl* m_tWindSpeed;
+		wxStaticText* m_staticText134;
+		wxTextCtrl* m_tWindDirection;
+		wxStaticText* m_staticText135;
+		wxTextCtrl* m_tBoatSpeed;
+		wxButton* m_button46;
+		wxListCtrl* m_lMeasurements;
+		wxButton* m_bRemoveMeasurement;
+		wxButton* m_bRemoveAllMeasurements;
+		wxButton* m_button48;
+		wxButton* m_button50;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnAddTrueWindAngle( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveTrueWindAngle( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddTrueWindSpeed( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveTrueWindSpeed( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAddMeasurement( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveMeasurement( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnRemoveAllMeasurements( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnGeneratePolar( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		
+		EditPolarDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Edit Polar"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		~EditPolarDialogBase();
 	
 };
 

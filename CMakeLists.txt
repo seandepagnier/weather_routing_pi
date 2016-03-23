@@ -44,6 +44,7 @@ SET(SRC_WEATHER_ROUTING
             src/ReportDialog.cpp
             src/FilterRoutesDialog.cpp
             src/ConfigurationBatchDialog.cpp
+            src/EditPolarDialog.cpp
             src/AboutDialog.cpp
             src/Polar.cpp
             src/Boat.cpp

@@ -28,7 +28,7 @@
 
 #include <wx/fileconf.h>
 
-#include "WeatherRoutingUI.h"
+#include "EditPolarDialog.h"
 
 class weather_routing_pi;
 
@@ -37,6 +37,8 @@ class BoatDialog : public BoatDialogBase
 public:
     BoatDialog(wxWindow *parent, wxString boatpath);
     ~BoatDialog();
+
+    EditPolarDialog m_EditPolarDialog;
 
     Boat m_Boat;
     wxString m_boatpath;
@@ -57,9 +59,9 @@ private:
     void OnUpdatePlot( wxCommandEvent& event ) { OnUpdatePlot(); }
     void OnUpdatePlot( wxSpinEvent& event ) { OnUpdatePlot(); }
     void OnOpen( wxCommandEvent& event );
-    void Save();
-    void OnSaveAs( wxCommandEvent& event );
-    void OnSave( wxCommandEvent& event ) { Save(); }
+    void SaveBoat();
+    void OnSaveAsBoat( wxCommandEvent& event );
+    void OnSaveBoat( wxCommandEvent& event ) { SaveBoat(); }
     void OnClose( wxCommandEvent& event );
     void LoadFile(bool switched = false);
     void OnSaveFile( wxCommandEvent& event );

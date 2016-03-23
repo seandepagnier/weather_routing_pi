@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -745,7 +745,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
 
         /* quick test first to avoid slower calculation */
         if(VB + VW > configuration.MaxApparentWindKnots &&
-           Polar::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
+           Polar::VelocityApparentWind(VB, H, VW) > configuration.MaxApparentWindKnots)
             continue;
 
         /* landfall test */
@@ -839,7 +839,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
 
     /* quick test first to avoid slower calculation */
     if(VB + VW > configuration.MaxApparentWindKnots &&
-       Polar::VelocityApparentWind(VB, deg2rad(H), VW) > configuration.MaxApparentWindKnots)
+       Polar::VelocityApparentWind(VB, H, VW) > configuration.MaxApparentWindKnots)
         return NAN;
 
     /* landfall test if we are within 60 miles (otherwise it's very slow) */

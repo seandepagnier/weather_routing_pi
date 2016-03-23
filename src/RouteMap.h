@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -48,7 +48,7 @@ class Position
 {
 public:
     Position(double latitude, double longitude, Position *p=NULL,
-             double pheading=NAN, double pbearing=NAN, int sp=0, int t=0, int dm=0);
+             double pheading=NAN, double pbearing=NAN, int sp=-1, int t=0, int dm=0);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();

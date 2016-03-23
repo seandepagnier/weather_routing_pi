@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -86,6 +86,7 @@ public:
     void Render(wrDC &dc, PlugIn_ViewPort &vp);
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
+    CursorPositionDialog m_CursorPositionDialog;
 
     void SetConfigurationRoute(WeatherRoute *weatherroute);
     void UpdateBoatFilename(wxString boatFileName);
@@ -110,6 +111,8 @@ public:
 
     void CursorRouteChanged();
     void UpdateColumns();
+
+    void UpdateCursorPositionDialog();
 
     SettingsDialog m_SettingsDialog;
 
@@ -150,6 +153,7 @@ private:
     void OnStatistics( wxCommandEvent& event );
     void OnReport( wxCommandEvent& event );
     void OnPlot( wxCommandEvent& event );
+    void OnCursorPosition( wxCommandEvent& event );
     void OnManual( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );

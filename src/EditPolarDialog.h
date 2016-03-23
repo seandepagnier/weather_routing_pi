@@ -19,30 +19,43 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
+ *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.             *
  ***************************************************************************
- *
  */
 
-#include <wx/wx.h>
+#ifndef _EDITPOLAR_DIALOG_H_
+#define _EDITPOLAR_DIALOG_H_
 
-#include <stdlib.h>
-#include <math.h>
-#include <time.h>
+#include "WeatherRoutingUI.h"
 
-#include "AboutDialog.h"
-#include "weather_routing_pi.h"
+class BoatDialog;
 
-#include "Utilities.h"
-
-AboutDialog::AboutDialog( wxWindow *parent )
-    : AboutDialogBase(parent)
+class Polar;
+class EditPolarDialog : public EditPolarDialogBase
 {
-    m_stVersion->SetLabel(wxString::Format(_T("%d.%d"),
-                                           PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR));
-}
+public:
+    EditPolarDialog(wxWindow *parent);
 
-void AboutDialog::OnAboutAuthor( wxCommandEvent& event )
-{
-    wxLaunchDefaultBrowser(_T(ABOUT_AUTHOR_URL));
-}
+    void SetPolarIndex(int i);
+
+private:
+    void OnPolarGridChange( wxGridEvent& event );
+    void OnAddTrueWindAngle( wxCommandEvent& event );
+    void OnRemoveTrueWindAngle( wxCommandEvent& event );
+    void OnAddTrueWindSpeed( wxCommandEvent& event );
+    void OnRemoveTrueWindSpeed( wxCommandEvent& event );
+    void OnAddMeasurement( wxCommandEvent& event );
+    void OnRemoveMeasurement( wxCommandEvent& event );
+    void OnRemoveAllMeasurements( wxCommandEvent& event );
+    void OnGeneratePolar( wxCommandEvent& event );
+                        
+    void RebuildTrueWindAngles();
+    void RebuildTrueWindSpeeds();
+    void RebuildGrid();
+    Polar *GetPolar();
+
+    int polarindex;
+    BoatDialog *m_BoatDialog;
+};
+
+#endif

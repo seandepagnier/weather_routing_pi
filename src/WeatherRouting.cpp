@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -103,9 +103,9 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_ConfigurationDialog(*this),
-      m_ConfigurationBatchDialog(this), m_SettingsDialog(this),
-      m_StatisticsDialog(this), m_ReportDialog(*this), m_PlotDialog(*this),
-      m_FilterRoutesDialog(this),
+      m_ConfigurationBatchDialog(this), m_CursorPositionDialog(this),
+      m_SettingsDialog(this), m_StatisticsDialog(this), m_ReportDialog(*this),
+      m_PlotDialog(*this), m_FilterRoutesDialog(this),
       m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItems(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
       m_bShowSettings(false), m_bShowStatistics(false),
@@ -325,6 +325,80 @@ void WeatherRouting::UpdateColumns()
     }
 
     OnWeatherRouteSelected(); // update utc/local switch if configuration dialog is visible
+}
+
+static void CursorPositionDialogMessage(CursorPositionDialog &dlg, wxString msg)
+{
+    dlg.m_stPosition->SetLabel(msg);
+    dlg.m_stPolar->SetLabel(_T(""));
+    dlg.m_stSailChanges->SetLabel(_T(""));
+    dlg.m_stTacks->SetLabel(_T(""));
+    dlg.m_stWeatherData->SetLabel(_T(""));
+    dlg.Fit();
+}
+
+void WeatherRouting::UpdateCursorPositionDialog()
+{
+    CursorPositionDialog &dlg = m_CursorPositionDialog;
+    if(!dlg.IsShown())
+        return;
+
+    std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
+    if(currentroutemaps.size() != 1) {
+        CursorPositionDialogMessage(dlg, _("Select exactly 1 configuration"));
+        return;
+    }
+
+    RouteMapOverlay *rmo = currentroutemaps.front();
+    Position *p = rmo->GetLastCursorPosition();
+    if(!p) {
+        CursorPositionDialogMessage(dlg, _("Cursor outside computed route map"));
+        return;
+    }
+
+    wxString pos = wxString::Format(_T("%4.2f%c %4.2f%c"),
+                                    fabs(p->lat), p->lat < 0 ? 'S' : 'N',
+                                    fabs(p->lon), p->lon < 0 ? 'W' : 'E');
+    dlg.m_stPosition->SetLabel(pos);
+
+    RouteMapConfiguration configuration = rmo->GetConfiguration();
+    wxFileName fn = configuration.boat.Polars[p->polar].FileName;
+    dlg.m_stPolar->SetLabel(fn.GetFullName());
+
+    int sailchanges = 0;
+    int lpolar = p->polar;
+    for(Position *q = p->parent; q; q=q->parent)
+        if(lpolar != q->polar) {
+            sailchanges++;
+            lpolar = q->polar;
+        }
+
+    dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), sailchanges));
+
+    dlg.m_stTacks->SetLabel(wxString::Format(_T("%d"), p->tacks));
+
+    wxString weatherdata;
+    wxString grib = _("Grib") + _T(" ");
+    wxString climatology = _("Climatology") + _T(" ");
+    wxString data_deficient = _("Data Deficient") + _T(" ");
+    wxString wind = _("Wind") + _T(" ");
+    wxString current = _("Current") + _T(" ");
+    
+    if(p->data_mask & Position::GRIB_WIND)
+        weatherdata += grib + wind;
+    if(p->data_mask & Position::CLIMATOLOGY_WIND)
+        weatherdata += climatology + wind;
+    if(p->data_mask & Position::DATA_DEFICIENT_WIND)
+        weatherdata += data_deficient + wind;
+    if(p->data_mask & Position::GRIB_CURRENT)
+        weatherdata += grib + current;
+    if(p->data_mask & Position::CLIMATOLOGY_CURRENT)
+        weatherdata += climatology + current;
+    if(p->data_mask & Position::DATA_DEFICIENT_CURRENT)
+        weatherdata += data_deficient + current;
+
+    dlg.m_stWeatherData->SetLabel(weatherdata);
+    dlg.Fit();
 }
 
 void WeatherRouting::OnNewPosition( wxCommandEvent& event )
@@ -895,6 +969,12 @@ void WeatherRouting::OnPlot ( wxCommandEvent& event )
 {
     m_PlotDialog.SetRouteMapOverlay(FirstCurrentRouteMap());
     m_PlotDialog.Show();
+}
+
+void WeatherRouting::OnCursorPosition( wxCommandEvent& event )
+{
+    m_CursorPositionDialog.Show(!m_CursorPositionDialog.IsShown());
+    UpdateCursorPositionDialog();
 }
 
 void WeatherRouting::OnManual ( wxCommandEvent& event )

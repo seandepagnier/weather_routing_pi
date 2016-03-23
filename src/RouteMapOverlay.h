@@ -88,6 +88,8 @@ public:
     bool Start(wxString &error);
     void DeleteThread(); // like Stop(), but waits until the thread is deleted
 
+    Position *GetLastCursorPosition() { return last_cursor_position; }
+    
     bool m_UpdateOverlay;
     bool m_bEndRouteVisible;
 

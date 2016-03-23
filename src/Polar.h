@@ -32,6 +32,13 @@ struct SailingVMG
     float values[4];
 };
 
+struct PolarMeasurement
+{
+    PolarMeasurement(double va, double a, double vb)
+    : VA(va), A(a), VB(vb) {}
+    double VA, A, VB;
+};
+
 class Boat;
 
 #define DEGREES 360
@@ -43,6 +50,7 @@ public:
     static double DirectionApparentWind(double VA, double VB, double W, double VW);
     static double DirectionApparentWind(double VB, double W, double VW);
     static double VelocityTrueWind(double VA, double VB, double W);
+    static double VelocityTrueWind2(double VA, double VB, double A);
 
     Polar();
 
@@ -67,8 +75,17 @@ public:
 
     bool InsideCrossOverContour(float H, float VW);
     PolygonRegion CrossOverRegion;
+
+    void Generate(const std::list<PolarMeasurement> &measurements);
+    void AddDegreeStep(double twa);
+    void RemoveDegreeStep(int index);
+    void AddWindSpeed(double tws);
+    void RemoveWindSpeed(int index);
     
 private:
+    friend class EditPolarDialog;
+    friend class BoatDialog;
+
     void CalculateVMG(int speed);
 
     double AngleofAttackBoat(double A, double VA);
