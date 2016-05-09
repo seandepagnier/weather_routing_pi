@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 07:49-0500\n"
-"PO-Revision-Date: 2016-02-26 09:18-0500\n"
+"PO-Revision-Date: 2016-04-28 02:08-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -530,7 +530,7 @@ msgid "Weather Routing features include:\n"
 "  automatic boat polar computation\n"
 msgstr "De Weerroutering PlugIn heeft de volgende functies: \n"
 "  - berekenen van optimale vaarroute met verschillende beperkingen en gebaseerd op weergegevens\n"
-"  - automatisch berekenen van polairdiagram voor vaartuig.\n"
+"  - automatisch berekenen van polairdiagram voor zeilschip.\n"
 
 #: src/weather_routing_pi.cpp:208
 msgid "Grib plugin version not supported."
@@ -766,7 +766,7 @@ msgstr "&Exporteren"
 
 #: src/WeatherRoutingUI.cpp:97
 msgid "&Open"
-msgstr "&Open"
+msgstr "&Openen"
 
 #: src/WeatherRoutingUI.cpp:101
 msgid "&Save"
@@ -874,7 +874,7 @@ msgstr "&Informatie"
 
 #: src/WeatherRoutingUI.cpp:207
 msgid "&Manual"
-msgstr "&Handmatig"
+msgstr "&Handleiding"
 
 #: src/WeatherRoutingUI.cpp:211
 msgid "&About"
@@ -1150,7 +1150,7 @@ msgstr "Gegevensbron"
 
 #: src/WeatherRoutingUI.cpp:970
 msgid "Disable"
-msgstr "Deactiveren"
+msgstr "Uitschakelen"
 
 #: src/WeatherRoutingUI.cpp:970
 msgid "Currents Only"
@@ -1661,7 +1661,7 @@ msgstr "Routes"
 
 #: src/WeatherRoutingUI.cpp:2652
 msgid "InvRoutes"
-msgstr "InvRoutes"
+msgstr "Omgekeerde routes"
 
 #: src/WeatherRoutingUI.cpp:2660
 msgid "Skip Positions"
@@ -1785,11 +1785,11 @@ msgstr "Genereren"
 
 #: src/WeatherRoutingUI.cpp:3241
 msgid "name"
-msgstr "naam"
+msgstr "Naam"
 
 #: src/WeatherRoutingUI.cpp:3256
 msgid "latitude"
-msgstr "breedte"
+msgstr "Breedte"
 
 #: src/WeatherRoutingUI.cpp:3270 src/WeatherRoutingUI.cpp:3288
 msgid "minutes"
@@ -1797,7 +1797,7 @@ msgstr "minuten"
 
 #: src/WeatherRoutingUI.cpp:3274
 msgid "longitude"
-msgstr "lengte"
+msgstr "Lengte"
 
 #: src/WeatherRoutingUI.h:180
 msgid "Weather Routing Settings"

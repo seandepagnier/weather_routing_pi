@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 07:49-0500\n"
-"PO-Revision-Date: 2016-02-18 16:09-0500\n"
+"PO-Revision-Date: 2016-04-28 02:10-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -18,7 +18,7 @@ msgstr ""
 
 #: src/Boat.cpp:56
 msgid "Boat file does not exist."
-msgstr ""
+msgstr "Båtens fil finns inte."
 
 #: src/Boat.cpp:60
 msgid "Failed to load file: "
@@ -43,7 +43,7 @@ msgstr "ETA"
 #: src/BoatDialog.cpp:66 src/BoatDialog.cpp:568 src/BoatDialog.cpp:589
 #: src/BoatDialog.cpp:660 src/BoatDialog.cpp:696
 msgid "OpenCPN Weather Routing Plugin"
-msgstr ""
+msgstr "OpenCPN Modul för väder och ruttplanering"
 
 #: src/BoatDialog.cpp:86 src/BoatDialog.cpp:87 src/BoatDialog.cpp:88
 #: src/BoatDialog.cpp:89 src/BoatDialog.cpp:90 src/BoatDialog.cpp:91
@@ -54,7 +54,7 @@ msgstr "Saknas"
 
 #: src/BoatDialog.cpp:554 src/BoatDialog.cpp:641
 msgid "Select Boat"
-msgstr ""
+msgstr "Välj båt"
 
 #: src/BoatDialog.cpp:603
 msgid "Select Polar File"
