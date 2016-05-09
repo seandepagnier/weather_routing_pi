@@ -195,6 +195,9 @@ WeatherRouting::~WeatherRouting( )
 
 void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
 {
+    if (vp.bValid == false)
+        return;
+
     if(!dc.GetDC()) {
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_HINT_BIT ); //Save state
         glEnable( GL_LINE_SMOOTH );
