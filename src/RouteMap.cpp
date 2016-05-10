@@ -177,9 +177,9 @@ static inline bool Current(RouteMapConfiguration &configuration,
    The wind data is calculated from the ground not the sea,
    it is then converted to speed over water which the boat can feel.
 
-   C   - Sea Current Direction over ground
+   C   - Sea Current Direction over ground (from C)
    VC  - Velocity of Current
-   WG  - Wind direction over ground
+   WG  - Wind direction over ground (from WG)
    VWG - Velocity of wind over ground
    WA  - Angle of wind relative to true north
    VW - velocity of wind over water
@@ -200,7 +200,7 @@ static void OverWater(double WG, double VWG, double C, double VC, double &WA, do
 
 /* provisions to compute boat movement over ground
 
-   BG  - boat direction over ground
+   BG  - boat direction over ground (head to BG)
    BGV - boat speed over ground (gps velocity)  */
 static void OverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
 {
@@ -481,15 +481,6 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
     }
     VWG *= configuration.WindStrength;
 
-
-
-
-
-
-
-
-
-
     OverWater(WG, VWG, C, VC, W, VW);
     return true;
 }
@@ -511,6 +502,7 @@ void Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &con
         data.VBG = 0;
     else
         data.VBG *= 3600 / dt;
+    // speed vector is bearing but OverWater use from, subtract curent vector
     OverWater(data.BG, data.VBG, data.C, -data.VC, data.B, data.VB);
 }
 
