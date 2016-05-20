@@ -635,6 +635,7 @@ void WeatherRouting::UpdateComputeState()
 
 void WeatherRouting::OnCompute( wxCommandEvent& event )
 {
+    GetODVersion();
     std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++)
@@ -644,6 +645,7 @@ void WeatherRouting::OnCompute( wxCommandEvent& event )
 
 void WeatherRouting::OnComputeAll ( wxCommandEvent& event )
 {
+    GetODVersion();
     StartAll();
     UpdateComputeState();
 }
@@ -1878,3 +1880,17 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
 
     return configuration;
 }
+
+void WeatherRouting::GetODVersion( void )
+{
+    wxJSONValue jMsg;
+    wxJSONWriter writer;
+    wxString    MsgString;
+    jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
+    jMsg[wxT("Type")] = wxT("Request");
+    jMsg[wxT("Msg")] = wxS("Version");
+    jMsg[wxT("MsgId")] = wxS("version");
+    writer.Write( jMsg, MsgString );
+    SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+}
+

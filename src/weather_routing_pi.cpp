@@ -36,6 +36,10 @@
 
 wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
 wxString    g_ReceivedBoundaryEnterMessage;
+wxJSONValue g_ReceivedBoundaryCrossJSONMsg;
+wxString    g_ReceivedBoundaryCrossMessage;
+wxJSONValue g_ReceivedODVersionJSONMsg;
+wxString    g_ReceivedODVersionMessage;
 
 
 extern "C" DECL_EXP opencpn_plugin* create_pi(void *ppimgr)
@@ -331,6 +335,16 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
                         g_ReceivedBoundaryEnterJSONMsg = root;
                         g_ReceivedBoundaryEnterMessage = message_body;
                     } 
+                } else if(root[wxS("Msg")].AsString() == wxS("FindClosestBoundaryLineCrossing") ) {
+                    if(root[wxS("MsgId")].AsString() == wxS("enter")) {
+                        g_ReceivedBoundaryCrossJSONMsg = root;
+                        g_ReceivedBoundaryCrossMessage = message_body;
+                    } 
+                } else if(root[wxS("Msg")].AsString() == wxS("Version") ) {
+                    if(root[wxS("MsgId")].AsString() == wxS("version")) {
+                        g_ReceivedODVersionJSONMsg = root;
+                        g_ReceivedODVersionMessage = message_body;
+                    }
                 }
             }
         }

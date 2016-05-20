@@ -179,6 +179,8 @@ private:
     void DeleteRouteMaps(std::list<RouteMapOverlay *>routemapoverlays);
     RouteMapConfiguration DefaultConfiguration();
 
+    void GetODVersion( void );
+
     StatisticsDialog m_StatisticsDialog;
     ReportDialog m_ReportDialog;
     PlotDialog m_PlotDialog;
