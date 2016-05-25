@@ -251,6 +251,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxNotebook* m_notebook41;
 		wxPanel* m_panel18;
 		wxCheckBox* m_cbDetectLand;
+		wxCheckBox* m_cbDetectBoundary;
 		wxStaticText* m_staticText1292;
 		wxSpinCtrl* m_sWindStrength;
 		wxStaticText* m_staticText1301;

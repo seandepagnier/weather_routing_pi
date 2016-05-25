@@ -63,7 +63,7 @@ public:
     void OptimizeTackingSpeed();
     void ClosestVWi(double VW, int &VW1i, int &VW2i);
 
-    double Speed(double W, double VW);
+    double Speed(double W, double VW, bool bound=false);
     double SpeedAtApparentWindDirection(double A, double VW, double *pW=0);
     double SpeedAtApparentWindSpeed(double W, double VA);
     double SpeedAtApparentWind(double A, double VA, double *pW=0);

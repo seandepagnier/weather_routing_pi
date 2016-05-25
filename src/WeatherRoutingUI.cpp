@@ -849,6 +849,9 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cbCurrents->SetValue(true); 
 	fgSizer23->Add( m_cbCurrents, 0, wxALL, 5 );
 	
+	m_cbDetectBoundary = new wxCheckBox( m_panel18, wxID_ANY, _("Detect Boundary"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer23->Add( m_cbDetectBoundary, 0, wxALL, 5 );
+	
 	
 	fgSizer117->Add( fgSizer23, 1, wxEXPAND, 5 );
 	
@@ -3095,7 +3098,7 @@ EditPolarDialogBase::EditPolarDialogBase( wxWindow* parent, wxWindowID id, const
 	m_panel19->SetSizer( fgSizer93 );
 	m_panel19->Layout();
 	fgSizer93->Fit( m_panel19 );
-	m_notebook6->AddPage( m_panel19, _("Grid"), false );
+	m_notebook6->AddPage( m_panel19, _("Grid"), true );
 	m_panel20 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer98;
 	fgSizer98 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -3201,7 +3204,7 @@ EditPolarDialogBase::EditPolarDialogBase( wxWindow* parent, wxWindowID id, const
 	m_panel20->SetSizer( fgSizer98 );
 	m_panel20->Layout();
 	fgSizer98->Fit( m_panel20 );
-	m_notebook6->AddPage( m_panel20, _("Dimensions"), true );
+	m_notebook6->AddPage( m_panel20, _("Dimensions"), false );
 	m_panel21 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer102;
 	fgSizer102 = new wxFlexGridSizer( 0, 1, 0, 0 );

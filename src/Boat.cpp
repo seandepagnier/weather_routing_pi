@@ -149,7 +149,7 @@ wxString Boat::SaveXML(wxString filename)
 int Boat::TrySwitchPolar(int curpolar, double VW, double H, double Swell)
 {
     // are we still valid?
-    if(Polars[curpolar].InsideCrossOverContour(H, VW))
+    if(curpolar != -1 && Polars[curpolar].InsideCrossOverContour(H, VW))
         return curpolar;
 
     // the current polar must change; select the first polar we can use
@@ -186,11 +186,11 @@ bool Boat::FastestPolar(int p, float H, float VW)
     if(VW == 0 || VW == maxVW)
         return false;
 
-    double speed = Polars[p].Speed(H, VW)*(1+Polars[p].m_crossoverpercentage);
+    double speed = Polars[p].Speed(H, VW, true)*(1+Polars[p].m_crossoverpercentage);
     for(int i=0; i<(int)Polars.size(); i++) {
         if(i==p)
             continue;
-        if(Polars[i].Speed(H, VW) > speed)
+        if(Polars[i].Speed(H, VW, true) > speed)
             return false;
     }
 

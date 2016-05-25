@@ -184,6 +184,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_SPIN(CycloneDays);
 
     SET_CHECKBOX(DetectLand);
+    SET_CHECKBOX(DetectBoundary);
     SET_CHECKBOX(Currents);
     SET_CHECKBOX(InvertedRegions);
     SET_CHECKBOX(Anchoring);
@@ -308,6 +309,7 @@ void ConfigurationDialog::Update()
         GET_SPIN(CycloneDays);
 
         GET_CHECKBOX(DetectLand);
+        GET_CHECKBOX(DetectBoundary);
         GET_CHECKBOX(Currents);
         GET_CHECKBOX(InvertedRegions);
         GET_CHECKBOX(Anchoring);

@@ -34,6 +34,10 @@
 #include "WeatherRouting.h"
 #include "weather_routing_pi.h"
 
+wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
+wxString    g_ReceivedBoundaryEnterMessage;
+
+
 extern "C" DECL_EXP opencpn_plugin* create_pi(void *ppimgr)
 {
     return new weather_routing_pi(ppimgr);
@@ -199,7 +203,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             shown_warnings = true;
 
             int grib_version = v[_T("GribVersionMajor")].AsInt() * 1000 + v[_T("GribVersionMinor")].AsInt();
-            if(grib_version < 2003 || grib_version > 3000) {
+            if(grib_version < 4001 || grib_version > 4001) {
                 wxMessageDialog mdlg(m_parent_window,
                                      _("Grib plugin version not supported."),
                                      _("Weather Routing"), wxOK | wxICON_WARNING);
@@ -269,7 +273,68 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             m_pWeather_Routing->m_ConfigurationDialog.m_pCyclones->Enable
                 (RouteMap::ClimatologyCycloneTrackCrossings!=NULL);
         }
-     }
+    }
+    if(message_id == wxS("WEATHER_ROUTING_PI")) {
+        // construct the JSON root object
+        wxJSONValue  root;
+        // construct a JSON parser
+        wxJSONReader reader;
+        wxString    sLogMessage;
+        bool        bFail = false;
+        // now read the JSON text and store it in the 'root' structure
+        // check for errors before retreiving values...
+        int numErrors = reader.Parse( message_body, &root );
+        if ( numErrors > 0 )  {
+            const wxArrayString& errors = reader.GetErrors();
+            for(int i = 0; i < (int)errors.GetCount(); i++)
+            {
+                if(i == 0) {
+                    sLogMessage.clear();
+                    sLogMessage.Append(wxT("weather_routing_pi: Error parsing JSON message - "));
+                    sLogMessage.Append( message_id );
+                    sLogMessage.Append(wxT(", error text: "));
+                } else sLogMessage.Append(wxT("\n"));
+                sLogMessage.append( errors.Item( i ) );
+                wxLogMessage( sLogMessage );
+            }
+            return;
+        }
+        
+        if(!root.HasMember( wxS("Source"))) {
+            // Originator
+            wxLogMessage( wxS("No Source found in message") );
+            bFail = true;
+        }
+        
+        if(!root.HasMember( wxS("Msg"))) {
+            // Message identifier
+            wxLogMessage( wxS("No Msg found in message") );
+            bFail = true;
+        }
+        
+        if(!root.HasMember( wxS("Type"))) {
+            // Message type, orig or resp
+            wxLogMessage( wxS("No Type found in message") );
+            bFail = true;
+        }
+        
+        if(!root.HasMember( wxS("MsgId"))) {
+            // Unique (?) Msg number/identifier
+            wxLogMessage( wxS("No MsgNo found in message") );
+            bFail = true;
+        }
+        
+        if(!bFail) {
+            if(root[wxS("Type")].AsString() == wxS("Response") && root[wxS("Source")].AsString() == wxS("OCPN_DRAW_PI")) {
+                if(root[wxS("Msg")].AsString() == wxS("FindPointInAnyBoundary") ) {
+                    if(root[wxS("MsgId")].AsString() == wxS("enter")) {
+                        g_ReceivedBoundaryEnterJSONMsg = root;
+                        g_ReceivedBoundaryEnterMessage = message_body;
+                    } 
+                }
+            }
+        }
+    }
 }
 
 void weather_routing_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
@@ -376,6 +441,7 @@ void weather_routing_pi::SetColorScheme(PI_ColorScheme cs)
 wxString weather_routing_pi::StandardPath()
 {
     wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
+    wxString s = wxFileName::GetPathSeparator();
 #ifdef __WXMSW__
     wxString stdPath  = std_path.GetConfigDir();
 #endif
@@ -383,12 +449,34 @@ wxString weather_routing_pi::StandardPath()
     wxString stdPath  = std_path.GetUserDataDir();
 #endif
 #ifdef __WXOSX__
-    wxString stdPath  = std_path.GetUserConfigDir();   // should be ~/Library/Preferences	
+    wxString stdPath  = (std_path.GetUserConfigDir() + s + _T("opencpn"));   // should be ~/Library/Preferences/opencpn
 #endif
 
     return stdPath + wxFileName::GetPathSeparator() +
         _T("plugins") + wxFileName::GetPathSeparator() +
         _T("weather_routing") +  wxFileName::GetPathSeparator();
+
+    stdPath += s + _T("plugins");
+    if (!wxDirExists(stdPath))
+      wxMkdir(stdPath);
+
+    stdPath += s + _T("weather_routing");
+
+#ifdef __WXOSX__
+    // Compatibility with pre-OCPN-4.2; move config dir to
+    // ~/Library/Preferences/opencpn if it exists
+    wxString oldPath = (std_path.GetUserConfigDir() + s + _T("plugins") + s + _T("weather_routing"));
+    if (wxDirExists(oldPath) && !wxDirExists(stdPath)) {
+		wxLogMessage("weather_routing_pi: moving config dir %s to %s", oldPath, stdPath);
+		wxRenameFile(oldPath, stdPath);
+    }
+#endif
+
+    if (!wxDirExists(stdPath))
+      wxMkdir(stdPath);
+
+    stdPath += s;
+    return stdPath;
 }
 
 void weather_routing_pi::ShowMenuItems(bool show)

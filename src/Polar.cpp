@@ -417,7 +417,7 @@ void Polar::ClosestVWi(double VW, int &VW1i, int &VW2i)
 
 /* compute boat speed from true wind angle and true wind speed
  */
-double Polar::Speed(double W, double VW)
+double Polar::Speed(double W, double VW, bool bound)
 {
     if(VW < 0)
         return NAN;
@@ -431,9 +431,12 @@ double Polar::Speed(double W, double VW)
     if(W > 180)
         W = 360 - W;
 
-    if(W < degree_steps[0] || W > degree_steps[degree_steps.size()-1] ||
-       VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW)
+    if(W < degree_steps[0] || W > degree_steps[degree_steps.size()-1])
         return NAN;
+
+    if(bound)
+        if(VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW)
+            return NAN;
 
     unsigned int W1i = degree_step_index[(int)floor(W)];
     unsigned int W2i = degree_steps.size() == 1 ? 0 : W1i+1;
