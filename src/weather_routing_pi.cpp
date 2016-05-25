@@ -203,7 +203,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             shown_warnings = true;
 
             int grib_version = v[_T("GribVersionMajor")].AsInt() * 1000 + v[_T("GribVersionMinor")].AsInt();
-            if(grib_version < 2003 || grib_version > 4100) {
+            if(grib_version < 4001 || grib_version > 4001) {
                 wxMessageDialog mdlg(m_parent_window,
                                      _("Grib plugin version not supported."),
                                      _("Weather Routing"), wxOK | wxICON_WARNING);
