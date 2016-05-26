@@ -150,6 +150,10 @@ static inline bool Current(RouteMapConfiguration &configuration,
        RouteMap::ClimatologyData &&
        RouteMap::ClimatologyData(CURRENT, configuration.time, lat, lon, C, VC)) {
         data_mask |= Position::CLIMATOLOGY_CURRENT;
+        // XXX climatology current is reverse
+        C += 180.;
+        if (C >= 360.)
+            C -= 360.;
         return true;
     }
 
@@ -173,9 +177,9 @@ static inline bool Current(RouteMapConfiguration &configuration,
    The wind data is calculated from the ground not the sea,
    it is then converted to speed over water which the boat can feel.
 
-   C   - Sea Current Direction over ground
+   C   - Sea Current Direction over ground (from C)
    VC  - Velocity of Current
-   WG  - Wind direction over ground
+   WG  - Wind direction over ground (from WG)
    VWG - Velocity of wind over ground
    WA  - Angle of wind relative to true north
    VW - velocity of wind over water
@@ -190,12 +194,13 @@ static void OverWater(double WG, double VWG, double C, double VC, double &WA, do
     double Cx = VC * cos(deg2rad(C)), Cy = VC * sin(deg2rad(C));
     double Wx = VWG * cos(deg2rad(WG)) - Cx, Wy = VWG * sin(deg2rad(WG)) - Cy;
     WA = rad2deg(atan2(Wy, Wx));
+    if (WA < 0.) WA += 360.0;
     VW = distance(Wx, Wy);
 }
 
 /* provisions to compute boat movement over ground
 
-   BG  - boat direction over ground
+   BG  - boat direction over ground (head to BG)
    BGV - boat speed over ground (gps velocity)  */
 static void OverGround(double B, double VB, double C, double VC, double &BG, double &VBG)
 {
@@ -205,8 +210,9 @@ static void OverGround(double B, double VB, double C, double VC, double &BG, dou
     }
 
     double Cx = VC * cos(deg2rad(C)), Cy = VC * sin(deg2rad(C));
-    double BGx = VB * cos(deg2rad(B)) + Cx, BGy = VB * sin(deg2rad(B)) + Cy;
+    double BGx = VB * cos(deg2rad(B)) - Cx, BGy = VB * sin(deg2rad(B)) - Cy;
     BG  = rad2deg(atan2(BGy, BGx));
+    if (BG < 0.) BG += 360.0;
     VBG = distance(BGx, BGy);
 }
 
@@ -475,15 +481,6 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
     }
     VWG *= configuration.WindStrength;
 
-
-
-
-
-
-
-
-
-
     OverWater(WG, VWG, C, VC, W, VW);
     return true;
 }
@@ -499,13 +496,14 @@ void Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &con
     ReadWindAndCurrents(configuration, this, data.WG, data.VWG,
                         data.W, data.VW, data.C, data.VC, atlas, data_mask);
 
+    // boat bearing and distance over ground 
     ll_gc_ll_reverse(lat, lon, next->lat, next->lon, &data.BG, &data.VBG);
     if(dt == 0)
         data.VBG = 0;
     else
         data.VBG *= 3600 / dt;
-
-    OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
+    // speed vector is bearing but OverWater use from, subtract curent vector
+    OverWater(data.BG, data.VBG, data.C, -data.VC, data.B, data.VB);
 }
 
 void Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
@@ -631,7 +629,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     if(configuration.WindVSCurrent) {
         /* these are already computed in OverWater.. could optimize by reusing them */
         double Wx = VW*cos(deg2rad(W)), Wy = VW*sin(deg2rad(W));
-        double Cx = VC*cos(deg2rad(C) + M_PI), Cy = VC*sin(deg2rad(C) + M_PI);
+        double Cx = VC*cos(deg2rad(C)), Cy = VC*sin(deg2rad(C));
 
         if(Wx*Cx + Wy*Cy + configuration.WindVSCurrent < 0)
             return false;

@@ -794,12 +794,6 @@ void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
                 p.GetCurrentData(configuration, W2, VW2, data_mask2);
 
-                // XX climatology angle is to not from 
-                if ((data_mask1 & Position::CLIMATOLOGY_CURRENT))
-                    W1 += 180.0;
-                if ((data_mask2 & Position::CLIMATOLOGY_CURRENT)) 
-                    W2 += 180.0;
-
                 // now polar interpolation of the two wind positions
                 double d1 = p.Distance(p1), d2 = p.Distance(p2);
                 double d = d1 / (d1+d2);
