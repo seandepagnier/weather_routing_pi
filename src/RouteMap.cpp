@@ -87,6 +87,10 @@
 
 extern wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
 extern wxString    g_ReceivedBoundaryEnterMessage;
+extern wxJSONValue g_ReceivedBoundaryCrossJSONMsg;
+extern wxString    g_ReceivedBoundaryCrossMessage;
+extern wxJSONValue g_ReceivedODVersionJSONMsg;
+extern wxString    g_ReceivedODVersionMessage;
 
 static double Swell(GribRecordSet *grib, double lat, double lon)
 {
@@ -765,7 +769,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
             continue;
         
-        /* Bounary test */
+        /* Boundary test */
         if(configuration.DetectBoundary && EntersBoundary(dlat, nrdlon))
             continue;
 
@@ -895,20 +899,43 @@ bool Position::EntersBoundary(double dlat, double dlon)
     wxJSONValue jMsg;
     wxJSONWriter writer;
     wxString    MsgString;
-    jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
-    jMsg[wxT("Type")] = wxT("Request");
-    jMsg[wxT("Msg")] = wxS("FindPointInAnyBoundary");
-    jMsg[wxT("MsgId")] = wxS("enter");
-    jMsg[wxS("lat")] = dlat;
-    jMsg[wxS("lon")] = dlon;
-    jMsg[wxS("BoundaryType")] = wxT("Exclusion");
-    writer.Write( jMsg, MsgString );
-    SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
-    if(g_ReceivedBoundaryEnterMessage != wxEmptyString &&
-        g_ReceivedBoundaryEnterJSONMsg[wxS("MsgId")].AsString() == wxS("enter") &&
-        g_ReceivedBoundaryEnterJSONMsg[wxS("Found")].AsBool() == true ) {
-        // This is our message
-        return true;
+    if(g_ReceivedODVersionMessage != wxEmptyString &&
+        g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() >= 1 && 
+        g_ReceivedODVersionJSONMsg[wxS("Minor")].AsInt() >= 1 && 
+        g_ReceivedODVersionJSONMsg[wxS("Patch")].AsInt() >= 1) {
+        jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
+        jMsg[wxT("Type")] = wxT("Request");
+        jMsg[wxT("Msg")] = wxS("FindClosestBoundaryLineCrossing");
+        jMsg[wxT("MsgId")] = wxS("enter");
+        jMsg[wxS("StartLat")] = lat;
+        jMsg[wxS("StartLon")] = lon;
+        jMsg[wxS("EndLat")] = dlat;
+        jMsg[wxS("EndLon")] = dlon;
+        jMsg[wxS("BoundaryType")] = wxT("Exclusion");
+        writer.Write( jMsg, MsgString );
+        SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+        if(g_ReceivedBoundaryCrossMessage != wxEmptyString &&
+            g_ReceivedBoundaryCrossJSONMsg[wxS("MsgId")].AsString() == wxS("enter") &&
+            g_ReceivedBoundaryCrossJSONMsg[wxS("Found")].AsBool() == true ) {
+            // This is our message
+            return true;
+        }
+    } else {
+        jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
+        jMsg[wxT("Type")] = wxT("Request");
+        jMsg[wxT("Msg")] = wxS("FindPointInAnyBoundary");
+        jMsg[wxT("MsgId")] = wxS("enter");
+        jMsg[wxS("lat")] = dlat;
+        jMsg[wxS("lon")] = dlon;
+        jMsg[wxS("BoundaryType")] = wxT("Exclusion");
+        writer.Write( jMsg, MsgString );
+        SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+        if(g_ReceivedBoundaryEnterMessage != wxEmptyString &&
+            g_ReceivedBoundaryEnterJSONMsg[wxS("MsgId")].AsString() == wxS("enter") &&
+            g_ReceivedBoundaryEnterJSONMsg[wxS("Found")].AsBool() == true ) {
+            // This is our message
+            return true;
+        }
     }
     return false;
 }
