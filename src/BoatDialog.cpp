@@ -387,7 +387,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                     break;
                 }
                 
-                double a;
+                double a=NAN;
                 
                 switch(selection) {
                 case 0: case 2: a = W; break;
@@ -846,56 +846,76 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
     wxFileDialog openDialog
         ( this, _( "Select Polar File" ), path, wxT ( "" ),
           wxT ( "CSV, POL, TXT (*.csv, *.pol, *.txt)|*.CSV;*.csv;*.csv.gz;*.csv.bz2;*.POL;*.pol;*.pol.gz;*.pol.bz2;*.TXT;*.txt;*.txt.gz;*.txt.bz2|All files (*.*)|*.*" ),
-          wxFD_OPEN  );
+          wxFD_OPEN | wxFD_MULTIPLE );
 
     if( openDialog.ShowModal() != wxID_OK )
         return;
 
     pConf->Write( _T ( "FilePath" ), openDialog.GetPath());
-    
-    wxString filename = openDialog.GetPath(), message;
 
-    bool existed = wxFileName::Exists(filename);
+    wxArrayString paths;
+    openDialog.GetPaths(paths);
 
-    // write dummy file
-    if(!existed) {
-        wxFile file;
-        if(file.Open(filename, wxFile::write))
-            file.Write(dummy_polar);
+    bool generate = false, existed = true;
+    for(unsigned int i=0; i<paths.GetCount(); i++) {
+        wxString filename = paths[i], message;
+        Polar polar;
+
+        for(unsigned int j=0; j<m_Boat.Polars.size(); j++)
+            if(m_Boat.Polars[j].FileName == filename)
+                goto skip;
+
+        existed = wxFileName::Exists(filename);
+
+        // write dummy file
+        if(!existed) {
+            wxFile file;
+            if(file.Open(filename, wxFile::write))
+                file.Write(dummy_polar);
+        }
+        
+        if(polar.Open(filename, message)) {
+            m_Boat.Polars.push_back(polar);
+            RepopulatePolars();
+            m_lPolars->SetItemState(m_Boat.Polars.size()-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+            generate = true;
+        } else {
+            wxMessageDialog md(this, message,
+                               _("OpenCPN Weather Routing Plugin"),
+                               wxICON_ERROR | wxOK );
+            md.ShowModal();
+        }
+    skip:;
     }
-    
-    Polar polar;
-    bool success = polar.Open(filename, message);
 
-    if(success) {
-        m_Boat.Polars.push_back(polar);
-        RepopulatePolars();
-        m_lPolars->SetItemState(m_Boat.Polars.size()-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+    if(generate)
         GenerateCrossOverChart();
-
-        if(!existed)
-            OnEditPolar(event);
-    } else {
-        wxMessageDialog md(this, message,
-                           _("OpenCPN Weather Routing Plugin"),
-                           wxICON_ERROR | wxOK );
-        md.ShowModal();
-    }
+            
+    if(!existed)
+        OnEditPolar(event);
 }
 
 void BoatDialog::OnRemovePolar( wxCommandEvent& event )
 {
-    long index = SelectedPolar();
-    if(index < 0)
-        return;
+    long index = -1, lastindex = -1, count = 0;
 
-    m_Boat.Polars.erase(m_Boat.Polars.begin() + index);
+    while((index = m_lPolars->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1) {
+        m_Boat.Polars.erase(m_Boat.Polars.begin() + index - count++);
+        lastindex = index;
+    }
+
+    if(lastindex == -1)
+        return;
+    
     RepopulatePolars();
-    if(index == (int)m_Boat.Polars.size())
-        index--;
-    m_lPolars->SetItemState(index, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+
+    lastindex -= count;
+    if(lastindex == (int)m_Boat.Polars.size())
+        lastindex--;
+
+    m_lPolars->SetItemState(lastindex, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     GenerateCrossOverChart();
-    m_bRemovePolar->Enable(index != -1);
+    m_bRemovePolar->Enable(lastindex != -1);
 }
 
 class CrossOverGenerationThread : public wxThread
