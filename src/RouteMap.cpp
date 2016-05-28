@@ -530,7 +530,17 @@ static inline bool ComputeBoatSpeed
         VB = 0;
         int windatlas_count = 8;
         for(int i = 0; i<windatlas_count; i++) {
-            double VBc = polar.Speed(H-W+atlas.W[i], atlas.VW[i]);
+            double dir = H-W+atlas.W[i];
+            if(dir > 180)
+                dir = 360 - dir;
+            double VBc, mind = polar.MinDegreeStep();
+            // if tacking
+            if(fabs(dir) < mind)
+                VBc = polar.Speed(mind, atlas.VW[i])
+                    * cos(deg2rad(mind)) / cos(deg2rad(dir));
+            else
+                VBc = polar.Speed(dir, atlas.VW[i]);
+
             VB += atlas.directions[i]*VBc;
         }
 

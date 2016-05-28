@@ -662,6 +662,11 @@ void BoatDialog::OnOpenBoat ( wxCommandEvent& event )
 
 void BoatDialog::SaveBoat()
 {
+    while(m_CrossOverGenerationThread) {
+        wxYield();
+        wxThread::Sleep(10);
+    }
+    
     if(m_boatpath.empty()) {
         wxFileConfig *pConf = GetOCPNConfigObject();
         pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
@@ -692,8 +697,7 @@ void BoatDialog::SaveBoat()
         Update();
 
         Hide();
-    }
-    else {
+    } else {
         wxMessageDialog md(this, error, _("OpenCPN Weather Routing Plugin"),
                            wxICON_ERROR | wxOK );
         md.ShowModal();

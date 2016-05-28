@@ -68,6 +68,8 @@ public:
     double SpeedAtApparentWindSpeed(double W, double VA);
     double SpeedAtApparentWind(double A, double VA, double *pW=0);
 
+    double MinDegreeStep() { return degree_steps[0]; }
+
     SailingVMG GetVMGTrueWind(double VW);
     SailingVMG GetVMGApparentWind(double VA);
 
