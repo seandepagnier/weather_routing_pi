@@ -660,7 +660,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_panel11->SetSizer( fgSizer110 );
 	m_panel11->Layout();
 	fgSizer110->Fit( m_panel11 );
-	m_notebook4->AddPage( m_panel11, _("Basic"), false );
+	m_notebook4->AddPage( m_panel11, _("Basic"), true );
 	m_panel12 = new wxPanel( m_notebook4, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer951;
 	fgSizer951 = new wxFlexGridSizer( 0, 3, 0, 0 );
@@ -725,7 +725,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_panel12->SetSizer( fgSizer951 );
 	m_panel12->Layout();
 	fgSizer951->Fit( m_panel12 );
-	m_notebook4->AddPage( m_panel12, _("Additional"), true );
+	m_notebook4->AddPage( m_panel12, _("Additional"), false );
 	m_pCyclones = new wxPanel( m_notebook4, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	m_pCyclones->Enable( false );
 	

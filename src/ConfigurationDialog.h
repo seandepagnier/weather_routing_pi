@@ -48,6 +48,7 @@ public:
     void AddSource(wxString name);
     void RemoveSource( wxString name );
     void ClearSources();
+    void SetBoatFilename(wxString path);
 
     wxDateTime m_GribTimelineTime;
 

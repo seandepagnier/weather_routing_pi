@@ -332,6 +332,7 @@ void WeatherRouting::UpdateColumns()
 static void CursorPositionDialogMessage(CursorPositionDialog &dlg, wxString msg)
 {
     dlg.m_stPosition->SetLabel(msg);
+    dlg.m_stPosition->Fit();
     dlg.m_stPolar->SetLabel(_T(""));
     dlg.m_stSailChanges->SetLabel(_T(""));
     dlg.m_stTacks->SetLabel(_T(""));
@@ -364,8 +365,12 @@ void WeatherRouting::UpdateCursorPositionDialog()
     dlg.m_stPosition->SetLabel(pos);
 
     RouteMapConfiguration configuration = rmo->GetConfiguration();
-    wxFileName fn = configuration.boat.Polars[p->polar].FileName;
-    dlg.m_stPolar->SetLabel(fn.GetFullName());
+    if(p->polar == -1)
+        dlg.m_stPolar->SetLabel(wxEmptyString);
+    else {
+        wxFileName fn = configuration.boat.Polars[p->polar].FileName;
+        dlg.m_stPolar->SetLabel(fn.GetFullName());
+    }
 
     dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), p->SailChanges()));
 

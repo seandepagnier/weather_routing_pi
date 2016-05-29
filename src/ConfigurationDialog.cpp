@@ -94,12 +94,9 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
         ( this, _( "Select Boat File" ), wxFileName(m_tBoat->GetValue()).GetPath(), wxT ( "" ),
           wxT ( "xml (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ), wxFD_OPEN  );
 
-    if( openDialog.ShowModal() == wxID_OK ) {
-        m_tBoat->SetValue(openDialog.GetPath());
-        Update();
-    }
+    if( openDialog.ShowModal() == wxID_OK )
+        SetBoatFilename(openDialog.GetPath());
 }
-
 
 #define SET_CHECKBOX_FIELD(FIELD, VALUE)              \
     do { \
@@ -216,6 +213,12 @@ void ConfigurationDialog::ClearSources()
 {
     m_cStart->Clear();
     m_cEnd->Clear();
+}
+
+void ConfigurationDialog::SetBoatFilename(wxString path)
+{
+    m_tBoat->SetValue(path);
+    Update();
 }
 
 void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)

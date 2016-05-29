@@ -897,7 +897,7 @@ int Position::SailChanges()
     if(!parent)
         return 0;
 
-    return polar != parent->polar + parent->SailChanges();
+    return (polar != parent->polar) + parent->SailChanges();
 }
 
 bool Position::EntersBoundary(double dlat, double dlon)

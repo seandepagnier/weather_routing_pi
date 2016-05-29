@@ -326,9 +326,13 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
             bool lastvalid = false;
             int lx, ly;
-            for(unsigned int Wi = 0; Wi<polar.degree_steps.size()+full; Wi++) {
-                double W = polar.degree_steps[Wi%polar.degree_steps.size()], VB;
-                
+//            for(unsigned int Wi = 0; Wi<polar.degree_steps.size()+full; Wi++) {
+            //              double W = polar.degree_steps[Wi%polar.degree_steps.size()];
+            double W0 = polar.degree_steps[0];
+            double Wn = polar.degree_steps[polar.degree_steps.size()-1];
+            double Wd = Wn - W0, Ws = Wd / floor(Wd);
+            for(double W = W0; W <= Wn; W+= Ws) {
+                double VB;
                 switch(selection) {
                 case 0: case 1:
                     VB = polar.Speed(W, VW);
@@ -386,13 +390,15 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                     VW = Polar::VelocityTrueWind(VA, VB, W);
                     break;
                 }
-                
-                double a=NAN;
+
+                #if 0
+                double a;
                 
                 switch(selection) {
                 case 0: case 2: a = W; break;
                 case 1: case 3: a = Polar::DirectionApparentWind(VB, W, VW); break;
                 }
+                #endif
                 
                 int px, py;
                 int s;
@@ -692,6 +698,7 @@ void BoatDialog::SaveBoat()
 
     wxString error = m_Boat.SaveXML(m_boatpath);
     if(error.empty()) {
+        m_WeatherRouting.m_ConfigurationDialog.SetBoatFilename(m_boatpath);
         /* update any configurations that use this boat */
         m_WeatherRouting.UpdateBoatFilename(m_boatpath);
         Update();
