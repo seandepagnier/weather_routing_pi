@@ -90,7 +90,7 @@ private:
     double m_PlotScale;
     int m_MouseW;
 
-    bool m_orientation[2];
+    int m_orientation[2];
 
     bool m_CrossOverRegenerate;
     CrossOverGenerationThread *m_CrossOverGenerationThread;

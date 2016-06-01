@@ -32,6 +32,10 @@
 
 #include "PolygonRegion.h"
 
+#if !defined(snprintf) && defined(_MSC_VER)
+#define snprintf _snprintf
+#endif
+
 Contour::Contour(const std::list<Point> &in_points)
 {
     n = in_points.size();
@@ -387,7 +391,7 @@ TESStesselator* PolygonRegion::Tesselate(bool triangles)
     TESStesselator *tess = tessNewTess(&ma);
     
     PutContours(tess, false);
-    bool success;
+    int success;
     if(triangles)
         success = tessTesselate(tess, TESS_WINDING_POSITIVE, TESS_POLYGONS, 3, 2, 0);
     else

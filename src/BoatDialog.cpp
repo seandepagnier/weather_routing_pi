@@ -475,7 +475,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 
 static int CalcPolarPoints(wxPoint p0, wxPoint p1)
 {
-    return floor(fabs(p0.x - p1.x) / 5) + 1;
+    return floor(fabs((double)p0.x - p1.x) / 5) + 1;
 }
 
 void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
@@ -769,7 +769,7 @@ void BoatDialog::OnPolarSelected()
 
 void BoatDialog::OnUpdatePlot()
 {
-    bool vert = m_orientation[m_cPlotType->GetSelection()];
+    int vert = m_orientation[m_cPlotType->GetSelection()];
     m_cbOrientation->SetValue(vert);
     if(m_fgSizer->GetRows() != vert) {
         m_fgSizer->SetRows(vert);
@@ -1015,7 +1015,7 @@ void BoatDialog::RepopulatePolars()
 //        m_lPolars->SetColumnWidth(spFILENAME, wxLIST_AUTOSIZE);
 //    m_lPolars->SetColumnWidth(spFILENAME, 80);
 
-    bool enable = m_Boat.Polars.size();
+    int enable = m_Boat.Polars.size();
     m_bRemovePolar->Enable(enable);
 }
 
