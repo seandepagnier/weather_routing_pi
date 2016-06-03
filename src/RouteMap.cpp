@@ -2541,7 +2541,7 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist)
     do {
         it--;
         double dist;
-        Position *pos = (*it)->ClosestPosition(lat, lon, &dist);
+        Position *pos = (*it)->ClosestPosition(p.lat, p.lon, &dist);
         
         if(pos && dist < mindist) {
             minpos = pos;
