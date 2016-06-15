@@ -929,25 +929,32 @@ void BoatDialog::OnRemovePolar( wxCommandEvent& event )
     m_bRemovePolar->Enable(lastindex != -1);
 }
 
+static void status(void *arg, int p, int s)
+{
+    if(s == 0)
+        p = s = 1;
+
+    wxThreadEvent event(wxEVT_THREAD, 100*p/s);
+    ((wxEvtHandler*)arg)->AddPendingEvent(event);
+}
+
 class CrossOverGenerationThread : public wxThread
 {
 public:
-    CrossOverGenerationThread(Boat &boat, wxEvtHandler *message_target)
+    CrossOverGenerationThread(Boat &boat, BoatDialog &dlg)
         : wxThread(wxTHREAD_JOINABLE), m_Boat(boat),
-          m_pMessageTarget(message_target)
+          m_BoatDialog(dlg)
         {
             Create();
         }
 
     void *Entry() {
-        m_Boat.GenerateCrossOverChart();
-        wxThreadEvent event(wxEVT_THREAD, 0);   
-        m_pMessageTarget->AddPendingEvent(event);
+        m_Boat.GenerateCrossOverChart(&m_BoatDialog, status);
         return 0;
     }
 
     Boat m_Boat;
-    wxEvtHandler        *m_pMessageTarget;
+    BoatDialog &m_BoatDialog;
 };
 
 void BoatDialog::GenerateCrossOverChart()
@@ -958,9 +965,8 @@ void BoatDialog::GenerateCrossOverChart()
     }
 
     m_gCrossOverChart->Enable();
-    m_gCrossOverChart->SetValue(100);
 
-    m_CrossOverGenerationThread = new CrossOverGenerationThread(m_Boat, this);
+    m_CrossOverGenerationThread = new CrossOverGenerationThread(m_Boat, *this);
 
     Connect( wxEVT_THREAD, (wxEventFunction)&BoatDialog::OnEvtThread);
     m_CrossOverGenerationThread->Run();
@@ -968,8 +974,12 @@ void BoatDialog::GenerateCrossOverChart()
 
 void BoatDialog::OnEvtThread( wxThreadEvent & event )
 {
+    int id = event.GetId();
+    m_gCrossOverChart->SetValue(id);
+    if(id < 100)
+        return;
+
     m_gCrossOverChart->Disable();
-    m_gCrossOverChart->SetValue(0);
 
     m_CrossOverGenerationThread->Wait();
     Boat &tboat = m_CrossOverGenerationThread->m_Boat;

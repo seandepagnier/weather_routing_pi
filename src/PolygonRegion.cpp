@@ -268,7 +268,7 @@ bool PolygonRegion::Contains(float x, float y)
                 if(x == x0) {
                     if(x == x1) {
                         if(y <= y0 && y > y1)
-                        total++;
+                            total++;
                     } else if(y <= y0)
                         total++;
                 } else if(x < x1) { // x > x0

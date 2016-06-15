@@ -38,7 +38,7 @@ public:
 
     int TrySwitchPolar(int curpolar, double VW, double H, double Swell);
     bool FastestPolar(int p, float H, float VW);
-    void GenerateCrossOverChart();
+    void GenerateCrossOverChart(void *arg=0, void (*status)(void *, int, int)=0);
 
 private:
     Point Interp(const Point &p0, const Point &p1, int q, bool q0, bool q1);

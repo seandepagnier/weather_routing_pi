@@ -197,13 +197,16 @@ bool Boat::FastestPolar(int p, float H, float VW)
     return speed > 0;
 }
 
-void Boat::GenerateCrossOverChart()
+void Boat::GenerateCrossOverChart(void *arg, void (*status)(void *, int, int))
 {
     const int maxVW = 40;
     const int stepi = 8;
     float step = 1.0f/stepi;
 
     for(int p = 0; p < (int)Polars.size(); p++) {
+        if(status)
+            status(arg, p, Polars.size());
+
         bool buffer[2][maxVW*stepi+1];
         int bi = 0;
         std::list<Segment> segments;
@@ -239,7 +242,10 @@ void Boat::GenerateCrossOverChart()
         segments.splice(segments.end(), wrapped_segments);
         Polars[p].CrossOverRegion = PolygonRegion(segments);
         Polars[p].CrossOverRegion.Simplify(1e-1);
+
     }
+    if(status)
+        status(arg, Polars.size(), Polars.size());
 }
 
 Point Boat::Interp(const Point &p0, const Point &p1,
