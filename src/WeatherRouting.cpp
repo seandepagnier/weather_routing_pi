@@ -250,31 +250,30 @@ void WeatherRouting::UpdateDisplaySettings()
 void WeatherRouting::AddPosition(double lat, double lon)
 {
     wxTextEntryDialog pd( this, _("Enter Name"), _("New Position") );
-    if(pd.ShowModal() == wxID_OK) {
-        wxString name = pd.GetValue();
-        for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
-            it != RouteMap::Positions.end(); it++) {
-            if((*it).Name == name) {
-                wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),
-                                     _("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
-                if(mdlg.ShowModal() == wxID_YES) {
-                    long index = m_lPositions->FindItem(0, name);
-                    (*it).lat = lat;
-                    (*it).lon = lon;
-                    m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
-                    m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
-                }
-
-                UpdateConfigurations();
-                return;
-            }
-        }
-        AddPosition(lat, lon, name);
-    }
+    if(pd.ShowModal() == wxID_OK)
+        AddPosition(lat, lon, pd.GetValue());
 }
 
 void WeatherRouting::AddPosition(double lat, double lon, wxString name)
 {
+    for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
+        it != RouteMap::Positions.end(); it++) {
+        if((*it).Name == name) {
+            wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),
+                                 _("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
+            if(mdlg.ShowModal() == wxID_YES) {
+                long index = m_lPositions->FindItem(0, name);
+                (*it).lat = lat;
+                (*it).lon = lon;
+                m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+                m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+            }
+
+            UpdateConfigurations();
+            return;
+        }
+    }
+    
     RouteMap::Positions.push_back(RouteMapPosition(name, lat, lon));
     UpdateConfigurations();
 
@@ -404,19 +403,19 @@ void WeatherRouting::OnNewPosition( wxCommandEvent& event )
 {
     NewPositionDialog dlg(this);
     if(dlg.ShowModal() == wxID_OK) {
-        double lat, lon, minutes;
+        double lat=0, lon=0, lat_minutes=0, lon_minutes=0;
 
         wxString latitude_degrees = dlg.m_tLatitudeDegrees->GetValue();
         wxString latitude_minutes = dlg.m_tLatitudeMinutes->GetValue();
         latitude_degrees.ToDouble(&lat);
-        latitude_minutes.ToDouble(&minutes);
-        lat += minutes / 60;
+        latitude_minutes.ToDouble(&lat_minutes);
+        lat += lat_minutes / 60;
 
         wxString longitude_degrees = dlg.m_tLongitudeDegrees->GetValue();
         wxString longitude_minutes = dlg.m_tLongitudeMinutes->GetValue();
         longitude_degrees.ToDouble(&lon);
-        longitude_minutes.ToDouble(&minutes);
-        lon += minutes / 60;
+        longitude_minutes.ToDouble(&lon_minutes);
+        lon += lon_minutes / 60;
 
         AddPosition(lat, lon, dlg.m_tName->GetValue());
     }
