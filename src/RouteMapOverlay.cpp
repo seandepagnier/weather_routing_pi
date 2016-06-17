@@ -510,6 +510,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 
     if (vp.bValid == false)
         return;
+
     RouteMapConfiguration configuration = GetConfiguration();
 
     // if zoomed way in, don't cache the arrows for panning, instead we just
@@ -918,6 +919,9 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
 
     SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
 
+    Lock();
+    m_bNeedsGrib = false;
+    Unlock();
 }
 
 std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)

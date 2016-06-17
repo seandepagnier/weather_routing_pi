@@ -471,7 +471,6 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
             break;
         }
 
-        data_mask |= Position::DATA_DEFICIENT_WIND;
         p = p->parent;
         if(!p)
             return false;
@@ -551,6 +550,8 @@ static inline bool ComputeBoatSpeed
 
     /* failed to determine speed.. */
     if(isnan(B) || isnan(VB)) {
+        // when does this hit??
+        printf("polar failed bad! %f %f %f %f\n", W, VW, B, VB);
         configuration.polar_failed = true;
         return false; //B = VB = 0;
     }
@@ -626,8 +627,10 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     climatology_wind_atlas atlas;
     int data_mask = 0;
     if(!ReadWindAndCurrents(configuration, this,
-                            WG, VWG, W, VW, C, VC, atlas, data_mask))
+                            WG, VWG, W, VW, C, VC, atlas, data_mask)) {
+        configuration.wind_data_failed = true;        
         return false;
+    }
 
     if(VW > configuration.MaxTrueWindKnots)
         return false;
@@ -683,8 +686,10 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
 
         {
         int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S);
-        if(newpolar == -1)
+        if(newpolar == -1) {
+            configuration.polar_failed = true;
             continue;
+        }
         
         if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
                              B, VB, BG, VBG, dist, newpolar))
@@ -2337,39 +2342,17 @@ bool RouteMap::ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMa
 {
     IsoRouteList unmerged;
     while(!routelist.empty()) {
-        if(TestAbort())
-            return false;
-
         IsoRoute *r1 = routelist.front();
         routelist.pop_front();
         while(!routelist.empty()) {
+            if(TestAbort())
+                return false;
+
             IsoRoute *r2 = routelist.front();
             routelist.pop_front();
             IsoRouteList rl;
 
-#if 0
-            static int dbgcnt;
-            dbgcnt++;
-            if(dbgcnt==681019) {
-                printf("here\n");
-            }
-            int r1c = r1->Count(), r2c = r2->Count();
-#endif
             if(Merge(rl, r1, r2, 0, configuration.InvertedRegions)) {
-#if 0
-                if(r1c > 1 || r2c > 1) {
-                    double sum = 0;
-                    for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); it++)
-                        sum += (*it)->Count();
-
-                    if((r1c > 2*sum || r2c > 2*sum) && (r1c > 100 || r2c > 100) ) {
-                        printf("%d %d %d %d : ", origin.size(), dbgcnt, r1c, r2c);
-                        for(IsoRouteList::iterator it = rl.begin(); it != rl.end(); it++)
-                            printf("%d ", (*it)->Count());
-                        printf("\n");
-                    }
-                }
-#endif
                 routelist.splice(routelist.end(), rl);
                 goto remerge;
             } else
@@ -2390,14 +2373,12 @@ bool RouteMap::Propagate()
 {
     Lock();
 
-    if(m_bNeedsGrib) {
+    if(m_bNeedsGrib) { // waiting for timer in main thread to request the grib
         Unlock();
         return false;
     }
 
-    if(!m_bValid /*|| m_bFinished*/) {
-        /* config change */
-        m_bNeedsGrib = false;
+    if(!m_bValid) { /* config change */
         m_bFinished = true;
         Unlock();
         return false;
@@ -2408,7 +2389,6 @@ bool RouteMap::Propagate()
        (!ClimatologyCycloneTrackCrossings ||
         ClimatologyCycloneTrackCrossings(0, 0, 0, 0, wxDateTime(), 0)==-1)) {
         m_bFinished = true;
-        m_bNeedsGrib = false;
         m_bClimatologyFailed = true;
         Unlock();
         return false;
@@ -2417,13 +2397,14 @@ bool RouteMap::Propagate()
     if(!m_Configuration.UseGrib &&
        m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY) {
         m_bFinished = true;
-        m_bNeedsGrib = false;
         m_bNoData = true;
         Unlock();
         return false;
     }
 
     RouteMapConfiguration configuration = m_Configuration;
+    configuration.polar_failed = false;
+    configuration.wind_data_failed = false;
 
     // reset grib data deficient flag
     bool grib_is_data_deficient = false;
@@ -2460,8 +2441,6 @@ bool RouteMap::Propagate()
         configuration.grib = origin.back()->m_Grib;
         configuration.time = origin.back()->time;
         configuration.grib_is_data_deficient = origin.back()->m_Grib_is_data_deficient;
-        configuration.polar_failed = false;
-
         // will the grib data work for us?
         if((!configuration.grib ||
             !configuration.grib->m_GribRecordPtrArray[Idx_WIND_VX] ||
@@ -2470,22 +2449,12 @@ bool RouteMap::Propagate()
            m_Configuration.UseGrib) {
             Lock();
             m_bFinished = true;
-            m_bNeedsGrib = false;
             m_bGribFailed = true;
             Unlock();
             return false;
         }
 
         origin.back()->PropagateIntoList(routelist, configuration);
-
-        if(configuration.polar_failed) {
-            Lock();
-            m_bFinished = true;
-            m_bNeedsGrib = false;
-            m_bPolarFailed = true;
-            Unlock();
-            return false;
-        }
     }
 
     IsoChron* update;
@@ -2498,10 +2467,8 @@ bool RouteMap::Propagate()
         }
     } else {
         IsoRouteList merged;
-        if(!ReduceList(merged, routelist, configuration)) {
-
+        if(!ReduceList(merged, routelist, configuration))
             return false;
-        }
 
         for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
             (*it)->ReduceClosePoints();
@@ -2514,13 +2481,18 @@ bool RouteMap::Propagate()
         origin.push_back(update);
         if(update->Contains(m_Configuration.EndLat, m_Configuration.EndLon)) {
             m_bFinished = true;
-            m_bNeedsGrib = false;
             m_bReachedDestination = true;
         }
-    } else {
+    } else
         m_bFinished = true;
-        m_bNeedsGrib = false;
-    }
+
+    // take note of possible failure reasons
+    if(configuration.polar_failed)
+        m_bPolarFailed = true;
+
+    if(configuration.wind_data_failed)
+        m_bNoData = true;
+
     Unlock();
 
     return true;
@@ -2583,8 +2555,6 @@ void RouteMap::Reset()
 
 void RouteMap::SetNewGrib(GribRecordSet *grib)
 {
-    m_bNeedsGrib = !grib;
-
     /* copy the grib record set */
     if(grib) {
         m_NewGrib = new GribRecordSet;

@@ -1493,19 +1493,19 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
             else {
                 State = _T("");
                 if(routemapoverlay->GribFailed()) {
-                    State = _("Grib");
+                    State += _("Grib");
                     State += _T(": ");
                 }
                 if(routemapoverlay->ClimatologyFailed()) {
-                    State = _("Climatology");
+                    State += _("Climatology");
                     State += _T(": ");
                 }
                 if(routemapoverlay->PolarFailed()) {
-                    State = _("Polar");
+                    State += _("Polar");
                     State += _T(": ");
                 }
                 if(routemapoverlay->NoData()) {
-                    State = _("No Data");
+                    State += _("No Data");
                     State += _T(": ");
                 }
                 State += _("Failed");

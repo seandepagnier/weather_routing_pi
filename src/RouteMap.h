@@ -215,7 +215,7 @@ struct RouteMapConfiguration {
     // parameters
     GribRecordSet *grib;
     wxDateTime time;
-    bool grib_is_data_deficient, polar_failed;
+    bool grib_is_data_deficient, polar_failed, wind_data_failed;
 };
 
 bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
@@ -241,6 +241,7 @@ public:
 
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
+    void RequestedGrib() { Lock(); m_bNeedsGrib=false; Unlock(); }
     void SetNewGrib(GribRecordSet *grib);
     wxDateTime NewTime() { Lock(); wxDateTime time =  m_NewTime; Unlock(); return time; }
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;

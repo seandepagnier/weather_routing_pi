@@ -242,7 +242,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             RouteMapOverlay *routemapoverlay = m_pWeather_Routing->m_RouteMapOverlayNeedingGrib;
             if(routemapoverlay) {
                 routemapoverlay->Lock();
-                routemapoverlay->ReceivedGrib(gptr);
+                routemapoverlay->SetNewGrib(gptr);
                 routemapoverlay->Unlock();
             }
         }
