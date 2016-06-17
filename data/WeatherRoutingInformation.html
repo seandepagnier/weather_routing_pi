@@ -13,7 +13,7 @@ it is possible to form a map determining routes
 to any given location within the map.
 
 <h3>Quick Start</h3>
-First, load the grib file used for routing using the grib plugin.  Next, open the Weather Routing plugin from the main toolbar and right click the map and Select "Weather Route Position" at the starting location.  Repeat this step for the destination.  Now, in the Weather Routing window from the Configuration menu (next to File) Select "New".  From here you must configure your vessel correctly in the boat dialog.  When ready, select "Compute" from the Configuration menu to compute the weather route.
+First, load the grib file used for routing using the grib plugin.  Next, open the Weather Routing plugin from the main toolbar and right click the map and Select "Weather Route Position" at the starting location.  Repeat this step for the destination.  Now, in the Weather Routing window from the Configuration menu (next to File) Select "New".  From here you must configure your vessel correctly in the boat dialog; add a polar to specify how the boat sails.  When ready, select "Compute" from the Configuration menu to compute the weather route.
 
 <h3>Background</h3>
 
@@ -84,6 +84,19 @@ can be viewed during grib playback.
   <li><b>Courses (relative to true wind)</b> A list of courses to attempt sailing.  Excluding certain values can force the route to explicity show tacks/jibes.  Another option is to remove all upwind values to find a course which is always running off the wind (even if it is much longer.)  Good results typically have a course every 3-5 degrees; more steps takes longer computation time.</li>
 </ul>
 
+<h3>Failures</h3>
+  If the route failes to complete there are various reasons why displayed in the status column of that configuration.
+  <ul>
+    <li><b>Grib</b> Grib data not available at the needed time step.  This is different from being outside of the grib area.</li>
+    <li><b>Climatology</b> Can only occur if trying to avoid climatology cyclone data and the data isn't available.</li>
+    <li><b>Polar</b> Occurs when there is no polar defined for the conditions.</li>
+    <li><b>No Data</b> Occurs when navigating in an area where there exists no wind data.</li>
+  </ul>
+
+<p>It is also possible to fail with none of the above specified.  In this case it is likely due to the configuration settings being too restrictive.
+
+<p>It is possible to be restricted by constraints in one area, not have data in another area and have undefined polar data elsewhere, and changing any of the three allows for a successful route.  For this reason the cause of failure may be unclear.
+
 <h3>Batch Mode</h3>
 <p>Once a weather route is successfully computed, it is possible to determine the best time to leave.  To do this, many configurations must be generated each with a different start time.  Starting by selecting a single configuration with the earliest starting time.  From the configuration menu, select batch (ctrl+b) From here, enter the number of days/hours to generate spans.  Using decimal values for hours is allowed (ie: 0.5 for half-hour)  Once generate is selected, many configurations should appear.  Now, "Compute All (ctrl+a)" can be selected from the configurations menu.  A total progress bar can be seen under the configurations.  Finally a report describing the routes is available from the View menu.
 
@@ -103,17 +116,11 @@ The boat dialog displays the polar plot of the boat's speed vs true wind directi
 The tracking displays give data based on the mouse position over the plot.
 
 <p>
-<h4>Polar Config tab</h4>
-<dt>Configure the polar data to use.  Either Compute with various parameters, or specify a CSV file which contains a table of boat speeds for all possible true wind speeds and directions.
+<h4>Crossover tab</h4>
+<dt>Shows the relationship of the polars and which one is used
+  for each condition.
 
 <p>
-<h4>VMG tab</h4>
-<dt>Shows the best courses for up and down wind on each tack for a given true windspeed.  Optimize Tacking makes the polar reflect these tacking options on the relevant courses.  If this option is chosen, then the boat will assume the ability to sail in these angles (it is assumed the captain will tack periodically to maintain any course.)  If tacking is not optimized, then weather routing will tack only at the isochrons, resulting in overlapping alternate routes, and potentially slightly less optimal course (but will specifically display where to tack.)  It also may take significantly longer to compute courses in areas with rugged coastlines.
-
-<p>
-<h4>Switch Plan Rules</h4>
-<dt>It is possible to specify several sail plans (eg: spinnaker or normal sails) and then for each plan specify a different polar.  You must make rules for when it is appropriate to switch to a different sail plan.  The computed plot will display squares whenever a sail change occurs (if selected in the settings)
-
 <p>
 <h4>Statistics</h4>
 <dt>Displays miscellaneous statistics about the boat.
