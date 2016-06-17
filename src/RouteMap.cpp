@@ -854,8 +854,15 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
         B = W + H; /* rotated relative to true wind */
 
         double dummy_dist; // not used
+
+        int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S);
+        if(newpolar == -1) {
+            configuration.polar_failed = true;
+            return NAN;
+        }
+        
         if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
-                             B, VB, BG, VBG, dummy_dist, polar))
+                             B, VB, BG, VBG, dummy_dist, newpolar))
             return NAN;
 
         if(++iters == 10) // give up
@@ -913,10 +920,12 @@ bool Position::EntersBoundary(double dlat, double dlon)
     wxString    MsgString;
     jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
     jMsg[wxT("Type")] = wxT("Request");
-    jMsg[wxT("Msg")] = wxS("FindPointInAnyBoundary");
+    jMsg[wxT("Msg")] = wxS("FindClosestBoundaryLineCrossing");
     jMsg[wxT("MsgId")] = wxS("enter");
-    jMsg[wxS("lat")] = dlat;
-    jMsg[wxS("lon")] = dlon;
+    jMsg[wxS("StartLat")] = dlat;
+    jMsg[wxS("StartLon")] = dlon;
+    jMsg[wxS("EndLat")] = dlat;
+    jMsg[wxS("EndLon")] = dlon;
     jMsg[wxS("BoundaryType")] = wxT("Exclusion");
     writer.Write( jMsg, MsgString );
     SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
@@ -2442,11 +2451,12 @@ bool RouteMap::Propagate()
         configuration.time = origin.back()->time;
         configuration.grib_is_data_deficient = origin.back()->m_Grib_is_data_deficient;
         // will the grib data work for us?
-        if((!configuration.grib ||
+        if(m_Configuration.UseGrib &&
+           (!configuration.grib ||
             !configuration.grib->m_GribRecordPtrArray[Idx_WIND_VX] ||
             !configuration.grib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-           m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&
-           m_Configuration.UseGrib) {
+           (!RouteMap::ClimatologyData ||
+            m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY )) {
             Lock();
             m_bFinished = true;
             m_bGribFailed = true;
@@ -2555,25 +2565,28 @@ void RouteMap::Reset()
 
 void RouteMap::SetNewGrib(GribRecordSet *grib)
 {
+    if(!grib ||
+       !grib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+       !grib->m_GribRecordPtrArray[Idx_WIND_VY])
+        return;
+
     /* copy the grib record set */
-    if(grib) {
-        m_NewGrib = new GribRecordSet;
-        m_NewGrib->m_Reference_Time = grib->m_Reference_Time;
-        for(int i=0; i<Idx_COUNT; i++) {
-            m_NewGrib->m_GribRecordPtrArray[i] = NULL;
-            switch (i) {
-            case Idx_HTSIGW:
-            case Idx_WIND_VX:
-            case Idx_WIND_VY:
-            case Idx_SEACURRENT_VX:
-            case Idx_SEACURRENT_VY:
-                if(grib->m_GribRecordPtrArray[i]) {
-                    m_NewGrib->m_GribRecordPtrArray[i] = new GribRecord (*grib->m_GribRecordPtrArray[i]);
-                }
-                break;
-            default:
-                break;
+    m_NewGrib = new GribRecordSet;
+    m_NewGrib->m_Reference_Time = grib->m_Reference_Time;
+    for(int i=0; i<Idx_COUNT; i++) {
+        m_NewGrib->m_GribRecordPtrArray[i] = NULL;
+        switch (i) {
+        case Idx_HTSIGW:
+        case Idx_WIND_VX:
+        case Idx_WIND_VY:
+        case Idx_SEACURRENT_VX:
+        case Idx_SEACURRENT_VY:
+            if(grib->m_GribRecordPtrArray[i]) {
+                m_NewGrib->m_GribRecordPtrArray[i] = new GribRecord (*grib->m_GribRecordPtrArray[i]);
             }
+            break;
+        default:
+            break;
         }
     }
 }

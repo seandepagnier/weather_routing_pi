@@ -1023,7 +1023,7 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
             it++;
 
         /* get a new grib for the route map if needed */
-        if(routemapoverlay->NeedsGrib()) {
+        if(routemapoverlay->NeedsGrib() && !routemapoverlay->Finished()) {
             m_RouteMapOverlayNeedingGrib = routemapoverlay;
             routemapoverlay->RequestGrib(routemapoverlay->NewTime());
             m_RouteMapOverlayNeedingGrib = NULL;
@@ -1640,8 +1640,11 @@ void WeatherRouting::UpdateBoatFilename(wxString boatFileName)
             (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
 
         RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
-        if(c.boatFileName == boatFileName)
+        if(c.boatFileName == boatFileName) {
+            RouteMapOverlay *rmo = weatherroute->routemapoverlay;
+            rmo->ResetFinished();
             SetConfigurationRoute(weatherroute);
+        }
     }
 }
 

@@ -131,7 +131,8 @@ wxString Boat::SaveXML(wxString filename)
             if(file.Open(ContoursFileName, wxFile::write)) {
                 e->SetAttribute("CrossOverContours", ContoursFileName.mb_str());
                 file.Write(polar.CrossOverRegion.toString());
-            }
+            } else
+                return _("Failed to open for writing: ") + ContoursFileName;
         }
 
 //        e->SetAttribute("optimize_tacking", polar.optimize_tacking);
