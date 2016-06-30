@@ -87,6 +87,8 @@
 
 extern wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
 extern wxString    g_ReceivedBoundaryEnterMessage;
+extern wxJSONValue g_ReceivedBoundaryCrossJSONMsg;
+extern wxString    g_ReceivedBoundaryCrossMessage;
 
 static double Swell(GribRecordSet *grib, double lat, double lon)
 {
@@ -929,9 +931,9 @@ bool Position::EntersBoundary(double dlat, double dlon)
     jMsg[wxS("BoundaryType")] = wxT("Exclusion");
     writer.Write( jMsg, MsgString );
     SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
-    if(g_ReceivedBoundaryEnterMessage != wxEmptyString &&
-        g_ReceivedBoundaryEnterJSONMsg[wxS("MsgId")].AsString() == wxS("enter") &&
-        g_ReceivedBoundaryEnterJSONMsg[wxS("Found")].AsBool() == true ) {
+    if(g_ReceivedBoundaryCrossMessage != wxEmptyString &&
+        g_ReceivedBoundaryCrossJSONMsg[wxS("MsgId")].AsString() == wxS("enter") &&
+        g_ReceivedBoundaryCrossJSONMsg[wxS("Found")].AsBool() == true ) {
         // This is our message
         return true;
     }
