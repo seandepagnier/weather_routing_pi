@@ -126,7 +126,15 @@ wxString Boat::SaveXML(wxString filename)
 
         e->SetAttribute("FileName", polar.FileName.mb_str());
         if(!polar.CrossOverRegion.Empty()) {
-            wxString ContoursFileName = polar.FileName + _T(".contours");
+            wxString ContoursPath = weather_routing_pi::StandardPath() +
+                _T("contours") + wxFileName::GetPathSeparator();
+            if (!wxDirExists(ContoursPath))
+                wxMkdir(ContoursPath);
+
+            wxString ContoursFileName = polar.FileName;
+            ContoursFileName.Replace
+                (wxFileName::GetPathSeparator(), _T("!?!"));
+            ContoursFileName = ContoursPath + ContoursFileName + _T(".contours");
             wxFile file;
             if(file.Open(ContoursFileName, wxFile::write)) {
                 e->SetAttribute("CrossOverContours", ContoursFileName.mb_str());
