@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2016 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -46,8 +46,29 @@
 #define CLIMATOLOGY_MIN_MAJOR 0
 #define CLIMATOLOGY_MIN_MINOR 10
 
-wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
-wxString    g_ReceivedBoundaryEnterMessage;
+static wxJSONValue g_ReceivedODVersionJSONMsg;
+static bool ODVersionNewerThan(int major, int minor, int patch)
+{
+    wxJSONValue jMsg;
+    wxJSONWriter writer;
+    wxString    MsgString;
+    jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
+    jMsg[wxT("Type")] = wxT("Request");
+    jMsg[wxT("Msg")] = wxS("Version");
+    jMsg[wxT("MsgId")] = wxS("version");
+    writer.Write( jMsg, MsgString );
+    SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+
+    if(!g_ReceivedODVersionJSONMsg.Size())
+        return false;
+    if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() > major) return true;
+    if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() == major &&
+        g_ReceivedODVersionJSONMsg[wxS("Minor")].AsInt() > minor) return true;
+    if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() == major &&
+        g_ReceivedODVersionJSONMsg[wxS("Minor")].AsInt() == minor &&
+        g_ReceivedODVersionJSONMsg[wxS("Patch")].AsInt() >= patch) return true;
+    return false;
+}
 
 
 extern "C" DECL_EXP opencpn_plugin* create_pi(void *ppimgr)
@@ -294,64 +315,33 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
                 (RouteMap::ClimatologyCycloneTrackCrossings!=NULL);
         }
     }
+
+
     if(message_id == wxS("WEATHER_ROUTING_PI")) {
         // construct the JSON root object
         wxJSONValue  root;
         // construct a JSON parser
         wxJSONReader reader;
-        wxString    sLogMessage;
-        bool        bFail = false;
         // now read the JSON text and store it in the 'root' structure
         // check for errors before retreiving values...
         int numErrors = reader.Parse( message_body, &root );
-        if ( numErrors > 0 )  {
+        if ( numErrors > 0 ) {
+            wxLogMessage(_T("weather_routing_pi: Error parsing JSON message - "));
             const wxArrayString& errors = reader.GetErrors();
-            for(int i = 0; i < (int)errors.GetCount(); i++)
-            {
-                if(i == 0) {
-                    sLogMessage.clear();
-                    sLogMessage.Append(wxT("weather_routing_pi: Error parsing JSON message - "));
-                    sLogMessage.Append( message_id );
-                    sLogMessage.Append(wxT(", error text: "));
-                } else sLogMessage.Append(wxT("\n"));
-                sLogMessage.append( errors.Item( i ) );
-                wxLogMessage( sLogMessage );
+            for(int i = 0; i < (int)errors.GetCount(); i++) {
+                wxLogMessage( errors.Item( i ) );
+                return;
             }
-            return;
         }
         
-        if(!root.HasMember( wxS("Source"))) {
-            // Originator
-            wxLogMessage( wxS("No Source found in message") );
-            bFail = true;
-        }
-        
-        if(!root.HasMember( wxS("Msg"))) {
-            // Message identifier
-            wxLogMessage( wxS("No Msg found in message") );
-            bFail = true;
-        }
-        
-        if(!root.HasMember( wxS("Type"))) {
-            // Message type, orig or resp
-            wxLogMessage( wxS("No Type found in message") );
-            bFail = true;
-        }
-        
-        if(!root.HasMember( wxS("MsgId"))) {
-            // Unique (?) Msg number/identifier
-            wxLogMessage( wxS("No MsgNo found in message") );
-            bFail = true;
-        }
-        
-        if(!bFail) {
-            if(root[wxS("Type")].AsString() == wxS("Response") && root[wxS("Source")].AsString() == wxS("OCPN_DRAW_PI")) {
-                if(root[wxS("Msg")].AsString() == wxS("FindPointInAnyBoundary") ) {
-                    if(root[wxS("MsgId")].AsString() == wxS("enter")) {
-                        g_ReceivedBoundaryEnterJSONMsg = root;
-                        g_ReceivedBoundaryEnterMessage = message_body;
-                    } 
-                }
+        if(root[wxS("Type")].AsString() == wxS("Response") && root[wxS("Source")].AsString() == wxS("OCPN_DRAW_PI")) {
+            if(root[wxS("Msg")].AsString() == wxS("Version") ) {
+                if(root[wxS("MsgId")].AsString() == wxS("version"))
+                    g_ReceivedODVersionJSONMsg = root;
+            } else
+            if(root[wxS("Msg")].AsString() == wxS("GetAPIAddresses") ) {
+                wxString sptr = root[_T("OD_FindClosestBoundaryLineCrossing")].AsString();
+                sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ODFindClosestBoundaryLineCrossing);
             }
         }
     }
@@ -377,6 +367,19 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
 
         SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
         SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
+
+        if(ODVersionNewerThan( 1, 1, 15)) {
+            wxJSONValue jMsg;
+            wxJSONWriter writer;
+            wxString MsgString;
+            jMsg[wxT("Source")] = wxT("WEATHER_ROUTING_PI");
+            jMsg[wxT("Type")] = wxT("Request");
+            jMsg[wxT("Msg")] = wxS("GetAPIAddresses");
+            jMsg[wxT("MsgId")] = wxS("GetAPIAddresses");
+            writer.Write( jMsg, MsgString );
+            SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+        }
+        
         m_pWeather_Routing->Reset();
     }
 

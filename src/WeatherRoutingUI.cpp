@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec  8 2015)
+// C++ code generated with wxFormBuilder (version Jul 15 2016)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -849,7 +849,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cbCurrents->SetValue(true); 
 	fgSizer23->Add( m_cbCurrents, 0, wxALL, 5 );
 	
-	m_cbDetectBoundary = new wxCheckBox( m_panel18, wxID_ANY, _("Detect Boundary"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbDetectBoundary = new wxCheckBox( m_panel18, wxID_ANY, _("Detect Boundary"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer23->Add( m_cbDetectBoundary, 0, wxALL, 5 );
 	
 	
@@ -3195,7 +3195,7 @@ EditPolarDialogBase::EditPolarDialogBase( wxWindow* parent, wxWindowID id, const
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	m_gPolar->Connect( wxEVT_GRID_CELL_CHANGED, wxGridEventHandler( EditPolarDialogBase::OnPolarGridChanged ), NULL, this );
+	m_gPolar->Connect( wxEVT_GRID_CELL_CHANGE, wxGridEventHandler( EditPolarDialogBase::OnPolarGridChanged ), NULL, this );
 	m_tTrueWindAngle->Connect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( EditPolarDialogBase::d ), NULL, this );
 	m_bAddTrueWindAngle->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( EditPolarDialogBase::OnAddTrueWindAngle ), NULL, this );
 	m_bRemoveTrueWindAngle->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( EditPolarDialogBase::OnRemoveTrueWindAngle ), NULL, this );
@@ -3219,7 +3219,7 @@ EditPolarDialogBase::EditPolarDialogBase( wxWindow* parent, wxWindowID id, const
 EditPolarDialogBase::~EditPolarDialogBase()
 {
 	// Disconnect Events
-	m_gPolar->Disconnect( wxEVT_GRID_CELL_CHANGED, wxGridEventHandler( EditPolarDialogBase::OnPolarGridChanged ), NULL, this );
+	m_gPolar->Disconnect( wxEVT_GRID_CELL_CHANGE, wxGridEventHandler( EditPolarDialogBase::OnPolarGridChanged ), NULL, this );
 	m_tTrueWindAngle->Disconnect( wxEVT_COMMAND_TEXT_ENTER, wxCommandEventHandler( EditPolarDialogBase::d ), NULL, this );
 	m_bAddTrueWindAngle->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( EditPolarDialogBase::OnAddTrueWindAngle ), NULL, this );
 	m_bRemoveTrueWindAngle->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( EditPolarDialogBase::OnRemoveTrueWindAngle ), NULL, this );

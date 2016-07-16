@@ -1496,10 +1496,6 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
                     State += _("Grib");
                     State += _T(": ");
                 }
-                if(routemapoverlay->ClimatologyFailed()) {
-                    State += _("Climatology");
-                    State += _T(": ");
-                }
                 if(routemapoverlay->PolarFailed()) {
                     State += _("Polar");
                     State += _T(": ");
@@ -1741,8 +1737,7 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
 {
     if(!routemapoverlay ||
        (routemapoverlay->Finished() &&
-        !routemapoverlay->GribFailed() &&
-        !routemapoverlay->ClimatologyFailed()))
+        !routemapoverlay->GribFailed()))
         return;
 
     RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();

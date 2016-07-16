@@ -85,9 +85,6 @@
 
 #define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
 
-extern wxJSONValue g_ReceivedBoundaryEnterJSONMsg;
-extern wxString    g_ReceivedBoundaryEnterMessage;
-
 static double Swell(GribRecordSet *grib, double lat, double lon)
 {
     if(!grib)
@@ -773,8 +770,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
             continue;
         
-        /* Bounary test */
-        if(configuration.DetectBoundary && EntersBoundary(dlat, nrdlon))
+        /* Boundary test */
+        if(configuration.DetectBoundary && EntersBoundary(dlat, dlon))
             continue;
 
         /* crosses cyclone track(s)? */
@@ -879,6 +876,10 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
        && CrossesLand(configuration.EndLat, configuration.EndLon))
         return NAN;
 
+    /* Boundary test */
+    if(configuration.DetectBoundary && EntersBoundary(configuration.EndLat, configuration.EndLon))
+        return NAN;
+
     /* crosses cyclone track(s)? */
     if(configuration.AvoidCycloneTracks &&
        RouteMap::ClimatologyCycloneTrackCrossings) {
@@ -914,28 +915,10 @@ int Position::SailChanges()
 
 bool Position::EntersBoundary(double dlat, double dlon)
 {
-    // Do JSON message to OD Plugin to check if boundary m_crossinglat
-    wxJSONValue jMsg;
-    wxJSONWriter writer;
-    wxString    MsgString;
-    jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
-    jMsg[wxT("Type")] = wxT("Request");
-    jMsg[wxT("Msg")] = wxS("FindClosestBoundaryLineCrossing");
-    jMsg[wxT("MsgId")] = wxS("enter");
-    jMsg[wxS("StartLat")] = dlat;
-    jMsg[wxS("StartLon")] = dlon;
-    jMsg[wxS("EndLat")] = dlat;
-    jMsg[wxS("EndLon")] = dlon;
-    jMsg[wxS("BoundaryType")] = wxT("Exclusion");
-    writer.Write( jMsg, MsgString );
-    SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
-    if(g_ReceivedBoundaryEnterMessage != wxEmptyString &&
-        g_ReceivedBoundaryEnterJSONMsg[wxS("MsgId")].AsString() == wxS("enter") &&
-        g_ReceivedBoundaryEnterJSONMsg[wxS("Found")].AsBool() == true ) {
-        // This is our message
-        return true;
-    }
-    return false;
+    struct FindClosestBoundaryLineCrossing_t t;
+    t.dStartLat = lat, t.dStartLon = heading_resolve(lon);
+    t.dEndLat = dlat, t.dEndLon = heading_resolve(dlon);
+    return RouteMap::ODFindClosestBoundaryLineCrossing(&t);
 }
 
 SkipPosition::SkipPosition(Position *p, int q)
@@ -2326,6 +2309,8 @@ bool (*RouteMap::ClimatologyWindAtlasData)(const wxDateTime &, double, double, i
 int (*RouteMap::ClimatologyCycloneTrackCrossings)(double, double, double, double,
                                                   const wxDateTime &, int) = NULL;
 
+OD_FindClosestBoundaryLineCrossing RouteMap::ODFindClosestBoundaryLineCrossing = NULL;
+
 std::list<RouteMapPosition> RouteMap::Positions;
 
 RouteMap::RouteMap()
@@ -2389,24 +2374,6 @@ bool RouteMap::Propagate()
 
     if(!m_bValid) { /* config change */
         m_bFinished = true;
-        Unlock();
-        return false;
-    }
-
-    /* test for cyclone data if needed */
-    if(m_Configuration.AvoidCycloneTracks &&
-       (!ClimatologyCycloneTrackCrossings ||
-        ClimatologyCycloneTrackCrossings(0, 0, 0, 0, wxDateTime(), 0)==-1)) {
-        m_bFinished = true;
-        m_bClimatologyFailed = true;
-        Unlock();
-        return false;
-    }
-
-    if(!m_Configuration.UseGrib &&
-       m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY) {
-        m_bFinished = true;
-        m_bNoData = true;
         Unlock();
         return false;
     }
@@ -2555,7 +2522,6 @@ void RouteMap::Reset()
 
     m_bReachedDestination = false;
     m_bGribFailed = false;
-    m_bClimatologyFailed = false;
     m_bPolarFailed = false;
     m_bNoData = false;
     m_bFinished = false;

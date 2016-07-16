@@ -80,9 +80,29 @@ bool RouteMapOverlay::Start(wxString &error)
     }
 
     error = LoadBoat();
-
     if(error.size())
         return false;
+
+    RouteMapConfiguration configuration = GetConfiguration();
+    /* test for cyclone data if needed */
+    if(configuration.AvoidCycloneTracks &&
+       (!ClimatologyCycloneTrackCrossings ||
+        ClimatologyCycloneTrackCrossings(0, 0, 0, 0, wxDateTime(), 0)==-1)) {
+        error = _("Configuration specifies cyclone track avoidance and Climatology cyclone data is not available");
+        return false;
+    }
+ 
+    if(configuration.DetectBoundary &&
+       !RouteMap::ODFindClosestBoundaryLineCrossing) {
+        error = _("Configuration specifies boundary exclusion but ocpn_draw_pi boundary data not available");
+        return false;
+    }
+
+    if(!configuration.UseGrib &&
+       configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY) {
+        error = _("Configuration does not allow grib or climatology wind data");
+        return false;
+    }
 
     m_Thread = new RouteMapOverlayThread(*this);
     m_Thread->Run();
