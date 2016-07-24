@@ -85,6 +85,8 @@
 
 #define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
 
+using namespace std;
+
 static double Swell(GribRecordSet *grib, double lat, double lon)
 {
     if(!grib)
