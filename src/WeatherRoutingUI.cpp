@@ -1577,7 +1577,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_plot->SetSizer( fgSizer18 );
 	m_plot->Layout();
 	fgSizer18->Fit( m_plot );
-	m_nNotebook->AddPage( m_plot, _("Plot"), false );
+	m_nNotebook->AddPage( m_plot, _("Plot"), true );
 	m_panel10 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer45;
 	fgSizer45 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -1620,7 +1620,7 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_panel10->SetSizer( fgSizer45 );
 	m_panel10->Layout();
 	fgSizer45->Fit( m_panel10 );
-	m_nNotebook->AddPage( m_panel10, _("Cross Over Chart"), true );
+	m_nNotebook->AddPage( m_panel10, _("Cross Over Chart"), false );
 	m_panel24 = new wxPanel( m_nNotebook, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer117;
 	fgSizer117 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -2814,7 +2814,7 @@ EditPolarDialogBase::EditPolarDialogBase( wxWindow* parent, wxWindowID id, const
 	wxFlexGridSizer* fgSizer102;
 	fgSizer102 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer102->AddGrowableCol( 0 );
-	fgSizer102->AddGrowableRow( 1 );
+	fgSizer102->AddGrowableRow( 0 );
 	fgSizer102->SetFlexibleDirection( wxBOTH );
 	fgSizer102->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	

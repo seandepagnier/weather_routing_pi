@@ -285,6 +285,17 @@ bool Polar::Open(const wxString &filename, wxString &message)
 
     zu_close(f);
 
+    // add zero column for 0 speed in 0 wind in all directions
+    if(wind_speeds[0].VW > 0) {
+        std::vector<SailingWindSpeed> speeds;
+        speeds.push_back(SailingWindSpeed(0));
+        for(unsigned int i=0; i<degree_steps.size(); i++)
+            speeds[0].speeds.push_back(0);
+        for(unsigned int i=0; i<wind_speeds.size(); i++)
+            speeds.push_back(wind_speeds[i]);
+        wind_speeds = speeds;
+    }
+
 #if 0
     /* fill in port tack assuming symmetric */
     {
@@ -324,8 +335,18 @@ bool Polar::Save(const wxString &filename)
     if(!f)
         return false;
 
+    // save zero wind speed column only if non-zero speeds
+    int vwi0 = 1;
+    if(wind_speeds[0].VW == 0) {
+        for(unsigned int i=0; i<degree_steps.size(); i++)
+            if(wind_speeds[0].speeds[i] != 0)
+                vwi0 = 0;
+    } else
+        vwi0 = 0;
+
+    
     fputs("twa/tws", f);
-    for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
+    for(unsigned int VWi = vwi0; VWi<wind_speeds.size(); VWi++)
         fprintf(f, ";%.4g", wind_speeds[VWi].VW);
     fputs("\n", f);
 
@@ -333,7 +354,7 @@ bool Polar::Save(const wxString &filename)
         if(degree_steps[Wi] > 180)
             break;
         fprintf(f, "%.5g", degree_steps[Wi]);
-        for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
+        for(unsigned int VWi = vwi0; VWi<wind_speeds.size(); VWi++)
             fprintf(f, ";%.5g", wind_speeds[VWi].speeds[Wi]);
         fputs("\n", f);
     }

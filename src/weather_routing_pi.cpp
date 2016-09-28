@@ -59,7 +59,7 @@ static bool ODVersionNewerThan(int major, int minor, int patch)
     writer.Write( jMsg, MsgString );
     SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
 
-    if(!g_ReceivedODVersionJSONMsg.Size())
+    if(g_ReceivedODVersionJSONMsg.Size() <= 0)
         return false;
     if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() > major) return true;
     if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() == major &&
@@ -465,13 +465,11 @@ wxString weather_routing_pi::StandardPath()
 {
     wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
     wxString s = wxFileName::GetPathSeparator();
-#ifdef __WXMSW__
+#if defined(__WXMSW__)
     wxString stdPath  = std_path.GetConfigDir();
-#endif
-#ifdef __WXGTK__
+#elif defined(__WXGTK__) || defined(__WXQT__)
     wxString stdPath  = std_path.GetUserDataDir();
-#endif
-#ifdef __WXOSX__
+#elif defined(__WXOSX__)
     wxString stdPath  = (std_path.GetUserConfigDir() + s + _T("opencpn"));   // should be ~/Library/Preferences/opencpn
 #endif
 

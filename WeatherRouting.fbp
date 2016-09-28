@@ -12813,7 +12813,7 @@
                                             <object class="notebookpage" expanded="0">
                                                 <property name="bitmap"></property>
                                                 <property name="label">Plot</property>
-                                                <property name="select">0</property>
+                                                <property name="select">1</property>
                                                 <object class="wxPanel" expanded="0">
                                                     <property name="BottomDockable">1</property>
                                                     <property name="LeftDockable">1</property>
@@ -12988,7 +12988,7 @@
                                             <object class="notebookpage" expanded="0">
                                                 <property name="bitmap"></property>
                                                 <property name="label">Cross Over Chart</property>
-                                                <property name="select">1</property>
+                                                <property name="select">0</property>
                                                 <object class="wxPanel" expanded="0">
                                                     <property name="BottomDockable">1</property>
                                                     <property name="LeftDockable">1</property>
@@ -26027,7 +26027,7 @@
                                     <property name="cols">1</property>
                                     <property name="flexible_direction">wxBOTH</property>
                                     <property name="growablecols">0</property>
-                                    <property name="growablerows">1</property>
+                                    <property name="growablerows">0</property>
                                     <property name="hgap">0</property>
                                     <property name="minimum_size"></property>
                                     <property name="name">fgSizer102</property>
