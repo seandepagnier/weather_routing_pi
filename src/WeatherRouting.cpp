@@ -478,6 +478,7 @@ void WeatherRouting::OnDeletePosition( wxCommandEvent& event )
     wxListItem it;
     it.SetId(index);
     it.SetColumn(0);
+    it.SetMask(wxLIST_MASK_TEXT); // Note use of the mask, somehow it's required for this to work correctly on windows
     m_lPositions->GetItem(it);
     wxString name = it.GetText();
 
