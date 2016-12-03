@@ -98,6 +98,9 @@ static double Swell(GribRecordSet *grib, double lat, double lon)
     double height = grh->getInterpolatedValue(lon, lat, true );
     if(height == GRIB_NOTDEF)
         return 0;
+    // yep swell data can be negative!
+    if (height < 0.)
+        return 0.;
     return height;
 }
 

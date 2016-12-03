@@ -80,7 +80,7 @@ public:
     virtual void Clear();
     virtual void Lock() { routemutex.Lock(); }
     virtual void Unlock() { routemutex.Unlock(); }
-    bool Running() { return m_Thread && m_Thread->IsRunning(); }
+    bool Running() { return m_Thread && m_Thread->IsAlive(); }
 
     bool Start(wxString &error);
     void DeleteThread(); // like Stop(), but waits until the thread is deleted
