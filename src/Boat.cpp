@@ -56,7 +56,8 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
    
     TiXmlDocument doc;
     if(!doc.LoadFile( filename.mb_str() ))
-        return _("Failed to load file: ") + filename;
+        return _("Failed to load file: ") + filename + _T("\n") +
+            _("It should an xml file describing a boat, not a polar; try editing the boat.");
 
     TiXmlHandle root( doc.RootElement() );
     if(strcmp(doc.RootElement()->Value(), "OpenCPNWeatherRoutingBoat"))
