@@ -214,15 +214,18 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         wxJSONValue v;
         r.Parse(message_body, &v);
 
-        wxDateTime time;
-        time.Set
-            (v[_T("Day")].AsInt(), (wxDateTime::Month)v[_T("Month")].AsInt(), v[_T("Year")].AsInt(),
-             v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
+        if (v[_T("Day")].AsInt() != -1) {
+            wxDateTime time;
+        
+            time.Set
+              (v[_T("Day")].AsInt(), (wxDateTime::Month)v[_T("Month")].AsInt(), v[_T("Year")].AsInt(),
+               v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
 
-        if(m_pWeather_Routing) {
-            m_pWeather_Routing->m_ConfigurationDialog.m_GribTimelineTime = time.ToUTC();
+            if (m_pWeather_Routing && time.IsValid()) {
+                m_pWeather_Routing->m_ConfigurationDialog.m_GribTimelineTime = time.ToUTC();
 //            m_pWeather_Routing->m_ConfigurationDialog.m_cbUseGrib->Enable();
-            RequestRefresh(m_parent_window);
+                RequestRefresh(m_parent_window);
+            }
         }
     }
     if(message_id == _T("GRIB_TIMELINE_RECORD"))
