@@ -412,12 +412,18 @@ void WeatherRouting::OnNewPosition( wxCommandEvent& event )
         wxString latitude_minutes = dlg.m_tLatitudeMinutes->GetValue();
         latitude_degrees.ToDouble(&lat);
         latitude_minutes.ToDouble(&lat_minutes);
+        lat_minutes = fabs(lat_minutes);
+        if(lat < 0)
+            lat_minutes = -lat_minutes;
         lat += lat_minutes / 60;
 
         wxString longitude_degrees = dlg.m_tLongitudeDegrees->GetValue();
         wxString longitude_minutes = dlg.m_tLongitudeMinutes->GetValue();
         longitude_degrees.ToDouble(&lon);
         longitude_minutes.ToDouble(&lon_minutes);
+        lon_minutes = fabs(lon_minutes);
+        if(lon < 0)
+            lon_minutes = -lon_minutes;
         lon += lon_minutes / 60;
 
         AddPosition(lat, lon, dlg.m_tName->GetValue());
@@ -981,7 +987,7 @@ void WeatherRouting::OnCursorPosition( wxCommandEvent& event )
 
 void WeatherRouting::OnManual ( wxCommandEvent& event )
 {
-    wxLaunchDefaultBrowser(_T("http://opencpn.org/ocpn/Plugins_external_weather_routing"));
+    wxLaunchDefaultBrowser(_T("https://opencpn.org/OpenCPN/plugins/weatherroute.html"));
 }
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
