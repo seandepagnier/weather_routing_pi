@@ -611,21 +611,24 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
                 {
                 double W1, VW1, W2, VW2;
                 int data_mask1, data_mask2; // can be used to colorize barbs based on data type
-
+                bool v1, v2;
                 // now it is the isochron before p, so we find the two closest postions
                 Position *p1 = (*it)->ClosestPosition(lat, lon);
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
-                p.GetWindData(configuration, W1, VW1, data_mask1);
+                v1 = p.GetWindData(configuration, W1, VW1, data_mask1);
 
                 it++;
                 Position *p2 = (*it)->ClosestPosition(lat, lon);
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
-                p.GetWindData(configuration, W2, VW2, data_mask2);
-
+                v2 = p.GetWindData(configuration, W2, VW2, data_mask2);
+                if (!v1 || !v2) {
+                    // not valid data
+                    goto skip;
+                }
                 // now polar interpolation of the two wind positions
                 double d1 = p.Distance(p1), d2 = p.Distance(p2);
                 double d = d1 / (d1+d2);
@@ -804,15 +807,19 @@ void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
-                p.GetCurrentData(configuration, W1, VW1, data_mask1);
+                bool v1, v2;
+                
+                v1 = p.GetCurrentData(configuration, W1, VW1, data_mask1);
 
                 it++;
                 Position *p2 = (*it)->ClosestPosition(lat, lon);
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
-                p.GetCurrentData(configuration, W2, VW2, data_mask2);
-
+                v2 = p.GetCurrentData(configuration, W2, VW2, data_mask2);
+                if (!v1 || !v2) {
+                    goto skip;
+                }
 #if 0
                 // XX climatology angle is to not from
                 if ((data_mask1 & Position::CLIMATOLOGY_CURRENT))
