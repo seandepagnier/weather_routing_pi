@@ -502,18 +502,18 @@ void Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &con
     OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
 }
 
-void Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
+bool Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
 {
     double WG, VWG, C, VC;
     climatology_wind_atlas atlas;
-    ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
+    return ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
 }
 
-void Position::GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask)
+bool Position::GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask)
 {
     double WG, VWG, W, VW;
     climatology_wind_atlas atlas;
-    ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
+    return ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
 }
 
 static inline bool ComputeBoatSpeed
