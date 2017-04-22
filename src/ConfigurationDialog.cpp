@@ -155,6 +155,8 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_SPIN_VALUE(TimeStepSeconds, (int)(*it).dt%60);
 
     SET_CONTROL(boatFileName, m_tBoat, SetValue, wxString, _T(""));
+    long l = m_tBoat->GetValue().Length();
+    m_tBoat->SetSelection(l, l);
 
     SET_CHOICE(End);
 
@@ -218,6 +220,9 @@ void ConfigurationDialog::ClearSources()
 void ConfigurationDialog::SetBoatFilename(wxString path)
 {
     m_tBoat->SetValue(path);
+    long l = m_tBoat->GetValue().Length();
+    m_tBoat->SetSelection(l, l);
+
     Update();
 }
 
