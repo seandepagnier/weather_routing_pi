@@ -24,8 +24,9 @@
  */
 
 #include <wx/wx.h>
-#include "ocpn_plugin.h"
+#include <wx/glcanvas.h>
 
+#include "ocpn_plugin.h"
 #include "LineBufferOverlay.h"
 
 void LineBuffer::pushLine( float x0, float y0, float x1, float y1 )

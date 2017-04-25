@@ -26,40 +26,39 @@
 #ifndef _PLUGIN_H_
 #define _PLUGIN_H_
 
-
 #ifndef DECL_EXP
 #ifdef __WXMSW__
 #  define DECL_EXP     __declspec(dllexport)
 #else
-#  define DECL_EXP
+# ifdef __GNUC__
+# define DECL_EXP       __attribute__((visibility("default")))
+# endif
 #endif
 #endif
 
-
-#ifdef __GNUC__
-#undef  DECL_EXP
-#define DECL_EXP       __attribute__((visibility("default")))
-#endif
 
 #include <wx/xml/xml.h>
 
+#ifdef ocpnUSE_SVG
+#include "wxsvg/include/wxSVG/svg.h"
+#endif // ocpnUSE_SVG
+
 class wxGLContext;
-#ifdef ocpnUSE_GL
-#include <wx/glcanvas.h>
-#endif
 
 //    This is the most modern API Version number
 //    It is expected that the API will remain downward compatible, meaning that
 //    PlugIns conforming to API Version less then the most modern will also
 //    be correctly supported.
 #define API_VERSION_MAJOR           1
-#define API_VERSION_MINOR           11
+#define API_VERSION_MINOR           14
 
 //    Fwd Definitions
 class       wxFileConfig;
 class       wxNotebook;
 class       wxFont;
 class       wxAuiManager;
+class       wxScrolledWindow;
+class       wxGLCanvas;
 
 //---------------------------------------------------------------------------------------------------------
 //
@@ -85,6 +84,9 @@ class       wxAuiManager;
 #define     WANTS_DYNAMIC_OPENGL_OVERLAY_CALLBACK     0x00010000
 #define     WANTS_LATE_INIT                           0x00020000
 #define     INSTALLS_PLUGIN_CHART_GL                  0x00040000
+#define     WANTS_MOUSE_EVENTS                        0x00080000
+#define     WANTS_VECTOR_CHART_OBJECT_INFO            0x00100000
+#define     WANTS_KEYBOARD_EVENTS                     0x00200000
 
 //----------------------------------------------------------------------------------------------------------
 //    Some PlugIn API interface object class definitions
@@ -224,7 +226,13 @@ typedef enum OcpnProjTypePI
       PI_PROJECTION_UNKNOWN,
       PI_PROJECTION_MERCATOR,
       PI_PROJECTION_TRANSVERSE_MERCATOR,
-      PI_PROJECTION_POLYCONIC
+      PI_PROJECTION_POLYCONIC,
+
+      PI_PROJECTION_ORTHOGRAPHIC,
+      PI_PROJECTION_POLAR,
+      PI_PROJECTION_STEREOGRAPHIC,
+      PI_PROJECTION_GNOMONIC,
+      PI_PROJECTION_EQUIRECTANGULAR
 }_OcpnProjTypePI;
 
 typedef struct _ExtentPI{
@@ -304,7 +312,8 @@ class DECL_EXP PlugInChartBase : public wxObject
             virtual int GetSize_X();
             virtual int GetSize_Y();
             virtual void latlong_to_chartpix(double lat, double lon, double &pixx, double &pixy);
-
+            virtual void chartpix_to_latlong(double pixx, double pixy, double *plat, double *plon);
+            
       protected:
             ChartTypeEnumPI     m_ChartType;
             ChartFamilyEnumPI   m_ChartFamily;
@@ -482,6 +491,36 @@ class DECL_EXP opencpn_plugin_111 : public opencpn_plugin_110
 public:
     opencpn_plugin_111(void *pmgr);
     virtual ~opencpn_plugin_111();
+    
+};
+
+class DECL_EXP opencpn_plugin_112 : public opencpn_plugin_111
+{
+public:
+    opencpn_plugin_112(void *pmgr);
+    virtual ~opencpn_plugin_112();
+    
+    virtual bool MouseEventHook( wxMouseEvent &event );
+    virtual void SendVectorChartObjectInfo(wxString &chart, wxString &feature, wxString &objname, double lat, double lon, double scale, int nativescale);
+    
+};
+
+class DECL_EXP opencpn_plugin_113 : public opencpn_plugin_112
+{
+public:
+    opencpn_plugin_113(void *pmgr);
+    virtual ~opencpn_plugin_113();
+    
+    virtual bool KeyboardEventHook( wxKeyEvent &event );
+    virtual void OnToolbarToolDownCallback(int id);
+    virtual void OnToolbarToolUpCallback(int id);
+};
+
+class DECL_EXP opencpn_plugin_114 : public opencpn_plugin_113
+{
+public:
+  opencpn_plugin_114(void *pmgr);
+  virtual ~opencpn_plugin_114();
 
 };
 
@@ -519,6 +558,7 @@ public:
     wxString          m_MarkName;
     wxString          m_MarkDescription;
     wxDateTime        m_CreateTime;
+	bool			  m_IsVisible;
 
     wxString          m_IconName;
 
@@ -567,13 +607,20 @@ public:
 //----------------------------------------------------------------------------------------------------------
 
 
-extern "C"  DECL_EXP int InsertPlugInTool(wxString label, wxBitmap *bitmap, wxBitmap *bmpDisabled, wxItemKind kind,
+extern "C"  DECL_EXP int InsertPlugInTool(wxString label, wxBitmap *bitmap, wxBitmap *bmpRollover, wxItemKind kind,
                                           wxString shortHelp, wxString longHelp, wxObject *clientData, int position,
                                           int tool_sel, opencpn_plugin *pplugin);
 extern "C"  DECL_EXP void RemovePlugInTool(int tool_id);
 extern "C"  DECL_EXP void SetToolbarToolViz(int item, bool viz);      // Temporarily change toolbar tool viz
 extern "C"  DECL_EXP void SetToolbarItemState(int item, bool toggle);
-extern "C"  DECL_EXP void SetToolbarToolBitmaps(int item, wxBitmap *bitmap, wxBitmap *bmpDisabled);
+extern "C"  DECL_EXP void SetToolbarToolBitmaps(int item, wxBitmap *bitmap, wxBitmap *bmpRollover);
+
+extern "C"  DECL_EXP int InsertPlugInToolSVG(wxString label, wxString SVGfile, wxString SVGfileRollover, wxString SVGfileToggled,
+                                          wxItemKind kind, wxString shortHelp, wxString longHelp,
+                                          wxObject *clientData, int position, int tool_sel, opencpn_plugin *pplugin);
+extern "C"  DECL_EXP void SetToolbarToolBitmapsSVG(int item, wxString SVGfile,
+                                                   wxString SVGfileRollover,
+                                                   wxString SVGfileToggled );
 
 extern "C"  DECL_EXP  int AddCanvasContextMenuItem(wxMenuItem *pitem, opencpn_plugin *pplugin );
 extern "C"  DECL_EXP void RemoveCanvasContextMenuItem(int item);      // Fully remove this item
@@ -699,12 +746,21 @@ extern  DECL_EXP wxString GetOCPN_ExePath( void );
 extern "C"  DECL_EXP wxString *GetpPlugInLocation();
 extern  DECL_EXP wxString GetPlugInPath(opencpn_plugin *pplugin);
 
-extern "C"  DECL_EXP int AddChartToDBInPlace( wxString &full_path, bool b_ProgressDialog );
+extern "C"  DECL_EXP int AddChartToDBInPlace( wxString &full_path, bool b_RefreshCanvas );
 extern "C"  DECL_EXP int RemoveChartFromDBInPlace( wxString &full_path );
-
+extern  DECL_EXP wxString GetLocaleCanonicalName();
 
 //  API 1.11 adds access to S52 Presentation library
 //Types
+
+//      A flag field that defines the object capabilities passed by a chart to the S52 PLIB
+
+#define PLIB_CAPS_LINE_VBO              1
+#define PLIB_CAPS_LINE_BUFFER           1 << 1
+#define PLIB_CAPS_SINGLEGEO_BUFFER      1 << 2
+#define PLIB_CAPS_OBJSEGLIST            1 << 3
+#define PLIB_CAPS_OBJCATMUTATE          1 << 4
+
 
 class PI_S57Obj;
 
@@ -734,6 +790,41 @@ public:
     
 };
 
+
+// ----------------------------------------------------------------------------
+// PlugInChartBaseExtended
+//  Derived from PlugInChartBase, add extended chart support methods
+// ----------------------------------------------------------------------------
+
+class DECL_EXP PlugInChartBaseExtended : public PlugInChartBase
+{
+public:
+    PlugInChartBaseExtended();
+    virtual ~PlugInChartBaseExtended();
+    
+    virtual int RenderRegionViewOnGL( const wxGLContext &glc, const PlugIn_ViewPort& VPoint,
+                                      const wxRegion &Region, bool b_use_stencil );
+    
+    virtual wxBitmap &RenderRegionViewOnDCNoText(  const PlugIn_ViewPort& VPoint, const wxRegion &Region);
+    virtual bool RenderRegionViewOnDCTextOnly( wxMemoryDC &dc, const PlugIn_ViewPort& VPoint, const wxRegion &Region);
+    
+    virtual int RenderRegionViewOnGLNoText( const wxGLContext &glc, const PlugIn_ViewPort& VPoint,
+                                            const wxRegion &Region, bool b_use_stencil );
+
+    virtual int RenderRegionViewOnGLTextOnly( const wxGLContext &glc, const PlugIn_ViewPort& VPoint,
+                                              const wxRegion &Region, bool b_use_stencil );
+    
+    virtual ListOfPI_S57Obj *GetObjRuleListAtLatLon(float lat, float lon, float select_radius, PlugIn_ViewPort *VPoint);
+    virtual wxString CreateObjDescriptions( ListOfPI_S57Obj* obj_list );
+    
+    virtual int GetNoCOVREntries();
+    virtual int GetNoCOVRTablePoints(int iTable);
+    virtual int  GetNoCOVRTablenPoints(int iTable);
+    virtual float *GetNoCOVRTableHead(int iTable);
+    
+    virtual void ClearPLIBTextList();
+    
+};
 
 
 
@@ -785,6 +876,22 @@ typedef enum PI_InitReturn
     PI_INIT_FAIL_REMOVE,       // Init failed, suggest remove from further use
     PI_INIT_FAIL_NOERROR       // Init failed, request no explicit error message
 }_PI_InitReturn;
+
+class PI_line_segment_element
+{
+public:
+    size_t              vbo_offset;
+    size_t              n_points;
+    int                 priority;
+    float               lat_max;                // segment bounding box
+    float               lat_min;
+    float               lon_max;
+    float               lon_min;
+    int                 type;
+    void                *private0;
+   
+    PI_line_segment_element *next;
+};
 
 
 class DECL_EXP PI_S57Obj
@@ -849,13 +956,21 @@ public:
 
       PI_S57Obj               *next;            //  List linkage
 
-
                                                       // This transform converts from object geometry
                                                       // to SM coordinates.
       double                  x_rate;                 // These auxiliary transform coefficients are
       double                  y_rate;                 // to be used in GetPointPix() and friends
       double                  x_origin;               // on a per-object basis if necessary
       double                  y_origin;
+      
+      int auxParm0;                                   // some per-object auxiliary parameters, used for OpenGL
+      int auxParm1;
+      int auxParm2;
+      int auxParm3;
+
+      PI_line_segment_element *m_ls_list;
+      bool                    m_bcategory_mutable;
+      int                     m_DPRI;
 };
 
 
@@ -875,7 +990,8 @@ PI_DisPrio DECL_EXP PI_GetObjectDisplayPriority( PI_S57Obj *pObj );
 PI_DisCat DECL_EXP PI_GetObjectDisplayCategory( PI_S57Obj *pObj );
 void DECL_EXP PI_PLIBSetLineFeaturePriority( PI_S57Obj *pObj, int prio );
 void DECL_EXP PI_PLIBPrepareForNewRender(void);
-
+void DECL_EXP PI_PLIBFreeContext( void *pContext );
+void DECL_EXP PI_PLIBSetRenderCaps( unsigned int flags );
 
 bool DECL_EXP PI_PLIBSetContext( PI_S57Obj *pObj );
 
@@ -889,5 +1005,216 @@ int DECL_EXP PI_PLIBRenderAreaToGL( const wxGLContext &glcc, PI_S57Obj *pObj,
 int DECL_EXP PI_PLIBRenderObjectToGL( const wxGLContext &glcc, PI_S57Obj *pObj,
                                     PlugIn_ViewPort *vp, wxRect &render_rect );
 
+/* API 1.11 OpenGL Display List and vertex buffer object routines
+
+   Effectively these two routines cancel each other so all
+   of the translation, scaling and rotation can be done by opengl.
+
+   Display lists need only be built infrequently, but used in each frame
+   greatly accelerates the speed of rendering.  This avoids costly calculations,
+   and also allows the vertexes to be stored in graphics memory.
+
+   static int dl = 0;
+   glPushMatrix();
+   PlugInMultMatrixViewport(current_viewport);
+   if(dl)
+      glCallList(dl);
+   else {
+      dl = glGenLists(1);
+      PlugInViewPort norm_viewport = current_viewport;
+      NormalizeViewPort(norm_viewport);
+      glNewList(dl, GL_COMPILE_AND_EXECUTE);
+      ... // use norm_viewport with GetCanvasLLPix here
+      glEndList();
+   }      
+   glPopMatrix();
+   ... // use current_viewport with GetCanvasLLPix again
+*/
+
+extern DECL_EXP bool PlugInHasNormalizedViewPort ( PlugIn_ViewPort *vp );
+extern DECL_EXP void PlugInMultMatrixViewport ( PlugIn_ViewPort *vp, float lat=0, float lon=0 );
+extern DECL_EXP void PlugInNormalizeViewport ( PlugIn_ViewPort *vp, float lat=0, float lon=0 );
+
+class wxPoint2DDouble;
+extern "C"  DECL_EXP void GetDoubleCanvasPixLL(PlugIn_ViewPort *vp, wxPoint2DDouble *pp, double lat, double lon);
+
+/* API 1.13  */
+/* API 1.13  adds some more common functions to avoid unnecessary code duplication */
+
+
+extern DECL_EXP double fromDMM_Plugin( wxString sdms );
+extern DECL_EXP void SetCanvasRotation(double rotation);
+extern DECL_EXP void SetCanvasProjection(int projection);
+extern DECL_EXP bool GetSingleWaypoint( wxString GUID, PlugIn_Waypoint *pwaypoint );
+extern DECL_EXP bool CheckEdgePan_PlugIn( int x, int y, bool dragging, int margin, int delta );
+extern DECL_EXP wxBitmap GetIcon_PlugIn(const wxString & name);
+extern DECL_EXP void SetCursor_PlugIn( wxCursor *pPlugin_Cursor = NULL );
+extern DECL_EXP wxFont *GetOCPNScaledFont_PlugIn(wxString TextElement, int default_size = 0);
+extern DECL_EXP wxFont GetOCPNGUIScaledFont_PlugIn(wxString item);
+extern DECL_EXP double GetOCPNGUIToolScaleFactor_PlugIn(int GUIScaledFactor);
+extern DECL_EXP double GetOCPNGUIToolScaleFactor_PlugIn();
+extern DECL_EXP float  GetOCPNChartScaleFactor_Plugin();
+extern DECL_EXP wxColour GetFontColour_PlugIn(wxString TextElement);
+
+extern DECL_EXP double GetCanvasTilt();
+extern DECL_EXP void SetCanvasTilt(double tilt);
+
+extern DECL_EXP bool PlugInPlaySoundEx( wxString &sound_file, int deviceIndex=-1 );
+extern DECL_EXP void AddChartDirectory( wxString &path );
+extern DECL_EXP void ForceChartDBUpdate();
+
+extern  DECL_EXP wxString GetWritableDocumentsDir( void );
+extern  DECL_EXP wxDialog *GetActiveOptionsDialog();
+extern  DECL_EXP wxArrayString GetWaypointGUIDArray( void );
+
+extern  DECL_EXP bool AddPersistentFontKey(wxString TextElement);
+extern  DECL_EXP wxString GetActiveStyleName();
+
+extern  DECL_EXP wxBitmap GetBitmapFromSVGFile(wxString filename, unsigned int width, unsigned int height);
+extern  DECL_EXP bool IsTouchInterface_PlugIn(void);
+
+/*  Platform optimized File/Dir selector dialogs */
+extern  DECL_EXP int PlatformDirSelectorDialog( wxWindow *parent, wxString *file_spec, wxString Title, wxString initDir);
+
+extern  DECL_EXP int PlatformFileSelectorDialog( wxWindow *parent, wxString *file_spec, wxString Title, wxString initDir,
+                                wxString suggestedName, wxString wildcard);
+
+
+/*  OpenCPN HTTP File Download PlugIn Interface   */
+
+/*   Various method Return Codes, etc          */
+typedef enum _OCPN_DLStatus{
+    OCPN_DL_UNKNOWN         =-1,
+    OCPN_DL_NO_ERROR        = 0,
+    OCPN_DL_FAILED          = 1,
+    OCPN_DL_ABORTED         = 2,
+    OCPN_DL_USER_TIMEOUT    = 4,
+    OCPN_DL_STARTED         = 8
+}OCPN_DLStatus;
+
+
+typedef enum _OCPN_DLCondition{
+    OCPN_DL_EVENT_TYPE_UNKNOWN      = -1,
+    OCPN_DL_EVENT_TYPE_START        = 80,
+    OCPN_DL_EVENT_TYPE_PROGRESS     = 81,
+    OCPN_DL_EVENT_TYPE_END          = 82
+}OCPN_DLCondition;
+
+//      Style definitions for Synchronous file download modal dialogs, if desired.
+//      Abstracted from wxCURL package
+enum OCPN_DLDialogStyle
+{
+    OCPN_DLDS_ELAPSED_TIME = 0x0001,       //!< The dialog shows the elapsed time.
+    OCPN_DLDS_ESTIMATED_TIME = 0x0002,     //!< The dialog shows the estimated total time.
+    OCPN_DLDS_REMAINING_TIME = 0x0004,     //!< The dialog shows the remaining time.
+    OCPN_DLDS_SPEED = 0x0008,              //!< The dialog shows the transfer speed.
+    OCPN_DLDS_SIZE = 0x0010,               //!< The dialog shows the size of the resource to download/upload.
+    OCPN_DLDS_URL = 0x0020,                //!< The dialog shows the URL involved in the transfer.
+    
+    // styles related to the use of wxCurlConnectionSettingsDialog:
+    
+    OCPN_DLDS_CONN_SETTINGS_AUTH = 0x0040,  //!< The dialog allows the user to change the authentication settings.
+    OCPN_DLDS_CONN_SETTINGS_PORT = 0x0080,  //!< The dialog allows the user to change the port for the transfer.
+    OCPN_DLDS_CONN_SETTINGS_PROXY = 0x0100, //!< The dialog allows the user to change the proxy settings.
+    
+    OCPN_DLDS_CONN_SETTINGS_ALL = OCPN_DLDS_CONN_SETTINGS_AUTH|OCPN_DLDS_CONN_SETTINGS_PORT|OCPN_DLDS_CONN_SETTINGS_PROXY,
+    
+    OCPN_DLDS_SHOW_ALL =OCPN_DLDS_ELAPSED_TIME|OCPN_DLDS_ESTIMATED_TIME|OCPN_DLDS_REMAINING_TIME|
+    OCPN_DLDS_SPEED|OCPN_DLDS_SIZE|OCPN_DLDS_URL|OCPN_DLDS_CONN_SETTINGS_ALL,
+    
+    OCPN_DLDS_CAN_ABORT = 0x0200,          //!< The transfer can be aborted by the user.
+    OCPN_DLDS_CAN_START = 0x0400,          //!< The transfer won't start automatically. The user needs to start it.
+    OCPN_DLDS_CAN_PAUSE = 0x0800,          //!< The transfer can be paused.
+    
+    OCPN_DLDS_AUTO_CLOSE = 0x1000,         //!< The dialog auto closes when transfer is complete.
+    
+    // by default all available features are enabled:
+    OCPN_DLDS_DEFAULT_STYLE = OCPN_DLDS_CAN_START|OCPN_DLDS_CAN_PAUSE|OCPN_DLDS_CAN_ABORT|OCPN_DLDS_SHOW_ALL|OCPN_DLDS_AUTO_CLOSE
+};
+
+#define ONLINE_CHECK_RETRY 30 // Recheck the Internet connection availability every ONLINE_CHECK_RETRY s
+
+/*   Synchronous (Blocking) download of a single file  */
+
+extern DECL_EXP _OCPN_DLStatus OCPN_downloadFile( const wxString& url, const wxString &outputFile, 
+                                       const wxString &title, const wxString &message, 
+                                       const wxBitmap& bitmap,
+                                       wxWindow *parent, long style, int timeout_secs);
+
+
+/*   Asynchronous (Background) download of a single file  */
+
+extern DECL_EXP _OCPN_DLStatus OCPN_downloadFileBackground( const wxString& url, const wxString &outputFile,
+                                                  wxEvtHandler *handler, long *handle);
+
+extern DECL_EXP void OCPN_cancelDownloadFileBackground( long handle );
+
+/*   Synchronous (Blocking) HTTP POST operation for small amounts of data */
+
+extern DECL_EXP _OCPN_DLStatus OCPN_postDataHttp( const wxString& url, const wxString& parameters, wxString& result, int timeout_secs );
+
+/*   Check whether connection to the Internet is working */
+
+extern DECL_EXP bool OCPN_isOnline();
+
+/*  Supporting  Event for Background downloading          */
+/*  OCPN_downloadEvent Definition  */
+
+/*  PlugIn should be ready/able to handle this event after initiating a background file transfer  
+ * 
+ * The event as received should be parsed primarily by the getDLEventCondition() method.
+ * This will allow identification of download start, progress, and end states.
+ * 
+ * Other accessor methods contain status, byte counts, etc.
+ * 
+ * A PlugIn may safely destroy its EvtHandler after receipt of an OCPN_downloadEvent with 
+ *     getDLEventCondition == OCPN_DL_EVENT_TYPE_END
+ */
+
+class DECL_EXP OCPN_downloadEvent: public wxEvent
+{
+public:
+    OCPN_downloadEvent( wxEventType commandType = wxEVT_NULL, int id = 0 );
+    ~OCPN_downloadEvent( );
+    
+    // accessors
+    _OCPN_DLStatus getDLEventStatus(){ return m_stat; }
+    OCPN_DLCondition getDLEventCondition(){ return m_condition; }
+    
+    void setDLEventStatus( _OCPN_DLStatus stat ){ m_stat = stat; }
+    void setDLEventCondition( OCPN_DLCondition cond ){ m_condition = cond; }
+    
+    void setTotal( long bytes ){m_totalBytes = bytes; }
+    void setTransferred( long bytes ){m_sofarBytes = bytes; }
+    long getTotal(){ return m_totalBytes; }
+    long getTransferred(){ return m_sofarBytes; }
+    
+    void setComplete(bool b_complete){ m_b_complete = b_complete; }
+    bool getComplete(){ return m_b_complete; }
+    
+    
+    // required for sending with wxPostEvent()
+    wxEvent *Clone() const;
+    
+private:
+    OCPN_DLStatus m_stat;
+    OCPN_DLCondition m_condition;
+    
+    long m_totalBytes;
+    long m_sofarBytes;
+    bool m_b_complete;
+};
+
+//DECLARE_EVENT_TYPE(wxEVT_DOWNLOAD_EVENT, -1)
+//extern const wxEventType DECL_EXP wxEVT_DOWNLOAD_EVENT;
+
+extern WXDLLIMPEXP_CORE const wxEventType wxEVT_DOWNLOAD_EVENT;
+
+// API 1.14 Extra canvas Support
+
+/* Allow drawing of objects onto other OpenGL canvases */
+extern void PlugInAISDrawGL( wxGLCanvas* glcanvas, const PlugIn_ViewPort& vp );
+extern wxColour PlugInGetFontColor(const wxString TextElement);
+extern bool PlugInSetFontColor(const wxString TextElement, const wxColour color);
 
 #endif //_PLUGIN_H_

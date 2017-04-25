@@ -24,6 +24,7 @@
  */
 
 #include <wx/wx.h>
+#include <wx/glcanvas.h>
 
 #include "ocpn_plugin.h"
 #include "wrdc.h"

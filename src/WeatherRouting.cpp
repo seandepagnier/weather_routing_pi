@@ -32,6 +32,8 @@
 #include <math.h>
 #include <time.h>
 
+#include <wx/glcanvas.h>
+
 #include "tinyxml/tinyxml.h"
 
 #include "Utilities.h"
