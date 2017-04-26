@@ -875,10 +875,12 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
        Polar::VelocityApparentWind(VB, H, VW) > configuration.MaxApparentWindKnots)
         return NAN;
 
+#if 0
     /* landfall test if we are within 60 miles (otherwise it's very slow) */
     if(configuration.DetectLand && dist < 60
        && CrossesLand(configuration.EndLat, configuration.EndLon))
         return NAN;
+#endif
 
     /* Boundary test */
     if(configuration.DetectBoundary && EntersBoundary(configuration.EndLat, configuration.EndLon))
