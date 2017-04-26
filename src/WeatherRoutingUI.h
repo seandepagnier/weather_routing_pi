@@ -68,8 +68,8 @@ class WeatherRoutingBase : public wxFrame
 		wxListCtrl* m_lWeatherRoutes;
 		wxButton* m_bCompute;
 		wxButton* m_bExport;
-		wxMenu* m_mFile;
 		wxMenuBar* m_menubar3;
+		wxMenu* m_mFile;
 		wxMenu* m_mPosition;
 		wxMenu* m_mConfiguration;
 		wxMenuItem* m_mBatch;
@@ -134,11 +134,6 @@ class WeatherRoutingBase : public wxFrame
 		{
 			m_splitter1->SetSashPosition( 120 );
 			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( WeatherRoutingBase::m_splitter1OnIdle ), NULL, this );
-		}
-		
-		void WeatherRoutingBaseOnContextMenu( wxMouseEvent &event )
-		{
-			this->PopupMenu( m_mFile, event.GetPosition() );
 		}
 	
 };

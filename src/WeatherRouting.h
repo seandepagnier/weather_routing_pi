@@ -205,6 +205,8 @@ private:
     bool m_bShowSettings, m_bShowStatistics, m_bShowReport, m_bShowPlot, m_bShowFilter;
 
     weather_routing_pi &m_weather_routing_pi;
+
+    wxFileName m_FileName;
 };
 
 #endif

@@ -191,7 +191,7 @@ WeatherRouting::~WeatherRouting( )
     pConf->Write ( _T ( "DialogWidth" ), s.x);
     pConf->Write ( _T ( "DialogHeight" ), s.y);
 
-    SaveXML(m_default_configuration_path);
+    SaveXML(m_FileName.GetFullPath());
 
     for(std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
         it != m_WeatherRoutes.end(); it++)
@@ -743,7 +743,7 @@ void WeatherRouting::OnOpen( wxCommandEvent& event )
 {
     wxString error;
     wxFileDialog openDialog
-        ( this, _( "Select Configuration" ), _T(""), wxT ( "" ),
+        ( this, _( "Select Configuration" ), m_FileName.GetPath(), m_FileName.GetName(),
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 
@@ -759,7 +759,7 @@ void WeatherRouting::OnSave( wxCommandEvent& event )
 {
     wxString error;
     wxFileDialog saveDialog
-        ( this, _( "Select Configuration" ), wxEmptyString, wxEmptyString,
+        ( this, _( "Select Configuration" ), m_FileName.GetPath(), m_FileName.GetName(),
           wxT ( "XML files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_SAVE  );
 
@@ -1100,8 +1100,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
     wxString error;
 
     wxFileName fn(filename);
-
     SetTitle(_("Weather Routing") + wxString(_T(" - ")) + fn.GetFullName());
+    m_FileName = fn;
 
     wxProgressDialog *progressdialog = NULL;
     wxDateTime start = wxDateTime::UNow();
@@ -1245,6 +1245,10 @@ failed:
 
 void WeatherRouting::SaveXML(wxString filename)
 {
+    wxFileName fn(filename);
+    SetTitle(_("Weather Routing") + wxString(_T(" - ")) + fn.GetFullName());
+    m_FileName = fn;
+
     TiXmlDocument doc;
     TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "utf-8", "" );
     doc.LinkEndChild( decl );

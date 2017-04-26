@@ -91,6 +91,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	this->SetSizer( fgSizer92 );
 	this->Layout();
+	m_menubar3 = new wxMenuBar( 0 );
 	m_mFile = new wxMenu();
 	wxMenuItem* m_mOpen;
 	m_mOpen = new wxMenuItem( m_mFile, wxID_ANY, wxString( _("&Open") ) + wxT('\t') + wxT("Ctrl+O"), wxEmptyString, wxITEM_NORMAL );
@@ -106,9 +107,8 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	m_mClose = new wxMenuItem( m_mFile, wxID_ANY, wxString( _("&Close") ) + wxT('\t') + wxT("Ctrl+W"), wxEmptyString, wxITEM_NORMAL );
 	m_mFile->Append( m_mClose );
 	
-	this->Connect( wxEVT_RIGHT_DOWN, wxMouseEventHandler( WeatherRoutingBase::WeatherRoutingBaseOnContextMenu ), NULL, this ); 
+	m_menubar3->Append( m_mFile, _("&File") ); 
 	
-	m_menubar3 = new wxMenuBar( 0 );
 	m_mPosition = new wxMenu();
 	wxMenuItem* m_mNewPosition;
 	m_mNewPosition = new wxMenuItem( m_mPosition, wxID_ANY, wxString( _("&New Position") ) , wxEmptyString, wxITEM_NORMAL );
@@ -305,7 +305,6 @@ WeatherRoutingBase::~WeatherRoutingBase()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnManual ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
 	
-	delete m_mFile; 
 }
 
 SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
