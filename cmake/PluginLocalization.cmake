@@ -28,7 +28,7 @@ MACRO(GETTEXT_UPDATE_PO _potFile)
 
     ADD_CUSTOM_COMMAND(
       OUTPUT ${_absFile}.dummy
-      COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --width=80 --strict --quiet --update --backup=none --no-location -s ${_absFile} ${_absPotFile}
+      COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --width=80 --strict --quiet --update --backup=none -F ${_absFile} ${_absPotFile}
       DEPENDS ${_absPotFile} ${_absFile}
       COMMENT "${I18N_NAME}-po-update [${_poBasename}]: Updated po file."
       )
