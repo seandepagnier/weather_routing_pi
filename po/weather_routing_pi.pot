@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: weather_routing_pi 1.10\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-29 23:07+0200\n"
+"POT-Creation-Date: 2017-05-01 22:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,6 +87,11 @@ msgstr ""
 msgid "Select Polar File"
 msgstr ""
 
+#: src/BoatDialog.cpp:1041
+#, c-format
+msgid "%.1f True %.1f Apparent"
+msgstr ""
+
 #: src/ConfigurationBatchDialog.cpp:285
 msgid ""
 "Batch mode generates multiple configurations based on the selected "
@@ -143,17 +148,17 @@ msgstr ""
 msgid "Sailboat Transform ETA"
 msgstr ""
 
-#: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:61
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.h:49 src/WeatherRouting.h:71
 #: src/WeatherRoutingUI.cpp:512
 msgid "Start"
 msgstr ""
 
-#: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:61
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.h:49 src/WeatherRouting.h:71
 #: src/WeatherRoutingUI.cpp:2215
 msgid "Start Time"
 msgstr ""
 
-#: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:62
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.h:50 src/WeatherRouting.h:72
 #: src/WeatherRoutingUI.cpp:785
 msgid "End"
 msgstr ""
@@ -162,7 +167,7 @@ msgstr ""
 msgid "BoatFileName"
 msgstr ""
 
-#: src/FilterRoutesDialog.cpp:42 src/WeatherRouting.h:69
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.h:57 src/WeatherRouting.h:79
 #: src/WeatherRoutingUI.cpp:1888
 msgid "State"
 msgstr ""
@@ -413,6 +418,72 @@ msgid ""
 "multiple processors\n"
 msgstr ""
 
+#: src/SettingsDialog.h:50 src/WeatherRouting.h:72
+msgid "End Time"
+msgstr ""
+
+#: src/SettingsDialog.h:50 src/WeatherRouting.h:72
+msgid "Time"
+msgstr ""
+
+#: src/SettingsDialog.h:50 src/WeatherRouting.h:72
+msgid "Distance"
+msgstr ""
+
+#: src/SettingsDialog.h:51 src/WeatherRouting.h:73
+msgid "Avg Speed"
+msgstr ""
+
+#: src/SettingsDialog.h:51 src/WeatherRouting.h:73
+msgid "Max Speed"
+msgstr ""
+
+#: src/SettingsDialog.h:52 src/WeatherRouting.h:74
+msgid "Avg Speed Ground"
+msgstr ""
+
+#: src/SettingsDialog.h:52 src/WeatherRouting.h:74
+msgid "Max Speed Ground"
+msgstr ""
+
+#: src/SettingsDialog.h:53 src/WeatherRouting.h:75
+msgid "Avg Wind"
+msgstr ""
+
+#: src/SettingsDialog.h:53 src/WeatherRouting.h:75
+msgid "Max Wind"
+msgstr ""
+
+#: src/SettingsDialog.h:54 src/WeatherRouting.h:76
+msgid "Avg Current"
+msgstr ""
+
+#: src/SettingsDialog.h:54 src/WeatherRouting.h:76
+msgid "Max Current"
+msgstr ""
+
+#: src/SettingsDialog.h:55 src/WeatherRouting.h:77
+msgid "Avg Swell"
+msgstr ""
+
+#: src/SettingsDialog.h:55 src/WeatherRouting.h:77 src/WeatherRoutingUI.cpp:647
+msgid "Max Swell"
+msgstr ""
+
+#: src/SettingsDialog.h:56 src/WeatherRouting.h:78
+msgid "Upwind Percentage"
+msgstr ""
+
+#: src/SettingsDialog.h:57 src/WeatherRouting.h:79
+msgid "Port Starboard"
+msgstr ""
+
+#: src/SettingsDialog.h:57 src/WeatherRouting.h:79 src/WeatherRoutingUI.cpp:1311
+#: src/WeatherRoutingUI.cpp:1327 src/WeatherRoutingUI.cpp:1343
+#: src/WeatherRoutingUI.cpp:2615
+msgid "Tacks"
+msgstr ""
+
 #: src/StatisticsDialog.cpp:62
 msgid "No Route"
 msgstr ""
@@ -622,72 +693,6 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:1762
 msgid "Zero Time Step is invalid"
-msgstr ""
-
-#: src/WeatherRouting.h:62
-msgid "End Time"
-msgstr ""
-
-#: src/WeatherRouting.h:62
-msgid "Time"
-msgstr ""
-
-#: src/WeatherRouting.h:62
-msgid "Distance"
-msgstr ""
-
-#: src/WeatherRouting.h:63
-msgid "Avg Speed"
-msgstr ""
-
-#: src/WeatherRouting.h:63
-msgid "Max Speed"
-msgstr ""
-
-#: src/WeatherRouting.h:64
-msgid "Avg Speed Ground"
-msgstr ""
-
-#: src/WeatherRouting.h:64
-msgid "Max Speed Ground"
-msgstr ""
-
-#: src/WeatherRouting.h:65
-msgid "Avg Wind"
-msgstr ""
-
-#: src/WeatherRouting.h:65
-msgid "Max Wind"
-msgstr ""
-
-#: src/WeatherRouting.h:66
-msgid "Avg Current"
-msgstr ""
-
-#: src/WeatherRouting.h:66
-msgid "Max Current"
-msgstr ""
-
-#: src/WeatherRouting.h:67
-msgid "Avg Swell"
-msgstr ""
-
-#: src/WeatherRouting.h:67 src/WeatherRoutingUI.cpp:647
-msgid "Max Swell"
-msgstr ""
-
-#: src/WeatherRouting.h:68
-msgid "Upwind Percentage"
-msgstr ""
-
-#: src/WeatherRouting.h:69
-msgid "Port Starboard"
-msgstr ""
-
-#: src/WeatherRouting.h:69 src/WeatherRoutingUI.cpp:1311
-#: src/WeatherRoutingUI.cpp:1327 src/WeatherRoutingUI.cpp:1343
-#: src/WeatherRoutingUI.cpp:2615
-msgid "Tacks"
 msgstr ""
 
 #: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:1928
