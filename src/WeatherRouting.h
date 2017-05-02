@@ -77,8 +77,7 @@ public:
                                         _("Avg Swell"), _("Max Swell"),
                                         _("Upwind Percentage"),
                                         _("Port Starboard"), _("Tacks"), _("State")};
-
-
+    int sashpos;
 
     WeatherRouting(wxWindow *parent, weather_routing_pi &plugin);
     ~WeatherRouting();
@@ -163,6 +162,7 @@ private:
 
     void OnComputationTimer( wxTimerEvent & );
     void OnHideConfigurationTimer( wxTimerEvent & );
+    void OnRenderedTimer( wxTimerEvent & );
 
     bool OpenXML(wxString filename, bool reportfailure = true);
     void SaveXML(wxString filename);
