@@ -1109,6 +1109,8 @@ void WeatherRouting::OnRenderedTimer ( wxTimerEvent & )
 {
     // don't do it until the window system is up and running
     if ( GetClientSize().GetWidth() > 20 ) {
+        if (!sashpos)
+	    sashpos = GetClientSize().GetWidth() / 5;
         m_splitter1->SetSashPosition(sashpos, true);
         Disconnect(wxEVT_IDLE, wxTimerEventHandler(WeatherRouting::OnRenderedTimer ), NULL, this );
     }
