@@ -2305,7 +2305,7 @@ msgstr "Affichage courant"
 # File: src/WeatherRoutingUI.cpp, line: 415
 # File: src/WeatherRoutingUI.cpp, line: 415
 msgid "Computation"
-msgstr "En cours de calcul"
+msgstr "Calcul"
 #
 # File: src/WeatherRoutingUI.cpp, line: 422
 # File: src/WeatherRoutingUI.cpp, line: 422
@@ -3701,7 +3701,7 @@ msgstr "Retirer"
 # File: src/WeatherRoutingUI.cpp, line: 1748
 # File: src/WeatherRoutingUI.cpp, line: 1748
 msgid "Open Boat"
-msgstr "Ouvrir un bateau"
+msgstr "Ouvrir bateau"
 #
 # File: src/WeatherRoutingUI.cpp, line: 1751
 # File: src/WeatherRoutingUI.cpp, line: 1751
@@ -3710,7 +3710,7 @@ msgstr "Ouvrir un bateau"
 # File: src/WeatherRoutingUI.cpp, line: 1751
 # File: src/WeatherRoutingUI.cpp, line: 1751
 msgid "Save Boat"
-msgstr "Sauvegarder un bateau"
+msgstr "Sauvegarder bateau"
 #
 # File: src/WeatherRoutingUI.cpp, line: 1754
 # File: src/WeatherRoutingUI.cpp, line: 1754
@@ -3719,7 +3719,7 @@ msgstr "Sauvegarder un bateau"
 # File: src/WeatherRoutingUI.cpp, line: 1754
 # File: src/WeatherRoutingUI.cpp, line: 1754
 msgid "Save As Boat"
-msgstr "Sauvegarder en tant que nouveau bateau"
+msgstr "Sauvegarder nouveau bateau"
 #
 # File: src/WeatherRoutingUI.cpp, line: 1859
 # File: src/WeatherRoutingUI.cpp, line: 1859
