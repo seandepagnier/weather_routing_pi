@@ -329,6 +329,7 @@ void WeatherRouting::UpdateColumns()
             }
 
             m_lWeatherRoutes->InsertColumn(columns[i], name);
+            m_lWeatherRoutes->SetColumnWidth(columns[i], wxLIST_AUTOSIZE);
         } else
             columns[i] = -1;
     }
