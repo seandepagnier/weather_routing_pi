@@ -163,6 +163,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     pConf->Read ( _T ( "DialogWidth" ), &s.x, s.x);
     pConf->Read ( _T ( "DialogHeight" ), &s.y, s.y);
     SetSize(s);
+    pConf->Read ( _T ( "DialogSplit" ), &sashpos, 0);
 
     /* periodically check for updates from computation thread */
     m_tCompute.Connect(wxEVT_TIMER, wxTimerEventHandler
@@ -170,6 +171,9 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
     m_tHideConfiguration.Connect(wxEVT_TIMER, wxTimerEventHandler
                        ( WeatherRouting::OnHideConfigurationTimer ), NULL, this);
+
+    Connect(wxEVT_IDLE, wxTimerEventHandler
+                       ( WeatherRouting::OnRenderedTimer ), NULL, this);
 
     SetEnableConfigurationMenu();
 }
@@ -190,6 +194,7 @@ WeatherRouting::~WeatherRouting( )
     wxSize s = GetSize();
     pConf->Write ( _T ( "DialogWidth" ), s.x);
     pConf->Write ( _T ( "DialogHeight" ), s.y);
+    pConf->Write ( _T ( "DialogSplit" ), m_splitter1->GetSashPosition());
 
     SaveXML(m_FileName.GetFullPath());
 
@@ -271,7 +276,9 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
                 (*it).lat = lat;
                 (*it).lon = lon;
                 m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+                m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
                 m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+                m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
             }
 
             UpdateConfigurations();
@@ -288,8 +295,11 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
     m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
     
     m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+    m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
     m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+    m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
     
+
     m_ConfigurationDialog.AddSource(name);
     m_ConfigurationBatchDialog.AddSource(name);
 }
@@ -319,6 +329,7 @@ void WeatherRouting::UpdateColumns()
             }
 
             m_lWeatherRoutes->InsertColumn(columns[i], name);
+            m_lWeatherRoutes->SetColumnWidth(columns[i], wxLIST_AUTOSIZE);
         } else
             columns[i] = -1;
     }
@@ -1092,6 +1103,17 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
 void WeatherRouting::OnHideConfigurationTimer( wxTimerEvent & )
 {
     m_ConfigurationDialog.Hide();
+}
+
+void WeatherRouting::OnRenderedTimer ( wxTimerEvent & )
+{
+    // don't do it until the window system is up and running
+    if ( GetClientSize().GetWidth() > 20 ) {
+        if (!sashpos)
+	    sashpos = GetClientSize().GetWidth() / 5;
+        m_splitter1->SetSashPosition(sashpos, true);
+        Disconnect(wxEVT_IDLE, wxTimerEventHandler(WeatherRouting::OnRenderedTimer ), NULL, this );
+    }
 }
 
 bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)

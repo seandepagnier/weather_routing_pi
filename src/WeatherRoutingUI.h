@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jul 15 2016)
+// C++ code generated with wxFormBuilder (version Apr 30 2017)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -126,15 +126,9 @@ class WeatherRoutingBase : public wxFrame
 		wxGauge* m_gProgress;
 		wxMenuItem* m_mDeleteAll;
 		
-		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
+		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
-		
-		void m_splitter1OnIdle( wxIdleEvent& )
-		{
-			m_splitter1->SetSashPosition( 120 );
-			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( WeatherRoutingBase::m_splitter1OnIdle ), NULL, this );
-		}
 	
 };
 
@@ -328,7 +322,7 @@ class PlotDialogBase : public wxDialog
 	public:
 		wxRadioButton* m_rbCursorRoute;
 		
-		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Route Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,480 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		PlotDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Route Plot"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~PlotDialogBase();
 	
 };
@@ -428,12 +422,12 @@ class BoatDialogBase : public wxDialog
 	public:
 		wxGauge* m_gCrossOverChart;
 		
-		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,500 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		BoatDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Boat"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~BoatDialogBase();
 		
 		void m_splitter2OnIdle( wxIdleEvent& )
 		{
-			m_splitter2->SetSashPosition( 400 );
+			m_splitter2->SetSashPosition( 0 );
 			m_splitter2->Disconnect( wxEVT_IDLE, wxIdleEventHandler( BoatDialogBase::m_splitter2OnIdle ), NULL, this );
 		}
 	
@@ -491,35 +485,8 @@ class ReportDialogBase : public wxDialog
 	
 	public:
 		
-		ReportDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Route Report"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 600,440 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		ReportDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Route Report"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCLOSE_BOX|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~ReportDialogBase();
-	
-};
-
-///////////////////////////////////////////////////////////////////////////////
-/// Class FilterRoutesDialogBase
-///////////////////////////////////////////////////////////////////////////////
-class FilterRoutesDialogBase : public wxDialog 
-{
-	private:
-	
-	protected:
-		wxChoice* m_cCategory;
-		wxTextCtrl* m_tFilter;
-		wxButton* m_button48;
-		wxButton* m_bDone;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void OnCategory( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnFilterText( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnResetAll( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		FilterRoutesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Filter Routes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
-		~FilterRoutesDialogBase();
 	
 };
 
@@ -605,33 +572,29 @@ class ConfigurationBatchDialogBase : public wxDialog
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class NewPositionDialog
+/// Class FilterRoutesDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class NewPositionDialog : public wxDialog 
+class FilterRoutesDialogBase : public wxDialog 
 {
 	private:
 	
 	protected:
-		wxStaticText* m_staticText140;
-		wxStaticText* m_staticText142;
-		wxStaticText* m_staticText143;
-		wxStaticText* m_staticText144;
-		wxStaticText* m_staticText145;
-		wxStaticText* m_staticText146;
-		wxStaticText* m_staticText147;
-		wxStdDialogButtonSizer* m_sdbSizer4;
-		wxButton* m_sdbSizer4OK;
-		wxButton* m_sdbSizer4Cancel;
+		wxChoice* m_cCategory;
+		wxTextCtrl* m_tFilter;
+		wxButton* m_button48;
+		wxButton* m_bDone;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnCategory( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnFilterText( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnResetAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnDone( wxCommandEvent& event ) { event.Skip(); }
+		
 	
 	public:
-		wxTextCtrl* m_tName;
-		wxTextCtrl* m_tLatitudeDegrees;
-		wxTextCtrl* m_tLatitudeMinutes;
-		wxTextCtrl* m_tLongitudeDegrees;
-		wxTextCtrl* m_tLongitudeMinutes;
 		
-		NewPositionDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("New Weather Routing Position"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
-		~NewPositionDialog();
+		FilterRoutesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Filter Routes"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~FilterRoutesDialogBase();
 	
 };
 
@@ -660,6 +623,37 @@ class CursorPositionDialog : public wxDialog
 		
 		CursorPositionDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cursor Position"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
 		~CursorPositionDialog();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class NewPositionDialog
+///////////////////////////////////////////////////////////////////////////////
+class NewPositionDialog : public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText140;
+		wxStaticText* m_staticText142;
+		wxStaticText* m_staticText143;
+		wxStaticText* m_staticText144;
+		wxStaticText* m_staticText145;
+		wxStaticText* m_staticText146;
+		wxStaticText* m_staticText147;
+		wxStdDialogButtonSizer* m_sdbSizer4;
+		wxButton* m_sdbSizer4OK;
+		wxButton* m_sdbSizer4Cancel;
+	
+	public:
+		wxTextCtrl* m_tName;
+		wxTextCtrl* m_tLatitudeDegrees;
+		wxTextCtrl* m_tLatitudeMinutes;
+		wxTextCtrl* m_tLongitudeDegrees;
+		wxTextCtrl* m_tLongitudeMinutes;
+		
+		NewPositionDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("New Weather Routing Position"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		~NewPositionDialog();
 	
 };
 
