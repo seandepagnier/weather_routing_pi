@@ -185,6 +185,7 @@ int zu_close(ZUFILE *f)
                     break;
             }
         }
+        free(f);
     }
     return 0;
 }
