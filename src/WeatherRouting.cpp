@@ -79,6 +79,16 @@ static const char *eye[]={
 WeatherRoute::WeatherRoute() : routemapoverlay(new RouteMapOverlay) {}
 WeatherRoute::~WeatherRoute() { delete routemapoverlay; }
 
+ const wxString WeatherRouting::column_names[NUM_COLS] = {_T(""), _("Start"), _("Start Time"),
+                                                          _("End"), _("End Time"), _("Time"), _("Distance"),
+                                                          _("Avg Speed"), _("Max Speed"),
+                                                          _("Avg Speed Ground"), _("Max Speed Ground"),
+                                                          _("Avg Wind"), _("Max Wind"),
+                                                          _("Avg Current"), _("Max Current"),
+                                                          _("Avg Swell"), _("Max Swell"),
+                                                          _("Upwind Percentage"),
+                                                          _("Port Starboard"), _("Tacks"), _("State")};
+
 static int sortcol, sortorder = 1;
 // sort callback. Sort by body.
 #if wxCHECK_VERSION(2, 9, 0)

@@ -46,15 +46,7 @@ public:
     void OnUpdate( );
     void OnUpdateColumns( wxCommandEvent& event );
     void OnHelp( wxCommandEvent& event );
-    const wxString column_names[21] = {_T(""), _("Start"), _("Start Time"),
-                                        _("End"), _("End Time"), _("Time"), _("Distance"),
-                                        _("Avg Speed"), _("Max Speed"),
-                                        _("Avg Speed Ground"), _("Max Speed Ground"),
-                                        _("Avg Wind"), _("Max Wind"),
-                                        _("Avg Current"), _("Max Current"),
-                                        _("Avg Swell"), _("Max Swell"),
-                                        _("Upwind Percentage"),
-                                        _("Port Starboard"), _("Tacks"), _("State")};
+    static const wxString column_names[21];
 
 
 };
