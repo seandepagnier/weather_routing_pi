@@ -66,7 +66,8 @@ void EditPolarDialog::OnPolarGridChanged( wxGridEvent& event )
 void EditPolarDialog::OnAddTrueWindAngle( wxCommandEvent& event )
 {
     double twa;
-    m_tTrueWindAngle->GetValue().ToDouble(&twa);
+    if(!m_tTrueWindAngle->GetValue().ToDouble(&twa) || twa < 0 || twa > 180)
+        return
     m_tTrueWindAngle->Clear();
     GetPolar()->AddDegreeStep(twa);
     RebuildTrueWindAngles();
@@ -83,7 +84,8 @@ void EditPolarDialog::OnRemoveTrueWindAngle( wxCommandEvent& event )
 void EditPolarDialog::OnAddTrueWindSpeed( wxCommandEvent& event )
 {
     double tws;
-    m_tTrueWindSpeed->GetValue().ToDouble(&tws);
+    if(!m_tTrueWindSpeed->GetValue().ToDouble(&tws) || tws < 0 || tws > 180)
+        return;
     m_tTrueWindSpeed->Clear();
     GetPolar()->AddWindSpeed(tws);
     RebuildTrueWindSpeeds();
