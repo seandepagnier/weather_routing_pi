@@ -71,8 +71,8 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         std::list<PlotData> p = (*it)->GetPlotData();
 
         page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
-        page += _("Leaving ") + c.StartTime.Format(_T("%x")) + _T("<dt>");
-        page += _("Arriving ") + (*it)->EndTime().Format(_T("%x")) + _T("<dt>");
+        page += _("Leaving ") + c.StartTime.Format(_T("%x %X")) + _T("<dt>");
+        page += _("Arriving ") + (*it)->EndTime().Format(_T("%x %X")) + _T("<dt>");
         page += _("Duration ") + ((*it)->EndTime() - c.StartTime).Format() + _T("<dt>");
         page += _T("<p>");
         double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
