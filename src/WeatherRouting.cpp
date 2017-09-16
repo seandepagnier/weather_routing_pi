@@ -1010,7 +1010,7 @@ void WeatherRouting::OnCursorPosition( wxCommandEvent& event )
 
 void WeatherRouting::OnManual ( wxCommandEvent& event )
 {
-    wxLaunchDefaultBrowser(_T("https://opencpn.org/OpenCPN/plugins/weatherroute.html"));
+    wxLaunchDefaultBrowser(_T("https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:toolbar_buttons:plugins:weather:weather_routing"));
 }
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
