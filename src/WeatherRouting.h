@@ -68,15 +68,7 @@ public:
           AVGWIND, MAXWIND, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
           UPWIND_PERCENTAGE, PORT_STARBOARD, TACKS, STATE, NUM_COLS};
     long columns[NUM_COLS];
-    const wxString column_names[NUM_COLS] = {_T(""), _("Start"), _("Start Time"),
-                                        _("End"), _("End Time"), _("Time"), _("Distance"),
-                                        _("Avg Speed"), _("Max Speed"),
-                                        _("Avg Speed Ground"), _("Max Speed Ground"),
-                                        _("Avg Wind"), _("Max Wind"),
-                                        _("Avg Current"), _("Max Current"),
-                                        _("Avg Swell"), _("Max Swell"),
-                                        _("Upwind Percentage"),
-                                        _("Port Starboard"), _("Tacks"), _("State")};
+    static const wxString column_names[NUM_COLS];
     int sashpos;
 
     WeatherRouting(wxWindow *parent, weather_routing_pi &plugin);

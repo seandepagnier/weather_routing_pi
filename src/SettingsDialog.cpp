@@ -37,6 +37,16 @@
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
 
+const wxString SettingsDialog::column_names[21] = {_T(""), _("Start"), _("Start Time"),
+                                                   _("End"), _("End Time"), _("Time"), _("Distance"),
+                                                   _("Avg Speed"), _("Max Speed"),
+                                                   _("Avg Speed Ground"), _("Max Speed Ground"),
+                                                   _("Avg Wind"), _("Max Wind"),
+                                                   _("Avg Current"), _("Max Current"),
+                                                   _("Avg Swell"), _("Max Swell"),
+                                                   _("Upwind Percentage"),
+                                                   _("Port Starboard"), _("Tacks"), _("State")};
+
 SettingsDialog::SettingsDialog( wxWindow *parent )
     : SettingsDialogBase(parent)
 {
