@@ -208,6 +208,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
             PARSE_ERROR(_("Failed to read."));
 
         token = strtok_r(line, delim, &saveptr);
+        assert(token != 0);
         linenum++;
 
         /* chomp invisible bytes */
