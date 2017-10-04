@@ -364,7 +364,7 @@ public:
     wxDateTime StartTime() { Lock(); wxDateTime time; if(origin.size()) time = origin.front()->time;
         Unlock(); return time; }
 
-    void SetConfiguration(RouteMapConfiguration &o) { Lock();
+    void SetConfiguration(const RouteMapConfiguration &o) { Lock();
         m_Configuration = o;
         m_bValid = m_Configuration.Update();
         m_bFinished = false;

@@ -165,7 +165,7 @@ private:
     void UpdateConfigurations();
     void UpdateDialogs();
 
-    void AddConfiguration(RouteMapConfiguration configuration);
+    void AddConfiguration(const RouteMapConfiguration &configuration);
     void UpdateRouteMap(RouteMapOverlay *routemapoverlay);
     void UpdateItem(long index, bool stateonly=false);
 
