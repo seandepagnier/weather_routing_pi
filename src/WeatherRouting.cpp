@@ -1777,6 +1777,11 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
     }
 
     AddPlugInTrack(newTrack);
+    // not done PlugIn_Track DTOR
+    newTrack->pWaypointList->DeleteContents( true );
+    newTrack->pWaypointList->Clear();
+
+    delete newTrack;
 
     GetParent()->Refresh();
 }
