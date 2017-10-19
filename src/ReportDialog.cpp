@@ -153,15 +153,12 @@ void ReportDialog::GenerateRoutesReport()
     for(std::map<wxString, std::list<RouteMapOverlay *> >::iterator it = routes.begin();
         it != routes.end(); it++) {
         std::list<RouteMapOverlay *> overlays = it->second;
+        assert(overlays.begin() != overlays.end());
         RouteMapOverlay *first = *overlays.begin();
-        RouteMapConfiguration c = first->GetConfiguration();
-        page += _T("<p>");
-        page += c.Start + _T(" ") + _("to") + _T(" ") + c.End + _T(" ") + wxString::Format
-            (_T("(%ld ") + wxString(_("configurations")) + _T(")\n"), overlays.size());
 
         /* determine fastest time */
         wxTimeSpan fastest_time;
-        RouteMapOverlay *fastest = NULL;
+        RouteMapOverlay *fastest;
         for(std::list<RouteMapOverlay *>::iterator it2 = overlays.begin(); it2 != overlays.end(); it2++) {
             wxTimeSpan current_time = ((*it2)->EndTime() - (*it2)->StartTime());
             if(*it2 == first || current_time < fastest_time) {
@@ -169,6 +166,10 @@ void ReportDialog::GenerateRoutesReport()
                 fastest = *it2;
             }
         }
+        RouteMapConfiguration c = first->GetConfiguration();
+        page += _T("<p>");
+        page += c.Start + _T(" ") + _("to") + _T(" ") + c.End + _T(" ") + wxString::Format
+            (_T("(%ld ") + wxString(_("configurations")) + _T(")\n"), overlays.size());
         page += _("<dt>Fastest configuration ") + fastest->StartTime().Format(_T("%x"));
         page += wxString(_T(" ")) + _("avg speed") + wxString::Format
             (_T(": %.2f knots"), fastest->RouteInfo(RouteMapOverlay::AVGSPEED));

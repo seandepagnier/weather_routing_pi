@@ -182,7 +182,7 @@ Polar::Polar()
 #define MESSAGE(S) (S + wxString(_T("\n")) + wxString::FromUTF8(filename) \
                     + (line > 0 ? (_(" line ") + wxString::Format(_T("%d"), linenum)) : _T("")))
 #define PARSE_WARNING(S) do { if(message.empty()) message = MESSAGE(S); } while (0)
-#define PARSE_ERROR(S) if(message.empty()) do { message = _("Boat polar failed") + wxString(_T("\n")) \
+#define PARSE_ERROR(S) do { message = _("Boat polar failed") + wxString(_T("\n")) \
                                   + MESSAGE(S); goto failed; } while (0)
 bool Polar::Open(const wxString &filename, wxString &message)
 {
@@ -208,6 +208,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
             PARSE_ERROR(_("Failed to read."));
 
         token = strtok_r(line, delim, &saveptr);
+        assert(token != 0);
         linenum++;
 
         /* chomp invisible bytes */
