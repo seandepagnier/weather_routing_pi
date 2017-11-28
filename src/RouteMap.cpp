@@ -924,6 +924,7 @@ bool Position::EntersBoundary(double dlat, double dlon)
     struct FindClosestBoundaryLineCrossing_t t;
     t.dStartLat = lat, t.dStartLon = heading_resolve(lon);
     t.dEndLat = dlat, t.dEndLon = heading_resolve(dlon);
+    t.sBoundaryState = wxT("Active");
     return RouteMap::ODFindClosestBoundaryLineCrossing(&t);
 }
 
