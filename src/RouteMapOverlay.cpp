@@ -1164,7 +1164,7 @@ void RouteMapOverlay::UpdateDestination()
     bool done = ReachedDestination();
     if(done) {
         delete destination_position;
-
+        destination_position = 0;
         Lock();
         /* this doesn't happen often, so can be slow.. for each position in the last
            isochron, we try to propagate to the destination */
