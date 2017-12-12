@@ -483,11 +483,7 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
     wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
     if(!window)
         return;
-#if wxUSE_GRAPHICS_CONTEXT
-    wxGCDC dc(window);
-#else    
-    wxClientDC dc(window);
-#endif    
+    wxPaintDC dc(window);
     dc.SetBackgroundMode(wxTRANSPARENT);
 
     long index = SelectedPolar();
