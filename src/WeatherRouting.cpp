@@ -1214,8 +1214,16 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.dt = AttributeDouble(e, "dt", 0);
             
                     configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
-                    if(!wxFileName::FileExists(configuration.boatFileName))
-                        configuration.boatFileName = _T("");
+                    if(!wxFileName::FileExists(configuration.boatFileName)) {
+                        configuration.boatFileName = weather_routing_pi::StandardPath() +
+			                             _T("boats") +
+						     wxFileName::GetPathSeparator() +
+						     configuration.boatFileName;
+                        if(!wxFileName::FileExists(configuration.boatFileName)) {
+
+                            configuration.boatFileName = _T("");
+			}
+		    }
             
                     configuration.Integrator = (RouteMapConfiguration::IntegratorType)
                         AttributeInt(e, "Integrator", 0);
@@ -1973,7 +1981,8 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     } else
         configuration.EndLat = 0, configuration.EndLon = 0;
     
-    configuration.boatFileName = weather_routing_pi::StandardPath() + _T("Boat.xml");
+    configuration.boatFileName = weather_routing_pi::StandardPath() +
+        _T("boats") + wxFileName::GetPathSeparator() + _T("Boat.xml");
     
     configuration.Integrator = RouteMapConfiguration::NEWTON;
 

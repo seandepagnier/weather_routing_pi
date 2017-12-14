@@ -75,6 +75,10 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
             Polar polar; //(wxString::FromUTF8(e->Attribute("Name")));
 
             polar.FileName = wxString::FromUTF8(e->Attribute("FileName"));
+            if(!wxFileName::FileExists(polar.FileName))
+	        polar.FileName = weather_routing_pi::StandardPath() + _T("polars") +
+		                 wxFileName::GetPathSeparator() + polar.FileName;
+
             const char *str = e->Attribute("CrossOverContours");
             if(str) {
                 wxFile contours(str);
