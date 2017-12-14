@@ -63,6 +63,8 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
     if(strcmp(doc.RootElement()->Value(), "OpenCPNWeatherRoutingBoat"))
         return _("Invalid xml file (no OCPWeatherRoutingBoat node): " + filename);
 
+    bool generateContours = false;
+
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
         if(!strcmp(e->Value(), "Polar")) {
             if(!cleared) {
@@ -85,7 +87,8 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
                     }
                     delete [] data;
                 }
-            }
+            } else
+	        generateContours = true;
 
             wxString message;
             if(!polar.Open(polar.FileName, message))
@@ -101,7 +104,12 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
             Polars.push_back(polar);
         }
     }
-    
+
+    if (generateContours) {
+        GenerateCrossOverChart();
+        SaveXML(filename);
+    }
+
     m_last_filename = filename;
     m_last_filetime = last_filetime;
     return _T("");
