@@ -721,35 +721,6 @@ void BoatDialog::OnClose ( wxCommandEvent& event )
     EndModal(wxID_CANCEL);
 }
 
-void BoatDialog::OnSaveFile ( wxCommandEvent& event )
-{
-    long index = SelectedPolar();
-    if(index < 0)
-        return;
-
-    wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-
-    wxString path;
-    pConf->Read ( _T ( "FilePath" ), &path, weather_routing_pi::StandardPath());
-
-    wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
-                             wxT ( "Boat Polar files (*.file)|*.FILE;*.file|All files (*.*)|*.*" ), wxFD_SAVE  );
-
-    if( saveDialog.ShowModal() == wxID_OK ) {
-        wxString filename = saveDialog.GetPath();
-        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-        pConf->Write ( _T ( "FILEPath" ), wxFileName(filename).GetPath() );
-
-        Polar &polar = m_Boat.Polars[index];
-        if(!polar.Save(saveDialog.GetPath().mb_str())) {
-            wxMessageDialog md(this, _("Failed saving boat polar to file"), _("OpenCPN Weather Routing Plugin"),
-                               wxICON_ERROR | wxOK );
-            md.ShowModal();
-        }
-    }
-}
-
 void BoatDialog::OnPolarSelected()
 {
     int i = SelectedPolar();
