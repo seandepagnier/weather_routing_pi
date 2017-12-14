@@ -27,6 +27,7 @@
 #include <wx/wx.h>
 #include <wx/imaglist.h>
 #include <wx/progdlg.h>
+#include <wx/dir.h>
 
 #include <stdlib.h>
 #include <math.h>
@@ -151,15 +152,36 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     m_default_configuration_path = weather_routing_pi::StandardPath()
         + _T("WeatherRoutingConfiguration.xml");
 
-    if(!OpenXML(m_default_configuration_path, false)) {
+    if(!wxFileName::FileExists(m_default_configuration_path)) {
         /* create directory for plugin files if it doesn't already exist */
-        wxFileName fn(m_default_configuration_path);
-        wxFileName fn2 = fn.GetPath();
-        if(!fn.DirExists()) {
-            fn2.Mkdir();
-            fn.Mkdir();
+	wxFileName fn;
+	wxString boatsdir = weather_routing_pi::StandardPath() + wxFileName::GetPathSeparator() + _T("boats");
+	wxString polarsdir = weather_routing_pi::StandardPath() + wxFileName::GetPathSeparator() + _T("polars");
+
+	fn.Mkdir(weather_routing_pi::StandardPath());
+	fn.Mkdir(boatsdir);
+	fn.Mkdir(polarsdir);
+
+	wxString cfg = *GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/") + _T("WeatherRoutingConfiguration.xml");
+	if (wxFileName::FileExists(cfg))
+	    wxCopyFile(cfg, m_default_configuration_path);
+
+	wxArrayString boats;
+	wxDir::GetAllFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/boats"), &boats);
+	for (unsigned int i = 0; i < boats.Count(); i++) {
+	    wxFileName f(boats.Item(i));
+	    wxCopyFile(boats.Item(i), boatsdir + wxFileName::GetPathSeparator() + f.GetFullName());
+        }
+
+	wxArrayString polars;
+	wxDir::GetAllFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/polars"), &polars);
+	for (unsigned int i = 0; i < polars.Count(); i++) {
+	    wxFileName f(polars.Item(i));
+	    wxCopyFile(polars.Item(i), polarsdir + wxFileName::GetPathSeparator() + f.GetFullName());
         }
     }
+
+    OpenXML(m_default_configuration_path, false);
 
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
