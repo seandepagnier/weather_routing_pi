@@ -247,7 +247,7 @@ void ConfigurationBatchDialog::OnDisconnectAll( wxCommandEvent& event )
 void ConfigurationBatchDialog::OnAddBoat( wxCommandEvent& event )
 {
     wxFileDialog openDialog
-        ( this, _( "Select Polar" ), weather_routing_pi::StandardPath(), wxT ( "" ),
+        ( this, _( "Select Polar" ), weather_routing_pi::StandardPath() + "boats" , wxT ( "" ),
           wxT ( "XML Weather Routing files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
           wxFD_OPEN  );
 

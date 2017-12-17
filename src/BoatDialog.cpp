@@ -638,7 +638,7 @@ void BoatDialog::OnOpenBoat ( wxCommandEvent& event )
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
     wxString path;
-    pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
+    pConf->Read ( _T ( "BoatPath" ), &path, weather_routing_pi::StandardPath() + _T("boats"));
 
     wxFileDialog openDialog
         ( this, _( "Select Boat" ), path, wxT ( "" ),
@@ -646,10 +646,10 @@ void BoatDialog::OnOpenBoat ( wxCommandEvent& event )
           wxFD_OPEN  );
 
     if( openDialog.ShowModal() == wxID_OK ) {
-        wxString filename = openDialog.GetPath();
         pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-        pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
+        pConf->Write ( _T ( "BoatPath" ), openDialog.GetDirectory() );
 
+        wxString filename = openDialog.GetPath();
         wxString error = m_Boat.OpenXML(filename);
         if(error.empty()) {
             RepopulatePolars();
@@ -677,18 +677,17 @@ void BoatDialog::SaveBoat()
         pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
         wxString path;
-        pConf->Read ( _T ( "Path" ), &path, weather_routing_pi::StandardPath());
+        pConf->Read ( _T ( "BoatPath" ), &path, weather_routing_pi::StandardPath() + _T("boats"));
 
         wxFileDialog saveDialog( this, _( "Select Boat" ), path, wxT ( "" ),
                                  wxT ( "Boat files (*.xml)|*.XML;*.xml|All files (*.*)|*.*" ),
                                  wxFD_SAVE | wxFD_OVERWRITE_PROMPT );
 
         if( saveDialog.ShowModal() == wxID_OK ) {
-            wxString filename = wxFileDialog::AppendExtension(saveDialog.GetPath(), _T("*.xml"));
-
             pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-            pConf->Write ( _T ( "Path" ), wxFileName(filename).GetPath() );
+            pConf->Write ( _T ( "BoatPath" ), saveDialog.GetDirectory() );
 
+            wxString filename = wxFileDialog::AppendExtension(saveDialog.GetPath(), _T("*.xml"));
             m_boatpath = filename;
             SetTitle(m_boatpath);
         } else
@@ -719,35 +718,6 @@ void BoatDialog::OnSaveAsBoat ( wxCommandEvent& event )
 void BoatDialog::OnClose ( wxCommandEvent& event )
 {
     EndModal(wxID_CANCEL);
-}
-
-void BoatDialog::OnSaveFile ( wxCommandEvent& event )
-{
-    long index = SelectedPolar();
-    if(index < 0)
-        return;
-
-    wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-
-    wxString path;
-    pConf->Read ( _T ( "FilePath" ), &path, weather_routing_pi::StandardPath());
-
-    wxFileDialog saveDialog( this, _( "Select Polar" ), path, wxT ( "" ),
-                             wxT ( "Boat Polar files (*.file)|*.FILE;*.file|All files (*.*)|*.*" ), wxFD_SAVE  );
-
-    if( saveDialog.ShowModal() == wxID_OK ) {
-        wxString filename = saveDialog.GetPath();
-        pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
-        pConf->Write ( _T ( "FILEPath" ), wxFileName(filename).GetPath() );
-
-        Polar &polar = m_Boat.Polars[index];
-        if(!polar.Save(saveDialog.GetPath().mb_str())) {
-            wxMessageDialog md(this, _("Failed saving boat polar to file"), _("OpenCPN Weather Routing Plugin"),
-                               wxICON_ERROR | wxOK );
-            md.ShowModal();
-        }
-    }
 }
 
 void BoatDialog::OnPolarSelected()
@@ -849,9 +819,7 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
     wxString path;
-    pConf->Read ( _T ( "FilePath" ), &path, *GetpSharedDataLocation()
-                  + _T("plugins/weather_routing_pi/data/polars"));
-    path = wxFileName(path).GetPath();
+    pConf->Read ( _T ( "PolarPath" ), &path, weather_routing_pi::StandardPath() + _T("polars"));
 
     wxFileDialog openDialog
         ( this, _( "Select Polar File" ), path, wxT ( "" ),
@@ -861,7 +829,7 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
     if( openDialog.ShowModal() != wxID_OK )
         return;
 
-    pConf->Write( _T ( "FilePath" ), openDialog.GetPath());
+    pConf->Write( _T ( "PolarPath" ), openDialog.GetDirectory());
 
     wxArrayString paths;
     openDialog.GetPaths(paths);
