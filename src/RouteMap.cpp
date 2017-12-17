@@ -483,15 +483,20 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
 }
 
 /* get data from a position for plotting */
-void Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
+bool Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(configuration.grib, lat, lon);
     data.tacks = tacks;
 
     climatology_wind_atlas atlas;
     int data_mask = 0; // not used for plotting yet
-    ReadWindAndCurrents(configuration, this, data.WG, data.VWG,
-                        data.W, data.VW, data.C, data.VC, atlas, data_mask);
+    if(!ReadWindAndCurrents(configuration, this, data.WG, data.VWG,
+                            data.W, data.VW, data.C, data.VC, atlas, data_mask)) {
+        // I don't think this can ever be hit, because the data should have been there
+        // for the position be be created in the first place
+        printf("Wind/Current data failed for position!!!\n");
+        return false;
+    }
 
     ll_gc_ll_reverse(lat, lon, next->lat, next->lon, &data.BG, &data.VBG);
     if(dt == 0)
@@ -500,6 +505,7 @@ void Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &con
         data.VBG *= 3600 / dt;
 
     OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
+    return true;
 }
 
 bool Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
@@ -924,6 +930,7 @@ bool Position::EntersBoundary(double dlat, double dlon)
     struct FindClosestBoundaryLineCrossing_t t;
     t.dStartLat = lat, t.dStartLon = heading_resolve(lon);
     t.dEndLat = dlat, t.dEndLon = heading_resolve(dlon);
+    t.sBoundaryState = wxT("Active");
     return RouteMap::ODFindClosestBoundaryLineCrossing(&t);
 }
 

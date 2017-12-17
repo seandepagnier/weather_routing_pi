@@ -988,8 +988,8 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
             data.time = (*it)->time;
 
             data.lat = pos->lat, data.lon = pos->lon;
-            pos->GetPlotData(next, dt, configuration, data);
-            plotdata.push_front(data);
+            if(pos->GetPlotData(next, dt, configuration, data))
+                plotdata.push_front(data);
 
             it = itp;
             next = pos;
