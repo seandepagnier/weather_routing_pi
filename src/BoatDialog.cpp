@@ -539,7 +539,7 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
     wxColour colors[] = {*wxRED, *wxGREEN, *wxBLUE, *wxCYAN, *wxYELLOW,
                          wxColour(255, 0, 255)};
     int c = 0;
-    for(unsigned int i=0; i<m_Boat.Polars.size(); i++) {
+    for(int i=0; i<(int)m_Boat.Polars.size(); i++) {
         bool bold = i == index;
 
 //        dc.SetPen(wxPen(colors[c], bold ? 1 : 3));

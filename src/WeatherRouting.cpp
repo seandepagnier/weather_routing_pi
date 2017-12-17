@@ -79,7 +79,7 @@ static const char *eye[]={
 WeatherRoute::WeatherRoute() : routemapoverlay(new RouteMapOverlay) {}
 WeatherRoute::~WeatherRoute() { delete routemapoverlay; }
 
- const wxString WeatherRouting::column_names[NUM_COLS] = {_T(""), _("Start"), _("Start Time"),
+const wxString WeatherRouting::column_names[NUM_COLS] = {_T(""), _("Boat"), _("Start"), _("Start Time"),
                                                           _("End"), _("End Time"), _("Time"), _("Distance"),
                                                           _("Avg Speed"), _("Max Speed"),
                                                           _("Avg Speed Ground"), _("Max Speed Ground"),
@@ -1575,6 +1575,11 @@ void WeatherRouting::UpdateItem(long index, bool stateonly)
         if(columns[VISIBLE] >= 0) {
             m_lWeatherRoutes->SetItemImage(index, weatherroute->routemapoverlay->m_bEndRouteVisible ? 0 : -1);
             m_lWeatherRoutes->SetColumnWidth(columns[VISIBLE], 28);
+        }
+
+        if(columns[BOAT] >= 0) {
+            m_lWeatherRoutes->SetItem(index, columns[BOAT], wxFileName(weatherroute->BoatFilename).GetName());
+            m_lWeatherRoutes->SetColumnWidth(columns[BOAT], wxLIST_AUTOSIZE);
         }
 
         if(columns[START] >= 0) {
