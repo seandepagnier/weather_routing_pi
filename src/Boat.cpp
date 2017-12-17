@@ -146,7 +146,9 @@ wxString Boat::SaveXML(wxString filename)
 
             wxString ContoursFileName = polar.FileName;
             ContoursFileName.Replace
-                (wxFileName::GetPathSeparator(), _T("!?!"));
+                (wxFileName::GetPathSeparator(), _T("_"));
+            ContoursFileName.Replace
+                (wxFileName::GetVolumeSeparator(), _T("_"));
             ContoursFileName = ContoursPath + ContoursFileName + _T(".contours");
             wxFile file;
             if(file.Open(ContoursFileName, wxFile::write)) {
