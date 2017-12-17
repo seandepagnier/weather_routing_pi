@@ -63,6 +63,8 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
     if(strcmp(doc.RootElement()->Value(), "OpenCPNWeatherRoutingBoat"))
         return _("Invalid xml file (no OCPWeatherRoutingBoat node): " + filename);
 
+    bool generateContours = false;
+
     for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement()) {
         if(!strcmp(e->Value(), "Polar")) {
             if(!cleared) {
@@ -73,6 +75,10 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
             Polar polar; //(wxString::FromUTF8(e->Attribute("Name")));
 
             polar.FileName = wxString::FromUTF8(e->Attribute("FileName"));
+            if(!wxFileName::FileExists(polar.FileName))
+	        polar.FileName = weather_routing_pi::StandardPath() + _T("polars") +
+		                 wxFileName::GetPathSeparator() + polar.FileName;
+
             const char *str = e->Attribute("CrossOverContours");
             if(str) {
                 wxFile contours(str);
@@ -85,7 +91,8 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
                     }
                     delete [] data;
                 }
-            }
+            } else
+	        generateContours = true;
 
             wxString message;
             if(!polar.Open(polar.FileName, message))
@@ -101,7 +108,12 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
             Polars.push_back(polar);
         }
     }
-    
+
+    if (generateContours) {
+        GenerateCrossOverChart();
+        SaveXML(filename);
+    }
+
     m_last_filename = filename;
     m_last_filetime = last_filetime;
     return _T("");
@@ -134,7 +146,9 @@ wxString Boat::SaveXML(wxString filename)
 
             wxString ContoursFileName = polar.FileName;
             ContoursFileName.Replace
-                (wxFileName::GetPathSeparator(), _T("!?!"));
+                (wxFileName::GetPathSeparator(), _T("_"));
+            ContoursFileName.Replace
+                (wxFileName::GetVolumeSeparator(), _T("_"));
             ContoursFileName = ContoursPath + ContoursFileName + _T(".contours");
             wxFile file;
             if(file.Open(ContoursFileName, wxFile::write)) {
