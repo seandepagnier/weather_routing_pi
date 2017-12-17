@@ -1197,9 +1197,9 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     RouteMapConfiguration configuration;
                     configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
                     wxDateTime date;
-                    date.ParseDate(wxString::FromUTF8(e->Attribute("StartDate")));
+                    date.ParseISODate(wxString::FromUTF8(e->Attribute("StartDate")));
                     wxDateTime time;
-                    time.ParseTime(wxString::FromUTF8(e->Attribute("StartTime")));
+                    time.ParseISOTime(wxString::FromUTF8(e->Attribute("StartTime")));
                     if(date.IsValid()) {
                         if(time.IsValid()) {
                             date.SetHour(time.GetHour());
@@ -1312,8 +1312,8 @@ void WeatherRouting::SaveXML(wxString filename)
             (*it)->routemapoverlay->GetConfiguration();
 
         c->SetAttribute("Start", configuration.Start.mb_str());
-        c->SetAttribute("StartDate", configuration.StartTime.FormatDate().mb_str());
-        c->SetAttribute("StartTime", configuration.StartTime.FormatTime().mb_str());
+        c->SetAttribute("StartDate", configuration.StartTime.FormatISODate().mb_str());
+        c->SetAttribute("StartTime", configuration.StartTime.FormatISOTime().mb_str());
         c->SetAttribute("End", configuration.End.mb_str());
         c->SetAttribute("dt", configuration.dt);
 

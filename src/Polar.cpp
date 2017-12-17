@@ -176,6 +176,7 @@ double Polar::VelocityTrueWind2(double VA, double VB, double A)
 
 Polar::Polar()
 {
+    m_crossoverpercentage = 0;
 }
 
 #define MAX_WINDSPEEDS_IN_TABLE 200
