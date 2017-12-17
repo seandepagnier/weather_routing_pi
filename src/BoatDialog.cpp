@@ -667,6 +667,7 @@ void BoatDialog::OnOpenBoat ( wxCommandEvent& event )
 
 void BoatDialog::SaveBoat()
 {
+    // wait for crossover generation to comple
     while(m_CrossOverGenerationThread) {
         wxYield();
         wxThread::Sleep(10);
