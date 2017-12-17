@@ -37,15 +37,15 @@
 #include "weather_routing_pi.h"
 #include "WeatherRouting.h"
 
-const wxString SettingsDialog::column_names[21] = {_T(""), _("Start"), _("Start Time"),
-                                                   _("End"), _("End Time"), _("Time"), _("Distance"),
-                                                   _("Avg Speed"), _("Max Speed"),
-                                                   _("Avg Speed Ground"), _("Max Speed Ground"),
-                                                   _("Avg Wind"), _("Max Wind"),
-                                                   _("Avg Current"), _("Max Current"),
-                                                   _("Avg Swell"), _("Max Swell"),
-                                                   _("Upwind Percentage"),
-                                                   _("Port Starboard"), _("Tacks"), _("State")};
+const wxString SettingsDialog::column_names[] = {_T(""), _("Boat"), _("Start"), _("Start Time"),
+                                                 _("End"), _("End Time"), _("Time"), _("Distance"),
+                                                 _("Avg Speed"), _("Max Speed"),
+                                                 _("Avg Speed Ground"), _("Max Speed Ground"),
+                                                 _("Avg Wind"), _("Max Wind"),
+                                                 _("Avg Current"), _("Max Current"),
+                                                 _("Avg Swell"), _("Max Swell"),
+                                                 _("Upwind Percentage"),
+                                                 _("Port Starboard"), _("Tacks"), _("State")};
 
 SettingsDialog::SettingsDialog( wxWindow *parent )
     : SettingsDialogBase(parent)
@@ -100,14 +100,14 @@ void SettingsDialog::LoadSettings()
     // set defaults
     bool columns[WeatherRouting::NUM_COLS];
     for(int i=0; i<WeatherRouting::NUM_COLS; i++)
-        columns[i] = i <= WeatherRouting::DISTANCE || i == WeatherRouting::STATE;
+        columns[i] = i != WeatherRouting::BOAT && (i <= WeatherRouting::DISTANCE || i == WeatherRouting::STATE);
 
     for(int i=0; i<WeatherRouting::NUM_COLS; i++) {
         if(i == 0)
             m_cblFields->Append(_("Visible"));
         else
             m_cblFields->Append(column_names[i]);
-        pConf->Read( wxString::Format(_T("Column%d"), i), &columns[i], columns[i]);
+        pConf->Read( wxString::Format(_T("Column ") + column_names[i], i), &columns[i], columns[i]);
         m_cblFields->Check(i, columns[i]);
     }
 
@@ -139,7 +139,7 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("ConcurrentThreads"), m_sConcurrentThreads->GetValue());
 
     for(int i=0; i<WeatherRouting::NUM_COLS; i++)
-        pConf->Write( wxString::Format(_T("Column%d"), i), m_cblFields->IsChecked(i));
+        pConf->Write( wxString::Format(_T("Column ") + column_names[i], i), m_cblFields->IsChecked(i));
 
     pConf->Write( _T("UseLocalTime"), m_cbUseLocalTime->GetValue());
 
