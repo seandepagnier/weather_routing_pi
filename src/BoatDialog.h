@@ -63,7 +63,6 @@ private:
     void OnSaveBoat( wxCommandEvent& event ) { SaveBoat(); }
     void OnClose( wxCommandEvent& event );
     void LoadFile(bool switched = false);
-    void OnSaveFile( wxCommandEvent& event );
     void OnPolarSelected( wxListEvent& event ) { OnPolarSelected(); }
     void OnPolarSelected();
 
