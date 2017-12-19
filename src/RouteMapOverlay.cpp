@@ -966,8 +966,6 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
         RouteMapConfiguration configuration = GetConfiguration();
         Lock();
         IsoChronList::iterator it = origin.begin(), itp;
-
-
         
         for(Position *p = pos; p; p=p->parent)
             if(++it == origin.end()) {
@@ -1037,6 +1035,10 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
         case MAXWIND:
             if(total < it->VW)
                 total = it->VW;
+            break;
+        case MAXWINDGUST:
+            if(total < it->VW_GUST)
+                total = it->VW_GUST;
             break;
         case AVGCURRENT:
             total += it->VC;

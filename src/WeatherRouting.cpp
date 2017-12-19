@@ -84,7 +84,7 @@ const wxString WeatherRouting::column_names[NUM_COLS] = {_T(""), _("Boat"), _("S
                                                           _("End"), _("End Time"), _("Time"), _("Distance"),
                                                           _("Avg Speed"), _("Max Speed"),
                                                           _("Avg Speed Ground"), _("Max Speed Ground"),
-                                                          _("Avg Wind"), _("Max Wind"),
+                                                         _("Avg Wind"), _("Max Wind"), _("Max Wind Gust"),
                                                           _("Avg Current"), _("Max Current"),
                                                           _("Avg Swell"), _("Max Swell"),
                                                           _("Upwind Percentage"),
@@ -1538,6 +1538,9 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
         MaxWind = wxString::Format
             (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXWIND));
 
+        MaxWindGust = wxString::Format
+            (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::MAXWINDGUST));
+        
         AvgCurrent = wxString::Format
             (_T("%.2f"), routemapoverlay->RouteInfo(RouteMapOverlay::AVGCURRENT));
 
@@ -1658,6 +1661,9 @@ void WeatherRouting::UpdateItem(long index, bool stateonly)
         if(columns[MAXWIND] >= 0)
             m_lWeatherRoutes->SetItem(index, columns[MAXWIND], weatherroute->MaxWind);
 
+        if(columns[MAXWINDGUST] >= 0)
+            m_lWeatherRoutes->SetItem(index, columns[MAXWINDGUST], weatherroute->MaxWindGust);
+        
         if(columns[AVGCURRENT] >= 0)
             m_lWeatherRoutes->SetItem(index, columns[AVGCURRENT], weatherroute->AvgCurrent);
 

@@ -98,6 +98,7 @@ double PlotDialog::GetValue(PlotData &data, int var)
         return rad2deg(Polar::DirectionApparentWind
                        (GetValue(data, APPARENT_WIND_SPEED), data.VB,
                         GetValue(data, WIND_DIRECTION), data.VW));
+    case WIND_GUST: return data.VW_GUST;
     }
     case CURRENT_VELOCITY: return data.VC;
     case CURRENT_DIRECTION: return data.C;
@@ -120,6 +121,7 @@ int PlotDialog::GetType(int var)
     case WIND_VELOCITY:
     case WIND_VELOCITY_GROUND:
     case APPARENT_WIND_SPEED:
+    case WIND_GUST:
         return WIND_SPEED;
     case WIND_DIRECTION:
     case WIND_DIRECTION_GROUND:

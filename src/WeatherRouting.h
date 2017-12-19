@@ -52,7 +52,8 @@ public:
 
     bool Filtered;
     wxString BoatFilename, Start, StartTime, End, EndTime, Time, Distance,
-        AvgSpeed, MaxSpeed, AvgSpeedGround, MaxSpeedGround, AvgWind, MaxWind,
+        AvgSpeed, MaxSpeed, AvgSpeedGround, MaxSpeedGround,
+        AvgWind, MaxWind, MaxWindGust,
         AvgCurrent, MaxCurrent, AvgSwell, MaxSwell, UpwindPercentage, PortStarboard,
         Tacks, State;
     RouteMapOverlay *routemapoverlay;
@@ -63,9 +64,9 @@ class WeatherRouting : public WeatherRoutingBase
 public:
     enum {POSITION_NAME=0, POSITION_LAT, POSITION_LON};
 
-    enum {VISIBLE=0, BOAT, START, STARTTIME, END, ENDTIME, TIME, DISTANCE, AVGSPEED, MAXSPEED,
-          AVGSPEEDGROUND, MAXSPEEDGROUND,
-          AVGWIND, MAXWIND, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
+    enum {VISIBLE=0, BOAT, START, STARTTIME, END, ENDTIME, TIME, DISTANCE,
+          AVGSPEED, MAXSPEED, AVGSPEEDGROUND, MAXSPEEDGROUND,
+          AVGWIND, MAXWIND, MAXWINDGUST, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
           UPWIND_PERCENTAGE, PORT_STARBOARD, TACKS, STATE, NUM_COLS};
     long columns[NUM_COLS];
     static const wxString column_names[NUM_COLS];

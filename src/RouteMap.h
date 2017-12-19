@@ -40,6 +40,7 @@ struct PlotData
     wxDateTime time;
     double lat, lon;
     double VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
+    double VW_GUST;
     int tacks;
 };
 

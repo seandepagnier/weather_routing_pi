@@ -104,6 +104,22 @@ static double Swell(GribRecordSet *grib, double lat, double lon)
     return height;
 }
 
+static double Gust(GribRecordSet *grib, double lat, double lon)
+{
+    if(!grib)
+        return NAN;
+
+    GribRecord *grh = grib->m_GribRecordPtrArray[Idx_WIND_GUST];
+    if(!grh)
+        return NAN;
+
+    double gust = grh->getInterpolatedValue(lon, lat, true );
+    if(gust == GRIB_NOTDEF)
+        return NAN;
+    return gust;
+}
+
+
 static inline bool GribWind(GribRecordSet *grib, double lat, double lon,
                             double &WG, double &VWG)
 {
@@ -486,6 +502,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
 bool Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(configuration.grib, lat, lon);
+    data.VW_GUST = Gust(configuration.grib, lat, lon);
     data.tacks = tacks;
 
     climatology_wind_atlas atlas;
@@ -2556,6 +2573,7 @@ void RouteMap::SetNewGrib(GribRecordSet *grib)
         m_NewGrib->m_GribRecordPtrArray[i] = NULL;
         switch (i) {
         case Idx_HTSIGW:
+        case Idx_WIND_GUST:
         case Idx_WIND_VX:
         case Idx_WIND_VY:
         case Idx_SEACURRENT_VX:
