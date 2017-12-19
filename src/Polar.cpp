@@ -894,8 +894,8 @@ void Polar::CalculateVMG(int VWi)
 
     // for symmetric polars
     if(degree_steps[degree_steps.size()-1] <= 180) {
-        ws.VMG.values[0] = ws.VMG.values[1];
-        ws.VMG.values[2] = ws.VMG.values[3];
+        ws.VMG.values[0] = 360 - ws.VMG.values[1];
+        ws.VMG.values[2] = 360 - ws.VMG.values[3];
     }
 }
 

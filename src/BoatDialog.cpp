@@ -402,10 +402,9 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                 
                 int px, py;
                 int s;
-                for(s = 0; s<num_wind_speeds-1; s++) {
-                    if(wind_speeds[s] > polar.wind_speeds[VWi].VW)
+                for(s = 0; s<num_wind_speeds-1; s++)
+                    if(wind_speeds[s] > windspeed)
                         break;
-                }
                 { // interpolate into non-linear windspeed space
                     double x = windspeed, x1 = wind_speeds[s], x2 = wind_speeds[s+1];
                     double y1 = s * w / num_wind_speeds;
@@ -417,8 +416,6 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                 
                 if(lastvalid) {
                     dc.DrawLine(lx, ly, px, py);
-                    if(full)
-                        dc.DrawLine(2*cx-lx, ly, 2*cx-px, py);
                 }
 
                 lx = px, ly = py;
@@ -428,11 +425,11 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
     }
 
     /* vmg */
-
     wxPoint lastp[4];
     bool lastpvalid[4] = {false, false, false, false};
     for(unsigned int VWi = 0; VWi<polar.wind_speeds.size(); VWi++) {
-        double VW = polar.wind_speeds[VWi].VW;
+        double VA, VW = polar.wind_speeds[VWi].VW;
+        double windspeed = polar.wind_speeds[VWi].VW;
         SailingVMG vmg = polar.GetVMGTrueWind(VW);
 
         for(int i=0; i<4; i++) {
@@ -455,13 +452,33 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
             case 0: case 2: a = W; break;
             case 1: case 3: a = Polar::DirectionApparentWind(VB, W, VW); break;
             }
+            switch(selection) {
+            case 0: case 1:
+                VB = polar.Speed(W, VW);
+                break;
+            case 2: case 3:
+                VA = windspeed;
+                VB = polar.SpeedAtApparentWindSpeed(W, VA);
+                //VW = Polar::VelocityTrueWind(VA, VB, W);
+                break;
+            }
 
             wxPoint p;
             if(plottype == 0) {
                 p.x =  m_PlotScale*VB*sin(deg2rad(a)) + cx;
                 p.y = -m_PlotScale*VB*cos(deg2rad(a)) + cy;
             } else {
-                p.x = a * w / (full ? 360 : 180) + cx;
+                int s;
+                for(s = 0; s<num_wind_speeds-1; s++)
+                    if(wind_speeds[s] > windspeed)
+                        break;
+                { // interpolate into non-linear windspeed space
+                    double x = windspeed, x1 = wind_speeds[s], x2 = wind_speeds[s+1];
+                    double y1 = s * w / num_wind_speeds;
+                    double y2 = (s+1) * w / num_wind_speeds;
+
+                    p.x = x2 - x1 ? (y2 - y1)*(x - x1)/(x2 - x1) + y1 : y1;
+                }
                 p.y = h - 2*VB*m_PlotScale;
             }
 
