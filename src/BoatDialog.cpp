@@ -1002,7 +1002,7 @@ wxString BoatDialog::FormatVMG(double W, double VW)
     long index = SelectedPolar();
     Polar &polar = m_Boat.Polars[index];
     double A = isnan(W) ? NAN :
-        positive_degrees(Polar::DirectionApparentWind(polar.Speed(W, VW), W, VW));
+        positive_degrees(Polar::DirectionApparentWind(polar.Speed(W, VW, true), W, VW));
     return wxString::Format(_("%.1f True %.1f Apparent"), W, A);
 }
 
