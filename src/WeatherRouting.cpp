@@ -1843,6 +1843,14 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
         return;
     }
 
+    if(fabs(configuration.StartLat) > configuration.MaxLatitude ||
+       fabs(configuration.EndLat) > configuration.MaxLatitude) {
+        wxMessageDialog mdlg(this, _("Start/End lies outside of Max Latitude constraint:\n\
+routing will fail"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+    }
+
     /* initialize crossing land routine from main thread as it is
        not re-entrant, and cannot be done by worker-threads later */
     if(configuration.DetectLand)
