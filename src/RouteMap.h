@@ -201,7 +201,7 @@ struct RouteMapConfiguration {
     bool AllowDataDeficient;
     double WindStrength; // wind speed multiplier
 
-    bool DetectLand, DetectBoundary, Currents, InvertedRegions, Anchoring;
+    bool DetectLand, DetectBoundary, Currents, OptimizeTacking, InvertedRegions, Anchoring;
 
     double FromDegree, ToDegree, ByDegrees;
 

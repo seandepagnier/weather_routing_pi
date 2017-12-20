@@ -99,6 +99,9 @@ bool RouteMapOverlay::Start(wxString &error)
         return false;
     }
 
+    //if(configuration.OptimizeTacking)
+    //m_Configuration.boat.OptimizeTacking();
+
     if(!configuration.UseGrib &&
        configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY) {
         error = _("Configuration does not allow grib or climatology wind data");

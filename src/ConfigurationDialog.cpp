@@ -185,6 +185,8 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(DetectLand);
     SET_CHECKBOX(DetectBoundary);
     SET_CHECKBOX(Currents);
+    SET_CHECKBOX(OptimizeTacking);
+    
     SET_CHECKBOX(InvertedRegions);
     SET_CHECKBOX(Anchoring);
 
@@ -341,6 +343,8 @@ void ConfigurationDialog::Update()
         GET_CHECKBOX(DetectLand);
         GET_CHECKBOX(DetectBoundary);
         GET_CHECKBOX(Currents);
+        GET_CHECKBOX(OptimizeTacking);
+        
         GET_CHECKBOX(InvertedRegions);
         GET_CHECKBOX(Anchoring);
 

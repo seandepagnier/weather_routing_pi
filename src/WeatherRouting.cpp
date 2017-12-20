@@ -1274,6 +1274,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.DetectLand = AttributeBool(e, "DetectLand", true);
                     configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
                     configuration.Currents = AttributeBool(e, "Currents", true);
+                    configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
+                    
                     configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
                     configuration.Anchoring = AttributeBool(e, "Anchoring", false);
 
@@ -1374,6 +1376,8 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("DetectLand", configuration.DetectLand);
         c->SetAttribute("DetectBoundary", configuration.DetectBoundary);
         c->SetAttribute("Currents", configuration.Currents);
+        c->SetAttribute("OptimizeTacking", configuration.OptimizeTacking);
+
         c->SetAttribute("InvertedRegions", configuration.InvertedRegions);
         c->SetAttribute("Anchoring", configuration.Anchoring);
 

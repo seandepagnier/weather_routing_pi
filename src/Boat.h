@@ -36,7 +36,7 @@ public:
 
     std::vector<Polar> Polars;
 
-    int TrySwitchPolar(int curpolar, double VW, double H, double Swell);
+    int TrySwitchPolar(int curpolar, double VW, double H, double Swell, bool optimize_tacking);
     bool FastestPolar(int p, float H, float VW);
     void GenerateCrossOverChart(void *arg=0, void (*status)(void *, int, int)=0);
 

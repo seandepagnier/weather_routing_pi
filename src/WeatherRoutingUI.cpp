@@ -657,8 +657,6 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	wxFlexGridSizer* fgSizer112;
 	fgSizer112 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer112->AddGrowableCol( 0 );
-	fgSizer112->AddGrowableCol( 1 );
 	fgSizer112->SetFlexibleDirection( wxBOTH );
 	fgSizer112->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -730,7 +728,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cbCurrents->SetValue(true); 
 	fgSizer23->Add( m_cbCurrents, 0, wxALL, 5 );
 	
-	m_cbOptimizeTacking = new wxCheckBox( m_panel24, wxID_ANY, _("Optimize Tacking"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbOptimizeTacking = new wxCheckBox( m_panel24, wxID_ANY, _("Optimize Tacking"), wxDefaultPosition, wxDefaultSize, wxCHK_3STATE );
 	fgSizer23->Add( m_cbOptimizeTacking, 0, wxALL, 5 );
 	
 	
