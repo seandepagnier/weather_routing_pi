@@ -70,7 +70,7 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         RouteMapConfiguration c = (*it)->GetConfiguration();
         std::list<PlotData> p = (*it)->GetPlotData();
 
-        page += _("Boat Filename") + _T(" ") + c.boatFileName + _T("<dt>");
+        page += _("Boat Filename") + _T(" ") + wxFileName(c.boatFileName).GetName() + _T("<dt>");
         page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
         page += _("Leaving ") + c.StartTime.Format(_T("%x %X")) + _T("<dt>");
         page += _("Arriving ") + (*it)->EndTime().Format(_T("%x %X")) + _T("<dt>");

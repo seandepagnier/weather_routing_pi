@@ -60,10 +60,10 @@ public:
 
     wxString FileName;
 
-    void OptimizeTackingSpeed();
+    void OptimizeTackingSpeeds();
     void ClosestVWi(double VW, int &VW1i, int &VW2i);
 
-    double Speed(double W, double VW, bool bound=false);
+    double Speed(double W, double VW, bool bound=false, bool optimize_tacking=false);
     double SpeedAtApparentWindDirection(double A, double VW, double *pW=0);
     double SpeedAtApparentWindSpeed(double W, double VA);
     double SpeedAtApparentWind(double A, double VA, double *pW=0);
@@ -76,7 +76,7 @@ public:
     double TrueWindSpeed(double VB, double W, double maxVW);
     void UpdateDegreeStepLookup();
 
-    bool InsideCrossOverContour(float H, float VW);
+    bool InsideCrossOverContour(float H, float VW, bool optimize_tacking);
     PolygonRegion CrossOverRegion;
 
     void Generate(const std::list<PolarMeasurement> &measurements);
@@ -103,6 +103,7 @@ private:
         std::vector<float> speeds; // by degree_count
         SailingVMG VMG;
     }; // num_wind_speeds
+    bool VMGAngle(SailingWindSpeed &ws1, SailingWindSpeed &ws2, float VW, float &W);
 
     std::vector<SailingWindSpeed> wind_speeds;
     std::vector<double> degree_steps;

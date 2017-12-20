@@ -185,6 +185,8 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(DetectLand);
     SET_CHECKBOX(DetectBoundary);
     SET_CHECKBOX(Currents);
+    SET_CHECKBOX(OptimizeTacking);
+    
     SET_CHECKBOX(InvertedRegions);
     SET_CHECKBOX(Anchoring);
 
@@ -222,6 +224,28 @@ void ConfigurationDialog::SetBoatFilename(wxString path)
     m_tBoat->SetValue(path);
     long l = m_tBoat->GetValue().Length();
     m_tBoat->SetSelection(l, l);
+
+    Update();
+}
+
+void ConfigurationDialog::OnResetAdvanced( wxCommandEvent& event )
+{
+    m_bBlockUpdate = true;
+    m_sMaxLatitude->SetValue(90);
+    m_sTackingTime->SetValue(0);
+    m_sWindVSCurrent->SetValue(0);
+    m_sMaxCourseAngle->SetValue(180);
+    m_sMaxSearchAngle->SetValue(120);
+    m_cbAvoidCycloneTracks->SetValue(false);
+    m_cbInvertedRegions->SetValue(false);
+    m_cbAnchoring->SetValue(false);
+    m_cIntegrator->SetSelection(0);
+    m_sWindStrength->SetValue(100);
+    m_sTackingTime->SetValue(0);
+    m_sFromDegree->SetValue(0);
+    m_sToDegree->SetValue(180);
+    m_tByDegrees->SetValue(_T("5"));
+    m_bBlockUpdate = false;
 
     Update();
 }
@@ -319,6 +343,8 @@ void ConfigurationDialog::Update()
         GET_CHECKBOX(DetectLand);
         GET_CHECKBOX(DetectBoundary);
         GET_CHECKBOX(Currents);
+        GET_CHECKBOX(OptimizeTacking);
+        
         GET_CHECKBOX(InvertedRegions);
         GET_CHECKBOX(Anchoring);
 

@@ -98,10 +98,6 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
             if(!polar.Open(polar.FileName, message))
                 return message;
 
-//            polar.optimize_tacking = AttributeBool(e, "optimize_tacking", false);
-//            if(polar.optimize_tacking)
-//                polar.OptimizeTackingSpeed();
-            
             polar.m_crossoverpercentage =
                 AttributeDouble(e, "CrossOverPercentage", 0) / 100.0;
             
@@ -160,7 +156,6 @@ wxString Boat::SaveXML(wxString filename)
             }
         }
 
-//        e->SetAttribute("optimize_tacking", polar.optimize_tacking);
         e->SetAttribute("CrossOverPercentage", 100*polar.m_crossoverpercentage);
         
         root->LinkEndChild(e);
@@ -172,15 +167,15 @@ wxString Boat::SaveXML(wxString filename)
     return wxString();
 }
 
-int Boat::TrySwitchPolar(int curpolar, double VW, double H, double Swell)
+int Boat::TrySwitchPolar(int curpolar, double VW, double H, double Swell, bool optimize_tacking)
 {
     // are we still valid?
-    if(curpolar != -1 && Polars[curpolar].InsideCrossOverContour(H, VW))
+    if(curpolar != -1 && Polars[curpolar].InsideCrossOverContour(H, VW, optimize_tacking))
         return curpolar;
 
     // the current polar must change; select the first polar we can use
     for(int i=0; i<(int)Polars.size(); i++)
-        if(i != curpolar && Polars[i].InsideCrossOverContour(H, VW))
+        if(i != curpolar && Polars[i].InsideCrossOverContour(H, VW, optimize_tacking))
             return i;
 
     return -1; // no valid polar

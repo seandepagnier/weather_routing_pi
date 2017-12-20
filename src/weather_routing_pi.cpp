@@ -314,7 +314,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         if(m_pWeather_Routing) {
             m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable
                 (RouteMap::ClimatologyData!=NULL);
-            m_pWeather_Routing->m_ConfigurationDialog.m_pCyclones->Enable
+            m_pWeather_Routing->m_ConfigurationDialog.m_cbAvoidCycloneTracks->Enable
                 (RouteMap::ClimatologyCycloneTrackCrossings!=NULL);
         }
     }

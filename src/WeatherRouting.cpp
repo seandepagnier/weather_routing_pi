@@ -1274,6 +1274,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                     configuration.DetectLand = AttributeBool(e, "DetectLand", true);
                     configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
                     configuration.Currents = AttributeBool(e, "Currents", true);
+                    configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
+                    
                     configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
                     configuration.Anchoring = AttributeBool(e, "Anchoring", false);
 
@@ -1374,6 +1376,8 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("DetectLand", configuration.DetectLand);
         c->SetAttribute("DetectBoundary", configuration.DetectBoundary);
         c->SetAttribute("Currents", configuration.Currents);
+        c->SetAttribute("OptimizeTacking", configuration.OptimizeTacking);
+
         c->SetAttribute("InvertedRegions", configuration.InvertedRegions);
         c->SetAttribute("Anchoring", configuration.Anchoring);
 
@@ -1841,6 +1845,14 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
                              _("Weather Routing"), wxOK | wxICON_WARNING);
         mdlg.ShowModal();
         return;
+    }
+
+    if(fabs(configuration.StartLat) > configuration.MaxLatitude ||
+       fabs(configuration.EndLat) > configuration.MaxLatitude) {
+        wxMessageDialog mdlg(this, _("Start/End lies outside of Max Latitude constraint:\n\
+routing will fail"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
     }
 
     /* initialize crossing land routine from main thread as it is

@@ -559,10 +559,10 @@ static inline bool ComputeBoatSpeed
             double VBc, mind = polar.MinDegreeStep();
             // if tacking
             if(fabs(dir) < mind)
-                VBc = polar.Speed(mind, atlas.VW[i])
+                VBc = polar.Speed(mind, atlas.VW[i], true, configuration.OptimizeTacking)
                     * cos(deg2rad(mind)) / cos(deg2rad(dir));
             else
-                VBc = polar.Speed(dir, atlas.VW[i]);
+                VBc = polar.Speed(dir, atlas.VW[i], true, configuration.OptimizeTacking);
 
             VB += atlas.directions[i]*VBc;
         }
@@ -570,7 +570,7 @@ static inline bool ComputeBoatSpeed
         if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)
             VB *= 1-atlas.calm;
     } else
-        VB = polar.Speed(H, VW);
+        VB = polar.Speed(H, VW, true, configuration.OptimizeTacking);
 
     /* failed to determine speed.. */
     if(isnan(B) || isnan(VB)) {
@@ -709,7 +709,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         }
 
         {
-        int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S);
+        int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S, configuration.OptimizeTacking);
         if(newpolar == -1) {
             configuration.polar_failed = true;
             continue;
@@ -879,7 +879,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
 
         double dummy_dist; // not used
 
-        int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S);
+        int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S, configuration.OptimizeTacking);
         if(newpolar == -1) {
             configuration.polar_failed = true;
             return NAN;
