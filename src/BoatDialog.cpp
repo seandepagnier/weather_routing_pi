@@ -433,13 +433,13 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
         SailingVMG vmg = polar.GetVMGTrueWind(VW);
 
         for(int i=0; i<4; i++) {
-            if(i%2 == 0 && !full)
+            if(i%2 == 1 && !full)
                 continue;
 
             if(i < 2)
                 dc.SetPen(wxPen(wxColor(255, 0, 255), 2));
             else
-                dc.SetPen(wxPen(wxColor(255, 255, 0), 2));
+                dc.SetPen(wxPen(wxColor(0, 255, 255), 2));
 
             double W = vmg.values[i];
             if(isnan(W))
@@ -1018,8 +1018,9 @@ wxString BoatDialog::FormatVMG(double W, double VW)
 {
     long index = SelectedPolar();
     Polar &polar = m_Boat.Polars[index];
-    double A = isnan(W) ? NAN :
-        positive_degrees(Polar::DirectionApparentWind(polar.Speed(W, VW, true), W, VW));
+    if(isnan(W))
+        return _("wind speed out of range");
+    double A = positive_degrees(Polar::DirectionApparentWind(polar.Speed(W, VW, true), W, VW));
     return wxString::Format(_("%.1f True %.1f Apparent"), W, A);
 }
 
