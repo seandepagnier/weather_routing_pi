@@ -47,7 +47,7 @@ can be viewed during grib playback.
       <li><b>Currents Only</b> Use climatology for currents, but never wind.</li>
       <li><b>Cumulative Map</b> Pretend the wind comes from all of the directions in the wind atlas
         for the percentage of time based on the atlas.  For this mode to work optimally, you should sail
-      at all angles from 0 to 360, and check "optimize tacking" in the vmg tab of the boat dialog.  This will
+      at all angles from 0 to 360, and enable "optimize tacking".  This will
       allow the program to assume you will tack as needed in intervals shorter than the isochrons to take advantage of wind shifts.</li>
       <li><b>Cumulative - Calms</b> Like Cumulative Map, except the boat also drifts without sailing during calms.</li>
       <li><b>Most Likely</b> Use the interpolated most likely wind data from the wind atlas, with the most likely wind speed.</li>
@@ -72,7 +72,7 @@ can be viewed during grib playback.
     by sitting in place until the current abades.</li>
   <li><b>Max Diverted Course</b> Maximum course error to continue toward destination.  Not all possible courses will be considered and therefore the most optimal route may not be found.  This usually (but not in all cases) is obvious when the optimal route is sometimes near the edge of the graph.  Using a reasonable value can greatly speeds the rate of computation.</li>
   <li><b>Max Course Angle</b> Like Max Diverted Course, except the search range is based from the starting position to the destination.  Normally should be set to 180.</li>
-  <li><b>Max Search Angle</b> This specifies how much the boat course can change between propagations.  A value of 180 gives the maximum flexibility of boat movement, but increases the computation time.  A minimum of 90 is usually needed for tacking, a value of 120 is recommended with strong currents.  Smaller values (60 or less) can give very fast results, but should be used with care, as if the other settings are not appropriate, an inaccurate graph will result.  For example, if tacking is needed at any time, then in this case, all courses (0-360) must be specified as degree steps and the boat polar optimized for tacking (see below: VMG tab of boat dialog)
+  <li><b>Max Search Angle</b> This specifies how much the boat course can change between propagations.  A value of 180 gives the maximum flexibility of boat movement, but increases the computation time.  A minimum of 90 is usually needed for tacking, a value of 120 is recommended with strong currents.  Smaller values (60 or less) can give very fast results, but should be used with care, as if the other settings are not appropriate, an inaccurate graph will result.  For example, if tacking is needed at any time, then in this case, all courses (0-360) must be specified as degree steps and "optimize tacking" should be enabled.
   <li><b>Max True Wind Knots</b> Do not navigate in areas with more true wind than this value.</li>
   <li><b>Max Apparent Wind Knots</b> Do not navigate in areas with more apparent wind than this value.  This should be set to a high value (ie: 100) if not used to avoid extra calculations.</li>
   <li><b>Max Swell Meters</b> Do not attempt to navigate in areas with more wave average height than this value.</li>
