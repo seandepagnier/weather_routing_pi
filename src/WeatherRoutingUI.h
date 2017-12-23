@@ -191,7 +191,9 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText28;
 		wxButton* m_bGribTime;
 		wxStaticText* m_staticText30;
-		wxTextCtrl* m_tStartHour;
+		wxSpinCtrl* m_sStartHour;
+		wxStaticText* m_staticText134;
+		wxTextCtrl* m_tStartMinute;
 		wxButton* m_bCurrentTime;
 		wxTextCtrl* m_tBoat;
 		wxButton* m_bBoatFilename;
@@ -257,11 +259,11 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateDate( wxDateEvent& event ) { event.Skip(); }
 		virtual void OnGribTime( wxCommandEvent& event ) { event.Skip(); }
+		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBoatFilename( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
-		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }

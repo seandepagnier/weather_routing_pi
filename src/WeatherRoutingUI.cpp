@@ -537,29 +537,56 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer60->Add( fgSizer6, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer94;
-	fgSizer94 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer94 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer94->SetFlexibleDirection( wxBOTH );
 	fgSizer94->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxFlexGridSizer* fgSizer1122;
+	fgSizer1122 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer1122->SetFlexibleDirection( wxBOTH );
+	fgSizer1122->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	m_staticText28 = new wxStaticText( m_panel24, wxID_ANY, _("Date"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText28->Wrap( -1 );
-	fgSizer94->Add( m_staticText28, 0, wxALL, 5 );
+	fgSizer1122->Add( m_staticText28, 0, wxALL, 5 );
 	
 	m_dpStartDate = new wxDatePickerCtrl( m_panel24, wxID_ANY, wxDefaultDateTime, wxDefaultPosition, wxDefaultSize, wxDP_ALLOWNONE|wxDP_DEFAULT );
-	fgSizer94->Add( m_dpStartDate, 0, wxALL, 5 );
+	fgSizer1122->Add( m_dpStartDate, 0, wxALL, 5 );
 	
 	m_bGribTime = new wxButton( m_panel24, wxID_ANY, _("Grib Time"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer94->Add( m_bGribTime, 0, wxLEFT|wxRIGHT, 5 );
+	fgSizer1122->Add( m_bGribTime, 0, wxLEFT|wxRIGHT, 5 );
+	
+	
+	fgSizer94->Add( fgSizer1122, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer111;
+	fgSizer111 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer111->SetFlexibleDirection( wxBOTH );
+	fgSizer111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	m_staticText30 = new wxStaticText( m_panel24, wxID_ANY, _("Hour"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText30->Wrap( -1 );
-	fgSizer94->Add( m_staticText30, 0, wxALL, 5 );
+	fgSizer111->Add( m_staticText30, 0, wxALL, 5 );
 	
-	m_tStartHour = new wxTextCtrl( m_panel24, wxID_ANY, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer94->Add( m_tStartHour, 0, wxALL, 5 );
+	m_sStartHour = new wxSpinCtrl( m_panel24, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 23, 0 );
+	m_sStartHour->SetMaxSize( wxSize( 60,-1 ) );
+	
+	fgSizer111->Add( m_sStartHour, 0, wxALL, 5 );
+	
+	m_staticText134 = new wxStaticText( m_panel24, wxID_ANY, _(":"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText134->Wrap( -1 );
+	fgSizer111->Add( m_staticText134, 0, wxALL, 5 );
+	
+	m_tStartMinute = new wxTextCtrl( m_panel24, wxID_ANY, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_tStartMinute->SetMaxSize( wxSize( 40,-1 ) );
+	
+	fgSizer111->Add( m_tStartMinute, 0, wxALL, 5 );
 	
 	m_bCurrentTime = new wxButton( m_panel24, wxID_ANY, _("Current Time"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer94->Add( m_bCurrentTime, 0, wxLEFT|wxRIGHT, 5 );
+	fgSizer111->Add( m_bCurrentTime, 0, wxLEFT|wxRIGHT, 5 );
+	
+	
+	fgSizer94->Add( fgSizer111, 1, wxEXPAND, 5 );
 	
 	
 	fgSizer60->Add( fgSizer94, 1, wxEXPAND, 5 );
@@ -1064,7 +1091,9 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_cStart->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_dpStartDate->Connect( wxEVT_DATE_CHANGED, wxDateEventHandler( ConfigurationDialogBase::OnUpdateDate ), NULL, this );
 	m_bGribTime->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnGribTime ), NULL, this );
-	m_tStartHour->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_sStartHour->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sStartHour->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_tStartMinute->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bCurrentTime->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnCurrentTime ), NULL, this );
 	m_tBoat->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bBoatFilename->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnBoatFilename ), NULL, this );
@@ -1183,7 +1212,9 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_cStart->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_dpStartDate->Disconnect( wxEVT_DATE_CHANGED, wxDateEventHandler( ConfigurationDialogBase::OnUpdateDate ), NULL, this );
 	m_bGribTime->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnGribTime ), NULL, this );
-	m_tStartHour->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_sStartHour->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sStartHour->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_tStartMinute->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bCurrentTime->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnCurrentTime ), NULL, this );
 	m_tBoat->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bBoatFilename->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnBoatFilename ), NULL, this );
