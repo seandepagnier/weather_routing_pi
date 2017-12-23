@@ -80,15 +80,15 @@ static const char *eye[]={
 WeatherRoute::WeatherRoute() : routemapoverlay(new RouteMapOverlay) {}
 WeatherRoute::~WeatherRoute() { delete routemapoverlay; }
 
-const wxString WeatherRouting::column_names[NUM_COLS] = {_T(""), _("Boat"), _("Start"), _("Start Time"),
-                                                          _("End"), _("End Time"), _("Time"), _("Distance"),
-                                                          _("Avg Speed"), _("Max Speed"),
-                                                          _("Avg Speed Ground"), _("Max Speed Ground"),
-                                                         _("Avg Wind"), _("Max Wind"), _("Max Wind Gust"),
-                                                          _("Avg Current"), _("Max Current"),
-                                                          _("Avg Swell"), _("Max Swell"),
-                                                          _("Upwind Percentage"),
-                                                          _("Port Starboard"), _("Tacks"), _("State")};
+const wxString WeatherRouting::column_names[NUM_COLS] = {"", "Boat", "Start", "Start Time",
+                                                         "End", "End Time", "Time", "Distance",
+                                                         "Avg Speed", "Max Speed",
+                                                         "Avg Speed Ground", "Max Speed Ground",
+                                                         "Avg Wind", "Max Wind", "Max Wind Gust",
+                                                         "Avg Current", "Max Current",
+                                                         "Avg Swell", "Max Swell",
+                                                         "Upwind Percentage",
+                                                         "Port Starboard", "Tacks", "State"};
 
 static int sortcol, sortorder = 1;
 // sort callback. Sort by body.
@@ -349,7 +349,7 @@ void WeatherRouting::UpdateColumns()
     for(int i=0; i<NUM_COLS; i++) {
         if(m_SettingsDialog.m_cblFields->IsChecked(i)) {
             columns[i] = m_lWeatherRoutes->GetColumnCount();
-            wxString name = column_names[i];
+            wxString name = _(column_names[i]);
 
             if(i == STARTTIME || i == ENDTIME) {
                 name += _T(" (");
