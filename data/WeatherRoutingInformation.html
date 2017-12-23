@@ -59,6 +59,7 @@ can be viewed during grib playback.
   <li><b>Integrator</b> Newton's method is default and fastest, but doesn't take into account changes
     in wind/current along each step.  Rutta Kunge (4th order) is much more accurate taking 4 samples, but a lot slower.  Generally Newton's method with a smaller time step is recommended for more accuracy.</li>
   <li><b>Detect Land</b> Use GSHHS coastline data to avoid sailing through land.  This check is quite slow and should be optimized in the future.  It is recommended to upgrade to the high resolution background map <a href="http://opencpn.org/ocpn/chart_sources">available here</a>.</li>
+  <li><b>Optimize Tacking</b> Boat may sail on all courses 0-360, even directly upwind and it is assumed that the captain performs tacking at the optimal angles to closely approximate the generated weather route for upwind and downwind.  Tacks will not be visible in the generated route.  This may allow navigation in tighter areas, or otherwise better results without decreasing the time step.
   <li><b>Inverted Regions</b> This is relatively rare, but in some cases it may be
     possible to reach a location from two different routes (imagine either side of an island)
     which is further away from the destination before the destination can be reached.  At this
