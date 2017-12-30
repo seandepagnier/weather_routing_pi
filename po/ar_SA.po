@@ -3,26 +3,26 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-12-20 21:14+0100\n"
-"PO-Revision-Date: 2017-12-26 06:23-0500\n"
+"PO-Revision-Date: 2017-12-26 06:22-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
-"Language-Team: Greek\n"
-"Language: el_GR\n"
+"Language-Team: Arabic\n"
+"Language: ar_SA\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: opencpn\n"
-"X-Crowdin-Language: el\n"
+"X-Crowdin-Language: ar\n"
 "X-Crowdin-File: /plugins/weather_routing_pi/po/weather_routing_pi.pot\n"
 
 #: src/Boat.cpp:55
 msgid "Boat file does not exist."
-msgstr "Δεν υπάρχει το αρχείο του πλοίου."
+msgstr ""
 
 #: src/Boat.cpp:59
 msgid "Failed to load file: "
-msgstr "Απέτυχε η φόρτωση του αρχείου: "
+msgstr ""
 
 #: src/Boat.cpp:60
 msgid "It should an xml file describing a boat, not a polar; try editing the boat."
@@ -30,7 +30,7 @@ msgstr ""
 
 #: src/Boat.cpp:64
 msgid "Invalid xml file (no OCPWeatherRoutingBoat node): "
-msgstr "Μη έγκυρο xml αρχείο (δεν υπάρχει κόμβος OCPWeatherRoutingBoat): "
+msgstr ""
 
 #: src/Boat.cpp:155
 msgid "Failed to open for writing: "
@@ -38,7 +38,7 @@ msgstr ""
 
 #: src/Boat.cpp:165
 msgid "Failed saving file: "
-msgstr "Απέτυχε η αποθήκευση του αρχείου: "
+msgstr ""
 
 #: src/BoatDialog.cpp:67
 msgid "Filename"
@@ -47,14 +47,14 @@ msgstr ""
 #: src/BoatDialog.cpp:102 src/BoatDialog.cpp:674 src/BoatDialog.cpp:724
 #: src/BoatDialog.cpp:820 src/BoatDialog.cpp:826 src/BoatDialog.cpp:880
 msgid "OpenCPN Weather Routing Plugin"
-msgstr "Πρόσθετο OpenCPN Weather Routing"
+msgstr ""
 
 #: src/BoatDialog.cpp:116 src/BoatDialog.cpp:117 src/BoatDialog.cpp:118
 #: src/BoatDialog.cpp:119 src/BoatDialog.cpp:120 src/BoatDialog.cpp:121
 #: src/PlotDialog.cpp:59 src/WeatherRouting.cpp:1520
 #: src/WeatherRoutingUI.cpp:2124
 msgid "N/A"
-msgstr "Δ/Υ"
+msgstr ""
 
 #: src/BoatDialog.cpp:224
 msgid "Select a polar to view plot"
@@ -62,7 +62,7 @@ msgstr ""
 
 #: src/BoatDialog.cpp:661 src/BoatDialog.cpp:700
 msgid "Select Boat"
-msgstr "Επιλέξτε πλοίο"
+msgstr ""
 
 #: src/BoatDialog.cpp:819
 msgid "Failed to save"
@@ -74,7 +74,7 @@ msgstr ""
 
 #: src/BoatDialog.cpp:843
 msgid "Select Polar File"
-msgstr "Επιλέξτε Αρχείο πολικών δεδομένων"
+msgstr ""
 
 #: src/BoatDialog.cpp:1023
 #, c-format
@@ -83,11 +83,11 @@ msgstr ""
 
 #: src/ConfigurationBatchDialog.cpp:250
 msgid "Select Polar"
-msgstr "Επιλέξτε πολικά δεδομένα"
+msgstr ""
 
 #: src/ConfigurationBatchDialog.cpp:285
 msgid "Batch mode generates multiple configurations based on the selected configuration."
-msgstr "Ο μαζική επεξεργασία δημιουργεί πολλαπλές διαμορφώσεις με βάση την επιλεγμένη διαμόρφωση."
+msgstr ""
 
 #: src/ConfigurationBatchDialog.cpp:287 src/ConfigurationDialog.cpp:264
 #: src/ConfigurationDialog.cpp:379 src/ReportDialog.cpp:240
@@ -102,19 +102,19 @@ msgstr "Ο μαζική επεξεργασία δημιουργεί πολλαπ
 #: src/WeatherRouting.cpp:1845 src/WeatherRouting.cpp:1854
 #: src/WeatherRoutingUI.h:129
 msgid "Weather Routing"
-msgstr "Δρομολόγιο βάσει του καιρού"
+msgstr ""
 
 #: src/ConfigurationDialog.cpp:94
 msgid "Select Boat File"
-msgstr "Επιλέξτε αρχείο πλοίου"
+msgstr ""
 
 #: src/ConfigurationDialog.cpp:263
 msgid "Invalid Date Time."
-msgstr "Μη έγκυρη ημερομηνία ώρα."
+msgstr ""
 
 #: src/ConfigurationDialog.cpp:378
 msgid "Warning: less than 4 different degree steps specified\n"
-msgstr "Προειδοποίηση: καθορίσθηκαν λιγότερο από 4 διαφορετικά βήματα γωνίας\n"
+msgstr ""
 
 #: src/EditPolarDialog.cpp:41
 msgid "True Wind Speed"
@@ -143,74 +143,74 @@ msgstr ""
 #: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:40
 #: src/WeatherRouting.cpp:83 src/WeatherRoutingUI.cpp:520
 msgid "Start"
-msgstr "Αρχή"
+msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:40
 #: src/WeatherRouting.cpp:83 src/WeatherRoutingUI.cpp:2200
 msgid "Start Time"
-msgstr "Ώρα έναρξης"
+msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:41
 #: src/WeatherRouting.cpp:84 src/WeatherRoutingUI.cpp:664
 msgid "End"
-msgstr "Τέλος"
+msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42
 msgid "BoatFileName"
-msgstr "ΌνομαΑρχείουΠλοίου"
+msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:48
 #: src/WeatherRouting.cpp:91 src/WeatherRoutingUI.cpp:1939
 msgid "State"
-msgstr "κατάσταση"
+msgstr ""
 
 #: src/Polar.cpp:184
 msgid " line "
-msgstr " γραμμή "
+msgstr ""
 
 #: src/Polar.cpp:186
 msgid "Boat polar failed"
-msgstr "Το πολικό διάγραμμα του πλοίου απέτυχε"
+msgstr ""
 
 #: src/Polar.cpp:204
 msgid "Failed to open."
-msgstr "Απέτυχε το άνοιγμα."
+msgstr ""
 
 #: src/Polar.cpp:209
 msgid "Failed to read."
-msgstr "Απέτυχε η ανάγνωση."
+msgstr ""
 
 #: src/Polar.cpp:224
 msgid "Unrecognized format."
-msgstr "Μη αναγνωρίσιμη μορφή."
+msgstr ""
 
 #: src/Polar.cpp:230
 msgid "Too many wind speeds."
-msgstr "Πάρα πολλές ταχύτητες ανέμου."
+msgstr ""
 
 #: src/Polar.cpp:249
 msgid "Wind direction out of range."
-msgstr "Κατεύθυνση ανέμου εκτός ορίων."
+msgstr ""
 
 #: src/Polar.cpp:254
 msgid "Wind direction out of order."
-msgstr "Κατεύθυνση ανέμου εκτός λειτουργίας."
+msgstr ""
 
 #: src/Polar.cpp:278
 msgid "Too few tokens."
-msgstr "Πολύ λίγα σημεία."
+msgstr ""
 
 #: src/Polar.cpp:284
 msgid "Too many tokens."
-msgstr "Πάρα πολλές ενδείξεις."
+msgstr ""
 
 #: src/ReportDialog.cpp:56
 msgid "No Configuration selected."
-msgstr "Δεν επελέχθη διαμόρφωση."
+msgstr ""
 
 #: src/ReportDialog.cpp:66
 msgid "Destination not yet reached."
-msgstr "Δεν φθάσαμε ακόμη στον προορισμό."
+msgstr ""
 
 #: src/ReportDialog.cpp:73
 msgid "Boat Filename"
@@ -218,153 +218,152 @@ msgstr ""
 
 #: src/ReportDialog.cpp:74
 msgid "Route from "
-msgstr "Διαδρομή από "
+msgstr ""
 
 #: src/ReportDialog.cpp:74 src/ReportDialog.cpp:277 src/ReportDialog.cpp:315
 msgid " to "
-msgstr " προς "
+msgstr ""
 
 #: src/ReportDialog.cpp:75
 msgid "Leaving "
-msgstr "Αναχώρηση "
+msgstr ""
 
 #: src/ReportDialog.cpp:76
 msgid "Arriving "
-msgstr "Άφιξη "
+msgstr ""
 
 #: src/ReportDialog.cpp:77
 msgid "Duration "
-msgstr "Διάρκεια "
+msgstr ""
 
 #: src/ReportDialog.cpp:81
 msgid "Distance sailed: "
-msgstr "Απόσταση πλου: "
+msgstr ""
 
 #: src/ReportDialog.cpp:84
 msgid "longer than great circle route"
-msgstr "μεγαλύτερη από από διαδρομή μεγάλου κύκλου"
+msgstr ""
 
 #: src/ReportDialog.cpp:88
 msgid "Average Speed Over Water (SOW)"
-msgstr "Μέση ταχύτητα στο νερό (SOW)"
+msgstr ""
 
 #: src/ReportDialog.cpp:90
 msgid "Average Speed Over Ground (SOG)"
-msgstr "Μέση πραγματική ταχύτητα (SOG)"
+msgstr ""
 
 #: src/ReportDialog.cpp:92
 msgid "Average Wind"
-msgstr "Μέση ταχύτητα ανέμου"
+msgstr ""
 
 #: src/ReportDialog.cpp:94
 msgid "Average Swell"
-msgstr "Μέσο ύψος κύματος"
+msgstr ""
 
 #: src/ReportDialog.cpp:96
 msgid "Upwind"
-msgstr "Προσήνεμα"
+msgstr ""
 
 #: src/ReportDialog.cpp:99
 msgid "Port/Starboard"
-msgstr "Αριστερά/δεξιά"
+msgstr ""
 
 #: src/ReportDialog.cpp:105
 msgid "Number of tacks"
-msgstr "Αριθμός τακ"
+msgstr ""
 
 #: src/ReportDialog.cpp:114
 msgid "speed change due to "
-msgstr "αλλαγή ταχύτητας λόγω "
+msgstr ""
 
 #: src/ReportDialog.cpp:116
 msgid "favorable"
-msgstr "ευνοϊκή"
+msgstr ""
 
 #: src/ReportDialog.cpp:118
 msgid "unfavorable"
-msgstr "δυσμενής"
+msgstr ""
 
 #: src/ReportDialog.cpp:119
 msgid " currents."
-msgstr " ρεύματα."
+msgstr ""
 
 #: src/ReportDialog.cpp:149
 msgid "No routes to report yet."
-msgstr "Δεν υπαρχουν διαδρομές ακόμα."
+msgstr ""
 
 #: src/ReportDialog.cpp:172 src/ReportDialog.cpp:221
 msgid "to"
-msgstr "προς"
+msgstr ""
 
 #: src/ReportDialog.cpp:173
 msgid "configurations"
-msgstr "διαμορφώσεις"
+msgstr ""
 
 #: src/ReportDialog.cpp:174
 msgid "<dt>Fastest configuration "
-msgstr "<dt>Τάχιστη διαμόρφωση "
+msgstr ""
 
 #: src/ReportDialog.cpp:175
 msgid "avg speed"
-msgstr "μέση ταχύτητα"
+msgstr ""
 
 #: src/ReportDialog.cpp:180
 msgid "Best Times (mostly downwind)"
-msgstr "Καλύτεροι χρόνοι (κυρίως πρύμα)"
+msgstr ""
 
 #: src/ReportDialog.cpp:219 src/ReportDialog.cpp:274 src/ReportDialog.cpp:302
 msgid " and "
-msgstr " και "
+msgstr ""
 
 #: src/ReportDialog.cpp:233
 msgid "any"
-msgstr "κάθε"
+msgstr ""
 
 #: src/ReportDialog.cpp:235 src/ReportDialog.cpp:285
 msgid "none"
-msgstr "κανένα"
+msgstr ""
 
 #: src/ReportDialog.cpp:238
 msgid "Cyclones"
-msgstr "Κυκλώνες"
+msgstr ""
 
 #: src/ReportDialog.cpp:240
 msgid "Calculating Cyclone Crossings"
-msgstr "Υπολογίζει περάσματα κυκλώνων"
+msgstr ""
 
 #: src/ReportDialog.cpp:250
 msgid "Climatology data unavailable."
-msgstr "Δεν υπάρχουν κλιματολογικά δεδομένα."
+msgstr ""
 
 #: src/ReportDialog.cpp:283
 msgid "all months"
-msgstr "όλους τους μήνες"
+msgstr ""
 
 #: src/ReportDialog.cpp:291
 msgid "All routes are safe from cyclones."
-msgstr "Όλα οι διαδρομές είναι ασφαλείς από κυκλώνες."
+msgstr ""
 
 #: src/ReportDialog.cpp:293
 msgid "No routes found to be safe from cyclones."
-msgstr "Δεν Υπαρχουν διαδρομές ασφαλείς από κυκλώνες."
+msgstr ""
 
 #: src/ReportDialog.cpp:295
 msgid "Start times for cyclone safe routes: "
-msgstr "Ώρες εκκίνησης για διδρομές ασφαλείς από κυκλώνες: "
+msgstr ""
 
 #: src/ReportDialog.cpp:326
 msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\n"
 "For example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
-msgstr "Τα δελτία του Weather routing δίνουν την επισκόπηση μιας διαδρομής με βάση πολλαπλές διαμορφώσεις.\n\n"
-"Για παράδειγμα, χρησιμοποιώντας το διάλογο για την batch διαμόρφωση, είναι δυνατή η εύκολη δημιουργία πολλαπλών ταυτοσήμων διαμορφώσεων που έχουν, όμως, διαφορετικούς χρόνους εκκίνησης. Μόλις υπολογισθούν, όλες αυτές οι διαμορφώσεις, είναι διαθέσιμες για να γίνει το δελτίο. Μπορεί, λοιπόν, να δοθεί μια επισκόπηση της καλύτερης ώρας, της αναμενόμενης ταχύτητας και των καιρικών συνθηκών. Εάν διατίθενται κλιματολογικά δεδομένα, τότε μπορούν να περιγραφούν ο κίνδυνος κυκλώνων και πρόσθετες καιρικές συνθήκες."
+msgstr ""
 
 #: src/ReportDialog.cpp:333
 msgid "Weather Routing Report"
-msgstr "ΔΕΛΤΙΟ Weather Routing"
+msgstr ""
 
 #: src/RouteMapOverlay.cpp:79
 msgid "error, thread already created\n"
-msgstr "σφάλμα, το τμήμα έχει ήδη δημιουργηθεί\n"
+msgstr ""
 
 #: src/RouteMapOverlay.cpp:92
 msgid "Configuration specifies cyclone track avoidance and Climatology cyclone data is not available"
@@ -382,43 +381,43 @@ msgstr ""
 #: src/WeatherRouting.cpp:486 src/WeatherRouting.cpp:495
 #: src/WeatherRoutingUI.cpp:574 src/WeatherRoutingUI.h:424
 msgid "Boat"
-msgstr "Πλοίο"
+msgstr ""
 
 #: src/SettingsDialog.cpp:41 src/WeatherRouting.cpp:84
 msgid "End Time"
-msgstr "Ώρα λήξης"
+msgstr ""
 
 #: src/SettingsDialog.cpp:41 src/WeatherRouting.cpp:84
 msgid "Time"
-msgstr "Χρόνος"
+msgstr ""
 
 #: src/SettingsDialog.cpp:41 src/WeatherRouting.cpp:84
 msgid "Distance"
-msgstr "Απόσταση"
+msgstr ""
 
 #: src/SettingsDialog.cpp:42 src/WeatherRouting.cpp:85
 msgid "Avg Speed"
-msgstr "μέση ταχύτητα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:42 src/WeatherRouting.cpp:85
 msgid "Max Speed"
-msgstr "Μέγιστη ταχύτητα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:43 src/WeatherRouting.cpp:86
 msgid "Avg Speed Ground"
-msgstr "μέση πραγματική ταχύτητα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:43 src/WeatherRouting.cpp:86
 msgid "Max Speed Ground"
-msgstr "Μέγιστη πραγματική ταχύτητα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:44 src/WeatherRouting.cpp:87
 msgid "Avg Wind"
-msgstr "μέση ταχύτητα ανέμου"
+msgstr ""
 
 #: src/SettingsDialog.cpp:44 src/WeatherRouting.cpp:87
 msgid "Max Wind"
-msgstr "μέγιστη ταχύτητα ανέμου"
+msgstr ""
 
 #: src/SettingsDialog.cpp:44 src/WeatherRouting.cpp:87
 msgid "Max Wind Gust"
@@ -426,38 +425,38 @@ msgstr ""
 
 #: src/SettingsDialog.cpp:45 src/WeatherRouting.cpp:88
 msgid "Avg Current"
-msgstr "μέσο ρεύμα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:45 src/WeatherRouting.cpp:88
 msgid "Max Current"
-msgstr "μέγιστο ρεύμα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:46 src/WeatherRouting.cpp:89
 msgid "Avg Swell"
-msgstr "μέσο κύμα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:46 src/WeatherRouting.cpp:89
 #: src/WeatherRoutingUI.cpp:638
 msgid "Max Swell"
-msgstr "μεγιστο κύμα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:47 src/WeatherRouting.cpp:90
 msgid "Upwind Percentage"
-msgstr "ποσοστό όρτσα"
+msgstr ""
 
 #: src/SettingsDialog.cpp:48 src/WeatherRouting.cpp:91
 msgid "Port Starboard"
-msgstr "Αριστερά/δεξιά"
+msgstr ""
 
 #: src/SettingsDialog.cpp:48 src/WeatherRouting.cpp:91
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392 src/WeatherRoutingUI.cpp:2577
 msgid "Tacks"
-msgstr "Τακ"
+msgstr ""
 
 #: src/SettingsDialog.cpp:107
 msgid "Visible"
-msgstr "Ορατό"
+msgstr ""
 
 #: src/SettingsDialog.cpp:167
 msgid "Cursor Route -- optimal route closest to the cursor\n"
@@ -470,56 +469,45 @@ msgid "Cursor Route -- optimal route closest to the cursor\n"
 "Squares At Sail Changes -- render squares along Routes whenever a sail change is made\n"
 "Filter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\n"
 "Number of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
-msgstr "Διαδρομή δρομέα -- βέλτιστη διαδρομή πλησιέστερα στον δρομέα\n"
-"Διαδρομή προορισμού -- βέλτιστη διαδρομή προς τον επιθυμητό προορισμό\n"
-"Πάχος διαδρομής -- Πάχος γραμμής για τις διαδρομές δρομέα και προορισμού\n"
-"Πάχος ισοχρόνων -- πάχος γραμμής των ισοχρόνων στον χάρτη\n"
-"Πάχος εναλλακτικών διαδρομών -- Πάχος γραμμής για τις εναλλακτικές διδρομές\n"
-"Σημείωση: όλα τα πάχη μπορούν να τεθούν στο 0 για να απενεργοποιηθεί η εμφάνισή τους\n"
-"Εναλλακτικές για όλες τις ισόχρονες -- Εμφάνιση όλων των εναλλακτικών διαδρομών, όχι μόνο αυτών που φτάνουν μέχρι την τελευταία ισόχρονη\n"
-"Τετράγωνα σε αλλαγές πανιών -- σχεδιάζει τετράγωνα στις διαδρομές όπου γίνεται αλλαγή πανιών\n"
-"Φίτρο διαδρομών από τη Κλιματολογία -- αυτό επί του παρόντος δεν κάνει τίποτα, αλλά σκόπευα να φτιάξω χάρτες weather route που αντλούν στοιχεία από grib και Κλιματολογία και δείχνουν σαφώς ποια δεδομένα χρησιμοποιήθηκαν που \n\n"
-"Αριθμός ταυτόχρονων πορειών --εάν υπάρχουν πολλαπλές διαμορφώσεις, μπορούν να υπολογιστούν σε ξεχωριστές πορείες, κάτι που επιτρέπει κάποια επιτάχυνση εάν χρησιμοποιούνται παράλληλοι υπολογιστές\n"
+msgstr ""
 
 #: src/StatisticsDialog.cpp:62
 msgid "No Route"
-msgstr "Καμία διαδρομή"
+msgstr ""
 
 #: src/StatisticsDialog.cpp:63
 msgid "Running"
-msgstr "Σε εκτέλεση"
+msgstr ""
 
 #: src/StatisticsDialog.cpp:63 src/WeatherRoutingUI.cpp:1943
 msgid "Stopped"
-msgstr "Σταμάτησε"
+msgstr ""
 
 #: src/weather_routing_pi.cpp:115
 msgid "Weather_Routing"
-msgstr "Δρομολόγηση βάσει του καιρού"
+msgstr ""
 
 #: src/weather_routing_pi.cpp:120
 msgid "Weather Route Position"
-msgstr "Θέση του Weather Route"
+msgstr ""
 
 #: src/weather_routing_pi.cpp:174
 msgid "WeatherRouting"
-msgstr "Δρομολόγηση βάσει του καιρού"
+msgstr ""
 
 #: src/weather_routing_pi.cpp:179
 msgid "Compute optimal routes based on weather and constraints."
-msgstr "Υπολογίστε τις βέλτιστες διαδρομές με βάση τις καιρικές συνθήκες και περιορισμούς."
+msgstr ""
 
 #: src/weather_routing_pi.cpp:184
 msgid "Weather Routing features include:\n"
 "  optimal routing subject to various constraints based on weather data\n"
 "  automatic boat polar computation\n"
-msgstr "Το Weather Routing παρέχει: \n"
-" τη βέλτιστη διαδρομή για τους περιορισμούς που βάζουν οι μετεωρολογικές προβλέψεις\n"
-" αυτόματο υπολογισμό των πολικών διαγραμμάτων του πλοίου\n"
+msgstr ""
 
 #: src/weather_routing_pi.cpp:250
 msgid "Grib plugin version not supported."
-msgstr "Δεν υποστηρίζεται αυτή η έκδοση του πρόσθετου Grib."
+msgstr ""
 
 #: src/weather_routing_pi.cpp:252 src/weather_routing_pi.cpp:298
 #, c-format
@@ -528,35 +516,35 @@ msgstr ""
 
 #: src/weather_routing_pi.cpp:296
 msgid "Climatology plugin version not supported, no climatology data."
-msgstr "Η έκδοση αυτή του προσθέτου Κλιματολογίας δεν υποστηρίζεται. Όχι κλιματολογικά δεδομένα."
+msgstr ""
 
 #: src/WeatherRouting.cpp:142
 msgid "Name"
-msgstr "Όνομα"
+msgstr ""
 
 #: src/WeatherRouting.cpp:143
 msgid "Lat"
-msgstr "Πλάτος"
+msgstr ""
 
 #: src/WeatherRouting.cpp:144
 msgid "Lon"
-msgstr "Μήκος"
+msgstr ""
 
 #: src/WeatherRouting.cpp:294
 msgid "Enter Name"
-msgstr "Εισαγωγή ονόματος"
+msgstr ""
 
 #: src/WeatherRouting.cpp:294
 msgid "New Position"
-msgstr "Νέα θέση"
+msgstr ""
 
 #: src/WeatherRouting.cpp:304
 msgid "This name already exists, replace?\n"
-msgstr "Αυτό το όνομα υπάρχει ήδη. Αντικατάσταση;\n"
+msgstr ""
 
 #: src/WeatherRouting.cpp:357
 msgid "local"
-msgstr "τοπική"
+msgstr ""
 
 #: src/WeatherRouting.cpp:398
 msgid "Select exactly 1 configuration"
@@ -569,11 +557,11 @@ msgstr ""
 #: src/WeatherRouting.cpp:427 src/WeatherRouting.cpp:1581
 #: src/WeatherRoutingUI.cpp:756
 msgid "Grib"
-msgstr "Grib"
+msgstr ""
 
 #: src/WeatherRouting.cpp:428 src/WeatherRoutingUI.cpp:761
 msgid "Climatology"
-msgstr "Κλιματολογία"
+msgstr ""
 
 #: src/WeatherRouting.cpp:429
 msgid "Data Deficient"
@@ -589,104 +577,104 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:630
 msgid "Cannot goto invalid route(s)."
-msgstr "Δεν μπορώ να πάω, οι διαδρομές δεν ισχύουν."
+msgstr ""
 
 #: src/WeatherRouting.cpp:789 src/WeatherRouting.cpp:805
 msgid "Select Configuration"
-msgstr "Επιλέξτε διαμόρφωση"
+msgstr ""
 
 #: src/WeatherRouting.cpp:871
 msgid "Zero time span forbidden, aborting."
-msgstr "Δεν πειτρέπεται μηδενικό χρονικό διάστημα."
+msgstr ""
 
 #: src/WeatherRouting.cpp:894
 msgid "Batch configuration"
-msgstr "Μαζική διαμόρφωση"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1041
 msgid "WeatherRoutingInformation.html"
-msgstr "WeatherRoutingInformation.html"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1096
 msgid "Failed to start configuration: "
-msgstr "Απέτυχε να αρχίσει τη διαμόρφωση: "
+msgstr ""
 
 #: src/WeatherRouting.cpp:1167
 msgid "Failed to load file."
-msgstr "Απέτυχε η φόρτωση του αρχείου."
+msgstr ""
 
 #: src/WeatherRouting.cpp:1172
 msgid "Invalid xml file"
-msgstr "Μη έγκυρο αρχείο xml"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1190
 msgid "Load"
-msgstr "Φόρτωση"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1206
 msgid "File contains duplicate position name, discaring\n"
-msgstr "Το αρχείο περιέχει διπλό όνομα θέσης\n"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1295
 msgid "Unrecognized xml node"
-msgstr "Άγνωστος κόμβος xml"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1392
 msgid "Failed to save xml file: "
-msgstr "Απέτυχε η αποθήκευση του αρχείου xml: "
+msgstr ""
 
 #: src/WeatherRouting.cpp:1570
 msgid "Invalid Start/End"
-msgstr "Μη έγκυρη έναρξη/λήξη"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1573
 msgid "Computing..."
-msgstr "Υπολογισμός..."
+msgstr ""
 
 #: src/WeatherRouting.cpp:1577
 msgid "Complete"
-msgstr "Ολοκλήρωση"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1585 src/WeatherRoutingUI.cpp:1731
 #: src/WeatherRoutingUI.cpp:2561
 msgid "Polar"
-msgstr "Πολικό διάγραμμα"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1589
 msgid "No Data"
-msgstr "Δεν υπάρχουν δεδομένα"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1592
 msgid "Failed"
-msgstr "Απέτυχε"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1598
 msgid "Waiting..."
-msgstr "Σε αναμονή..."
+msgstr ""
 
 #: src/WeatherRouting.cpp:1601
 msgid "Not Computed"
-msgstr "Δεν υπολογίσθηκε"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1775
 msgid "No Weather Route selected"
-msgstr "Δεν επιλέχθηκε Weather Route"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1807
 msgid "Empty Route, nothing to export\n"
-msgstr "Κενή διαδρομή, δεν εξάγεται\n"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1814
 msgid "Weather Route"
-msgstr "Δρομολόγιο βάσει του καιρού"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1818
 msgid "Weather Route Point"
-msgstr "Σημείο για Weather Route"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1844
 msgid "Zero Time Step is invalid"
-msgstr "Μηδενικό χρονικό βήμα δεν είναι έγκυρο"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1852
 msgid "Start/End lies outside of Max Latitude constraint:\n"
@@ -695,119 +683,119 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:1979
 msgid "Positions"
-msgstr "Θέσεις"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:50
 msgid "Configurations"
-msgstr "Διαμορφώσεις"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:68 src/WeatherRoutingUI.cpp:154
 msgid "&Compute"
-msgstr "&Υπολογισμός"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:71
 msgid "&Export"
-msgstr "&Εξαγωγή"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:98
 msgid "&Open"
-msgstr "&Άνοιγμα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:102
 msgid "&Save"
-msgstr "&Αποθήκευση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:108 src/WeatherRoutingUI.cpp:2071
 msgid "&Close"
-msgstr "&Κλείσιμο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:111
 msgid "&File"
-msgstr "&Αρχείο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:115
 msgid "&New Position"
-msgstr "&Νέα θέση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:119
 msgid "&Update Boat Position"
-msgstr "&Ενημέρωση θέσης πλοίου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:123 src/WeatherRoutingUI.cpp:146
 msgid "&Delete"
-msgstr "&Διαγραφή"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:127
 msgid "Delete &All"
-msgstr "Διαγραφή ό&λων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:130
 msgid "&Position"
-msgstr "&Θέση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:134
 msgid "&New"
-msgstr "&Νέο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:137
 msgid "&Batch"
-msgstr "&Μαζικά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:140 src/WeatherRoutingUI.cpp:1786
 msgid "&Edit"
-msgstr "&Επεξεργασία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:143
 msgid "&GoTo"
-msgstr "&Πήγαινε"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:149
 msgid "Delete All"
-msgstr "Διαγραφή όλων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:157
 msgid "Compute &All"
-msgstr "Υπολογισμός &Ολων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:160
 msgid "&Stop"
-msgstr "&Σταμάτα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:164
 msgid "&Reset All"
-msgstr "Επανα&φορά όλων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:169
 msgid "E&xport"
-msgstr "E&ξαγωγή"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:172
 msgid "Export All"
-msgstr "Εξαγωγή όλων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:178
 msgid "&Filter"
-msgstr "&Φίλτρο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:181
 msgid "&Configuration"
-msgstr "Ρυθμίσεις παραμέτρων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:185
 msgid "&Settings"
-msgstr "&Ρυθμίσεις"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:189
 msgid "S&tatistics"
-msgstr "&Στατιστικά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:193
 msgid "&Report"
-msgstr "&Αναφορά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:197
 msgid "&Plot"
-msgstr "&Γράφημα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:201
 msgid "&Cursor Position"
@@ -815,51 +803,51 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:204
 msgid "&View"
-msgstr "&Εμφάνιση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:208
 msgid "&Information"
-msgstr "&Πληροφοριες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:212
 msgid "&Manual"
-msgstr "&Εγχειρίδιο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:216
 msgid "&About"
-msgstr "&Περί"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:219
 msgid "&Help"
-msgstr "&Βοήθεια"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:330
 msgid "Display"
-msgstr "Εμφάνιση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:342
 msgid "Cursor Route Color"
-msgstr "Χρώμα διαδρομής δρομέα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:349
 msgid "Destination Route Color"
-msgstr "Χρώμα διαδρομής προορισμού"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:356
 msgid "Route Thickness"
-msgstr "Πάχος διαδρομής"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:363
 msgid "Iso Chron Thickness"
-msgstr "Πάχος ισοχρόνων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:370
 msgid "Alternate Routes Thickness"
-msgstr "Πάχος εναλακτικών διαδρομών"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:385
 msgid "Alternates for all IsoChrons"
-msgstr "Εναλλακτικές για όλες τις ισόχρονες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:388
 msgid "Display mark when Polar changes"
@@ -867,148 +855,148 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:392
 msgid "Display Wind Barbs"
-msgstr "Δείξε ένταση ανέμου με βέλη"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:395
 msgid "Display current"
-msgstr "Εμφάνιση ρεύματος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:416
 msgid "Computation"
-msgstr "Υπολογισμός"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:423
 msgid "Number of Concurrent threads"
-msgstr "Αριθμός ταυτόχρονων πορειών"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:440
 msgid "Use Local Time"
-msgstr "Χρήση τοπικής ώρας"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:544
 msgid "Date"
-msgstr "Ημερομηνία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:551
 msgid "Grib Time"
-msgstr "Ώρα δεδομένων GRIB"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:554
 msgid "Hour"
-msgstr "ώρα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:558 src/WeatherRoutingUI.cpp:1921
 #: src/WeatherRoutingUI.cpp:1951 src/WeatherRoutingUI.cpp:1959
 #: src/WeatherRoutingUI.cpp:1967 src/WeatherRoutingUI.cpp:1975
 #: src/WeatherRoutingUI.cpp:1983
 msgid "0"
-msgstr "0"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:561
 msgid "Current Time"
-msgstr "Τρέχουσα ώρα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:585
 msgid "..."
-msgstr "..."
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:588
 msgid "Edit"
-msgstr "Επεξεργασία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:598 src/WeatherRoutingUI.cpp:818
 msgid "Constraints"
-msgstr "Περιορισμοί"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:605
 msgid "Max Diverted Course"
-msgstr "Μέγιστη απόκλιση πορείας"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:612 src/WeatherRoutingUI.cpp:832
 #: src/WeatherRoutingUI.cpp:853 src/WeatherRoutingUI.cpp:864
 #: src/WeatherRoutingUI.cpp:2652 src/WeatherRoutingUI.cpp:2670
 msgid "degrees"
-msgstr "μοίρες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:616
 msgid "Max True Wind"
-msgstr "Μεγ. πραγμ. άνεμος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:623 src/WeatherRoutingUI.cpp:634
 msgid "knots"
-msgstr "κόμβοι"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:627
 msgid "Max Apparent Wind"
-msgstr "Μεγ. φαιν. άνεμος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:645
 msgid "meters"
-msgstr "μέτρα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:673
 msgid "Time Step"
-msgstr "Χρονικό βήμα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:683
 msgid "h"
-msgstr "h"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:690
 msgid "m"
-msgstr "min"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:697
 msgid "s"
-msgstr "s"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:708 src/WeatherRoutingUI.cpp:921
 msgid "Options"
-msgstr "Επιλογές"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:720
 msgid "Detect Land"
-msgstr "Ανίχνευση της γης"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:724
 msgid "Detect Boundary"
-msgstr "Ανίχνευση ορίου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:727
 msgid "Currents"
-msgstr "Ρεύματα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:731
 msgid "Optimize Tacking"
-msgstr "Βελτιστοποίηση των τακ"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:744
 msgid "Data Source"
-msgstr "Πηγή δεδομένων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:769
 msgid "Disable"
-msgstr "Μην επιτρέπεις"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:769
 msgid "Currents Only"
-msgstr "Ρεύματα μόνο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:769
 msgid "Cumulative Map"
-msgstr "Αθροιστικός χάρτης"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:769
 msgid "Cumulative - Calms"
-msgstr "Αθροιστικές άπνοιες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:769
 msgid "Most Likely"
-msgstr "Πιο πιθανό"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:769
 msgid "Average"
-msgstr "Μέσος Όρος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:786
 msgid "Last Valid if Data Deficient"
@@ -1016,27 +1004,27 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:795
 msgid " Close"
-msgstr " Κλείσιμο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:805
 msgid "Basic"
-msgstr "Βασικό"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:825
 msgid "Max Latitude +-"
-msgstr "Μέγ. πλάτος +-"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:836
 msgid "Wind vs Current"
-msgstr "Άνεμος vs. ρεύμα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:846
 msgid "Max Course Angle"
-msgstr "Μέγιστη γωνία κατέυθυνσης"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:857
 msgid "Max Search Angle"
-msgstr "Μέγιστη γωνία αναζήτησης"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:876
 msgid "Avoid cyclone tracks (climatology)"
@@ -1044,48 +1032,48 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:885
 msgid "within"
-msgstr "εντός"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:892
 msgid "Months"
-msgstr "Μήνες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:899
 msgid "Days"
-msgstr "Μέρες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:933
 msgid "Inverted Regions"
-msgstr "Ανεστραμμένες περιοχές"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:936
 msgid "Anchoring"
-msgstr "Αγκυροβολία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:947
 msgid "Integrator"
-msgstr "Ολοκληρωτής"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:952
 msgid "Newton"
-msgstr "Newton"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:953
 msgid "Runge Kutta"
-msgstr "Runge Kutta"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:964
 msgid "Wind strength is"
-msgstr "Η ένταση του ανέμου είναι"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:971 src/WeatherRoutingUI.cpp:2352
 #: src/WeatherRoutingUI.cpp:2363 src/WeatherRoutingUI.cpp:2374
 msgid "percent"
-msgstr "%"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:983
 msgid "Tacking Time"
-msgstr "Ώρα για τακ"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:990
 msgid "Seconds"
@@ -1093,27 +1081,27 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1004
 msgid "Courses (relative to true wind)"
-msgstr "Πορείες (σχετικά με τον αληθή άνεμο)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1011 src/WeatherRoutingUI.cpp:2345
 msgid "From"
-msgstr "Από"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1018 src/WeatherRoutingUI.cpp:2356
 msgid "To"
-msgstr "Προς"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1025 src/WeatherRoutingUI.cpp:2367
 msgid "By"
-msgstr "ανά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1029
 msgid "5"
-msgstr "5"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1032
 msgid "Degrees"
-msgstr "Μοίρες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1042
 msgid "Reset all Advanced Parameters"
@@ -1121,80 +1109,80 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1052
 msgid "Advanced"
-msgstr "Για προχωρημένους"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1327 src/WeatherRoutingUI.cpp:2553
 msgid "Position"
-msgstr "Θέση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1334
 msgid "Scale"
-msgstr "Κλίμακα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1354 src/WeatherRoutingUI.cpp:1370
 #: src/WeatherRoutingUI.cpp:1386
 msgid "Variable"
-msgstr "Μεταβλητή"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Speed Over Ground (SOG)"
-msgstr "Πραγμ. ταχύτητα (SOG)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Course Over Ground (COG)"
-msgstr "Πραγ. κατεύθυνση πορείας (COG)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Speed Over Water (SOW)"
-msgstr "Ταχύτητα δρομομέτρου (SOW)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Course Over Water (COW)"
-msgstr "Κατεύθυνση πορείας στο νερό (COW)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Wind Velocity"
-msgstr "Ταχύτητα ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392 src/WeatherRoutingUI.cpp:2906
 msgid "Wind Direction"
-msgstr "Διεύθυνση ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Wind Course"
-msgstr "Κατεύθυνση ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Wind Velocity Ground"
-msgstr "Ταχύτητα ανέμου ως προς το έδαφος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Wind Direction Ground"
-msgstr "Κατεύθυνση ανέμου ως προς το έδαφος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Wind Course Ground"
-msgstr "Πορεία ανέμου ως προς το έδαφος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Apparent Wind Speed (AWS)"
-msgstr "Ταχύτητα φαιν. ανέμου (AWS)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Apparent Wind Angle (AWA)"
-msgstr "Γωνία φαιν. ανέμου (AWA)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
@@ -1204,30 +1192,30 @@ msgstr ""
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Current Velocity"
-msgstr "Ταχύτητα ρεύματος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Current Direction"
-msgstr "Κατεύθυνση ρεύματος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
 #: src/WeatherRoutingUI.cpp:1392
 msgid "Sig Wave Height"
-msgstr "Σημ. ύψος κύματος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1366 src/WeatherRoutingUI.cpp:1382
 #: src/WeatherRoutingUI.cpp:1398
 msgid "        N/A         "
-msgstr "        Δ/Υ         "
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1410 src/WeatherRoutingUI.cpp:1932
 msgid "Current Route"
-msgstr "Τρέχουσα διαδρομή"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1413
 msgid "Cursor Route"
-msgstr "Διαδρομή δρομέα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1539
 msgid "Weather Routing Plugin Version"
@@ -1245,15 +1233,15 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1559
 msgid "About Author"
-msgstr "Σχετικά με τον δημιουργό"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1562 src/WeatherRoutingUI.cpp:2417
 msgid "Close"
-msgstr "Κλείσιμο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1629
 msgid "Plot"
-msgstr "Διάγραμμα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1648
 msgid "Overlap"
@@ -1285,7 +1273,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1711 src/WeatherRoutingUI.cpp:2899
 msgid "Wind Speed"
-msgstr "Ταχύτητα ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1722
 msgid "Stats"
@@ -1293,23 +1281,23 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1731
 msgid "Speed"
-msgstr "Ταχύτητα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1737
 msgid "True Wind Dir / True Wind Speed"
-msgstr "Αληθής κατεύθυνση/ταχύτητα ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1737
 msgid "Apparent Wind Dir / True Wind Speed"
-msgstr "Φαινόμενη κατεύθυνση/αληθής ταχύτητα ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1737
 msgid "True Wind Dir / Apparent Wind Speed"
-msgstr "Αληθής κατεύθυνση/φαινόμενη ταχύτητα ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1737
 msgid "Apparent Wind Dir / Apparent Wind Speed"
-msgstr "Φαινόμενη κατεύθυνση/ταχύτητα ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1745
 msgid "Full Plot"
@@ -1335,13 +1323,13 @@ msgstr ""
 #: src/WeatherRoutingUI.cpp:2798 src/WeatherRoutingUI.cpp:2844
 #: src/WeatherRoutingUI.cpp:2925
 msgid "Add"
-msgstr "Προσθήκη"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1792 src/WeatherRoutingUI.cpp:2323
 #: src/WeatherRoutingUI.cpp:2801 src/WeatherRoutingUI.cpp:2847
 #: src/WeatherRoutingUI.cpp:2955
 msgid "Remove"
-msgstr "Διαγραφη"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1798
 msgid "Open Boat"
@@ -1357,144 +1345,144 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1910
 msgid "Overall"
-msgstr "Συνολικά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1917
 msgid "Run Time"
-msgstr "Χρόνος εκτέλεσης"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1947
 msgid "Iso Chrons"
-msgstr "Ισόχρονες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1955 src/WeatherRoutingUI.cpp:2044
 #: src/WeatherRoutingUI.cpp:2303
 msgid "Routes"
-msgstr "Διαδρομές"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1963
 msgid "InvRoutes"
-msgstr "Αντιστρ. Διαδρομές"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1971
 msgid "Skip Positions"
-msgstr "Προσπέραση θέσεων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2025
 msgid "Current Configuration"
-msgstr "Τρέχουσα διαμόρφωση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2068 src/WeatherRoutingUI.cpp:2408
 msgid "Information"
-msgstr "Πληροφοριες"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2120
 msgid "Starting"
-msgstr "Εκκίνηση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2131
 msgid "For"
-msgstr "Για"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2138 src/WeatherRoutingUI.cpp:2159
 msgid "day(s)"
-msgstr "ημέρα (ες)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2148
 msgid "hour(s)"
-msgstr "ώρα (ες)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2152
 msgid "Spaced"
-msgstr "Διάστημα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2169
 msgid "Hour(s)"
-msgstr "Ώρα (ες)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2181
 msgid "Once"
-msgstr "Μία φορά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2184
 msgid "Daily"
-msgstr "Ημερήσιο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2187
 msgid "Weekly"
-msgstr "εβδομαδιαία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2190
 msgid "Monthly"
-msgstr "μηνιαία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2210
 msgid "Sources"
-msgstr "Πηγές"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2234
 msgid "Destinations"
-msgstr "Προορισμοί"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2255
 msgid "Auto Connect"
-msgstr "Αυτόματη σύνδεση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2262
 msgid "Within"
-msgstr "Εντός"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2269
 msgid "Nautical Miles"
-msgstr "Ναυτικά μίλια"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2273
 msgid "Connect"
-msgstr "Σύνδεση"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2287
 msgid "Disconnect All"
-msgstr "Αποσύνδεση όλων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2333
 msgid "Boats"
-msgstr "Πλοία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2386
 msgid "100"
-msgstr "100"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2389
 msgid "80 to 120"
-msgstr "80 μέχρι 120"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2399
 msgid "Wind Strength"
-msgstr "Ένταση ανέμου"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2411
 msgid "Reset"
-msgstr "Επαναφορά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2414 src/WeatherRoutingUI.cpp:3227
 msgid "Generate"
-msgstr "Δημιουργία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2481
 msgid "Category"
-msgstr "Κατηγορία"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2492
 msgid "Filter"
-msgstr "Φίλτρο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2505
 msgid "Reset All"
-msgstr "Επαναφορά όλων"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2508
 msgid "Done"
-msgstr "Έγινε"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2569
 msgid "Sail Changes"
@@ -1506,19 +1494,19 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2630
 msgid "name"
-msgstr "Όνομα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2645
 msgid "latitude"
-msgstr "Γεωγραφικό πλάτος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2659 src/WeatherRoutingUI.cpp:2677
 msgid "minutes"
-msgstr "λεπτά"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2663
 msgid "longitude"
-msgstr "Γεωγραφικό μήκος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2757
 msgid "Grid"
@@ -1542,11 +1530,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2887
 msgid "Apparent Wind"
-msgstr "Φαινόμενος άνεμος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2890
 msgid "True Wind"
-msgstr "Αληθής άνεμος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2913
 msgid "Boat Spead"
@@ -1574,80 +1562,80 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3016
 msgid "Hull Type"
-msgstr "Τύπος γάστρας"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3020
 msgid "Mono"
-msgstr "Μονή γάστρα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3020
 msgid "Catamaran"
-msgstr "Καταμαράν"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3020
 msgid "Trimaran"
-msgstr "Τριμαράν"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3020
 msgid "Proa"
-msgstr "Πιρόγα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3020
 msgid "Submarine"
-msgstr "Υποβρύχιο"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3034
 msgid "Displacement"
-msgstr "Εκτόπισμα"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3041
 msgid "tons"
-msgstr "τόνους"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3045
 msgid "Sail Area"
-msgstr "Επιφάνεια ιστιοφορίας"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3052
 msgid "sq/ft"
-msgstr "sq.ft"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3056
 msgid "Len Water Line (lwl)"
-msgstr "Μήκος ισάλου (LWL)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3063 src/WeatherRoutingUI.cpp:3074
 #: src/WeatherRoutingUI.cpp:3085
 msgid "ft"
-msgstr "πόδια"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3067
 msgid "Length Over All (loa)"
-msgstr "Ολικό μήκος (LOA)"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3078
 msgid "Beam"
-msgstr "πλατος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3100
 msgid "Sail Area Displacement Ratio"
-msgstr "Λόγος επιφ. πανιών / εκτοπίσματος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3108
 msgid "Displacement Length Ratio"
-msgstr "Λόγος μήκους / εκτοπίσματος"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3116
 msgid "Hull Speed"
-msgstr "Ταχύτητα γάστρας"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3124
 msgid "Capsize Risk"
-msgstr "Κίνδυνος ανατροπής"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3132
 msgid "Comfort Factor"
-msgstr "Παράγοντας άνεσης"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3191
 msgid "Add Row"
@@ -1675,35 +1663,35 @@ msgstr ""
 
 #: src/WeatherRoutingUI.h:175
 msgid "Weather Routing Settings"
-msgstr "Ρυθμίσεις του Weather Routing"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:281
 msgid "Weather Routing Configuration"
-msgstr "Διαμόρφωση του Weather Routing"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:324
 msgid "Weather Route Plot"
-msgstr "Διάγραμμα Weather Route"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:350
 msgid "About Weather Routing"
-msgstr "Σχετικά με τη δρομολόγηση με βάση το δελτίο καιρού (Weather Routing)"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:462
 msgid "Weather Routing Statistics"
-msgstr "Στατιστικά του Weather Routing"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:487
 msgid "Weather Route Report"
-msgstr "Αναφορά του Weather Route"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:568
 msgid "Weather Routing Configuration Batch"
-msgstr "Διαμόρφωση για μαζική δημιουργία δρομολογίου βάσει του καιρού"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:595
 msgid "Filter Routes"
-msgstr "Φιλτράρησε τις διαδρομές"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:623
 msgid "Cursor Position"
@@ -1711,7 +1699,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.h:654
 msgid "New Weather Routing Position"
-msgstr "Νέα θέση Weather Routing"
+msgstr ""
 
 #: src/WeatherRoutingUI.h:755
 msgid "Edit Polar"
