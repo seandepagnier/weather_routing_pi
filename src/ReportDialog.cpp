@@ -173,7 +173,7 @@ void ReportDialog::GenerateRoutesReport()
         page += _T("<p>");
         page += c.Start + _T(" ") + _("to") + _T(" ") + c.End + _T(" ") + wxString::Format
             (_T("(%ld ") + wxString(_("configurations")) + _T(")\n"), overlays.size());
-        page += _("<dt>Fastest configuration ") + fastest->StartTime().Format(_T("%x"));
+        page += _("<dt>Fastest configuration ") + fastest->StartTime().Format(_T("%x %X"));
         page += wxString(_T(" ")) + _("avg speed") + wxString::Format
             (_T(": %.2f "), fastest->RouteInfo(RouteMapOverlay::AVGSPEED))
 	    + _("knots");
