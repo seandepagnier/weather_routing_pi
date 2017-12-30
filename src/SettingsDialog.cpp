@@ -107,7 +107,7 @@ void SettingsDialog::LoadSettings()
             m_cblFields->Append(_("Visible"));
         else
             m_cblFields->Append(_(column_names[i]));
-        pConf->Read( wxString::Format(_T("Column ") + _(column_names[i]), i), &columns[i], columns[i]);
+        pConf->Read( wxString::Format(_T("Column_") + _(column_names[i]), i), &columns[i], columns[i]);
         m_cblFields->Check(i, columns[i]);
     }
 
@@ -139,7 +139,7 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("ConcurrentThreads"), m_sConcurrentThreads->GetValue());
 
     for(int i=0; i<WeatherRouting::NUM_COLS; i++)
-        pConf->Write( wxString::Format(_T("Column ") + _(column_names[i]), i), m_cblFields->IsChecked(i));
+        pConf->Write( wxString::Format(_T("Column_") + _(column_names[i]), i), m_cblFields->IsChecked(i));
 
     pConf->Write( _T("UseLocalTime"), m_cbUseLocalTime->GetValue());
 
