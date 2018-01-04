@@ -1,0 +1,1707 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: opencpn\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-12-20 21:14+0100\n"
+"PO-Revision-Date: 2017-12-30 05:02-0500\n"
+"Last-Translator: nohal <pavel@kalian.cz>\n"
+"Language-Team: Turkish\n"
+"Language: tr_TR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Language: tr\n"
+"X-Crowdin-File: /plugins/weather_routing_pi/po/weather_routing_pi.pot\n"
+
+#: src/Boat.cpp:55
+msgid "Boat file does not exist."
+msgstr "Bot dosyası yok."
+
+#: src/Boat.cpp:59
+msgid "Failed to load file: "
+msgstr "Dosya yüklenirken hata oluştu: "
+
+#: src/Boat.cpp:60
+msgid "It should an xml file describing a boat, not a polar; try editing the boat."
+msgstr "Bir kutbu değil, bir tekneyi tanımlayan bir xml dosyası olmalıdır; tekneyi düzenlemeyi dene."
+
+#: src/Boat.cpp:64
+msgid "Invalid xml file (no OCPWeatherRoutingBoat node): "
+msgstr "Geçersiz xml dosyası (OCPWeatherRoutingBoat düğümü yok): "
+
+#: src/Boat.cpp:155
+msgid "Failed to open for writing: "
+msgstr "Yazı yazma için açılamadı: "
+
+#: src/Boat.cpp:165
+msgid "Failed saving file: "
+msgstr "Dosya kaydetme başarısız: "
+
+#: src/BoatDialog.cpp:67
+msgid "Filename"
+msgstr "Dosya adı"
+
+#: src/BoatDialog.cpp:102 src/BoatDialog.cpp:674 src/BoatDialog.cpp:724
+#: src/BoatDialog.cpp:820 src/BoatDialog.cpp:826 src/BoatDialog.cpp:880
+msgid "OpenCPN Weather Routing Plugin"
+msgstr "OpenCPN Hava Durumu Rotalama Eklentisi"
+
+#: src/BoatDialog.cpp:116 src/BoatDialog.cpp:117 src/BoatDialog.cpp:118
+#: src/BoatDialog.cpp:119 src/BoatDialog.cpp:120 src/BoatDialog.cpp:121
+#: src/PlotDialog.cpp:59 src/WeatherRouting.cpp:1520
+#: src/WeatherRoutingUI.cpp:2124
+msgid "N/A"
+msgstr "Kullanılamaz"
+
+#: src/BoatDialog.cpp:224
+msgid "Select a polar to view plot"
+msgstr "Çizimi görüntülemek için bir kutup seçin"
+
+#: src/BoatDialog.cpp:661 src/BoatDialog.cpp:700
+msgid "Select Boat"
+msgstr "Tekne Seçin"
+
+#: src/BoatDialog.cpp:819
+msgid "Failed to save"
+msgstr "Kaydetme başarısız oldu"
+
+#: src/BoatDialog.cpp:825
+msgid "Failed to revert"
+msgstr "Geri dönme başarısız oldu"
+
+#: src/BoatDialog.cpp:843
+msgid "Select Polar File"
+msgstr "Kutup Dosyasını Seçin"
+
+#: src/BoatDialog.cpp:1023
+#, c-format
+msgid "%.1f True %.1f Apparent"
+msgstr "%.1f Gerçek %.1f Belirgin"
+
+#: src/ConfigurationBatchDialog.cpp:250
+msgid "Select Polar"
+msgstr "Kutup Seçin"
+
+#: src/ConfigurationBatchDialog.cpp:285
+msgid "Batch mode generates multiple configurations based on the selected configuration."
+msgstr "Toplu iş modu seçilen yapılandırmaya bağlı olarak birden çok yapılandırma oluşturur."
+
+#: src/ConfigurationBatchDialog.cpp:287 src/ConfigurationDialog.cpp:264
+#: src/ConfigurationDialog.cpp:379 src/ReportDialog.cpp:240
+#: src/SettingsDialog.cpp:183 src/weather_routing_pi.cpp:253
+#: src/weather_routing_pi.cpp:299 src/WeatherRouting.cpp:305
+#: src/WeatherRouting.cpp:631 src/WeatherRouting.cpp:872
+#: src/WeatherRouting.cpp:894 src/WeatherRouting.cpp:1097
+#: src/WeatherRouting.cpp:1157 src/WeatherRouting.cpp:1190
+#: src/WeatherRouting.cpp:1207 src/WeatherRouting.cpp:1304
+#: src/WeatherRouting.cpp:1313 src/WeatherRouting.cpp:1393
+#: src/WeatherRouting.cpp:1776 src/WeatherRouting.cpp:1808
+#: src/WeatherRouting.cpp:1845 src/WeatherRouting.cpp:1854
+#: src/WeatherRoutingUI.h:129
+msgid "Weather Routing"
+msgstr "Hava Durumu Yönlendirme"
+
+#: src/ConfigurationDialog.cpp:94
+msgid "Select Boat File"
+msgstr "Tekne Dosyasını Seçin"
+
+#: src/ConfigurationDialog.cpp:263
+msgid "Invalid Date Time."
+msgstr "Geçersiz tarih, saat."
+
+#: src/ConfigurationDialog.cpp:378
+msgid "Warning: less than 4 different degree steps specified\n"
+msgstr ""
+
+#: src/EditPolarDialog.cpp:41
+msgid "True Wind Speed"
+msgstr "Gerçek Rüzgar Hızı"
+
+#: src/EditPolarDialog.cpp:42
+msgid "True Wind Direction"
+msgstr "Gerçek Rüzgar Yönü"
+
+#: src/EditPolarDialog.cpp:43
+msgid "Apparent Wind Speed"
+msgstr "Belirgin Rüzgar Hızı"
+
+#: src/EditPolarDialog.cpp:44
+msgid "Apparent Wind Direction"
+msgstr "Belirgin Rüzgar Yönü"
+
+#: src/EditPolarDialog.cpp:45
+msgid "Boat Speed"
+msgstr "Tekne Hızı"
+
+#: src/EditPolarDialog.cpp:46
+msgid "Sailboat Transform ETA"
+msgstr "Yelkenli Dönüşümü ETA"
+
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:40
+#: src/WeatherRouting.cpp:83 src/WeatherRoutingUI.cpp:520
+msgid "Start"
+msgstr "Başla"
+
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:40
+#: src/WeatherRouting.cpp:83 src/WeatherRoutingUI.cpp:2200
+msgid "Start Time"
+msgstr "Başlangıç Zamanı"
+
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:41
+#: src/WeatherRouting.cpp:84 src/WeatherRoutingUI.cpp:664
+msgid "End"
+msgstr "Son"
+
+#: src/FilterRoutesDialog.cpp:42
+msgid "BoatFileName"
+msgstr ""
+
+#: src/FilterRoutesDialog.cpp:42 src/SettingsDialog.cpp:48
+#: src/WeatherRouting.cpp:91 src/WeatherRoutingUI.cpp:1939
+msgid "State"
+msgstr "Durum"
+
+#: src/Polar.cpp:184
+msgid " line "
+msgstr "satır"
+
+#: src/Polar.cpp:186
+msgid "Boat polar failed"
+msgstr ""
+
+#: src/Polar.cpp:204
+msgid "Failed to open."
+msgstr "Açma başarısız oldu."
+
+#: src/Polar.cpp:209
+msgid "Failed to read."
+msgstr "Okuma başarısız oldu."
+
+#: src/Polar.cpp:224
+msgid "Unrecognized format."
+msgstr "Tanınmayan biçim."
+
+#: src/Polar.cpp:230
+msgid "Too many wind speeds."
+msgstr "Çok fazla Rüzgar hızı."
+
+#: src/Polar.cpp:249
+msgid "Wind direction out of range."
+msgstr "Rüzgar yönü aralık dışında."
+
+#: src/Polar.cpp:254
+msgid "Wind direction out of order."
+msgstr "Rüzgar yönü düzensiz."
+
+#: src/Polar.cpp:278
+msgid "Too few tokens."
+msgstr "Çok az gösterge."
+
+#: src/Polar.cpp:284
+msgid "Too many tokens."
+msgstr "Çok fazla gösterge."
+
+#: src/ReportDialog.cpp:56
+msgid "No Configuration selected."
+msgstr "Yapılandırma seçilmedi."
+
+#: src/ReportDialog.cpp:66
+msgid "Destination not yet reached."
+msgstr "Hedefe henüz ulaşılmadı."
+
+#: src/ReportDialog.cpp:73
+msgid "Boat Filename"
+msgstr "Tekne Dosya adı"
+
+#: src/ReportDialog.cpp:74
+msgid "Route from "
+msgstr ""
+
+#: src/ReportDialog.cpp:74 src/ReportDialog.cpp:277 src/ReportDialog.cpp:315
+msgid " to "
+msgstr ""
+
+#: src/ReportDialog.cpp:75
+msgid "Leaving "
+msgstr "Ayrılma "
+
+#: src/ReportDialog.cpp:76
+msgid "Arriving "
+msgstr "Ulaşma "
+
+#: src/ReportDialog.cpp:77
+msgid "Duration "
+msgstr "Süre "
+
+#: src/ReportDialog.cpp:81
+msgid "Distance sailed: "
+msgstr "Yol alınan uzaklık: "
+
+#: src/ReportDialog.cpp:84
+msgid "longer than great circle route"
+msgstr "büyük daire rotasından daha uzun"
+
+#: src/ReportDialog.cpp:88
+msgid "Average Speed Over Water (SOW)"
+msgstr "Su Üzerindeki Ortalama Hız (SOW)"
+
+#: src/ReportDialog.cpp:90
+msgid "Average Speed Over Ground (SOG)"
+msgstr "Yer Üzerindeki Ortalama Hız (SOG)"
+
+#: src/ReportDialog.cpp:92
+msgid "Average Wind"
+msgstr "Ortalama Rüzgar"
+
+#: src/ReportDialog.cpp:94
+msgid "Average Swell"
+msgstr "Ortalama Ölü Dalga"
+
+#: src/ReportDialog.cpp:96
+msgid "Upwind"
+msgstr "Rüzgara karşı"
+
+#: src/ReportDialog.cpp:99
+msgid "Port/Starboard"
+msgstr "İskele/Sancak"
+
+#: src/ReportDialog.cpp:105
+msgid "Number of tacks"
+msgstr "Yön Değişikliği Sayısı"
+
+#: src/ReportDialog.cpp:114
+msgid "speed change due to "
+msgstr "sebebiyle hız değişikliği "
+
+#: src/ReportDialog.cpp:116
+msgid "favorable"
+msgstr "olumlu"
+
+#: src/ReportDialog.cpp:118
+msgid "unfavorable"
+msgstr "olumsuz"
+
+#: src/ReportDialog.cpp:119
+msgid " currents."
+msgstr "akıntılar."
+
+#: src/ReportDialog.cpp:149
+msgid "No routes to report yet."
+msgstr "Henüz raporlanacak rota yok."
+
+#: src/ReportDialog.cpp:172 src/ReportDialog.cpp:221
+msgid "to"
+msgstr ""
+
+#: src/ReportDialog.cpp:173
+msgid "configurations"
+msgstr "yapılandırmalar"
+
+#: src/ReportDialog.cpp:174
+msgid "<dt>Fastest configuration "
+msgstr "<dt>En hızlı yapılandırma"
+
+#: src/ReportDialog.cpp:175
+msgid "avg speed"
+msgstr "ortalama hız"
+
+#: src/ReportDialog.cpp:180
+msgid "Best Times (mostly downwind)"
+msgstr "En iyi Zamanlar (çoğunlukla rüzgar yönünde)"
+
+#: src/ReportDialog.cpp:219 src/ReportDialog.cpp:274 src/ReportDialog.cpp:302
+msgid " and "
+msgstr "ve"
+
+#: src/ReportDialog.cpp:233
+msgid "any"
+msgstr "hiç"
+
+#: src/ReportDialog.cpp:235 src/ReportDialog.cpp:285
+msgid "none"
+msgstr "hiçbiri"
+
+#: src/ReportDialog.cpp:238
+msgid "Cyclones"
+msgstr "Siklonlar"
+
+#: src/ReportDialog.cpp:240
+msgid "Calculating Cyclone Crossings"
+msgstr "Siklon Geçişlerini Hesaplama"
+
+#: src/ReportDialog.cpp:250
+msgid "Climatology data unavailable."
+msgstr "İklimbilim veri kullanılamaz."
+
+#: src/ReportDialog.cpp:283
+msgid "all months"
+msgstr "tüm aylar"
+
+#: src/ReportDialog.cpp:291
+msgid "All routes are safe from cyclones."
+msgstr "Tüm rotalar siklonlar açısından güvenlidir."
+
+#: src/ReportDialog.cpp:293
+msgid "No routes found to be safe from cyclones."
+msgstr "Siklonlar açısından güvenli olan rota bulunamadı."
+
+#: src/ReportDialog.cpp:295
+msgid "Start times for cyclone safe routes: "
+msgstr ""
+
+#: src/ReportDialog.cpp:326
+msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\n"
+"For example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
+msgstr ""
+
+#: src/ReportDialog.cpp:333
+msgid "Weather Routing Report"
+msgstr ""
+
+#: src/RouteMapOverlay.cpp:79
+msgid "error, thread already created\n"
+msgstr "hata, konu zaten oluşturuldu\n"
+
+#: src/RouteMapOverlay.cpp:92
+msgid "Configuration specifies cyclone track avoidance and Climatology cyclone data is not available"
+msgstr ""
+
+#: src/RouteMapOverlay.cpp:98
+msgid "Configuration specifies boundary exclusion but ocpn_draw_pi boundary data not available"
+msgstr ""
+
+#: src/RouteMapOverlay.cpp:107
+msgid "Configuration does not allow grib or climatology wind data"
+msgstr ""
+
+#: src/SettingsDialog.cpp:40 src/WeatherRouting.cpp:83
+#: src/WeatherRouting.cpp:486 src/WeatherRouting.cpp:495
+#: src/WeatherRoutingUI.cpp:574 src/WeatherRoutingUI.h:424
+msgid "Boat"
+msgstr "Tekne"
+
+#: src/SettingsDialog.cpp:41 src/WeatherRouting.cpp:84
+msgid "End Time"
+msgstr "Bitiş Zamanı"
+
+#: src/SettingsDialog.cpp:41 src/WeatherRouting.cpp:84
+msgid "Time"
+msgstr "Zaman"
+
+#: src/SettingsDialog.cpp:41 src/WeatherRouting.cpp:84
+msgid "Distance"
+msgstr "Mesafe"
+
+#: src/SettingsDialog.cpp:42 src/WeatherRouting.cpp:85
+msgid "Avg Speed"
+msgstr "Ortalama Hız"
+
+#: src/SettingsDialog.cpp:42 src/WeatherRouting.cpp:85
+msgid "Max Speed"
+msgstr "Maksimum Hız"
+
+#: src/SettingsDialog.cpp:43 src/WeatherRouting.cpp:86
+msgid "Avg Speed Ground"
+msgstr ""
+
+#: src/SettingsDialog.cpp:43 src/WeatherRouting.cpp:86
+msgid "Max Speed Ground"
+msgstr ""
+
+#: src/SettingsDialog.cpp:44 src/WeatherRouting.cpp:87
+msgid "Avg Wind"
+msgstr "Ortalama Rüzgar"
+
+#: src/SettingsDialog.cpp:44 src/WeatherRouting.cpp:87
+msgid "Max Wind"
+msgstr "Maksimum Rüzgar"
+
+#: src/SettingsDialog.cpp:44 src/WeatherRouting.cpp:87
+msgid "Max Wind Gust"
+msgstr ""
+
+#: src/SettingsDialog.cpp:45 src/WeatherRouting.cpp:88
+msgid "Avg Current"
+msgstr "Ortalama Akıntı"
+
+#: src/SettingsDialog.cpp:45 src/WeatherRouting.cpp:88
+msgid "Max Current"
+msgstr "Maksimum Akıntı"
+
+#: src/SettingsDialog.cpp:46 src/WeatherRouting.cpp:89
+msgid "Avg Swell"
+msgstr "Ortalama Ölü Dalga"
+
+#: src/SettingsDialog.cpp:46 src/WeatherRouting.cpp:89
+#: src/WeatherRoutingUI.cpp:638
+msgid "Max Swell"
+msgstr "Maksimum Ölü Dalga"
+
+#: src/SettingsDialog.cpp:47 src/WeatherRouting.cpp:90
+msgid "Upwind Percentage"
+msgstr ""
+
+#: src/SettingsDialog.cpp:48 src/WeatherRouting.cpp:91
+msgid "Port Starboard"
+msgstr "İskele Sancak"
+
+#: src/SettingsDialog.cpp:48 src/WeatherRouting.cpp:91
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392 src/WeatherRoutingUI.cpp:2577
+msgid "Tacks"
+msgstr "Yön değişmeler"
+
+#: src/SettingsDialog.cpp:107
+msgid "Visible"
+msgstr "Görünür"
+
+#: src/SettingsDialog.cpp:167
+msgid "Cursor Route -- optimal route closest to the cursor\n"
+"Destination Route -- optimal route to the desired destination\n"
+"Route Thickness -- thickness to draw Cursor and Destination Routes\n"
+"Iso Chron Thickness -- thickness for isochrons on map\n"
+"Alternate Routes Thickness -- thickness for alternate routes\n"
+"Note: All thicknesses can be set to 0 to disable their display\n"
+"Alternates for all Isochrons -- display all alternate routes not only the ones which reach the last isochron\n"
+"Squares At Sail Changes -- render squares along Routes whenever a sail change is made\n"
+"Filter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\n"
+"Number of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
+msgstr ""
+
+#: src/StatisticsDialog.cpp:62
+msgid "No Route"
+msgstr "Rota Yok"
+
+#: src/StatisticsDialog.cpp:63
+msgid "Running"
+msgstr "Çalışıyor"
+
+#: src/StatisticsDialog.cpp:63 src/WeatherRoutingUI.cpp:1943
+msgid "Stopped"
+msgstr "Durdu"
+
+#: src/weather_routing_pi.cpp:115
+msgid "Weather_Routing"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:120
+msgid "Weather Route Position"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:174
+msgid "WeatherRouting"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:179
+msgid "Compute optimal routes based on weather and constraints."
+msgstr "Hava ve kısıtlamalara göre en uygun rotayı hesapla."
+
+#: src/weather_routing_pi.cpp:184
+msgid "Weather Routing features include:\n"
+"  optimal routing subject to various constraints based on weather data\n"
+"  automatic boat polar computation\n"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:250
+msgid "Grib plugin version not supported."
+msgstr "Grib eklenti sürümü desteklenmiyor."
+
+#: src/weather_routing_pi.cpp:252 src/weather_routing_pi.cpp:298
+#, c-format
+msgid "Use versions %d.%d to %d.%d"
+msgstr ""
+
+#: src/weather_routing_pi.cpp:296
+msgid "Climatology plugin version not supported, no climatology data."
+msgstr "İklimbilim eklenti sürümü desteklenmiyor, iklimbilim verisi yok."
+
+#: src/WeatherRouting.cpp:142
+msgid "Name"
+msgstr "Ad"
+
+#: src/WeatherRouting.cpp:143
+msgid "Lat"
+msgstr "Enlem"
+
+#: src/WeatherRouting.cpp:144
+msgid "Lon"
+msgstr "Boylam"
+
+#: src/WeatherRouting.cpp:294
+msgid "Enter Name"
+msgstr "Adı Girin"
+
+#: src/WeatherRouting.cpp:294
+msgid "New Position"
+msgstr "Yeni Pozisyon"
+
+#: src/WeatherRouting.cpp:304
+msgid "This name already exists, replace?\n"
+msgstr "Bu ad zaten mevcut, değiştir?\n"
+
+#: src/WeatherRouting.cpp:357
+msgid "local"
+msgstr "yerel"
+
+#: src/WeatherRouting.cpp:398
+msgid "Select exactly 1 configuration"
+msgstr "Tam olarak 1 yapılandırma seçin"
+
+#: src/WeatherRouting.cpp:405
+msgid "Cursor outside computed route map"
+msgstr "İmleç hesaplanan yol haritasının dışında"
+
+#: src/WeatherRouting.cpp:427 src/WeatherRouting.cpp:1581
+#: src/WeatherRoutingUI.cpp:756
+msgid "Grib"
+msgstr "Grib"
+
+#: src/WeatherRouting.cpp:428 src/WeatherRoutingUI.cpp:761
+msgid "Climatology"
+msgstr "İklimbilim"
+
+#: src/WeatherRouting.cpp:429
+msgid "Data Deficient"
+msgstr "Yetersiz Veri"
+
+#: src/WeatherRouting.cpp:430
+msgid "Wind"
+msgstr "Rüzgar"
+
+#: src/WeatherRouting.cpp:431
+msgid "Current"
+msgstr "Akıntı"
+
+#: src/WeatherRouting.cpp:630
+msgid "Cannot goto invalid route(s)."
+msgstr "Geçersiz rotaya(rotalara) gidilemiyor."
+
+#: src/WeatherRouting.cpp:789 src/WeatherRouting.cpp:805
+msgid "Select Configuration"
+msgstr "Yapılandırma Seçin"
+
+#: src/WeatherRouting.cpp:871
+msgid "Zero time span forbidden, aborting."
+msgstr ""
+
+#: src/WeatherRouting.cpp:894
+msgid "Batch configuration"
+msgstr "Toplu yapılandırma"
+
+#: src/WeatherRouting.cpp:1041
+msgid "WeatherRoutingInformation.html"
+msgstr ""
+
+#: src/WeatherRouting.cpp:1096
+msgid "Failed to start configuration: "
+msgstr "Yapılandırma başlatma başarısız: "
+
+#: src/WeatherRouting.cpp:1167
+msgid "Failed to load file."
+msgstr "Dosya yüklenemedi."
+
+#: src/WeatherRouting.cpp:1172
+msgid "Invalid xml file"
+msgstr "Geçersiz xml dosyası"
+
+#: src/WeatherRouting.cpp:1190
+msgid "Load"
+msgstr "Yükle"
+
+#: src/WeatherRouting.cpp:1206
+msgid "File contains duplicate position name, discaring\n"
+msgstr "Dosya yinelenen konum adı içeriyor, ayırıyor\n"
+
+#: src/WeatherRouting.cpp:1295
+msgid "Unrecognized xml node"
+msgstr "Tanınmayan xml düğümü"
+
+#: src/WeatherRouting.cpp:1392
+msgid "Failed to save xml file: "
+msgstr "xml dosyası kaydedilemedi: "
+
+#: src/WeatherRouting.cpp:1570
+msgid "Invalid Start/End"
+msgstr "Geçersiz başlangıç/bitiş"
+
+#: src/WeatherRouting.cpp:1573
+msgid "Computing..."
+msgstr "Hesaplanıyor..."
+
+#: src/WeatherRouting.cpp:1577
+msgid "Complete"
+msgstr "Tamamlandı"
+
+#: src/WeatherRouting.cpp:1585 src/WeatherRoutingUI.cpp:1731
+#: src/WeatherRoutingUI.cpp:2561
+msgid "Polar"
+msgstr "Kutup"
+
+#: src/WeatherRouting.cpp:1589
+msgid "No Data"
+msgstr "Veri Yok"
+
+#: src/WeatherRouting.cpp:1592
+msgid "Failed"
+msgstr "Başarısız"
+
+#: src/WeatherRouting.cpp:1598
+msgid "Waiting..."
+msgstr "Bekleniyor..."
+
+#: src/WeatherRouting.cpp:1601
+msgid "Not Computed"
+msgstr "Hesaplanmadı"
+
+#: src/WeatherRouting.cpp:1775
+msgid "No Weather Route selected"
+msgstr "Seçilen Hava Rotası yok"
+
+#: src/WeatherRouting.cpp:1807
+msgid "Empty Route, nothing to export\n"
+msgstr "Boş rota, dışa aktarılacak bir şey yok\n"
+
+#: src/WeatherRouting.cpp:1814
+msgid "Weather Route"
+msgstr "Hava Rotası"
+
+#: src/WeatherRouting.cpp:1818
+msgid "Weather Route Point"
+msgstr "Hava Rota Noktası"
+
+#: src/WeatherRouting.cpp:1844
+msgid "Zero Time Step is invalid"
+msgstr ""
+
+#: src/WeatherRouting.cpp:1852
+msgid "Start/End lies outside of Max Latitude constraint:\n"
+"routing will fail"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:1979
+msgid "Positions"
+msgstr "Pozisyonlar"
+
+#: src/WeatherRoutingUI.cpp:50
+msgid "Configurations"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:68 src/WeatherRoutingUI.cpp:154
+msgid "&Compute"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:71
+msgid "&Export"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:98
+msgid "&Open"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:102
+msgid "&Save"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:108 src/WeatherRoutingUI.cpp:2071
+msgid "&Close"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:111
+msgid "&File"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:115
+msgid "&New Position"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:119
+msgid "&Update Boat Position"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:123 src/WeatherRoutingUI.cpp:146
+msgid "&Delete"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:127
+msgid "Delete &All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:130
+msgid "&Position"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:134
+msgid "&New"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:137
+msgid "&Batch"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:140 src/WeatherRoutingUI.cpp:1786
+msgid "&Edit"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:143
+msgid "&GoTo"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:149
+msgid "Delete All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:157
+msgid "Compute &All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:160
+msgid "&Stop"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:164
+msgid "&Reset All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:169
+msgid "E&xport"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:172
+msgid "Export All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:178
+msgid "&Filter"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:181
+msgid "&Configuration"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:185
+msgid "&Settings"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:189
+msgid "S&tatistics"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:193
+msgid "&Report"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:197
+msgid "&Plot"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:201
+msgid "&Cursor Position"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:204
+msgid "&View"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:208
+msgid "&Information"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:212
+msgid "&Manual"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:216
+msgid "&About"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:219
+msgid "&Help"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:330
+msgid "Display"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:342
+msgid "Cursor Route Color"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:349
+msgid "Destination Route Color"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:356
+msgid "Route Thickness"
+msgstr "Rota Kalınlığı"
+
+#: src/WeatherRoutingUI.cpp:363
+msgid "Iso Chron Thickness"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:370
+msgid "Alternate Routes Thickness"
+msgstr "Alternatif Rotalar Kalınlığı"
+
+#: src/WeatherRoutingUI.cpp:385
+msgid "Alternates for all IsoChrons"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:388
+msgid "Display mark when Polar changes"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:392
+msgid "Display Wind Barbs"
+msgstr "Rüzgar Oklarını Görüntüle"
+
+#: src/WeatherRoutingUI.cpp:395
+msgid "Display current"
+msgstr "Akıntıyı görüntüle"
+
+#: src/WeatherRoutingUI.cpp:416
+msgid "Computation"
+msgstr "Hesaplama"
+
+#: src/WeatherRoutingUI.cpp:423
+msgid "Number of Concurrent threads"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:440
+msgid "Use Local Time"
+msgstr "Yerel Saati Kullan"
+
+#: src/WeatherRoutingUI.cpp:544
+msgid "Date"
+msgstr "Tarih"
+
+#: src/WeatherRoutingUI.cpp:551
+msgid "Grib Time"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:554
+msgid "Hour"
+msgstr "Saat"
+
+#: src/WeatherRoutingUI.cpp:558 src/WeatherRoutingUI.cpp:1921
+#: src/WeatherRoutingUI.cpp:1951 src/WeatherRoutingUI.cpp:1959
+#: src/WeatherRoutingUI.cpp:1967 src/WeatherRoutingUI.cpp:1975
+#: src/WeatherRoutingUI.cpp:1983
+msgid "0"
+msgstr "0"
+
+#: src/WeatherRoutingUI.cpp:561
+msgid "Current Time"
+msgstr "Şu anki Saat"
+
+#: src/WeatherRoutingUI.cpp:585
+msgid "..."
+msgstr "..."
+
+#: src/WeatherRoutingUI.cpp:588
+msgid "Edit"
+msgstr "Düzenle"
+
+#: src/WeatherRoutingUI.cpp:598 src/WeatherRoutingUI.cpp:818
+msgid "Constraints"
+msgstr "Kısıtlamalar"
+
+#: src/WeatherRoutingUI.cpp:605
+msgid "Max Diverted Course"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:612 src/WeatherRoutingUI.cpp:832
+#: src/WeatherRoutingUI.cpp:853 src/WeatherRoutingUI.cpp:864
+#: src/WeatherRoutingUI.cpp:2652 src/WeatherRoutingUI.cpp:2670
+msgid "degrees"
+msgstr "dereceler"
+
+#: src/WeatherRoutingUI.cpp:616
+msgid "Max True Wind"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:623 src/WeatherRoutingUI.cpp:634
+msgid "knots"
+msgstr "deniz mili"
+
+#: src/WeatherRoutingUI.cpp:627
+msgid "Max Apparent Wind"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:645
+msgid "meters"
+msgstr "metre"
+
+#: src/WeatherRoutingUI.cpp:673
+msgid "Time Step"
+msgstr "Zaman Adımı"
+
+#: src/WeatherRoutingUI.cpp:683
+msgid "h"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:690
+msgid "m"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:697
+msgid "s"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:708 src/WeatherRoutingUI.cpp:921
+msgid "Options"
+msgstr "Seçenekler"
+
+#: src/WeatherRoutingUI.cpp:720
+msgid "Detect Land"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:724
+msgid "Detect Boundary"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:727
+msgid "Currents"
+msgstr "Akıntılar"
+
+#: src/WeatherRoutingUI.cpp:731
+msgid "Optimize Tacking"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:744
+msgid "Data Source"
+msgstr "Veri Kaynağı"
+
+#: src/WeatherRoutingUI.cpp:769
+msgid "Disable"
+msgstr "Devre Dışı Bırak"
+
+#: src/WeatherRoutingUI.cpp:769
+msgid "Currents Only"
+msgstr "Sadece Akıntılar"
+
+#: src/WeatherRoutingUI.cpp:769
+msgid "Cumulative Map"
+msgstr "Toplu Harita"
+
+#: src/WeatherRoutingUI.cpp:769
+msgid "Cumulative - Calms"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:769
+msgid "Most Likely"
+msgstr "Büyük Olasılıkla"
+
+#: src/WeatherRoutingUI.cpp:769
+msgid "Average"
+msgstr "Ortalama"
+
+#: src/WeatherRoutingUI.cpp:786
+msgid "Last Valid if Data Deficient"
+msgstr "Veri eksikliği varsa son geçerli olan"
+
+#: src/WeatherRoutingUI.cpp:795
+msgid " Close"
+msgstr "Kapat"
+
+#: src/WeatherRoutingUI.cpp:805
+msgid "Basic"
+msgstr "Temel"
+
+#: src/WeatherRoutingUI.cpp:825
+msgid "Max Latitude +-"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:836
+msgid "Wind vs Current"
+msgstr "Rüzgar vs Akıntı"
+
+#: src/WeatherRoutingUI.cpp:846
+msgid "Max Course Angle"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:857
+msgid "Max Search Angle"
+msgstr "Max Arama Açısı"
+
+#: src/WeatherRoutingUI.cpp:876
+msgid "Avoid cyclone tracks (climatology)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:885
+msgid "within"
+msgstr "içinde"
+
+#: src/WeatherRoutingUI.cpp:892
+msgid "Months"
+msgstr "Ay"
+
+#: src/WeatherRoutingUI.cpp:899
+msgid "Days"
+msgstr "Gün"
+
+#: src/WeatherRoutingUI.cpp:933
+msgid "Inverted Regions"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:936
+msgid "Anchoring"
+msgstr "Demir Atma"
+
+#: src/WeatherRoutingUI.cpp:947
+msgid "Integrator"
+msgstr "Toplayıcı"
+
+#: src/WeatherRoutingUI.cpp:952
+msgid "Newton"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:953
+msgid "Runge Kutta"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:964
+msgid "Wind strength is"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:971 src/WeatherRoutingUI.cpp:2352
+#: src/WeatherRoutingUI.cpp:2363 src/WeatherRoutingUI.cpp:2374
+msgid "percent"
+msgstr "yüzde"
+
+#: src/WeatherRoutingUI.cpp:983
+msgid "Tacking Time"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:990
+msgid "Seconds"
+msgstr "Saniye"
+
+#: src/WeatherRoutingUI.cpp:1004
+msgid "Courses (relative to true wind)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1011 src/WeatherRoutingUI.cpp:2345
+msgid "From"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1018 src/WeatherRoutingUI.cpp:2356
+msgid "To"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1025 src/WeatherRoutingUI.cpp:2367
+msgid "By"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1029
+msgid "5"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1032
+msgid "Degrees"
+msgstr "Derece"
+
+#: src/WeatherRoutingUI.cpp:1042
+msgid "Reset all Advanced Parameters"
+msgstr "Tüm gelişmiş parametreleri sıfırla"
+
+#: src/WeatherRoutingUI.cpp:1052
+msgid "Advanced"
+msgstr "Gelişmiş"
+
+#: src/WeatherRoutingUI.cpp:1327 src/WeatherRoutingUI.cpp:2553
+msgid "Position"
+msgstr "Pozisyon"
+
+#: src/WeatherRoutingUI.cpp:1334
+msgid "Scale"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1354 src/WeatherRoutingUI.cpp:1370
+#: src/WeatherRoutingUI.cpp:1386
+msgid "Variable"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Speed Over Ground (SOG)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Course Over Ground (COG)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Speed Over Water (SOW)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Course Over Water (COW)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Wind Velocity"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392 src/WeatherRoutingUI.cpp:2906
+msgid "Wind Direction"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Wind Course"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Wind Velocity Ground"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Wind Direction Ground"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Wind Course Ground"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Apparent Wind Speed (AWS)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Apparent Wind Angle (AWA)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Wind Gust"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Current Velocity"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Current Direction"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1360 src/WeatherRoutingUI.cpp:1376
+#: src/WeatherRoutingUI.cpp:1392
+msgid "Sig Wave Height"
+msgstr "Sig Dalga Yüksekliği"
+
+#: src/WeatherRoutingUI.cpp:1366 src/WeatherRoutingUI.cpp:1382
+#: src/WeatherRoutingUI.cpp:1398
+msgid "        N/A         "
+msgstr "N/A"
+
+#: src/WeatherRoutingUI.cpp:1410 src/WeatherRoutingUI.cpp:1932
+msgid "Current Route"
+msgstr "Geçerli Rota"
+
+#: src/WeatherRoutingUI.cpp:1413
+msgid "Cursor Route"
+msgstr "İmleç Rotası"
+
+#: src/WeatherRoutingUI.cpp:1539
+msgid "Weather Routing Plugin Version"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1550
+msgid "The weather routing plugin for opencpn is intended to calculate sailing routes based on computerized weather data and boat sailing ability.\n\n"
+"License: GPLv3+\n\n"
+"Source Code:\n"
+"https://github.com/seandepagnier/weather_routing_pi\n\n"
+"Author:\n"
+"Sean D'Epagnier\n\n"
+"Many thanks to all of the translators and testers."
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1559
+msgid "About Author"
+msgstr "Yazar Hakkında"
+
+#: src/WeatherRoutingUI.cpp:1562 src/WeatherRoutingUI.cpp:2417
+msgid "Close"
+msgstr "Kapat"
+
+#: src/WeatherRoutingUI.cpp:1629
+msgid "Plot"
+msgstr "Çizim"
+
+#: src/WeatherRoutingUI.cpp:1648
+msgid "Overlap"
+msgstr "Örtüşmek"
+
+#: src/WeatherRoutingUI.cpp:1655
+msgid "%"
+msgstr "%"
+
+#: src/WeatherRoutingUI.cpp:1672
+msgid "Cross Over Chart"
+msgstr "Çapraz Geçiş Grafiği"
+
+#: src/WeatherRoutingUI.cpp:1679
+msgid "Upwind Port Tack"
+msgstr "Rüzgara Karşı İskele Yön Değişme"
+
+#: src/WeatherRoutingUI.cpp:1687
+msgid "Upwind Starboard Tack"
+msgstr "Rüzgara Sancak Yön Değişme"
+
+#: src/WeatherRoutingUI.cpp:1695
+msgid "Downwind Port Tack"
+msgstr "Rüzgar Yönünde İskele Yön Değişme"
+
+#: src/WeatherRoutingUI.cpp:1703
+msgid "Downwind Starboard Tack"
+msgstr "Rüzgar Yönünde Sancak Yön Değişme"
+
+#: src/WeatherRoutingUI.cpp:1711 src/WeatherRoutingUI.cpp:2899
+msgid "Wind Speed"
+msgstr "Rüzgar Hızı"
+
+#: src/WeatherRoutingUI.cpp:1722
+msgid "Stats"
+msgstr "İstatistikler"
+
+#: src/WeatherRoutingUI.cpp:1731
+msgid "Speed"
+msgstr "Hız"
+
+#: src/WeatherRoutingUI.cpp:1737
+msgid "True Wind Dir / True Wind Speed"
+msgstr "Gerçek Rüzgar Dir / Gerçek Rüzgar Hızı"
+
+#: src/WeatherRoutingUI.cpp:1737
+msgid "Apparent Wind Dir / True Wind Speed"
+msgstr "Belirgin Rüzgar Dir / Gerçek Rüzgar Hızı"
+
+#: src/WeatherRoutingUI.cpp:1737
+msgid "True Wind Dir / Apparent Wind Speed"
+msgstr "Gerçek Rüzgar Dir / Belirgin Rüzgar Hızı"
+
+#: src/WeatherRoutingUI.cpp:1737
+msgid "Apparent Wind Dir / Apparent Wind Speed"
+msgstr "Belirgin Rüzgar Dir / Belirgin Rüzgar Hızı"
+
+#: src/WeatherRoutingUI.cpp:1745
+msgid "Full Plot"
+msgstr "Tam Çizim"
+
+#: src/WeatherRoutingUI.cpp:1748
+msgid "Vert"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1760
+msgid "Polars"
+msgstr "Kutuplar"
+
+#: src/WeatherRoutingUI.cpp:1780
+msgid "Up"
+msgstr "Yukarı"
+
+#: src/WeatherRoutingUI.cpp:1783
+msgid "Down"
+msgstr "Aşağı"
+
+#: src/WeatherRoutingUI.cpp:1789 src/WeatherRoutingUI.cpp:2320
+#: src/WeatherRoutingUI.cpp:2798 src/WeatherRoutingUI.cpp:2844
+#: src/WeatherRoutingUI.cpp:2925
+msgid "Add"
+msgstr "Ekle"
+
+#: src/WeatherRoutingUI.cpp:1792 src/WeatherRoutingUI.cpp:2323
+#: src/WeatherRoutingUI.cpp:2801 src/WeatherRoutingUI.cpp:2847
+#: src/WeatherRoutingUI.cpp:2955
+msgid "Remove"
+msgstr "Kaldır"
+
+#: src/WeatherRoutingUI.cpp:1798
+msgid "Open Boat"
+msgstr "Tekneyi Aç"
+
+#: src/WeatherRoutingUI.cpp:1801
+msgid "Save Boat"
+msgstr "Tekneyi Kaydet"
+
+#: src/WeatherRoutingUI.cpp:1804
+msgid "Save As Boat"
+msgstr "Tekne Olarak Kaydet"
+
+#: src/WeatherRoutingUI.cpp:1910
+msgid "Overall"
+msgstr "Genel"
+
+#: src/WeatherRoutingUI.cpp:1917
+msgid "Run Time"
+msgstr "Çalışma Süresi"
+
+#: src/WeatherRoutingUI.cpp:1947
+msgid "Iso Chrons"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1955 src/WeatherRoutingUI.cpp:2044
+#: src/WeatherRoutingUI.cpp:2303
+msgid "Routes"
+msgstr "Rotalar"
+
+#: src/WeatherRoutingUI.cpp:1963
+msgid "InvRoutes"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:1971
+msgid "Skip Positions"
+msgstr "Pozisyonları Geç"
+
+#: src/WeatherRoutingUI.cpp:2025
+msgid "Current Configuration"
+msgstr "Geçerli Yapılandırma"
+
+#: src/WeatherRoutingUI.cpp:2068 src/WeatherRoutingUI.cpp:2408
+msgid "Information"
+msgstr "Bilgi"
+
+#: src/WeatherRoutingUI.cpp:2120
+msgid "Starting"
+msgstr "Başlangıç"
+
+#: src/WeatherRoutingUI.cpp:2131
+msgid "For"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2138 src/WeatherRoutingUI.cpp:2159
+msgid "day(s)"
+msgstr "gün"
+
+#: src/WeatherRoutingUI.cpp:2148
+msgid "hour(s)"
+msgstr "saat"
+
+#: src/WeatherRoutingUI.cpp:2152
+msgid "Spaced"
+msgstr "Aralıklı"
+
+#: src/WeatherRoutingUI.cpp:2169
+msgid "Hour(s)"
+msgstr "Saat"
+
+#: src/WeatherRoutingUI.cpp:2181
+msgid "Once"
+msgstr "Bir kez"
+
+#: src/WeatherRoutingUI.cpp:2184
+msgid "Daily"
+msgstr "Günlük"
+
+#: src/WeatherRoutingUI.cpp:2187
+msgid "Weekly"
+msgstr "Haftalık"
+
+#: src/WeatherRoutingUI.cpp:2190
+msgid "Monthly"
+msgstr "Aylık"
+
+#: src/WeatherRoutingUI.cpp:2210
+msgid "Sources"
+msgstr "Kaynaklar"
+
+#: src/WeatherRoutingUI.cpp:2234
+msgid "Destinations"
+msgstr "Hedefler"
+
+#: src/WeatherRoutingUI.cpp:2255
+msgid "Auto Connect"
+msgstr "Otomatik Bağlantı"
+
+#: src/WeatherRoutingUI.cpp:2262
+msgid "Within"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2269
+msgid "Nautical Miles"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2273
+msgid "Connect"
+msgstr "Bağlan"
+
+#: src/WeatherRoutingUI.cpp:2287
+msgid "Disconnect All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2333
+msgid "Boats"
+msgstr "Tekneler"
+
+#: src/WeatherRoutingUI.cpp:2386
+msgid "100"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2389
+msgid "80 to 120"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2399
+msgid "Wind Strength"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2411
+msgid "Reset"
+msgstr "Sıfırla"
+
+#: src/WeatherRoutingUI.cpp:2414 src/WeatherRoutingUI.cpp:3227
+msgid "Generate"
+msgstr "Oluştur"
+
+#: src/WeatherRoutingUI.cpp:2481
+msgid "Category"
+msgstr "Kategori"
+
+#: src/WeatherRoutingUI.cpp:2492
+msgid "Filter"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2505
+msgid "Reset All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2508
+msgid "Done"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2569
+msgid "Sail Changes"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2585
+msgid "Weather Data"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2630
+msgid "name"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2645
+msgid "latitude"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2659 src/WeatherRoutingUI.cpp:2677
+msgid "minutes"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2663
+msgid "longitude"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2757
+msgid "Grid"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2768
+msgid "True Wind Angles"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2814
+msgid "True WInd Speeds"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2863
+msgid "Dimensions"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2880
+msgid "New Measurement"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2887
+msgid "Apparent Wind"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2890
+msgid "True Wind"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2913
+msgid "Boat Spead"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2938 src/WeatherRoutingUI.cpp:2980
+msgid "Measurements"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2958
+msgid "Remove All"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2961
+msgid "Import NMEA Log"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2964
+msgid "Generate Polar"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:2993
+msgid "Warning:  All of the below are currently not used"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3016
+msgid "Hull Type"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3020
+msgid "Mono"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3020
+msgid "Catamaran"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3020
+msgid "Trimaran"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3020
+msgid "Proa"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3020
+msgid "Submarine"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3034
+msgid "Displacement"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3041
+msgid "tons"
+msgstr "ton"
+
+#: src/WeatherRoutingUI.cpp:3045
+msgid "Sail Area"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3052
+msgid "sq/ft"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3056
+msgid "Len Water Line (lwl)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3063 src/WeatherRoutingUI.cpp:3074
+#: src/WeatherRoutingUI.cpp:3085
+msgid "ft"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3067
+msgid "Length Over All (loa)"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3078
+msgid "Beam"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3100
+msgid "Sail Area Displacement Ratio"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3108
+msgid "Displacement Length Ratio"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3116
+msgid "Hull Speed"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3124
+msgid "Capsize Risk"
+msgstr "Alabora Riski"
+
+#: src/WeatherRoutingUI.cpp:3132
+msgid "Comfort Factor"
+msgstr "Konfor Faktörü"
+
+#: src/WeatherRoutingUI.cpp:3191
+msgid "Add Row"
+msgstr "Satır Ekle"
+
+#: src/WeatherRoutingUI.cpp:3194
+msgid "Remove Row"
+msgstr "Satır Sil"
+
+#: src/WeatherRoutingUI.cpp:3197
+msgid "Add Col"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3200
+msgid "Remove Col"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3203
+msgid "MyButton"
+msgstr ""
+
+#: src/WeatherRoutingUI.cpp:3219
+msgid "Boat Characteristics"
+msgstr "Tekne Özellikleri"
+
+#: src/WeatherRoutingUI.h:175
+msgid "Weather Routing Settings"
+msgstr "Hava Yönlendirme Ayarları"
+
+#: src/WeatherRoutingUI.h:281
+msgid "Weather Routing Configuration"
+msgstr "Hava Yönlendirme Yapılandırması"
+
+#: src/WeatherRoutingUI.h:324
+msgid "Weather Route Plot"
+msgstr "Hava Durumu Rota Çizimi"
+
+#: src/WeatherRoutingUI.h:350
+msgid "About Weather Routing"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:462
+msgid "Weather Routing Statistics"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:487
+msgid "Weather Route Report"
+msgstr "Hava Durumu Rota Raporu"
+
+#: src/WeatherRoutingUI.h:568
+msgid "Weather Routing Configuration Batch"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:595
+msgid "Filter Routes"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:623
+msgid "Cursor Position"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:654
+msgid "New Weather Routing Position"
+msgstr ""
+
+#: src/WeatherRoutingUI.h:755
+msgid "Edit Polar"
+msgstr "Kutup Düzenle"
+
