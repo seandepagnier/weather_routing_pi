@@ -893,12 +893,19 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
             return NAN;
     } while((bearing - BG) > 1e-3);
 
+    /* only allow if we fit in the isochron time.  We could optimize this by finding
+       the maximum boat speed once, and using that before computing boat speed for
+       this angle, but for now, we don't worry because propagating to the end is a
+       small amount of total computation */
+    if(dist / VBG > configuration.dt / 3600.0)
+        return NAN;
+    
     /* quick test first to avoid slower calculation */
     if(VB + VW > configuration.MaxApparentWindKnots &&
        Polar::VelocityApparentWind(VB, H, VW) > configuration.MaxApparentWindKnots)
         return NAN;
 
-#if 0
+#if 1
     /* landfall test if we are within 60 miles (otherwise it's very slow) */
     if(configuration.DetectLand && dist < 60
        && CrossesLand(configuration.EndLat, configuration.EndLon))
