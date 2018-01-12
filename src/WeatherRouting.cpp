@@ -1826,12 +1826,14 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
         newTrack->pWaypointList->Append(newPoint);
     }
 
-    // last point
+    // last point, missing if config didn't succeed
     Position *p = routemapoverlay.GetDestination();
-    PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
+    if (p) {
+        PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
             (p->lat, p->lon, _T("circle"), _("Weather Route Destination"));
-    newPoint->m_CreateTime =  routemapoverlay.EndTime();
-    newTrack->pWaypointList->Append(newPoint);
+        newPoint->m_CreateTime =  routemapoverlay.EndTime();
+        newTrack->pWaypointList->Append(newPoint);
+    }
 
     AddPlugInTrack(newTrack);
     // not done PlugIn_Track DTOR
