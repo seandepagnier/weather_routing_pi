@@ -1192,9 +1192,9 @@ void RouteMapOverlay::UpdateDestination()
         }
         Unlock();
 
-        if(isinf(mindt))
+        if(isinf(mindt)) {
             goto not_able_to_propagate;
-
+        }
         destination_position = new Position(configuration.EndLat, configuration.EndLon,
                                             endp, minH, NAN, endp->polar, endp->tacks + mintacked,
                                             mindata_mask);
