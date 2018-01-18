@@ -37,8 +37,6 @@ IF(WIN32)
 #  SET(CPACK_NSIS_INSTALLED_ICON_NAME "${PACKAGE_NAME}")
 SET(CPACK_NSIS_DISPLAY_NAME "OpenCPN ${PACKAGE_NAME}")
 
-#  SET(CPACK_PACKAGE_FILE_NAME "${PACKAGE_NAME}_${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}_setup" )
-
   SET(CPACK_NSIS_DIR "${PROJECT_SOURCE_DIR}/buildwin/NSIS_Unicode")  #Gunther
   SET(CPACK_BUILDWIN_DIR "${PROJECT_SOURCE_DIR}/buildwin")  #Gunther
 
@@ -147,8 +145,9 @@ ENDIF(TWIN32 AND NOT UNIX)
 
 INCLUDE(CPack)
 
-
+IF(NOT STANDALONE MATCHES "BUNDLED")
 IF(APPLE)
+MESSAGE (STATUS "*** Staging to build PlugIn OSX Package ***")
 
  #  Copy a bunch of files so the Packages installer builder can find them
  #  relative to ${CMAKE_CURRENT_BINARY_DIR}
@@ -181,3 +180,6 @@ configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/pkg_background.jpg
 
 
 ENDIF(APPLE)
+
+ENDIF(NOT STANDALONE MATCHES "BUNDLED")
+

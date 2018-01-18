@@ -53,7 +53,11 @@ static const int wind_speeds[] = {0, 2, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32,
 static const int num_wind_speeds = (sizeof wind_speeds) / (sizeof *wind_speeds);
 
 BoatDialog::BoatDialog(WeatherRouting &weatherrouting)
+#ifndef __WXOSX__
     : BoatDialogBase(&weatherrouting),
+#else
+    : BoatDialogBase(&weatherrouting, wxID_ANY, _("Boat"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP ),
+#endif
       m_WeatherRouting(weatherrouting), m_PlotScale(0), m_CrossOverRegenerate(false), m_CrossOverGenerationThread(NULL)
 {
     // for small screens: don't let boat dialog be larger than screen

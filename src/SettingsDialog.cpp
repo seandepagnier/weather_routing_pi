@@ -48,7 +48,11 @@ const wxString SettingsDialog::column_names[] = {"", "Boat", "Start", "Start Tim
                                                  "Port Starboard", "Tacks", "State"};
 
 SettingsDialog::SettingsDialog( wxWindow *parent )
+#ifndef __WXOSX__
     : SettingsDialogBase(parent)
+#else
+    : SettingsDialogBase( parent, wxID_ANY, _("Weather Routing Settings"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP )
+#endif
 {
 }
 
