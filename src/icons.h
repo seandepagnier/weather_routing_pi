@@ -7,8 +7,17 @@
 #	include <wx/wx.h>
 #endif
 
+#include <wx/filename.h>
+#include <wx/mstream.h>
+
 extern void initialize_images(void);
 
 extern wxBitmap *_img_WeatherRouting;
+
+#ifdef WEATHER_ROUTING_USE_SVG
+extern wxString _svg_weather_routing;
+extern wxString _svg_weather_routing_rollover;
+extern wxString _svg_weather_routing_toggled;
+#endif
 
 #endif /* ICONS_H */
