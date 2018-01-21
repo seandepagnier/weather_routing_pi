@@ -669,7 +669,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             return false;
     }
 
-    double timeseconds = configuration.dt;
+    double timeseconds = configuration.DeltaTime;
     double dist;
 
     bool first_avoid = true;
@@ -898,7 +898,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
        the maximum boat speed once, and using that before computing boat speed for
        this angle, but for now, we don't worry because propagating to the end is a
        small amount of total computation */
-    if(dist / VBG > configuration.dt / 3600.0)
+    if(dist / VBG > configuration.DeltaTime / 3600.0)
         return NAN;
     
     /* quick test first to avoid slower calculation */
@@ -1258,7 +1258,7 @@ bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfi
 
     bool ret = false;
     Position *p = skippoints->point;
-    double timeseconds = configuration.dt;
+    double timeseconds = configuration.DeltaTime;
     do {
         double C, VC;
         if(configuration.Currents && Current(grib, configuration.ClimatologyType,
@@ -2440,7 +2440,7 @@ bool RouteMap::Propagate()
     // request the next grib
     // in a different thread (grib record averaging going in parallel)
     m_NewGrib = NULL;
-    m_NewTime += wxTimeSpan(0, 0, configuration.dt);
+    m_NewTime += wxTimeSpan(0, 0, configuration.DeltaTime);
     m_bNeedsGrib = configuration.UseGrib;
 
     Unlock();
