@@ -1813,11 +1813,25 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
     PlugIn_Track* newTrack = new PlugIn_Track;
     newTrack->m_NameString = _("Weather Route");
 
+    // XXX double check time is really end time, not start time off by one.
+    RouteMapConfiguration c = routemapoverlay.GetConfiguration();
+    wxDateTime t = c.StartTime;
+
     for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
             ((*it).lat, (*it).lon, _T("circle"), _("Weather Route Point"));
 
-        newPoint->m_CreateTime = (*it).time;
+        newPoint->m_CreateTime = t;
+        t = (*it).time;
+        newTrack->pWaypointList->Append(newPoint);
+    }
+
+    // last point, missing if config didn't succeed
+    Position *p = routemapoverlay.GetDestination();
+    if (p) {
+        PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
+            (p->lat, p->lon, _T("circle"), _("Weather Route Destination"));
+        newPoint->m_CreateTime =  routemapoverlay.EndTime();
         newTrack->pWaypointList->Append(newPoint);
     }
 
