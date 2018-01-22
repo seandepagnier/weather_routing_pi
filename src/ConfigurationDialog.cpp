@@ -42,9 +42,13 @@
 #include "icons.h"
 
 ConfigurationDialog::ConfigurationDialog(WeatherRouting &weatherrouting)
-    : ConfigurationDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting),
-      m_bBlockUpdate(false)
-
+#ifndef __WXOSX__
+    : ConfigurationDialogBase(&weatherrouting),
+#else
+    : ConfigurationDialogBase(&weatherrouting, wxID_ANY, _("Weather Routing Configuration"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP),
+#endif
+       m_WeatherRouting(weatherrouting),
+       m_bBlockUpdate(false)
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );

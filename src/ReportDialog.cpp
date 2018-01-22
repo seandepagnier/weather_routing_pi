@@ -42,7 +42,12 @@
 #include "WeatherRouting.h"
 
 ReportDialog::ReportDialog( WeatherRouting &weatherrouting )
-    : ReportDialogBase(&weatherrouting), m_WeatherRouting(weatherrouting)
+#ifndef __WXOSX__
+    : ReportDialogBase(&weatherrouting),
+#else
+    : ReportDialogBase(&weatherrouting, wxID_ANY, _("Weather Route Report"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP),
+#endif
+      m_WeatherRouting(weatherrouting)
 {
     m_bReportStale = true;
     SetRouteMapOverlays(std::list<RouteMapOverlay*>());

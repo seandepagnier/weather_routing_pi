@@ -55,7 +55,7 @@ std::cout << x << std::endl; } while (0)
 #include "version.h"
 
 #define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    10
+#define     MY_API_VERSION_MINOR    13
 
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
 
@@ -82,7 +82,7 @@ std::cout << x << std::endl; } while (0)
 
 class WeatherRouting;
 
-class weather_routing_pi : public wxEvtHandler, public opencpn_plugin_110
+class weather_routing_pi : public wxEvtHandler, public opencpn_plugin_113
 {
 public:
       weather_routing_pi(void *ppimgr);
