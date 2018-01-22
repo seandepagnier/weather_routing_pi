@@ -67,19 +67,22 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         it != routemapoverlays.end(); it++) {
 
         page += _T("<p>");
-        if(!(*it)->ReachedDestination()) {
+        if(!(*it)->ReachedDestination() ) {
             m_htmlConfigurationReport->SetPage(_("Destination not yet reached."));
             continue;
         }
 
         RouteMapConfiguration c = (*it)->GetConfiguration();
         std::list<PlotData> p = (*it)->GetPlotData();
+        Position *d = (*it)->GetDestination();
 
         page += _("Boat Filename") + _T(" ") + wxFileName(c.boatFileName).GetName() + _T("<dt>");
         page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
         page += _("Leaving ") + c.StartTime.Format(_T("%x %X")) + _T("<dt>");
-        page += _("Arriving ") + (*it)->EndTime().Format(_T("%x %X")) + _T("<dt>");
-        page += _("Duration ") + ((*it)->EndTime() - c.StartTime).Format() + _T("<dt>");
+        if (d) {
+            page += _("Arriving ") + (*it)->EndTime().Format(_T("%x %X")) + _T("<dt>");
+            page += _("Duration ") + ((*it)->EndTime() - c.StartTime).Format() + _T("<dt>");
+        }
         page += _T("<p>");
         double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
         double distance_sailed = (*it)->RouteInfo(RouteMapOverlay::DISTANCE);
@@ -107,9 +110,9 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
             (isnan(port_starboard) ? _T("nan") : wxString::Format
              (_T("%d/%d"), (int)port_starboard, 100-(int)port_starboard)) + _T("<dt>");
 
-        Position *destination = (*it)->GetDestination();
-
-        page += _("Number of tacks") + wxString::Format(_T(": %d "), destination->tacks) + _T("<dt>\n");
+        if (d) {
+            page += _("Number of tacks") + wxString::Format(_T(": %d "), d->tacks) + _T("<dt>\n");
+        }
 
         /* determine if currents significantly improve this (boat over ground speed average is 10% or
            more faster than boat over water)  then attempt to determine which current based on lat/lon
