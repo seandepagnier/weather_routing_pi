@@ -9455,7 +9455,7 @@
                                                                             <event name="OnRightUp"></event>
                                                                             <event name="OnSetFocus"></event>
                                                                             <event name="OnSize"></event>
-                                                                            <event name="OnSpinCtrl">OnUpdate</event>
+                                                                            <event name="OnSpinCtrl">OnUpdateSpin</event>
                                                                             <event name="OnSpinCtrlText"></event>
                                                                             <event name="OnTextEnter"></event>
                                                                             <event name="OnUpdateUI"></event>
