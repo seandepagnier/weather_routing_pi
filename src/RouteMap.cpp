@@ -640,6 +640,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     Position *points = NULL;
     /* through all angles relative to wind */
     int count = 0;
+    bool boundary = false;
+    bool land = false;
 
     double S = Swell(configuration.grib, lat, lon);
     if(S > configuration.MaxSwellMeters)
@@ -795,13 +797,15 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             continue;
 
         /* landfall test */
-        if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
+        if(configuration.DetectLand && CrossesLand(dlat, nrdlon)) {
+            configuration.land_crossing = true;
             continue;
-        
+        }
         /* Boundary test */
-        if(configuration.DetectBoundary && EntersBoundary(dlat, dlon))
+        if(configuration.DetectBoundary && EntersBoundary(dlat, dlon)) {
+            configuration.boundary_crossing = true;
             continue;
-
+        }
         /* crosses cyclone track(s)? */
         if(configuration.AvoidCycloneTracks &&
            RouteMap::ClimatologyCycloneTrackCrossings) {
@@ -2419,6 +2423,8 @@ bool RouteMap::Propagate()
     RouteMapConfiguration configuration = m_Configuration;
     configuration.polar_failed = false;
     configuration.wind_data_failed = false;
+    configuration.boundary_crossing = false;
+    configuration.land_crossing = false;
 
     // reset grib data deficient flag
     bool grib_is_data_deficient = false;
@@ -2508,6 +2514,12 @@ bool RouteMap::Propagate()
     if(configuration.wind_data_failed)
         m_bNoData = true;
 
+    if(configuration.boundary_crossing)
+        m_bBoundaryCrossing = true;
+
+    if(configuration.land_crossing)
+        m_bLandCrossing = true;
+
     Unlock();
 
     return true;
@@ -2563,6 +2575,8 @@ void RouteMap::Reset()
     m_bPolarFailed = false;
     m_bNoData = false;
     m_bFinished = false;
+    m_bLandCrossing = false;
+    m_bBoundaryCrossing = false;
 
     Unlock();
 }

@@ -1589,6 +1589,15 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
                     State += _("No Data");
                     State += _T(": ");
                 }
+                if(routemapoverlay->LandCrossing()) {
+                    State += _("Land");
+                    State += _T(": ");
+                }
+                if(routemapoverlay->BoundaryCrossing()) {
+                    State += _("Boundary");
+                    State += _T(": ");
+                }
+
                 State += _("Failed");
             }
         } else {
