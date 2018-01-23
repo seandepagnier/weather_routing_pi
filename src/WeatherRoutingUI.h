@@ -268,7 +268,6 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnResetAdvanced( wxCommandEvent& event ) { event.Skip(); }
 		
 	
