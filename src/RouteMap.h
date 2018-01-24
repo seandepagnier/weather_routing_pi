@@ -272,7 +272,7 @@ protected:
 class IsoChron
 {
 public:
-    IsoChron(IsoRouteList r, wxDateTime t, Shared_GribRecordSet &g, bool grib_is_data_deficient);
+    IsoChron(IsoRouteList r, wxDateTime t, double d, Shared_GribRecordSet &g, bool grib_is_data_deficient);
     ~IsoChron();
 
     void PropagateIntoList(IsoRouteList &routelist, RouteMapConfiguration &configuration);
@@ -283,6 +283,7 @@ public:
 
     IsoRouteList routes;
     wxDateTime time;
+    double delta;
     Shared_GribRecordSet m_SharedGrib;
     WR_GribRecordSet *m_Grib;
     bool m_Grib_is_data_deficient;
@@ -316,7 +317,8 @@ struct RouteMapConfiguration {
 
     wxDateTime StartTime;
 
-    double DeltaTime; /* time in seconds between propagations */
+    double DeltaTime; /* default time in seconds between propagations */
+    double UsedDeltaTime; /* time in seconds between propagations */
 
     Boat boat;
     wxString boatFileName;

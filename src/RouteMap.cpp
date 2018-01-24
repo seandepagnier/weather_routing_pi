@@ -749,7 +749,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             return false;
     }
 
-    double timeseconds = configuration.DeltaTime;
+    double timeseconds = configuration.UsedDeltaTime;
     double dist;
 
     bool first_avoid = true;
@@ -1419,7 +1419,7 @@ bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfi
 
     bool ret = false;
     Position *p = skippoints->point;
-    double timeseconds = configuration.DeltaTime;
+    double timeseconds = configuration.UsedDeltaTime;
     do {
         double C, VC;
         if(configuration.Currents && Current(grib, configuration.ClimatologyType,
@@ -2354,8 +2354,8 @@ typedef  wxWeakRef<Shared_GribRecordSet> Shared_GribRecordSetRef;
 static std::map<time_t, Shared_GribRecordSetRef> grib_key;
 static wxMutex s_key_mutex;
 
-IsoChron::IsoChron(IsoRouteList r, wxDateTime t, Shared_GribRecordSet &g, bool grib_is_data_deficient)
-    : routes(r), time(t), m_SharedGrib(g), m_Grib(0), m_Grib_is_data_deficient(grib_is_data_deficient)
+IsoChron::IsoChron(IsoRouteList r, wxDateTime t, double d, Shared_GribRecordSet &g, bool grib_is_data_deficient)
+    : routes(r), time(t), delta(d), m_SharedGrib(g), m_Grib(0), m_Grib_is_data_deficient(grib_is_data_deficient)
 {
     m_Grib = m_SharedGrib.GetGribRecordSet();
     if (m_Grib ) {
@@ -2619,6 +2619,7 @@ bool RouteMap::Propagate()
         return false;
     }
 
+    //
     RouteMapConfiguration configuration = m_Configuration;
     configuration.polar_failed = false;
     configuration.wind_data_failed = false;
@@ -2641,12 +2642,15 @@ bool RouteMap::Propagate()
 
     Shared_GribRecordSet shared_grib = m_SharedNewGrib;
     wxDateTime time = m_NewTime;
+    double delta;
+
+    m_NewGrib = 0;
+    m_SharedNewGrib.SetGribRecordSet(0);
 
     // request the next grib
     // in a different thread (grib record averaging going in parallel)
-    m_NewGrib = 0;
-    m_SharedNewGrib.SetGribRecordSet(0);
-    m_NewTime += wxTimeSpan(0, 0, configuration.DeltaTime);
+    delta = configuration.DeltaTime;
+    m_NewTime += wxTimeSpan(0, 0, delta);
     m_bNeedsGrib = configuration.UseGrib;
 
     Unlock();
@@ -2660,6 +2664,7 @@ bool RouteMap::Propagate()
     } else {
         configuration.grib = origin.back()->m_Grib;
         configuration.time = origin.back()->time;
+        configuration.UsedDeltaTime = origin.back()->delta;
         configuration.grib_is_data_deficient = origin.back()->m_Grib_is_data_deficient;
         // will the grib data work for us?
         if(m_Configuration.UseGrib &&
@@ -2689,7 +2694,7 @@ bool RouteMap::Propagate()
         for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
             (*it)->ReduceClosePoints();
 
-        update = new IsoChron(merged, time, shared_grib, grib_is_data_deficient);
+        update = new IsoChron(merged, time, delta, shared_grib, grib_is_data_deficient);
     }
 
     Lock();
