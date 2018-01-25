@@ -1618,6 +1618,7 @@ void RouteMapOverlay::UpdateDestination()
             configuration.grib_is_data_deficient = isochron->m_Grib_is_data_deficient;
             
             configuration.time = isochron->time;
+            configuration.UsedDeltaTime = isochron->delta;
             (*it)->PropagateToEnd(configuration, mindt, endp, minH,
                                   mintacked, mindata_mask);
         }
