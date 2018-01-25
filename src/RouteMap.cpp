@@ -582,6 +582,7 @@ bool RoutePoint::GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration 
     data.WVHT = Swell(configuration, lat, lon);
     data.VW_GUST = Gust(configuration, lat, lon);
     data.tacks = tacks;
+    data.delta = dt;
 
     climatology_wind_atlas atlas;
     int data_mask = 0; // not used for plotting yet
@@ -1117,7 +1118,23 @@ bool Position::EntersBoundary(double dlat, double dlon)
     t.dStartLat = lat, t.dStartLon = heading_resolve(lon);
     t.dEndLat = dlat, t.dEndLon = heading_resolve(dlon);
     t.sBoundaryState = wxT("Active");
+
+    // we request any type
     return RouteMap::ODFindClosestBoundaryLineCrossing(&t);
+}
+
+bool Position::EntersBoundary(double dlat, double dlon, double dist)
+{
+    struct FindClosestBoundaryLineCrossing_t t;
+    t.dStartLat = lat;
+    t.dStartLon = heading_resolve(lon);
+    t.dEndLat = dlat;
+    t.dEndLon = heading_resolve(dlon);
+    t.sBoundaryState = wxT("Active");
+    t.dCrossingDistance = 0.;
+    // last point don't care about boundary after it.
+    bool ret = RouteMap::ODFindClosestBoundaryLineCrossing(&t);
+    return ret && t.dCrossingDistance < dist;
 }
 
 SkipPosition::SkipPosition(Position *p, int q)
