@@ -29,7 +29,6 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
   MESSAGE (STATUS "DEBUG available")
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 #SET(PROFILING 1)
-
 #  IF NOT DEBUGGING CFLAGS="-O2 -march=native"
 IF(NOT MSVC)
  IF(PROFILING)
@@ -40,7 +39,7 @@ IF(NOT MSVC)
     ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -fexceptions" )
   ELSE()
 #  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
-    ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -fexceptions" )
+    ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -O2 -fexceptions -fPIC" )
   ENDIF(DEBUG)
  ENDIF(PROFILING)
 
