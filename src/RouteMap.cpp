@@ -872,6 +872,8 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
     double B, VB, BG = W, VBG;
     int iters = 0;
     H = 0;
+    bool old = configuration.OptimizeTacking;
+    configuration.OptimizeTacking = true;
     do {
         /* make our correction in range */
         while(bearing - BG > 180)
@@ -887,16 +889,19 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
         int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S, configuration.OptimizeTacking);
         if(newpolar == -1) {
             configuration.polar_failed = true;
+            configuration.OptimizeTacking = old;
             return NAN;
         }
         
         if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
-                             B, VB, BG, VBG, dummy_dist, newpolar))
+                             B, VB, BG, VBG, dummy_dist, newpolar)
+                || ++iters == 10 // give up
+          ) {
+            configuration.OptimizeTacking = old;
             return NAN;
-
-        if(++iters == 10) // give up
-            return NAN;
+        }
     } while((bearing - BG) > 1e-3);
+    configuration.OptimizeTacking = old;
 
     /* only allow if we fit in the isochron time.  We could optimize this by finding
        the maximum boat speed once, and using that before computing boat speed for
