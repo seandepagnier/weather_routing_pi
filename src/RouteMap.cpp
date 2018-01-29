@@ -796,15 +796,42 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
            Polar::VelocityApparentWind(VB, H, VW) > configuration.MaxApparentWindKnots)
             continue;
 
-        /* landfall test */
-        if(configuration.DetectLand && CrossesLand(dlat, nrdlon)) {
-            configuration.land_crossing = true;
-            continue;
-        }
-        /* Boundary test */
-        if(configuration.DetectBoundary && EntersBoundary(dlat, dlon)) {
-            configuration.boundary_crossing = true;
-            continue;
+        if(configuration.DetectLand || configuration.DetectBoundary) {
+            double dlat1, dlon1; 
+            double bearing, dist2end;
+            double dist2test;
+
+            // it's not an error if there's boundaries after we reach destination
+            ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, &dist2end);
+            if (dist2end < dist) {
+                dist2test = dist2end;
+                ll_gc_ll(lat, lon, heading_resolve(BG), dist2test, &dlat1, &dlon1);
+            }
+            else {
+                dist2test = dist;
+                dlat1 = dlat;
+                dlon1 = dlon;
+            }
+ 
+            /* landfall test */
+            if(configuration.DetectLand) {
+                double ndlon1 = dlon1;
+                if (ndlon1 > 360) {
+                    ndlon1 -360;
+                }
+                if (CrossesLand(dlat1, ndlon1)) {
+                    configuration.land_crossing = true;
+                    continue;
+                }
+            }
+
+            /* Boundary test */
+            if(configuration.DetectBoundary) {
+                if (EntersBoundary(dlat1, dlon1)) {
+                    configuration.boundary_crossing = true;
+                    continue;
+                }
+            }
         }
         /* crosses cyclone track(s)? */
         if(configuration.AvoidCycloneTracks &&
