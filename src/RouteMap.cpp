@@ -116,6 +116,7 @@ static double Gust(GribRecordSet *grib, double lat, double lon)
     double gust = grh->getInterpolatedValue(lon, lat, true );
     if(gust == GRIB_NOTDEF)
         return NAN;
+    gust *= 3.6 / 1.852; // knots
     return gust;
 }
 
