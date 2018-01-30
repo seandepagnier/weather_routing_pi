@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec  3 2017)
+// C++ code generated with wxFormBuilder (version Dec 20 2017)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __WEATHERROUTINGUI_H__
@@ -268,7 +268,6 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnUpdate( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnResetAdvanced( wxCommandEvent& event ) { event.Skip(); }
 		
 	
@@ -282,7 +281,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxSpinCtrl* m_sToDegree;
 		wxTextCtrl* m_tByDegrees;
 		
-		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = wxDEFAULT_DIALOG_STYLE ); 
+		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE ); 
 		~ConfigurationDialogBase();
 	
 };

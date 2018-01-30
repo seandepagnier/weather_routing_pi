@@ -42,7 +42,12 @@
 wxString FilterNames[] = {_("Start"), _("Start Time"), _("End"), _("BoatFileName"), _("State")};
 
 FilterRoutesDialog::FilterRoutesDialog(WeatherRouting *weatherrouting)
-    : FilterRoutesDialogBase(weatherrouting), m_WeatherRouting(weatherrouting)
+#ifndef __WXOSX__
+    : FilterRoutesDialogBase(weatherrouting),
+#else
+    : FilterRoutesDialogBase(weatherrouting, wxID_ANY, _("Filter Routes"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP),
+#endif
+      m_WeatherRouting(weatherrouting)
 {
     for(int i=0; i<NUM_FILTERS; i++)
         m_cCategory->Append(FilterNames[i]);

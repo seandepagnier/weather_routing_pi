@@ -40,7 +40,12 @@
 #include "ConfigurationBatchDialog.h"
 
 ConfigurationBatchDialog::ConfigurationBatchDialog(WeatherRouting *parent)
-    : ConfigurationBatchDialogBase(parent), m_WeatherRouting(*parent)
+#ifndef __WXOSX__
+    : ConfigurationBatchDialogBase(parent),
+#else
+    : ConfigurationBatchDialogBase(parent, wxID_ANY, _("Weather Routing Configuration Batch"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP),
+#endif
+      m_WeatherRouting(*parent)
 {
     Reset();
 }

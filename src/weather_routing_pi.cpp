@@ -84,7 +84,7 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 #include "icons.h"
 
 weather_routing_pi::weather_routing_pi(void *ppimgr)
-      :opencpn_plugin_110(ppimgr)
+      :opencpn_plugin_113(ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
@@ -110,11 +110,16 @@ int weather_routing_pi::Init(void)
 
       m_pWeather_Routing = NULL;
 
+#ifdef WEATHER_ROUTING_USE_SVG
+      m_leftclick_tool_id = InsertPlugInToolSVG(_T( "WeatherRouting" ),
+          _svg_weather_routing, _svg_weather_routing_rollover, _svg_weather_routing_toggled,
+          wxITEM_CHECK, _("Weather Routing"), _T( "" ), NULL, WEATHER_ROUTING_TOOL_POSITION, 0, this);
+#else
       m_leftclick_tool_id  = InsertPlugInTool
           (_T(""), _img_WeatherRouting, _img_WeatherRouting, wxITEM_CHECK,
-           _("Weather_Routing"), _T(""), NULL,
+           _("Weather Routing"), _T(""), NULL,
            WEATHER_ROUTING_TOOL_POSITION, 0, this);
-
+#endif
       wxMenu dummy_menu;
       m_position_menu_id = AddCanvasContextMenuItem
           (new wxMenuItem(&dummy_menu, -1, _("Weather Route Position")), this );

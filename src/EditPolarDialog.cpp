@@ -32,8 +32,13 @@
 #include "Utilities.h"
 
 enum {spTRUE_WIND_SPEED, spTRUE_WIND_DIRECTION, spAPPARENT_WIND_SPEED, spAPPARENT_WIND_DIRECTION, spBOAT_SPEED, spETA};
+
 EditPolarDialog::EditPolarDialog(wxWindow *parent)
+#ifndef __WXOSX__
     : EditPolarDialogBase(parent),
+#else
+    : EditPolarDialogBase(parent, wxID_ANY, _("Edit Polar"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP),
+#endif
       m_BoatDialog(static_cast<BoatDialog*>(parent))
 {
 //	m_gPolar->Connect( wxEVT_GRID_CELL_CHANGED, wxGridEventHandler( EditPolarDialogBase::OnPolarGridChanged ), NULL, this );
