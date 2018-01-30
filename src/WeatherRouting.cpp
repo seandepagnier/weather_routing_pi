@@ -1869,6 +1869,17 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
         mdlg.ShowModal();
         return;
     }
+    if (configuration.DetectBoundary) {
+        if (m_weather_routing_pi.InBoundary(configuration.EndLat, configuration.EndLon)
+             ||
+            m_weather_routing_pi.InBoundary(configuration.StartLat, configuration.StartLon)) 
+        {
+            wxMessageDialog mdlg(this, _("Start or destination inside exclusion boundary"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+            mdlg.ShowModal();
+            return;
+        }
+    }
 
     if(fabs(configuration.StartLat) > configuration.MaxLatitude ||
        fabs(configuration.EndLat) > configuration.MaxLatitude) {
