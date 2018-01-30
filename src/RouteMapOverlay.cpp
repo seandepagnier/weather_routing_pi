@@ -379,7 +379,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 Unlock();
             }
 
-            unsigned char routecolors[][3] = {
+            static const unsigned char routecolors[][3] = {
                 {  0,   0, 128}, {  0, 192,   0}, {  0, 128, 192}, {  0, 255,   0},
                 {  0,   0, 255}, {  0, 128, 128}, {  0, 255,   0}, {  0, 192, 192},
                 {  0, 128, 255}, {  0, 255, 128}, {  0,   0, 255}, {  0, 192,   0},
