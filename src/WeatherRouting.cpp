@@ -1567,7 +1567,7 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
     }
 
     if(!routemapoverlay->Valid())
-        State = _("Invalid Start/End");
+        State = _("Invalid Start/End ") + routemapoverlay->GetError();
     else
     if(routemapoverlay->Running())
         State = _("Computing...");
@@ -1863,10 +1863,8 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
 
     RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
 
-    if(configuration.DeltaTime == 0) {
-        wxMessageDialog mdlg(this, _("Zero Time Step is invalid"),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
-        mdlg.ShowModal();
+    if(configuration.DeltaTime <= 0) {
+        routemapoverlay->SetError(_("Zero Time Step"));
         return;
     }
     if (configuration.DetectBoundary) {
@@ -1874,19 +1872,15 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
              ||
             m_weather_routing_pi.InBoundary(configuration.StartLat, configuration.StartLon)) 
         {
-            wxMessageDialog mdlg(this, _("Start or destination inside exclusion boundary"),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
-            mdlg.ShowModal();
+            routemapoverlay->SetError(_("inside exclusion boundary"));
             return;
         }
     }
 
     if(fabs(configuration.StartLat) > configuration.MaxLatitude ||
        fabs(configuration.EndLat) > configuration.MaxLatitude) {
-        wxMessageDialog mdlg(this, _("Start/End lies outside of Max Latitude constraint:\n\
-routing will fail"),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
-        mdlg.ShowModal();
+            routemapoverlay->SetError(_("lies outside of Max Latitude constraint"));
+            return;
     }
 
     /* initialize crossing land routine from main thread as it is

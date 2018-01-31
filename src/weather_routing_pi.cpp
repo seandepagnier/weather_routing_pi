@@ -354,8 +354,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             else if (root[wxS("Msg")].AsString() == wxS("FindPointInAnyBoundary") ) {
               if (root[wxS("MsgId")].AsString() == wxS("exist")) {
                  b_in_boundary_reply = root[wxS("Found")].AsBool() == true;
-                 if (b_in_boundary_reply)
-                    printf("collision with %s\n", (const char*)root[wxS("GUID")].AsString().mb_str());
+                 // if (b_in_boundary_reply) printf("collision with %s\n", (const char*)root[wxS("GUID")].AsString().mb_str());
               }
             }
         }
