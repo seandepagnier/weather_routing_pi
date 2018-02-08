@@ -182,7 +182,7 @@ struct RouteMapConfiguration {
     wxString Start, End;
     wxDateTime StartTime;
 
-    double dt; /* time in seconds between propagations */
+    double DeltaTime; /* time in seconds between propagations */
 
     Boat boat;
     wxString boatFileName;
@@ -219,6 +219,7 @@ struct RouteMapConfiguration {
     GribRecordSet *grib;
     wxDateTime time;
     bool grib_is_data_deficient, polar_failed, wind_data_failed;
+    bool land_crossing, boundary_crossing;
 };
 
 bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
@@ -240,6 +241,8 @@ public:
     LOCKING_ACCESSOR(GribFailed, m_bGribFailed)
     LOCKING_ACCESSOR(PolarFailed, m_bPolarFailed)
     LOCKING_ACCESSOR(NoData, m_bNoData)
+    LOCKING_ACCESSOR(LandCrossing, m_bLandCrossing)
+    LOCKING_ACCESSOR(BoundaryCrossing, m_bBoundaryCrossing)
 
     bool Empty() { Lock(); bool empty = origin.size() == 0; Unlock(); return empty; }
     bool NeedsGrib() { Lock(); bool needsgrib = m_bNeedsGrib; Unlock(); return needsgrib; }
@@ -292,6 +295,7 @@ private:
     RouteMapConfiguration m_Configuration;
     bool m_bFinished, m_bValid;
     bool m_bReachedDestination, m_bGribFailed, m_bPolarFailed, m_bNoData;
+    bool m_bLandCrossing, m_bBoundaryCrossing;
 
     wxDateTime m_NewTime;
 };

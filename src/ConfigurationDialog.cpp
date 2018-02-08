@@ -154,9 +154,9 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CONTROL_VALUE(wxString::Format(_T("%.2f"), (double)STARTTIME.GetMinute() + STARTTIME.GetSecond()/60.0),
                 m_tStartMinute, SetValue, wxString, _T(""));
 
-    SET_SPIN_VALUE(TimeStepHours, (int)((*it).dt / 3600));
-    SET_SPIN_VALUE(TimeStepMinutes, ((int)(*it).dt / 60) % 60);
-    SET_SPIN_VALUE(TimeStepSeconds, (int)(*it).dt%60);
+    SET_SPIN_VALUE(TimeStepHours, (int)((*it).DeltaTime / 3600));
+    SET_SPIN_VALUE(TimeStepMinutes, ((int)(*it).DeltaTime / 60) % 60);
+    SET_SPIN_VALUE(TimeStepSeconds, (int)(*it).DeltaTime%60);
 
     SET_CONTROL(boatFileName, m_tBoat, SetValue, wxString, _T(""));
     long l = m_tBoat->GetValue().Length();
@@ -330,7 +330,7 @@ void ConfigurationDialog::Update()
             configuration.boatFileName = m_tBoat->GetValue();
 
         if(m_sTimeStepHours->IsEnabled()) {
-            configuration.dt = 60*(60*m_sTimeStepHours->GetValue()
+            configuration.DeltaTime = 60*(60*m_sTimeStepHours->GetValue()
                                    + m_sTimeStepMinutes->GetValue())
                 + m_sTimeStepSeconds->GetValue();
         }

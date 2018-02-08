@@ -640,6 +640,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     Position *points = NULL;
     /* through all angles relative to wind */
     int count = 0;
+    bool boundary = false;
+    bool land = false;
 
     double S = Swell(configuration.grib, lat, lon);
     if(S > configuration.MaxSwellMeters)
@@ -669,7 +671,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             return false;
     }
 
-    double timeseconds = configuration.dt;
+    double timeseconds = configuration.DeltaTime;
     double dist;
 
     bool first_avoid = true;
@@ -794,14 +796,43 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
            Polar::VelocityApparentWind(VB, H, VW) > configuration.MaxApparentWindKnots)
             continue;
 
-        /* landfall test */
-        if(configuration.DetectLand && CrossesLand(dlat, nrdlon))
-            continue;
-        
-        /* Boundary test */
-        if(configuration.DetectBoundary && EntersBoundary(dlat, dlon))
-            continue;
+        if(configuration.DetectLand || configuration.DetectBoundary) {
+            double dlat1, dlon1; 
+            double bearing, dist2end;
+            double dist2test;
 
+            // it's not an error if there's boundaries after we reach destination
+            ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, &dist2end);
+            if (dist2end < dist) {
+                dist2test = dist2end;
+                ll_gc_ll(lat, lon, heading_resolve(BG), dist2test, &dlat1, &dlon1);
+            }
+            else {
+                dist2test = dist;
+                dlat1 = dlat;
+                dlon1 = dlon;
+            }
+ 
+            /* landfall test */
+            if(configuration.DetectLand) {
+                double ndlon1 = dlon1;
+                if (ndlon1 > 360) {
+                    ndlon1 -360;
+                }
+                if (CrossesLand(dlat1, ndlon1)) {
+                    configuration.land_crossing = true;
+                    continue;
+                }
+            }
+
+            /* Boundary test */
+            if(configuration.DetectBoundary) {
+                if (EntersBoundary(dlat1, dlon1)) {
+                    configuration.boundary_crossing = true;
+                    continue;
+                }
+            }
+        }
         /* crosses cyclone track(s)? */
         if(configuration.AvoidCycloneTracks &&
            RouteMap::ClimatologyCycloneTrackCrossings) {
@@ -868,6 +899,8 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
     double B, VB, BG = W, VBG;
     int iters = 0;
     H = 0;
+    bool old = configuration.OptimizeTacking;
+    configuration.OptimizeTacking = true;
     do {
         /* make our correction in range */
         while(bearing - BG > 180)
@@ -883,22 +916,25 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
         int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S, configuration.OptimizeTacking);
         if(newpolar == -1) {
             configuration.polar_failed = true;
+            configuration.OptimizeTacking = old;
             return NAN;
         }
         
         if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
-                             B, VB, BG, VBG, dummy_dist, newpolar))
+                             B, VB, BG, VBG, dummy_dist, newpolar)
+                || ++iters == 10 // give up
+          ) {
+            configuration.OptimizeTacking = old;
             return NAN;
-
-        if(++iters == 10) // give up
-            return NAN;
+        }
     } while((bearing - BG) > 1e-3);
+    configuration.OptimizeTacking = old;
 
     /* only allow if we fit in the isochron time.  We could optimize this by finding
        the maximum boat speed once, and using that before computing boat speed for
        this angle, but for now, we don't worry because propagating to the end is a
        small amount of total computation */
-    if(dist / VBG > configuration.dt / 3600.0)
+    if(dist / VBG > configuration.DeltaTime / 3600.0)
         return NAN;
     
     /* quick test first to avoid slower calculation */
@@ -1258,7 +1294,7 @@ bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfi
 
     bool ret = false;
     Position *p = skippoints->point;
-    double timeseconds = configuration.dt;
+    double timeseconds = configuration.DeltaTime;
     do {
         double C, VC;
         if(configuration.Currents && Current(grib, configuration.ClimatologyType,
@@ -2419,6 +2455,8 @@ bool RouteMap::Propagate()
     RouteMapConfiguration configuration = m_Configuration;
     configuration.polar_failed = false;
     configuration.wind_data_failed = false;
+    configuration.boundary_crossing = false;
+    configuration.land_crossing = false;
 
     // reset grib data deficient flag
     bool grib_is_data_deficient = false;
@@ -2440,7 +2478,7 @@ bool RouteMap::Propagate()
     // request the next grib
     // in a different thread (grib record averaging going in parallel)
     m_NewGrib = NULL;
-    m_NewTime += wxTimeSpan(0, 0, configuration.dt);
+    m_NewTime += wxTimeSpan(0, 0, configuration.DeltaTime);
     m_bNeedsGrib = configuration.UseGrib;
 
     Unlock();
@@ -2508,6 +2546,12 @@ bool RouteMap::Propagate()
     if(configuration.wind_data_failed)
         m_bNoData = true;
 
+    if(configuration.boundary_crossing)
+        m_bBoundaryCrossing = true;
+
+    if(configuration.land_crossing)
+        m_bLandCrossing = true;
+
     Unlock();
 
     return true;
@@ -2563,6 +2607,8 @@ void RouteMap::Reset()
     m_bPolarFailed = false;
     m_bNoData = false;
     m_bFinished = false;
+    m_bLandCrossing = false;
+    m_bBoundaryCrossing = false;
 
     Unlock();
 }
