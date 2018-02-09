@@ -276,6 +276,17 @@ public:
     void ResetFinished() { Lock(); m_bFinished = false; Unlock(); }
     wxString LoadBoat() { return m_Configuration.boat.OpenXML(m_Configuration.boatFileName); }
 
+    // XXX Isn't wxString refcounting thread safe?
+    wxString GetError() { Lock(); wxString ret = m_ErrorMsg; Unlock(); return ret; }
+
+    void SetError(wxString msg) {
+       Lock();
+       m_ErrorMsg = msg;
+       m_bValid = false;
+       m_bFinished = false;
+       Unlock();
+    }
+
 protected:
     virtual void Clear();
     bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration);
@@ -291,11 +302,13 @@ protected:
     GribRecordSet *m_NewGrib;
 
 private:
-
+ 
     RouteMapConfiguration m_Configuration;
     bool m_bFinished, m_bValid;
     bool m_bReachedDestination, m_bGribFailed, m_bPolarFailed, m_bNoData;
     bool m_bLandCrossing, m_bBoundaryCrossing;
+
+    wxString m_ErrorMsg;
 
     wxDateTime m_NewTime;
 };
