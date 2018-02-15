@@ -99,6 +99,7 @@ public:
       wxString GetCommonName();
       wxString GetShortDescription();
       wxString GetLongDescription();
+      bool InBoundary(double lat, double lon);
 
       bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
       bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
@@ -128,6 +129,8 @@ private:
 
       bool LoadConfig(void);
       bool SaveConfig(void);
+
+      bool	       b_in_boundary_reply;
 
       wxFileConfig     *m_pconfig;
       wxWindow         *m_parent_window;

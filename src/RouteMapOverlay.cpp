@@ -985,7 +985,7 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 
             PlotData data;
 
-            double dt = configuration.dt;
+            double dt = configuration.DeltaTime;
             data.time = (*it)->time;
 
             data.lat = pos->lat, data.lon = pos->lon;

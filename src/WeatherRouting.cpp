@@ -1233,7 +1233,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                         configuration.StartTime = wxDateTime::Now();
             
                     configuration.End = wxString::FromUTF8(e->Attribute("End"));
-                    configuration.dt = AttributeDouble(e, "dt", 0);
+                    configuration.DeltaTime = AttributeDouble(e, "dt", 0);
             
                     configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
                     if(!wxFileName::FileExists(configuration.boatFileName)) {
@@ -1347,7 +1347,7 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("StartDate", configuration.StartTime.FormatISODate().mb_str());
         c->SetAttribute("StartTime", configuration.StartTime.FormatISOTime().mb_str());
         c->SetAttribute("End", configuration.End.mb_str());
-        c->SetAttribute("dt", configuration.dt);
+        c->SetAttribute("dt", configuration.DeltaTime);
 
         c->SetAttribute("Boat", configuration.boatFileName.ToUTF8());
 
@@ -1567,7 +1567,7 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
     }
 
     if(!routemapoverlay->Valid())
-        State = _("Invalid Start/End");
+        State = _("Invalid Start/End ") + routemapoverlay->GetError();
     else
     if(routemapoverlay->Running())
         State = _("Computing...");
@@ -1589,6 +1589,15 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
                     State += _("No Data");
                     State += _T(": ");
                 }
+                if(routemapoverlay->LandCrossing()) {
+                    State += _("Land");
+                    State += _T(": ");
+                }
+                if(routemapoverlay->BoundaryCrossing()) {
+                    State += _("Boundary");
+                    State += _T(": ");
+                }
+
                 State += _("Failed");
             }
         } else {
@@ -1882,19 +1891,24 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
 
     RouteMapConfiguration configuration = routemapoverlay->GetConfiguration();
 
-    if(configuration.dt == 0) {
-        wxMessageDialog mdlg(this, _("Zero Time Step is invalid"),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
-        mdlg.ShowModal();
+    if(configuration.DeltaTime <= 0) {
+        routemapoverlay->SetError(_("Zero Time Step"));
         return;
+    }
+    if (configuration.DetectBoundary) {
+        if (m_weather_routing_pi.InBoundary(configuration.EndLat, configuration.EndLon)
+             ||
+            m_weather_routing_pi.InBoundary(configuration.StartLat, configuration.StartLon)) 
+        {
+            routemapoverlay->SetError(_("inside exclusion boundary"));
+            return;
+        }
     }
 
     if(fabs(configuration.StartLat) > configuration.MaxLatitude ||
        fabs(configuration.EndLat) > configuration.MaxLatitude) {
-        wxMessageDialog mdlg(this, _("Start/End lies outside of Max Latitude constraint:\n\
-routing will fail"),
-                             _("Weather Routing"), wxOK | wxICON_WARNING);
-        mdlg.ShowModal();
+            routemapoverlay->SetError(_("lies outside of Max Latitude constraint"));
+            return;
     }
 
     /* initialize crossing land routine from main thread as it is
@@ -2059,7 +2073,7 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
         configuration.StartLat = 0, configuration.StartLon = 0;
 
     configuration.StartTime = wxDateTime::Now();
-    configuration.dt = 3600;
+    configuration.DeltaTime = 3600;
 
     if(RouteMap::Positions.size() >= 2) {
         RouteMapPosition &p = *(++RouteMap::Positions.begin());

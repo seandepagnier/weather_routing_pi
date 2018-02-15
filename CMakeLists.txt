@@ -60,12 +60,12 @@ SET(SRC_WEATHER_ROUTING
             src/GribRecord.cpp
 )
 
-IF(WIN32)
+#IF(WIN32)
 SET(SRC_JSON
             src/wxJSON/jsonval.cpp
             src/wxJSON/jsonreader.cpp
             src/wxJSON/jsonwriter.cpp)
-ENDIF(WIN32)
+#ENDIF(WIN32)
 
 SET(SRC_LIBTESS2
   src/libtess2/bucketalloc.c
