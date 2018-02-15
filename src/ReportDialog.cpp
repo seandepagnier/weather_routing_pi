@@ -167,9 +167,14 @@ void ReportDialog::GenerateRoutesReport()
         assert(overlays.begin() != overlays.end());
         RouteMapOverlay *first = *overlays.begin();
 
+        RouteMapConfiguration c = first->GetConfiguration();
+        page += _T("<p>");
+        page += c.Start + _T(" ") + _("to") + _T(" ") + c.End + _T(" ") + wxString::Format
+            (_T("(%ld ") + wxString(_("configurations")) + _T(")\n"), overlays.size());
+
         /* determine fastest time */
         wxTimeSpan fastest_time;
-        RouteMapOverlay *fastest;
+        RouteMapOverlay *fastest = NULL;
         for(std::list<RouteMapOverlay *>::iterator it2 = overlays.begin(); it2 != overlays.end(); it2++) {
             wxTimeSpan current_time = ((*it2)->EndTime() - (*it2)->StartTime());
             if(*it2 == first || current_time < fastest_time) {
@@ -177,14 +182,12 @@ void ReportDialog::GenerateRoutesReport()
                 fastest = *it2;
             }
         }
-        RouteMapConfiguration c = first->GetConfiguration();
-        page += _T("<p>");
-        page += c.Start + _T(" ") + _("to") + _T(" ") + c.End + _T(" ") + wxString::Format
-            (_T("(%ld ") + wxString(_("configurations")) + _T(")\n"), overlays.size());
-        page += _("<dt>Fastest configuration ") + fastest->StartTime().Format(_T("%x %X"));
-        page += wxString(_T(" ")) + _("avg speed") + wxString::Format
-            (_T(": %.2f "), fastest->RouteInfo(RouteMapOverlay::AVGSPEED))
-	    + _("knots");
+        if(fastest) {
+            page += _("<dt>Fastest configuration ") + fastest->StartTime().Format(_T("%x %X"));
+            page += wxString(_T(" ")) + _("avg speed") + wxString::Format
+                (_T(": %.2f "), fastest->RouteInfo(RouteMapOverlay::AVGSPEED))
+                + _("knots");
+        }
 
         /* determine best times if upwind percentage is below 50 */
         page += _T("<dt>");
