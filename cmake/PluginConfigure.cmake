@@ -20,7 +20,7 @@ configure_file(cmake/wxWTranslateCatalog.h.in ${PROJECT_SOURCE_DIR}/src/wxWTrans
 SET(PACKAGE_VERSION "${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}" )
 
 SET(CMAKE_BUILD_TYPE Debug)
-#SET(CMAKE_VERBOSE_MAKEFILE ON)
+SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
@@ -39,7 +39,7 @@ IF(NOT MSVC)
     ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -fexceptions" )
   ELSE()
 #  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
-    ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -O2 -fexceptions -fPIC" )
+    ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -O0 -fexceptions -fPIC" )
   ENDIF(DEBUG)
  ENDIF(PROFILING)
 
@@ -60,6 +60,10 @@ ENDIF(MSVC)
 SET(wxWidgets_USE_LIBS base core net xml html adv)
 SET(BUILD_SHARED_LIBS TRUE)
 
+set (WXWIDGETS_FORCE_VERSION CACHE VERSION "Force usage of a specific wxWidgets version.")
+if(WXWIDGETS_FORCE_VERSION)
+  set (wxWidgets_CONFIG_OPTIONS --version=${WXWIDGETS_FORCE_VERSION})
+endif()
 FIND_PACKAGE(wxWidgets REQUIRED)
 
 IF(MSYS)
