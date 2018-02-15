@@ -37,6 +37,9 @@ install:
 
 before_build:
   - cd c:\project\weather_routing_pi
+  - cd buildwin
+  - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/PVW32Con.exe
+  - cd ..
   - mkdir build
   - cd build
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.2-vc120_xp/opencpn.lib
