@@ -1,0 +1,47 @@
+language: cpp
+install:
+    - sudo apt-get -qq update
+    - sudo apt-get install libwxgtk3.0-dev libwxgtk3.0-0 libgps-dev libglu1-mesa-dev libgtk2.0-dev libbz2-dev libtinyxml-dev 
+    - sudo apt-get install libportaudio2 portaudio19-dev libcurl4-openssl-dev libexpat1-dev libcairo2-dev librtlsdr-dev
+    - sudo apt-get install rpm
+script:
+  - if [[ "${COVERITY_SCAN_BRANCH}" == 1 ]];
+    then
+      echo "Don't build on coverty_scan branch.";
+      exit 0;
+    fi
+  - mkdir build && cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release ../
+  - make -j2 package
+
+notifications:
+    email: false
+    
+git:
+    depth: 10
+
+before_install:
+      - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-6
+      - g++-6
+
+# Set encrypted variable 'GitHub_auth_token' in Travis repo settings to deploy packages
+# for tagged commits to GitHub Releases.
+deploy:
+- provider: releases
+  api_key: $GitHub_auth_token
+  file_glob: true
+  file: $TRAVIS_BUILD_DIR/build/*.{deb,rpm,dmg,txz,pkg.tar.xz}
+  skip_cleanup: true
+  on: # Set deploy conditions
+      # Deploy only when tag is specified
+      tags: true
+      # or his branch
+      branch: dev
+      # and only when API token is set
+      condition: "${#GitHub_auth_token} != 0" 
