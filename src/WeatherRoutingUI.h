@@ -89,6 +89,7 @@ class WeatherRoutingBase : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
+		virtual void OnEditPositionClick( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPositionKeyDown( wxListEvent& event ) { event.Skip(); }
 		virtual void OnEditConfigurationClick( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }

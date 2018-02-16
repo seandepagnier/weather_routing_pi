@@ -80,7 +80,7 @@ static const char *eye[]={
 WeatherRoute::WeatherRoute() : routemapoverlay(new RouteMapOverlay) {}
 WeatherRoute::~WeatherRoute() { delete routemapoverlay; }
 
-const wxString WeatherRouting::column_names[NUM_COLS] = {"", "Boat", "Start", "Start Time",
+const wxString WeatherRouting::column_names[NUM_COLS] = {"Visible", "Boat", "Start", "Start Time",
                                                          "End", "End Time", "Time", "Distance",
                                                          "Avg Speed", "Max Speed",
                                                          "Avg Speed Ground", "Max Speed Ground",
