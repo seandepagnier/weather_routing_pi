@@ -42,7 +42,7 @@ before_build:
   - cd ..
   - mkdir build
   - cd build
-  - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.2-vc120_xp/opencpn.lib
+  - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.8.2-vc120_xp/opencpn.lib
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/OpenCPN_buildwin.7z
   - cmd: 7z x -y OpenCPN_buildwin.7z -oc:\project\weather_routing_pi
   - cmake -T v120_xp ..
