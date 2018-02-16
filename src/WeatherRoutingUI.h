@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec 20 2017)
+// C++ code generated with wxFormBuilder (version Feb  6 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -37,6 +37,7 @@
 #include <wx/combobox.h>
 #include <wx/datectrl.h>
 #include <wx/dateevt.h>
+#include <wx/timectrl.h>
 #include <wx/textctrl.h>
 #include <wx/choice.h>
 #include <wx/valtext.h>
@@ -193,9 +194,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText28;
 		wxButton* m_bGribTime;
 		wxStaticText* m_staticText30;
-		wxSpinCtrl* m_sStartHour;
-		wxStaticText* m_staticText134;
-		wxTextCtrl* m_tStartMinute;
+		wxTimePickerCtrl* m_tpTime;
 		wxButton* m_bCurrentTime;
 		wxTextCtrl* m_tBoat;
 		wxButton* m_bBoatFilename;
@@ -261,11 +260,12 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnUpdate( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateDate( wxDateEvent& event ) { event.Skip(); }
 		virtual void OnGribTime( wxCommandEvent& event ) { event.Skip(); }
-		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
+		virtual void OnUpdateTime( wxDateEvent& event ) { event.Skip(); }
 		virtual void OnCurrentTime( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnBoatFilename( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
+		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetAdvanced( wxCommandEvent& event ) { event.Skip(); }

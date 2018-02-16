@@ -56,6 +56,7 @@ protected:
     void OnUpdate( wxCommandEvent& event ) { Update(); }
     void OnResetAdvanced( wxCommandEvent& event );
     void OnUpdateDate( wxDateEvent& event ) { Update(); }
+    void OnUpdateTime( wxDateEvent& event ) { Update(); }
     void OnGribTime( wxCommandEvent& event );
     void OnCurrentTime( wxCommandEvent& event );
     void OnUpdateSpin( wxSpinEvent& event ) { Update(); }
