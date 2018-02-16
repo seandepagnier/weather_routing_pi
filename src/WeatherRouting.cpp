@@ -1616,6 +1616,8 @@ void WeatherRouting::UpdateItem(long index, bool stateonly)
 {
     WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
         (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+    if( !weatherroute )
+        return;
 
     if(!stateonly) {
         if(columns[VISIBLE] >= 0) {
@@ -1830,6 +1832,7 @@ void WeatherRouting::RebuildList()
         it != m_WeatherRoutes.end(); it++) {
         if(!(*it)->Filtered) {
             wxListItem item;
+            item.SetId(m_lWeatherRoutes->GetItemCount());
             item.SetData(*it);
             UpdateItem(m_lWeatherRoutes->InsertItem(item));
         }
