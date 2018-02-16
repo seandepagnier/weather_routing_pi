@@ -225,6 +225,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
+	m_lPositions->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditPositionClick ), NULL, this );
 	m_lPositions->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnPositionKeyDown ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditConfigurationClick ), NULL, this );
 	m_lWeatherRoutes->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
@@ -268,6 +269,7 @@ WeatherRoutingBase::~WeatherRoutingBase()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
+	m_lPositions->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditPositionClick ), NULL, this );
 	m_lPositions->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnPositionKeyDown ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditConfigurationClick ), NULL, this );
 	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
@@ -699,7 +701,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText110->Wrap( -1 );
 	fgSizer921->Add( m_staticText110, 0, wxALL, 5 );
 	
-	m_sTimeStepMinutes = new wxSpinCtrl( sbSizer251->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 60, 0 );
+	m_sTimeStepMinutes = new wxSpinCtrl( sbSizer251->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 60, 1 );
 	fgSizer921->Add( m_sTimeStepMinutes, 0, wxALL, 5 );
 	
 	m_staticText111 = new wxStaticText( sbSizer251->GetStaticBox(), wxID_ANY, _("m"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1080,6 +1082,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	this->Centre( wxBOTH );
 	
 	// Connect Events
+	m_cStart->Connect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cStart->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_dpStartDate->Connect( wxEVT_DATE_CHANGED, wxDateEventHandler( ConfigurationDialogBase::OnUpdateDate ), NULL, this );
 	m_bGribTime->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnGribTime ), NULL, this );
@@ -1120,6 +1123,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sMaxSwellMeters->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSwellMeters->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSwellMeters->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_cEnd->Connect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cEnd->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sTimeStepHours->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepHours->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
@@ -1199,6 +1203,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 ConfigurationDialogBase::~ConfigurationDialogBase()
 {
 	// Disconnect Events
+	m_cStart->Disconnect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cStart->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_dpStartDate->Disconnect( wxEVT_DATE_CHANGED, wxDateEventHandler( ConfigurationDialogBase::OnUpdateDate ), NULL, this );
 	m_bGribTime->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnGribTime ), NULL, this );
@@ -1239,6 +1244,7 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sMaxSwellMeters->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSwellMeters->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sMaxSwellMeters->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_cEnd->Disconnect( wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_cEnd->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_sTimeStepHours->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTimeStepHours->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
