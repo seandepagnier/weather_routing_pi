@@ -180,14 +180,14 @@ void ReportDialog::GenerateRoutesReport()
         wxTimeSpan fastest_time;
         RouteMapOverlay *fastest;
 
-        std::multimap< wxTimeSpan, RouteMapOverlay * > sort_by_duration;
+        std::multimap< wxDateTime, RouteMapOverlay * > sort_by_start;
         bool any_bad = false;
         bool any_good = false;
 
         for(std::list<RouteMapOverlay *>::iterator it2 = overlays.begin(); it2 != overlays.end(); it2++) {
             RouteMapOverlay *r = *it2;
             wxTimeSpan current_time = r->EndTime() - r->StartTime();
-            sort_by_duration.insert(std::pair<wxTimeSpan, RouteMapOverlay * >(current_time , r));
+            sort_by_start.insert(std::pair< wxDateTime, RouteMapOverlay * >(r->StartTime() , r));
             if(r == first || current_time < fastest_time) {
                 fastest_time = current_time;
                 fastest = r;
@@ -217,20 +217,39 @@ void ReportDialog::GenerateRoutesReport()
         }
         else {
             bool first_print = true;
-
-            std::multimap< wxTimeSpan, RouteMapOverlay * >::iterator it2;
-            for(it2 = sort_by_duration.begin(); it2 != sort_by_duration.end(); it2++) {
-                RouteMapOverlay *r = it2->second;
-                if(r->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND) <= 50) {
-                    if(first_print)
-                        first_print = false;
-                    else
-                        page += _(" and ");
-                    page += r->StartTime().Format(_T("%d %B ")) + _("to") + r->EndTime().Format(_T(" %d %B"));
+            std::multimap< wxDateTime, RouteMapOverlay * > reduce_by_start;
+            // merge downwind routes in bigger interval
+            // assume most routes with same start time are of same kind (downwind or upwind)
+            std::multimap< wxDateTime, RouteMapOverlay * >::iterator it = sort_by_start.begin();
+            while (it != sort_by_start.end() ) {
+                // remove first upwind routes, from any_good test there's at least one downwind route
+                for(; it != sort_by_start.end(); it++) {
+                    RouteMapOverlay *r = it->second;
+                    if (r->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND) <= 50) {
+                        break;
+                     }
                 }
+                if (it == sort_by_start.end()) 
+                    break;
+
+                RouteMapOverlay *r = it->second;
+                wxDateTime s = r->StartTime();
+                wxDateTime e = r->EndTime();
+                // merge downwind
+                for(; it != sort_by_start.end(); it++) {
+                    RouteMapOverlay *r = it->second;
+                    if (r->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND) > 50) {
+                        break;
+                    }
+                    e = r->EndTime();
+                }
+                if(first_print)
+                    first_print = false;
+                else
+                    page += _(" and ");
+                page += s.Format(_T("%d %B ")) + _("to") + e.Format(_T(" %d %B"));
             }
         }
-
 
         page += _T("<dt>");
         page += _("Cyclones") + wxString(_T(": "));
