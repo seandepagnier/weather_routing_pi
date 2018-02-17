@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb  6 2018)
+// C++ code generated with wxFormBuilder (version Feb 17 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO *NOT* EDIT THIS FILE!
+// PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #include "WeatherRoutingUI.h"
@@ -2574,6 +2574,14 @@ CursorPositionDialog::CursorPositionDialog( wxWindow* parent, wxWindowID id, con
 	fgSizer91->AddGrowableCol( 1 );
 	fgSizer91->SetFlexibleDirection( wxBOTH );
 	fgSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText134 = new wxStaticText( this, wxID_ANY, _("Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText134->Wrap( -1 );
+	fgSizer91->Add( m_staticText134, 0, wxALL, 5 );
+	
+	m_stTime = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stTime->Wrap( -1 );
+	fgSizer91->Add( m_stTime, 0, wxALL|wxEXPAND, 5 );
 	
 	m_staticText128 = new wxStaticText( this, wxID_ANY, _("Position"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText128->Wrap( -1 );

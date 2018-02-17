@@ -1140,7 +1140,7 @@ void RouteMapOverlay::Clear()
 void RouteMapOverlay::UpdateCursorPosition()
 {
     Position *last_last_cursor_position = last_cursor_position;
-    last_cursor_position = ClosestPosition(last_cursor_lat, last_cursor_lon);
+    last_cursor_position = ClosestPosition(last_cursor_lat, last_cursor_lon, &m_cursor_time);
     if(last_last_cursor_position != last_cursor_position)
         last_cursor_plotdata.clear();
 }

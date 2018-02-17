@@ -86,7 +86,8 @@ public:
     void DeleteThread(); // like Stop(), but waits until the thread is deleted
 
     Position *GetLastCursorPosition() { return last_cursor_position; }
-    
+    wxDateTime GetLastCursorTime() { return m_cursor_time; }
+
     bool m_UpdateOverlay;
     bool m_bEndRouteVisible;
 
@@ -105,6 +106,7 @@ private:
 
     double last_cursor_lat, last_cursor_lon;
     Position *last_cursor_position, *destination_position, *last_destination_position;
+    wxDateTime m_cursor_time;
     wxDateTime m_EndTime;
     bool m_bUpdated;
 

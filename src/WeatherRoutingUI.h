@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb  6 2018)
+// C++ code generated with wxFormBuilder (version Feb 17 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO *NOT* EDIT THIS FILE!
+// PLEASE DO "NOT" EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __WEATHERROUTINGUI_H__
@@ -609,6 +609,7 @@ class CursorPositionDialog : public wxDialog
 	private:
 	
 	protected:
+		wxStaticText* m_staticText134;
 		wxStaticText* m_staticText128;
 		wxStaticText* m_staticText124;
 		wxStaticText* m_staticText130;
@@ -618,6 +619,7 @@ class CursorPositionDialog : public wxDialog
 		wxButton* m_sdbSizer5OK;
 	
 	public:
+		wxStaticText* m_stTime;
 		wxStaticText* m_stPosition;
 		wxStaticText* m_stPolar;
 		wxStaticText* m_stSailChanges;
