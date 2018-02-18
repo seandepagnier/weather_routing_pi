@@ -2572,6 +2572,8 @@ Position *RouteMap::ClosestPosition(double lat, double lon, wxDateTime *t, doubl
 
     Position *minpos = NULL;
     double mindist = INFINITY;
+    bool inside;
+    bool first = (t !=0);
     wxDateTime min_t;
     Lock();
 
@@ -2584,17 +2586,23 @@ Position *RouteMap::ClosestPosition(double lat, double lon, wxDateTime *t, doubl
         wxDateTime cur_t;
         Position *pos = (*it)->ClosestPosition(p.lat, p.lon, &cur_t, &dist);
         
-        if(pos && dist < mindist) {
+        if(dist > mindist)
+            break;
+
+        if(pos && dist <= mindist) {
             minpos = pos;
             mindist = dist;
-            min_t = cur_t;
-        } else if(dist > mindist)
-            break;
+            if (!min_t.IsValid() || (cur_t.IsValid() && cur_t < min_t))
+                min_t = cur_t;
+        }
+        /* bail if we don't contain because obviously we aren't getting any closer
+        */
 
-        /* bail if we don't contain because obviously we aren't getting any closer */
-        if(!(*it)->Contains(p))
+        inside = (*it)->Contains(p);
+        if(!inside && !first) 
             break;
-
+        if(inside)
+            first = false;
     } while(it != origin.begin());
 
     Unlock();
