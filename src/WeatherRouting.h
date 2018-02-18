@@ -29,6 +29,7 @@
 
 #include <wx/treectrl.h>
 #include <wx/fileconf.h>
+#include <wx/collpane.h>
 
 #include "WeatherRoutingUI.h"
 #include "ConfigurationDialog.h"
@@ -61,6 +62,11 @@ public:
 
 class WeatherRouting : public WeatherRoutingBase
 {
+private:
+    wxCollapsiblePane *m_colpane;
+    wxWindow *m_colpaneWindow;
+    WeatherRoutingPanel *m_panel;
+    
 public:
     enum {POSITION_NAME=0, POSITION_LAT, POSITION_LON};
 
@@ -112,7 +118,7 @@ public:
     SettingsDialog m_SettingsDialog;
 
 private:
-
+    void OnCollPaneChanged( wxCollapsiblePaneEvent& event );
     void OnNewPosition( wxCommandEvent& event );
     void OnUpdateBoat( wxCommandEvent& event );
     void OnDeletePosition( wxCommandEvent& event );
@@ -123,6 +129,7 @@ private:
     void OnOpen( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
+    void OnSize( wxSizeEvent& event );
     void OnNew( wxCommandEvent& event );
     void OnEditConfigurationClick( wxMouseEvent& event ) { OnEditConfiguration(); }
     void OnWeatherRouteSort( wxListEvent& event );
@@ -201,6 +208,8 @@ private:
     weather_routing_pi &m_weather_routing_pi;
 
     wxFileName m_FileName;
+    
+    wxSize m_size;
 };
 
 #endif

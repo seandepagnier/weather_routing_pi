@@ -115,7 +115,7 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 }
 
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
-    : WeatherRoutingBase(parent), m_ConfigurationDialog(*this),
+    : WeatherRoutingBase(parent), m_panel(NULL), m_ConfigurationDialog(*this),
       m_ConfigurationBatchDialog(this), m_CursorPositionDialog(this),
       m_BoatDialog(*this),
       m_SettingsDialog(this), m_StatisticsDialog(this), m_ReportDialog(*this),
@@ -138,17 +138,32 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     m_FilterRoutesDialog.SetIcon(icon);
 
     m_SettingsDialog.LoadSettings();
+    
+    wxBoxSizer* bSizer;
+    bSizer = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(bSizer);
+    m_colpane = new wxCollapsiblePane(this, wxID_ANY, _("Weather Routing"), wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
+    bSizer->Add(m_colpane, 1, wxEXPAND|wxALL, 5);
+    m_colpaneWindow = m_colpane->GetPane();
+    wxSizer *paneSz = new wxBoxSizer(wxVERTICAL);
+    m_colpaneWindow->SetSizer(paneSz);
+    m_panel = new WeatherRoutingPanel(m_colpaneWindow);
+    paneSz->Add(m_panel, 1, wxEXPAND, 0);
+    bSizer->SetSizeHints(this);
+    paneSz->SetSizeHints(m_colpaneWindow);
 
-    m_lPositions->InsertColumn(POSITION_NAME, _("Name"));
-    m_lPositions->InsertColumn(POSITION_LAT, _("Lat"));
-    m_lPositions->InsertColumn(POSITION_LON, _("Lon"));
+    m_panel->m_lPositions->InsertColumn(POSITION_NAME, _("Name"));
+    m_panel->m_lPositions->InsertColumn(POSITION_LAT, _("Lat"));
+    m_panel->m_lPositions->InsertColumn(POSITION_LON, _("Lon"));
 
     wxImageList *imglist = new wxImageList(20, 20, true, 1);
     imglist->Add(wxBitmap(eye));
-    m_lWeatherRoutes->AssignImageList(imglist, wxIMAGE_LIST_SMALL);
+    m_panel->m_lWeatherRoutes->AssignImageList(imglist, wxIMAGE_LIST_SMALL);
 
     UpdateColumns();
 
+    m_colpane->Expand();
+    
     m_default_configuration_path = weather_routing_pi::StandardPath()
         + _T("WeatherRoutingConfiguration.xml");
 
@@ -191,10 +206,10 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     pConf->Read ( _T ( "DialogY" ), &p.y, p.y);
     SetPosition(p);
 
-    wxSize s = GetSize();
-    pConf->Read ( _T ( "DialogWidth" ), &s.x, s.x);
-    pConf->Read ( _T ( "DialogHeight" ), &s.y, s.y);
-    SetSize(s);
+    m_size = GetSize();
+    pConf->Read ( _T ( "DialogWidth" ), &m_size.x, wxMax(m_size.x, 100));
+    pConf->Read ( _T ( "DialogHeight" ), &m_size.y, wxMax(m_size.y, 100));
+    SetSize(m_size);
     pConf->Read ( _T ( "DialogSplit" ), &sashpos, 0);
 
     /* periodically check for updates from computation thread */
@@ -208,10 +223,36 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
                        ( WeatherRouting::OnRenderedTimer ), NULL, this);
 
     SetEnableConfigurationMenu();
+    
+    // Connect Events
+    m_colpane->Connect( wxEVT_COLLAPSIBLEPANE_CHANGED, wxCollapsiblePaneEventHandler( WeatherRouting::OnCollPaneChanged ), NULL, this );
+    //m_panel->m_lPositions->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditPositionClick ), NULL, this );
+    m_panel->m_lPositions->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnPositionKeyDown ), NULL, this );
+    m_panel->m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditConfigurationClick ), NULL, this );
+    m_panel->m_lWeatherRoutes->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRouting::OnWeatherRoutesListLeftDown ), NULL, this );
+    m_panel->m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRouting::OnWeatherRouteSort ), NULL, this );
+    m_panel->m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRouting::OnWeatherRouteSelected ), NULL, this );
+    m_panel->m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRouting::OnWeatherRouteSelected ), NULL, this );
+    m_panel->m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnWeatherRouteKeyDown ), NULL, this );
+    m_panel->m_bCompute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnCompute ), NULL, this );
+    m_panel->m_bExport->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExport ), NULL, this );
 }
 
 WeatherRouting::~WeatherRouting( )
 {
+    // Disconnect Events
+    m_colpane->Disconnect( wxEVT_COLLAPSIBLEPANE_CHANGED, wxCollapsiblePaneEventHandler( WeatherRouting::OnCollPaneChanged ), NULL, this );
+    //m_panel->m_lPositions->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditPositionClick ), NULL, this );
+    m_panel->m_lPositions->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnPositionKeyDown ), NULL, this );
+    m_panel->m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditConfigurationClick ), NULL, this );
+    m_panel->m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRouting::OnWeatherRoutesListLeftDown ), NULL, this );
+    m_panel->m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRouting::OnWeatherRouteSort ), NULL, this );
+    m_panel->m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRouting::OnWeatherRouteSelected ), NULL, this );
+    m_panel->m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRouting::OnWeatherRouteSelected ), NULL, this );
+    m_panel->m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnWeatherRouteKeyDown ), NULL, this );
+    m_panel->m_bCompute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnCompute ), NULL, this );
+    m_panel->m_bExport->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExport ), NULL, this );
+    
     Stop();
 
     m_SettingsDialog.SaveSettings();
@@ -223,16 +264,17 @@ WeatherRouting::~WeatherRouting( )
     pConf->Write ( _T ( "DialogX" ), p.x);
     pConf->Write ( _T ( "DialogY" ), p.y);
 
-    wxSize s = GetSize();
-    pConf->Write ( _T ( "DialogWidth" ), s.x);
-    pConf->Write ( _T ( "DialogHeight" ), s.y);
-    pConf->Write ( _T ( "DialogSplit" ), m_splitter1->GetSashPosition());
+    pConf->Write ( _T ( "DialogWidth" ), m_size.x);
+    pConf->Write ( _T ( "DialogHeight" ), m_size.y);
+    pConf->Write ( _T ( "DialogSplit" ), m_panel->m_splitter1->GetSashPosition());
 
     SaveXML(m_FileName.GetFullPath());
 
     for(std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
         it != m_WeatherRoutes.end(); it++)
         delete *it;
+    delete m_panel;
+    delete m_colpane;
 }
 
 void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
@@ -252,9 +294,9 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
     if(!time.IsValid())
         time = wxDateTime::UNow();
 
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         if(weatherroute->routemapoverlay->m_bEndRouteVisible)
             weatherroute->routemapoverlay->Render(time, m_SettingsDialog, dc, vp, true);
     }
@@ -280,9 +322,9 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
 
 void WeatherRouting::UpdateDisplaySettings()
 {
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         weatherroute->routemapoverlay->m_UpdateOverlay = true;
     }
 
@@ -304,13 +346,13 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
             wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),
                                  _("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
             if(mdlg.ShowModal() == wxID_YES) {
-                long index = m_lPositions->FindItem(0, name);
+                long index = m_panel->m_lPositions->FindItem(0, name);
                 (*it).lat = lat;
                 (*it).lon = lon;
-                m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
-                m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
-                m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
-                m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
+                m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+                m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
+                m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+                m_panel->m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
             }
 
             UpdateConfigurations();
@@ -322,14 +364,14 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
     UpdateConfigurations();
 
     wxListItem item;
-    long index = m_lPositions->InsertItem(m_lPositions->GetItemCount(), item);
-    m_lPositions->SetItem(index, POSITION_NAME, name);
-    m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
+    long index = m_panel->m_lPositions->InsertItem(m_panel->m_lPositions->GetItemCount(), item);
+    m_panel->m_lPositions->SetItem(index, POSITION_NAME, name);
+    m_panel->m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
     
-    m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
-    m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
-    m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
-    m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
+    m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+    m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
+    m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+    m_panel->m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
     
 
     m_ConfigurationDialog.AddSource(name);
@@ -344,11 +386,11 @@ void WeatherRouting::CursorRouteChanged()
 
 void WeatherRouting::UpdateColumns()
 {
-    m_lWeatherRoutes->DeleteAllColumns();
+    m_panel->m_lWeatherRoutes->DeleteAllColumns();
 
     for(int i=0; i<NUM_COLS; i++) {
         if(m_SettingsDialog.m_cblFields->IsChecked(i)) {
-            columns[i] = m_lWeatherRoutes->GetColumnCount();
+            columns[i] = m_panel->m_lWeatherRoutes->GetColumnCount();
             wxString name = _(column_names[i]);
 
             if(i == STARTTIME || i == ENDTIME) {
@@ -360,15 +402,15 @@ void WeatherRouting::UpdateColumns()
                 name += _T(")");
             }
 
-            m_lWeatherRoutes->InsertColumn(columns[i], name);
-            m_lWeatherRoutes->SetColumnWidth(columns[i], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->InsertColumn(columns[i], name);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[i], wxLIST_AUTOSIZE);
         } else
             columns[i] = -1;
     }
 
     std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++, it++) {
-        m_lWeatherRoutes->SetItemPtrData(i, (wxUIntPtr)*it); // somehow this gets lost
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++, it++) {
+        m_panel->m_lWeatherRoutes->SetItemPtrData(i, (wxUIntPtr)*it); // somehow this gets lost
         (*it)->Update(this); // update utc/local switch to strings of start/end time
         UpdateItem(i);
     }
@@ -487,8 +529,8 @@ void WeatherRouting::OnUpdateBoat( wxCommandEvent& event )
     for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
         it != RouteMap::Positions.end(); it++, index++)
         if((*it).Name == _("Boat")) {
-            m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
-            m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+            m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+            m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
 
             (*it).lat = lat, (*it).lon = lon;
             UpdateConfigurations();
@@ -528,7 +570,7 @@ void WeatherRouting::OnListLabelEdit( wxListEvent& event )
 
 void WeatherRouting::OnDeletePosition( wxCommandEvent& event )
 {
-    long index = m_lPositions->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    long index = m_panel->m_lPositions->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if(index < 0)
         return;
 
@@ -536,7 +578,7 @@ void WeatherRouting::OnDeletePosition( wxCommandEvent& event )
     it.SetId(index);
     it.SetColumn(0);
     it.SetMask(wxLIST_MASK_TEXT); // Note use of the mask, somehow it's required for this to work correctly on windows
-    m_lPositions->GetItem(it);
+    m_panel->m_lPositions->GetItem(it);
     wxString name = it.GetText();
 
     for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
@@ -548,7 +590,7 @@ void WeatherRouting::OnDeletePosition( wxCommandEvent& event )
 
     m_ConfigurationDialog.RemoveSource(name);
     m_ConfigurationBatchDialog.RemoveSource(name);
-    m_lPositions->DeleteItem(index);
+    m_panel->m_lPositions->DeleteItem(index);
 
     UpdateConfigurations();
 }
@@ -558,7 +600,7 @@ void WeatherRouting::OnDeleteAllPositions( wxCommandEvent& event )
     RouteMap::Positions.clear();
     m_ConfigurationDialog.ClearSources();
     m_ConfigurationBatchDialog.ClearSources();
-    m_lPositions->DeleteAllItems();
+    m_panel->m_lPositions->DeleteAllItems();
 }
 
 void WeatherRouting::OnPositionKeyDown( wxListEvent& event )
@@ -638,14 +680,14 @@ void WeatherRouting::OnGoTo( wxCommandEvent& event )
 
 void WeatherRouting::OnDelete( wxCommandEvent& event )
 {
-    long index = m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    long index = m_panel->m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if (index < 0) return;
 
     DeleteRouteMaps(CurrentRouteMaps());
 
     /* select map just after the first one selected */
-    int cnt = m_lWeatherRoutes->GetItemCount();
-    m_lWeatherRoutes->SetItemState(index == cnt ? index - 1 : index,
+    int cnt = m_panel->m_lWeatherRoutes->GetItemCount();
+    m_panel->m_lWeatherRoutes->SetItemState(index == cnt ? index - 1 : index,
                                    wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     GetParent()->Refresh();
 }
@@ -653,9 +695,9 @@ void WeatherRouting::OnDelete( wxCommandEvent& event )
 void WeatherRouting::OnDeleteAll( wxCommandEvent& event )
 {
     std::list<RouteMapOverlay *>allroutemapoverlays;
-    for(int i=0; i< m_lWeatherRoutes->GetItemCount(); i++) {
+    for(int i=0; i< m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         allroutemapoverlays.push_back(weatherroute->routemapoverlay);
     }
 
@@ -670,15 +712,15 @@ void WeatherRouting::OnWeatherRouteSort( wxListEvent& event )
     sortorder = -sortorder;
 
     if(sortcol == 0) {
-        for(int index=0; index<m_lWeatherRoutes->GetItemCount(); index++) {
+        for(int index=0; index<m_panel->m_lWeatherRoutes->GetItemCount(); index++) {
             WeatherRoute *weatherroute =
-                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(index)));
             weatherroute->routemapoverlay->m_bEndRouteVisible = sortorder == 1;
             UpdateItem(index);
         }
         RequestRefresh( GetParent() );
     } else
-        m_lWeatherRoutes->SortItems(SortWeatherRoutes, (long)m_lWeatherRoutes);
+        m_panel->m_lWeatherRoutes->SortItems(SortWeatherRoutes, (long)m_panel->m_lWeatherRoutes);
 }
 
 void WeatherRouting::OnWeatherRouteSelected( )
@@ -725,18 +767,18 @@ void WeatherRouting::OnWeatherRoutesListLeftDown(wxMouseEvent &event)
 {
     wxPoint pos = event.GetPosition();
     int flags = 0;
-    long index = m_lWeatherRoutes->HitTest(pos, flags);
+    long index = m_panel->m_lWeatherRoutes->HitTest(pos, flags);
     
     // Do we have the Visibility column?
     if(columns[VISIBLE] >= 0) {
-        int minx = 0, maxx = m_lWeatherRoutes->GetColumnWidth(columns[VISIBLE]);
+        int minx = 0, maxx = m_panel->m_lWeatherRoutes->GetColumnWidth(columns[VISIBLE]);
 
         //    Clicking Visibility column?
         if (index >= 0 && event.GetX() >= minx && event.GetX() < maxx)
         {
             // Process the clicked item
             WeatherRoute *weatherroute =
-                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(index)));
             weatherroute->routemapoverlay->m_bEndRouteVisible =
                 !weatherroute->routemapoverlay->m_bEndRouteVisible;
             UpdateItem(index);
@@ -750,16 +792,16 @@ void WeatherRouting::OnWeatherRoutesListLeftDown(wxMouseEvent &event)
 
 void WeatherRouting::UpdateComputeState()
 {
-    m_gProgress->SetRange(m_RoutesToRun);
+    m_panel->m_gProgress->SetRange(m_RoutesToRun);
 
     if(m_bRunning)
         return;
 
     m_bRunning = true;
-    m_gProgress->SetValue(0);
+    m_panel->m_gProgress->SetValue(0);
     
     m_mCompute->Enable();
-    m_bCompute->Enable();
+    m_panel->m_bCompute->Enable();
     m_StartTime = wxDateTime::Now();
     m_tCompute.Start(1, true);
 }
@@ -818,6 +860,29 @@ void WeatherRouting::OnClose( wxCommandEvent& event )
     Hide();
 }
 
+void WeatherRouting::OnCollPaneChanged( wxCollapsiblePaneEvent& event )
+{
+    if(m_colpane->IsExpanded())
+        SetSize(m_size);
+    else
+        Fit();
+    Update();
+    Layout();
+}
+
+
+void WeatherRouting::OnSize( wxSizeEvent& event )
+{
+    if(m_colpane && m_colpane->IsExpanded ()) {
+        Update();
+        Layout();
+        m_size = GetSize();
+    } else {
+        Fit();
+    }
+    event.Skip();
+}
+
 void WeatherRouting::OnNew( wxCommandEvent& event )
 {
     RouteMapConfiguration configuration;
@@ -829,10 +894,10 @@ void WeatherRouting::OnNew( wxCommandEvent& event )
     AddConfiguration(configuration);
 
     // deselect all
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
-        m_lWeatherRoutes->SetItemState(i, 0, wxLIST_STATE_SELECTED);
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++)
+        m_panel->m_lWeatherRoutes->SetItemState(i, 0, wxLIST_STATE_SELECTED);
 
-    m_lWeatherRoutes->SetItemState(m_lWeatherRoutes->GetItemCount() - 1,
+    m_panel->m_lWeatherRoutes->SetItemState(m_panel->m_lWeatherRoutes->GetItemCount() - 1,
                                    wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     OnEditConfiguration();
 }
@@ -999,9 +1064,9 @@ void WeatherRouting::OnExport ( wxCommandEvent& event )
 
 void WeatherRouting::OnExportAll( wxCommandEvent& event )
 {
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++)
         Export(*reinterpret_cast<WeatherRoute*>
-               (wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)))->routemapoverlay);
+               (wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)))->routemapoverlay);
 }
 
 void WeatherRouting::OnSettings( wxCommandEvent& event )
@@ -1061,7 +1126,7 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
 
             it = m_RunningRouteMaps.erase(it);
 
-            m_gProgress->SetValue(m_RoutesToRun - m_WaitingRouteMaps.size() - m_RunningRouteMaps.size());
+            m_panel->m_gProgress->SetValue(m_RoutesToRun - m_WaitingRouteMaps.size() - m_RunningRouteMaps.size());
             UpdateRouteMap(routemapoverlay);
 
             /* update report if needed */
@@ -1146,7 +1211,7 @@ void WeatherRouting::OnRenderedTimer ( wxTimerEvent & )
     if ( GetClientSize().GetWidth() > 20 ) {
         if (!sashpos)
 	    sashpos = GetClientSize().GetWidth() / 5;
-        m_splitter1->SetSashPosition(sashpos, true);
+        m_panel->m_splitter1->SetSashPosition(sashpos, true);
         Disconnect(wxEVT_IDLE, wxTimerEventHandler(WeatherRouting::OnRenderedTimer ), NULL, this );
     }
 }
@@ -1406,13 +1471,13 @@ void WeatherRouting::SetEnableConfigurationMenu()
     m_mGoTo->Enable(current);
     m_mDelete->Enable(current);
     m_mCompute->Enable(current);
-    m_bCompute->Enable(current);
+    m_panel->m_bCompute->Enable(current);
     m_mExport->Enable(current);
-    m_bExport->Enable(current);
+    m_panel->m_bExport->Enable(current);
 
     m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size() > 0);
 
-    bool cnt = m_lWeatherRoutes->GetItemCount() > 0;
+    bool cnt = m_panel->m_lWeatherRoutes->GetItemCount() > 0;
     m_mDeleteAll->Enable(cnt);
     m_mComputeAll->Enable(cnt);
     m_mExportAll->Enable(cnt);
@@ -1420,9 +1485,9 @@ void WeatherRouting::SetEnableConfigurationMenu()
 
 void WeatherRouting::UpdateConfigurations()
 {
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
 
         /* get and set configuration to update start/end positions */
         RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
@@ -1457,10 +1522,10 @@ void WeatherRouting::AddConfiguration(const RouteMapConfiguration &configuration
     m_WeatherRoutes.push_back(weatherroute);
 
     wxListItem item;
-    item.SetId(m_lWeatherRoutes->GetItemCount());
+    item.SetId(m_panel->m_lWeatherRoutes->GetItemCount());
     item.SetData(weatherroute);
-    if(m_lWeatherRoutes->GetColumnCount())
-        UpdateItem(m_lWeatherRoutes->InsertItem(item));
+    if(m_panel->m_lWeatherRoutes->GetColumnCount())
+        UpdateItem(m_panel->m_lWeatherRoutes->InsertItem(item));
 
     m_mDeleteAll->Enable();
     m_mComputeAll->Enable();
@@ -1469,9 +1534,9 @@ void WeatherRouting::AddConfiguration(const RouteMapConfiguration &configuration
 
 void WeatherRouting::UpdateRouteMap(RouteMapOverlay *routemapoverlay)
 {
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         if(weatherroute->routemapoverlay == routemapoverlay) {
             weatherroute->Update(this);
             UpdateItem(i);
@@ -1618,125 +1683,125 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
 void WeatherRouting::UpdateItem(long index, bool stateonly)
 {
     WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
-        (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+        (wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(index)));
     if( !weatherroute )
         return;
 
     if(!stateonly) {
         if(columns[VISIBLE] >= 0) {
-            m_lWeatherRoutes->SetItemImage(index, weatherroute->routemapoverlay->m_bEndRouteVisible ? 0 : -1);
-            m_lWeatherRoutes->SetColumnWidth(columns[VISIBLE], 28);
+            m_panel->m_lWeatherRoutes->SetItemImage(index, weatherroute->routemapoverlay->m_bEndRouteVisible ? 0 : -1);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[VISIBLE], 28);
         }
 
         if(columns[BOAT] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[BOAT], wxFileName(weatherroute->BoatFilename).GetName());
-            m_lWeatherRoutes->SetColumnWidth(columns[BOAT], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[BOAT], wxFileName(weatherroute->BoatFilename).GetName());
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[BOAT], wxLIST_AUTOSIZE);
         }
 
         if(columns[START] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[START], weatherroute->Start);
-            m_lWeatherRoutes->SetColumnWidth(columns[START], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[START], weatherroute->Start);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[START], wxLIST_AUTOSIZE);
         }
 
         if(columns[STARTTIME] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[STARTTIME], weatherroute->StartTime);
-            m_lWeatherRoutes->SetColumnWidth(columns[STARTTIME], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[STARTTIME], weatherroute->StartTime);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[STARTTIME], wxLIST_AUTOSIZE);
         }
 
         if(columns[END] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[END], weatherroute->End);
-            m_lWeatherRoutes->SetColumnWidth(columns[END], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[END], weatherroute->End);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[END], wxLIST_AUTOSIZE);
         }
 
         if(columns[ENDTIME] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[ENDTIME], weatherroute->EndTime);
-            m_lWeatherRoutes->SetColumnWidth(columns[ENDTIME], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[ENDTIME], weatherroute->EndTime);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[ENDTIME], wxLIST_AUTOSIZE);
         }
 
         if(columns[TIME] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[TIME], weatherroute->Time);
-            m_lWeatherRoutes->SetColumnWidth(columns[TIME], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[TIME], weatherroute->Time);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[TIME], wxLIST_AUTOSIZE);
         }
 
         if(columns[DISTANCE] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[DISTANCE], weatherroute->Distance);
-            m_lWeatherRoutes->SetColumnWidth(columns[DISTANCE], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[DISTANCE], weatherroute->Distance);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[DISTANCE], wxLIST_AUTOSIZE);
         }
 
         if(columns[AVGSPEED] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[AVGSPEED], weatherroute->AvgSpeed);
-            m_lWeatherRoutes->SetColumnWidth(columns[AVGSPEED], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[AVGSPEED], weatherroute->AvgSpeed);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[AVGSPEED], wxLIST_AUTOSIZE);
         }
 
         if(columns[MAXSPEED] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[MAXSPEED], weatherroute->MaxSpeed);
-            m_lWeatherRoutes->SetColumnWidth(columns[MAXSPEED], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[MAXSPEED], weatherroute->MaxSpeed);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[MAXSPEED], wxLIST_AUTOSIZE);
         }
 
         if(columns[AVGSPEEDGROUND] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[AVGSPEEDGROUND], weatherroute->AvgSpeedGround);
-            m_lWeatherRoutes->SetColumnWidth(columns[AVGSPEEDGROUND], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[AVGSPEEDGROUND], weatherroute->AvgSpeedGround);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[AVGSPEEDGROUND], wxLIST_AUTOSIZE);
         }
 
         if(columns[MAXSPEEDGROUND] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[MAXSPEEDGROUND], weatherroute->MaxSpeedGround);
-            m_lWeatherRoutes->SetColumnWidth(columns[MAXSPEEDGROUND], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[MAXSPEEDGROUND], weatherroute->MaxSpeedGround);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[MAXSPEEDGROUND], wxLIST_AUTOSIZE);
         }
 
         if(columns[AVGWIND] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[AVGWIND], weatherroute->AvgWind);
-            m_lWeatherRoutes->SetColumnWidth(columns[AVGWIND], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[AVGWIND], weatherroute->AvgWind);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[AVGWIND], wxLIST_AUTOSIZE);
         }
 
         if(columns[MAXWIND] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[MAXWIND], weatherroute->MaxWind);
-            m_lWeatherRoutes->SetColumnWidth(columns[MAXWIND], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[MAXWIND], weatherroute->MaxWind);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[MAXWIND], wxLIST_AUTOSIZE);
         }
 
         if(columns[MAXWINDGUST] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[MAXWINDGUST], weatherroute->MaxWindGust);
-            m_lWeatherRoutes->SetColumnWidth(columns[MAXWINDGUST], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[MAXWINDGUST], weatherroute->MaxWindGust);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[MAXWINDGUST], wxLIST_AUTOSIZE);
         }
         
         if(columns[AVGCURRENT] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[AVGCURRENT], weatherroute->AvgCurrent);
-            m_lWeatherRoutes->SetColumnWidth(columns[AVGCURRENT], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[AVGCURRENT], weatherroute->AvgCurrent);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[AVGCURRENT], wxLIST_AUTOSIZE);
         }
 
         if(columns[MAXCURRENT] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[MAXCURRENT], weatherroute->MaxCurrent);
-            m_lWeatherRoutes->SetColumnWidth(columns[MAXCURRENT], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[MAXCURRENT], weatherroute->MaxCurrent);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[MAXCURRENT], wxLIST_AUTOSIZE);
         }
 
         if(columns[AVGSWELL] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[AVGSWELL], weatherroute->AvgSwell);
-            m_lWeatherRoutes->SetColumnWidth(columns[AVGSWELL], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[AVGSWELL], weatherroute->AvgSwell);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[AVGSWELL], wxLIST_AUTOSIZE);
         }
 
         if(columns[MAXSWELL] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[MAXSWELL], weatherroute->MaxSwell);
-            m_lWeatherRoutes->SetColumnWidth(columns[MAXSWELL], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[MAXSWELL], weatherroute->MaxSwell);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[MAXSWELL], wxLIST_AUTOSIZE);
         }
 
         if(columns[UPWIND_PERCENTAGE] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[UPWIND_PERCENTAGE], weatherroute->UpwindPercentage);
-            m_lWeatherRoutes->SetColumnWidth(columns[UPWIND_PERCENTAGE], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[UPWIND_PERCENTAGE], weatherroute->UpwindPercentage);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[UPWIND_PERCENTAGE], wxLIST_AUTOSIZE);
         }
 
         if(columns[PORT_STARBOARD] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[PORT_STARBOARD], weatherroute->PortStarboard);
-            m_lWeatherRoutes->SetColumnWidth(columns[PORT_STARBOARD], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[PORT_STARBOARD], weatherroute->PortStarboard);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[PORT_STARBOARD], wxLIST_AUTOSIZE);
         }
 
         if(columns[TACKS] >= 0) {
-            m_lWeatherRoutes->SetItem(index, columns[TACKS], weatherroute->Tacks);
-            m_lWeatherRoutes->SetColumnWidth(columns[TACKS], wxLIST_AUTOSIZE);
+            m_panel->m_lWeatherRoutes->SetItem(index, columns[TACKS], weatherroute->Tacks);
+            m_panel->m_lWeatherRoutes->SetColumnWidth(columns[TACKS], wxLIST_AUTOSIZE);
         }
     }
 
     if(columns[STATE] >= 0) {
-        m_lWeatherRoutes->SetItem(index, columns[STATE], weatherroute->State);
-        m_lWeatherRoutes->SetColumnWidth(columns[STATE], wxLIST_AUTOSIZE);
+        m_panel->m_lWeatherRoutes->SetItem(index, columns[STATE], weatherroute->State);
+        m_panel->m_lWeatherRoutes->SetColumnWidth(columns[STATE], wxLIST_AUTOSIZE);
     }
 }
 
@@ -1754,9 +1819,9 @@ void WeatherRouting::SetConfigurationRoute(WeatherRoute *weatherroute)
 
     weatherroute->Update(this);
 
-    for(long index = 0; index<m_lWeatherRoutes->GetItemCount(); index++) {
+    for(long index = 0; index<m_panel->m_lWeatherRoutes->GetItemCount(); index++) {
         WeatherRoute *wr = reinterpret_cast<WeatherRoute*>
-            (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+            (wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(index)));
         if(weatherroute == wr) {
             UpdateItem(index);
             break;
@@ -1766,9 +1831,9 @@ void WeatherRouting::SetConfigurationRoute(WeatherRoute *weatherroute)
 
 void WeatherRouting::UpdateBoatFilename(wxString boatFileName)
 {
-    for(long index = 0; index<m_lWeatherRoutes->GetItemCount(); index++) {
+    for(long index = 0; index<m_panel->m_lWeatherRoutes->GetItemCount(); index++) {
         WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
-            (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+            (wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(index)));
 
         RouteMapConfiguration c = weatherroute->routemapoverlay->GetConfiguration();
         if(c.boatFileName == boatFileName) {
@@ -1783,11 +1848,11 @@ void WeatherRouting::UpdateCurrentConfigurations()
 {
     long index = -1;
     for(;;) {
-        index = m_lWeatherRoutes->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+        index = m_panel->m_lWeatherRoutes->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
         if(index == -1)
             break;
         WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>
-            (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)));
+            (wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(index)));
         SetConfigurationRoute(weatherroute);
     }
 }
@@ -1797,7 +1862,7 @@ void WeatherRouting::UpdateStates()
     for(std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
         it != m_WeatherRoutes.end(); it++)
         (*it)->Update(this, true);
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++)
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++)
         UpdateItem(i, true);
 }
 
@@ -1805,13 +1870,14 @@ std::list <RouteMapOverlay *>WeatherRouting::CurrentRouteMaps(bool messagedialog
 {
     std::list<RouteMapOverlay *>routemapoverlays;
     long index = -1;
-    for(;;) {
-        index = m_lWeatherRoutes->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-        if(index == -1)
-            break;
-        routemapoverlays.push_back(reinterpret_cast<WeatherRoute*>
-                                   (wxUIntToPtr(m_lWeatherRoutes->GetItemData(index)))->routemapoverlay);
-    }
+    if(m_panel)
+        for(;;) {
+            index = m_panel->m_lWeatherRoutes->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+            if(index == -1)
+                break;
+            routemapoverlays.push_back(reinterpret_cast<WeatherRoute*>
+                                       (wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(index)))->routemapoverlay);
+        }
 
     if(messagedialog && routemapoverlays.empty()) {
         wxMessageDialog mdlg(this, _("No Weather Route selected"),
@@ -1830,14 +1896,14 @@ RouteMapOverlay *WeatherRouting::FirstCurrentRouteMap()
 
 void WeatherRouting::RebuildList()
 {
-    m_lWeatherRoutes->DeleteAllItems();
+    m_panel->m_lWeatherRoutes->DeleteAllItems();
     for(std::list<WeatherRoute*>::iterator it = m_WeatherRoutes.begin();
         it != m_WeatherRoutes.end(); it++) {
         if(!(*it)->Filtered) {
             wxListItem item;
-            item.SetId(m_lWeatherRoutes->GetItemCount());
+            item.SetId(m_panel->m_lWeatherRoutes->GetItemCount());
             item.SetData(*it);
-            UpdateItem(m_lWeatherRoutes->InsertItem(item));
+            UpdateItem(m_panel->m_lWeatherRoutes->InsertItem(item));
         }
     }
 }
@@ -1952,8 +2018,8 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
 
 void WeatherRouting::StartAll()
 {
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
-        WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
+        WeatherRoute *weatherroute = reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         Start(weatherroute->routemapoverlay);
     }
 }
@@ -1990,7 +2056,7 @@ void WeatherRouting::Stop()
     UpdateStates();
 
     m_RoutesToRun = 0;
-    m_gProgress->SetValue(0);
+    m_panel->m_gProgress->SetValue(0);
     m_bRunning = false;
 
     SetEnableConfigurationMenu();
@@ -2003,9 +2069,9 @@ void WeatherRouting::Reset()
     if(m_bRunning)
         Stop();
 
-    for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+    for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =
-            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+            reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         weatherroute->routemapoverlay->Reset();
     }
 
@@ -2041,11 +2107,11 @@ void WeatherRouting::DeleteRouteMaps(std::list<RouteMapOverlay *>routemapoverlay
                 break;
             }
 
-        for(int i=0; i<m_lWeatherRoutes->GetItemCount(); i++) {
+        for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
             WeatherRoute *weatherroute =
-                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_lWeatherRoutes->GetItemData(i)));
+                reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
             if(weatherroute->routemapoverlay == *it) {
-                m_lWeatherRoutes->DeleteItem(i);
+                m_panel->m_lWeatherRoutes->DeleteItem(i);
                 break;
             }
         }
