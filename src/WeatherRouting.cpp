@@ -380,6 +380,7 @@ static void CursorPositionDialogMessage(CursorPositionDialog &dlg, wxString msg)
 {
     dlg.m_stPosition->SetLabel(msg);
     dlg.m_stPosition->Fit();
+    dlg.m_stTime->SetLabel(_T(""));
     dlg.m_stPolar->SetLabel(_T(""));
     dlg.m_stSailChanges->SetLabel(_T(""));
     dlg.m_stTacks->SetLabel(_T(""));
@@ -405,6 +406,8 @@ void WeatherRouting::UpdateCursorPositionDialog()
         CursorPositionDialogMessage(dlg, _("Cursor outside computed route map"));
         return;
     }
+
+    dlg.m_stTime->SetLabel(rmo->GetLastCursorTime().Format(_T("%x %X")));
 
     wxString pos = wxString::Format(_T("%4.2f%c %4.2f%c"),
                                     fabs(p->lat), p->lat < 0 ? 'S' : 'N',

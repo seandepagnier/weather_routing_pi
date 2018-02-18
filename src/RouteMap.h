@@ -266,7 +266,7 @@ public:
     void PropagateIntoList(IsoRouteList &routelist, RouteMapConfiguration &configuration);
     bool Contains(Position &p);
     bool Contains(double lat, double lon);
-    Position *ClosestPosition(double lat, double lon, double *dist=0);
+    Position *ClosestPosition(double lat, double lon, wxDateTime *t = 0, double *dist=0);
     void ResetDrawnFlag();
 
     IsoRouteList routes;
@@ -402,7 +402,7 @@ public:
 protected:
     virtual void Clear();
     bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration);
-    Position *ClosestPosition(double lat, double lon, double *dist=0);
+    Position *ClosestPosition(double lat, double lon, wxDateTime *t=0, double *dist=0);
 
     /* protect any member variables with mutexes if needed */
     virtual void Lock() = 0;

@@ -2314,20 +2314,24 @@ bool IsoChron::Contains(double lat, double lon)
     return Contains(p);
 }
 
-Position* IsoChron::ClosestPosition(double lat, double lon, double *dist)
+Position* IsoChron::ClosestPosition(double lat, double lon, wxDateTime *t, double *d)
 {
     Position *minpos = NULL;
     double mindist = INFINITY;
+    wxDateTime mint;
     for(IsoRouteList::iterator it = routes.begin(); it != routes.end(); ++it) {
         double dist;
         Position *pos = (*it)->ClosestPosition(lat, lon, &dist);
         if(pos && dist < mindist) {
             minpos = pos;
             mindist = dist;
+            mint = time;
         }
     }
-    if(dist)
-        *dist = mindist;
+    if(d)
+        *d = mindist;
+    if(t)
+        *t = mint;
     return minpos;
 }
 
@@ -2561,13 +2565,16 @@ bool RouteMap::Propagate()
     return true;
 }
 
-Position *RouteMap::ClosestPosition(double lat, double lon, double *dist)
+Position *RouteMap::ClosestPosition(double lat, double lon, wxDateTime *t, double *d)
 {
     if(origin.empty())
         return NULL;
 
     Position *minpos = NULL;
     double mindist = INFINITY;
+    bool inside;
+    bool first = (t !=0);
+    wxDateTime min_t;
     Lock();
 
     IsoChronList::iterator it = origin.end();
@@ -2576,24 +2583,34 @@ Position *RouteMap::ClosestPosition(double lat, double lon, double *dist)
     do {
         it--;
         double dist;
-        Position *pos = (*it)->ClosestPosition(p.lat, p.lon, &dist);
+        wxDateTime cur_t;
+        Position *pos = (*it)->ClosestPosition(p.lat, p.lon, &cur_t, &dist);
         
-        if(pos && dist < mindist) {
+        if(dist > mindist)
+            break;
+
+        if(pos && dist <= mindist) {
             minpos = pos;
             mindist = dist;
-        } else if(dist > mindist)
-            break;
+            if (!min_t.IsValid() || (cur_t.IsValid() && cur_t < min_t))
+                min_t = cur_t;
+        }
+        /* bail if we don't contain because obviously we aren't getting any closer
+        */
 
-        /* bail if we don't contain because obviously we aren't getting any closer */
-        if(!(*it)->Contains(p))
+        inside = (*it)->Contains(p);
+        if(!inside && !first) 
             break;
-
+        if(inside)
+            first = false;
     } while(it != origin.begin());
 
     Unlock();
 
-    if(dist)
-        *dist = mindist;
+    if(d)
+        *d = mindist;
+    if(t)
+        *t = min_t;
     return minpos;
 }
 
