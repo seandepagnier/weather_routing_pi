@@ -128,7 +128,10 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
         } \
     } \
     CONTROL->SETTER(allsame ? value : NULLVALUE); \
-    /*CONTROL->Enable(allsame);*/ \
+    if(allsame) \
+        CONTROL->SetForegroundColour(wxColour(0, 0, 0)); \
+    else \
+        CONTROL->SetForegroundColour(wxColour(180, 180, 180)); \
     } while (0)
 
 #define SET_CONTROL(FIELD, CONTROL, SETTER, TYPE, NULLVALUE) \
@@ -305,8 +308,10 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
            } while(0)
 
 #define GET_SPIN(FIELD) \
-    if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_s##FIELD) != m_edited_controls.end())                                      \
-        configuration.FIELD = m_s##FIELD->GetValue()
+    if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_s##FIELD) != m_edited_controls.end()) {                                     \
+        configuration.FIELD = m_s##FIELD->GetValue(); \
+        m_s##FIELD->SetForegroundColour(wxColour(0, 0, 0)); \
+    }
 
 #define GET_CHOICE(FIELD) \
     if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_c##FIELD) != m_edited_controls.end()) \
@@ -342,6 +347,7 @@ void ConfigurationDialog::Update()
                     s = configuration.StartTime.GetSecond();
                 }
                 configuration.StartTime = m_dpStartDate->GetValue();
+                m_dpStartDate->SetForegroundColour(wxColour(0, 0, 0));
                 if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) == m_edited_controls.end()) {
                     // ... and add it afterwards
                     configuration.StartTime.SetHour(h);
@@ -354,18 +360,24 @@ void ConfigurationDialog::Update()
             configuration.StartTime.SetHour(m_tpTime->GetValue().GetHour());
             configuration.StartTime.SetMinute(m_tpTime->GetValue().GetMinute());
             configuration.StartTime.SetSecond(m_tpTime->GetValue().GetSecond());
+            m_tpTime->SetForegroundColour(wxColour(0, 0, 0));
         }
 
         if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
             configuration.StartTime = configuration.StartTime.ToUTC();
 
-        if(!m_tBoat->GetValue().empty())
+        if(!m_tBoat->GetValue().empty()) {
             configuration.boatFileName = m_tBoat->GetValue();
+            m_tBoat->SetForegroundColour(wxColour(0, 0, 0));
+        }
 
-        if(m_sTimeStepHours->IsEnabled()) {
+        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepHours) != m_edited_controls.end() || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepMinutes) != m_edited_controls.end() || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepSeconds) != m_edited_controls.end()) {
             configuration.DeltaTime = 60*(60*m_sTimeStepHours->GetValue()
                                    + m_sTimeStepMinutes->GetValue())
                 + m_sTimeStepSeconds->GetValue();
+            m_sTimeStepHours->SetForegroundColour(wxColour(0, 0, 0));
+            m_sTimeStepMinutes->SetForegroundColour(wxColour(0, 0, 0));
+            m_sTimeStepSeconds->SetForegroundColour(wxColour(0, 0, 0));
         }
 
         if(m_cIntegrator->GetValue() == _T("Newton"))
