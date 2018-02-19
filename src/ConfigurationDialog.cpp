@@ -267,6 +267,8 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 
         m_dpStartDate->SetValue(datetime);
         m_tpTime->SetValue(datetime);
+        m_edited_controls.push_back(m_tpTime);
+        m_edited_controls.push_back(m_dpStartDate);
     } else {
         wxMessageDialog mdlg(this, _("Invalid Date Time."),
                              wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
