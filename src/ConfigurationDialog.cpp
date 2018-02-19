@@ -135,8 +135,7 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 #define SET_CHOICE(FIELD) SET_CONTROL(FIELD, m_c##FIELD, SetValue, wxString, _T(""))
 
 #define SET_SPIN_VALUE(FIELD, VALUE)                                          \
-    m_s##FIELD->Enable(); \
-    SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, int, (m_s##FIELD->Disable(), value))
+    SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, int, value)
 
 #define SET_SPIN(FIELD) \
     SET_SPIN_VALUE(FIELD, (*it).FIELD)
