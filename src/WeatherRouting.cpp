@@ -140,6 +140,78 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     m_PlotDialog.SetIcon(icon);
     m_FilterRoutesDialog.SetIcon(icon);
 
+    m_default_configuration_path = weather_routing_pi::StandardPath()
+        + _T("WeatherRoutingConfiguration.xml");
+
+    bool forceCopyBoats = false;
+    bool forceCopyPolars = false;
+    wxString boatsdir = weather_routing_pi::StandardPath() + wxFileName::GetPathSeparator() + _T("boats");
+    if (!wxFileName::DirExists(boatsdir))
+        forceCopyBoats = true;
+    wxString polarsdir = weather_routing_pi::StandardPath() + wxFileName::GetPathSeparator() + _T("polars");
+    if (!wxFileName::DirExists(polarsdir))
+        forceCopyPolars = true;
+
+    /* ensure the directories exist */
+    wxFileName fn;
+    fn.Mkdir(weather_routing_pi::StandardPath());
+    fn.Mkdir(boatsdir);
+    fn.Mkdir(polarsdir);
+
+    /* if the boats or polars directories did not previously exist, populate them */
+    if (forceCopyBoats)
+        CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/boats"), boatsdir);
+    if (forceCopyPolars)
+        CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/polars"), polarsdir);
+
+    int confVersion;
+    pConf->Read ( _T ( "ConfigVersion" ), &confVersion, 0);
+
+    if (confVersion < PLUGIN_VERSION_MAJOR * 100 + PLUGIN_VERSION_MINOR) {
+        wxString confDlgChoices[3] = {
+          _("Import new boats and polars"),
+          _("Import example configurations")};
+
+        wxMultiChoiceDialog confDlg(this,
+                                    _("A new version of the Weather Route plugin has been installed.\n\n"
+				    "\"Import new boats and polars\" will overwrite the standard boats\n"
+				    "and polars with newer data. If you have modified this data and not\n"
+				    "changed the names, your modifications will be overwritten, so be\n"
+				    "sure to backup your changes. If you have added new polars or boats\n"
+				    "with exclusive names, they will be kept untouched.\n\n"
+				    "\"Import example configurations\" will overwrite your route\n"
+				    "configurations with a sample set showing you how WeatherRouting\n"
+				    "works. Backup your existing configurations if you need.\n\n"
+				    "Pressing \"OK\" will apply the selected changes, pressing \"Cancel\"\n"
+				    "will do nothing and you will be asked again on the next launch."),
+                                    _("New or updated data available"),
+                                    2,
+                                    confDlgChoices);
+
+	/* check on by default if user starts WR for the first time */
+	if (confVersion == 0) {
+	    wxArrayInt sel;
+	    sel.Add(0);
+	    sel.Add(1);
+	    confDlg.SetSelections(sel);
+	}
+        if ( confDlg.ShowModal() == wxID_OK ) {
+	    wxArrayInt result = confDlg.GetSelections();
+	    for (size_t i = 0; i < result.GetCount(); i++) {
+	        if (result[i] == 0) {
+		    CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/boats"), boatsdir);
+		    CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/polars"), polarsdir);
+		}
+		else if (result[i] == 1) {
+		    wxString cfg = *GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/") + _T("WeatherRoutingConfiguration.xml");
+		    if (wxFileName::FileExists(cfg))
+			wxCopyFile(cfg, m_default_configuration_path);
+		}
+            }
+            pConf->Write (  _T ( "ConfigVersion" ), PLUGIN_VERSION_MAJOR * 100 + PLUGIN_VERSION_MINOR);
+        }
+    }
+
     m_SettingsDialog.LoadSettings();
     
     pConf->Read ( _T ( "DisableColPane" ), &m_disable_colpane, false);
@@ -176,38 +248,6 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
     if(m_colpane)
         m_colpane->Expand();
-    
-    m_default_configuration_path = weather_routing_pi::StandardPath()
-        + _T("WeatherRoutingConfiguration.xml");
-
-    if(!wxFileName::FileExists(m_default_configuration_path)) {
-        /* create directory for plugin files if it doesn't already exist */
-	wxFileName fn;
-	wxString boatsdir = weather_routing_pi::StandardPath() + wxFileName::GetPathSeparator() + _T("boats");
-	wxString polarsdir = weather_routing_pi::StandardPath() + wxFileName::GetPathSeparator() + _T("polars");
-
-	fn.Mkdir(weather_routing_pi::StandardPath());
-	fn.Mkdir(boatsdir);
-	fn.Mkdir(polarsdir);
-
-	wxString cfg = *GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/") + _T("WeatherRoutingConfiguration.xml");
-	if (wxFileName::FileExists(cfg))
-	    wxCopyFile(cfg, m_default_configuration_path);
-
-	wxArrayString boats;
-	wxDir::GetAllFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/boats"), &boats);
-	for (unsigned int i = 0; i < boats.Count(); i++) {
-	    wxFileName f(boats.Item(i));
-	    wxCopyFile(boats.Item(i), boatsdir + wxFileName::GetPathSeparator() + f.GetFullName());
-        }
-
-	wxArrayString polars;
-	wxDir::GetAllFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/polars"), &polars);
-	for (unsigned int i = 0; i < polars.Count(); i++) {
-	    wxFileName f(polars.Item(i));
-	    wxCopyFile(polars.Item(i), polarsdir + wxFileName::GetPathSeparator() + f.GetFullName());
-        }
-    }
 
     OpenXML(m_default_configuration_path, false);
 
@@ -287,6 +327,16 @@ WeatherRouting::~WeatherRouting( )
         delete *it;
     delete m_panel;
     delete m_colpane;
+}
+
+void WeatherRouting::CopyDataFiles(wxString from, wxString to)
+{
+    wxArrayString fns;
+    wxDir::GetAllFiles(from, &fns);
+    for (unsigned int i = 0; i < fns.Count(); i++) {
+	wxFileName f(fns.Item(i));
+	wxCopyFile(fns.Item(i), to + wxFileName::GetPathSeparator() + f.GetFullName());
+    }
 }
 
 void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
