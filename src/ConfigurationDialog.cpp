@@ -41,6 +41,8 @@
 #include "WeatherRouting.h"
 #include "icons.h"
 
+#include <algorithm>
+
 ConfigurationDialog::ConfigurationDialog(WeatherRouting &weatherrouting)
 #ifndef __WXOSX__
     : ConfigurationDialogBase(&weatherrouting),
@@ -126,6 +128,7 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
         } \
     } \
     CONTROL->SETTER(allsame ? value : NULLVALUE); \
+    /*CONTROL->Enable(allsame);*/ \
     } while (0)
 
 #define SET_CONTROL(FIELD, CONTROL, SETTER, TYPE, NULLVALUE) \
@@ -134,8 +137,7 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 #define SET_CHOICE(FIELD) SET_CONTROL(FIELD, m_c##FIELD, SetValue, wxString, _T(""))
 
 #define SET_SPIN_VALUE(FIELD, VALUE)                                          \
-    m_s##FIELD->Enable(); \
-    SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, int, (m_s##FIELD->Disable(), value))
+    SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, int, value)
 
 #define SET_SPIN(FIELD) \
     SET_SPIN_VALUE(FIELD, (*it).FIELD)
@@ -143,6 +145,8 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> configurations)
 {
     m_bBlockUpdate = true;
+    
+    m_edited_controls.clear();
 
     SET_CHOICE(Start);
 
@@ -151,6 +155,9 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_CONTROL_VALUE(STARTTIME.GetDateOnly(), m_dpStartDate, SetValue, wxDateTime, wxDateTime());
     SET_CONTROL_VALUE(STARTTIME, m_tpTime, SetValue, wxDateTime, wxDateTime());
+    
+    m_bCurrentTime->Enable(m_tpTime->IsEnabled() && m_dpStartDate->IsEnabled());
+    m_bGribTime->Enable(m_tpTime->IsEnabled() && m_dpStartDate->IsEnabled());
 
     SET_SPIN_VALUE(TimeStepHours, (int)((*it).DeltaTime / 3600));
     SET_SPIN_VALUE(TimeStepMinutes, ((int)(*it).DeltaTime / 60) % 60);
@@ -276,11 +283,11 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
            } while(0)
 
 #define GET_SPIN(FIELD) \
-    if(m_s##FIELD->IsEnabled())                                      \
+    if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_s##FIELD) != m_edited_controls.end())                                      \
         configuration.FIELD = m_s##FIELD->GetValue()
 
 #define GET_CHOICE(FIELD) \
-    if(!m_c##FIELD->GetValue().empty()) \
+    if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_c##FIELD) != m_edited_controls.end()) \
         configuration.FIELD = m_c##FIELD->GetValue();
 
 void ConfigurationDialog::Update()
@@ -299,10 +306,11 @@ void ConfigurationDialog::Update()
         GET_CHOICE(Start);
         GET_CHOICE(End);
 
-        if(m_dpStartDate->GetValue().IsValid())
-            configuration.StartTime = m_dpStartDate->GetValue();
+        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end())
+            if(m_dpStartDate->GetValue().IsValid())
+                configuration.StartTime = m_dpStartDate->GetValue();
 
-        if(m_tpTime->IsEnabled()) {
+        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) != m_edited_controls.end()) {
             configuration.StartTime.SetHour(m_tpTime->GetValue().GetHour());
             configuration.StartTime.SetMinute(m_tpTime->GetValue().GetMinute());
             configuration.StartTime.SetSecond(m_tpTime->GetValue().GetSecond());
