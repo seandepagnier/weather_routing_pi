@@ -88,32 +88,35 @@ double PlotDialog::GetValue(PlotData &data, int var)
 {
     switch(var) {
     case SPEED_OVER_GROUND:            return data.VBG;
-    case COURSE_OVER_GROUND:           return data.BG;
+    case COURSE_OVER_GROUND:           return positive_degrees(data.BG);
+
     case SPEED_OVER_WATER:             return data.VB;
-    case COURSE_OVER_WATER:            return data.B;
+    case COURSE_OVER_WATER:            return positive_degrees(data.B);
+
     case WIND_VELOCITY:                return data.VW;
     case WIND_DIRECTION:               return heading_resolve(data.B - data.W);
-    case WIND_COURSE:                  return data.W;
+    case WIND_COURSE:                  return positive_degrees(data.W);
+
     case WIND_VELOCITY_GROUND:         return data.VWG;
     case WIND_DIRECTION_GROUND:        return heading_resolve(data.BG - data.WG);
-    case WIND_COURSE_GROUND:           return data.WG;
-    case APPARENT_WIND_SPEED:
+    case WIND_COURSE_GROUND:           return positive_degrees(data.WG);
+
+   case APPARENT_WIND_SPEED:
         return Polar::VelocityApparentWind(data.VB, GetValue(data, WIND_DIRECTION), data.VW);
     case APPARENT_WIND_ANGLE: {
-        return rad2deg(Polar::DirectionApparentWind
-                       (GetValue(data, APPARENT_WIND_SPEED), data.VB,
-                        GetValue(data, WIND_DIRECTION), data.VW));
+        return Polar::DirectionApparentWind (GetValue(data, APPARENT_WIND_SPEED), data.VB,
+                                              GetValue(data, WIND_DIRECTION), data.VW);
     case WIND_GUST: return data.VW_GUST;
     }
     case CURRENT_VELOCITY: return data.VC;
-    case CURRENT_DIRECTION: return data.C;
+    case CURRENT_DIRECTION: return positive_degrees(data.C);
     case SIG_WAVE_HEIGHT: return data.WVHT;
     case TACKS: return data.tacks;
     }
     return NAN;
 }
 
-enum Type {SPEED, COURSE, WIND_SPEED, WIND_DIRECTION, CURRENT_SPEED, CURRENT_DIRECTION, WAVE_HEIGHT, TACKS, INVALID};
+enum Type {SPEED, COURSE, WIND_SPEED, WIND_DIRECTION, CURRENT_SPEED, CURRENT_DIRECTION, WAVE_HEIGHT, TACKS, WIND_COURSE, INVALID};
 int PlotDialog::GetType(int var)
 {
     switch(var) {
@@ -134,6 +137,7 @@ int PlotDialog::GetType(int var)
         return WIND_DIRECTION;
     case WIND_COURSE:
     case WIND_COURSE_GROUND:
+        return WIND_COURSE;
     case CURRENT_VELOCITY:
         return CURRENT_SPEED;
     case CURRENT_DIRECTION:
