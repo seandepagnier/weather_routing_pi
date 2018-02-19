@@ -126,6 +126,7 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
         } \
     } \
     CONTROL->SETTER(allsame ? value : NULLVALUE); \
+    CONTROL->Enable(allsame); \
     } while (0)
 
 #define SET_CONTROL(FIELD, CONTROL, SETTER, TYPE, NULLVALUE) \
@@ -151,6 +152,9 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_CONTROL_VALUE(STARTTIME.GetDateOnly(), m_dpStartDate, SetValue, wxDateTime, wxDateTime());
     SET_CONTROL_VALUE(STARTTIME, m_tpTime, SetValue, wxDateTime, wxDateTime());
+    
+    m_bCurrentTime->Enable(m_tpTime->IsEnabled() && m_dpStartDate->IsEnabled());
+    m_bGribTime->Enable(m_tpTime->IsEnabled() && m_dpStartDate->IsEnabled());
 
     SET_SPIN_VALUE(TimeStepHours, (int)((*it).DeltaTime / 3600));
     SET_SPIN_VALUE(TimeStepMinutes, ((int)(*it).DeltaTime / 60) % 60);
@@ -280,7 +284,7 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
         configuration.FIELD = m_s##FIELD->GetValue()
 
 #define GET_CHOICE(FIELD) \
-    if(!m_c##FIELD->GetValue().empty()) \
+    if(m_c##FIELD->IsEnabled()) \
         configuration.FIELD = m_c##FIELD->GetValue();
 
 void ConfigurationDialog::Update()
@@ -299,8 +303,9 @@ void ConfigurationDialog::Update()
         GET_CHOICE(Start);
         GET_CHOICE(End);
 
-        if(m_dpStartDate->GetValue().IsValid())
-            configuration.StartTime = m_dpStartDate->GetValue();
+        if(m_dpStartDate->IsEnabled())
+            if(m_dpStartDate->GetValue().IsValid())
+                configuration.StartTime = m_dpStartDate->GetValue();
 
         if(m_tpTime->IsEnabled()) {
             configuration.StartTime.SetHour(m_tpTime->GetValue().GetHour());
