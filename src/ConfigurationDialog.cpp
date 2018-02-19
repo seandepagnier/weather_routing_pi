@@ -134,7 +134,27 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 #define SET_CONTROL(FIELD, CONTROL, SETTER, TYPE, NULLVALUE) \
     SET_CONTROL_VALUE((*it).FIELD, CONTROL, SETTER, TYPE, NULLVALUE)
 
-#define SET_CHOICE(FIELD) SET_CONTROL(FIELD, m_c##FIELD, SetValue, wxString, _T(""))
+#define SET_CHOICE(FIELD) \
+    do { \
+        bool allsame = true;                            \
+        bool nullval = false;                           \
+        std::list<RouteMapConfiguration>::iterator it = configurations.begin(); \
+        wxString value = (*it).FIELD; \
+        for(it++; it != configurations.end(); it++) {                             \
+            if(value != (*it).FIELD) {                                       \
+                allsame = false; \
+                break; \
+            } \
+        } \
+        if(allsame) \
+            m_c##FIELD->SetValue(value); \
+        else { \
+            if(!nullval) \
+                m_c##FIELD->Append(wxEmptyString); \
+            nullval = true; \
+            m_c##FIELD->SetValue(wxEmptyString); \
+        } \
+    } while (0)
 
 #define SET_SPIN_VALUE(FIELD, VALUE)                                          \
     SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, int, value)
@@ -290,7 +310,11 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 
 #define GET_CHOICE(FIELD) \
     if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_c##FIELD) != m_edited_controls.end()) \
-        configuration.FIELD = m_c##FIELD->GetValue();
+        if(m_c##FIELD->GetValue() != wxEmptyString) { \
+            configuration.FIELD = m_c##FIELD->GetValue(); \
+            if(m_c##FIELD->GetString(m_c##FIELD->GetCount() - 1) == wxEmptyString) \
+                m_c##FIELD->Delete(m_c##FIELD->GetCount() - 1); \
+        }
 
 void ConfigurationDialog::Update()
 {
@@ -309,8 +333,22 @@ void ConfigurationDialog::Update()
         GET_CHOICE(End);
 
         if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end())
-            if(m_dpStartDate->GetValue().IsValid())
+            if(m_dpStartDate->GetValue().IsValid()) {
+                int h, m, s;
+                if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) == m_edited_controls.end()) {
+                    // We must preserve the time in case only date but not time, is being changed by the user...
+                    h = configuration.StartTime.GetHour();
+                    m = configuration.StartTime.GetMinute();
+                    s = configuration.StartTime.GetSecond();
+                }
                 configuration.StartTime = m_dpStartDate->GetValue();
+                if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) == m_edited_controls.end()) {
+                    // ... and add it afterwards
+                    configuration.StartTime.SetHour(h);
+                    configuration.StartTime.SetMinute(m);
+                    configuration.StartTime.SetSecond(s);
+                }
+            }
 
         if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) != m_edited_controls.end()) {
             configuration.StartTime.SetHour(m_tpTime->GetValue().GetHour());
