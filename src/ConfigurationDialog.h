@@ -32,6 +32,8 @@
 
 #include "WeatherRoutingUI.h"
 
+#include <vector>
+
 class WeatherRouting;
 class weather_routing_pi;
 
@@ -53,13 +55,14 @@ public:
     wxDateTime m_GribTimelineTime;
 
 protected:
-    void OnUpdate( wxCommandEvent& event ) { Update(); }
+    void OnValueChange ( wxEvent& event ) { m_edited_controls.push_back(event.GetEventObject()); }
+    void OnUpdate( wxCommandEvent& event ) { OnValueChange(event); Update(); }
     void OnResetAdvanced( wxCommandEvent& event );
-    void OnUpdateDate( wxDateEvent& event ) { Update(); }
-    void OnUpdateTime( wxDateEvent& event ) { Update(); }
+    void OnUpdateDate( wxDateEvent& event ) { OnValueChange(event); Update(); }
+    void OnUpdateTime( wxDateEvent& event ) { OnValueChange(event); Update(); }
     void OnGribTime( wxCommandEvent& event );
     void OnCurrentTime( wxCommandEvent& event );
-    void OnUpdateSpin( wxSpinEvent& event ) { Update(); }
+    void OnUpdateSpin( wxSpinEvent& event ) { OnValueChange(event); Update(); }
     void OnBoatFilename( wxCommandEvent& event );
     void OnEditBoat( wxCommandEvent& event ) { EditBoat(); }
     void OnUpdateIntegratorNewton( wxCommandEvent& event );
@@ -86,6 +89,8 @@ private:
 
     WeatherRouting &m_WeatherRouting;
     bool m_bBlockUpdate;
+    
+    std::vector<wxObject*> m_edited_controls;
 };
 
 #endif
