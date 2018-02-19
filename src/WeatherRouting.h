@@ -63,6 +63,7 @@ public:
 class WeatherRouting : public WeatherRoutingBase
 {
 private:
+    bool m_disable_colpane;
     wxCollapsiblePane *m_colpane;
     wxWindow *m_colpaneWindow;
     WeatherRoutingPanel *m_panel;

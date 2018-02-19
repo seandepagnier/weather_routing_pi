@@ -126,6 +126,9 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
       m_bShowReport(false), m_bShowPlot(false),
       m_bShowFilter(false), m_weather_routing_pi(plugin)
 {
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+    
     wxIcon icon;
     icon.CopyFromBitmap(*_img_WeatherRouting);
     m_ConfigurationDialog.SetIcon(icon);
@@ -139,18 +142,27 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
     m_SettingsDialog.LoadSettings();
     
+    pConf->Read ( _T ( "DisableColPane" ), &m_disable_colpane, false);
     wxBoxSizer* bSizer;
     bSizer = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(bSizer);
-    m_colpane = new wxCollapsiblePane(this, wxID_ANY, _("Weather Routing"), wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
-    bSizer->Add(m_colpane, 1, wxEXPAND|wxALL, 5);
-    m_colpaneWindow = m_colpane->GetPane();
-    wxSizer *paneSz = new wxBoxSizer(wxVERTICAL);
-    m_colpaneWindow->SetSizer(paneSz);
-    m_panel = new WeatherRoutingPanel(m_colpaneWindow);
-    paneSz->Add(m_panel, 1, wxEXPAND, 0);
+    if(!m_disable_colpane) {
+        m_colpane = new wxCollapsiblePane(this, wxID_ANY, _("Weather Routing"), wxDefaultPosition, wxDefaultSize, wxCP_NO_TLW_RESIZE);
+        bSizer->Add(m_colpane, 1, wxEXPAND|wxALL, 5);
+        m_colpaneWindow = m_colpane->GetPane();
+        wxSizer *paneSz = new wxBoxSizer(wxVERTICAL);
+        m_colpaneWindow->SetSizer(paneSz);
+        m_panel = new WeatherRoutingPanel(m_colpaneWindow);
+        paneSz->Add(m_panel, 1, wxEXPAND, 0);
+        paneSz->SetSizeHints(m_colpaneWindow);
+    } else {
+        m_colpane = NULL;
+        m_colpaneWindow = this;
+        m_panel = new WeatherRoutingPanel(m_colpaneWindow);
+        bSizer->Add(m_panel, 1, wxEXPAND, 0);
+    }
     bSizer->SetSizeHints(this);
-    paneSz->SetSizeHints(m_colpaneWindow);
+    
 
     m_panel->m_lPositions->InsertColumn(POSITION_NAME, _("Name"));
     m_panel->m_lPositions->InsertColumn(POSITION_LAT, _("Lat"));
@@ -162,7 +174,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
     UpdateColumns();
 
-    m_colpane->Expand();
+    if(m_colpane)
+        m_colpane->Expand();
     
     m_default_configuration_path = weather_routing_pi::StandardPath()
         + _T("WeatherRoutingConfiguration.xml");
@@ -198,9 +211,6 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
     OpenXML(m_default_configuration_path, false);
 
-    wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
-
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "DialogX" ), &p.x, p.x);
     pConf->Read ( _T ( "DialogY" ), &p.y, p.y);
@@ -225,7 +235,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     SetEnableConfigurationMenu();
     
     // Connect Events
-    m_colpane->Connect( wxEVT_COLLAPSIBLEPANE_CHANGED, wxCollapsiblePaneEventHandler( WeatherRouting::OnCollPaneChanged ), NULL, this );
+    if(m_colpane)
+        m_colpane->Connect( wxEVT_COLLAPSIBLEPANE_CHANGED, wxCollapsiblePaneEventHandler( WeatherRouting::OnCollPaneChanged ), NULL, this );
     //m_panel->m_lPositions->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditPositionClick ), NULL, this );
     m_panel->m_lPositions->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnPositionKeyDown ), NULL, this );
     m_panel->m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditConfigurationClick ), NULL, this );
@@ -241,7 +252,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 WeatherRouting::~WeatherRouting( )
 {
     // Disconnect Events
-    m_colpane->Disconnect( wxEVT_COLLAPSIBLEPANE_CHANGED, wxCollapsiblePaneEventHandler( WeatherRouting::OnCollPaneChanged ), NULL, this );
+    if(m_colpane)
+        m_colpane->Disconnect( wxEVT_COLLAPSIBLEPANE_CHANGED, wxCollapsiblePaneEventHandler( WeatherRouting::OnCollPaneChanged ), NULL, this );
     //m_panel->m_lPositions->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditPositionClick ), NULL, this );
     m_panel->m_lPositions->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnPositionKeyDown ), NULL, this );
     m_panel->m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRouting::OnEditConfigurationClick ), NULL, this );
@@ -862,10 +874,11 @@ void WeatherRouting::OnClose( wxCommandEvent& event )
 
 void WeatherRouting::OnCollPaneChanged( wxCollapsiblePaneEvent& event )
 {
-    if(m_colpane->IsExpanded())
+    if(m_colpane && m_colpane->IsExpanded())
         SetSize(m_size);
     else
-        Fit();
+        if(m_colpane)
+            Fit();
     Update();
     Layout();
 }
@@ -878,7 +891,8 @@ void WeatherRouting::OnSize( wxSizeEvent& event )
         Layout();
         m_size = GetSize();
     } else {
-        Fit();
+        if(m_colpane)
+            Fit();
     }
     event.Skip();
 }
