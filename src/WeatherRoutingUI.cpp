@@ -1,5 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////
+
 // C++ code generated with wxFormBuilder (version Feb 18 2018)
+
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -11,87 +13,8 @@
 
 WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxFrame( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxSize( 600,400 ), wxDefaultSize );
+	this->SetSizeHints( wxSize( 400,300 ), wxDefaultSize );
 	
-	wxFlexGridSizer* fgSizer92;
-	fgSizer92 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer92->AddGrowableCol( 0 );
-	fgSizer92->AddGrowableRow( 0 );
-	fgSizer92->SetFlexibleDirection( wxBOTH );
-	fgSizer92->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
-	m_splitter1->SetSashGravity( 0.2 );
-	m_splitter1->SetMinimumPaneSize( 1 );
-	
-	m_panel11 = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxStaticBoxSizer* sbSizer30;
-	sbSizer30 = new wxStaticBoxSizer( new wxStaticBox( m_panel11, wxID_ANY, _("Positions") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer93;
-	fgSizer93 = new wxFlexGridSizer( 1, 1, 0, 0 );
-	fgSizer93->AddGrowableCol( 0 );
-	fgSizer93->AddGrowableRow( 0 );
-	fgSizer93->SetFlexibleDirection( wxBOTH );
-	fgSizer93->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_lPositions = new wxListCtrl( sbSizer30->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxLC_HRULES|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
-	fgSizer93->Add( m_lPositions, 0, wxALL|wxEXPAND, 5 );
-	
-	
-	sbSizer30->Add( fgSizer93, 1, wxEXPAND, 5 );
-	
-	
-	m_panel11->SetSizer( sbSizer30 );
-	m_panel11->Layout();
-	sbSizer30->Fit( m_panel11 );
-	m_panel12 = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
-	wxStaticBoxSizer* sbSizer29;
-	sbSizer29 = new wxStaticBoxSizer( new wxStaticBox( m_panel12, wxID_ANY, _("Configurations") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer17;
-	fgSizer17 = new wxFlexGridSizer( 2, 1, 0, 0 );
-	fgSizer17->AddGrowableCol( 0 );
-	fgSizer17->AddGrowableRow( 0 );
-	fgSizer17->SetFlexibleDirection( wxBOTH );
-	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
-	
-	m_lWeatherRoutes = new wxListCtrl( sbSizer29->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxHSCROLL|wxVSCROLL );
-	fgSizer17->Add( m_lWeatherRoutes, 0, wxALL|wxEXPAND, 5 );
-	
-	wxFlexGridSizer* fgSizer116;
-	fgSizer116 = new wxFlexGridSizer( 1, 0, 0, 0 );
-	fgSizer116->AddGrowableCol( 2 );
-	fgSizer116->SetFlexibleDirection( wxBOTH );
-	fgSizer116->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_bCompute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Compute"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer116->Add( m_bCompute, 0, wxALL, 5 );
-	
-	m_bExport = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Export"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer116->Add( m_bExport, 0, wxALL, 5 );
-	
-	m_gProgress = new wxGauge( sbSizer29->GetStaticBox(), wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
-	m_gProgress->SetValue( 0 ); 
-	fgSizer116->Add( m_gProgress, 0, wxALL|wxEXPAND, 5 );
-	
-	
-	fgSizer17->Add( fgSizer116, 1, wxEXPAND, 5 );
-	
-	
-	sbSizer29->Add( fgSizer17, 1, wxEXPAND, 5 );
-	
-	
-	m_panel12->SetSizer( sbSizer29 );
-	m_panel12->Layout();
-	sbSizer29->Fit( m_panel12 );
-	m_splitter1->SplitVertically( m_panel11, m_panel12, -1 );
-	fgSizer92->Add( m_splitter1, 1, wxEXPAND, 5 );
-	
-	
-	this->SetSizer( fgSizer92 );
-	this->Layout();
-	fgSizer92->Fit( this );
 	m_menubar3 = new wxMenuBar( 0 );
 	m_mFile = new wxMenu();
 	wxMenuItem* m_mOpen;
@@ -225,16 +148,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
-	m_lPositions->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditPositionClick ), NULL, this );
-	m_lPositions->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnPositionKeyDown ), NULL, this );
-	m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditConfigurationClick ), NULL, this );
-	m_lWeatherRoutes->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
-	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSort ), NULL, this );
-	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
-	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
-	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteKeyDown ), NULL, this );
-	m_bCompute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingBase::OnCompute ), NULL, this );
-	m_bExport->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingBase::OnExport ), NULL, this );
+	this->Connect( wxEVT_SIZE, wxSizeEventHandler( WeatherRoutingBase::OnSize ) );
 	this->Connect( m_mOpen->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnOpen ) );
 	this->Connect( m_mSave->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnSave ) );
 	this->Connect( m_mClose->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnClose ) );
@@ -269,16 +183,7 @@ WeatherRoutingBase::~WeatherRoutingBase()
 {
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( WeatherRoutingBase::OnClose ) );
-	m_lPositions->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditPositionClick ), NULL, this );
-	m_lPositions->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnPositionKeyDown ), NULL, this );
-	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingBase::OnEditConfigurationClick ), NULL, this );
-	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingBase::OnWeatherRoutesListLeftDown ), NULL, this );
-	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSort ), NULL, this );
-	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
-	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteSelected ), NULL, this );
-	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingBase::OnWeatherRouteKeyDown ), NULL, this );
-	m_bCompute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingBase::OnCompute ), NULL, this );
-	m_bExport->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingBase::OnExport ), NULL, this );
+	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( WeatherRoutingBase::OnSize ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnOpen ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnSave ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnClose ) );
@@ -307,6 +212,114 @@ WeatherRoutingBase::~WeatherRoutingBase()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnManual ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
+	
+}
+
+WeatherRoutingPanel::WeatherRoutingPanel( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : wxPanel( parent, id, pos, size, style )
+{
+	this->SetMinSize( wxSize( 100,100 ) );
+	
+	wxBoxSizer* bSizerMain;
+	bSizerMain = new wxBoxSizer( wxVERTICAL );
+	
+	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
+	m_splitter1->SetSashGravity( 0.2 );
+	m_splitter1->SetMinimumPaneSize( 1 );
+	
+	m_panel11 = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxStaticBoxSizer* sbSizer30;
+	sbSizer30 = new wxStaticBoxSizer( new wxStaticBox( m_panel11, wxID_ANY, _("Positions") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer93;
+	fgSizer93 = new wxFlexGridSizer( 1, 1, 0, 0 );
+	fgSizer93->AddGrowableCol( 0 );
+	fgSizer93->AddGrowableRow( 0 );
+	fgSizer93->SetFlexibleDirection( wxBOTH );
+	fgSizer93->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_lPositions = new wxListCtrl( sbSizer30->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxLC_HRULES|wxLC_REPORT|wxLC_SINGLE_SEL|wxHSCROLL|wxVSCROLL );
+	fgSizer93->Add( m_lPositions, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	sbSizer30->Add( fgSizer93, 1, wxEXPAND, 5 );
+	
+	
+	m_panel11->SetSizer( sbSizer30 );
+	m_panel11->Layout();
+	sbSizer30->Fit( m_panel11 );
+	m_panel12 = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxStaticBoxSizer* sbSizer29;
+	sbSizer29 = new wxStaticBoxSizer( new wxStaticBox( m_panel12, wxID_ANY, _("Configurations") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer17;
+	fgSizer17 = new wxFlexGridSizer( 2, 1, 0, 0 );
+	fgSizer17->AddGrowableCol( 0 );
+	fgSizer17->AddGrowableRow( 0 );
+	fgSizer17->SetFlexibleDirection( wxBOTH );
+	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
+	
+	m_lWeatherRoutes = new wxListCtrl( sbSizer29->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxLC_HRULES|wxLC_NO_SORT_HEADER|wxLC_REPORT|wxHSCROLL|wxVSCROLL );
+	fgSizer17->Add( m_lWeatherRoutes, 0, wxALL|wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer116;
+	fgSizer116 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer116->AddGrowableCol( 2 );
+	fgSizer116->SetFlexibleDirection( wxBOTH );
+	fgSizer116->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_bCompute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Compute"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer116->Add( m_bCompute, 0, wxALL, 5 );
+	
+	m_bExport = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Export"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer116->Add( m_bExport, 0, wxALL, 5 );
+	
+	m_gProgress = new wxGauge( sbSizer29->GetStaticBox(), wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
+	m_gProgress->SetValue( 0 ); 
+	fgSizer116->Add( m_gProgress, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer17->Add( fgSizer116, 1, wxEXPAND, 5 );
+	
+	
+	sbSizer29->Add( fgSizer17, 1, wxEXPAND, 5 );
+	
+	
+	m_panel12->SetSizer( sbSizer29 );
+	m_panel12->Layout();
+	sbSizer29->Fit( m_panel12 );
+	m_splitter1->SplitVertically( m_panel11, m_panel12, -1 );
+	bSizerMain->Add( m_splitter1, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( bSizerMain );
+	this->Layout();
+	
+	// Connect Events
+	m_lPositions->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingPanel::OnEditPositionClick ), NULL, this );
+	m_lPositions->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingPanel::OnPositionKeyDown ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingPanel::OnEditConfigurationClick ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingPanel::OnWeatherRoutesListLeftDown ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteSort ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteSelected ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteSelected ), NULL, this );
+	m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteKeyDown ), NULL, this );
+	m_bCompute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingPanel::OnCompute ), NULL, this );
+	m_bExport->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingPanel::OnExport ), NULL, this );
+}
+
+WeatherRoutingPanel::~WeatherRoutingPanel()
+{
+	// Disconnect Events
+	m_lPositions->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingPanel::OnEditPositionClick ), NULL, this );
+	m_lPositions->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingPanel::OnPositionKeyDown ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DCLICK, wxMouseEventHandler( WeatherRoutingPanel::OnEditConfigurationClick ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_LEFT_DOWN, wxMouseEventHandler( WeatherRoutingPanel::OnWeatherRoutesListLeftDown ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_COL_CLICK, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteSort ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_DESELECTED, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteSelected ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteSelected ), NULL, this );
+	m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRoutingPanel::OnWeatherRouteKeyDown ), NULL, this );
+	m_bCompute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingPanel::OnCompute ), NULL, this );
+	m_bExport->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRoutingPanel::OnExport ), NULL, this );
 	
 }
 

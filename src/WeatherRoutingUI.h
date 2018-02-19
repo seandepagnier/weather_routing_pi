@@ -11,23 +11,23 @@
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
 #include <wx/intl.h>
-#include <wx/listctrl.h>
+#include <wx/string.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
+#include <wx/menu.h>
 #include <wx/gdicmn.h>
 #include <wx/font.h>
 #include <wx/colour.h>
 #include <wx/settings.h>
-#include <wx/string.h>
+#include <wx/frame.h>
+#include <wx/listctrl.h>
 #include <wx/sizer.h>
 #include <wx/statbox.h>
 #include <wx/panel.h>
 #include <wx/button.h>
 #include <wx/gauge.h>
 #include <wx/splitter.h>
-#include <wx/bitmap.h>
-#include <wx/image.h>
-#include <wx/icon.h>
-#include <wx/menu.h>
-#include <wx/frame.h>
 #include <wx/stattext.h>
 #include <wx/clrpicker.h>
 #include <wx/spinctrl.h>
@@ -64,13 +64,6 @@ class WeatherRoutingBase : public wxFrame
 	private:
 	
 	protected:
-		wxSplitterWindow* m_splitter1;
-		wxPanel* m_panel11;
-		wxListCtrl* m_lPositions;
-		wxPanel* m_panel12;
-		wxListCtrl* m_lWeatherRoutes;
-		wxButton* m_bCompute;
-		wxButton* m_bExport;
 		wxMenuBar* m_menubar3;
 		wxMenu* m_mFile;
 		wxMenu* m_mPosition;
@@ -89,15 +82,7 @@ class WeatherRoutingBase : public wxFrame
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
-		virtual void OnEditPositionClick( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnPositionKeyDown( wxListEvent& event ) { event.Skip(); }
-		virtual void OnEditConfigurationClick( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
-		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
-		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
-		virtual void OnWeatherRouteKeyDown( wxListEvent& event ) { event.Skip(); }
-		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnOpen( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSave( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
@@ -111,9 +96,11 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnGoTo( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDelete( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDeleteAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnComputeAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStop( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetAll( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
@@ -127,12 +114,47 @@ class WeatherRoutingBase : public wxFrame
 		
 	
 	public:
-		wxGauge* m_gProgress;
 		wxMenuItem* m_mDeleteAll;
 		
 		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
+	
+};
+
+///////////////////////////////////////////////////////////////////////////////
+/// Class WeatherRoutingPanel
+///////////////////////////////////////////////////////////////////////////////
+class WeatherRoutingPanel : public wxPanel 
+{
+	private:
+	
+	protected:
+		wxPanel* m_panel11;
+		wxPanel* m_panel12;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void OnEditPositionClick( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnPositionKeyDown( wxListEvent& event ) { event.Skip(); }
+		virtual void OnEditConfigurationClick( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnWeatherRouteSort( wxListEvent& event ) { event.Skip(); }
+		virtual void OnWeatherRouteSelected( wxListEvent& event ) { event.Skip(); }
+		virtual void OnWeatherRouteKeyDown( wxListEvent& event ) { event.Skip(); }
+		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxSplitterWindow* m_splitter1;
+		wxListCtrl* m_lPositions;
+		wxListCtrl* m_lWeatherRoutes;
+		wxButton* m_bCompute;
+		wxButton* m_bExport;
+		wxGauge* m_gProgress;
+		
+		WeatherRoutingPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL ); 
+		~WeatherRoutingPanel();
 	
 };
 
