@@ -208,12 +208,14 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 			wxCopyFile(cfg, m_default_configuration_path);
 		}
             }
+            pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) ); // path can change after modal dialog
             pConf->Write (  _T ( "ConfigVersion" ), PLUGIN_VERSION_MAJOR * 100 + PLUGIN_VERSION_MINOR);
         }
     }
 
     m_SettingsDialog.LoadSettings();
     
+    pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) ); // path can change after modal dialog
     pConf->Read ( _T ( "DisableColPane" ), &m_disable_colpane, false);
     wxBoxSizer* bSizer;
     bSizer = new wxBoxSizer(wxVERTICAL);
