@@ -119,6 +119,7 @@ public:
     SettingsDialog m_SettingsDialog;
 
 private:
+    void CopyDataFiles(wxString from, wxString to);
     void OnCollPaneChanged( wxCollapsiblePaneEvent& event );
     void OnNewPosition( wxCommandEvent& event );
     void OnUpdateBoat( wxCommandEvent& event );
