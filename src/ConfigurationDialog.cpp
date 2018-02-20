@@ -128,23 +128,25 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
         } \
     } \
     CONTROL->SETTER(allsame ? value : NULLVALUE); \
+    wxSize s(CONTROL->GetSize()); \
     if(allsame) \
-        CONTROL->SetForegroundColour(wxColour(0, 0, 0)); \
+        CONTROL->SetForegroundColour(wxColour(0, 0, 0));        \
     else \
         CONTROL->SetForegroundColour(wxColour(180, 180, 180)); \
+    CONTROL->Fit(); \
+    CONTROL->SetSize(s); \
     } while (0)
 
 #define SET_CONTROL(FIELD, CONTROL, SETTER, TYPE, NULLVALUE) \
     SET_CONTROL_VALUE((*it).FIELD, CONTROL, SETTER, TYPE, NULLVALUE)
 
-#define SET_CHOICE(FIELD) \
+#define SET_CHOICE_VALUE(FIELD, VALUE)                \
     do { \
         bool allsame = true;                            \
-        bool nullval = false;                           \
         std::list<RouteMapConfiguration>::iterator it = configurations.begin(); \
-        wxString value = (*it).FIELD; \
+        wxString value = VALUE; \
         for(it++; it != configurations.end(); it++) {                             \
-            if(value != (*it).FIELD) {                                       \
+            if(value != VALUE) {                                       \
                 allsame = false; \
                 break; \
             } \
@@ -152,12 +154,12 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
         if(allsame) \
             m_c##FIELD->SetValue(value); \
         else { \
-            if(!nullval) \
-                m_c##FIELD->Append(wxEmptyString); \
-            nullval = true; \
+            if(m_c##FIELD->GetString(m_c##FIELD->GetCount() - 1) != wxEmptyString) \
+                m_c##FIELD->Append(wxEmptyString);                      \
             m_c##FIELD->SetValue(wxEmptyString); \
         } \
     } while (0)
+#define SET_CHOICE(FIELD) SET_CHOICE_VALUE(FIELD, (*it).FIELD)
 
 #define SET_SPIN_VALUE(FIELD, VALUE)                                          \
     SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, int, value)
@@ -196,8 +198,8 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_SPIN(ToDegree);
     SET_CONTROL_VALUE(wxString::Format(_T("%f"), (*it).ByDegrees), m_tByDegrees, SetValue, wxString, _T(""));
 
-    SET_CONTROL_VALUE(((*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA ?
-                       _T("Runge Kutta") : _T("Newton")), m_cIntegrator, SetValue, wxString, _T(""));
+    SET_CHOICE_VALUE(Integrator, ((*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA ?
+                                  _T("Runge Kutta") : _T("Newton")));
 
     SET_SPIN(MaxDivertedCourse);
     SET_SPIN(MaxCourseAngle);
@@ -310,7 +312,7 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
 #define GET_SPIN(FIELD) \
     if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_s##FIELD) != m_edited_controls.end()) {                                     \
         configuration.FIELD = m_s##FIELD->GetValue(); \
-        m_s##FIELD->SetForegroundColour(wxColour(0, 0, 0)); \
+        m_s##FIELD->SetForegroundColour(wxColour(0, 0, 0));  \
     }
 
 #define GET_CHOICE(FIELD) \

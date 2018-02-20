@@ -1,7 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-
-// C++ code generated with wxFormBuilder (version Feb 18 2018)
-
+// C++ code generated with wxFormBuilder (version Feb 20 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -982,7 +980,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText139->Wrap( -1 );
 	fgSizer115->Add( m_staticText139, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	m_cIntegrator = new wxComboBox( sbSizer29->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	m_cIntegrator = new wxComboBox( sbSizer29->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_READONLY );
 	m_cIntegrator->Append( _("Newton") );
 	m_cIntegrator->Append( _("Runge Kutta") );
 	fgSizer115->Add( m_cIntegrator, 0, wxALL, 5 );
