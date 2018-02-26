@@ -1314,8 +1314,10 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
         int i=0;
         for(TiXmlElement* e = root.FirstChild().Element(); e; e = e->NextSiblingElement(), i++) {
             if(progressdialog) {
-                if(!progressdialog->Update(i))
+                if(!progressdialog->Update(i)) {
+                    delete progressdialog;
                     return true;
+                }
             } else {
                 wxDateTime now = wxDateTime::UNow();
                 /* if it's going to take more than a half second, show a progress dialog */
@@ -1434,6 +1436,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
     return true;
 failed:
 
+    delete progressdialog;
     if(reportfailure) {
         wxMessageDialog mdlg(this, error, _("Weather Routing"), wxOK | wxICON_ERROR);
         mdlg.ShowModal();
