@@ -1116,6 +1116,7 @@ void WeatherRouting::OnFilter( wxCommandEvent& event )
 
 void WeatherRouting::OnResetAll( wxCommandEvent& event )
 {
+    m_StatisticsDialog.SetRunTime(m_RunTime = wxTimeSpan(0));
     Reset();
     UpdateStates();
 }
