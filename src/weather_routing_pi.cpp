@@ -140,6 +140,7 @@ int weather_routing_pi::Init(void)
 
 bool weather_routing_pi::DeInit(void)
 {
+    m_tCursorLatLon.Stop();
     if(m_pWeather_Routing)
         m_pWeather_Routing->Close();
     WeatherRouting *wr = m_pWeather_Routing;
@@ -461,6 +462,9 @@ bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort 
 
 void weather_routing_pi::OnCursorLatLonTimer( wxTimerEvent & )
 {
+    if (m_pWeather_Routing == 0)
+        return;
+
     std::list<RouteMapOverlay *>routemapoverlays = m_pWeather_Routing->CurrentRouteMaps();
     bool refresh = false;
     for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
