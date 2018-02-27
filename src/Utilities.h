@@ -61,8 +61,8 @@ char *strtok_r(char *str, const char *delim, char **save);
 #endif
 
 #include <cmath>
-using std::isnan;
-using std::isinf;
+//using std::isnan;
+//using std::isinf;
 
 /* min must have correct paren to make predence correct */
 #ifdef MIN
