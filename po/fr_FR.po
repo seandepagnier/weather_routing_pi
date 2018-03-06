@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-15 09:58-0300\n"
-"PO-Revision-Date: 2018-02-15 13:05-0500\n"
+"PO-Revision-Date: 2018-03-03 08:23-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -83,7 +83,7 @@ msgstr "Sélectionner le fichier de polaire"
 
 #: src/BoatDialog.cpp:1026
 msgid "wind speed out of range"
-msgstr ""
+msgstr "vitesse du vent non gérée"
 
 #: src/BoatDialog.cpp:1028
 #, c-format
@@ -604,7 +604,7 @@ msgstr "Impossible de sauvegarder le fichier xml :"
 
 #: src/WeatherRouting.cpp:1570
 msgid "Invalid Start/End "
-msgstr ""
+msgstr "Départ/Arrivée invalide "
 
 #: src/WeatherRouting.cpp:1573
 msgid "Computing..."
@@ -625,11 +625,11 @@ msgstr "Pas de donnée"
 
 #: src/WeatherRouting.cpp:1593
 msgid "Land"
-msgstr ""
+msgstr "Terre"
 
 #: src/WeatherRouting.cpp:1597
 msgid "Boundary"
-msgstr ""
+msgstr "Barrière"
 
 #: src/WeatherRouting.cpp:1601
 msgid "Failed"
@@ -661,19 +661,19 @@ msgstr "Caractéristiques de la météo-route obtenue"
 
 #: src/WeatherRouting.cpp:1842
 msgid "Weather Route Destination"
-msgstr ""
+msgstr "Destination du Météo-Routage"
 
 #: src/WeatherRouting.cpp:1867
 msgid "Zero Time Step"
-msgstr ""
+msgstr "Intervalle de temps nul"
 
 #: src/WeatherRouting.cpp:1875
 msgid "inside exclusion boundary"
-msgstr ""
+msgstr "a l'intérieur d'une zone barrière"
 
 #: src/WeatherRouting.cpp:1882
 msgid "lies outside of Max Latitude constraint"
-msgstr ""
+msgstr "se trouve en dehors de la contrainte Latitude Maximale"
 
 #: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:2021
 msgid "Positions"
@@ -881,7 +881,7 @@ msgstr "Heure"
 
 #: src/WeatherRoutingUI.cpp:582
 msgid ":"
-msgstr ""
+msgstr ":"
 
 #: src/WeatherRoutingUI.cpp:586 src/WeatherRoutingUI.cpp:1963
 #: src/WeatherRoutingUI.cpp:1993 src/WeatherRoutingUI.cpp:2001
@@ -892,7 +892,7 @@ msgstr "0"
 
 #: src/WeatherRoutingUI.cpp:591
 msgid "Current Time"
-msgstr "Heure des courants"
+msgstr "Heure actuelle"
 
 #: src/WeatherRoutingUI.cpp:618
 msgid "..."

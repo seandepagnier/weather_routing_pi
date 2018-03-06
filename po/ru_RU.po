@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-15 09:58-0300\n"
-"PO-Revision-Date: 2018-02-15 13:06-0500\n"
+"PO-Revision-Date: 2018-03-03 08:25-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: opencpn\n"
 "X-Crowdin-Language: ru\n"
@@ -18,36 +18,36 @@ msgstr ""
 
 #: src/Boat.cpp:55
 msgid "Boat file does not exist."
-msgstr ""
+msgstr "Файл лодки не существует."
 
 #: src/Boat.cpp:59
 msgid "Failed to load file: "
-msgstr ""
+msgstr "Не удалось загрузить файл: "
 
 #: src/Boat.cpp:60
 msgid "It should an xml file describing a boat, not a polar; try editing the boat."
-msgstr ""
+msgstr "Это должен xml-файл, описывающий лодку, а не полярную; попробуйте отредактировать лодку."
 
 #: src/Boat.cpp:64
 msgid "Invalid xml file (no OCPWeatherRoutingBoat node): "
-msgstr ""
+msgstr "Неверный xml-файл (без узла OCPWeatherRoutingBoat): "
 
 #: src/Boat.cpp:156
 msgid "Failed to open for writing: "
-msgstr ""
+msgstr "Не удалось открыть для записи: "
 
 #: src/Boat.cpp:166
 msgid "Failed saving file: "
-msgstr ""
+msgstr "Не удалось сохранить файл: "
 
 #: src/BoatDialog.cpp:59 src/WeatherRouting.cpp:486 src/WeatherRouting.cpp:495
 #: src/WeatherRoutingUI.cpp:607 src/WeatherRoutingUI.h:427
 msgid "Boat"
-msgstr ""
+msgstr "Лодка"
 
 #: src/BoatDialog.cpp:71
 msgid "Filename"
-msgstr ""
+msgstr "Имя файла"
 
 #: src/BoatDialog.cpp:106 src/BoatDialog.cpp:678 src/BoatDialog.cpp:728
 #: src/BoatDialog.cpp:824 src/BoatDialog.cpp:830 src/BoatDialog.cpp:884
@@ -63,27 +63,27 @@ msgstr ""
 
 #: src/BoatDialog.cpp:228
 msgid "Select a polar to view plot"
-msgstr ""
+msgstr "Выберите полярную диаграмму для просмотра"
 
 #: src/BoatDialog.cpp:665 src/BoatDialog.cpp:704
 msgid "Select Boat"
-msgstr ""
+msgstr "Выбрать Лодку"
 
 #: src/BoatDialog.cpp:823
 msgid "Failed to save"
-msgstr ""
+msgstr "Не смог спасти"
 
 #: src/BoatDialog.cpp:829
 msgid "Failed to revert"
-msgstr ""
+msgstr "Не удалось вернуться"
 
 #: src/BoatDialog.cpp:847
 msgid "Select Polar File"
-msgstr ""
+msgstr "Выберите Файл Polar"
 
 #: src/BoatDialog.cpp:1026
 msgid "wind speed out of range"
-msgstr ""
+msgstr "скорость ветра вне диапазона"
 
 #: src/BoatDialog.cpp:1028
 #, c-format
@@ -92,15 +92,15 @@ msgstr ""
 
 #: src/ConfigurationBatchDialog.cpp:46 src/WeatherRoutingUI.h:571
 msgid "Weather Routing Configuration Batch"
-msgstr ""
+msgstr "Пакет Конфигурации Маршрутизации Погоды"
 
 #: src/ConfigurationBatchDialog.cpp:255
 msgid "Select Polar"
-msgstr ""
+msgstr "Выберите Полярный"
 
 #: src/ConfigurationBatchDialog.cpp:290
 msgid "Batch mode generates multiple configurations based on the selected configuration."
-msgstr ""
+msgstr "Пакетный режим создает несколько конфигураций на основе выбранной конфигурации."
 
 #: src/ConfigurationBatchDialog.cpp:292 src/ConfigurationDialog.cpp:269
 #: src/ConfigurationDialog.cpp:394 src/ReportDialog.cpp:251
@@ -115,63 +115,63 @@ msgstr ""
 #: src/WeatherRouting.cpp:1785 src/WeatherRouting.cpp:1817
 #: src/WeatherRoutingUI.h:131
 msgid "Weather Routing"
-msgstr ""
+msgstr "Маршрутизация Погоды"
 
 #: src/ConfigurationDialog.cpp:48 src/WeatherRoutingUI.h:284
 msgid "Weather Routing Configuration"
-msgstr ""
+msgstr "Конфигурация Маршрутизации Погоды"
 
 #: src/ConfigurationDialog.cpp:98
 msgid "Select Boat File"
-msgstr ""
+msgstr "Выберите Файл Лодки"
 
 #: src/ConfigurationDialog.cpp:268
 msgid "Invalid Date Time."
-msgstr ""
+msgstr "Неверное Время Даты."
 
 #: src/ConfigurationDialog.cpp:393
 msgid "Warning: less than 4 different degree steps specified\n"
-msgstr ""
+msgstr "Предупреждение: менее 4 различных шагов степени указано\n"
 
 #: src/EditPolarDialog.cpp:40 src/WeatherRoutingUI.h:758
 msgid "Edit Polar"
-msgstr ""
+msgstr "Редактировать Полярный"
 
 #: src/EditPolarDialog.cpp:46
 msgid "True Wind Speed"
-msgstr ""
+msgstr "Истинная Скорость Ветра"
 
 #: src/EditPolarDialog.cpp:47
 msgid "True Wind Direction"
-msgstr ""
+msgstr "Истинное Направление Ветра"
 
 #: src/EditPolarDialog.cpp:48
 msgid "Apparent Wind Speed"
-msgstr ""
+msgstr "Кажущаяся Скорость Ветра"
 
 #: src/EditPolarDialog.cpp:49
 msgid "Apparent Wind Direction"
-msgstr ""
+msgstr "Видимое Направление Ветра"
 
 #: src/EditPolarDialog.cpp:50
 msgid "Boat Speed"
-msgstr ""
+msgstr "Скорость лодки"
 
 #: src/EditPolarDialog.cpp:51
 msgid "Sailboat Transform ETA"
-msgstr ""
+msgstr "Парусник Transform ETA"
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:525
 msgid "Start"
-msgstr ""
+msgstr "Начать"
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:2242
 msgid "Start Time"
-msgstr ""
+msgstr "Время начала"
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:698
 msgid "End"
-msgstr ""
+msgstr "Конец"
 
 #: src/FilterRoutesDialog.cpp:42
 msgid "BoatFileName"
@@ -179,15 +179,15 @@ msgstr ""
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:1981
 msgid "State"
-msgstr ""
+msgstr "Государство"
 
 #: src/FilterRoutesDialog.cpp:48 src/WeatherRoutingUI.h:598
 msgid "Filter Routes"
-msgstr ""
+msgstr "Фильтровать Маршруты"
 
 #: src/PlotDialog.cpp:49 src/WeatherRoutingUI.h:327
 msgid "Weather Route Plot"
-msgstr ""
+msgstr "Участок Маршрута Погоды"
 
 #: src/Polar.cpp:184
 msgid " line "
@@ -195,11 +195,11 @@ msgstr ""
 
 #: src/Polar.cpp:186
 msgid "Boat polar failed"
-msgstr ""
+msgstr "Лодка Полярный не удалось"
 
 #: src/Polar.cpp:204
 msgid "Failed to open."
-msgstr ""
+msgstr "Не удалось открыть."
 
 #: src/Polar.cpp:209
 msgid "Failed to read."
@@ -207,47 +207,47 @@ msgstr ""
 
 #: src/Polar.cpp:224
 msgid "Unrecognized format."
-msgstr ""
+msgstr "Непризнанный Формат."
 
 #: src/Polar.cpp:230
 msgid "Too many wind speeds."
-msgstr ""
+msgstr "Слишком много скоростей ветра."
 
 #: src/Polar.cpp:249
 msgid "Wind direction out of range."
-msgstr ""
+msgstr "Направление ветра вне диапазона."
 
 #: src/Polar.cpp:254
 msgid "Wind direction out of order."
-msgstr ""
+msgstr "Направление ветра выходит из строя."
 
 #: src/Polar.cpp:278
 msgid "Too few tokens."
-msgstr ""
+msgstr "Слишком мало жетонов."
 
 #: src/Polar.cpp:284
 msgid "Too many tokens."
-msgstr ""
+msgstr "Слишком много жетонов."
 
 #: src/ReportDialog.cpp:48 src/WeatherRoutingUI.h:490
 msgid "Weather Route Report"
-msgstr ""
+msgstr "Прогноз Погоды По Маршруту"
 
 #: src/ReportDialog.cpp:61
 msgid "No Configuration selected."
-msgstr ""
+msgstr "Конфигурация не выбрана."
 
 #: src/ReportDialog.cpp:71
 msgid "Destination not yet reached."
-msgstr ""
+msgstr "Пункт назначения еще не достигнут."
 
 #: src/ReportDialog.cpp:79
 msgid "Boat Filename"
-msgstr ""
+msgstr "Лодку Именем"
 
 #: src/ReportDialog.cpp:80
 msgid "Route from "
-msgstr ""
+msgstr "Маршрут от "
 
 #: src/ReportDialog.cpp:80 src/ReportDialog.cpp:288 src/ReportDialog.cpp:326
 msgid " to "
@@ -271,11 +271,11 @@ msgstr ""
 
 #: src/ReportDialog.cpp:92
 msgid "longer than great circle route"
-msgstr ""
+msgstr "более длинний чем большой маршрут круга"
 
 #: src/ReportDialog.cpp:96
 msgid "Average Speed Over Water (SOW)"
-msgstr ""
+msgstr "Средняя скорость по воде (СВИНОМАТКА)"
 
 #: src/ReportDialog.cpp:97 src/ReportDialog.cpp:99 src/ReportDialog.cpp:102
 #: src/ReportDialog.cpp:187 src/WeatherRoutingUI.cpp:656
@@ -285,35 +285,35 @@ msgstr ""
 
 #: src/ReportDialog.cpp:98
 msgid "Average Speed Over Ground (SOG)"
-msgstr ""
+msgstr "Средняя скорость над землей (СОГ)"
 
 #: src/ReportDialog.cpp:100
 msgid "Average Wind"
-msgstr ""
+msgstr "Средний Ветер"
 
 #: src/ReportDialog.cpp:103
 msgid "Average Swell"
-msgstr ""
+msgstr "Средняя Цаца"
 
 #: src/ReportDialog.cpp:105 src/WeatherRoutingUI.cpp:678
 msgid "meters"
-msgstr ""
+msgstr "измерители"
 
 #: src/ReportDialog.cpp:106
 msgid "Upwind"
-msgstr ""
+msgstr "Против ветра"
 
 #: src/ReportDialog.cpp:109
 msgid "Port/Starboard"
-msgstr ""
+msgstr "Порт/Правый"
 
 #: src/ReportDialog.cpp:114
 msgid "Number of tacks"
-msgstr ""
+msgstr "Количество галсов"
 
 #: src/ReportDialog.cpp:124
 msgid "speed change due to "
-msgstr ""
+msgstr "изменение скорости из-за "
 
 #: src/ReportDialog.cpp:126
 msgid "favorable"

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-02-15 09:58-0300\n"
-"PO-Revision-Date: 2018-02-15 13:05-0500\n"
+"PO-Revision-Date: 2018-03-03 08:24-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -83,7 +83,7 @@ msgstr "Επιλέξτε Αρχείο πολικών δεδομένων"
 
 #: src/BoatDialog.cpp:1026
 msgid "wind speed out of range"
-msgstr ""
+msgstr "ταχύτητα ανέμου εκτός ορίων"
 
 #: src/BoatDialog.cpp:1028
 #, c-format
@@ -603,7 +603,7 @@ msgstr "Απέτυχε η αποθήκευση του αρχείου xml: "
 
 #: src/WeatherRouting.cpp:1570
 msgid "Invalid Start/End "
-msgstr ""
+msgstr "Μη έγκυρη έναρξη/λήξη "
 
 #: src/WeatherRouting.cpp:1573
 msgid "Computing..."
@@ -624,11 +624,11 @@ msgstr "Δεν υπάρχουν δεδομένα"
 
 #: src/WeatherRouting.cpp:1593
 msgid "Land"
-msgstr ""
+msgstr "Ξηρά"
 
 #: src/WeatherRouting.cpp:1597
 msgid "Boundary"
-msgstr ""
+msgstr "Όριο"
 
 #: src/WeatherRouting.cpp:1601
 msgid "Failed"
@@ -660,19 +660,19 @@ msgstr "Σημείο για Weather Route"
 
 #: src/WeatherRouting.cpp:1842
 msgid "Weather Route Destination"
-msgstr ""
+msgstr "Προορισμός Weather Routing"
 
 #: src/WeatherRouting.cpp:1867
 msgid "Zero Time Step"
-msgstr ""
+msgstr "Μηδενικό χρονικό βήμα"
 
 #: src/WeatherRouting.cpp:1875
 msgid "inside exclusion boundary"
-msgstr ""
+msgstr "εντός αποκλεισμένης περιοχής"
 
 #: src/WeatherRouting.cpp:1882
 msgid "lies outside of Max Latitude constraint"
-msgstr ""
+msgstr "είναι εκτός μεγίστου επιτρεπτού γ. πλάτους"
 
 #: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:2021
 msgid "Positions"

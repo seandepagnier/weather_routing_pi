@@ -5,102 +5,102 @@ msgstr ""
 "POT-Creation-Date: 2018-02-15 09:58-0300\n"
 "PO-Revision-Date: 2018-03-03 08:23-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
-"Language-Team: Finnish\n"
-"Language: fi_FI\n"
+"Language-Team: Filipino\n"
+"Language: fil_PH\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: opencpn\n"
-"X-Crowdin-Language: fi\n"
+"X-Crowdin-Language: fil\n"
 "X-Crowdin-File: /plugins/weather_routing_pi/po/weather_routing_pi.pot\n"
 
 #: src/Boat.cpp:55
 msgid "Boat file does not exist."
-msgstr "Veneen tiedostoa ei ole."
+msgstr "Ang taklasan ng barko ay hindi umiiral."
 
 #: src/Boat.cpp:59
 msgid "Failed to load file: "
-msgstr "Tiedoston lataus epäonnistui: "
+msgstr "Nabigo sa pagkarga ng taklasan: "
 
 #: src/Boat.cpp:60
 msgid "It should an xml file describing a boat, not a polar; try editing the boat."
-msgstr "Veneen kuvaukseen pitää olla xml tiedosto, ei polar; Kokeile muokata vene."
+msgstr "Ito ay dapat na naka-xml na taklasan na naglalarawan sa barko, hindi isang polar; subukang i-edit ang barko."
 
 #: src/Boat.cpp:64
 msgid "Invalid xml file (no OCPWeatherRoutingBoat node): "
-msgstr "Epäkelpo xml-tiedosto (ei OCPWeatherRoutingBoat haaraa): "
+msgstr "Imbalidong xml na taklasan (walang node ng OCPWeatherRoutingBoat): "
 
 #: src/Boat.cpp:156
 msgid "Failed to open for writing: "
-msgstr "Ei voi avata kirjoittamista varten: "
+msgstr "Nabigo sa pagbukas upang sulatan: "
 
 #: src/Boat.cpp:166
 msgid "Failed saving file: "
-msgstr "Tiedoston tallentaminen epäonnistui: "
+msgstr "Nabigo sa pag-save ng taklasan: "
 
 #: src/BoatDialog.cpp:59 src/WeatherRouting.cpp:486 src/WeatherRouting.cpp:495
 #: src/WeatherRoutingUI.cpp:607 src/WeatherRoutingUI.h:427
 msgid "Boat"
-msgstr "Vene"
+msgstr "Barko"
 
 #: src/BoatDialog.cpp:71
 msgid "Filename"
-msgstr "Tiedostonimi"
+msgstr "Pangalan ng Taklasan"
 
 #: src/BoatDialog.cpp:106 src/BoatDialog.cpp:678 src/BoatDialog.cpp:728
 #: src/BoatDialog.cpp:824 src/BoatDialog.cpp:830 src/BoatDialog.cpp:884
 msgid "OpenCPN Weather Routing Plugin"
-msgstr "OpenCPN Weather reititys lisäosa"
+msgstr "Saksakan ng Pagruta ng Panahon sa OpenCPN"
 
 #: src/BoatDialog.cpp:120 src/BoatDialog.cpp:121 src/BoatDialog.cpp:122
 #: src/BoatDialog.cpp:123 src/BoatDialog.cpp:124 src/BoatDialog.cpp:125
 #: src/PlotDialog.cpp:64 src/WeatherRouting.cpp:1520
 #: src/WeatherRoutingUI.cpp:2166
 msgid "N/A"
-msgstr "N/A"
+msgstr "Hindi Maaari"
 
 #: src/BoatDialog.cpp:228
 msgid "Select a polar to view plot"
-msgstr "Valitse polar näytettäväksi"
+msgstr "Pumili ng polar upang makita ang balangkas"
 
 #: src/BoatDialog.cpp:665 src/BoatDialog.cpp:704
 msgid "Select Boat"
-msgstr "Valitse vene"
+msgstr "Pumili ng Barko"
 
 #: src/BoatDialog.cpp:823
 msgid "Failed to save"
-msgstr "Tallennus epäonnistui"
+msgstr "Nabigo sa pag-save"
 
 #: src/BoatDialog.cpp:829
 msgid "Failed to revert"
-msgstr "Ei voitu palauttaa"
+msgstr "Nabigo sa pagpapabalik"
 
 #: src/BoatDialog.cpp:847
 msgid "Select Polar File"
-msgstr "Valitse Polar-tiedosto"
+msgstr "Pumili ng Taklasang Polar"
 
 #: src/BoatDialog.cpp:1026
 msgid "wind speed out of range"
-msgstr "tuulennopeus näyttöalueen ulkopuolella"
+msgstr "ang bilis ng hangin ay hindi nasasaklaw"
 
 #: src/BoatDialog.cpp:1028
 #, c-format
 msgid "%.1f True %.1f Apparent"
-msgstr "%.1f totta %.1f ilmeistä"
+msgstr "%.1f Tunay %.1f na Kasalukuyan"
 
 #: src/ConfigurationBatchDialog.cpp:46 src/WeatherRoutingUI.h:571
 msgid "Weather Routing Configuration Batch"
-msgstr "Weather Routing kokoopanon komentojono"
+msgstr "Pangkat sa Pagsasaayos sa Pagruta ng Panahon"
 
 #: src/ConfigurationBatchDialog.cpp:255
 msgid "Select Polar"
-msgstr "Valitse Polar"
+msgstr "Pumili ng Polar"
 
 #: src/ConfigurationBatchDialog.cpp:290
 msgid "Batch mode generates multiple configurations based on the selected configuration."
-msgstr "Eräajo luo useita kokoonpanoja valitun kokoonpanon pohjalta."
+msgstr "Ang pangkatang moda ay lumilikha ng maramihang pagsasaayos na nakabase sa napiling pagsasaayos."
 
 #: src/ConfigurationBatchDialog.cpp:292 src/ConfigurationDialog.cpp:269
 #: src/ConfigurationDialog.cpp:394 src/ReportDialog.cpp:251
@@ -115,315 +115,315 @@ msgstr "Eräajo luo useita kokoonpanoja valitun kokoonpanon pohjalta."
 #: src/WeatherRouting.cpp:1785 src/WeatherRouting.cpp:1817
 #: src/WeatherRoutingUI.h:131
 msgid "Weather Routing"
-msgstr "Sää reititys"
+msgstr "Pagruta sa Panahon"
 
 #: src/ConfigurationDialog.cpp:48 src/WeatherRoutingUI.h:284
 msgid "Weather Routing Configuration"
-msgstr "Sää reitityksen kokoonpano"
+msgstr "Pagsasaayos sa Ruta ng Panahon"
 
 #: src/ConfigurationDialog.cpp:98
 msgid "Select Boat File"
-msgstr "Valitse veneen tiedosto"
+msgstr "Pumili sa Taklasan ng Barko"
 
 #: src/ConfigurationDialog.cpp:268
 msgid "Invalid Date Time."
-msgstr "Kelvoton päivämäärä ja aika."
+msgstr "Imbalidong Petsa."
 
 #: src/ConfigurationDialog.cpp:393
 msgid "Warning: less than 4 different degree steps specified\n"
-msgstr "Varoitus: alle 4 eri asteväliä lueteltu\n"
+msgstr "Babala: mas mababa sa 4 na iba't-ibang antas ng mga hakbang ang natukoy\n"
 
 #: src/EditPolarDialog.cpp:40 src/WeatherRoutingUI.h:758
 msgid "Edit Polar"
-msgstr "Muokkaa Polaria"
+msgstr "I-edit ang Polar"
 
 #: src/EditPolarDialog.cpp:46
 msgid "True Wind Speed"
-msgstr "Tosi tuulennopeus"
+msgstr "Totoong Bilis ng Hangin"
 
 #: src/EditPolarDialog.cpp:47
 msgid "True Wind Direction"
-msgstr "Tosi tuulensuunta"
+msgstr "Totoong Direksyon ng Hangin"
 
 #: src/EditPolarDialog.cpp:48
 msgid "Apparent Wind Speed"
-msgstr "Suhteellinen tuulennopeus"
+msgstr "Kasalukuyang Bilis ng Hangin"
 
 #: src/EditPolarDialog.cpp:49
 msgid "Apparent Wind Direction"
-msgstr "Suhteellinen tuulensuunta"
+msgstr "Kasalukuyang Direksyon ng Hangin"
 
 #: src/EditPolarDialog.cpp:50
 msgid "Boat Speed"
-msgstr "Veneen nopeus"
+msgstr "Bilis ng Barko"
 
 #: src/EditPolarDialog.cpp:51
 msgid "Sailboat Transform ETA"
-msgstr "Purjevene muunnos ETA"
+msgstr "ETA ng Pagbabagong-anyo ng Bangka"
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:525
 msgid "Start"
-msgstr "Aloita"
+msgstr "Simulan"
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:2242
 msgid "Start Time"
-msgstr "Alkamisaika"
+msgstr "Panimulang Oras"
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:698
 msgid "End"
-msgstr "Lopeta"
+msgstr "Katapusan"
 
 #: src/FilterRoutesDialog.cpp:42
 msgid "BoatFileName"
-msgstr "Venetiedostonimi"
+msgstr "Pangalan sa Taklasan ng barko"
 
 #: src/FilterRoutesDialog.cpp:42 src/WeatherRoutingUI.cpp:1981
 msgid "State"
-msgstr "Tila"
+msgstr "Estado"
 
 #: src/FilterRoutesDialog.cpp:48 src/WeatherRoutingUI.h:598
 msgid "Filter Routes"
-msgstr "Suodata reitit"
+msgstr "Salain ang mga Ruta"
 
 #: src/PlotDialog.cpp:49 src/WeatherRoutingUI.h:327
 msgid "Weather Route Plot"
-msgstr "Sää reittipiirros"
+msgstr "Balangkas sa Ruta ng Panahon"
 
 #: src/Polar.cpp:184
 msgid " line "
-msgstr " rivi "
+msgstr " linya "
 
 #: src/Polar.cpp:186
 msgid "Boat polar failed"
-msgstr "Veneen polar puuttuu"
+msgstr "Nabigo sa pag-polar ng barko"
 
 #: src/Polar.cpp:204
 msgid "Failed to open."
-msgstr "Ei voitu avata."
+msgstr "Nabigo sa pagbukas."
 
 #: src/Polar.cpp:209
 msgid "Failed to read."
-msgstr "Ei voitu lukea."
+msgstr "Nabigo sa pagbasa."
 
 #: src/Polar.cpp:224
 msgid "Unrecognized format."
-msgstr "Tunnistamaton muoto."
+msgstr "Hindi nakilala ang pormat."
 
 #: src/Polar.cpp:230
 msgid "Too many wind speeds."
-msgstr "Liian monta tuulen nopeutta."
+msgstr "Masyadong maraming bilis ng hangin,."
 
 #: src/Polar.cpp:249
 msgid "Wind direction out of range."
-msgstr "Tuulensuunta alueen ulkopuolella."
+msgstr "Ang direksyon ng hangin hindi nasasaklaw."
 
 #: src/Polar.cpp:254
 msgid "Wind direction out of order."
-msgstr "Tuulensuunta epäkunnossa."
+msgstr "Ang direksyon ng hangin wala sa alintuntunin."
 
 #: src/Polar.cpp:278
 msgid "Too few tokens."
-msgstr "Liian vähän merkkejä."
+msgstr "Masyadong kaunti ang mga token."
 
 #: src/Polar.cpp:284
 msgid "Too many tokens."
-msgstr "Liikaa merkkejä."
+msgstr "Masyadong maraming mga token."
 
 #: src/ReportDialog.cpp:48 src/WeatherRoutingUI.h:490
 msgid "Weather Route Report"
-msgstr "Weather Route raportti"
+msgstr "Ulat sa Ruta ng Panahon"
 
 #: src/ReportDialog.cpp:61
 msgid "No Configuration selected."
-msgstr "Kokoonpanoa ei ole valittu."
+msgstr "Walang pagsasaayos na napili."
 
 #: src/ReportDialog.cpp:71
 msgid "Destination not yet reached."
-msgstr "Kohdetta ei ole vielä saavutettu."
+msgstr "Hindi pa naabot sa destinasyon."
 
 #: src/ReportDialog.cpp:79
 msgid "Boat Filename"
-msgstr "Veneen tiedostonimi"
+msgstr "Pangalan ng Taklasan ng Barko"
 
 #: src/ReportDialog.cpp:80
 msgid "Route from "
-msgstr "Reitti alkaen "
+msgstr "Magruta mula sa "
 
 #: src/ReportDialog.cpp:80 src/ReportDialog.cpp:288 src/ReportDialog.cpp:326
 msgid " to "
-msgstr " kohti "
+msgstr " patungo sa "
 
 #: src/ReportDialog.cpp:81
 msgid "Leaving "
-msgstr "Lähtiessä "
+msgstr "Paalis "
 
 #: src/ReportDialog.cpp:83
 msgid "Arriving "
-msgstr "Saapuessa perille "
+msgstr "Parating "
 
 #: src/ReportDialog.cpp:84
 msgid "Duration "
-msgstr "Kesto "
+msgstr "Tagal "
 
 #: src/ReportDialog.cpp:89
 msgid "Distance sailed: "
-msgstr "Purjehdittu matka: "
+msgstr "Distansyang nalayag: "
 
 #: src/ReportDialog.cpp:92
 msgid "longer than great circle route"
-msgstr "pitempi kuin isoympyrä reitti"
+msgstr "mas mahaba kaysa sa ruta nang malalaking bilog"
 
 #: src/ReportDialog.cpp:96
 msgid "Average Speed Over Water (SOW)"
-msgstr "Keskinopeus veden halki (SOW)"
+msgstr "Karaniwang Bilis Sa Tubig (SOW)"
 
 #: src/ReportDialog.cpp:97 src/ReportDialog.cpp:99 src/ReportDialog.cpp:102
 #: src/ReportDialog.cpp:187 src/WeatherRoutingUI.cpp:656
 #: src/WeatherRoutingUI.cpp:667
 msgid "knots"
-msgstr "solmua"
+msgstr "mga knot"
 
 #: src/ReportDialog.cpp:98
 msgid "Average Speed Over Ground (SOG)"
-msgstr "Keskimääräinen nopeus pohjan yli (SOG)"
+msgstr "Karaniwang Bilis Sa Lupa (SOG)"
 
 #: src/ReportDialog.cpp:100
 msgid "Average Wind"
-msgstr "Keskimääräinen tuuli"
+msgstr "Karaniwang Hangin"
 
 #: src/ReportDialog.cpp:103
 msgid "Average Swell"
-msgstr "Keskimääräinen aallokko"
+msgstr "Karaniwang Bukol"
 
 #: src/ReportDialog.cpp:105 src/WeatherRoutingUI.cpp:678
 msgid "meters"
-msgstr "metriä"
+msgstr "metros"
 
 #: src/ReportDialog.cpp:106
 msgid "Upwind"
-msgstr "Vastatuuli"
+msgstr "Pasalungat"
 
 #: src/ReportDialog.cpp:109
 msgid "Port/Starboard"
-msgstr "Vasemmalle/oikealle"
+msgstr "Kaliwang Tagiliran/Kanang Tagiliran"
 
 #: src/ReportDialog.cpp:114
 msgid "Number of tacks"
-msgstr "Jälkien lukumäärä"
+msgstr "Bilang ng mga pagliko"
 
 #: src/ReportDialog.cpp:124
 msgid "speed change due to "
-msgstr "nopeuden muutossyy "
+msgstr "pagbabago sa bilis dahil sa "
 
 #: src/ReportDialog.cpp:126
 msgid "favorable"
-msgstr "suotuisa"
+msgstr "kanais-nais"
 
 #: src/ReportDialog.cpp:128
 msgid "unfavorable"
-msgstr "epäsuotuisa"
+msgstr "hindi kanais-nais"
 
 #: src/ReportDialog.cpp:129
 msgid " currents."
-msgstr " virtaukset."
+msgstr " mga alon."
 
 #: src/ReportDialog.cpp:159
 msgid "No routes to report yet."
-msgstr "Ei vielä ilmoitettavia reittejä."
+msgstr "Wala pang rutang maiiulat."
 
 #: src/ReportDialog.cpp:182 src/ReportDialog.cpp:232
 msgid "to"
-msgstr "kohti"
+msgstr "sa"
 
 #: src/ReportDialog.cpp:183
 msgid "configurations"
-msgstr "kokoonpanomääritykset"
+msgstr "mga pagsasaayos"
 
 #: src/ReportDialog.cpp:184
 msgid "<dt>Fastest configuration "
-msgstr "<dt>Nopein kokoonpano "
+msgstr "<dt>Pinakamabilis na pagsasayos "
 
 #: src/ReportDialog.cpp:185
 msgid "avg speed"
-msgstr "keskim. nopeus"
+msgstr "karaniwang bilis"
 
 #: src/ReportDialog.cpp:191
 msgid "Best Times (mostly downwind)"
-msgstr "Parhaat ajat (enimmäkseen myötätuuleen)"
+msgstr "Pinakamabilis na Oras (madalas sa pagsama ng hangin)"
 
 #: src/ReportDialog.cpp:230 src/ReportDialog.cpp:285 src/ReportDialog.cpp:313
 msgid " and "
-msgstr " ja "
+msgstr " at "
 
 #: src/ReportDialog.cpp:244
 msgid "any"
-msgstr "kaikki"
+msgstr "anuman"
 
 #: src/ReportDialog.cpp:246 src/ReportDialog.cpp:296
 msgid "none"
-msgstr "ei mitään"
+msgstr "wala"
 
 #: src/ReportDialog.cpp:249
 msgid "Cyclones"
-msgstr "Pyörremyrskyt"
+msgstr "Mga bagyo"
 
 #: src/ReportDialog.cpp:251
 msgid "Calculating Cyclone Crossings"
-msgstr "Lasketaan pyörremyrskyjen risteykset"
+msgstr "Pagkalkula sa mga Pagtawid sa Bagyo"
 
 #: src/ReportDialog.cpp:261
 msgid "Climatology data unavailable."
-msgstr "Ilmastotietoja ei ole käytettävissä."
+msgstr "Walang datos sa klimatolohiya."
 
 #: src/ReportDialog.cpp:294
 msgid "all months"
-msgstr "kaikki kuukaudet"
+msgstr "lahat ng buwan"
 
 #: src/ReportDialog.cpp:302
 msgid "All routes are safe from cyclones."
-msgstr "Kaikki reitit ovat turvassa pyörremyrskyiltä."
+msgstr "Ang lahat ng ruta ay ligtas mula sa mga bagyo."
 
 #: src/ReportDialog.cpp:304
 msgid "No routes found to be safe from cyclones."
-msgstr "Reittejä ei ole todettu olevan turvassa pyörremyrskyiltä."
+msgstr "Walang nakitang rutang ligtas mula sa mga bagyo."
 
 #: src/ReportDialog.cpp:306
 msgid "Start times for cyclone safe routes: "
-msgstr "Aika, josta alkaen on pyörremyrskyturvallisia reittejä: "
+msgstr "Mga panimulang oras para sa mga ligtas na ruta mula sa bagyo: "
 
 #: src/ReportDialog.cpp:337
 msgid "Weather Routing Reports gives an overview of a given route based on multiple configurations.\n\n"
 "For example using the configuration batch dialog, it is possible to easily generate multiple otherwise identical configurations which have different starting times. Once all of these configurations are computed, they become available to the report generator. An overview can be given of the best times, expected speed, and weather conditions. If climatology is available, cyclone risk and additional weather conditions may be described."
-msgstr "Weather Routing raportit antavat yleisnäkymän annettuun reittiiin useiden  koosteiden perusteella.\n\n"
-"Esimerkiksi käyttäen kokoonpanon eräajo valintaa, voidaan helposti luoda useita muuten samanlaisia kokoonpanoja, joilla on eri alkamisajat. Kun kaikki nämä asetukset lasketaan ne tulevat saataville raporttigeneraattoriin. Yhteenvetona voidaan antaa parhaat ajat, odotetut nopeudet ja sääolosuhteet. Jos ilmasto-olot on käytettävissä, sykloni riski ja muut sääolosuhteet voidaan kuvata."
+msgstr "Ang mga Ulat sa Pagruruta ng Panahon ay nagbibigay ng pangkalahatang-ideya sa isang naibigay na ruta na nakabase sa maramihang pagsasaayos.\n\n"
+"Halimbawa ang paggamit ng diyalogo sa pangkatang pagsasayos, posibleng madali nalang ang paglikha ng maramihan kung hindi man ay mga magkakahawig na pagsasaayos na mayroong mga iba't-ibang panimulang oras. Kapag ang lahat ng mga pagsasaayos na mga ito ay nakwenta na, sila ay magiging nasa tagalikha ng ulat. Ang pangkalahatang-ideya ay maaaring nabigay sa mga pinakamabilis na oras, inaasahang bilis, at mga kondisyon ng panahon. Kung ang klimatolohiya ay magagamit, ang panganib mula sa bagyo at ang mga karagdagang kondisyon ay maaaring ilarawan."
 
 #: src/ReportDialog.cpp:344
 msgid "Weather Routing Report"
-msgstr "Weather Routing raportti"
+msgstr "Ulat ng Pagruruta sa Panahon"
 
 #: src/RouteMapOverlay.cpp:79
 msgid "error, thread already created\n"
-msgstr "virhe säie on jo muodostettu\n"
+msgstr "kamalian, ang hibla ay nagawa na\n"
 
 #: src/RouteMapOverlay.cpp:92
 msgid "Configuration specifies cyclone track avoidance and Climatology cyclone data is not available"
-msgstr "Kokoonpano täsmentää sykloonin jäljen välttämisen ja ilmasto sykloonin tietoja ei ole saatavilla"
+msgstr "Ang pagsasaayos ay tumutukoy sa landas ng pag-iwas sa bagyo at wala ang datos ng bagyo sa Klimatolohiya"
 
 #: src/RouteMapOverlay.cpp:98
 msgid "Configuration specifies boundary exclusion but ocpn_draw_pi boundary data not available"
-msgstr "Kokoonpano määrittää rajan ulkopuolen, mutta ocpn_draw_pi rajan tietoja ei ole saatavilla"
+msgstr "Ang pagsasaayos ay tumutukoy pagbubukod ng hangganan ngunit wala ang datos ng hangganan saocpn_draw_pi"
 
 #: src/RouteMapOverlay.cpp:107
 msgid "Configuration does not allow grib or climatology wind data"
-msgstr "Kokoonpano ei salli grib tai ilmasto tuuli tietoja"
+msgstr "Ang pagsasaayos ay hindi nagpapahintulot sa datos ng hangin sa grib o klimatolohiya"
 
 #: src/SettingsDialog.cpp:54 src/WeatherRoutingUI.h:177
 msgid "Weather Routing Settings"
-msgstr "Sää reititysasetukset"
+msgstr "Mga Pagtatakda sa Pagruta ng Panahon"
 
 #: src/SettingsDialog.cpp:111
 msgid "Visible"
-msgstr "Näkyvä"
+msgstr "Nakikita"
 
 #: src/SettingsDialog.cpp:171
 msgid "Cursor Route -- optimal route closest to the cursor\n"
@@ -436,101 +436,101 @@ msgid "Cursor Route -- optimal route closest to the cursor\n"
 "Squares At Sail Changes -- render squares along Routes whenever a sail change is made\n"
 "Filter Routes by Climatology -- This currently does nothing, but I intended to make weather route maps which derive data from grib and climatology clearly render which data was used where \n\n"
 "Number of Concurrent Threads -- if there are multiple configurations, they can be computed in separate threads which allows a speedup if there are multiple processors\n"
-msgstr "Kohdistinreitti--optimaalinen reitti lähimpänä kursoria\n"
-"Kohdereitti--optimaalinen reitti haluttuun kohteeseen\n"
-"Vakioaikaero paksuus--aikaeroviivan paksuus kartalla\n"
-"Vaihtoehtoreittipaksuus--vaihtoehtoisen reittiviivan paksuus\n"
-"Reittipaksuus--kursorin Kohdereitin viivan piirtopaksuus\n"
-"Huomaa: Kaikki paksuudet voidaan asettaa 0 ja estää niiden näkyminen\n"
-"Vaihtoehdot kaikille aikaerokäyrille--näyttää kaikki vaihtoehtoiset reitit eikä vain niitä,jotka yltävät viimeiseen aikaerokäyrään\n"
-"Purjeneliöiden muutokset - mitä tekevät neliöt reiteillä kun tehdään muutoksia purjeisiin\n"
-"Suodatetaan reittejä ilmasto-olojen mukaan--tämä ei vielä tee mitään, mutta aioin tehdä Sää reittikartat, jotka jakavat tietoja grib- ja ilmastotiedosta tekevät selväksi, mitä tietoja käytettiin missäkin \n\n"
-"Lukuisia rinnakkaisia säikeitä--jos on useita kokoonpanoja, ne voidaan laskea eri säikeissä, jonka antaa lisää nopeutta, jos on olemassa useita prosessoreja\n"
+msgstr "Ang Ruta ng Panturo -- pinakamainam na ruta na pinakamalapit sa panturo\n"
+"Ruta ng Destinasyon -- pinakamainam na ruta sa ninanais na destinasyon\n"
+"Kapal ng Ruta -- kapal sa pagguhit ng Rutang Panturo at Destinasyon\n"
+"Kapal ng Iso Chron -- kapal para sa mga isochron sa mapa\n"
+"Kapal ng Alternatibong mga Ruta -- kapal ng mga alternatibong mga ruta\n"
+"Tandaan: Ang lahat ng kapal ay maaaring itakda sa 0 upang baldahin ang kanilang displey\n"
+"Mga Alternatibo para sa lahat ng mga Isochron -- nagdidispley sa lahat ng mga alternatibong ruta hindi lamang ang mga nakarating sa huling isochron\n"
+"Mga Parisukat sa Pagbabago sa Paglalayag -- nagbibigay ng mga parisukat na malapit sa Ruta kapag ang pagbabago sa paglalayag ay nagawa\n"
+"Pagsasala sa mga Ruta sa pamamagitan ng Klimatolohiya -- Ito ang kasalukuyang walang ginagawa, ngunit ito ay naglalayong gumawa ng mga mapa sa ruta ng panahon na nakukuha ang mga datos mula sa grib at ang klimatolohiya ay malinaw na ibinibigay kung anong datos ang nagamit sa kung saan \n\n"
+"Bilang nang mga Kasabayang Hibla -- kung merong maramihang pagsasaayos, maaari sila makwenta sa hiwalay na hibla na nagpapahintulot sa kanilang pagbilis kapag merong maraming mga tagaproseso\n"
 
 #: src/StatisticsDialog.cpp:45 src/WeatherRoutingUI.h:626
 msgid "Cursor Position"
-msgstr "Kohdistimen sijainti"
+msgstr "Posisyon ng Panturo"
 
 #: src/StatisticsDialog.cpp:66
 msgid "No Route"
-msgstr "Ei reittiä"
+msgstr "Walang Ruta"
 
 #: src/StatisticsDialog.cpp:67
 msgid "Running"
-msgstr "Käynnissä"
+msgstr "Tumatakbo"
 
 #: src/StatisticsDialog.cpp:67 src/WeatherRoutingUI.cpp:1985
 msgid "Stopped"
-msgstr "Pysäytetty"
+msgstr "Nahinto"
 
 #: src/weather_routing_pi.cpp:125
 msgid "Weather Route Position"
-msgstr "Weather Route sijainti"
+msgstr "Posisyon sa Ruta ng Panahon"
 
 #: src/weather_routing_pi.cpp:179
 msgid "WeatherRouting"
-msgstr "Sääretitys"
+msgstr "Pagruta ng Panahon"
 
 #: src/weather_routing_pi.cpp:184
 msgid "Compute optimal routes based on weather and constraints."
-msgstr "Laskee optimaaliset reitit säähän ja rajoituksiin perustuen."
+msgstr "Kwentahin ang pinakamainam na mga ruta na nakabase sa panahon at mga hadlang."
 
 #: src/weather_routing_pi.cpp:189
 msgid "Weather Routing features include:\n"
 "  optimal routing subject to various constraints based on weather data\n"
 "  automatic boat polar computation\n"
-msgstr "Sää reitityksen ominaisuuksiin kuuluu:\n"
-" optimaalinen reititys säädatan eri rajoituksiin perustuva\n"
-" automaattinen veneen polarkäyrälaskenta\n"
+msgstr "Kasama sa mga katangian sa Pagruta ng Panahon ay ang:\n"
+" sakop ng mainam na pagruta sa iba-ibang hadlang na nakabase sa datos ng panahon\n"
+" awtomatikong pagkwenta sa polar ng barko\n"
 
 #: src/weather_routing_pi.cpp:255
 msgid "Grib plugin version not supported."
-msgstr "Grib laajennuksen versiota ei tueta."
+msgstr "Ang plugin ng grib ay hindi suportado."
 
 #: src/weather_routing_pi.cpp:257 src/weather_routing_pi.cpp:303
 #, c-format
 msgid "Use versions %d.%d to %d.%d"
-msgstr "Käytä versiot %d.%d %d.%d"
+msgstr "Gamitin ang mga bersyong %d.%d hanggang sa %d.%d"
 
 #: src/weather_routing_pi.cpp:301
 msgid "Climatology plugin version not supported, no climatology data."
-msgstr "Ilmasto laajennuksen versiota ei tueta, ei ilmasto tietoja."
+msgstr "Ang bersyon ng plugin sa klimatolohiya ay hindi suportaado, walang datos sa klimatolohiya."
 
 #: src/WeatherRouting.cpp:142
 msgid "Name"
-msgstr "Nimi"
+msgstr "Pangalan"
 
 #: src/WeatherRouting.cpp:143
 msgid "Lat"
-msgstr "Lat"
+msgstr "Latitud"
 
 #: src/WeatherRouting.cpp:144
 msgid "Lon"
-msgstr "Lon"
+msgstr "Longhitud"
 
 #: src/WeatherRouting.cpp:294
 msgid "Enter Name"
-msgstr "Anna nimi"
+msgstr "Maglagat ng Pangalan"
 
 #: src/WeatherRouting.cpp:294
 msgid "New Position"
-msgstr "Uusi sijainti"
+msgstr "Bagong Posisyon"
 
 #: src/WeatherRouting.cpp:304
 msgid "This name already exists, replace?\n"
-msgstr "Nimi on jo käytössä, korvaa?\n"
+msgstr "Ang pangalang ito ay nagamit na, baguhin?\n"
 
 #: src/WeatherRouting.cpp:357
 msgid "local"
-msgstr "paikallinen"
+msgstr "lokal"
 
 #: src/WeatherRouting.cpp:398
 msgid "Select exactly 1 configuration"
-msgstr "Valitse täsmälleen 1 kokoonpano"
+msgstr "Pumili ng eksaktong isang pagsasaayos"
 
 #: src/WeatherRouting.cpp:405
 msgid "Cursor outside computed route map"
-msgstr "Kursori on lasketun reittikartan ulkopuolella"
+msgstr "Ang panturo ay nasa labas mapa ng nakwentang ruta"
 
 #: src/WeatherRouting.cpp:427 src/WeatherRouting.cpp:1581
 #: src/WeatherRoutingUI.cpp:790
@@ -539,79 +539,79 @@ msgstr "Grib"
 
 #: src/WeatherRouting.cpp:428 src/WeatherRoutingUI.cpp:795
 msgid "Climatology"
-msgstr "Ilmasto"
+msgstr "Klimatolohiya"
 
 #: src/WeatherRouting.cpp:429
 msgid "Data Deficient"
-msgstr "Puutteellista tietoa"
+msgstr "Kulang ang Datos"
 
 #: src/WeatherRouting.cpp:430
 msgid "Wind"
-msgstr "Tuuli"
+msgstr "Hangin"
 
 #: src/WeatherRouting.cpp:431
 msgid "Current"
-msgstr "Virta"
+msgstr "Alon"
 
 #: src/WeatherRouting.cpp:630
 msgid "Cannot goto invalid route(s)."
-msgstr "Ei voida mennä virhereitille."
+msgstr "Dili maaaring pumunta sa imbalidong ruta/mga ruta."
 
 #: src/WeatherRouting.cpp:789 src/WeatherRouting.cpp:805
 msgid "Select Configuration"
-msgstr "Valitse kokoonpano"
+msgstr "Pumili ng Pagsasaayos"
 
 #: src/WeatherRouting.cpp:871
 msgid "Zero time span forbidden, aborting."
-msgstr "Nolla aikajänteellä kielletty, keskeytetään."
+msgstr "Ang oras na may habang sero ay pinagbabawal, mabibigo."
 
 #: src/WeatherRouting.cpp:894
 msgid "Batch configuration"
-msgstr "Erän kokoonpano"
+msgstr "Pangkatang pagsasaayos"
 
 #: src/WeatherRouting.cpp:1041
 msgid "WeatherRoutingInformation.html"
-msgstr "WeatherRoutingInformation.html"
+msgstr ""
 
 #: src/WeatherRouting.cpp:1096
 msgid "Failed to start configuration: "
-msgstr "Kokoonpano ei käynnistynyt: "
+msgstr "Nabigo sa pagsimula ng pagsasaayos: "
 
 #: src/WeatherRouting.cpp:1167
 msgid "Failed to load file."
-msgstr "Tiedoston lataus epäonnistui."
+msgstr "Nabigo sa pagkarga ng talaksan."
 
 #: src/WeatherRouting.cpp:1172
 msgid "Invalid xml file"
-msgstr "Kelvoton xml-tiedosto"
+msgstr "Imbalidong talaksan na xml"
 
 #: src/WeatherRouting.cpp:1190
 msgid "Load"
-msgstr "Lataa"
+msgstr "Ikarga"
 
 #: src/WeatherRouting.cpp:1206
 msgid "File contains duplicate position name, discaring\n"
-msgstr "Tiedosto sisältää päällekkäisiä sijaintien nimiä, hylätään\n"
+msgstr "Ang talaksan ay naglalaman ng duplikadong pangalan ng posisyon, naghihingal\n"
 
 #: src/WeatherRouting.cpp:1295
 msgid "Unrecognized xml node"
-msgstr "Tuntematon xml-haara"
+msgstr "Hindi makilalang node na xml"
 
 #: src/WeatherRouting.cpp:1392
 msgid "Failed to save xml file: "
-msgstr "Tiedostoa ei voi tallentaa xml-muodossa: "
+msgstr "Nagibo sa pag-save ng talaksan na xml: "
 
 #: src/WeatherRouting.cpp:1570
 msgid "Invalid Start/End "
-msgstr "Epäkelpo alku/loppu "
+msgstr "Imbalidong Panimula/Panapos "
 
 #: src/WeatherRouting.cpp:1573
 msgid "Computing..."
-msgstr "Lasketaan..."
+msgstr "Nagkukuwenta..."
 
 #: src/WeatherRouting.cpp:1577
 msgid "Complete"
-msgstr "Suoritettu"
+msgstr "Kompleto"
 
 #: src/WeatherRouting.cpp:1585 src/WeatherRoutingUI.cpp:1773
 #: src/WeatherRoutingUI.cpp:2603
@@ -620,263 +620,263 @@ msgstr "Polar"
 
 #: src/WeatherRouting.cpp:1589
 msgid "No Data"
-msgstr "Ei tietoja"
+msgstr "Walang Datos"
 
 #: src/WeatherRouting.cpp:1593
 msgid "Land"
-msgstr "Maa"
+msgstr "Lupa"
 
 #: src/WeatherRouting.cpp:1597
 msgid "Boundary"
-msgstr "Raja"
+msgstr "Hangganan"
 
 #: src/WeatherRouting.cpp:1601
 msgid "Failed"
-msgstr "Hylätty"
+msgstr "Nabigo"
 
 #: src/WeatherRouting.cpp:1607
 msgid "Waiting..."
-msgstr "Odotetaan..."
+msgstr "Naghihintay..."
 
 #: src/WeatherRouting.cpp:1610
 msgid "Not Computed"
-msgstr "Ei laskettu"
+msgstr "Hindi Nakwenta"
 
 #: src/WeatherRouting.cpp:1784
 msgid "No Weather Route selected"
-msgstr "Weather Route ei ole valittu"
+msgstr "Walang napiling Ruta ng Panahon"
 
 #: src/WeatherRouting.cpp:1816
 msgid "Empty Route, nothing to export\n"
-msgstr "Tyhjä reitti, ei vietävää\n"
+msgstr "Walang lamang Ruta, walang mailuluwas\n"
 
 #: src/WeatherRouting.cpp:1823
 msgid "Weather Route"
-msgstr "Weather Route"
+msgstr "Ruta ng Panahon"
 
 #: src/WeatherRouting.cpp:1831
 msgid "Weather Route Point"
-msgstr "Weather Route piste"
+msgstr "Punto sa Ruta ng Panahon"
 
 #: src/WeatherRouting.cpp:1842
 msgid "Weather Route Destination"
-msgstr "Sää reitin määränpää"
+msgstr "Destinasyon sa Ruta ng Panahon"
 
 #: src/WeatherRouting.cpp:1867
 msgid "Zero Time Step"
-msgstr "Nolla aikaväli"
+msgstr "Hakbang na may Oras na Sero"
 
 #: src/WeatherRouting.cpp:1875
 msgid "inside exclusion boundary"
-msgstr "hylkäysrajan sisäpuolella"
+msgstr "sa loob ng nakabukod na hangganan"
 
 #: src/WeatherRouting.cpp:1882
 msgid "lies outside of Max Latitude constraint"
-msgstr "sijaitsee Max latitude rajan ulkopuolella"
+msgstr "nasa labas ng Pinakamataas na Latitude na hadlang"
 
 #: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:2021
 msgid "Positions"
-msgstr "Sijainnit"
+msgstr "Mga posiston"
 
 #: src/WeatherRoutingUI.cpp:50
 msgid "Configurations"
-msgstr "Kokoonpanomääritykset"
+msgstr "Mga Pagsasaayos"
 
 #: src/WeatherRoutingUI.cpp:68 src/WeatherRoutingUI.cpp:154
 msgid "&Compute"
-msgstr "&Laske"
+msgstr "&Magkwenta"
 
 #: src/WeatherRoutingUI.cpp:71
 msgid "&Export"
-msgstr "&Vie"
+msgstr "&Magluwas"
 
 #: src/WeatherRoutingUI.cpp:98
 msgid "&Open"
-msgstr "&Avaa"
+msgstr "&Magbukas"
 
 #: src/WeatherRoutingUI.cpp:102
 msgid "&Save"
-msgstr "&Tallenna"
+msgstr "&Mag-save"
 
 #: src/WeatherRoutingUI.cpp:108 src/WeatherRoutingUI.cpp:2113
 msgid "&Close"
-msgstr "&Sulje"
+msgstr "&Magsarado"
 
 #: src/WeatherRoutingUI.cpp:111
 msgid "&File"
-msgstr "&Tiedosto"
+msgstr "&Taklasan"
 
 #: src/WeatherRoutingUI.cpp:115
 msgid "&New Position"
-msgstr "&Uusi sijainti"
+msgstr "&Bagong Posisyon"
 
 #: src/WeatherRoutingUI.cpp:119
 msgid "&Update Boat Position"
-msgstr "&Päivitä veneen sijainti"
+msgstr "&Mag-update sa Posisyon ng Barko"
 
 #: src/WeatherRoutingUI.cpp:123 src/WeatherRoutingUI.cpp:146
 msgid "&Delete"
-msgstr "&Poista"
+msgstr "&Magtanggal"
 
 #: src/WeatherRoutingUI.cpp:127
 msgid "Delete &All"
-msgstr "Poista &kaikki"
+msgstr "Tanggalin ang &Lahat"
 
 #: src/WeatherRoutingUI.cpp:130
 msgid "&Position"
-msgstr "&Sijainti"
+msgstr "&Posisyon"
 
 #: src/WeatherRoutingUI.cpp:134
 msgid "&New"
-msgstr "&Uusi"
+msgstr "&Bago"
 
 #: src/WeatherRoutingUI.cpp:137
 msgid "&Batch"
-msgstr "&Erä"
+msgstr "&Pangkat"
 
 #: src/WeatherRoutingUI.cpp:140 src/WeatherRoutingUI.cpp:1828
 msgid "&Edit"
-msgstr "&Muokkaa"
+msgstr "&Mag-edit"
 
 #: src/WeatherRoutingUI.cpp:143
 msgid "&GoTo"
-msgstr "&Mene"
+msgstr "&PumuntaSa"
 
 #: src/WeatherRoutingUI.cpp:149
 msgid "Delete All"
-msgstr "Poista kaikki"
+msgstr "Tanggalin ang Lahat"
 
 #: src/WeatherRoutingUI.cpp:157
 msgid "Compute &All"
-msgstr "Laske &kaikki"
+msgstr "Kwentahin &Lahat"
 
 #: src/WeatherRoutingUI.cpp:160
 msgid "&Stop"
-msgstr "&Pysäytä"
+msgstr "&Huminto"
 
 #: src/WeatherRoutingUI.cpp:164
 msgid "&Reset All"
-msgstr "&Palauta kaikki"
+msgstr "&Itakdang muli ang Lahat"
 
 #: src/WeatherRoutingUI.cpp:169
 msgid "E&xport"
-msgstr "&Vie"
+msgstr "&Magluwas"
 
 #: src/WeatherRoutingUI.cpp:172
 msgid "Export All"
-msgstr "Vie kaikki"
+msgstr "Iluwas ang Lahat"
 
 #: src/WeatherRoutingUI.cpp:178
 msgid "&Filter"
-msgstr "&Suodatin"
+msgstr "&Magsala"
 
 #: src/WeatherRoutingUI.cpp:181
 msgid "&Configuration"
-msgstr "&Kokoonpano"
+msgstr "&Pagsasaayos"
 
 #: src/WeatherRoutingUI.cpp:185
 msgid "&Settings"
-msgstr "A&setukset"
+msgstr "&Mga Pagkakatakda"
 
 #: src/WeatherRoutingUI.cpp:189
 msgid "S&tatistics"
-msgstr "S&tilastot"
+msgstr "&Mga Istatistika"
 
 #: src/WeatherRoutingUI.cpp:193
 msgid "&Report"
-msgstr "&Raportti"
+msgstr "&Mag-ulat"
 
 #: src/WeatherRoutingUI.cpp:197
 msgid "&Plot"
-msgstr "&Piirrä"
+msgstr "&Magbalangkas"
 
 #: src/WeatherRoutingUI.cpp:201
 msgid "&Cursor Position"
-msgstr "&Kohdistimen sijainti"
+msgstr "&Posisyon ng Panturo"
 
 #: src/WeatherRoutingUI.cpp:204
 msgid "&View"
-msgstr "&Katso"
+msgstr "&Tingnan"
 
 #: src/WeatherRoutingUI.cpp:208
 msgid "&Information"
-msgstr "&Informaatiota"
+msgstr "&Impormasyon"
 
 #: src/WeatherRoutingUI.cpp:212
 msgid "&Manual"
-msgstr "&Käsikirja"
+msgstr "&Manwal"
 
 #: src/WeatherRoutingUI.cpp:216
 msgid "&About"
-msgstr "Tietoj&a"
+msgstr "&Tungkol"
 
 #: src/WeatherRoutingUI.cpp:219
 msgid "&Help"
-msgstr "&Ohje"
+msgstr "&Tulong"
 
 #: src/WeatherRoutingUI.cpp:330
 msgid "Display"
-msgstr "Näyttö"
+msgstr "Displey"
 
 #: src/WeatherRoutingUI.cpp:342
 msgid "Cursor Route Color"
-msgstr "Kohdistinreiti väri"
+msgstr "Kulay ng Rutang Panturo"
 
 #: src/WeatherRoutingUI.cpp:349
 msgid "Destination Route Color"
-msgstr "Kohdereitti väri"
+msgstr "Kulay ng Rutang Destinasyon"
 
 #: src/WeatherRoutingUI.cpp:356
 msgid "Route Thickness"
-msgstr "Reitti paksuus"
+msgstr "Kapal ng Ruta"
 
 #: src/WeatherRoutingUI.cpp:363
 msgid "Iso Chron Thickness"
-msgstr "Vakioaikaero paksuus"
+msgstr "Kapal ng Iso Chron"
 
 #: src/WeatherRoutingUI.cpp:370
 msgid "Alternate Routes Thickness"
-msgstr "Vaihtoehtoreitti paksuus"
+msgstr "Kapal ng mga Alternatibong Ruta"
 
 #: src/WeatherRoutingUI.cpp:385
 msgid "Alternates for all IsoChrons"
-msgstr "Vaihtoehto kaikkille vakioaikakäyrille"
+msgstr "Mga kahalili para sa lahat ng mga IsoChron"
 
 #: src/WeatherRoutingUI.cpp:388
 msgid "Display mark when Polar changes"
-msgstr "Näytä merkki polarin muuttuessa"
+msgstr "I-displey ang tanda kapag nagbago ang Polar"
 
 #: src/WeatherRoutingUI.cpp:392
 msgid "Display Wind Barbs"
-msgstr "Näytä tuuli väkäset"
+msgstr "I-displey ang mga Sima ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:395
 msgid "Display current"
-msgstr "Näytä nykyinen"
+msgstr "I-displey ang kasalukuyan"
 
 #: src/WeatherRoutingUI.cpp:416
 msgid "Computation"
-msgstr "Laskenta"
+msgstr "Pagkukuwenta"
 
 #: src/WeatherRoutingUI.cpp:423
 msgid "Number of Concurrent threads"
-msgstr "Samanaikaisten säikeiden määrä"
+msgstr "Bilang nang mga Kasabayang Hibla"
 
 #: src/WeatherRoutingUI.cpp:440
 msgid "Use Local Time"
-msgstr "Käytä paikallista aikaa"
+msgstr "Gumamit ng Lokal na Oras"
 
 #: src/WeatherRoutingUI.cpp:555
 msgid "Date"
-msgstr "Päivämäärä"
+msgstr "Petsa"
 
 #: src/WeatherRoutingUI.cpp:562
 msgid "Grib Time"
-msgstr "Grib aika"
+msgstr "Oras sa Grib"
 
 #: src/WeatherRoutingUI.cpp:573
 msgid "Hour"
-msgstr "Tunti"
+msgstr "Oras"
 
 #: src/WeatherRoutingUI.cpp:582
 msgid ":"
@@ -887,11 +887,11 @@ msgstr ":"
 #: src/WeatherRoutingUI.cpp:2009 src/WeatherRoutingUI.cpp:2017
 #: src/WeatherRoutingUI.cpp:2025
 msgid "0"
-msgstr "0"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:591
 msgid "Current Time"
-msgstr "Nykyinen aika"
+msgstr "Kasalukuyang Oras"
 
 #: src/WeatherRoutingUI.cpp:618
 msgid "..."
@@ -899,41 +899,41 @@ msgstr "..."
 
 #: src/WeatherRoutingUI.cpp:621
 msgid "Edit"
-msgstr "Muokkaa"
+msgstr "I-edit"
 
 #: src/WeatherRoutingUI.cpp:631 src/WeatherRoutingUI.cpp:855
 msgid "Constraints"
-msgstr "Rajoitukset"
+msgstr "Mga Hadlang"
 
 #: src/WeatherRoutingUI.cpp:638
 msgid "Max Diverted Course"
-msgstr "Max käännetty kurssi"
+msgstr "Pinakamalaking Nalihis na Pagdadaraanan"
 
 #: src/WeatherRoutingUI.cpp:645 src/WeatherRoutingUI.cpp:869
 #: src/WeatherRoutingUI.cpp:890 src/WeatherRoutingUI.cpp:901
 #: src/WeatherRoutingUI.cpp:2694 src/WeatherRoutingUI.cpp:2712
 msgid "degrees"
-msgstr "astetta"
+msgstr "mga antas"
 
 #: src/WeatherRoutingUI.cpp:649
 msgid "Max True Wind"
-msgstr "Max tosi tuuli"
+msgstr "Pinakamalakas na Totoong Hangin"
 
 #: src/WeatherRoutingUI.cpp:660
 msgid "Max Apparent Wind"
-msgstr "Max suhteellinen tuuli"
+msgstr "Pinakamalakas na Kasalukuyang Hangin"
 
 #: src/WeatherRoutingUI.cpp:671
 msgid "Max Swell"
-msgstr "Maks. allokko"
+msgstr "Pinakamalaking Bukol"
 
 #: src/WeatherRoutingUI.cpp:707
 msgid "Time Step"
-msgstr "Aikaväli"
+msgstr "Hakbang ng Oras"
 
 #: src/WeatherRoutingUI.cpp:717
 msgid "h"
-msgstr "h"
+msgstr "o"
 
 #: src/WeatherRoutingUI.cpp:724
 msgid "m"
@@ -945,107 +945,107 @@ msgstr "s"
 
 #: src/WeatherRoutingUI.cpp:742 src/WeatherRoutingUI.cpp:959
 msgid "Options"
-msgstr "Vaihtoehdot"
+msgstr "Mga pagpipilian"
 
 #: src/WeatherRoutingUI.cpp:754
 msgid "Detect Land"
-msgstr "Maata näkyvissä"
+msgstr "Tumuklas ng Lupa"
 
 #: src/WeatherRoutingUI.cpp:758
 msgid "Detect Boundary"
-msgstr "Havaitse raja"
+msgstr "Tumuklas ng Hangganan"
 
 #: src/WeatherRoutingUI.cpp:761
 msgid "Currents"
-msgstr "Virrat"
+msgstr "Mga Alon"
 
 #: src/WeatherRoutingUI.cpp:765
 msgid "Optimize Tacking"
-msgstr "Optimoi halssi"
+msgstr "Gawing mainam ang Pagkabit"
 
 #: src/WeatherRoutingUI.cpp:778
 msgid "Data Source"
-msgstr "Tietolähde"
+msgstr "Pinagkukunan ng Datos"
 
 #: src/WeatherRoutingUI.cpp:803
 msgid "Disable"
-msgstr "Estä"
+msgstr "Baldahin"
 
 #: src/WeatherRoutingUI.cpp:803
 msgid "Currents Only"
-msgstr "Vain virtaukset"
+msgstr "Mga alon lamang"
 
 #: src/WeatherRoutingUI.cpp:803
 msgid "Cumulative Map"
-msgstr "Kumulatiivinen kartta"
+msgstr "Pinagsamang Mapa"
 
 #: src/WeatherRoutingUI.cpp:803
 msgid "Cumulative - Calms"
-msgstr "Kumulatiivinen - Tyynet"
+msgstr "Pinagsama - Kalma"
 
 #: src/WeatherRoutingUI.cpp:803
 msgid "Most Likely"
-msgstr "Todennäköisesti"
+msgstr "Malamang"
 
 #: src/WeatherRoutingUI.cpp:803
 msgid "Average"
-msgstr "Keskimääräinen"
+msgstr "Karaniwan"
 
 #: src/WeatherRoutingUI.cpp:820
 msgid "Last Valid if Data Deficient"
-msgstr "Viimeinen voimassa oleva, jos tiedot puutteellisia"
+msgstr "Huling Balido kung Kulang ang Datos"
 
 #: src/WeatherRoutingUI.cpp:829
 msgid " Close"
-msgstr " Sulje"
+msgstr " Isarado"
 
 #: src/WeatherRoutingUI.cpp:839
 msgid "Basic"
-msgstr "Perus"
+msgstr "Pangunahin"
 
 #: src/WeatherRoutingUI.cpp:862
 msgid "Max Latitude +-"
-msgstr "Max latitudi +-"
+msgstr "Pinakamataas na Latitude+-"
 
 #: src/WeatherRoutingUI.cpp:873
 msgid "Wind vs Current"
-msgstr "Tuuli vs virta"
+msgstr "Hangin laban sa Alon"
 
 #: src/WeatherRoutingUI.cpp:883
 msgid "Max Course Angle"
-msgstr "Max kurssikulma"
+msgstr "Pinakamalaking Anggulo ng Pagdadaraanan"
 
 #: src/WeatherRoutingUI.cpp:894
 msgid "Max Search Angle"
-msgstr "Max etsintäkulma"
+msgstr "Pinakamalaking Anggulo ng Paghahanap"
 
 #: src/WeatherRoutingUI.cpp:913
 msgid "Avoid cyclone tracks (climatology)"
-msgstr "Vältä sykloonien reittejä (ilmasto)"
+msgstr "Iwasan ang landas ng bagyo (klimatolohiya)"
 
 #: src/WeatherRoutingUI.cpp:922
 msgid "within"
-msgstr "sisällä"
+msgstr "sa loob ng"
 
 #: src/WeatherRoutingUI.cpp:929
 msgid "Months"
-msgstr "Kuukaudet"
+msgstr "Mga Buwan"
 
 #: src/WeatherRoutingUI.cpp:936
 msgid "Days"
-msgstr "Päivät"
+msgstr "Mga Araw"
 
 #: src/WeatherRoutingUI.cpp:971
 msgid "Inverted Regions"
-msgstr "Käänteiset alueet"
+msgstr "Baliktad na mga Rehiyon"
 
 #: src/WeatherRoutingUI.cpp:974
 msgid "Anchoring"
-msgstr "Ankkurointi"
+msgstr "Pag-aangkla"
 
 #: src/WeatherRoutingUI.cpp:985
 msgid "Integrator"
-msgstr "Yhdistäjä"
+msgstr "Integretor"
 
 #: src/WeatherRoutingUI.cpp:990
 msgid "Newton"
@@ -1057,167 +1057,167 @@ msgstr "Runge Kutta"
 
 #: src/WeatherRoutingUI.cpp:1002
 msgid "Wind strength is"
-msgstr "Tuulen voimakkuus on"
+msgstr "Ang lakas ng hangin ay"
 
 #: src/WeatherRoutingUI.cpp:1009 src/WeatherRoutingUI.cpp:2394
 #: src/WeatherRoutingUI.cpp:2405 src/WeatherRoutingUI.cpp:2416
 msgid "percent"
-msgstr "prosenttia"
+msgstr "porsiyento"
 
 #: src/WeatherRoutingUI.cpp:1021
 msgid "Tacking Time"
-msgstr "Jälki aika"
+msgstr "Oras ng Pagkabit"
 
 #: src/WeatherRoutingUI.cpp:1028
 msgid "Seconds"
-msgstr "Sekuntia"
+msgstr "Mga ilang segundo"
 
 #: src/WeatherRoutingUI.cpp:1042
 msgid "Courses (relative to true wind)"
-msgstr "Kurssit (suhteessa tosituuleen)"
+msgstr "Mga Pagdadaraanan (may kaugnayan sa totoong hangin)"
 
 #: src/WeatherRoutingUI.cpp:1049 src/WeatherRoutingUI.cpp:2387
 msgid "From"
-msgstr "Alkaen"
+msgstr "Mula sa"
 
 #: src/WeatherRoutingUI.cpp:1056 src/WeatherRoutingUI.cpp:2398
 msgid "To"
-msgstr "saakka"
+msgstr "Hanggang sa"
 
 #: src/WeatherRoutingUI.cpp:1063 src/WeatherRoutingUI.cpp:2409
 msgid "By"
-msgstr "Mennessä"
+msgstr "Ng"
 
 #: src/WeatherRoutingUI.cpp:1067
 msgid "5"
-msgstr "5"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1070
 msgid "Degrees"
-msgstr "Astetta"
+msgstr "Mga Digri"
 
 #: src/WeatherRoutingUI.cpp:1080
 msgid "Reset all Advanced Parameters"
-msgstr "Palauta kaikki kehittyneet parametrit"
+msgstr "Itakda muli ang lahat ng mga Paunang Parametro"
 
 #: src/WeatherRoutingUI.cpp:1090
 msgid "Advanced"
-msgstr "Edistynyt"
+msgstr "Paunang"
 
 #: src/WeatherRoutingUI.cpp:1369 src/WeatherRoutingUI.cpp:2595
 msgid "Position"
-msgstr "Sijainti"
+msgstr "Posisyon"
 
 #: src/WeatherRoutingUI.cpp:1376
 msgid "Scale"
-msgstr "Asteikko"
+msgstr "Iskala"
 
 #: src/WeatherRoutingUI.cpp:1396 src/WeatherRoutingUI.cpp:1412
 #: src/WeatherRoutingUI.cpp:1428
 msgid "Variable"
-msgstr "Muuttuja"
+msgstr "Baryabol"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Speed Over Ground (SOG)"
-msgstr "Nopeus pohjan yli (SOG)"
+msgstr "Bilis sa Lupa (SOG)"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Course Over Ground (COG)"
-msgstr "Kurssi pohjan yli (COG)"
+msgstr "Pagdadaraanan sa Lupa (COG)"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Speed Over Water (SOW)"
-msgstr "Nopeus veden yli (SOW)"
+msgstr "Bilis sa Tubig (SOW)"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Course Over Water (COW)"
-msgstr "Kurssin veden yli (COW)"
+msgstr "Pagdadaraanan sa Tubig (COW)"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Wind Velocity"
-msgstr "Tuulen nopeus"
+msgstr "Tulin ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434 src/WeatherRoutingUI.cpp:2948
 msgid "Wind Direction"
-msgstr "Tuulensuunta"
+msgstr "Direksyon ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Wind Course"
-msgstr "Tuulen suunta"
+msgstr "Pagdadaraanan ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Wind Velocity Ground"
-msgstr "Tuulen nopeus pohjansuhteen"
+msgstr "Tulin ng Hangin sa Lupa"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Wind Direction Ground"
-msgstr "Tuulen suuntaan maahannähden"
+msgstr "Direksyon ng Hangin sa Lupa"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Wind Course Ground"
-msgstr "Tuulen kurssi maahannähden"
+msgstr "Pagdadaraanan ng Hangin sa Lupa"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Apparent Wind Speed (AWS)"
-msgstr "Suhteellinen tuulennopeus (AWS)"
+msgstr "Kasalukuyang Bilis ng Hangin (AWS)"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Apparent Wind Angle (AWA)"
-msgstr "Suhteellinen tuulikulma (AWA)"
+msgstr "Kasalukuyang Anggulo ng Hangin (AWA)"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Wind Gust"
-msgstr "Tuulenpuuska"
+msgstr "Bugso ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Current Velocity"
-msgstr "Virran nopeus"
+msgstr "Tulin ng Alon"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Current Direction"
-msgstr "Virran suunta"
+msgstr "Direksyon ng Alon"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434
 msgid "Sig Wave Height"
-msgstr "Näkyvä aallonkorkeus"
+msgstr "Taas ng Makahulugang Alon"
 
 #: src/WeatherRoutingUI.cpp:1402 src/WeatherRoutingUI.cpp:1418
 #: src/WeatherRoutingUI.cpp:1434 src/WeatherRoutingUI.cpp:2619
 msgid "Tacks"
-msgstr "Halssit"
+msgstr "Mga Kabit"
 
 #: src/WeatherRoutingUI.cpp:1408 src/WeatherRoutingUI.cpp:1424
 #: src/WeatherRoutingUI.cpp:1440
 msgid "        N/A         "
-msgstr "        N/A         "
+msgstr "        Hindi Magagamit         "
 
 #: src/WeatherRoutingUI.cpp:1452 src/WeatherRoutingUI.cpp:1974
 msgid "Current Route"
-msgstr "Nykyinen reitin"
+msgstr "Kasalukuyang Ruta"
 
 #: src/WeatherRoutingUI.cpp:1455
 msgid "Cursor Route"
-msgstr "Kohdistinreitti"
+msgstr "Rutang Panturo"
 
 #: src/WeatherRoutingUI.cpp:1581
 msgid "Weather Routing Plugin Version"
-msgstr "Sää Plugin reititysversio"
+msgstr "Bersyon sa Plugin sa Pagruta ng Panahon"
 
 #: src/WeatherRoutingUI.cpp:1592
 msgid "The weather routing plugin for opencpn is intended to calculate sailing routes based on computerized weather data and boat sailing ability.\n\n"
@@ -1227,346 +1227,346 @@ msgid "The weather routing plugin for opencpn is intended to calculate sailing r
 "Author:\n"
 "Sean D'Epagnier\n\n"
 "Many thanks to all of the translators and testers."
-msgstr "Sään mukaan reitittävä lisäosa opencpn:lle on tarkoitettu suunnitteluvälineeksi, joka pohjaa tietokoneessa olevaan säädataan ja veneen purjehdusominaisuuksiin.\n\n"
-"Lisenssi: GPLv3+\n\n"
-"Lähdekoodi:\n"
+msgstr "Ang plugin sa pagruta ng panahon para sa opencpn ay nilalayon sa pagkalkula sa mga ruta ng paglalayag na nasabase sa datos ng panahon gamit ang kompyuter at ang abilidad sa paglalayag ng barko.\n\n"
+"Lisensya: GPLv3+\n\n"
+"Pinagmulang Kodigo:\n"
 "https://github.com/seandepagnier/weather_routing_pi\n\n"
-"Tekijä:\n"
+"May-akda:\n"
 "Sean D'Epagnier\n\n"
-"Suurkiitokset kaikille kääntäjille ja testaajille."
+"Maraming salamat sa lahat ng mga tagapagsalin at sa mga tagasubok."
 
 #: src/WeatherRoutingUI.cpp:1601
 msgid "About Author"
-msgstr "Tietoa Tekijä"
+msgstr "Tungkol sa May-akda"
 
 #: src/WeatherRoutingUI.cpp:1604 src/WeatherRoutingUI.cpp:2459
 msgid "Close"
-msgstr "Sulje"
+msgstr "Isarado"
 
 #: src/WeatherRoutingUI.cpp:1671
 msgid "Plot"
-msgstr "Diagrammi"
+msgstr "Magbalangkas"
 
 #: src/WeatherRoutingUI.cpp:1690
 msgid "Overlap"
-msgstr "Päällekkäisiä"
+msgstr "Sapawan"
 
 #: src/WeatherRoutingUI.cpp:1697
 msgid "%"
-msgstr "%"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1714
 msgid "Cross Over Chart"
-msgstr "Cross Over kartta"
+msgstr "Natawiran sa Tsart"
 
 #: src/WeatherRoutingUI.cpp:1721
 msgid "Upwind Port Tack"
-msgstr "Vastatuuleen oikealla halssilla"
+msgstr "Salungat na Hangin mula sa Kaliwang Bahagi ng Barko"
 
 #: src/WeatherRoutingUI.cpp:1729
 msgid "Upwind Starboard Tack"
-msgstr "Vastatuuleen vasemmalla halssilla"
+msgstr "Salungat na Hangin mula sa Kanang Bahagi ng Barko"
 
 #: src/WeatherRoutingUI.cpp:1737
 msgid "Downwind Port Tack"
-msgstr "Myötätuuleen oikealla halssilla"
+msgstr "Pababa na Hangin mula sa Kaliwang Bahagi ng Barko"
 
 #: src/WeatherRoutingUI.cpp:1745
 msgid "Downwind Starboard Tack"
-msgstr "Myötätuuleen vasemmalla halssilla"
+msgstr "Pababa na Hangin mula sa Kanang Bahagi ng Barko"
 
 #: src/WeatherRoutingUI.cpp:1753 src/WeatherRoutingUI.cpp:2941
 msgid "Wind Speed"
-msgstr "Tuulennopeus"
+msgstr "Bilis ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1764
 msgid "Stats"
-msgstr "Tilastot"
+msgstr "Mga Istatistika"
 
 #: src/WeatherRoutingUI.cpp:1773
 msgid "Speed"
-msgstr "Nopeus"
+msgstr "Bilis"
 
 #: src/WeatherRoutingUI.cpp:1779
 msgid "True Wind Dir / True Wind Speed"
-msgstr "Tuuli tosisuunta / Tuuli Tosinopeus"
+msgstr "Totoong Direksyon ng Hangin/Totoong Bilis ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1779
 msgid "Apparent Wind Dir / True Wind Speed"
-msgstr "Suhteellinen tuulensuunta / todellinen tuulennopeus"
+msgstr "Kasalukuyang Direksyon ng Hangin/Totoong Bilis ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1779
 msgid "True Wind Dir / Apparent Wind Speed"
-msgstr "Tosituulen suunta / suhteellinen tuulen nopeus"
+msgstr "Totoong Direskyon ng Hangin/Kasalukuyang Bilis ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1779
 msgid "Apparent Wind Dir / Apparent Wind Speed"
-msgstr "Suhteellinen tuulen suunta / suhteellinen tuulen nopeus"
+msgstr "Kasalukuyang Direksyon ng Hangin / Kasalukuyang Bilis ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:1787
 msgid "Full Plot"
-msgstr "Täysi graafi"
+msgstr "Buong Balangkas"
 
 #: src/WeatherRoutingUI.cpp:1790
 msgid "Vert"
-msgstr "Vert"
+msgstr "Bertikal"
 
 #: src/WeatherRoutingUI.cpp:1802
 msgid "Polars"
-msgstr "Polarit"
+msgstr "Mga Polar"
 
 #: src/WeatherRoutingUI.cpp:1822
 msgid "Up"
-msgstr "Ylös"
+msgstr "Taas"
 
 #: src/WeatherRoutingUI.cpp:1825
 msgid "Down"
-msgstr "Alas"
+msgstr "Baba"
 
 #: src/WeatherRoutingUI.cpp:1831 src/WeatherRoutingUI.cpp:2362
 #: src/WeatherRoutingUI.cpp:2840 src/WeatherRoutingUI.cpp:2886
 #: src/WeatherRoutingUI.cpp:2967
 msgid "Add"
-msgstr "Lisää"
+msgstr "Magdagdag"
 
 #: src/WeatherRoutingUI.cpp:1834 src/WeatherRoutingUI.cpp:2365
 #: src/WeatherRoutingUI.cpp:2843 src/WeatherRoutingUI.cpp:2889
 #: src/WeatherRoutingUI.cpp:2997
 msgid "Remove"
-msgstr "Poista"
+msgstr "Mag-alis"
 
 #: src/WeatherRoutingUI.cpp:1840
 msgid "Open Boat"
-msgstr "Avovene"
+msgstr "Magbukas ng Barko"
 
 #: src/WeatherRoutingUI.cpp:1843
 msgid "Save Boat"
-msgstr "Tallenna vene"
+msgstr "I-save ang Barko"
 
 #: src/WeatherRoutingUI.cpp:1846
 msgid "Save As Boat"
-msgstr "Tallenna vene"
+msgstr "I-save Bilang Barko"
 
 #: src/WeatherRoutingUI.cpp:1952
 msgid "Overall"
-msgstr "Yleistä"
+msgstr "Kabuuan"
 
 #: src/WeatherRoutingUI.cpp:1959
 msgid "Run Time"
-msgstr "Ajoaika"
+msgstr "Oras ng Pagtakbo"
 
 #: src/WeatherRoutingUI.cpp:1989
 msgid "Iso Chrons"
-msgstr "Vakioaikaerot"
+msgstr "Mga Iso Chron"
 
 #: src/WeatherRoutingUI.cpp:1997 src/WeatherRoutingUI.cpp:2086
 #: src/WeatherRoutingUI.cpp:2345
 msgid "Routes"
-msgstr "Reittit"
+msgstr "Mga Ruta"
 
 #: src/WeatherRoutingUI.cpp:2005
 msgid "InvRoutes"
-msgstr "Käännetytreitit"
+msgstr "Imbalidong mga Ruta"
 
 #: src/WeatherRoutingUI.cpp:2013
 msgid "Skip Positions"
-msgstr "Ohita sijainnit"
+msgstr "Laktawan ang mga Posisyon"
 
 #: src/WeatherRoutingUI.cpp:2067
 msgid "Current Configuration"
-msgstr "Nykyinen kokoonpano"
+msgstr "Kasalukuyang Pagsasaayos"
 
 #: src/WeatherRoutingUI.cpp:2110 src/WeatherRoutingUI.cpp:2450
 msgid "Information"
-msgstr "Informaatiota"
+msgstr "Impormasyon"
 
 #: src/WeatherRoutingUI.cpp:2162
 msgid "Starting"
-msgstr "Alkaa"
+msgstr "Nagsisimula"
 
 #: src/WeatherRoutingUI.cpp:2173
 msgid "For"
-msgstr "Varten"
+msgstr "Para"
 
 #: src/WeatherRoutingUI.cpp:2180 src/WeatherRoutingUI.cpp:2201
 msgid "day(s)"
-msgstr "päivä (t)"
+msgstr "araw/mga araw"
 
 #: src/WeatherRoutingUI.cpp:2190
 msgid "hour(s)"
-msgstr "tunnit"
+msgstr "oras/mga oras"
 
 #: src/WeatherRoutingUI.cpp:2194
 msgid "Spaced"
-msgstr "välilyönnit"
+msgstr "May pagitan"
 
 #: src/WeatherRoutingUI.cpp:2211
 msgid "Hour(s)"
-msgstr "Tunnit"
+msgstr "Oras/Mga Oras"
 
 #: src/WeatherRoutingUI.cpp:2223
 msgid "Once"
-msgstr "Kerran"
+msgstr "Isang Beses"
 
 #: src/WeatherRoutingUI.cpp:2226
 msgid "Daily"
-msgstr "Päivittäin"
+msgstr "Bawat Araw"
 
 #: src/WeatherRoutingUI.cpp:2229
 msgid "Weekly"
-msgstr "Viikoittain"
+msgstr "Bawat Linggo"
 
 #: src/WeatherRoutingUI.cpp:2232
 msgid "Monthly"
-msgstr "Kuukausittain"
+msgstr "Bawat Buwan"
 
 #: src/WeatherRoutingUI.cpp:2252
 msgid "Sources"
-msgstr "Lähteet"
+msgstr "Mga Pinagkukunan"
 
 #: src/WeatherRoutingUI.cpp:2276
 msgid "Destinations"
-msgstr "Kohteet"
+msgstr "Mga Destinasyon"
 
 #: src/WeatherRoutingUI.cpp:2297
 msgid "Auto Connect"
-msgstr "Auto yhteys"
+msgstr "Awtomatikong Pagkonek"
 
 #: src/WeatherRoutingUI.cpp:2304
 msgid "Within"
-msgstr "Sisällä"
+msgstr "Sa loob ng"
 
 #: src/WeatherRoutingUI.cpp:2311
 msgid "Nautical Miles"
-msgstr "Merimailia"
+msgstr "Nauukol sa Pandagat na Milya"
 
 #: src/WeatherRoutingUI.cpp:2315
 msgid "Connect"
-msgstr "Yhdistä"
+msgstr "Magkonekta"
 
 #: src/WeatherRoutingUI.cpp:2329
 msgid "Disconnect All"
-msgstr "Irrota kaikki"
+msgstr "Idiskonekta ang Lahat"
 
 #: src/WeatherRoutingUI.cpp:2375
 msgid "Boats"
-msgstr "Veneet"
+msgstr "Mga Barko"
 
 #: src/WeatherRoutingUI.cpp:2428
 msgid "100"
-msgstr "100"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2431
 msgid "80 to 120"
-msgstr "80-120"
+msgstr "80 hanggang 20"
 
 #: src/WeatherRoutingUI.cpp:2441
 msgid "Wind Strength"
-msgstr "Tuulen voimakkuus"
+msgstr "Lakas ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:2453
 msgid "Reset"
-msgstr "Palauta"
+msgstr "Magtakdang muli"
 
 #: src/WeatherRoutingUI.cpp:2456 src/WeatherRoutingUI.cpp:3269
 msgid "Generate"
-msgstr "Luo"
+msgstr "Maglikha"
 
 #: src/WeatherRoutingUI.cpp:2523
 msgid "Category"
-msgstr "Kategoria"
+msgstr "Kategoriya"
 
 #: src/WeatherRoutingUI.cpp:2534
 msgid "Filter"
-msgstr "Suodatin"
+msgstr "Magsala"
 
 #: src/WeatherRoutingUI.cpp:2547
 msgid "Reset All"
-msgstr "Palauta kaikki"
+msgstr "Itakdang muli ang Lahat"
 
 #: src/WeatherRoutingUI.cpp:2550
 msgid "Done"
-msgstr "Tehty"
+msgstr "Natapos"
 
 #: src/WeatherRoutingUI.cpp:2611
 msgid "Sail Changes"
-msgstr "Purje muutokset"
+msgstr "Mga Pagbabago sa Paglalayag"
 
 #: src/WeatherRoutingUI.cpp:2627
 msgid "Weather Data"
-msgstr "Säätiedot"
+msgstr "Datos ng Panahon"
 
 #: src/WeatherRoutingUI.cpp:2672
 msgid "name"
-msgstr "nimi"
+msgstr "pangalan"
 
 #: src/WeatherRoutingUI.cpp:2687
 msgid "latitude"
-msgstr "pituusaste"
+msgstr "latitud"
 
 #: src/WeatherRoutingUI.cpp:2701 src/WeatherRoutingUI.cpp:2719
 msgid "minutes"
-msgstr "minuuttia"
+msgstr "mga minuto"
 
 #: src/WeatherRoutingUI.cpp:2705
 msgid "longitude"
-msgstr "leveysaste"
+msgstr "longhitud"
 
 #: src/WeatherRoutingUI.cpp:2799
 msgid "Grid"
-msgstr "Ruudukko"
+msgstr "Parilya"
 
 #: src/WeatherRoutingUI.cpp:2810
 msgid "True Wind Angles"
-msgstr "Tosi tuulikulmat"
+msgstr "Totoong Anggulo ng hangin"
 
 #: src/WeatherRoutingUI.cpp:2856
 msgid "True WInd Speeds"
-msgstr "Tosi tuulennopeuet"
+msgstr "Mga Totoong Bilis ng Hangin"
 
 #: src/WeatherRoutingUI.cpp:2905
 msgid "Dimensions"
-msgstr "Mitat"
+msgstr "Mga Dimensyon"
 
 #: src/WeatherRoutingUI.cpp:2922
 msgid "New Measurement"
-msgstr "Uusi mittaus"
+msgstr "Bagong Pagsukat"
 
 #: src/WeatherRoutingUI.cpp:2929
 msgid "Apparent Wind"
-msgstr "Suhteellinen tuuli"
+msgstr "Kasalukuyang Hangin"
 
 #: src/WeatherRoutingUI.cpp:2932
 msgid "True Wind"
-msgstr "Tosituuli"
+msgstr "Totoong Hangin"
 
 #: src/WeatherRoutingUI.cpp:2955
 msgid "Boat Spead"
-msgstr "Veneen nopeus"
+msgstr "Bilis ng Barko"
 
 #: src/WeatherRoutingUI.cpp:2980 src/WeatherRoutingUI.cpp:3022
 msgid "Measurements"
-msgstr "Mittaukset"
+msgstr "Mga Pagsukat"
 
 #: src/WeatherRoutingUI.cpp:3000
 msgid "Remove All"
-msgstr "Poista kaikki"
+msgstr "Alisin ang Lahat"
 
 #: src/WeatherRoutingUI.cpp:3003
 msgid "Import NMEA Log"
-msgstr "Tuo NMEA loki"
+msgstr "I-angkat ang Talaang NMEA"
 
 #: src/WeatherRoutingUI.cpp:3006
 msgid "Generate Polar"
-msgstr "Luo Polar"
+msgstr "Lumikha ng Polar"
 
 #: src/WeatherRoutingUI.cpp:3035
 msgid "Warning:  All of the below are currently not used"
-msgstr "Varoitus: Kaikki alla eivät ole käytössä"
+msgstr "Babala: Ang lahat ng nasa ibaba ay kasalukuyang hindi ginagamit"
 
 #: src/WeatherRoutingUI.cpp:3058
 msgid "Hull Type"
-msgstr "Rungon tyyppi"
+msgstr "Uri ng Hull"
 
 #: src/WeatherRoutingUI.cpp:3062
 msgid "Mono"
@@ -1574,11 +1574,11 @@ msgstr "Mono"
 
 #: src/WeatherRoutingUI.cpp:3062
 msgid "Catamaran"
-msgstr "Katamaraani"
+msgstr "Catamaran"
 
 #: src/WeatherRoutingUI.cpp:3062
 msgid "Trimaran"
-msgstr "Trimaraani"
+msgstr "Trimaran"
 
 #: src/WeatherRoutingUI.cpp:3062
 msgid "Proa"
@@ -1586,94 +1586,94 @@ msgstr "Proa"
 
 #: src/WeatherRoutingUI.cpp:3062
 msgid "Submarine"
-msgstr "Sukellusvene"
+msgstr "Submarino"
 
 #: src/WeatherRoutingUI.cpp:3076
 msgid "Displacement"
-msgstr "Uppouma"
+msgstr "Pag-alis"
 
 #: src/WeatherRoutingUI.cpp:3083
 msgid "tons"
-msgstr "tonnia"
+msgstr "mga tonelada"
 
 #: src/WeatherRoutingUI.cpp:3087
 msgid "Sail Area"
-msgstr "Purje ala"
+msgstr "Lugar na Lalayagan"
 
 #: src/WeatherRoutingUI.cpp:3094
 msgid "sq/ft"
-msgstr "sq/ft"
+msgstr "kuwadrado/piye"
 
 #: src/WeatherRoutingUI.cpp:3098
 msgid "Len Water Line (lwl)"
-msgstr "Vesirajan pituus (lwl)"
+msgstr "Kahabaan ng Linya ng Tubid (lwl)"
 
 #: src/WeatherRoutingUI.cpp:3105 src/WeatherRoutingUI.cpp:3116
 #: src/WeatherRoutingUI.cpp:3127
 msgid "ft"
-msgstr "ft"
+msgstr "piye"
 
 #: src/WeatherRoutingUI.cpp:3109
 msgid "Length Over All (loa)"
-msgstr "Kokonaispituus (loa)"
+msgstr "Kahabaan sa Lahat (loa)"
 
 #: src/WeatherRoutingUI.cpp:3120
 msgid "Beam"
-msgstr "Leveys"
+msgstr "Barakilan"
 
 #: src/WeatherRoutingUI.cpp:3142
 msgid "Sail Area Displacement Ratio"
-msgstr "Purjeala-uppouma suhdeluku"
+msgstr "Proposyon ng Lugar at Pag-alis sa Paglayag"
 
 #: src/WeatherRoutingUI.cpp:3150
 msgid "Displacement Length Ratio"
-msgstr "Uppouma-pituus suhdeluku"
+msgstr "Proposyon sa Haba ng Pag-lis"
 
 #: src/WeatherRoutingUI.cpp:3158
 msgid "Hull Speed"
-msgstr "Runkonopeus"
+msgstr "Bilis ng Hull"
 
 #: src/WeatherRoutingUI.cpp:3166
 msgid "Capsize Risk"
-msgstr "Kaatumisriski"
+msgstr "Panganib sa Pagtaob"
 
 #: src/WeatherRoutingUI.cpp:3174
 msgid "Comfort Factor"
-msgstr "Mukavuus tekijä"
+msgstr "Paktor ng Kaginhawaan"
 
 #: src/WeatherRoutingUI.cpp:3233
 msgid "Add Row"
-msgstr "Lisää rivi"
+msgstr "Magdagdag ng Hanay"
 
 #: src/WeatherRoutingUI.cpp:3236
 msgid "Remove Row"
-msgstr "Poista rivi"
+msgstr "Alsisin ang Hanay"
 
 #: src/WeatherRoutingUI.cpp:3239
 msgid "Add Col"
-msgstr "Lisää sarake"
+msgstr "Magdagdag ng Kolum"
 
 #: src/WeatherRoutingUI.cpp:3242
 msgid "Remove Col"
-msgstr "Poista sarake"
+msgstr "Alisin ang Kolum"
 
 #: src/WeatherRoutingUI.cpp:3245
 msgid "MyButton"
-msgstr "MyButton"
+msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3261
 msgid "Boat Characteristics"
-msgstr "Veneen ominaisuudet"
+msgstr "Mga Katangian ng Barko"
 
 #: src/WeatherRoutingUI.h:353
 msgid "About Weather Routing"
-msgstr "Tietoja sääreitityksestä"
+msgstr "Tungkol sa Pagruruta ng Panahon"
 
 #: src/WeatherRoutingUI.h:465
 msgid "Weather Routing Statistics"
-msgstr "Sää reitityksen tilastoja"
+msgstr "Mga Istatistika sa Pagruruta ng Panahon"
 
 #: src/WeatherRoutingUI.h:657
 msgid "New Weather Routing Position"
-msgstr "Uusi sää reititys sijainti"
+msgstr "Bagong Posisyon sa Pagruruta ng Panahon"
 
