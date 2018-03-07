@@ -19,7 +19,7 @@ configure_file(cmake/version.h.in ${PROJECT_SOURCE_DIR}/src/version.h)
 configure_file(cmake/wxWTranslateCatalog.h.in ${PROJECT_SOURCE_DIR}/src/wxWTranslateCatalog.h)
 SET(PACKAGE_VERSION "${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}.${PLUGIN_VERSION_PATCH}" )
 
-SET(CMAKE_BUILD_TYPE Debug)
+# SET(CMAKE_BUILD_TYPE Debug)
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
