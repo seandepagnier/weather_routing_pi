@@ -567,8 +567,8 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         // of the arrow on the route (and not the
         // middle of the arrow) for readability.
         int xOffset, yOffset;
-        xOffset = (int)(0.5 * 30 * sin(deg2rad(W)));
-        yOffset = (int)(0.5 * 30 * cos(deg2rad(W)));
+        xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
+        yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
         
         // Draw barbs
         g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
