@@ -92,6 +92,12 @@ void SettingsDialog::LoadSettings()
     bool DisplayWindBarbs = m_cbDisplayWindBarbs->GetValue();
     pConf->Read( _T("DisplayWindBarbs"), &DisplayWindBarbs, DisplayWindBarbs);
     m_cbDisplayWindBarbs->SetValue(DisplayWindBarbs);
+    
+    // WindBarbsOnRoute Customization
+    bool DisplayWindBarbsOnRoute = m_cbDisplayWindBarbsOnRoute->GetValue();
+    pConf->Read( _T("DisplayWindBarbsOnRoute"), &DisplayWindBarbsOnRoute,
+                DisplayWindBarbsOnRoute);
+    m_cbDisplayWindBarbsOnRoute->SetValue(DisplayWindBarbsOnRoute);
 
     bool DisplayCurrent = m_cbDisplayCurrent->GetValue();
     pConf->Read( _T("DisplayCurrent"), &DisplayCurrent, DisplayCurrent);
@@ -138,6 +144,8 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("AlternatesForAll"), m_cbAlternatesForAll->GetValue());
     pConf->Write( _T("MarkAtPolarChange"), m_cbMarkAtPolarChange->GetValue());
     pConf->Write( _T("DisplayWindBarbs"), m_cbDisplayWindBarbs->GetValue());
+    // WindBarbsOnRoute Customization
+    pConf->Write( _T("DisplayWindBarbsOnRoute"), m_cbDisplayWindBarbsOnRoute->GetValue());
     pConf->Write( _T("DisplayCurrent"), m_cbDisplayCurrent->GetValue());
 
     pConf->Write( _T("ConcurrentThreads"), m_sConcurrentThreads->GetValue());
