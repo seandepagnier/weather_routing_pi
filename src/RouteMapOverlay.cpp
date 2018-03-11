@@ -551,9 +551,9 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     // if not, then displays wind barbs along the calculated
     // route by looping over [last_destination_plotdata] which
     // contains lat, lon, wind info for each points.
+    std::list<PlotData> plot = GetPlotData(false);
     std::list<PlotData>::iterator it;
-    for (it = last_destination_plotdata.begin();
-         it != last_destination_plotdata.end(); it++)
+    for (it = plot.begin(); it != plot.end(); it++)
     {
         wxPoint p;
         GetCanvasPixLL(&vp, &p, it->lat, it->lon);
