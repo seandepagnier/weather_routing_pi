@@ -548,8 +548,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     if (origin.size() < 2)
         return;
     
-    Lock();
-    
     // if not, then displays wind barbs along the calculated
     // route by looping over [last_destination_plotdata] which
     // contains lat, lon, wind info for each points.
@@ -580,9 +578,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     
     // Draw the wind barbs, and use a cache
     // to avoid generating again the same wind barbs
-    Unlock();
     wind_barb_route_cache.Finalize();
-    
     wxColour colour(180, 140, 14);
     wxPoint point;
     GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
