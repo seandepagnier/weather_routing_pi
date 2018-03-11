@@ -369,6 +369,11 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++) {
         (*it)->Render(time, m_SettingsDialog, dc, vp, false);
+        
+        // Start WindBarbsOnRoute customization
+        if (it == currentroutemaps.begin() &&
+            m_SettingsDialog.m_cbDisplayWindBarbsOnRoute->GetValue())
+             (*it)->RenderWindBarbsOnRoute(dc, vp);
 
         if(it == currentroutemaps.begin() &&
            m_SettingsDialog.m_cbDisplayWindBarbs->GetValue())

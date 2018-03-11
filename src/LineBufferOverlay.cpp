@@ -104,6 +104,8 @@ void WindBarbLineBuffer::pushTriangle( int b )
 }
 
 LineBufferOverlay g_LineBufferOverlay;
+// Customization WindBarbsOnRoute
+LineBufferOverlay g_barbsOnRoute_LineBufferOverlay;
 
 LineBufferOverlay::LineBufferOverlay()
 {

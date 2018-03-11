@@ -36,6 +36,7 @@
 #include "RouteMapOverlay.h"
 #include "SettingsDialog.h"
 
+
 RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
     : wxThread(wxTHREAD_JOINABLE), m_RouteMapOverlay(routemapoverlay)
 {
@@ -525,6 +526,88 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtPo
         break;
     }
     Unlock();
+}
+
+
+void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
+{
+    /* Method to render wind barbs on the route that has been generated
+     * by WeatherRouting plugin. The idead is to visualize the wind
+     * direction and strenght at any step of the trip.
+     *
+     * Customization by: Sylvain Carlioz -- with Pavel Kalian's help ;-)
+     * OpenCPN's licence
+     * March, 2018
+     */
+    
+    RouteMapConfiguration configuration = GetConfiguration();
+    
+    // if no route has been calculated by
+    // WeatherRouting, then stops the method.
+    // ([origin] is a list of all isochrons)
+    if (origin.size() < 2)
+        return;
+    
+    // if not, then displays wind barbs along the calculated
+    // route by looping over [last_destination_plotdata] which
+    // contains lat, lon, wind info for each points.
+    std::list<PlotData> plot = GetPlotData(false);
+    std::list<PlotData>::iterator it;
+    for (it = plot.begin(); it != plot.end(); it++)
+    {
+        wxPoint p;
+        GetCanvasPixLL(&vp, &p, it->lat, it->lon);
+        
+        double VW = it->VW;
+        double W = it->W;
+        
+        // Calculate the offset to put the head
+        // of the arrow on the route (and not the
+        // middle of the arrow) for readability.
+        int xOffset, yOffset;
+        xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
+        yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
+        
+        // Draw barbs
+        g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
+            wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
+            deg2rad(W) + vp.rotation, it->lat < 0
+        );
+        
+    }
+    
+    // Draw the wind barbs, and use a cache
+    // to avoid generating again the same wind barbs
+    wind_barb_route_cache.Finalize();
+    wxColour colour(180, 140, 14);
+    wxPoint point;
+    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    
+    if(dc.GetDC())
+    {
+        dc.SetPen(wxPen(colour, 2));
+        dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    }
+#ifdef ocpnUSE_GL
+    else
+    {
+        glColor3ub(colour.Red(), colour.Green(), colour.Blue());
+        glEnable(GL_BLEND);
+        glLineWidth(2);
+        glEnableClientState(GL_VERTEX_ARRAY);
+    }
+#endif
+    
+    if(dc.GetDC()) {
+        wind_barb_route_cache.draw(dc.GetDC());
+    } else
+        wind_barb_route_cache.draw(NULL);
+    
+#ifdef ocpnUSE_GL
+    if(!dc.GetDC()) {
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
+#endif
 }
 
 void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)

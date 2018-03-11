@@ -67,3 +67,4 @@ private:
 };
 
 extern LineBufferOverlay g_LineBufferOverlay;
+extern LineBufferOverlay g_barbsOnRoute_LineBufferOverlay;
