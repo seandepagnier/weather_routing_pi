@@ -619,7 +619,14 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         glRotated(vp.rotation*180/M_PI, 0, 0, 1);
         
         glColor3ub(colour.Red(), colour.Green(), colour.Blue());
+        
+        // Anti-aliasing options to render
+        // wind barbs at best quality (copy from grip_pi)
         glEnable(GL_BLEND);
+        glEnable(GL_LINE_SMOOTH);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        
         glLineWidth(2);
         glEnableClientState(GL_VERTEX_ARRAY);
     }
