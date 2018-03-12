@@ -601,7 +601,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     // Draw the wind barbs
     wxPoint point;
     GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
-    wxColour colour(180, 140, 14);
+    wxColour colour(170, 0, 170);
     
     if(dc.GetDC())
     {
@@ -618,8 +618,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         glTranslated(point.x, point.y, 0);
         glRotated(vp.rotation*180/M_PI, 0, 0, 1);
         
-        glColor3ub(colour.Red(), colour.Green(), colour.Blue());
-        
         // Anti-aliasing options to render
         // wind barbs at best quality (copy from grip_pi)
         glEnable(GL_BLEND);
@@ -627,6 +625,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         
+        glColor3ub(colour.Red(), colour.Green(), colour.Blue());
         glLineWidth(2);
         glEnableClientState(GL_VERTEX_ARRAY);
     }
