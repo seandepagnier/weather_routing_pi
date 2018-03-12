@@ -119,12 +119,15 @@ private:
     std::list<PlotData> last_destination_plotdata, last_cursor_plotdata;
 
     LineBuffer wind_barb_cache;
-    // Customization WindBarbsOnRoute
-    LineBuffer wind_barb_route_cache;
-    
     double wind_barb_cache_scale;
     size_t wind_barb_cache_origin_size;
     int wind_barb_cache_projection;
+    
+    // Customization WindBarbsOnRoute
+    LineBuffer wind_barb_route_cache;
+    double wind_barb_route_cache_scale;
+    size_t wind_barb_route_cache_origin_size;
+    int wind_barb_route_cache_projection;
 
     LineBuffer current_cache;
     double current_cache_scale;
