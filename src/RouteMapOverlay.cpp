@@ -62,7 +62,7 @@ RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_overlaylist(0), wind_barb_cache_origin_size(0), current_cache_origin_size(0)
+      m_bUpdated(false), m_overlaylist(0), wind_barb_cache_origin_size(0), current_cache_origin_size(0), wind_barb_route_cache_origin_size(0)
 {
 }
 
@@ -548,49 +548,76 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     if (origin.size() < 2)
         return;
     
-    // if not, then displays wind barbs along the calculated
-    // route by looping over [last_destination_plotdata] which
-    // contains lat, lon, wind info for each points.
-    std::list<PlotData> plot = GetPlotData(false);
-    std::list<PlotData>::iterator it;
-    for (it = plot.begin(); it != plot.end(); it++)
+    // if not, then check if wind barbs have to be
+    // calculated or are stored in cache line buffer.
+    bool toCompute = origin.size() != wind_barb_route_cache_origin_size ||
+                     vp.view_scale_ppm != wind_barb_route_cache_scale ||
+                     vp.m_projection_type != wind_barb_route_cache_projection;
+    
+    // Create a specific viewport at position (0,0)
+    // to draw the winds barbs, and then translate it
+    PlugIn_ViewPort nvp = vp;
+    nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
+    nvp.pix_width = 0;
+    nvp.pix_height = 0;
+    nvp.rotation = 0;
+    nvp.skew = 0;
+    
+    // calculate wind barbs along the route by looping
+    // over [GetPlotData(false)] list which contains lat,
+    // lon, wind info for each points, only if needed.
+    if (toCompute)
     {
-        wxPoint p;
-        GetCanvasPixLL(&vp, &p, it->lat, it->lon);
+        wind_barb_route_cache_origin_size = origin.size();
+        wind_barb_route_cache_scale = vp.view_scale_ppm;
+        wind_barb_route_cache_projection = vp.m_projection_type;
         
-        double VW = it->VW;
-        double W = it->W;
-        
-        // Calculate the offset to put the head
-        // of the arrow on the route (and not the
-        // middle of the arrow) for readability.
-        int xOffset, yOffset;
-        xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
-        yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
-        
-        // Draw barbs
-        g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
-            wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
-            deg2rad(W) + vp.rotation, it->lat < 0
-        );
-        
+        std::list<PlotData> plot = GetPlotData(false);
+        std::list<PlotData>::iterator it;
+        for (it = plot.begin(); it != plot.end(); it++)
+        {
+            wxPoint p;
+            GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
+            
+            double VW = it->VW;
+            double W = it->W;
+            
+            // Calculate the offset to put the head
+            // of the arrow on the route (and not the
+            // middle of the arrow) for readability.
+            int xOffset, yOffset;
+            xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
+            yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
+            
+            // Draw barbs
+            g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
+                wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
+                deg2rad(W) + vp.rotation, it->lat < 0
+            );
+        }
+        wind_barb_route_cache.Finalize();
     }
     
-    // Draw the wind barbs, and use a cache
-    // to avoid generating again the same wind barbs
-    wind_barb_route_cache.Finalize();
-    wxColour colour(180, 140, 14);
+    // Draw the wind barbs
     wxPoint point;
     GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    wxColour colour(180, 140, 14);
     
     if(dc.GetDC())
     {
         dc.SetPen(wxPen(colour, 2));
         dc.SetBrush(*wxTRANSPARENT_BRUSH);
     }
+    
 #ifdef ocpnUSE_GL
     else
     {
+        // Translate and rotate the matrix
+        // anyway, event if cached
+        glPushMatrix();
+        glTranslated(point.x, point.y, 0);
+        glRotated(vp.rotation*180/M_PI, 0, 0, 1);
+        
         glColor3ub(colour.Red(), colour.Green(), colour.Blue());
         glEnable(GL_BLEND);
         glLineWidth(2);
@@ -599,13 +626,19 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
 #endif
     
     if(dc.GetDC()) {
-        wind_barb_route_cache.draw(dc.GetDC());
+        // Draw the wind barbs with a correction
+        // in all cases on position and rotation
+        LineBuffer tb;
+        tb.pushTransformedBuffer(wind_barb_route_cache, point.x, point.y, vp.rotation);
+        tb.Finalize();
+        tb.draw(dc.GetDC());
     } else
         wind_barb_route_cache.draw(NULL);
-    
+
 #ifdef ocpnUSE_GL
     if(!dc.GetDC()) {
         glDisableClientState(GL_VERTEX_ARRAY);
+        glPopMatrix();
     }
 #endif
 }
