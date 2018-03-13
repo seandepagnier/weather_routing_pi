@@ -473,10 +473,14 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtPo
             wxPoint r;
             GetCanvasPixLL(&vp, &r, p->lat, p->lon);
             int s = 6;
-            glVertex2i(r.x-s, r.y-s), glVertex2i(r.x+s, r.y-s);
-            glVertex2i(r.x+s, r.y-s), glVertex2i(r.x+s, r.y+s);
-            glVertex2i(r.x+s, r.y+s), glVertex2i(r.x-s, r.y+s);
-            glVertex2i(r.x-s, r.y+s), glVertex2i(r.x-s, r.y-s);
+            if(dc.GetDC()) {
+                // draw dc rectangle here
+            } else {
+                glVertex2i(r.x-s, r.y-s), glVertex2i(r.x+s, r.y-s);
+                glVertex2i(r.x+s, r.y-s), glVertex2i(r.x+s, r.y+s);
+                glVertex2i(r.x+s, r.y+s), glVertex2i(r.x-s, r.y+s);
+                glVertex2i(r.x-s, r.y+s), glVertex2i(r.x-s, r.y-s);
+            }
         } else
             DrawLine(p, p->parent, dc, vp);
     }
@@ -508,14 +512,16 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, bool MarkAtPo
             double d = cspan.GetSeconds().ToDouble() / span.GetSeconds().ToDouble();
 
             if(d > 1)
-                d = 1;
+                // d = 1; // draw at end??
+                break; // don't draw if grib time is after end
 
             GetCanvasPixLL(&vp, &r,
                            p->parent->lat + d*(p->lat - p->parent->lat),
                            p->parent->lon + d*heading_resolve(p->lon - p->parent->lon));
 
         } else if(it == origin.begin())
-            GetCanvasPixLL(&vp, &r, p->parent->lat, p->parent->lon);
+            //GetCanvasPixLL(&vp, &r, p->parent->lat, p->parent->lon);
+            break; // don't draw if time is before start
         else {
             it--;
             continue;
@@ -552,7 +558,8 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     // calculated or are stored in cache line buffer.
     bool toCompute = origin.size() != wind_barb_route_cache_origin_size ||
                      vp.view_scale_ppm != wind_barb_route_cache_scale ||
-                     vp.m_projection_type != wind_barb_route_cache_projection;
+                     vp.m_projection_type != wind_barb_route_cache_projection ||
+                     vp.m_projection_type != PI_PROJECTION_MERCATOR;
     
     // Create a specific viewport at position (0,0)
     // to draw the winds barbs, and then translate it
