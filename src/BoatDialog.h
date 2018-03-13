@@ -49,7 +49,6 @@ private:
     
     void OnPaintPlot( wxPaintEvent& event );
     void OnUpdatePlot( wxSizeEvent& event ) { OnUpdatePlot(); }
-    void OnOrientation( wxCommandEvent& event );
     void OnPaintCrossOverChart( wxPaintEvent& event );
     void OnOverlapPercentage( wxSpinEvent& event );
     void OnSizePlot( wxSizeEvent& event ) { RefreshPlots(); }
@@ -88,8 +87,6 @@ private:
 
     double m_PlotScale;
     int m_MouseW;
-
-    int m_orientation[2];
 
     bool m_CrossOverRegenerate;
     CrossOverGenerationThread *m_CrossOverGenerationThread;

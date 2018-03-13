@@ -412,7 +412,6 @@ class BoatDialogBase : public wxDialog
 		wxChoice* m_cPlotType;
 		wxChoice* m_cPlotVariable;
 		wxCheckBox* m_cbFullPlot;
-		wxCheckBox* m_cbOrientation;
 		wxPanel* m_panel21;
 		wxListCtrl* m_lPolars;
 		wxButton* m_bUp;
@@ -433,7 +432,6 @@ class BoatDialogBase : public wxDialog
 		virtual void OnOverlapPercentage( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnVMGWindSpeed( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnOrientation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnPolarSelected( wxListEvent& event ) { event.Skip(); }
 		virtual void OnUpPolar( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnDownPolar( wxCommandEvent& event ) { event.Skip(); }
