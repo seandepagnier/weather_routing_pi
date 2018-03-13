@@ -2256,6 +2256,7 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.DetectLand = true;
     configuration.DetectBoundary = false;
     configuration.Currents = false;
+    configuration.OptimizeTacking = false;
     configuration.InvertedRegions = false;
     configuration.Anchoring = false;
 
