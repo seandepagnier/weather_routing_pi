@@ -58,8 +58,13 @@ public:
                         wrDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
+
     void RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_ViewPort &vp);
-    void RenderCourse(Position *pos, wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
+    
+    // Customization ComfortDisplay
+    void RenderCourse(Position *pos, wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp,
+                      bool comfortRoute = false);
+    int sailingConditionLevel(PlotData plot);
     
     // Customization WindBarbsOnRoute
     void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);

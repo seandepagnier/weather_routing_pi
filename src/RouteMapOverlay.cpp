@@ -220,6 +220,7 @@ static wxColour TransparentColor(wxColor c)
     return wxColor(c.Red(), c.Green(), c.Blue(), c.Alpha()*7/24);
 }
 
+
 void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
                                      wrDC &dc, PlugIn_ViewPort &vp)
 {
@@ -445,7 +446,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         }
         SetColor(dc, DestinationColor, true);
         SetWidth(dc, RouteThickness, true);
-        RenderCourse(last_destination_position, time, dc, vp);
+        RenderCourse(last_destination_position, time, dc, vp, true);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
@@ -460,14 +461,14 @@ void RouteMapOverlay::RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_Vie
 {
     if(!pos)
         return;
-
+    
     Lock();
-
+    
     /* draw lines to this route */
     Position *p;
     if(!dc.GetDC())
         glBegin(GL_LINES);
-
+    
     int polar = pos->polar;
     for(p = pos; p && p->parent; p = p->parent) {
         if(p->polar == polar)
@@ -490,8 +491,68 @@ void RouteMapOverlay::RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_Vie
     Unlock();
 }
 
-void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time,
-                                   wrDC &dc, PlugIn_ViewPort &vp)
+/* Customization ComfortDisplay
+ * -----------------------------------------------------
+ * The idea is to display the weather route with different
+ * colors giving an idea of the sailing comfort:
+ * Green = Light conditions, relax and enjoy
+ * Orange = Can be tough, stay focus
+ * Red = Strong conditions, heavy sailors, be prepared
+ */
+int RouteMapOverlay::sailingConditionLevel(PlotData plot)
+{
+    /* Method to calculate a indicator between 1 and 3
+     * of the sailing conditions based on sea conditions
+     * such as waves, wind, current.
+     */
+    
+    double level_calc = 0.0;
+    
+    /* Define coefficient to weight relative impact
+     * of the parameter on sailing comfort
+     *
+     * Definitions:
+     * C   - Sea Current Direction over ground
+     * VC  - Velocity of Current
+     * W   - Wind Direction
+     * WG  - Wind direction over ground
+     * VWG - Velocity of wind over ground
+     * WA  - Angle of wind relative to true north
+     * VW  - velocity of wind over water
+     */
+    
+    double coef_WV = 1.0;
+    double coef_W = 1.0;
+    
+    // Define MAX constants. Over this value, the ratio
+    // is more than 1 which means it is very impacting
+    // the sailing comfort.
+    double MAX_WV = 30;     // No more than 30knt, please
+    double MAX_W = 50;      // No more than 50° app. wind
+    
+    double WV = plot.VW;
+    double W = plot.W;
+    
+    
+    level_calc = (coef_WV * WV/MAX_WV + coef_W * MAX_W/W) / (coef_WV + coef_W);
+    
+    if (level_calc <= 0.5)
+        // Light conditions, enjoy ;-)
+        return 1;
+    if (level_calc > 0.5 && level_calc <= 1)
+        // Can be tough
+        return 2;
+    if (level_calc > 1)
+        // Strong conditions
+        return 3;
+    return 0;
+}
+
+// -----------------------------------------------------
+
+
+void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, wrDC &dc,
+                                   PlugIn_ViewPort &vp, bool comfortRoute)
 {
     if(!pos)
         return;
@@ -502,18 +563,54 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time,
     Position *p;
     if(!dc.GetDC())
         glBegin(GL_LINES);
-
+    
     int polar = pos->polar;
-    for(p = pos; p && p->parent; p = p->parent) {
-        DrawLine(p, p->parent, dc, vp);
-        polar = p->polar;
+    
+    /* ComfortDisplay Customization
+     * ------------------------------------------------
+     * To get weather data (wind, current, waves) on a
+     * position and through time, iterate over the
+     * position and in parallel on GetPlotData
+     * Thanks Sean for your help :-)
+     */
+    std::list<PlotData> plot = GetPlotData(false);
+    std::list<PlotData>::iterator itt;
+
+    for(p = pos, itt = plot.end();
+        (p && p->parent) && (itt != plot.begin());
+        p = p->parent, itt--)
+    {
+        if (comfortRoute)
+        {
+            int level = sailingConditionLevel(*itt);
+            switch (level) {
+                case 1:
+                {
+                    wxColor green(50, 205, 50);
+                    SetColor(dc, green, true);
+                    break;
+                }
+                case 2:
+                {
+                    wxColor orange(255, 165, 0);
+                    SetColor(dc, orange, true);
+                    break;
+                }
+                case 3:
+                {
+                    SetColor(dc, *wxRED, true);
+                    break;
+                }
+            }
+        }
+        DrawLine(p, p->parent, dc, vp);polar = p->polar;
     }
+    
     if(!dc.GetDC())
         glEnd();
-
     /* render boat on optimal course at time */
     IsoChronList::iterator it = origin.begin();
-
+    
     /* get route iso for this position */
     for(p=pos->parent; p; p=p->parent)
         if(++it == origin.end()) {
@@ -522,27 +619,27 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time,
         }
     if(it != origin.begin())
         it--;
-
+    
     for(p = pos; p->parent; p = p->parent) {
         wxDateTime ittime = (*it)->time;
         wxPoint r;
-
+        
         if(time >= ittime) {
             wxDateTime timestart = (*it)->time;
             it++;
             wxDateTime timeend = (*it)->time;
-
+            
             wxTimeSpan span = timeend - timestart, cspan = time - timestart;
             double d = cspan.GetSeconds().ToDouble() / span.GetSeconds().ToDouble();
-
+            
             if(d > 1)
                 // d = 1; // draw at end??
                 break; // don't draw if grib time is after end
-
+            
             GetCanvasPixLL(&vp, &r,
                            p->parent->lat + d*(p->lat - p->parent->lat),
                            p->parent->lon + d*heading_resolve(p->lon - p->parent->lon));
-
+            
         } else if(it == origin.begin())
             //GetCanvasPixLL(&vp, &r, p->parent->lat, p->parent->lon);
             break; // don't draw if time is before start
