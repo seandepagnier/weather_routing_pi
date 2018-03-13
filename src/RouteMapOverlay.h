@@ -58,8 +58,8 @@ public:
                         wrDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
-    void RenderCourse(Position *pos, wxDateTime time, bool MarkAtPolarChange,
-                      wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderCourse(Position *pos, wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
     
     // Customization WindBarbsOnRoute
     void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
