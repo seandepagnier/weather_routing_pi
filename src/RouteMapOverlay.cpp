@@ -449,6 +449,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         bool confortOnRoute = settingsdialog.m_cbDisplayComfort->GetValue();
         RenderCourse(last_destination_position, dc, vp, confortOnRoute);
         SetColor(dc, Darken(DestinationColor), true);
+        SetWidth(dc, RouteThickness/2, true);
         RenderBoatOnCourse(last_destination_position, time, dc, vp);
         
         if(MarkAtPolarChange) {
