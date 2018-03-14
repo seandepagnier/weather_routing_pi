@@ -760,6 +760,9 @@ void wrDC::DrawEllipse( wxCoord x, wxCoord y, wxCoord width, wxCoord height )
 
         //      Enable anti-aliased lines, at best quality
         glEnable( GL_BLEND );
+        glEnable(GL_LINE_SMOOTH);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
         /* formula for variable step count to produce smooth ellipse */
         float steps = floorf(wxMax(sqrtf(sqrtf((float)(width*width + height*height))), 1) * M_PI);
