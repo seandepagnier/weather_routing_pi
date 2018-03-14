@@ -98,6 +98,12 @@ void SettingsDialog::LoadSettings()
     pConf->Read( _T("DisplayWindBarbsOnRoute"), &DisplayWindBarbsOnRoute,
                 DisplayWindBarbsOnRoute);
     m_cbDisplayWindBarbsOnRoute->SetValue(DisplayWindBarbsOnRoute);
+    
+    // ComfortOnRoute Customization
+    bool DisplayComfortOnRoute = m_cbDisplayComfort->GetValue();
+    pConf->Read( _T("DisplayComfortOnRoute"), &DisplayComfortOnRoute,
+                DisplayComfortOnRoute);
+    m_cbDisplayComfort->SetValue(DisplayComfortOnRoute);
 
     bool DisplayCurrent = m_cbDisplayCurrent->GetValue();
     pConf->Read( _T("DisplayCurrent"), &DisplayCurrent, DisplayCurrent);
@@ -146,6 +152,7 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("DisplayWindBarbs"), m_cbDisplayWindBarbs->GetValue());
     // WindBarbsOnRoute Customization
     pConf->Write( _T("DisplayWindBarbsOnRoute"), m_cbDisplayWindBarbsOnRoute->GetValue());
+    pConf->Write( _T("DisplayComfortOnRoute"), m_cbDisplayComfort->GetValue());
     pConf->Write( _T("DisplayCurrent"), m_cbDisplayCurrent->GetValue());
 
     pConf->Write( _T("ConcurrentThreads"), m_sConcurrentThreads->GetValue());
