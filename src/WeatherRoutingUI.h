@@ -194,6 +194,7 @@ class SettingsDialogBase : public wxDialog
 		wxCheckBox* m_cbMarkAtPolarChange;
 		wxCheckBox* m_cbDisplayWindBarbs;
 		wxCheckBox* m_cbDisplayWindBarbsOnRoute;
+        wxCheckBox* m_cbDisplayComfort;
 		wxCheckBox* m_cbDisplayCurrent;
 		wxSpinCtrl* m_sConcurrentThreads;
 		wxCheckListBox* m_cblFields;
