@@ -436,7 +436,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         if(!justendroute) {
             SetColor(dc, CursorColor, true);
             SetWidth(dc, RouteThickness, true);
-            RenderCourse(last_cursor_position, time, dc, vp);
+            RenderCourse(last_cursor_position, dc, vp);
 
             if(MarkAtPolarChange) {
                 SetColor(dc, Darken(CursorColor), true);
@@ -447,7 +447,9 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         SetColor(dc, DestinationColor, true);
         SetWidth(dc, RouteThickness, true);
         bool confortOnRoute = settingsdialog.m_cbDisplayComfort->GetValue();
-        RenderCourse(last_destination_position, time, dc, vp, confortOnRoute);
+        RenderCourse(last_destination_position, dc, vp, confortOnRoute);
+        SetColor(dc, Darken(DestinationColor), true);
+        RenderBoatOnCourse(last_destination_position, time, dc, vp);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
@@ -552,8 +554,8 @@ int RouteMapOverlay::sailingConditionLevel(PlotData plot)
 // -----------------------------------------------------
 
 
-void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, wrDC &dc,
-                                   PlugIn_ViewPort &vp, bool comfortRoute)
+void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
+                                   bool comfortRoute)
 {
     if(!pos)
         return;
@@ -609,6 +611,25 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, wrDC &dc,
     
     if(!dc.GetDC())
         glEnd();
+    Unlock();
+}
+
+
+void RouteMapOverlay::RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &dc,
+                                         PlugIn_ViewPort &vp)
+{
+    /* Dedicated method to render the boat circle
+     * on the weather route to be able to select the
+     * color of the maker, and avoid to generate twice
+     * (1 normally, 1 for polar changed -- to avoid)
+     */
+    if(!pos)
+        return;
+    
+    Lock();
+    
+    Position *p;
+    
     /* render boat on optimal course at time */
     IsoChronList::iterator it = origin.begin();
     
@@ -655,7 +676,6 @@ void RouteMapOverlay::RenderCourse(Position *pos, wxDateTime time, wrDC &dc,
     }
     Unlock();
 }
-
 
 void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
 {
