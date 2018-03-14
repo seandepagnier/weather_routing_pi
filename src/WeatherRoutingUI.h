@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 20 2018)
+// C++ code generated with wxFormBuilder (version Mar 14 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -190,12 +190,13 @@ class SettingsDialogBase : public wxDialog
 		wxSpinCtrl* m_sRouteThickness;
 		wxSpinCtrl* m_sIsoChronThickness;
 		wxSpinCtrl* m_sAlternateRouteThickness;
+		wxCheckBox* m_cbDisplayCursorRoute;
 		wxCheckBox* m_cbAlternatesForAll;
 		wxCheckBox* m_cbMarkAtPolarChange;
+		wxCheckBox* m_cbDisplayCurrent;
 		wxCheckBox* m_cbDisplayWindBarbs;
 		wxCheckBox* m_cbDisplayWindBarbsOnRoute;
-        wxCheckBox* m_cbDisplayComfort;
-		wxCheckBox* m_cbDisplayCurrent;
+		wxCheckBox* m_cbDisplayComfort;
 		wxSpinCtrl* m_sConcurrentThreads;
 		wxCheckListBox* m_cblFields;
 		wxCheckBox* m_cbUseLocalTime;
