@@ -433,7 +433,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             DestinationColor = settingsdialog.m_cpDestinationRoute->GetColour();
         bool MarkAtPolarChange = settingsdialog.m_cbMarkAtPolarChange->GetValue();
 
-        if(!justendroute) {
+        if(!justendroute && settingsdialog.m_cbDisplayCursorRoute->GetValue()) {
             SetColor(dc, CursorColor, true);
             SetWidth(dc, RouteThickness, true);
             RenderCourse(last_cursor_position, dc, vp);

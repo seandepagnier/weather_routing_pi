@@ -80,7 +80,12 @@ void SettingsDialog::LoadSettings()
     int AlternateRouteThickness = m_sAlternateRouteThickness->GetValue();
     pConf->Read( _T("AlternateRouteThickness"), &AlternateRouteThickness, AlternateRouteThickness);
     m_sAlternateRouteThickness->SetValue(AlternateRouteThickness);
-
+    
+    // Cursor Route optional
+    bool DisplayCursorRoute = m_cbDisplayCursorRoute->GetValue();
+    pConf->Read( _T("CursorRoute"), &DisplayCursorRoute, DisplayCursorRoute);
+    m_cbDisplayCursorRoute->SetValue(DisplayCursorRoute);
+    
     bool AlternatesForAll = m_cbAlternatesForAll->GetValue();
     pConf->Read( _T("AlternatesForAll"), &AlternatesForAll, AlternatesForAll);
     m_cbAlternatesForAll->SetValue(AlternatesForAll);
@@ -142,6 +147,8 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("IsoChronThickness"), m_sIsoChronThickness->GetValue());
     pConf->Write( _T("AlternateRouteThickness"), m_sAlternateRouteThickness->GetValue());
     pConf->Write( _T("AlternatesForAll"), m_cbAlternatesForAll->GetValue());
+    // CursorOnRoute Customization
+    pConf->Write( _T("CursorRoute"), m_cbDisplayCursorRoute->GetValue());
     pConf->Write( _T("MarkAtPolarChange"), m_cbMarkAtPolarChange->GetValue());
     pConf->Write( _T("DisplayWindBarbs"), m_cbDisplayWindBarbs->GetValue());
     // WindBarbsOnRoute Customization
