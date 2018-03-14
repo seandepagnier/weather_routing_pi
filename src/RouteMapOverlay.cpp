@@ -4,7 +4,7 @@
  * Author:   Sean D'Epagnier
  *
  ***************************************************************************
- *   Copyright (C) 2015 by Sean D'Epagnier                                 *
+ *   Copyright (C) 2018 by Sean D'Epagnier                                 *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -99,9 +99,6 @@ bool RouteMapOverlay::Start(wxString &error)
         error = _("Configuration specifies boundary exclusion but ocpn_draw_pi boundary data not available");
         return false;
     }
-
-    //if(configuration.OptimizeTacking)
-    //m_Configuration.boat.OptimizeTacking();
 
     if(!configuration.UseGrib &&
        configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY) {
@@ -288,6 +285,8 @@ static wxColour Darken(wxColour c)
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                              wrDC &dc, PlugIn_ViewPort &vp, bool justendroute)
 {
+    dc.SetPen(*wxBLACK); // reset pen
+    dc.SetBrush( *wxTRANSPARENT_BRUSH); // reset brush
     if(!justendroute) {
         RouteMapConfiguration configuration = GetConfiguration();
 
@@ -552,6 +551,19 @@ int RouteMapOverlay::sailingConditionLevel(PlotData plot)
     return 0;
 }
 
+static wxColour sailingConditionColor(int level)
+{
+    switch (level) {
+    case 1:
+        return wxColor(50, 205, 50);
+    case 2:
+        return wxColor(255, 165, 0);
+    case 3:
+        return *wxRED;
+    }
+    return *wxBLACK;
+}
+
 // -----------------------------------------------------
 
 
@@ -568,8 +580,6 @@ void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
     if(!dc.GetDC())
         glBegin(GL_LINES);
     
-    int polar = pos->polar;
-    
     /* ComfortDisplay Customization
      * ------------------------------------------------
      * To get weather data (wind, current, waves) on a
@@ -578,36 +588,19 @@ void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
      * Thanks Sean for your help :-)
      */
     std::list<PlotData> plot = GetPlotData(false);
-    std::list<PlotData>::iterator itt;
+    std::list<PlotData>::reverse_iterator itt =  plot.rbegin();
 
-    for(p = pos, itt = plot.end();
-        (p && p->parent) && (itt != plot.begin());
-        p = p->parent, itt--)
+    wxColor lc = sailingConditionColor(sailingConditionLevel(*itt));
+    for(p = pos; (p && p->parent) && (itt != plot.rend()); p = p->parent)
     {
         if (comfortRoute)
         {
-            int level = sailingConditionLevel(*itt);
-            switch (level) {
-                case 1:
-                {
-                    wxColor green(50, 205, 50);
-                    SetColor(dc, green, true);
-                    break;
-                }
-                case 2:
-                {
-                    wxColor orange(255, 165, 0);
-                    SetColor(dc, orange, true);
-                    break;
-                }
-                case 3:
-                {
-                    SetColor(dc, *wxRED, true);
-                    break;
-                }
-            }
-        }
-        DrawLine(p, p->parent, dc, vp);polar = p->polar;
+            wxColor c = sailingConditionColor(sailingConditionLevel(*itt));
+            DrawLine(p, lc, p->parent, c, dc, vp);
+            lc = c;
+            itt++;
+        } else
+            DrawLine(p, p->parent, dc, vp);
     }
     
     if(!dc.GetDC())
@@ -671,7 +664,6 @@ void RouteMapOverlay::RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &d
             continue;
         }
         
-        dc.SetBrush( *wxTRANSPARENT_BRUSH);
         dc.DrawCircle( r.x, r.y, 7 );
         break;
     }
@@ -756,7 +748,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     if(dc.GetDC())
     {
         dc.SetPen(wxPen(colour, 2));
-        dc.SetBrush(*wxTRANSPARENT_BRUSH);
     }
     
 #ifdef ocpnUSE_GL
@@ -947,10 +938,8 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
     wxPoint point;
     GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
-    if(dc.GetDC()) {
+    if(dc.GetDC())
         dc.SetPen( wxPen( colour, 2 ) );
-        dc.SetBrush( *wxTRANSPARENT_BRUSH);
-    } 
 #ifdef ocpnUSE_GL
     else {
         if(!nocache) {
@@ -1145,10 +1134,8 @@ void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
     wxPoint point;
     GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
-    if(dc.GetDC()) {
+    if(dc.GetDC())
         dc.SetPen( wxPen( colour, 2 ) );
-        dc.SetBrush( *wxTRANSPARENT_BRUSH);
-    } 
 #ifdef ocpnUSE_GL
     else {
         if(!nocache) {
@@ -1247,6 +1234,7 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
                 Unlock();
                 return plotdata;
             }
+        it--;
 
         while(pos) {
             itp = it;
@@ -1254,6 +1242,7 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 
             configuration.grib = (*it)->m_Grib;
             configuration.time = (*it)->time;
+            //printf("grib time %p %d\n", configuration.grib, configuration.time);
 
             PlotData data;
 
