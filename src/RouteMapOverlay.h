@@ -130,9 +130,6 @@ private:
     
     // Customization WindBarbsOnRoute
     LineBuffer wind_barb_route_cache;
-    double wind_barb_route_cache_scale;
-    size_t wind_barb_route_cache_origin_size;
-    int wind_barb_route_cache_projection;
 
     LineBuffer current_cache;
     double current_cache_scale;
