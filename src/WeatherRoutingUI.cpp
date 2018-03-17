@@ -1362,6 +1362,8 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	m_PlotWindow = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
 	m_PlotWindow->SetScrollRate( 5, 5 );
+	m_PlotWindow->SetMinSize( wxSize( -1,210 ) );
+	
 	fgSizer3->Add( m_PlotWindow, 1, wxEXPAND | wxALL, 5 );
 	
 	wxFlexGridSizer* fgSizer12;
@@ -1418,6 +1420,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_stMousePosition1 = new wxStaticText( this, wxID_ANY, _("        N/A         "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_stMousePosition1->Wrap( -1 );
 	m_stMousePosition1->SetForegroundColour( wxColour( 251, 2, 7 ) );
+	m_stMousePosition1->SetMinSize( wxSize( 130,-1 ) );
 	
 	fgSizer78->Add( m_stMousePosition1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
@@ -1513,6 +1516,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_PlotWindow->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
 	m_PlotWindow->Connect( wxEVT_PAINT, wxPaintEventHandler( PlotDialogBase::OnPaintPlot ), NULL, this );
 	m_PlotWindow->Connect( wxEVT_SIZE, wxSizeEventHandler( PlotDialogBase::OnSizePlot ), NULL, this );
+	m_PlotWindow->Connect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( PlotDialogBase::OnUpdateUI ), NULL, this );
 	m_sPosition->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
 	m_sPosition->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
 	m_sPosition->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
@@ -1555,6 +1559,7 @@ PlotDialogBase::~PlotDialogBase()
 	m_PlotWindow->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( PlotDialogBase::OnMouseEventsPlot ), NULL, this );
 	m_PlotWindow->Disconnect( wxEVT_PAINT, wxPaintEventHandler( PlotDialogBase::OnPaintPlot ), NULL, this );
 	m_PlotWindow->Disconnect( wxEVT_SIZE, wxSizeEventHandler( PlotDialogBase::OnSizePlot ), NULL, this );
+	m_PlotWindow->Disconnect( wxEVT_UPDATE_UI, wxUpdateUIEventHandler( PlotDialogBase::OnUpdateUI ), NULL, this );
 	m_sPosition->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
 	m_sPosition->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
 	m_sPosition->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( PlotDialogBase::OnUpdatePlot ), NULL, this );
