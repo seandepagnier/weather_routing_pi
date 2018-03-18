@@ -325,13 +325,10 @@ class PlotDialogBase : public wxDialog
 		wxSlider* m_sPosition;
 		wxStaticText* m_staticText139;
 		wxSlider* m_sScale;
-		wxStaticText* m_staticText140;
 		wxChoice* m_cVariable1;
 		wxStaticText* m_stMousePosition1;
-		wxStaticText* m_staticText1401;
 		wxChoice* m_cVariable2;
 		wxStaticText* m_stMousePosition2;
-		wxStaticText* m_staticText14011;
 		wxChoice* m_cVariable3;
 		wxStaticText* m_stMousePosition3;
 		wxRadioButton* m_rbCurrentRoute;
@@ -342,6 +339,7 @@ class PlotDialogBase : public wxDialog
 		virtual void OnMouseEventsPlot( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlotVariable( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateRoute( wxCommandEvent& event ) { event.Skip(); }

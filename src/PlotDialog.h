@@ -57,6 +57,7 @@ private:
     void OnUpdatePlot( wxScrollEvent& event ) { m_PlotWindow->Refresh(); }
     void OnUpdatePlotVariable( wxCommandEvent& event ) { GetScale(); m_PlotWindow->Refresh(); }
     void OnUpdateRoute( wxCommandEvent& event );
+    void OnUpdateUI( wxUpdateUIEvent& event );
 
 private:
 
@@ -72,6 +73,7 @@ private:
     std::list<PlotData> m_PlotData;
 
     WeatherRouting &m_WeatherRouting;
+
 };
 
 #endif
