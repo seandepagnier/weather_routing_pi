@@ -240,14 +240,16 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
     // the current time position by the GRIB file
     wxDateTime gribTime = m_WeatherRouting.m_ConfigurationDialog.m_GribTimelineTime;
     double cursorTime = (gribTime - m_StartTime).GetSeconds().ToDouble();
-    int x_cursor = w * (scale * ((cursorTime - m_mintime) / (m_maxtime - m_mintime) - \
-                                 position) + position);
-    
-    wxColor orange(255, 165, 0);
-    wxPen cursorPen(orange, 3, wxPENSTYLE_DOT);
-    dc.SetPen(cursorPen);
-    dc.DrawLine(x_cursor, 0, x_cursor, h);
-    
+    if (cursorTime <= m_maxtime || cursorTime >= m_mintime)
+    {
+        int x_cursor = w * (scale * ((cursorTime - m_mintime) / (m_maxtime - m_mintime) - \
+                                     position) + position);
+        
+        wxColor orange(255, 165, 0);
+        wxPen cursorPen(orange, 3, wxPENSTYLE_DOT);
+        dc.SetPen(cursorPen);
+        dc.DrawLine(x_cursor, 0, x_cursor, h);
+    }
     // ----------------------------------------------------------------
 
     dc.SetTextForeground(*wxBLACK);
