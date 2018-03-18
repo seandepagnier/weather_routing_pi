@@ -1401,15 +1401,9 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	fgSizer97->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxFlexGridSizer* fgSizer78;
-	fgSizer78 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer78 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer78->SetFlexibleDirection( wxBOTH );
 	fgSizer78->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_staticText140 = new wxStaticText( this, wxID_ANY, _("Variable"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText140->Wrap( -1 );
-	m_staticText140->SetForegroundColour( wxColour( 255, 0, 0 ) );
-	
-	fgSizer78->Add( m_staticText140, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	wxString m_cVariable1Choices[] = { _("Speed Over Ground (SOG)"), _("Course Over Ground (COG)"), _("Speed Over Water (SOW)"), _("Course Over Water (COW)"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Speed (AWS)"), _("Apparent Wind Angle (AWA)"), _("Wind Gust"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable1NChoices = sizeof( m_cVariable1Choices ) / sizeof( wxString );
@@ -1424,12 +1418,6 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	
 	fgSizer78->Add( m_stMousePosition1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	m_staticText1401 = new wxStaticText( this, wxID_ANY, _("Variable"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText1401->Wrap( -1 );
-	m_staticText1401->SetForegroundColour( wxColour( 0, 255, 0 ) );
-	
-	fgSizer78->Add( m_staticText1401, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
 	wxString m_cVariable2Choices[] = { _("Speed Over Ground (SOG)"), _("Course Over Ground (COG)"), _("Speed Over Water (SOW)"), _("Course Over Water (COW)"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Speed (AWS)"), _("Apparent Wind Angle (AWA)"), _("Wind Gust"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable2NChoices = sizeof( m_cVariable2Choices ) / sizeof( wxString );
 	m_cVariable2 = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cVariable2NChoices, m_cVariable2Choices, 0 );
@@ -1441,12 +1429,6 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_stMousePosition2->SetForegroundColour( wxColour( 33, 255, 6 ) );
 	
 	fgSizer78->Add( m_stMousePosition2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
-	
-	m_staticText14011 = new wxStaticText( this, wxID_ANY, _("Variable"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText14011->Wrap( -1 );
-	m_staticText14011->SetForegroundColour( wxColour( 0, 0, 255 ) );
-	
-	fgSizer78->Add( m_staticText14011, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
 	wxString m_cVariable3Choices[] = { _("Speed Over Ground (SOG)"), _("Course Over Ground (COG)"), _("Speed Over Water (SOW)"), _("Course Over Water (COW)"), _("Wind Velocity"), _("Wind Direction"), _("Wind Course"), _("Wind Velocity Ground"), _("Wind Direction Ground"), _("Wind Course Ground"), _("Apparent Wind Speed (AWS)"), _("Apparent Wind Angle (AWA)"), _("Wind Gust"), _("Current Velocity"), _("Current Direction"), _("Sig Wave Height"), _("Tacks") };
 	int m_cVariable3NChoices = sizeof( m_cVariable3Choices ) / sizeof( wxString );

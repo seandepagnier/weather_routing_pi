@@ -325,13 +325,10 @@ class PlotDialogBase : public wxDialog
 		wxSlider* m_sPosition;
 		wxStaticText* m_staticText139;
 		wxSlider* m_sScale;
-		wxStaticText* m_staticText140;
 		wxChoice* m_cVariable1;
 		wxStaticText* m_stMousePosition1;
-		wxStaticText* m_staticText1401;
 		wxChoice* m_cVariable2;
 		wxStaticText* m_stMousePosition2;
-		wxStaticText* m_staticText14011;
 		wxChoice* m_cVariable3;
 		wxStaticText* m_stMousePosition3;
 		wxRadioButton* m_rbCurrentRoute;
