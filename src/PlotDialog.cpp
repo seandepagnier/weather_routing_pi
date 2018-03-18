@@ -50,6 +50,7 @@ PlotDialog::PlotDialog( WeatherRouting &weatherrouting )
 #endif
       m_WeatherRouting(weatherrouting)
 {
+    
 }
 
 PlotDialog::~PlotDialog()
@@ -232,10 +233,28 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
             lx = x, ly = y;
         }
     }
+    
+    // Cursor Customization
+    // ----------------------------------------------------------------
+    // Draw a cursor on the graph to show
+    // the current time position by the GRIB file
+    wxDateTime gribTime = m_WeatherRouting.m_ConfigurationDialog.m_GribTimelineTime;
+    double cursorTime = (gribTime - m_StartTime).GetSeconds().ToDouble();
+    if (cursorTime <= m_maxtime || cursorTime >= m_mintime)
+    {
+        int x_cursor = w * (scale * ((cursorTime - m_mintime) / (m_maxtime - m_mintime) - \
+                                     position) + position);
+        
+        wxColor orange(255, 165, 0);
+        wxPen cursorPen(orange, 3, wxPENSTYLE_DOT);
+        dc.SetPen(cursorPen);
+        dc.DrawLine(x_cursor, 0, x_cursor, h);
+    }
+    // ----------------------------------------------------------------
 
     dc.SetTextForeground(*wxBLACK);
     dc.SetPen(wxPen(*wxBLACK, 1, wxPENSTYLE_DOT));
-
+    
     const double steps = 10;
     bool grid = true;
     for(double i=1/steps; i<1-1/steps; i+=1/steps) {
@@ -282,4 +301,9 @@ void PlotDialog::SetRouteMapOverlay(RouteMapOverlay *routemapoverlay)
         m_PlotData = routemapoverlay->GetPlotData(m_rbCursorRoute->GetValue());
     GetScale();
     m_PlotWindow->Refresh();
+}
+
+void PlotDialog::OnUpdateUI(wxUpdateUIEvent &event)
+{
+    SetRouteMapOverlay(m_WeatherRouting.FirstCurrentRouteMap());
 }

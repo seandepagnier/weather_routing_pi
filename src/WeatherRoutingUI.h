@@ -342,6 +342,7 @@ class PlotDialogBase : public wxDialog
 		virtual void OnMouseEventsPlot( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPaintPlot( wxPaintEvent& event ) { event.Skip(); }
 		virtual void OnSizePlot( wxSizeEvent& event ) { event.Skip(); }
+		virtual void OnUpdateUI( wxUpdateUIEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlot( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnUpdatePlotVariable( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnUpdateRoute( wxCommandEvent& event ) { event.Skip(); }
