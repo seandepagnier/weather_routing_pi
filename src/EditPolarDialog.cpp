@@ -81,7 +81,10 @@ void EditPolarDialog::OnAddTrueWindAngle( wxCommandEvent& event )
 
 void EditPolarDialog::OnRemoveTrueWindAngle( wxCommandEvent& event )
 {
-    GetPolar()->RemoveDegreeStep(m_lTrueWindAngles->GetSelection());
+    int sel = m_lTrueWindAngles->GetSelection();
+    if (sel == -1)
+        return;
+    GetPolar()->RemoveDegreeStep(sel);
     RebuildTrueWindAngles();
     RebuildGrid();
 }
@@ -99,7 +102,10 @@ void EditPolarDialog::OnAddTrueWindSpeed( wxCommandEvent& event )
 
 void EditPolarDialog::OnRemoveTrueWindSpeed( wxCommandEvent& event )
 {
-    GetPolar()->RemoveWindSpeed(m_lTrueWindSpeeds->GetSelection());
+    int sel = m_lTrueWindSpeeds->GetSelection();
+    if (sel == -1)
+        return;
+    GetPolar()->RemoveWindSpeed(sel);
     RebuildTrueWindSpeeds();
     RebuildGrid();
 }
