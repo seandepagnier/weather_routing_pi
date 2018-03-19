@@ -90,6 +90,8 @@ private:
 
     bool m_CrossOverRegenerate;
     CrossOverGenerationThread *m_CrossOverGenerationThread;
+
+    bool m_EditingPolar;
 };
 
 #endif
