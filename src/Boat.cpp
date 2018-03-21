@@ -75,6 +75,7 @@ wxString Boat::OpenXML(wxString filename, bool shortcut)
             Polar polar; //(wxString::FromUTF8(e->Attribute("Name")));
 
             polar.FileName = wxString::FromUTF8(e->Attribute("FileName"));
+            polar.FileName.Replace (_T("/"), wxFileName::GetPathSeparator());
             if(!wxFileName::FileExists(polar.FileName))
 	        polar.FileName = weather_routing_pi::StandardPath() + _T("polars") +
 		                 wxFileName::GetPathSeparator() + polar.FileName;
