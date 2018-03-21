@@ -58,7 +58,7 @@ BoatDialog::BoatDialog(WeatherRouting &weatherrouting)
 #else
     : BoatDialogBase(&weatherrouting, wxID_ANY, _("Boat"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxSTAY_ON_TOP ),
 #endif
-      m_WeatherRouting(weatherrouting), m_PlotScale(0), m_CrossOverRegenerate(false), m_CrossOverGenerationThread(NULL), m_EditingPolar(false)
+      m_WeatherRouting(weatherrouting), m_PlotScale(0), m_CrossOverRegenerate(false), m_CrossOverGenerationThread(NULL)
 {
     // for small screens: don't let boat dialog be larger than screen
     int w,h;
@@ -209,9 +209,6 @@ void BoatDialog::OnMouseEventsPolarPlot( wxMouseEvent& event )
 
 void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 {
-    if (m_EditingPolar)
-        return;
-
     wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
     if(!window)
         return;
@@ -498,9 +495,6 @@ static int CalcPolarPoints(wxPoint p0, wxPoint p1)
 
 void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
 {
-    if (m_EditingPolar)
-        return;
-
     wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
     if(!window)
         return;
@@ -821,8 +815,6 @@ void BoatDialog::OnEditPolar( wxCommandEvent& event )
     if(i == -1)
         return;
 
-    m_EditingPolar = true;
-
     EditPolarDialog dlg(this);
          
     dlg.SetPolarIndex(i);
@@ -839,8 +831,6 @@ void BoatDialog::OnEditPolar( wxCommandEvent& event )
                          + message, _("OpenCPN Weather Routing Plugin"),
                          wxICON_ERROR | wxOK );
     }
-
-    m_EditingPolar = false;
 
     GenerateCrossOverChart();
     RefreshPlots();
