@@ -361,6 +361,10 @@ bool Polar::Save(const wxString &filename)
         fputs("\n", f);
     }
     fclose(f);
+
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+        CalculateVMG(VWi);
+
     return true;
 }
 
@@ -969,6 +973,7 @@ void Polar::AddWindSpeed(double tws)
     wind_speeds.insert(wind_speeds.begin()+VWi, SailingWindSpeed(tws));
     for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++)
         wind_speeds[VWi].speeds.push_back(0);
+    CalculateVMG(VWi);
 }
 
 void Polar::RemoveWindSpeed(int index)
