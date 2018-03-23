@@ -154,7 +154,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
     /* ensure the directories exist */
     wxFileName fn;
-    fn.Mkdir(weather_routing_pi::StandardPath());
+    fn.Mkdir(weather_routing_pi::StandardPath(), wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
     fn.Mkdir(boatsdir);
     fn.Mkdir(polarsdir);
 
@@ -333,11 +333,23 @@ WeatherRouting::~WeatherRouting( )
 
 void WeatherRouting::CopyDataFiles(wxString from, wxString to)
 {
-    wxArrayString fns;
-    wxDir::GetAllFiles(from, &fns);
-    for (unsigned int i = 0; i < fns.Count(); i++) {
-	wxFileName f(fns.Item(i));
-	wxCopyFile(fns.Item(i), to + wxFileName::GetPathSeparator() + f.GetFullName());
+    if (from[from.Len() - 1] != '\\' && from[from.Len() - 1] != '/') from += wxFILE_SEP_PATH;
+    if (to[to.Len() - 1] != '\\' && to[to.Len() - 1] != '/') to += wxFILE_SEP_PATH;
+
+    if (!wxDirExists(to))
+	wxFileName::Mkdir(to, wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL);
+
+    wxDir dir(from);
+    wxString next = wxEmptyString;
+    bool b = dir.GetFirst(&next);
+    while (b) {
+        const wxString fileFrom = from + next;
+        const wxString fileTo = to + next;
+        if (wxDirExists(fileFrom))
+            CopyDataFiles(fileFrom, fileTo);
+        else
+	    wxCopyFile(fileFrom, fileTo);
+        b = dir.GetNext(&next);
     }
 }
 
