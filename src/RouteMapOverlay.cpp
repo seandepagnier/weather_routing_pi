@@ -62,7 +62,7 @@ RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_overlaylist(0), wind_barb_cache_origin_size(0), current_cache_origin_size(0), wind_barb_route_cache_origin_size(0)
+      m_bUpdated(false), m_overlaylist(0), current_cache_origin_size(0)
 {
 }
 
@@ -710,13 +710,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     if (origin.size() < 2)
         return;
     
-    // if not, then check if wind barbs have to be
-    // calculated or are stored in cache line buffer.
-    bool toCompute = origin.size() != wind_barb_route_cache_origin_size ||
-                     vp.view_scale_ppm != wind_barb_route_cache_scale ||
-                     vp.m_projection_type != wind_barb_route_cache_projection ||
-                     vp.m_projection_type != PI_PROJECTION_MERCATOR;
-    
     // Create a specific viewport at position (0,0)
     // to draw the winds barbs, and then translate it
     PlugIn_ViewPort nvp = vp;
@@ -729,37 +722,30 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     // calculate wind barbs along the route by looping
     // over [GetPlotData(false)] list which contains lat,
     // lon, wind info for each points, only if needed.
-    if (toCompute)
+    std::list<PlotData> plot = GetPlotData(false);
+    std::list<PlotData>::iterator it;
+    for (it = plot.begin(); it != plot.end(); it++)
     {
-        wind_barb_route_cache_origin_size = origin.size();
-        wind_barb_route_cache_scale = vp.view_scale_ppm;
-        wind_barb_route_cache_projection = vp.m_projection_type;
+        wxPoint p;
+        GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
         
-        std::list<PlotData> plot = GetPlotData(false);
-        std::list<PlotData>::iterator it;
-        for (it = plot.begin(); it != plot.end(); it++)
-        {
-            wxPoint p;
-            GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
-            
-            double VW = it->VW;
-            double W = it->W;
-            
-            // Calculate the offset to put the head
-            // of the arrow on the route (and not the
-            // middle of the arrow) for readability.
-            int xOffset, yOffset;
-            xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
-            yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
-            
-            // Draw barbs
-            g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
-                wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
-                deg2rad(W) + vp.rotation, it->lat < 0
-            );
-        }
-        wind_barb_route_cache.Finalize();
+        double VW = it->VW;
+        double W = it->W;
+        
+        // Calculate the offset to put the head
+        // of the arrow on the route (and not the
+        // middle of the arrow) for readability.
+        int xOffset, yOffset;
+        xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
+        yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
+        
+        // Draw barbs
+        g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
+            wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
+            deg2rad(W) + vp.rotation, it->lat < 0
+        );
     }
+    wind_barb_route_cache.Finalize();
     
     // Draw the wind barbs
     wxPoint point;
