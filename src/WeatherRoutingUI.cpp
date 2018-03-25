@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 14 2018)
+// C++ code generated with wxFormBuilder (version Feb 20 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -1796,8 +1796,6 @@ BoatDialogBase::BoatDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	int m_cPlotVariableNChoices = sizeof( m_cPlotVariableChoices ) / sizeof( wxString );
 	m_cPlotVariable = new wxChoice( m_panel20, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cPlotVariableNChoices, m_cPlotVariableChoices, 0 );
 	m_cPlotVariable->SetSelection( 0 );
-	m_cPlotVariable->SetMaxSize( wxSize( 120,-1 ) );
-	
 	fgSizer1021->Add( m_cPlotVariable, 0, wxALL, 5 );
 	
 	m_cbFullPlot = new wxCheckBox( m_panel20, wxID_ANY, _("Full Plot"), wxDefaultPosition, wxDefaultSize, 0 );
