@@ -371,6 +371,10 @@ bool Polar::Save(const wxString &filename)
         fputs("\n", f);
     }
     fclose(f);
+
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+        CalculateVMG(VWi);
+
     return true;
 }
 

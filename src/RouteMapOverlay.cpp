@@ -62,7 +62,7 @@ RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_overlaylist(0), wind_barb_cache_origin_size(0), current_cache_origin_size(0), wind_barb_route_cache_origin_size(0)
+      m_bUpdated(false), m_overlaylist(0), current_cache_origin_size(0)
 {
 }
 
@@ -495,57 +495,78 @@ void RouteMapOverlay::RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_Vie
 }
 
 /* Customization ComfortDisplay
- * -----------------------------------------------------
- * The idea is to display the weather route with different
- * colors giving an idea of the sailing comfort:
- * Green = Light conditions, relax and enjoy
- * Orange = Can be tough, stay focus
- * Red = Strong conditions, heavy sailors, be prepared
+ * ----------------------------------------------------------------------------
+ * The idea is to display on the weather route different colors giving an idea
+ * of the sailing comfort along the trip:
+ *    Green = Light conditions, relax and enjoy
+ *    Orange = Can be tough, stay focus
+ *    Red = Strong conditions, heavy sailors, be prepared
  */
 int RouteMapOverlay::sailingConditionLevel(PlotData plot)
 {
-    /* Method to calculate a indicator between 1 and 3
-     * of the sailing conditions based on sea conditions
-     * such as waves, wind, current.
+    /* Method to calculate a indicator between 1 and 3 of the sailing conditions
+     * based on wind, wind course and waves.
+     *
+     * All these calculations are empirical and just made from experience and how
+     * people feel sailing comfort which is a highly subjective value...
      */
     
     double level_calc = 0.0;
     
-    /* Define coefficient to weight relative impact
-     * of the parameter on sailing comfort
-     *
-     * Definitions:
-     * C   - Sea Current Direction over ground
-     * VC  - Velocity of Current
-     * W   - Wind Direction
-     * WG  - Wind direction over ground
-     * VWG - Velocity of wind over ground
-     * WA  - Angle of wind relative to true north
-     * VW  - velocity of wind over water
-     */
+    // Define mximum constants. Over this value, sailing comfort is very impacted
+    // (coef > 1) and automatically displayed in red.
+    // Definitions:
+    // AW   - Apparent Wind Direction from the boat (0 = upwind)
+    // VW   - Velocity of wind over water
+    //WVHT - Swell (if available)
+    double MAX_WV = 27;     // Vigilant over 27knts/7B
+    double MAX_AW = 30;      // Upwind
+    double MAX_WVHT = 5;    // No more than 5m waves
     
-    double coef_WV = 1.0;
-    double coef_W = 1.0;
-    
-    // Define MAX constants. Over this value, the ratio
-    // is more than 1 which means it is very impacting
-    // the sailing comfort.
-    double MAX_WV = 30;     // No more than 30knt, please
-    double MAX_W = 50;      // No more than 50° app. wind
-    
+    // Use a exp function for wind as difficulty sailing comfort
+    // is exponentially degraded with wind speed.
+    // Over 30knts, it starts to be difficult
     double WV = plot.VW;
-    double W = plot.W;
+    double WV_normal = exp((1.32*WV-MAX_WV)/MAX_WV)-exp(-1);
+    if (WV_normal > 1)
+        WV_normal = 1.0;
     
+    // Use a normal distribution to set the maximum difficulty at 30° upwind,
+    // and reduce when we go downwind. Also, take into account that sailing
+    // on the wind becomes much more difficult when wind speed increases.
+    double AW = heading_resolve(plot.B-plot.W);
+    double AW_normal = ((1/((0.67*MAX_AW)*sqrt(2*M_PI))) * \
+                        exp(-(pow(AW-MAX_AW, 2))/(2*pow(0.67*MAX_AW,2))) * \
+                      75.19) * WV_normal;
+    if (AW_normal > 1)
+        AW_normal = 1.0;
     
-    level_calc = (coef_WV * WV/MAX_WV + coef_W * MAX_W/W) / (coef_WV + coef_W);
+    // If available, add swell conditions in comfort model.
+    // Use same exponential function for swell as sailing
+    // comfort exponentially decrease with swell height.
+    double WVHT = plot.WVHT;
+    double WVHT_normal = 0.0;
+    if (WVHT > 0)
+        WVHT_normal = exp((1.32*WVHT-MAX_WVHT)/MAX_WVHT)-exp(-1);
+    if (WVHT_normal > 1)
+        WVHT_normal = 1;
+    
+    // Calculate score
+    // Use an OR function X,Y E [0,1], f(X,Y) = 1-(1-X)(1-Y)
+    double WV_coef = 1.0;
+    double AW_coef = 0.6;
+    double WVHT_coef = 0.5;
+    level_calc = 1 - (1 - WV_coef * WV_normal) * \
+                (1 - AW_coef * AW_normal) *      \
+                (1 - WVHT_coef * WVHT_normal);
     
     if (level_calc <= 0.5)
         // Light conditions, enjoy ;-)
         return 1;
-    if (level_calc > 0.5 && level_calc <= 1)
+    if (level_calc > 0.5 && level_calc < 1)
         // Can be tough
         return 2;
-    if (level_calc > 1)
+    if (level_calc >= 1)
         // Strong conditions
         return 3;
     return 0;
@@ -689,13 +710,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     if (origin.size() < 2)
         return;
     
-    // if not, then check if wind barbs have to be
-    // calculated or are stored in cache line buffer.
-    bool toCompute = origin.size() != wind_barb_route_cache_origin_size ||
-                     vp.view_scale_ppm != wind_barb_route_cache_scale ||
-                     vp.m_projection_type != wind_barb_route_cache_projection ||
-                     vp.m_projection_type != PI_PROJECTION_MERCATOR;
-    
     // Create a specific viewport at position (0,0)
     // to draw the winds barbs, and then translate it
     PlugIn_ViewPort nvp = vp;
@@ -708,37 +722,30 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     // calculate wind barbs along the route by looping
     // over [GetPlotData(false)] list which contains lat,
     // lon, wind info for each points, only if needed.
-    if (toCompute)
+    std::list<PlotData> plot = GetPlotData(false);
+    std::list<PlotData>::iterator it;
+    for (it = plot.begin(); it != plot.end(); it++)
     {
-        wind_barb_route_cache_origin_size = origin.size();
-        wind_barb_route_cache_scale = vp.view_scale_ppm;
-        wind_barb_route_cache_projection = vp.m_projection_type;
+        wxPoint p;
+        GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
         
-        std::list<PlotData> plot = GetPlotData(false);
-        std::list<PlotData>::iterator it;
-        for (it = plot.begin(); it != plot.end(); it++)
-        {
-            wxPoint p;
-            GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
-            
-            double VW = it->VW;
-            double W = it->W;
-            
-            // Calculate the offset to put the head
-            // of the arrow on the route (and not the
-            // middle of the arrow) for readability.
-            int xOffset, yOffset;
-            xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
-            yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
-            
-            // Draw barbs
-            g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
-                wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
-                deg2rad(W) + vp.rotation, it->lat < 0
-            );
-        }
-        wind_barb_route_cache.Finalize();
+        double VW = it->VW;
+        double W = it->W;
+        
+        // Calculate the offset to put the head
+        // of the arrow on the route (and not the
+        // middle of the arrow) for readability.
+        int xOffset, yOffset;
+        xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
+        yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
+        
+        // Draw barbs
+        g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
+            wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
+            deg2rad(W) + vp.rotation, it->lat < 0
+        );
     }
+    wind_barb_route_cache.Finalize();
     
     // Draw the wind barbs
     wxPoint point;
