@@ -74,6 +74,8 @@ public:
     SailingVMG GetVMGApparentWind(double VA);
 
     double TrueWindSpeed(double VB, double W, double maxVW);
+    bool InterpolateSpeeds();
+    void UpdateSpeeds();
     void UpdateDegreeStepLookup();
 
     bool InsideCrossOverContour(float H, float VW, bool optimize_tacking);
@@ -101,6 +103,7 @@ private:
 
         float VW;
         std::vector<float> speeds; // by degree_count
+        std::vector<float> orig_speeds; // by degree_count, from polar file
         SailingVMG VMG;
     }; // num_wind_speeds
     bool VMGAngle(SailingWindSpeed &ws1, SailingWindSpeed &ws2, float VW, float &W);

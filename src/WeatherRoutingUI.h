@@ -696,6 +696,7 @@ class EditPolarDialogBase : public wxDialog
 		wxNotebook* m_notebook6;
 		wxPanel* m_panel19;
 		wxGrid* m_gPolar;
+		wxStaticText* m_staticText1351;
 		wxPanel* m_panel20;
 		wxTextCtrl* m_tTrueWindAngle;
 		wxListBox* m_lTrueWindAngles;

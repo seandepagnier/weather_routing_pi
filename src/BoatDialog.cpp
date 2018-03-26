@@ -341,6 +341,11 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                     break;
                 }
                 
+                if(isnan(VB)) {
+                    lastvalid = false;
+                    continue;
+                }
+
                 double a;
                 
                 switch(selection) {
@@ -387,6 +392,11 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                     VB = polar.SpeedAtApparentWindSpeed(W, VA);
                     VW = Polar::VelocityTrueWind(VA, VB, W);
                     break;
+                }
+
+                if(isnan(VB)) {
+                    lastvalid = false;
+                    continue;
                 }
 
                 #if 0
@@ -514,9 +524,8 @@ void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
     bool full = m_cbFullPlot->GetValue();
     double scale;
     int xc = full ? w / 2 : 0;
-    if(polar) {
+    if(polar)
         scale = wxMin(full ? w/2 : w, h/2) / 40.0;
-    }
     
     for(double VW = 0; VW < 40; VW += 10) {
         if(polar) {
@@ -861,6 +870,7 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
     for(unsigned int i=0; i<paths.GetCount(); i++) {
         wxString filename = paths[i], message;
         Polar polar;
+        bool success;
 
         for(unsigned int j=0; j<m_Boat.Polars.size(); j++)
             if(m_Boat.Polars[j].FileName == filename)
@@ -875,15 +885,17 @@ void BoatDialog::OnAddPolar( wxCommandEvent& event )
                 file.Write(dummy_polar);
         }
         
-        if(polar.Open(filename, message)) {
+        success = polar.Open(filename, message);
+        if(success) {
             m_Boat.Polars.push_back(polar);
             RepopulatePolars();
             m_lPolars->SetItemState(m_Boat.Polars.size()-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
             generate = true;
-        } else {
-            wxMessageDialog md(this, message,
-                               _("OpenCPN Weather Routing Plugin"),
-                               wxICON_ERROR | wxOK );
+        }
+
+        if(!message.IsEmpty()) {
+            wxMessageDialog md(this, message, _("OpenCPN Weather Routing Plugin"),
+                               success ? wxICON_WARNING : wxICON_ERROR | wxOK );
             md.ShowModal();
         }
     skip:;

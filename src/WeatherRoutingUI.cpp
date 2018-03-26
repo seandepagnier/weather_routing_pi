@@ -2809,6 +2809,10 @@ EditPolarDialogBase::EditPolarDialogBase( wxWindow* parent, wxWindowID id, const
 	
 	fgSizer93->Add( m_gPolar, 0, wxALL|wxEXPAND, 5 );
 	
+	m_staticText1351 = new wxStaticText( m_panel19, wxID_ANY, _("Leave any cell blank to automatically interpolate from nearby values.\n View the polar plot in the boat dialog while editing the polar."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1351->Wrap( -1 );
+	fgSizer93->Add( m_staticText1351, 0, wxALL, 5 );
+	
 	
 	m_panel19->SetSizer( fgSizer93 );
 	m_panel19->Layout();

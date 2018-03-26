@@ -24,6 +24,7 @@
  */
 
 #include <wx/wx.h>
+#include <wx/filename.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -99,6 +100,8 @@ double interp_value(double x, double x1, double x2, double y1, double y2)
     y = m*(x-x1)+y1, m = (y2 - y1)/(x2 - x1)
     y = (y2 - y1)*(x - x1)/(x2 - x1) + y1
 */
+    if(x == x1) return y1; // handle partial nan edge case
+    if(x == x2) return y2;
     return x2 - x1 ? (y2 - y1)*(x - x1)/(x2 - x1) + y1 : y1;
 }
 
@@ -179,11 +182,33 @@ Polar::Polar()
     m_crossoverpercentage = 0;
 }
 
+static char *strtok_polar(const char *line, char **saveptr)
+{
+    const char delim[] = " ;,\t\r\n";
+    if(line)
+        *saveptr = (char*)line;
+
+    char *start = *saveptr, *c = start;
+    while(*c == ' ') c++; // chomp spaces
+    while(*c) {
+        for(unsigned int i=0; i<(sizeof delim) / (sizeof *delim); i++)
+            if(*c == delim[i]) {
+                if(*c == '\r' || *c == '\n')
+                    c[1] = 0;
+                *c = 0;
+                *saveptr = c+1;
+                return start;
+            }
+        c++;
+    }
+    return NULL;
+}
+
 #define MAX_WINDSPEEDS_IN_TABLE 200
-#define MESSAGE(S) (S + wxString(_T("\n")) + wxString::FromUTF8(filename) \
-                    + (linenum > 0 ? (_(" line ") + wxString::Format(_T("%d"), linenum)) : _T("")))
-#define PARSE_WARNING(S) do { if(message.empty()) message = MESSAGE(S); } while (0)
-#define PARSE_ERROR(S) do { message = _("Boat polar failed") + wxString(_T("\n")) \
+#define MESSAGE(S) (wxString::FromUTF8(wxFileName(filename).GetFullName()) \
+                    + (linenum > 0 ? (_(" line ") + wxString::Format("%d", linenum)) : "") + ": " + S + "\n")
+#define PARSE_WARNING(S) do { if(message.size() < 512) message += MESSAGE(S); } while (0)
+#define PARSE_ERROR(S) do { message = _("Boat polar failed") + wxString("\n") \
                                   + MESSAGE(S); goto failed; } while (0)
 bool Polar::Open(const wxString &filename, wxString &message)
 {
@@ -198,7 +223,8 @@ bool Polar::Open(const wxString &filename, wxString &message)
     char line[1024];
     double lastentryW = -1;
     char *token, *saveptr;
-    const char delim[] = ";, \t\r\n";
+    double lastspeed = -1;
+    bool warn_zeros = false;
 
     if(!f)
         PARSE_ERROR(_("Failed to open."));
@@ -207,10 +233,11 @@ bool Polar::Open(const wxString &filename, wxString &message)
     for(;;) {
         if(!zu_gets(f, line, sizeof line))
             PARSE_ERROR(_("Failed to read."));
-
-        token = strtok_r(line, delim, &saveptr);
-        assert(token != 0);
         linenum++;
+
+        token = strtok_polar(line, &saveptr);
+        if(!token)
+            PARSE_ERROR(_("Invalid data."));
 
         /* chomp invisible bytes */
         while(*token < 0) token++;
@@ -223,24 +250,22 @@ bool Polar::Open(const wxString &filename, wxString &message)
         if(linenum == 2)
             PARSE_ERROR(_("Unrecognized format."));
     }
-    
-    while((token = strtok_r(NULL, delim, &saveptr))) {
-        wind_speeds.push_back(SailingWindSpeed(strtod(token, 0)));
+
+    while((token = strtok_polar(NULL, &saveptr))) {
+        double speed = strtod(token, 0);
+        if(speed > lastspeed)
+            wind_speeds.push_back(SailingWindSpeed(speed));
+        else
+            PARSE_ERROR(_("Invalid wind speeds.  Wind speeds must be increasing."));
         if(wind_speeds.size() > MAX_WINDSPEEDS_IN_TABLE)
             PARSE_ERROR(_("Too many wind speeds."));
+        lastspeed = speed;
     }
 
     while(zu_gets(f, line, sizeof line)) {
         linenum++;
 
-#if 0
-        /* strip newline/linefeed */
-        for(unsigned int i=0; i<strlen(line); i++)
-            if(line[i] == '\r' || line[i] == '\n')
-                line[i] = '\0';
-#endif
-
-        if(!(token = strtok_r(line, delim, &saveptr)))
+        if(!(token = strtok_polar(line, &saveptr)))
             break;
 
         double W = strtod(token, 0);
@@ -271,54 +296,34 @@ bool Polar::Open(const wxString &filename, wxString &message)
 
         {
             for(int VWi = 0; VWi < (int)wind_speeds.size(); VWi++) {
-                double s = 0;
-                if((token = strtok_r(NULL, delim, &saveptr)))
-                    s = strtod(token, 0);
-                else
-                    PARSE_WARNING(_("Too few tokens."));
+                double s = NAN;
+                if((token = strtok_polar(NULL, &saveptr))) {
+                    if(!strcmp(token, "0") && !warn_zeros) {
+                        PARSE_WARNING(_("Warning: 0 values found in polar.\n"
+                                        "These measurements will be interpolated.\n"
+                                        "To specify interpolated, leave blank values.\n"
+                                        "To specify course as 'invalid' use 0.0 rather than 0\n"));
+                        warn_zeros = true;
+                    } else if(*token) {
+                        s = strtod(token, 0);
+                        if(s < .05)
+                            s = 0;
+                    }
+                } else
+                    PARSE_WARNING(_("Too few measurements."));
 
-                wind_speeds[VWi].speeds.push_back(s);
+                wind_speeds[VWi].orig_speeds.push_back(s);
             }
 
-            if(strtok_r(NULL, delim, &saveptr))
-                PARSE_WARNING(_("Too many tokens."));
+            if(strtok_polar(NULL, &saveptr))
+                PARSE_WARNING(_("Too many measurements."));
         }
     }
 
     zu_close(f);
 
-    // add zero column for 0 speed in 0 wind in all directions
-    if(wind_speeds[0].VW > 0) {
-        std::vector<SailingWindSpeed> speeds;
-        speeds.push_back(SailingWindSpeed(0));
-        for(unsigned int i=0; i<degree_steps.size(); i++)
-            speeds[0].speeds.push_back(0);
-        for(unsigned int i=0; i<wind_speeds.size(); i++)
-            speeds.push_back(wind_speeds[i]);
-        wind_speeds = speeds;
-    }
 
-#if 0
-    /* fill in port tack assuming symmetric */
-    {
-        int Win = degree_steps.size()-1;
-        if(degree_steps[Win] == 180) Win--;
-        for(; Win >= 0; Win--) {
-            if(degree_steps[Win] == 0)
-                break;
-            
-            degree_steps.push_back(DEGREES - degree_steps[Win]);
-            
-            for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
-                wind_speeds[VWi].speeds.push_back(wind_speeds[VWi].speeds[Win]);
-        }
-    }
-#endif
-        
-    UpdateDegreeStepLookup();
-    
-    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
-        CalculateVMG(VWi);
+    UpdateSpeeds();
 
     FileName = wxString::FromUTF8(filename);
     return true;
@@ -357,7 +362,12 @@ bool Polar::Save(const wxString &filename)
             break;
         fprintf(f, "%.5g", degree_steps[Wi]);
         for(unsigned int VWi = vwi0; VWi<wind_speeds.size(); VWi++)
-            fprintf(f, ";%.5g", wind_speeds[VWi].speeds[Wi]);
+            if(isnan(wind_speeds[VWi].orig_speeds[Wi]))
+                fprintf(f, ";");
+            else if(wind_speeds[VWi].speeds[Wi] == 0) // if we actually want zero?
+                fprintf(f, ";0.01");
+            else
+                fprintf(f, ";%.5g", wind_speeds[VWi].speeds[Wi]);
         fputs("\n", f);
     }
     fclose(f);
@@ -516,7 +526,7 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
     double VB  = interp_value(W, W1, W2, VB1, VB2);
 
     if(VB < 0) // with faulty polars, extrapolation, sometimes results in negative boat speed
-        return 0;
+        return NAN;
 
     return VB;
 }
@@ -686,6 +696,106 @@ double Polar::TrueWindSpeed(double VB, double W, double maxVW)
     double VWmax = interp_value(W, W1, W2, VW1max, VW2max);
 
     return interp_value(VB, VBmin, VBmax, VWmin, VWmax);
+}
+
+bool Polar::InterpolateSpeeds()
+{
+    bool ret = false;
+    // interpolate wind speeds
+    for(unsigned int j=0; j<degree_steps.size(); j++)
+        for(unsigned int i=0; i<wind_speeds.size(); i++) {
+            if(isnan(wind_speeds[i].speeds[j])) {
+                // first try higher and lower wind speed
+                for(int i0=i-1; i0>=0; i0--)
+                    if(!isnan(wind_speeds[i0].speeds[j]))
+                        for(unsigned int i1=i+1; i1<wind_speeds.size(); i1++)
+                            if(!isnan(wind_speeds[i1].speeds[j])) {
+                                wind_speeds[i].speeds[j] =
+                                    interp_value(wind_speeds[i].VW,
+                                                 wind_speeds[i0].VW,
+                                                 wind_speeds[i1].VW,
+                                                 wind_speeds[i0].speeds[j],
+                                                 wind_speeds[i1].speeds[j]);
+                                ret = true;
+                                goto next;
+                            }
+                // now higher and lower angle
+                for(int j0=j-1; j0>=0; j0--)
+                    if(!isnan(wind_speeds[i].speeds[j0]))
+                        for(unsigned int j1=j+1; j1<degree_steps.size(); j1++)
+                            if(!isnan(wind_speeds[i].speeds[j1])) {
+                                double W0 = degree_steps[j0], W1 = degree_steps[j1];
+                                double W = degree_steps[j];
+                                double VW = wind_speeds[i].VW;
+                                double VB0 = wind_speeds[i].speeds[j0];
+                                double VB1 = wind_speeds[i].speeds[j1];
+                                double VA0 = VelocityApparentWind(VB0, W0, VW);
+                                double VA1 = VelocityApparentWind(VB0, W1, VW);
+                                double A0  = DirectionApparentWind(VA0, VB0, W0, VW);
+                                double A1  = DirectionApparentWind(VA1, VB1, W1, VW);
+
+                                // for different wind angles, use sailboat transform to
+                                // interpolate the boat speed, that is
+                                // VB = sin(A/2) * x
+                                double x0 = VB0 / sin(deg2rad(A0/2));
+                                double x1 = VB1 / sin(deg2rad(A1/2));
+
+                                double A = A0; // initial
+                                double VB = VB1;
+                                int c;
+                                for(c=0; c<24; c++) { // limit iterations
+                                    double x = interp_value(A, A0, A1, x0, x1);
+                                    double lastVB = sin(deg2rad(A/2)) * x;
+                                    if(fabs(lastVB - VB) < .001)
+                                        break;
+                                    VB = lastVB;
+                                    double VA  = VelocityApparentWind(VB, W, VW);
+                                    A = DirectionApparentWind(VA, VB, W, VW);
+                                }
+
+                                // if iteration falls outside range, use simple interpolation
+                                if(A < A0 || A > A1 || c == 24)
+                                    wind_speeds[i].speeds[j] = interp_value(W, W0, W1, VB0, VB1);
+                                else
+                                    wind_speeds[i].speeds[j] = VB;
+
+                                ret = true;
+                                goto next;
+                            }
+            next:;
+            }
+        }
+    return ret;
+}
+
+void Polar::UpdateSpeeds()
+{
+    // interpolate wind speeds
+    for(unsigned int i=0; i<wind_speeds.size(); i++) {
+        wind_speeds[i].speeds.clear();
+        for(unsigned int j=0; j<degree_steps.size(); j++)
+            wind_speeds[i].speeds.push_back(wind_speeds[i].orig_speeds[j]);
+    }
+
+    while(InterpolateSpeeds());
+
+    // add invalid speed in 0 wind in all directions, if not specified
+#if 0
+    if(wind_speeds[0].VW > 0) {
+        std::vector<SailingWindSpeed> speeds;
+        speeds.push_back(SailingWindSpeed(0));
+        for(unsigned int i=0; i<degree_steps.size(); i++)
+            speeds[0].speeds.push_back(NAN);
+        for(unsigned int i=0; i<wind_speeds.size(); i++)
+            speeds.push_back(wind_speeds[i]);
+        wind_speeds = speeds;
+    }
+#endif
+
+    UpdateDegreeStepLookup();
+
+    for(unsigned int VWi = 0; VWi < wind_speeds.size(); VWi++)
+        CalculateVMG(VWi);
 }
 
 void Polar::UpdateDegreeStepLookup()
@@ -917,9 +1027,9 @@ void Polar::CalculateVMG(int VWi)
                 double VB1 = upwind*cos(deg2rad(W1))*Speed(W1, ws.VW, true);
                 double VB2 = upwind*cos(deg2rad(W2))*Speed(W2, ws.VW, true);
 
-                if(isnan(VB2) || VB1 > VB2)
+                if(VB1 > VB2)
                     maxW = (W1 + maxW) / 2;
-                else
+                if(VB1 < VB2)
                     maxW = (W2 + maxW) / 2;
 
                 step /= 2;
@@ -945,8 +1055,9 @@ void Polar::AddDegreeStep(double twa)
 
     degree_steps.insert(degree_steps.begin()+Wi, twa);
     for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
-        wind_speeds[VWi].speeds.insert(wind_speeds[VWi].speeds.begin()+Wi, 0);
+        wind_speeds[VWi].orig_speeds.insert(wind_speeds[VWi].orig_speeds.begin()+Wi, NAN);
 
+    UpdateSpeeds();
     UpdateDegreeStepLookup();
 }
 
@@ -954,8 +1065,9 @@ void Polar::RemoveDegreeStep(int index)
 {
     degree_steps.erase(degree_steps.begin()+index);
     for(unsigned int VWi = 0; VWi<wind_speeds.size(); VWi++)
-        wind_speeds[VWi].speeds.erase(wind_speeds[VWi].speeds.begin()+index);
+        wind_speeds[VWi].orig_speeds.erase(wind_speeds[VWi].orig_speeds.begin()+index);
 
+    UpdateSpeeds();
     UpdateDegreeStepLookup();
 }
 
@@ -968,10 +1080,12 @@ void Polar::AddWindSpeed(double tws)
 
     wind_speeds.insert(wind_speeds.begin()+VWi, SailingWindSpeed(tws));
     for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++)
-        wind_speeds[VWi].speeds.push_back(0);
+        wind_speeds[VWi].orig_speeds.push_back(NAN);
+    UpdateSpeeds();
 }
 
 void Polar::RemoveWindSpeed(int index)
 {
     wind_speeds.erase(wind_speeds.begin()+index);
+    UpdateSpeeds();
 }

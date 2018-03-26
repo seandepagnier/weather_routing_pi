@@ -584,9 +584,6 @@ static inline bool ComputeBoatSpeed
     /* compound boatspeed with current */
     OverGround(B, VB, C, VC, BG, VBG);
 
-    if(!VBG) // no speed
-        return false;
-
     /* distance over ground */
     dist = VBG * timeseconds / 3600.0;
     return true;

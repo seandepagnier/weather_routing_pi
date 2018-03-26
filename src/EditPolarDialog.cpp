@@ -62,9 +62,14 @@ void EditPolarDialog::SetPolarIndex(int i)
 
 void EditPolarDialog::OnPolarGridChanged( wxGridEvent& event )
 {
+    wxString str = m_gPolar->GetCellValue(event.GetRow(), event.GetCol());
+    if(str == "0")
+        str = "";
     double VB;
-    m_gPolar->GetCellValue(event.GetRow(), event.GetCol()).ToDouble(&VB);
-    GetPolar()->wind_speeds[event.GetCol()].speeds[event.GetRow()] = VB;
+    if(!str.ToDouble(&VB))
+        VB = NAN;
+    GetPolar()->wind_speeds[event.GetCol()].orig_speeds[event.GetRow()] = VB;
+    GetPolar()->UpdateSpeeds();
     m_BoatDialog->Refresh();
 }
 
@@ -205,9 +210,11 @@ void EditPolarDialog::RebuildGrid()
         m_gPolar->SetColLabelValue
             ( i, wxString::Format(_T("%4.1f"), GetPolar()->wind_speeds[i].VW));
 
-        for(unsigned int j = 0; j<GetPolar()->degree_steps.size(); j++)
-            m_gPolar->SetCellValue
-                (j, i, wxString::Format(_T("%4.1f"), GetPolar()->wind_speeds[i].speeds[j]));
+        for(unsigned int j = 0; j<GetPolar()->degree_steps.size(); j++) {
+            double v = GetPolar()->wind_speeds[i].orig_speeds[j];
+            wxString str = isnan(v) ? "" : v==0 ? "0.0" : wxString::Format(_T("%4.1f"), v);
+            m_gPolar->SetCellValue(j, i, str);
+        }
     }
 
     m_BoatDialog->Refresh();
