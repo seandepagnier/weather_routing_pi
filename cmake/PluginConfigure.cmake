@@ -39,7 +39,7 @@ IF(NOT MSVC)
     ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -fexceptions" )
   ELSE()
 #  ADD_DEFINITIONS( "-Wall -g -fexceptions" )
-    ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -O0 -fexceptions -fPIC" )
+    ADD_DEFINITIONS( "-Wall -Wno-unused-result -g -O2 -fexceptions -fPIC" )
   ENDIF(DEBUG)
  ENDIF(PROFILING)
 
