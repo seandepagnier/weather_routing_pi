@@ -574,7 +574,7 @@ static inline bool ComputeBoatSpeed
         VB = polar.Speed(H, VW, true, configuration.OptimizeTacking);
 
     /* failed to determine speed.. */
-    if(isnan(B) || isnan(VB)) {
+    if(wxIsNaN(B) || wxIsNaN(VB)) {
         // when does this hit??
         printf("polar failed bad! %f %f %f %f\n", W, VW, B, VB);
         configuration.polar_failed = true;
@@ -689,7 +689,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         B = W + H; /* rotated relative to true wind */
 
         /* test to avoid extra computations related to backtracking */
-        if(!isnan(bearing1)) {
+        if(!wxIsNaN(bearing1)) {
             double bearing3 = heading_resolve(B);
             if((bearing1 > bearing2 && bearing3 > bearing2 && bearing3 < bearing1) ||
                (bearing1 < bearing2 && (bearing3 > bearing2 || bearing3 < bearing1))) {
@@ -2160,7 +2160,7 @@ void IsoRoute::PropagateToEnd(RouteMapConfiguration &configuration, double &mind
 
         /* did we tack thru the wind? apply penalty */
         bool tacked = false;
-        if(!isnan(dt) && p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
+        if(!wxIsNaN(dt) && p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
             tacked = true;
             dt += configuration.TackingTime;
 #if 0        
@@ -2169,7 +2169,7 @@ void IsoRoute::PropagateToEnd(RouteMapConfiguration &configuration, double &mind
 #endif
         }
 
-        if(!isnan(dt) && dt < mindt) {
+        if(!wxIsNaN(dt) && dt < mindt) {
             mindt = dt;
             minH = H;
             endp = p;

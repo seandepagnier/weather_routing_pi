@@ -290,7 +290,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     if(!justendroute) {
         RouteMapConfiguration configuration = GetConfiguration();
 
-        if(!isnan(configuration.StartLat)) {
+        if(!wxIsNaN(configuration.StartLat)) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
             SetColor(dc, *wxBLUE, true);
@@ -300,7 +300,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
         }
 
-        if(!isnan(configuration.StartLon)) {
+        if(!wxIsNaN(configuration.StartLon)) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
             SetColor(dc, *wxRED, true);

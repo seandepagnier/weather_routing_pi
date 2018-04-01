@@ -362,7 +362,7 @@ bool Polar::Save(const wxString &filename)
             break;
         fprintf(f, "%.5g", degree_steps[Wi]);
         for(unsigned int VWi = vwi0; VWi<wind_speeds.size(); VWi++)
-            if(isnan(wind_speeds[VWi].orig_speeds[Wi]))
+            if(wxIsNaN(wind_speeds[VWi].orig_speeds[Wi]))
                 fprintf(f, ";");
             else if(wind_speeds[VWi].speeds[Wi] == 0) // if we actually want zero?
                 fprintf(f, ";0.01");
@@ -402,7 +402,7 @@ void Polar::OptimizeTackingSpeed()
                 ct = wind_speeds[VWi].VMG.values[SailingVMG::PORT_UPWIND];
             }
 
-            if(isnan(bt) || isnan(ct))
+            if(wxIsNaN(bt) || wxIsNaN(ct))
                 continue;
             
             double a = wind_speeds[VWi].speeds[Wi];
@@ -547,7 +547,7 @@ double Polar::SpeedAtApparentWindDirection(double A, double VW, double *pW)
         double VA = VelocityApparentWind(VB, W, VW);
         double cA = positive_degrees(DirectionApparentWind(VA, VB, W, VW));
 
-        if(isnan(cA) || iters++ > 256) {
+        if(wxIsNaN(cA) || iters++ > 256) {
             if(pW) *pW = NAN;
             return NAN;
         }
@@ -572,7 +572,7 @@ double Polar::SpeedAtApparentWindSpeed(double W, double VA)
         VB -= (VB - cVB) * lp;
 
         double cVA = VelocityApparentWind(VB, W, VW);
-        if(isnan(cVA) || iters++ > 256)
+        if(wxIsNaN(cVA) || iters++ > 256)
             return NAN;
 
         if(fabsf(cVA - VA) < 2e-2)
@@ -595,7 +595,7 @@ double Polar::SpeedAtApparentWind(double A, double VA, double *pW)
         double cVA = VelocityApparentWind(VB, W, VW);
         double cA = positive_degrees(DirectionApparentWind(cVA, VB, W, VW));
 
-        if(isnan(cVA) || isnan(cA) || iters++ > 256) {
+        if(wxIsNaN(cVA) || wxIsNaN(cA) || iters++ > 256) {
             if(pW) *pW = NAN;
             return NAN;
         }
@@ -640,7 +640,7 @@ SailingVMG Polar::GetVMGApparentWind(double VA)
         for(;;) {
             SailingVMG vmg = GetVMGTrueWind(VW);
             double W = vmg.values[i];
-            if(isnan(W) || iters++ > 128) {
+            if(wxIsNaN(W) || iters++ > 128) {
                 avmg.values[i] = NAN;
                 break;
             }
@@ -708,12 +708,12 @@ bool Polar::InterpolateSpeeds()
     // interpolate wind speeds
     for(unsigned int j=0; j<degree_steps.size(); j++)
         for(unsigned int i=0; i<wind_speeds.size(); i++) {
-            if(isnan(wind_speeds[i].speeds[j])) {
+            if(wxIsNaN(wind_speeds[i].speeds[j])) {
                 // first try higher and lower wind speed
                 for(int i0=i-1; i0>=0; i0--)
-                    if(!isnan(wind_speeds[i0].speeds[j]))
+                    if(!wxIsNaN(wind_speeds[i0].speeds[j]))
                         for(unsigned int i1=i+1; i1<wind_speeds.size(); i1++)
-                            if(!isnan(wind_speeds[i1].speeds[j])) {
+                            if(!wxIsNaN(wind_speeds[i1].speeds[j])) {
                                 wind_speeds[i].speeds[j] =
                                     interp_value(wind_speeds[i].VW,
                                                  wind_speeds[i0].VW,
@@ -725,9 +725,9 @@ bool Polar::InterpolateSpeeds()
                             }
                 // now higher and lower angle
                 for(int j0=j-1; j0>=0; j0--)
-                    if(!isnan(wind_speeds[i].speeds[j0]))
+                    if(!wxIsNaN(wind_speeds[i].speeds[j0]))
                         for(unsigned int j1=j+1; j1<degree_steps.size(); j1++)
-                            if(!isnan(wind_speeds[i].speeds[j1])) {
+                            if(!wxIsNaN(wind_speeds[i].speeds[j1])) {
                                 double W0 = degree_steps[j0], W1 = degree_steps[j1];
                                 double W = degree_steps[j];
                                 double VW = wind_speeds[i].VW;
@@ -933,7 +933,7 @@ float BoatSpeedFromMeasurements(const std::list<PolarMeasurement> &measurements,
                 /det;
 
             besteta = dVW*VW + dW*W + ceta;
-            if(det == 0 || isnan(besteta))
+            if(det == 0 || wxIsNaN(besteta))
                 besteta = pos[0]->eta;
              
             if((besteta < pos[0]->eta &&
@@ -1019,7 +1019,7 @@ void Polar::CalculateVMG(int VWi)
         }
 
         // interpolate the best vmg (as it often lies between entries in the polar
-        if(!isnan(maxW)) {
+        if(!wxIsNaN(maxW)) {
             unsigned int Wi1 = maxWi > 0 ? maxWi - 1 : maxWi;
             unsigned int Wi2 = maxWi < degree_steps.size() - 1 ? maxWi + 1 : maxWi;
             double dsmaxWi = degree_steps[maxWi];
