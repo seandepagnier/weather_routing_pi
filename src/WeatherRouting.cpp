@@ -529,8 +529,12 @@ void WeatherRouting::UpdateCursorPositionDialog()
         CursorPositionDialogMessage(dlg, _("Cursor outside computed route map"));
         return;
     }
+    wxDateTime display_time = rmo->GetLastCursorTime();
 
-    dlg.m_stTime->SetLabel(rmo->GetLastCursorTime().Format(_T("%x %X")));
+    if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
+        display_time = display_time.FromUTC();
+
+    dlg.m_stTime->SetLabel(display_time.Format(_T("%x %H:%M")));
 
     wxString pos = wxString::Format(_T("%4.2f%c %4.2f%c"),
                                     fabs(p->lat), p->lat < 0 ? 'S' : 'N',
@@ -2011,14 +2015,12 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
 
     // XXX double check time is really end time, not start time off by one.
     RouteMapConfiguration c = routemapoverlay.GetConfiguration();
-    wxDateTime t = c.StartTime;
 
     for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
             ((*it).lat, (*it).lon, _T("circle"), _("Weather Route Point"));
 
-        newPoint->m_CreateTime = t;
-        t = (*it).time;
+        newPoint->m_CreateTime = (*it).time;
         newTrack->pWaypointList->Append(newPoint);
     }
 
