@@ -2011,14 +2011,12 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
 
     // XXX double check time is really end time, not start time off by one.
     RouteMapConfiguration c = routemapoverlay.GetConfiguration();
-    wxDateTime t = c.StartTime;
 
     for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
             ((*it).lat, (*it).lon, _T("circle"), _("Weather Route Point"));
 
-        newPoint->m_CreateTime = t;
-        t = (*it).time;
+        newPoint->m_CreateTime = (*it).time;
         newTrack->pWaypointList->Append(newPoint);
     }
 
