@@ -529,8 +529,12 @@ void WeatherRouting::UpdateCursorPositionDialog()
         CursorPositionDialogMessage(dlg, _("Cursor outside computed route map"));
         return;
     }
+    wxDateTime display_time = rmo->GetLastCursorTime();
 
-    dlg.m_stTime->SetLabel(rmo->GetLastCursorTime().Format(_T("%x %X")));
+    if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
+        display_time = display_time.FromUTC();
+
+    dlg.m_stTime->SetLabel(display_time.Format(_T("%x %X")));
 
     wxString pos = wxString::Format(_T("%4.2f%c %4.2f%c"),
                                     fabs(p->lat), p->lat < 0 ? 'S' : 'N',
