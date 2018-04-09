@@ -814,7 +814,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             if(configuration.DetectLand) {
                 double ndlon1 = dlon1;
                 if (ndlon1 > 360) {
-                    ndlon1 -360;
+                    ndlon1 -= 360;
                 }
                 if (CrossesLand(dlat1, ndlon1)) {
                     configuration.land_crossing = true;
