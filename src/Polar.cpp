@@ -1002,7 +1002,7 @@ void Polar::CalculateVMG(int VWi)
     for(int i=0; i<4; i++) {
         double upwind = i < 2 ? 1 : -1;
         double maxVB = 0;
-        float maxW = NAN;
+        double maxW = NAN;
         unsigned int maxWi = 0;
         for(unsigned int Wi = 0; Wi < degree_steps.size(); Wi++) {
             double W = degree_steps[Wi];

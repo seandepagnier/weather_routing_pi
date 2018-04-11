@@ -637,8 +637,6 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     Position *points = NULL;
     /* through all angles relative to wind */
     int count = 0;
-    bool boundary = false;
-    bool land = false;
 
     double S = Swell(configuration.grib, lat, lon);
     if(S > configuration.MaxSwellMeters)
@@ -726,7 +724,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             tacked = true;
         }
 
-        double dlat, dlon, nrdlon;
+        double dlat, dlon;
         if(configuration.Integrator == RouteMapConfiguration::RUNGE_KUTTA) {
             double k2_dist, k2_BG, k3_dist, k3_BG, k4_dist, k4_BG;
             // a lot more experimentation is needed here, maybe use grib for the right time??
@@ -753,7 +751,6 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         }
 #endif
 
-        nrdlon = dlon;
         if(configuration.positive_longitudes && dlon < 0)
             dlon += 360;
 
@@ -814,7 +811,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             if(configuration.DetectLand) {
                 double ndlon1 = dlon1;
                 if (ndlon1 > 360) {
-                    ndlon1 -360;
+                    ndlon1 -= 360;
                 }
                 if (CrossesLand(dlat1, ndlon1)) {
                     configuration.land_crossing = true;
