@@ -341,7 +341,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                     break;
                 }
                 
-                if(isnan(VB)) {
+                if(wxIsNaN(VB)) {
                     lastvalid = false;
                     continue;
                 }
@@ -394,7 +394,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                     break;
                 }
 
-                if(isnan(VB)) {
+                if(wxIsNaN(VB)) {
                     lastvalid = false;
                     continue;
                 }
@@ -450,7 +450,7 @@ void BoatDialog::OnPaintPlot(wxPaintEvent& event)
                 dc.SetPen(wxPen(wxColor(0, 255, 255), 2));
 
             double W = vmg.values[i];
-            if(isnan(W))
+            if(wxIsNaN(W))
                 continue;
 
             double VB = polar.Speed(W, VW);
@@ -1035,7 +1035,7 @@ wxString BoatDialog::FormatVMG(double W, double VW)
 {
     long index = SelectedPolar();
     Polar &polar = m_Boat.Polars[index];
-    if(isnan(W))
+    if(wxIsNaN(W))
         return _("wind speed out of range");
     double A = positive_degrees(Polar::DirectionApparentWind(polar.Speed(W, VW, true), W, VW));
     return wxString::Format(_("%.1f True %.1f Apparent"), W, A);
