@@ -339,24 +339,34 @@ void ConfigurationDialog::Update()
         GET_CHOICE(Start);
         GET_CHOICE(End);
 
-        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end())
+        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end()) {
             if(m_dpStartDate->GetValue().IsValid()) {
                 int h, m, s;
+                bool reset = false;
+
                 if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) == m_edited_controls.end()) {
                     // We must preserve the time in case only date but not time, is being changed by the user...
-                    h = configuration.StartTime.GetHour();
-                    m = configuration.StartTime.GetMinute();
-                    s = configuration.StartTime.GetSecond();
+                    // configuration.StartTime is UTC, m_dpStartDate Local or UTC so adjust  
+                   wxDateTime datetime = configuration.StartTime;
+
+                   reset = true;
+                   if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+                       datetime = datetime.FromUTC();
+
+                    h = datetime.GetHour();
+                    m = datetime.GetMinute();
+                    s = datetime.GetSecond();
                 }
                 configuration.StartTime = m_dpStartDate->GetValue();
                 m_dpStartDate->SetForegroundColour(wxColour(0, 0, 0));
-                if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) == m_edited_controls.end()) {
+                if(reset) {
                     // ... and add it afterwards
                     configuration.StartTime.SetHour(h);
                     configuration.StartTime.SetMinute(m);
                     configuration.StartTime.SetSecond(s);
                 }
             }
+        }
 
         if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) != m_edited_controls.end()) {
             configuration.StartTime.SetHour(m_tpTime->GetValue().GetHour());

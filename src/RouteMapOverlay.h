@@ -64,7 +64,7 @@ public:
     
     // Customization ComfortDisplay
     void RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
-    int sailingConditionLevel(PlotData plot);
+    int sailingConditionLevel(const PlotData &plot) const;
     
     // Customization WindBarbsOnRoute
     void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);

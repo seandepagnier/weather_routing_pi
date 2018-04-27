@@ -502,7 +502,7 @@ void RouteMapOverlay::RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_Vie
  *    Orange = Can be tough, stay focus
  *    Red = Strong conditions, heavy sailors, be prepared
  */
-int RouteMapOverlay::sailingConditionLevel(PlotData plot)
+int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
 {
     /* Method to calculate a indicator between 1 and 3 of the sailing conditions
      * based on wind, wind course and waves.
