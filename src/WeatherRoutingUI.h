@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 20 2018)
+// C++ code generated with wxFormBuilder (version Mar 29 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -276,6 +276,9 @@ class ConfigurationDialogBase : public wxDialog
 		wxStaticText* m_staticText24;
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText121;
+		wxStaticText* m_staticText241;
+		wxSpinCtrl* m_sSafetyMarginLand;
+		wxStaticText* m_staticText1211;
 		wxStaticText* m_staticText113;
 		wxStaticText* m_staticText115;
 		wxStaticText* m_staticText117;

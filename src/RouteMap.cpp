@@ -825,8 +825,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 // -----------------------------------------
                 // Modify the routing according to a safety
                 // margin defined by the user from the land.
-                // CONFIG: 15 NM as a security distance from land
-                double distSecure = 5;
+                // CONFIG: 2 NM as a security distance by default.
+                double distSecure = configuration.SafetyMarginLand;
                 double latBorderUp1, lonBorderUp1, latBorderUp2, lonBorderUp2;
                 double latBorderDown1, lonBorderDown1, latBorderDown2, lonBorderDown2;
                 
@@ -844,10 +844,10 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 
                 // Fist, find the (lat,long) of each
                 // points of the rectangle
-                ll_gc_ll(lat, lon, 90, distSecure, &latBorderUp1, &lonBorderUp1);
-                ll_gc_ll(dlat1, dlon1, 90, distSecure, &latBorderUp2, &lonBorderUp2);
-                ll_gc_ll(lat, lon, 180, distSecure, &latBorderDown1, &lonBorderDown1);
-                ll_gc_ll(dlat1, dlon1, 180, distSecure, &latBorderDown2, &lonBorderDown2);
+                ll_gc_ll(lat, lon, heading_resolve(BG)-90, distSecure, &latBorderUp1, &lonBorderUp1);
+                ll_gc_ll(dlat1, dlon1, heading_resolve(BG)-90, distSecure, &latBorderUp2, &lonBorderUp2);
+                ll_gc_ll(lat, lon, heading_resolve(BG)+90, distSecure, &latBorderDown1, &lonBorderDown1);
+                ll_gc_ll(dlat1, dlon1, heading_resolve(BG)+90, distSecure, &latBorderDown2, &lonBorderDown2);
                 
                 // Then, test if there is land
                 if (PlugIn_GSHHS_CrossesLand(latBorderUp1, lonBorderUp1, latBorderUp2, lonBorderUp2) ||
