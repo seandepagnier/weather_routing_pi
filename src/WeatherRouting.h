@@ -121,7 +121,8 @@ public:
     void UpdateDisplaySettings();
 
     void AddPosition(double lat, double lon);
-    void AddPosition(double lat, double lon, wxString name, wxString GUID = wxEmptyString);
+    void AddPosition(double lat, double lon, wxString name);
+    void AddPosition(double lat, double lon, wxString name, wxString GUID);
 
     void CursorRouteChanged();
     void UpdateColumns();
