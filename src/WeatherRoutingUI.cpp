@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 20 2018)
+// C++ code generated with wxFormBuilder (version Mar 29 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -1032,7 +1032,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText24->Wrap( -1 );
 	fgSizer1151->Add( m_staticText24, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	m_sTackingTime = new wxSpinCtrl( sbSizer29->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 0, 1000, 0 );
+	m_sTackingTime = new wxSpinCtrl( sbSizer29->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 0, 1000, 1 );
 	fgSizer1151->Add( m_sTackingTime, 0, wxALL, 5 );
 	
 	m_staticText121 = new wxStaticText( sbSizer29->GetStaticBox(), wxID_ANY, _("Seconds"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1041,6 +1041,25 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	
 	
 	fgSizer113->Add( fgSizer1151, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer11511;
+	fgSizer11511 = new wxFlexGridSizer( 1, 0, 0, 0 );
+	fgSizer11511->SetFlexibleDirection( wxBOTH );
+	fgSizer11511->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText241 = new wxStaticText( sbSizer29->GetStaticBox(), wxID_ANY, _("Safety Margin From Land"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText241->Wrap( -1 );
+	fgSizer11511->Add( m_staticText241, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	m_sSafetyMarginLand = new wxSpinCtrl( sbSizer29->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100, 2 );
+	fgSizer11511->Add( m_sSafetyMarginLand, 0, wxALL, 5 );
+	
+	m_staticText1211 = new wxStaticText( sbSizer29->GetStaticBox(), wxID_ANY, _("NM"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1211->Wrap( -1 );
+	fgSizer11511->Add( m_staticText1211, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
+	
+	
+	fgSizer113->Add( fgSizer11511, 1, wxEXPAND, 5 );
 	
 	
 	sbSizer29->Add( fgSizer113, 1, wxEXPAND, 5 );
@@ -1221,6 +1240,8 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sTackingTime->Connect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sSafetyMarginLand->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sSafetyMarginLand->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sFromDegree->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sToDegree->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_tByDegrees->Connect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
@@ -1342,6 +1363,8 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sTackingTime->Disconnect( wxEVT_ENTER_WINDOW, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sSafetyMarginLand->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
+	m_sSafetyMarginLand->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sFromDegree->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sToDegree->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_tByDegrees->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
@@ -2796,7 +2819,7 @@ EditPolarDialogBase::EditPolarDialogBase( wxWindow* parent, wxWindowID id, const
 	
 	fgSizer93->Add( m_gPolar, 0, wxALL|wxEXPAND, 5 );
 	
-	m_staticText1351 = new wxStaticText( m_panel19, wxID_ANY, _("Leave any cell blank to automatically interpolate from nearby values.\n View the polar plot in the boat dialog while editing the polar."), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1351 = new wxStaticText( m_panel19, wxID_ANY, _("Leave any cell blank to automatically interpolate from nearby values.  Use a value of 0.0 to specify invalid (cannot be used)\n View the polar plot in the boat dialog while editing the polar."), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1351->Wrap( -1 );
 	fgSizer93->Add( m_staticText1351, 0, wxALL, 5 );
 	

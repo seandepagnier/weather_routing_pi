@@ -411,6 +411,7 @@ void ConfigurationDialog::Update()
         GET_CHECKBOX(AvoidCycloneTracks);
         GET_SPIN(CycloneMonths);
         GET_SPIN(CycloneDays);
+        GET_SPIN(SafetyMarginLand);
 
         GET_CHECKBOX(DetectLand);
         GET_CHECKBOX(DetectBoundary);
