@@ -83,6 +83,7 @@
 
 #define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
 
+long RouteMapPosition::s_ID = 0;
 
 static double Swell(RouteMapConfiguration &configuration, double lat, double lon)
 {
