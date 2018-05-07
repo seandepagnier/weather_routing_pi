@@ -127,7 +127,7 @@ int weather_routing_pi::Init(void)
       SetCanvasMenuItemViz(m_waypoint_menu_id, false, "Waypoint");
 
       m_route_menu_id = AddCanvasMenuItem (new wxMenuItem(&dummy_menu, -1, _("Weather Route Analysis")), this, "Route" );
-      SetCanvasMenuItemViz(m_route_menu_id, false, "Route");
+      // SetCanvasMenuItemViz(m_route_menu_id, false, "Route");
 
       //    And load the configuration items
       LoadConfig();
@@ -395,30 +395,39 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 {
 }
 
+void weather_routing_pi::NewWR()
+{
+    if(m_pWeather_Routing)
+      return;
+
+    m_pWeather_Routing = new WeatherRouting(m_parent_window, *this);
+    wxPoint p = m_pWeather_Routing->GetPosition();
+    m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
+    m_pWeather_Routing->Move(p);
+
+    SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
+    SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
+
+    if(ODVersionNewerThan( 1, 1, 15)) {
+        wxJSONValue jMsg;
+        wxJSONWriter writer;
+        wxString MsgString;
+        jMsg[wxT("Source")] = wxT("WEATHER_ROUTING_PI");
+        jMsg[wxT("Type")] = wxT("Request");
+        jMsg[wxT("Msg")] = wxS("GetAPIAddresses");
+        jMsg[wxT("MsgId")] = wxS("GetAPIAddresses");
+        writer.Write( jMsg, MsgString );
+        SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+    }
+    
+    m_pWeather_Routing->Reset();
+    
+}
+
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
-    if(!m_pWeather_Routing) {
-        m_pWeather_Routing = new WeatherRouting(m_parent_window, *this);
-        wxPoint p = m_pWeather_Routing->GetPosition();
-        m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
-        m_pWeather_Routing->Move(p);
-
-        SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
-        SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
-
-        if(ODVersionNewerThan( 1, 1, 15)) {
-            Json::Value jMsg;
-            Json::FastWriter writer;
-
-            jMsg["Source"] = "WEATHER_ROUTING_PI";
-            jMsg["Type"] = "Request";
-            jMsg["Msg"] = "GetAPIAddresses";
-            jMsg["MsgId"] = "GetAPIAddresses";
-            SendPluginMessage( wxS("OCPN_DRAW_PI"), writer.write( jMsg) );
-        }
-        
-        m_pWeather_Routing->Reset();
-    }
+    if(!m_pWeather_Routing)
+        NewWR();
 
     m_pWeather_Routing->Show(!m_pWeather_Routing->IsShown());
 }
@@ -426,7 +435,7 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
 void weather_routing_pi::OnContextMenuItemCallback(int id)
 {
     if(!m_pWeather_Routing)
-        return;
+        NewWR();
 
     if(id == m_position_menu_id) {
         m_pWeather_Routing->AddPosition(m_cursor_lat, m_cursor_lon);
@@ -435,14 +444,23 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
         wxString GUID = GetSelectedWaypointGUID_Plugin();
         if (GUID.IsEmpty())
           return;
-        std::unique_ptr<PlugIn_Waypoint> w = GetWaypoint_Plugin( GUID);
+        std::unique_ptr<PlugIn_Waypoint> w = GetWaypoint_Plugin(GUID);
         PlugIn_Waypoint *wp = w.get();
         if (wp == nullptr)
             return;
         m_pWeather_Routing->AddPosition(wp->m_lat, wp->m_lon, wp->m_MarkName, wp->m_GUID);
     }
-    else if(id == m_route_menu_id)
-        ;
+    else if(id == m_route_menu_id) {
+        wxString GUID = GetSelectedRouteGUID_Plugin();
+        if (GUID.IsEmpty())
+          return;
+
+        std::unique_ptr<PlugIn_Route> rte = GetRoute_Plugin(GUID);
+        if (rte.get() == nullptr)
+           return;
+
+        //m_pWeather_Routing->AnalyseRoute(rte);
+    }
     m_pWeather_Routing->Reset();
 }
 
@@ -553,5 +571,5 @@ void weather_routing_pi::ShowMenuItems(bool show)
     SetToolbarItemState( m_leftclick_tool_id, show );
     SetCanvasMenuItemViz(m_position_menu_id, show);
     SetCanvasMenuItemViz(m_waypoint_menu_id, show, "Waypoint");
-    SetCanvasMenuItemViz(m_route_menu_id, show, "Route");
+    //SetCanvasMenuItemViz(m_route_menu_id, show, "Route");
 }

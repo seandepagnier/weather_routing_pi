@@ -131,6 +131,7 @@ public:
 
 private:
       void OnCursorLatLonTimer( wxTimerEvent & );
+      void NewWR();
 
       bool LoadConfig(void);
       bool SaveConfig(void);
