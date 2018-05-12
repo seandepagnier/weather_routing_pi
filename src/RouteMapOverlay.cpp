@@ -290,7 +290,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     if(!justendroute) {
         RouteMapConfiguration configuration = GetConfiguration();
 
-        if(!isnan(configuration.StartLat)) {
+        if(!wxIsNaN(configuration.StartLat)) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
             SetColor(dc, *wxBLUE, true);
@@ -300,7 +300,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
         }
 
-        if(!isnan(configuration.StartLon)) {
+        if(!wxIsNaN(configuration.StartLon)) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
             SetColor(dc, *wxRED, true);
@@ -502,7 +502,7 @@ void RouteMapOverlay::RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_Vie
  *    Orange = Can be tough, stay focus
  *    Red = Strong conditions, heavy sailors, be prepared
  */
-int RouteMapOverlay::sailingConditionLevel(PlotData plot)
+int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
 {
     /* Method to calculate a indicator between 1 and 3 of the sailing conditions
      * based on wind, wind course and waves.

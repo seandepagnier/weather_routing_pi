@@ -574,7 +574,7 @@ static inline bool ComputeBoatSpeed
         VB = polar.Speed(H, VW, true, configuration.OptimizeTacking);
 
     /* failed to determine speed.. */
-    if(isnan(B) || isnan(VB)) {
+    if(wxIsNaN(B) || wxIsNaN(VB)) {
         // when does this hit??
         printf("polar failed bad! %f %f %f %f\n", W, VW, B, VB);
         configuration.polar_failed = true;
@@ -637,8 +637,6 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     Position *points = NULL;
     /* through all angles relative to wind */
     int count = 0;
-    bool boundary = false;
-    bool land = false;
 
     double S = Swell(configuration.grib, lat, lon);
     if(S > configuration.MaxSwellMeters)
@@ -689,7 +687,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         B = W + H; /* rotated relative to true wind */
 
         /* test to avoid extra computations related to backtracking */
-        if(!isnan(bearing1)) {
+        if(!wxIsNaN(bearing1)) {
             double bearing3 = heading_resolve(B);
             if((bearing1 > bearing2 && bearing3 > bearing2 && bearing3 < bearing1) ||
                (bearing1 < bearing2 && (bearing3 > bearing2 || bearing3 < bearing1))) {
@@ -726,7 +724,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             tacked = true;
         }
 
-        double dlat, dlon, nrdlon;
+        double dlat, dlon;
         if(configuration.Integrator == RouteMapConfiguration::RUNGE_KUTTA) {
             double k2_dist, k2_BG, k3_dist, k3_BG, k4_dist, k4_BG;
             // a lot more experimentation is needed here, maybe use grib for the right time??
@@ -753,7 +751,6 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         }
 #endif
 
-        nrdlon = dlon;
         if(configuration.positive_longitudes && dlon < 0)
             dlon += 360;
 
@@ -813,10 +810,51 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             /* landfall test */
             if(configuration.DetectLand) {
                 double ndlon1 = dlon1;
+                
+                // Check first if crossing land.
                 if (ndlon1 > 360) {
-                    ndlon1 -360;
+                    ndlon1 -= 360;
                 }
-                if (CrossesLand(dlat1, ndlon1)) {
+                if (CrossesLand(dlat1, ndlon1))
+                {
+                    configuration.land_crossing = true;
+                    continue;
+                }
+            
+                // CUSTOMIZATION - Safety distance from land
+                // -----------------------------------------
+                // Modify the routing according to a safety
+                // margin defined by the user from the land.
+                // CONFIG: 2 NM as a security distance by default.
+                double distSecure = configuration.SafetyMarginLand;
+                double latBorderUp1, lonBorderUp1, latBorderUp2, lonBorderUp2;
+                double latBorderDown1, lonBorderDown1, latBorderDown2, lonBorderDown2;
+                
+                // Test if land is found within a rectangle with
+                // dimensiosn (dist, distSecure). Tests borders, plus diag,
+                // and middle of each side...
+                //            <- dist ->
+                // |-------------------------------|
+                // |                               |    ^
+                // |                               |    distSafety
+                // |-------------------------------|    ^
+                // |                               |
+                // |                               |
+                // |-------------------------------|
+                
+                // Fist, find the (lat,long) of each
+                // points of the rectangle
+                ll_gc_ll(lat, lon, heading_resolve(BG)-90, distSecure, &latBorderUp1, &lonBorderUp1);
+                ll_gc_ll(dlat1, dlon1, heading_resolve(BG)-90, distSecure, &latBorderUp2, &lonBorderUp2);
+                ll_gc_ll(lat, lon, heading_resolve(BG)+90, distSecure, &latBorderDown1, &lonBorderDown1);
+                ll_gc_ll(dlat1, dlon1, heading_resolve(BG)+90, distSecure, &latBorderDown2, &lonBorderDown2);
+                
+                // Then, test if there is land
+                if (PlugIn_GSHHS_CrossesLand(latBorderUp1, lonBorderUp1, latBorderUp2, lonBorderUp2) ||
+                    PlugIn_GSHHS_CrossesLand(latBorderDown1, lonBorderDown1, latBorderDown2, lonBorderDown2) ||
+                    PlugIn_GSHHS_CrossesLand(latBorderUp1, lonBorderUp1, latBorderDown2, lonBorderDown2) ||
+                    PlugIn_GSHHS_CrossesLand(latBorderDown1, lonBorderDown1, latBorderUp2, lonBorderUp2))
+                {
                     configuration.land_crossing = true;
                     continue;
                 }
@@ -2160,7 +2198,7 @@ void IsoRoute::PropagateToEnd(RouteMapConfiguration &configuration, double &mind
 
         /* did we tack thru the wind? apply penalty */
         bool tacked = false;
-        if(!isnan(dt) && p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
+        if(!wxIsNaN(dt) && p->parent_heading*H < 0 && fabs(p->parent_heading - H) < 180) {
             tacked = true;
             dt += configuration.TackingTime;
 #if 0        
@@ -2169,7 +2207,7 @@ void IsoRoute::PropagateToEnd(RouteMapConfiguration &configuration, double &mind
 #endif
         }
 
-        if(!isnan(dt) && dt < mindt) {
+        if(!wxIsNaN(dt) && dt < mindt) {
             mindt = dt;
             minH = H;
             endp = p;

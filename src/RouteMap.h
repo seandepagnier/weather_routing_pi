@@ -302,6 +302,7 @@ struct RouteMapConfiguration {
 
     double MaxDivertedCourse, MaxCourseAngle, MaxSearchAngle, MaxTrueWindKnots, MaxApparentWindKnots;
     double MaxSwellMeters, MaxLatitude, TackingTime, WindVSCurrent;
+    double SafetyMarginLand;
 
     bool AvoidCycloneTracks;
     int CycloneMonths, CycloneDays;
