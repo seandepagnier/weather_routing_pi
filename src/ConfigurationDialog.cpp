@@ -215,6 +215,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(AvoidCycloneTracks);
     SET_SPIN(CycloneMonths);
     SET_SPIN(CycloneDays);
+    SET_SPIN(SafetyMarginLand);
 
     SET_CHECKBOX(DetectLand);
     SET_CHECKBOX(DetectBoundary);
@@ -265,22 +266,28 @@ void ConfigurationDialog::SetBoatFilename(wxString path)
 void ConfigurationDialog::OnResetAdvanced( wxCommandEvent& event )
 {
     m_bBlockUpdate = true;
+
+    // constraints
     m_sMaxLatitude->SetValue(90);
-    m_sTackingTime->SetValue(0);
     m_sWindVSCurrent->SetValue(0);
     m_sMaxCourseAngle->SetValue(180);
     m_sMaxSearchAngle->SetValue(120);
     m_cbAvoidCycloneTracks->SetValue(false);
+    // XXX missing 2
+
+    // Options
     m_cbInvertedRegions->SetValue(false);
     m_cbAnchoring->SetValue(false);
     m_cIntegrator->SetSelection(0);
     m_sWindStrength->SetValue(100);
     m_sTackingTime->SetValue(0);
+    m_sSafetyMarginLand->SetValue(2.);
+
     m_sFromDegree->SetValue(0);
     m_sToDegree->SetValue(180);
     m_tByDegrees->SetValue(_T("5"));
-    m_bBlockUpdate = false;
 
+    m_bBlockUpdate = false;
     Update();
 }
 
