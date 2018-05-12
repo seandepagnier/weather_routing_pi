@@ -2015,7 +2015,7 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
 
     for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
-            ((*it).lat, (*it).lon, _T("circle"), _("Weather Route Point"));
+            ((*it).lat, heading_resolve((*it).lon), _T("circle"), _("Weather Route Point"));
 
         newPoint->m_CreateTime = t;
         t = (*it).time;
