@@ -86,8 +86,9 @@
 #define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
 
 
-static double Swell(WR_GribRecordSet *grib, double lat, double lon)
+static double Swell(RouteMapConfiguration &configuration, double lat, double lon)
 {
+    WR_GribRecordSet *grib = configuration.grib;
     if(!grib)
         return 0;
 
@@ -104,8 +105,9 @@ static double Swell(WR_GribRecordSet *grib, double lat, double lon)
     return height;
 }
 
-static double Gust(WR_GribRecordSet *grib, double lat, double lon)
+static double Gust(RouteMapConfiguration &configuration, double lat, double lon)
 {
+    WR_GribRecordSet *grib = configuration.grib;
     if(!grib)
         return NAN;
 
@@ -121,9 +123,10 @@ static double Gust(WR_GribRecordSet *grib, double lat, double lon)
 }
 
 
-static inline bool GribWind(WR_GribRecordSet *grib, double lat, double lon,
+static bool GribWind(RouteMapConfiguration &configuration, double lat, double lon,
                             double &WG, double &VWG)
 {
+    WR_GribRecordSet *grib = configuration.grib;
     if(!grib)
         return false;
 
@@ -138,9 +141,10 @@ static inline bool GribWind(WR_GribRecordSet *grib, double lat, double lon,
 
 enum {WIND, CURRENT};
 
-static inline bool GribCurrent(WR_GribRecordSet *grib, double lat, double lon,
+static bool GribCurrent(RouteMapConfiguration &configuration, double lat, double lon,
                                double &C, double &VC)
 {
+    WR_GribRecordSet *grib = configuration.grib;
     if(!grib)
         return false;
 
@@ -161,8 +165,7 @@ static inline bool Current(RouteMapConfiguration &configuration,
                            double lat, double lon,
                            double &C, double &VC, int &data_mask)
 {
-    if(!configuration.grib_is_data_deficient &&
-       GribCurrent(configuration.grib, lat, lon, C, VC)) {
+    if(!configuration.grib_is_data_deficient && GribCurrent(configuration, lat, lon, C, VC)) {
         data_mask |= Position::GRIB_CURRENT;
         return true;
     }
@@ -179,8 +182,7 @@ static inline bool Current(RouteMapConfiguration &configuration,
     // unlike wind, we don't use current data from a different location
     // so only current data from a different time is allowed
     if(configuration.AllowDataDeficient &&
-       configuration.grib_is_data_deficient &&
-       GribCurrent(grib, lat, lon, C, VC)) {
+       configuration.grib_is_data_deficient && GribCurrent(configuration, lat, lon, C, VC)) {
         data_mask |= Position::GRIB_CURRENT | Position::DATA_DEFICIENT_CURRENT;
         return true;
     }
@@ -420,8 +422,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
         C = VC = 0;
 
     for(;;) {
-        if(!configuration.grib_is_data_deficient && configuration.grib &&
-           GribWind(configuration.grib, p->lat, p->lon, WG, VWG)) {
+        if(!configuration.grib_is_data_deficient && GribWind(configuration, p->lat, p->lon, WG, VWG)) {
             data_mask |= Position::GRIB_WIND;
             break;
         }
@@ -483,8 +484,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
             return false;
 
         /* try deficient grib if climatology failed */
-        if(configuration.grib_is_data_deficient && configuration.grib &&
-           GribWind(configuration.grib, p->lat, p->lon, WG, VWG)) {
+        if(configuration.grib_is_data_deficient && GribWind(configuration, p->lat, p->lon, WG, VWG)) {
             data_mask |= Position::GRIB_WIND | Position::DATA_DEFICIENT_WIND;
             break;
         }
@@ -502,8 +502,8 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
 /* get data from a position for plotting */
 bool Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
 {
-    data.WVHT = Swell(configuration.grib, lat, lon);
-    data.VW_GUST = Gust(configuration.grib, lat, lon);
+    data.WVHT = Swell(configuration, lat, lon);
+    data.VW_GUST = Gust(configuration, lat, lon);
     data.tacks = tacks;
 
     climatology_wind_atlas atlas;
@@ -638,7 +638,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     /* through all angles relative to wind */
     int count = 0;
 
-    double S = Swell(configuration.grib, lat, lon);
+    double S = Swell(configuration, lat, lon);
     if(S > configuration.MaxSwellMeters)
         return false;
 
@@ -908,7 +908,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
 /* propagate to the end position in the configuration, and return the number of seconds it takes */
 double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask)
 {
-    double S = Swell(configuration.grib, lat, lon);
+    double S = Swell(configuration, lat, lon);
     if(S > configuration.MaxSwellMeters)
         return NAN;
 
