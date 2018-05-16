@@ -248,7 +248,7 @@ static void OverGround(double B, double VB, double C, double VC, double &BG, dou
    (y-y1) * (x2-x1) = (y2-y1) * (x-x1)
    (y-y3) * (x4-x3) = (y4-y3) * (x-x3)
 */
-inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
+static inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
                               double x3, double y3, double x4, double y4)
 {
     double ax = x2 - x1, ay = y2 - y1;
