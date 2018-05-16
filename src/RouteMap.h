@@ -37,19 +37,35 @@ class IsoRoute;
 
 typedef std::list<IsoRoute*> IsoRouteList;
 
-struct PlotData
+class PlotData;
+class RoutePoint {
+public:
+    RoutePoint(double latitude = 0., double longitude = 0., int t=0) : 
+        lat(latitude), lon(longitude), tacks(t) {}
+
+    virtual ~RoutePoint() {};
+
+    double lat;
+    double lon;
+    int tacks; /* how many times we have tacked to get to this position */
+
+    bool GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data);
+    bool GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
+    bool GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask);
+};
+
+class PlotData : public RoutePoint
 {
+public:
     wxDateTime time;
-    double lat, lon;
     double VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
     double VW_GUST;
-    int tacks;
 };
 
 class SkipPosition;
 
 /* circular linked list node for positions which take equal time to reach */
-class Position
+class Position: public RoutePoint
 {
 public:
     Position(double latitude, double longitude, Position *p=NULL,
@@ -58,10 +74,6 @@ public:
 
     SkipPosition *BuildSkipList();
 
-    bool GetPlotData(Position *next, double dt,
-                     RouteMapConfiguration &configuration, PlotData &data);
-    bool GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
-    bool GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask);
 
     bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
     double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
@@ -70,13 +82,9 @@ public:
     bool CrossesLand(double dlat, double dlon);
     int SailChanges();
     bool EntersBoundary(double dlat, double dlon);
-    
-    double lat, lon;
-
     double parent_heading; /* angle relative to true wind we sailed from parent to this position */
     double parent_bearing; /* angle relative to north */
     int polar; /* which polar in the boat we are using */
-    int tacks; /* how many times we have tacked to get to this position */
 
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */

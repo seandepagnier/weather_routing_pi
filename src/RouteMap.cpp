@@ -314,17 +314,16 @@ static inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 #define EPSILON (2e-11)
 Position::Position(double latitude, double longitude, Position *p,
                    double pheading, double pbearing, int sp, int t, int dm)
-    : lat(latitude), lon(longitude), parent_heading(pheading), parent_bearing(pbearing),
-      polar(sp), tacks(t),
-      parent(p), propagated(false), copied(false), data_mask(dm)
+    : RoutePoint(latitude, longitude, t), parent_heading(pheading), parent_bearing(pbearing),
+      polar(sp), parent(p), propagated(false), copied(false), data_mask(dm)
 {
     lat -= fmod(lat, EPSILON);
     lon -= fmod(lon, EPSILON);
 }
 
 Position::Position(Position *p)
-    : lat(p->lat), lon(p->lon), parent_heading(p->parent_heading), parent_bearing(p->parent_bearing),
-      polar(p->polar), tacks(p->tacks),
+    : RoutePoint(p->lat, p->lon, p->tacks), parent_heading(p->parent_heading), 
+      parent_bearing(p->parent_bearing), polar(p->polar), 
       parent(p->parent), propagated(p->propagated), copied(true), data_mask(p->data_mask)
 {
 }
@@ -418,7 +417,7 @@ struct climatology_wind_atlas
     double W[8], VW[8], storm, calm, directions[8];
 };
 
-static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Position *p,
+static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, RoutePoint *p,
 /* normal data */
  double &WG, double &VWG, double &W, double &VW, double &C, double &VC,
  climatology_wind_atlas &atlas, int &data_mask)
@@ -495,10 +494,10 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
             data_mask |= Position::GRIB_WIND | Position::DATA_DEFICIENT_WIND;
             break;
         }
-
-        p = p->parent;
-        if(!p)
+        Position *n = dynamic_cast<Position*>(p);
+        if(!n || !n->parent)
             return false;
+        p = n->parent;
     }
     VWG *= configuration.WindStrength;
 
@@ -507,7 +506,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
 }
 
 /* get data from a position for plotting */
-bool Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
+bool RoutePoint::GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
 {
     data.WVHT = Swell(configuration, lat, lon);
     data.VW_GUST = Gust(configuration, lat, lon);
@@ -533,14 +532,14 @@ bool Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &con
     return true;
 }
 
-bool Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
+bool RoutePoint::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
 {
     double WG, VWG, C, VC;
     climatology_wind_atlas atlas;
     return ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
 }
 
-bool Position::GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask)
+bool RoutePoint::GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask)
 {
     double WG, VWG, W, VW;
     climatology_wind_atlas atlas;
