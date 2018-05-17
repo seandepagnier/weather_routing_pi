@@ -704,11 +704,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     
     RouteMapConfiguration configuration = GetConfiguration();
     
-    // if no route has been calculated by
-    // WeatherRouting, then stops the method.
-    // ([origin] is a list of all isochrons)
-    if (origin.size() < 2)
-        return;
     
     // Create a specific viewport at position (0,0)
     // to draw the winds barbs, and then translate it
@@ -723,8 +718,13 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     // over [GetPlotData(false)] list which contains lat,
     // lon, wind info for each points, only if needed.
     std::list<PlotData> plot = GetPlotData(false);
-    std::list<PlotData>::iterator it;
-    for (it = plot.begin(); it != plot.end(); it++)
+
+    // if no route has been calculated by WeatherRouting, 
+    // then stops the method.
+    if (plot.empty())
+        return;
+
+    for ( std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); it++)
     {
         wxPoint p;
         GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
