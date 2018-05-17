@@ -2429,6 +2429,11 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
        not re-entrant, and cannot be done by worker-threads later */
     if(configuration.DetectLand)
         PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
+
+    /* same with grib */
+    if(!configuration.RouteGUID.IsEmpty())
+        SendPluginMessage( wxS("GRIB_VALUES_REQUEST"), _T("") );
+
     if(configuration.ClimatologyType != RouteMapConfiguration::DISABLED) {
         /* query climatology to load it from main thread */
         double dir, speed;
