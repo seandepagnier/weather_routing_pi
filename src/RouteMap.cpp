@@ -72,8 +72,6 @@
 #include <math.h>
 #include <map>
 
-#include "ocpn_plugin.h"
-
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
@@ -763,8 +761,9 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         bearing2 = heading_resolve( parent_bearing + configuration.MaxSearchAngle);
     }
 
-    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
+    for(auto it = configuration.DegreeSteps.begin();
         it != configuration.DegreeSteps.end(); it++) {
+
 
         double H = heading_resolve(*it);
         double B, VB, BG, VBG;
@@ -2465,8 +2464,16 @@ bool RouteMapConfiguration::Update()
     PlugIn_Waypoint waypoint;
 
     if (!RouteGUID.IsEmpty()) {
-        havestart = true;
-        haveend = true;
+        if (!StartGUID.IsEmpty() && GetSingleWaypoint( StartGUID, &waypoint )) {
+            StartLat = waypoint.m_lat;
+            StartLon = waypoint.m_lon;
+            havestart = true;
+        }
+        if (!EndGUID.IsEmpty() && GetSingleWaypoint( EndGUID, &waypoint )) {
+            EndLat = waypoint.m_lat;
+            EndLon = waypoint.m_lon;
+            haveend = true;
+        }
     }
     else for(const auto &it : RouteMap::Positions ) {
         if(Start == it.Name) {
@@ -2507,17 +2514,21 @@ bool RouteMapConfiguration::Update()
     ll_gc_ll_reverse(StartLat, StartLon, EndLat, EndLon, &StartEndBearing, 0);
 
     DegreeSteps.clear();
-
-    // ensure validity
-    FromDegree = wxMax(wxMin(FromDegree, 180), 0);
-    ToDegree = wxMax(wxMin(ToDegree, 180), 0);
-    if(FromDegree > ToDegree) FromDegree = ToDegree;
-    ByDegrees = wxMax(wxMin(ByDegrees, 60), .1);
+    if (RouteGUID.IsEmpty()) {
+        // ensure validity
+        FromDegree = wxMax(wxMin(FromDegree, 180), 0);
+        ToDegree = wxMax(wxMin(ToDegree, 180), 0);
+        if(FromDegree > ToDegree) FromDegree = ToDegree;
+        ByDegrees = wxMax(wxMin(ByDegrees, 60), .1);
     
-    for(double step=FromDegree; step <= ToDegree; step += ByDegrees) {
-        DegreeSteps.push_back(step);
-        if(step > 0 && step < 180)
-            DegreeSteps.push_back(360-step);
+        for(double step=FromDegree; step <= ToDegree; step += ByDegrees) {
+            DegreeSteps.push_back(step);
+            if(step > 0 && step < 180)
+                DegreeSteps.push_back(360-step);
+        }
+    }
+    else {
+        DegreeSteps.push_back(0.);
     }
     DegreeSteps.sort();
 
@@ -2610,10 +2621,10 @@ bool RouteMap::Propagate()
     bool grib_is_data_deficient = false;
         
     if(m_Configuration.AllowDataDeficient &&
-       (!m_NewGrib ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       origin.size() &&
+        ( !m_NewGrib ||
+          !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+          !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]
+        ) && origin.size() &&
        /*m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&*/
        m_Configuration.UseGrib) {
         SetNewGrib(origin.back()->m_Grib);
@@ -2759,7 +2770,7 @@ void RouteMap::Reset()
     m_SharedNewGrib.SetGribRecordSet(0);
     
     m_NewTime = m_Configuration.StartTime;
-    m_bNeedsGrib = m_Configuration.UseGrib;
+    m_bNeedsGrib = m_Configuration.UseGrib && m_Configuration.RouteGUID.IsEmpty();
     m_ErrorMsg = wxEmptyString;
 
     m_bReachedDestination = false;

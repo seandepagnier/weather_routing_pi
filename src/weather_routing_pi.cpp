@@ -462,14 +462,8 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
     }
     else if(id == m_route_menu_id) {
         wxString GUID = GetSelectedRouteGUID_Plugin();
-        if (GUID.IsEmpty())
-          return;
 
-        std::unique_ptr<PlugIn_Route> rte = GetRoute_Plugin(GUID);
-        if (rte.get() == nullptr)
-           return;
-
-        //m_pWeather_Routing->AnalyseRoute(rte);
+        m_pWeather_Routing->AddRoute(GUID);
     }
     m_pWeather_Routing->Reset();
 }

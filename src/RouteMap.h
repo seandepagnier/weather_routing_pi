@@ -308,7 +308,12 @@ struct RouteMapConfiguration {
     bool Update();
 
     wxString RouteGUID;       /* Route GUID if any */
-    wxString Start, End;
+    wxString Start;
+    wxString StartGUID;
+
+    wxString End;
+    wxString EndGUID;
+
     wxDateTime StartTime;
 
     double DeltaTime; /* time in seconds between propagations */
@@ -419,6 +424,14 @@ public:
     }
 
 protected:
+
+    void SetFinish() {
+       Lock();
+       m_bReachedDestination = true;
+       m_bFinished = true;
+       Unlock();
+    }
+
     virtual void Clear();
     bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration);
     Position *ClosestPosition(double lat, double lon, wxDateTime *t=0, double *dist=0);

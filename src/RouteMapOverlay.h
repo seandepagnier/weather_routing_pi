@@ -27,6 +27,7 @@
 #include "LineBufferOverlay.h"
 
 class PlugIn_ViewPort;
+class PlugIn_Route;
 
 class piDC;
 class RouteMapOverlay;
@@ -95,6 +96,7 @@ public:
 
     bool m_UpdateOverlay;
     bool m_bEndRouteVisible;
+    void RouteAnalysis(PlugIn_Route *proute);
 
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent,
