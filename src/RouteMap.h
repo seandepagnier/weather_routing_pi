@@ -40,18 +40,24 @@ typedef std::list<IsoRoute*> IsoRouteList;
 class PlotData;
 class RoutePoint {
 public:
-    RoutePoint(double latitude = 0., double longitude = 0., int t=0) : 
-        lat(latitude), lon(longitude), tacks(t) {}
+    RoutePoint(double latitude = 0., double longitude = 0., int sp = -1, int t=0) : 
+        lat(latitude), lon(longitude), polar(sp), tacks(t) {}
 
     virtual ~RoutePoint() {};
 
     double lat;
     double lon;
+    int polar; /* which polar in the boat we are using */
     int tacks; /* how many times we have tacked to get to this position */
 
     bool GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data);
     bool GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
     bool GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask);
+
+    bool CrossesLand(double dlat, double dlon);
+    bool EntersBoundary(double dlat, double dlon);
+    bool EntersBoundary(double dlat, double dlon, bool *inc);
+    double PropagateToPoint(double dlat, double dlon, RouteMapConfiguration &cf, double &H, int &data_mask, bool end = true);
 };
 
 class PlotData : public RoutePoint
@@ -76,15 +82,13 @@ public:
 
 
     bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
-    double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
 
     double Distance(Position *p);
-    bool CrossesLand(double dlat, double dlon);
     int SailChanges();
-    bool EntersBoundary(double dlat, double dlon);
+    double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
+   
     double parent_heading; /* angle relative to true wind we sailed from parent to this position */
     double parent_bearing; /* angle relative to north */
-    int polar; /* which polar in the boat we are using */
 
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */

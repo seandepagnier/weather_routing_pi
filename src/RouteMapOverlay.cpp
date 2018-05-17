@@ -151,7 +151,7 @@ static void SetWidth(piDC &dc, int w, bool penifgl = false)
     dc.SetPen(pen);
 }
 
-void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
+void RouteMapOverlay::DrawLine(RoutePoint *p1, RoutePoint *p2,
                                piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint p1p, p2p;
@@ -167,7 +167,7 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
         dc.StrokeLine(p1p.x, p1p.y, p2p.x, p2p.y);
 }
 
-void RouteMapOverlay::DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
+void RouteMapOverlay::DrawLine(RoutePoint *p1, wxColour &color1, RoutePoint *p2, wxColour &color2,
                                piDC &dc, PlugIn_ViewPort &vp)
 {
 #if 0
