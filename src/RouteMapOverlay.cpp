@@ -129,7 +129,12 @@ void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
 {
     std::list<PlotData> &plotdata = last_destination_plotdata;
     RouteMapConfiguration configuration =  GetConfiguration();
-    Lock();
+
+    configuration.polar_failed = false;
+    configuration.wind_data_failed = false;
+    configuration.boundary_crossing = false;
+    configuration.land_crossing = false;
+
     wxPlugin_WaypointListNode *pwpnode = proute->pWaypointList->GetFirst();
     PlugIn_Waypoint *pwp;
     wxDateTime curtime;
@@ -174,6 +179,7 @@ void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
             break;
         data.time = curtime;
     }
+    Lock();
     m_bUpdated = true;
     m_UpdateOverlay = true;
     last_destination_position = new Position(data.lat, data.lon,
@@ -182,8 +188,9 @@ void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
     last_cursor_plotdata = last_destination_plotdata;
     if (ok) {
         m_EndTime = data.time;
-        SetFinish();
     }
+    SetFinished(ok);
+    UpdateStatus(configuration);
     Unlock();
 }
 

@@ -425,11 +425,23 @@ public:
 
 protected:
 
-    void SetFinish() {
-       Lock();
-       m_bReachedDestination = true;
+    void SetFinished(bool destination ) {
+       m_bReachedDestination = destination;
        m_bFinished = true;
-       Unlock();
+    }
+
+    void UpdateStatus(const RouteMapConfiguration &configuration) {
+       if(configuration.polar_failed)
+          m_bPolarFailed = true;
+
+        if(configuration.wind_data_failed)
+           m_bNoData = true;
+
+        if(configuration.boundary_crossing)
+           m_bBoundaryCrossing = true;
+
+        if(configuration.land_crossing)
+           m_bLandCrossing = true;
     }
 
     virtual void Clear();

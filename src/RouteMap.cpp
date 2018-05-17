@@ -1002,8 +1002,10 @@ double RoutePoint::PropagateToPoint(double dlat, double dlon, RouteMapConfigurat
     double WG, VWG, W, VW, C, VC;
     climatology_wind_atlas atlas;
     if(!ReadWindAndCurrents(configuration, this,
-                            WG, VWG, W, VW, C, VC, atlas, data_mask))
+                            WG, VWG, W, VW, C, VC, atlas, data_mask)) {
+        if (!end) configuration.wind_data_failed = true;
         return NAN;
+    }
 
     if(VW > configuration.MaxTrueWindKnots)
         return NAN;
@@ -1063,12 +1065,16 @@ double RoutePoint::PropagateToPoint(double dlat, double dlon, RouteMapConfigurat
         return NAN;
 
     /* landfall test if we are within 60 miles (otherwise it's very slow) */
-    if(configuration.DetectLand && dist < 60 && CrossesLand(dlat, dlon))
+    if(configuration.DetectLand && dist < 60 && CrossesLand(dlat, dlon)) {
+        if (!end) configuration.land_crossing = true;
         return NAN;
+    }
 
     /* Boundary test */
-    if(configuration.DetectBoundary && EntersBoundary(dlat, dlon))
+    if(configuration.DetectBoundary && EntersBoundary(dlat, dlon)) {
+        if (!end) configuration.boundary_crossing = true;
         return NAN;
+    }
 
     /* crosses cyclone track(s)? */
     if(configuration.AvoidCycloneTracks &&
@@ -2688,24 +2694,13 @@ bool RouteMap::Propagate()
     if(update) {
         origin.push_back(update);
         if(update->Contains(m_Configuration.EndLat, m_Configuration.EndLon)) {
-            m_bFinished = true;
-            m_bReachedDestination = true;
+            SetFinished(true);
         }
     } else
         m_bFinished = true;
 
     // take note of possible failure reasons
-    if(configuration.polar_failed)
-        m_bPolarFailed = true;
-
-    if(configuration.wind_data_failed)
-        m_bNoData = true;
-
-    if(configuration.boundary_crossing)
-        m_bBoundaryCrossing = true;
-
-    if(configuration.land_crossing)
-        m_bLandCrossing = true;
+    UpdateStatus(configuration);
 
     Unlock();
 
