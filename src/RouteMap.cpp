@@ -1058,7 +1058,7 @@ double RoutePoint::PropagateToPoint(double dlat, double dlon, RouteMapConfigurat
        the maximum boat speed once, and using that before computing boat speed for
        this angle, but for now, we don't worry because propagating to the end is a
        small amount of total computation */
-    if(end && dist / VBG > configuration.DeltaTime / 3600.0)
+    if(end && dist / VBG > configuration.UsedDeltaTime / 3600.0)
         return NAN;
 
     /* quick test first to avoid slower calculation */
@@ -1112,7 +1112,7 @@ int Position::SailChanges()
     return (polar != parent->polar) + parent->SailChanges();
 }
 
-bool Position::EntersBoundary(double dlat, double dlon)
+bool RoutePoint::EntersBoundary(double dlat, double dlon)
 {
     struct FindClosestBoundaryLineCrossing_t t;
     t.dStartLat = lat, t.dStartLon = heading_resolve(lon);
@@ -1121,20 +1121,6 @@ bool Position::EntersBoundary(double dlat, double dlon)
 
     // we request any type
     return RouteMap::ODFindClosestBoundaryLineCrossing(&t);
-}
-
-bool Position::EntersBoundary(double dlat, double dlon, double dist)
-{
-    struct FindClosestBoundaryLineCrossing_t t;
-    t.dStartLat = lat;
-    t.dStartLon = heading_resolve(lon);
-    t.dEndLat = dlat;
-    t.dEndLon = heading_resolve(dlon);
-    t.sBoundaryState = wxT("Active");
-    t.dCrossingDistance = 0.;
-    // last point don't care about boundary after it.
-    bool ret = RouteMap::ODFindClosestBoundaryLineCrossing(&t);
-    return ret && t.dCrossingDistance < dist;
 }
 
 SkipPosition::SkipPosition(Position *p, int q)

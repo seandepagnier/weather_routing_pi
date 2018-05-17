@@ -87,12 +87,6 @@ public:
     int SailChanges();
     double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
    
-    bool EntersBoundary(double dlat, double dlon);
-    bool EntersBoundary(double dlat, double dlon, double dist);
-    bool EntersBoundary(double dlat, double dlon, bool *inc);
-    
-    double lat, lon;
-
     double parent_heading; /* angle relative to true wind we sailed from parent to this position */
     double parent_bearing; /* angle relative to north */
 
