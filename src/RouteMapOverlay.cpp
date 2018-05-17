@@ -158,7 +158,7 @@ void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
         double eta = dt;
         pwpnode = pwpnode->GetNext(); //PlugInWaypoint
         if (pwpnode) {
-            int data_mask;
+            int data_mask = 0;
             double H;
             pwp = pwpnode->GetData();
             rte.lat = pwp->m_lat, rte.lon = pwp->m_lon;
@@ -173,8 +173,10 @@ void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
         }
         else
             next = &data;
-        data.GetPlotData(next, eta, configuration, data);
-        plotdata.push_back(data);
+        if (!configuration.wind_data_failed) {
+            data.GetPlotData(next, eta, configuration, data);
+            plotdata.push_back(data);
+        }
         if (!ok)
             break;
         data.time = curtime;
