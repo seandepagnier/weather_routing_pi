@@ -85,9 +85,52 @@
 
 long RouteMapPosition::s_ID = 0;
 
+extern wxJSONValue g_ReceivedJSONMsg;
+extern wxString    g_ReceivedMessage;
+
+static wxJSONValue RequestGRIB(const wxDateTime &t, const wxString &what, double lat, double lon)
+{
+    wxJSONValue error;
+    wxJSONValue v;
+    wxJSONWriter writer;
+    wxString    MsgString;
+    // brain dead wx is expecting time in local time
+    wxDateTime time = t.FromUTC();
+    if (!time.IsValid())
+        return error;
+
+    v[_T("Day")] = time.GetDay();
+    v[_T("Month")] = time.GetMonth();
+    v[_T("Year")] = time.GetYear();
+    v[_T("Hour")] = time.GetHour();
+    v[_T("Minute")] = time.GetMinute();
+    v[_T("Second")] = time.GetSecond();
+
+    v[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
+    v[wxT("Type")] = wxT("Request");
+    v[wxT("Msg")] = wxS("GRIB_VALUES_REQUEST");
+    v[wxS("lat")] = lat;
+    v[wxS("lon")] = lon;
+    v[what] = 1;
+    writer.Write( v, MsgString );
+    SendPluginMessage( wxS("GRIB_VALUES_REQUEST"), MsgString );
+    if(g_ReceivedMessage != wxEmptyString && g_ReceivedJSONMsg[wxT("Type")].AsString() == _T("Reply")) {
+        return g_ReceivedJSONMsg;
+    }
+    return error;
+}
+
 static double Swell(RouteMapConfiguration &configuration, double lat, double lon)
 {
     WR_GribRecordSet *grib = configuration.grib;
+
+    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+       wxJSONValue r = RequestGRIB(configuration.time, "SWELL", lat, lon);
+       if (!r.HasMember(_T("SWELL")))
+           return 0;
+       return r[_T("SWELL")].AsDouble();
+    }
+
     if(!grib)
         return 0;
 
@@ -107,14 +150,23 @@ static double Swell(RouteMapConfiguration &configuration, double lat, double lon
 static double Gust(RouteMapConfiguration &configuration, double lat, double lon)
 {
     WR_GribRecordSet *grib = configuration.grib;
-    if(!grib)
-        return NAN;
+    double gust;
 
-    GribRecord *grh = grib->m_GribRecordPtrArray[Idx_WIND_GUST];
-    if(!grh)
+    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+       wxJSONValue r = RequestGRIB(configuration.time, "GUST", lat, lon);
+       if (!r.HasMember(_T("GUST")))
+           return NAN;
+       gust =  r[_T("GUST")].AsDouble();
+    }
+    else if(!grib)
         return NAN;
+    else {
+        GribRecord *grh = grib->m_GribRecordPtrArray[Idx_WIND_GUST];
+        if(!grh)
+            return NAN;
 
-    double gust = grh->getInterpolatedValue(lon, lat, true );
+        gust = grh->getInterpolatedValue(lon, lat, true );
+    }
     if(gust == GRIB_NOTDEF)
         return NAN;
     gust *= 3.6 / 1.852; // knots
@@ -126,10 +178,21 @@ static bool GribWind(RouteMapConfiguration &configuration, double lat, double lo
                             double &WG, double &VWG)
 {
     WR_GribRecordSet *grib = configuration.grib;
-    if(!grib)
+
+    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+       wxJSONValue r = RequestGRIB(configuration.time, "WIND SPEED", lat, lon);
+       if (!r.HasMember(_T("WIND SPEED")))
+           return false;
+       VWG = r[_T("WIND SPEED")].AsDouble();
+
+       if (!r.HasMember(_T("WIND DIR")))
+           return false;
+       WG = r[_T("WIND DIR")].AsDouble();
+    }
+    else if(!grib)
         return false;
 
-    if(!GribRecord::getInterpolatedValues(VWG, WG,
+    else if(!GribRecord::getInterpolatedValues(VWG, WG,
                                           grib->m_GribRecordPtrArray[Idx_WIND_VX],
                                           grib->m_GribRecordPtrArray[Idx_WIND_VY], lon, lat))
         return false;
@@ -149,10 +212,21 @@ static bool GribCurrent(RouteMapConfiguration &configuration, double lat, double
                                double &C, double &VC)
 {
     WR_GribRecordSet *grib = configuration.grib;
-    if(!grib)
+
+    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+       wxJSONValue r = RequestGRIB(configuration.time, "CURRENT SPEED", lat, lon);
+       if (!r.HasMember(_T("CURRENT SPEED")))
+           return false;
+       VC = r[_T("CURRENT SPEED")].AsDouble();
+
+       if (!r.HasMember(_T("CURRENT DIR")))
+           return false;
+       C = r[_T("CURRENT DIR")].AsDouble();
+    }
+    else if(!grib)
         return false;
 
-    if(!GribRecord::getInterpolatedValues(VC, C,
+    else if(!GribRecord::getInterpolatedValues(VC, C,
                                           grib->m_GribRecordPtrArray[Idx_SEACURRENT_VX],
                                           grib->m_GribRecordPtrArray[Idx_SEACURRENT_VY],
                                           lon, lat))
