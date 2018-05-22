@@ -435,7 +435,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         if(!justendroute && settingsdialog.m_cbDisplayCursorRoute->GetValue()) {
             SetColor(dc, CursorColor, true);
             SetWidth(dc, RouteThickness, true);
-            RenderCourse(last_cursor_position, dc, vp);
+            RenderCourse(true, dc, vp);
 
             if(MarkAtPolarChange) {
                 SetColor(dc, Darken(CursorColor), true);
@@ -446,7 +446,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         SetColor(dc, DestinationColor, true);
         SetWidth(dc, RouteThickness, true);
         bool confortOnRoute = settingsdialog.m_cbDisplayComfort->GetValue();
-        RenderCourse(last_destination_position, dc, vp, confortOnRoute);
+        RenderCourse(false , dc, vp, confortOnRoute);
         SetColor(dc, Darken(DestinationColor), true);
         SetWidth(dc, RouteThickness/2, true);
         RenderBoatOnCourse(last_destination_position, time, dc, vp);
@@ -588,9 +588,10 @@ static wxColour sailingConditionColor(int level)
 // -----------------------------------------------------
 
 
-void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
-                                   bool comfortRoute)
+void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp,
+        bool comfortRoute)
 {
+    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
     if(!pos)
         return;
 
