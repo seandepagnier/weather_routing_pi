@@ -591,8 +591,8 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
     
     Lock();
     std::list<PlotData> plot = GetPlotData(cursor_route);
-    std::list<PlotData>::reverse_iterator itt =  plot.rbegin();
-    if (itt == plot.rend()) {
+    std::list<PlotData>::iterator itt =  plot.begin();
+    if (itt == plot.end()) {
         Unlock();
         return;
     }
@@ -603,7 +603,7 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
 #endif    
     
     int polar = itt->polar;
-    for(; itt != plot.rend(); itt++)
+    for(; itt != plot.end(); itt++)
     {
         if(itt->polar == polar)
             continue;
@@ -785,7 +785,7 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
         if (comfortRoute)
         {
             wxColor c = sailingConditionColor(sailingConditionLevel(*itt));
-            DrawLine(to, lc, from, c, dc, vp);
+            DrawLine(to, c, from, lc, dc, vp);
             lc = c;
         } 
         else 
@@ -812,9 +812,10 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, piD
     if(!pos)
         return;
     
+    Lock();
     std::list<PlotData> plot = GetPlotData(cursor_route);
     
-    for(std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); )  {
+    for(auto it = plot.begin(); it != plot.end(); )  {
         wxDateTime ittime = it->time;
         
         wxDateTime timestart = ittime;
