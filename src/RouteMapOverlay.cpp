@@ -650,49 +650,33 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
         return;
     
     Lock();
+    std::list<PlotData> plot = GetPlotData(cursor_route);
     
-    Position *p;
-    
-    /* render boat on optimal course at time */
-    IsoChronList::iterator it = origin.begin();
-    
-    /* get route iso for this position */
-    for(p=pos->parent; p; p=p->parent)
-        if(++it == origin.end()) {
-            Unlock();
-            return;
-        }
-    if(it != origin.begin())
-        it--;
-    
-    for(p = pos; p->parent; p = p->parent) {
-        wxDateTime ittime = (*it)->time;
-        wxPoint r;
+    for(std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); )  {
+        wxDateTime ittime = it->time;
         
-        if(time >= ittime) {
-            wxDateTime timestart = (*it)->time;
-            it++;
-            wxDateTime timeend = (*it)->time;
-            
-            wxTimeSpan span = timeend - timestart, cspan = time - timestart;
-            double d = cspan.GetSeconds().ToDouble() / span.GetSeconds().ToDouble();
-            
-            if(d > 1)
-                // d = 1; // draw at end??
-                break; // don't draw if grib time is after end
-            
-            GetCanvasPixLL(&vp, &r,
-                           p->parent->lat + d*(p->lat - p->parent->lat),
-                           p->parent->lon + d*heading_resolve(p->lon - p->parent->lon));
-            
-        } else if(it == origin.begin())
-            //GetCanvasPixLL(&vp, &r, p->parent->lat, p->parent->lon);
-            break; // don't draw if time is before start
-        else {
-            it--;
+        wxDateTime timestart = ittime;
+        double plat = it->lat;
+        double plon = it->lon;
+        it++;
+        if (it == plot.end())
+            break;
+
+        wxDateTime timeend = it->time;
+        if (!(time >= timestart && time <= timeend))
             continue;
-        }
-        
+
+        wxTimeSpan span = timeend - timestart, cspan = time - timestart;
+        double d = cspan.GetSeconds().ToDouble() / span.GetSeconds().ToDouble();
+
+        if(d > 1)
+            // d = 1; // draw at end??
+           break; // don't draw if grib time is after end
+
+        wxPoint r;
+        GetCanvasPixLL(&vp, &r,
+                           plat + d*(it->lat - plat), plon + d*heading_resolve(it->lon - plon));
+
         dc.DrawCircle( r.x, r.y, 7 );
         break;
     }
