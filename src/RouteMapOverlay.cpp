@@ -157,22 +157,21 @@ void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
         data.lat = pwp->m_lat, data.lon = pwp->m_lon;
         double eta = dt;
         pwpnode = pwpnode->GetNext(); //PlugInWaypoint
-        if (pwpnode) {
-            int data_mask = 0;
-            double H;
-            pwp = pwpnode->GetData();
-            rte.lat = pwp->m_lat, rte.lon = pwp->m_lon;
-            next = &rte;
-            eta = data.PropagateToPoint(rte.lat, rte.lon, configuration, H, data_mask, false);
-            if(wxIsNaN(eta)) {
-                ok = false;
-                eta = dt;
-            }
-            // ll_gc_ll_reverse(data.lat, data.lon, next->lat, next->lon, &data.BG, &data.VBG);
-            curtime += wxTimeSpan(0, 0, eta);
+        if (pwpnode == nullptr)
+            break;
+
+        int data_mask = 0;
+        double H;
+        pwp = pwpnode->GetData();
+        rte.lat = pwp->m_lat, rte.lon = pwp->m_lon;
+        next = &rte;
+        eta = data.PropagateToPoint(rte.lat, rte.lon, configuration, H, data_mask, false);
+        if(std::isnan(eta)) {
+            ok = false;
+            eta = dt;
         }
-        else
-            next = &data;
+        // ll_gc_ll_reverse(data.lat, data.lon, next->lat, next->lon, &data.BG, &data.VBG);
+        curtime += wxTimeSpan(0, 0, eta);
         if (!configuration.wind_data_failed) {
             data.GetPlotData(next, eta, configuration, data);
             plotdata.push_back(data);
@@ -591,19 +590,25 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
         return;
     
     Lock();
+    std::list<PlotData> plot = GetPlotData(cursor_route);
+    std::list<PlotData>::reverse_iterator itt =  plot.rbegin();
+    if (itt == plot.rend()) {
+        Unlock();
+        return;
+    }
 
-    /* draw lines to this route */
-    Position *p;
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glBegin(GL_LINES);
 #endif    
-    int polar = pos->polar;
-    for(p = pos; p && p->parent; p = p->parent) {
-        if(p->polar == polar)
+    
+    int polar = itt->polar;
+    for(; itt != plot.rend(); itt++)
+    {
+        if(itt->polar == polar)
             continue;
         wxPoint r;
-        GetCanvasPixLL(&vp, &r, p->lat, p->lon);
+        GetCanvasPixLL(&vp, &r, itt->lat, itt->lon);
         int s = 6;
 #ifndef __OCPN__ANDROID__
         if(!dc.GetDC()) {
@@ -614,7 +619,7 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
         } else
 #endif
             dc.DrawRectangle(r.x-s, r.y-s, 2*s, 2*s);
-        polar = p->polar;
+        polar = itt->polar;
     }
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
@@ -729,6 +734,24 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
 
     Lock();
 
+    bool rte = !GetConfiguration().RouteGUID.IsEmpty();
+    if (cursor_route == true) {
+        // never draw comfort if cursor route
+        assert(comfortRoute == false);
+        if (!rte) {
+            if(!dc.GetDC())
+                glBegin(GL_LINES);
+
+            for(Position *p = pos; p && p->parent; p = p->parent)
+                DrawLine(p, p->parent, dc, vp);
+
+            if(!dc.GetDC())
+                glEnd();
+        }
+        Unlock();
+        return;
+    }
+
     /* ComfortDisplay Customization
      * ------------------------------------------------
      * To get weather data (wind, current, waves) on a
@@ -737,10 +760,10 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
      * Thanks Sean for your help :-)
      */
     std::list<PlotData> plot = GetPlotData(false);
-    std::list<PlotData>::reverse_iterator itt =  plot.rbegin();
-    std::list<PlotData>::reverse_iterator inext =  itt;
+    std::list<PlotData>::reverse_iterator itt = plot.rbegin();
+    std::list<PlotData>::reverse_iterator inext = itt;
 
-    if (itt == plot.rend() || ++inext == plot.rend()) {
+    if (itt == plot.rend()) {
         Unlock();
         return;
     }
@@ -748,36 +771,25 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
     Lock();
     wxColor lc = sailingConditionColor(sailingConditionLevel(*itt));
 
-    bool rte = !GetConfiguration().RouteGUID.IsEmpty();
-
     /* draw lines to this route */
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glBegin(GL_LINES);
 #endif
 
-    if (rte) for(; itt != plot.rend(); inext = itt, itt++)
+    /* end point if reached is not in GetPlotData */
+    RoutePoint *to, from;
+    for(to = pos; itt != plot.rend(); inext = itt, itt++, to = &(*itt))
     {
+        RoutePoint *from = &(*inext);
         if (comfortRoute)
         {
             wxColor c = sailingConditionColor(sailingConditionLevel(*itt));
-            DrawLine(&(*itt), lc, &(*inext), c, dc, vp);
+            DrawLine(to, lc, from, c, dc, vp);
             lc = c;
         } 
         else 
-            DrawLine(&(*itt), &(*inext), dc, vp);
-    }
-    else for(Position *p = pos; (p && p->parent) && (itt != plot.rend()); p = p->parent)
-    {
-        if (comfortRoute)
-        {
-            wxColor c = sailingConditionColor(sailingConditionLevel(*itt));
-            DrawLine(p, lc, p->parent, c, dc, vp);
-            itt++;
-            lc = c;
-        } 
-        else 
-            DrawLine(p, p->parent, dc, vp);
+            DrawLine(to, from, dc, vp);
     }
 
 #ifndef __OCPN__ANDROID__
