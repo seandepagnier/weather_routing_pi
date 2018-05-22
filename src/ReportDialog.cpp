@@ -73,7 +73,6 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         }
 
         RouteMapConfiguration c = (*it)->GetConfiguration();
-        std::list<PlotData> p = (*it)->GetPlotData();
         Position *d = (*it)->GetDestination();
 
         page += _("Boat Filename") + _T(" ") + wxFileName(c.boatFileName).GetName() + _T("<dt>");
