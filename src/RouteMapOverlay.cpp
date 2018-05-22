@@ -440,7 +440,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             if(MarkAtPolarChange) {
                 SetColor(dc, Darken(CursorColor), true);
                 SetWidth(dc, (RouteThickness+1)/2, true);
-                RenderPolarChangeMarks(last_cursor_position, dc, vp);
+                RenderPolarChangeMarks(true, dc, vp);
             }
         }
         SetColor(dc, DestinationColor, true);
@@ -449,24 +449,26 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         RenderCourse(false , dc, vp, confortOnRoute);
         SetColor(dc, Darken(DestinationColor), true);
         SetWidth(dc, RouteThickness/2, true);
-        RenderBoatOnCourse(last_destination_position, time, dc, vp);
+        RenderBoatOnCourse(false, time, dc, vp);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
             SetWidth(dc, (RouteThickness+1)/2, true);
-            RenderPolarChangeMarks(last_destination_position, dc, vp);
+            RenderPolarChangeMarks(false, dc, vp);
         }
     }
 }
 
 
-void RouteMapOverlay::RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp)
 {
+    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
+
     if(!pos)
         return;
     
     Lock();
-    
+
     /* draw lines to this route */
     Position *p;
     if(!dc.GetDC())
@@ -635,7 +637,7 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort 
 }
 
 
-void RouteMapOverlay::RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &dc,
+void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrDC &dc,
                                          PlugIn_ViewPort &vp)
 {
     /* Dedicated method to render the boat circle
@@ -643,6 +645,7 @@ void RouteMapOverlay::RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &d
      * color of the maker, and avoid to generate twice
      * (1 normally, 1 for polar changed -- to avoid)
      */
+    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
     if(!pos)
         return;
     
