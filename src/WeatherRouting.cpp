@@ -450,11 +450,15 @@ void WeatherRouting::Render(piDC &dc, PlugIn_ViewPort &vp)
         if (lat == waypoint.m_lat && lon == waypoint.m_lon && waypoint.m_MarkName.IsSameAs((*it).Name))
             continue;
 
+        long index = m_panel->m_lPositions->FindItem(0, (*it).ID);
+        if (index < 0) {
+            // corrupted data
+            continue;
+        }
+
         wxString name = waypoint.m_MarkName;
         lat = waypoint.m_lat;
         lon = waypoint.m_lon;
-        long index = m_panel->m_lPositions->FindItem(0, (*it).ID);
-        assert(index >= 0);
         (*it).lat = lat;
         (*it).lon = lon;
 
