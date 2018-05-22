@@ -185,7 +185,7 @@ void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
     m_bUpdated = true;
     m_UpdateOverlay = true;
     last_destination_position = new Position(data.lat, data.lon,
-                                            nullptr, /*minH*/ NAN, NAN, 0/*endp->polar*/, true , 0);
+                                            nullptr, /*minH*/ NAN, NAN, data.polar, true , 0);
 
     last_cursor_plotdata = last_destination_plotdata;
     if (ok) {
