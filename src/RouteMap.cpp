@@ -581,9 +581,13 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Rou
 /* get data from a position for plotting */
 bool RoutePoint::GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
 {
+    data.lat = lat;
+    data.lon = lon;
+    data.tacks = tacks;
+    data.polar = polar;
+
     data.WVHT = Swell(configuration, lat, lon);
     data.VW_GUST = Gust(configuration, lat, lon);
-    data.tacks = tacks;
     data.delta = dt;
 
     climatology_wind_atlas atlas;

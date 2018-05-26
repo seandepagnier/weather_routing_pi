@@ -1418,7 +1418,6 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
             double dt = configuration.UsedDeltaTime;
             data.time = (*it)->time;
 
-            data.lat = pos->lat, data.lon = pos->lon;
             if(pos->GetPlotData(next, dt, configuration, data))
                 plotdata.push_front(data);
 
