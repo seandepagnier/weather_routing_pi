@@ -596,11 +596,6 @@ void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
 
     Lock();
 
-    /* draw lines to this route */
-    Position *p;
-    if(!dc.GetDC())
-        glBegin(GL_LINES);
-    
     /* ComfortDisplay Customization
      * ------------------------------------------------
      * To get weather data (wind, current, waves) on a
@@ -609,9 +604,18 @@ void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
      * Thanks Sean for your help :-)
      */
     std::list<PlotData> plot = GetPlotData(false);
-    std::list<PlotData>::reverse_iterator itt =  plot.rbegin();
+    std::list<PlotData>::reverse_iterator itt = plot.rbegin();
+    if (itt == plot.rend()) {
+        Unlock();
+        return;
+    }
 
     wxColor lc = sailingConditionColor(sailingConditionLevel(*itt));
+
+    /* draw lines to this route */
+    Position *p;
+    if(!dc.GetDC())
+        glBegin(GL_LINES);
     for(p = pos; (p && p->parent) && (itt != plot.rend()); p = p->parent)
     {
         if (comfortRoute)
@@ -623,7 +627,7 @@ void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
         } else
             DrawLine(p, p->parent, dc, vp);
     }
-    
+
     if(!dc.GetDC())
         glEnd();
     Unlock();
