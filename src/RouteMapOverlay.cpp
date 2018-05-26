@@ -734,7 +734,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         // Draw barbs
         g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
             wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
-            deg2rad(W) + vp.rotation, it->lat < 0
+            deg2rad(W) + nvp.rotation, it->lat < 0
         );
     }
     wind_barb_route_cache.Finalize();
