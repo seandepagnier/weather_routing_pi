@@ -59,11 +59,11 @@ public:
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
 
-    void RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_ViewPort &vp);
-    void RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderPolarChangeMarks(bool cursor_route,  wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderBoatOnCourse(bool cursor_route,  wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
     
     // Customization ComfortDisplay
-    void RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
+    void RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
     int sailingConditionLevel(const PlotData &plot) const;
     
     // Customization WindBarbsOnRoute
