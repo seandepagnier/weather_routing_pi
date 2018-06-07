@@ -2530,6 +2530,11 @@ bool RouteMap::Propagate()
 
     // request the next grib
     // in a different thread (grib record averaging going in parallel)
+
+    m_Configuration.slow_start = false;
+    if (origin.empty() && (configuration.DetectBoundary || configuration.DetectLand))
+        m_Configuration.slow_start = true;
+
     m_NewGrib = 0;
     m_SharedNewGrib.SetGribRecordSet(0);
     m_NewTime += wxTimeSpan(0, 0, configuration.DeltaTime);
