@@ -63,8 +63,8 @@ RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), clear_destination_plotdata(false),
-      m_overlaylist(0), current_cache_origin_size(0)
+      m_bUpdated(false), m_overlaylist(0),
+      clear_destination_plotdata(false),current_cache_origin_size(0)
 {
 }
 
@@ -599,8 +599,6 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort 
     if(!pos)
         return;
 
-    Lock();
-
     /* ComfortDisplay Customization
      * ------------------------------------------------
      * To get weather data (wind, current, waves) on a
@@ -611,10 +609,10 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort 
     std::list<PlotData> plot = GetPlotData(false);
     std::list<PlotData>::reverse_iterator itt = plot.rbegin();
     if (itt == plot.rend()) {
-        Unlock();
         return;
     }
 
+    Lock();
     wxColor lc = sailingConditionColor(sailingConditionLevel(*itt));
 
     /* draw lines to this route */
@@ -651,7 +649,6 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
     if(!pos)
         return;
     
-    Lock();
     std::list<PlotData> plot = GetPlotData(cursor_route);
     
     for(std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); )  {
@@ -682,7 +679,6 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
         dc.DrawCircle( r.x, r.y, 7 );
         break;
     }
-    Unlock();
 }
 
 void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
