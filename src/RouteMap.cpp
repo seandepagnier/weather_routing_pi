@@ -683,9 +683,18 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         bearing1 = heading_resolve( parent_bearing - configuration.MaxSearchAngle);
         bearing2 = heading_resolve( parent_bearing + configuration.MaxSearchAngle);
     }
+    std::list<double> &active = configuration.DegreeSteps;
+    std::list<double> start;
+    if (configuration.slow_start) {
+        for(double step = 0.; step <= 180.; step += 1.0) {
+            start.push_back(step);
+            if(step > 0 && step < 180) start.push_back(360-step);
+        }
+        start.sort();
+        active = start;
+    }
 
-    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
-        it != configuration.DegreeSteps.end(); it++) {
+    for(std::list<double>::iterator it = active.begin();it != active.end(); it++) {
 
         double H = heading_resolve(*it);
         double B, VB, BG, VBG;
