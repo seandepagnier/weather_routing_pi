@@ -419,7 +419,7 @@ void WeatherRouting::AddPosition(double lat, double lon)
         AddPosition(lat, lon, pd.GetValue());
 }
 
-void WeatherRouting::AddPosition(double lat, double lon, wxString name)
+void WeatherRouting::AddPosition(double lat, double lon, wxString name, wxString GUID)
 {
     for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
         it != RouteMap::Positions.end(); it++) {
@@ -430,6 +430,7 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
                 long index = m_panel->m_lPositions->FindItem(0, name);
                 (*it).lat = lat;
                 (*it).lon = lon;
+                (*it).GUID = wxEmptyString;
                 m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
                 m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
                 m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
@@ -441,7 +442,7 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name)
         }
     }
     
-    RouteMap::Positions.push_back(RouteMapPosition(name, lat, lon));
+    RouteMap::Positions.push_back(RouteMapPosition(name, lat, lon, GUID));
     UpdateConfigurations();
 
     wxListItem item;
@@ -1352,6 +1353,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
         
             if(!strcmp(e->Value(), "Position")) {
                 wxString name = wxString::FromUTF8(e->Attribute("Name"));
+                wxString GUID = wxString::FromUTF8(e->Attribute("GUID"));
                 double lat = AttributeDouble(e, "Latitude", NAN);
                 double lon = AttributeDouble(e, "Longitude", NAN);
             
@@ -1369,12 +1371,13 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                         goto skipadd;
                     }
                 }
-                AddPosition(lat, lon, name);
+                AddPosition(lat, lon, name, GUID);
             
             skipadd:;
             } else
                 if(!strcmp(e->Value(), "Configuration")) {
                     RouteMapConfiguration configuration;
+                    configuration.RouteGUID = wxString::FromUTF8(e->Attribute("GUID"));
                     configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
                     wxDateTime date;
                     date.ParseISODate(wxString::FromUTF8(e->Attribute("StartDate")));
@@ -1492,6 +1495,8 @@ void WeatherRouting::SaveXML(wxString filename)
         c->SetAttribute("Name", (*it).Name.mb_str());
         c->SetAttribute("Latitude", wxString::Format(_T("%.5f"), (*it).lat).mb_str());
         c->SetAttribute("Longitude", wxString::Format(_T("%.5f"), (*it).lon).mb_str());
+        if (!(*it).GUID.IsEmpty())
+            c->SetAttribute("GUID", (*it).GUID.mb_str());
 
         root->LinkEndChild(c);
     }
@@ -1502,6 +1507,9 @@ void WeatherRouting::SaveXML(wxString filename)
 
         RouteMapConfiguration configuration =
             (*it)->routemapoverlay->GetConfiguration();
+
+        if (!configuration.RouteGUID.IsEmpty())
+            c->SetAttribute("GUID", configuration.RouteGUID.mb_str());
 
         c->SetAttribute("Start", configuration.Start.mb_str());
         c->SetAttribute("StartDate", configuration.StartTime.FormatISODate().mb_str());
