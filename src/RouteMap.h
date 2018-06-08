@@ -279,10 +279,11 @@ public:
 typedef std::list<IsoChron*> IsoChronList;
 
 struct RouteMapPosition {
-    RouteMapPosition(wxString n, double lat0, double lon0)
-    : Name(n), lat(lat0), lon(lon0) {}
+    RouteMapPosition(wxString n, double lat0, double lon0, wxString guid = wxEmptyString)
+    : Name(n), GUID(guid), lat(lat0), lon(lon0) {}
 
     wxString Name;
+    wxString GUID;
     double lat, lon;
 };
 
@@ -290,6 +291,7 @@ struct RouteMapConfiguration {
     RouteMapConfiguration () : StartLon(0), EndLon(0), grib_is_data_deficient(false) {} /* avoid waiting forever in update longitudes */
     bool Update();
 
+    wxString RouteGUID;       /* Route GUID if any */
     wxString Start, End;
     wxDateTime StartTime;
 
