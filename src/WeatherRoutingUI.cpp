@@ -1051,7 +1051,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText241->Wrap( -1 );
 	fgSizer11511->Add( m_staticText241, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 	
-	m_sSafetyMarginLand = new wxSpinCtrl( sbSizer29->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100, 2 );
+	m_sSafetyMarginLand = new wxSpinCtrl( sbSizer29->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 0, 100, 0 );
 	fgSizer11511->Add( m_sSafetyMarginLand, 0, wxALL, 5 );
 	
 	m_staticText1211 = new wxStaticText( sbSizer29->GetStaticBox(), wxID_ANY, _("NM"), wxDefaultPosition, wxDefaultSize, 0 );
