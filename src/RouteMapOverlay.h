@@ -48,7 +48,7 @@ class RouteMapOverlay : public RouteMap
 public:
     enum RouteInfoType {DISTANCE, AVGSPEED, MAXSPEED, AVGSPEEDGROUND, MAXSPEEDGROUND,
                         AVGWIND, MAXWIND, MAXWINDGUST, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
-                        PERCENTAGE_UPWIND, PORT_STARBOARD, TACKS};
+                        PERCENTAGE_UPWIND, PORT_STARBOARD, TACKS, COMFORT};
 
     RouteMapOverlay();
     ~RouteMapOverlay();
@@ -65,6 +65,8 @@ public:
     // Customization ComfortDisplay
     void RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
     int sailingConditionLevel(const PlotData &plot) const;
+    static wxColour sailingConditionColor(int level);
+    static wxString sailingConditionText(int level);
     
     // Customization WindBarbsOnRoute
     void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
@@ -130,6 +132,9 @@ private:
     
     // Customization WindBarbsOnRoute
     LineBuffer wind_barb_route_cache;
+    
+    // Customization Sailing Comfort
+    int m_sailingComfort;
 
     LineBuffer current_cache;
     double current_cache_scale;
