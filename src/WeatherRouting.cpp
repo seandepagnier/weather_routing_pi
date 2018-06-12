@@ -2278,7 +2278,7 @@ RouteMapConfiguration WeatherRouting::DefaultConfiguration()
     configuration.AllowDataDeficient = false;
     configuration.WindStrength = 1;
     configuration.DetectLand = true;
-    configuration.SafetyMarginLand = 2.;
+    configuration.SafetyMarginLand = 0.;
     configuration.DetectBoundary = false;
     configuration.Currents = false;
     configuration.OptimizeTacking = false;

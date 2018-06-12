@@ -281,7 +281,7 @@ void ConfigurationDialog::OnResetAdvanced( wxCommandEvent& event )
     m_cIntegrator->SetSelection(0);
     m_sWindStrength->SetValue(100);
     m_sTackingTime->SetValue(0);
-    m_sSafetyMarginLand->SetValue(2.);
+    m_sSafetyMarginLand->SetValue(0.);
 
     m_sFromDegree->SetValue(0);
     m_sToDegree->SetValue(180);
