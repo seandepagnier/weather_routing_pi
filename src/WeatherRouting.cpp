@@ -544,7 +544,7 @@ void WeatherRouting::AddPosition(double lat, double lon)
 void WeatherRouting::AddPosition(double lat, double lon, wxString name)
 {
     for(auto it = RouteMap::Positions.begin(); it != RouteMap::Positions.end(); it++) {
-        if((*it).Name == name) {
+        if((*it).GUID.IsEmpty() && (*it).Name == name) {
             wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),
                                  _("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
             if(mdlg.ShowModal() == wxID_YES) {
@@ -1695,9 +1695,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 double lat = AttributeDouble(e, "Latitude", NAN);
                 double lon = AttributeDouble(e, "Longitude", NAN);
             
-                for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
-                    it != RouteMap::Positions.end(); it++) {
-                    if((*it).Name == name) {
+                if (GUID.IsEmpty()) for(auto it : RouteMap::Positions) {
+                    if (it.Name == name) {
                         static bool warnonce = true;
                         if(warnonce) {
                             warnonce = false;
@@ -1712,87 +1711,87 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 AddPosition(lat, lon, name, GUID);
             
             skipadd:;
-            } else
-                if(!strcmp(e->Value(), "Configuration")) {
-                    RouteMapConfiguration configuration;
-                    configuration.RouteGUID = wxString::FromUTF8(e->Attribute("GUID"));
-                    configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
-                    wxDateTime date;
-                    date.ParseISODate(wxString::FromUTF8(e->Attribute("StartDate")));
-                    wxDateTime time;
-                    time.ParseISOTime(wxString::FromUTF8(e->Attribute("StartTime")));
-                    if(date.IsValid()) {
-                        if(time.IsValid()) {
-                            date.SetHour(time.GetHour());
-                            date.SetMinute(time.GetMinute());
-                            date.SetSecond(time.GetSecond());
-                        }
-                        configuration.StartTime = date;
-                    } else
-                        configuration.StartTime = wxDateTime::Now();
+            } 
+            else if(!strcmp(e->Value(), "Configuration")) {
+                RouteMapConfiguration configuration;
+                configuration.RouteGUID = wxString::FromUTF8(e->Attribute("GUID"));
+                configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
+                wxDateTime date;
+                date.ParseISODate(wxString::FromUTF8(e->Attribute("StartDate")));
+                wxDateTime time;
+                time.ParseISOTime(wxString::FromUTF8(e->Attribute("StartTime")));
+                if(date.IsValid()) {
+                    if(time.IsValid()) {
+                        date.SetHour(time.GetHour());
+                        date.SetMinute(time.GetMinute());
+                        date.SetSecond(time.GetSecond());
+                    }
+                    configuration.StartTime = date;
+                } else
+                    configuration.StartTime = wxDateTime::Now();
             
-                    configuration.End = wxString::FromUTF8(e->Attribute("End"));
-                    configuration.DeltaTime = AttributeDouble(e, "dt", 0);
+                configuration.End = wxString::FromUTF8(e->Attribute("End"));
+                configuration.DeltaTime = AttributeDouble(e, "dt", 0);
             
-                    configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
-                    if(!wxFileName::FileExists(configuration.boatFileName)) {
-                        configuration.boatFileName = weather_routing_pi::StandardPath() +
+                configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
+                if(!wxFileName::FileExists(configuration.boatFileName)) {
+                    configuration.boatFileName = weather_routing_pi::StandardPath() +
 			                             _T("boats") +
 						     wxFileName::GetPathSeparator() +
 						     configuration.boatFileName;
-                        if(!wxFileName::FileExists(configuration.boatFileName)) {
+                    if(!wxFileName::FileExists(configuration.boatFileName)) {
 
-                            configuration.boatFileName = _T("");
+                        configuration.boatFileName = _T("");
 			}
-		    }
+		}
             
-                    configuration.Integrator = (RouteMapConfiguration::IntegratorType)
-                        AttributeInt(e, "Integrator", 0);
+                configuration.Integrator = (RouteMapConfiguration::IntegratorType)
+                    AttributeInt(e, "Integrator", 0);
 
-                    configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 90);
-                    configuration.MaxCourseAngle = AttributeDouble(e, "MaxCourseAngle", 180);
-                    configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 120);
-                    configuration.MaxTrueWindKnots = AttributeDouble(e, "MaxTrueWindKnots", 100);
-                    configuration.MaxApparentWindKnots = AttributeDouble(e, "MaxApparentWindKnots", 100);
+                configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 90);
+                configuration.MaxCourseAngle = AttributeDouble(e, "MaxCourseAngle", 180);
+                configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 120);
+                configuration.MaxTrueWindKnots = AttributeDouble(e, "MaxTrueWindKnots", 100);
+                configuration.MaxApparentWindKnots = AttributeDouble(e, "MaxApparentWindKnots", 100);
 
-                    configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
-                    configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
-                    configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
-                    configuration.WindVSCurrent = AttributeDouble(e, "WindVSCurrent", 0);
+                configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
+                configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
+                configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
+                configuration.WindVSCurrent = AttributeDouble(e, "WindVSCurrent", 0);
 
-                    configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
-                    configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 2);
-                    configuration.CycloneDays = AttributeInt(e, "CycloneDays", 0);
+                configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
+                configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 2);
+                configuration.CycloneDays = AttributeInt(e, "CycloneDays", 0);
 
-                    configuration.UseGrib = AttributeBool(e, "UseGrib", true);
-                    configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
-                        AttributeInt(e, "ClimatologyType", RouteMapConfiguration::CUMULATIVE_MAP);
-                    configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
-                    configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
+                configuration.UseGrib = AttributeBool(e, "UseGrib", true);
+                configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
+                    AttributeInt(e, "ClimatologyType", RouteMapConfiguration::CUMULATIVE_MAP);
+                configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
+                configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
 
-                    configuration.DetectLand = AttributeBool(e, "DetectLand", true);
-                    configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 2.);
-                    configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
-                    configuration.Currents = AttributeBool(e, "Currents", true);
-                    configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
-                    
-                    configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
-                    configuration.Anchoring = AttributeBool(e, "Anchoring", false);
+                configuration.DetectLand = AttributeBool(e, "DetectLand", true);
+                configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 2.);
+                configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
+                configuration.Currents = AttributeBool(e, "Currents", true);
+                configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
+                
+                configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
+                configuration.Anchoring = AttributeBool(e, "Anchoring", false);
 
-                    configuration.FromDegree = AttributeDouble(e, "FromDegree", 0);
-                    configuration.ToDegree = AttributeDouble(e, "ToDegree", 180);
-                    configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5);
+                configuration.FromDegree = AttributeDouble(e, "FromDegree", 0);
+                configuration.ToDegree = AttributeDouble(e, "ToDegree", 180);
+                configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5);
 
-                    if(configuration.boatFileName == lastboatFileName)
-                        configuration.boat = lastboat;
+                if(configuration.boatFileName == lastboatFileName)
+                    configuration.boat = lastboat;
             
-                    AddConfiguration(configuration);
+                AddConfiguration(configuration);
 
-                    lastboatFileName = configuration.boatFileName;
-                    m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
-                    lastboat = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration().boat;
-                } else
-                    FAIL(_("Unrecognized xml node"));
+                lastboatFileName = configuration.boatFileName;
+                m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
+                lastboat = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration().boat;
+            } else
+                FAIL(_("Unrecognized xml node"));
         }
     }
 
