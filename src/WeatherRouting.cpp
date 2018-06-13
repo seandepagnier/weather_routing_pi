@@ -437,20 +437,20 @@ void WeatherRouting::Render(piDC &dc, PlugIn_ViewPort &vp)
 
     // polling is bad
     bool work = false;
-    for(auto it = RouteMap::Positions.begin();it != RouteMap::Positions.end(); it++) {
-        if((*it).GUID.IsEmpty())
+    for(auto &it :RouteMap::Positions) {
+        if (it.GUID.IsEmpty())
             continue;
 
         PlugIn_Waypoint waypoint;
-        double lat = (*it).lat;
-        double lon = (*it).lon;
+        double lat = it.lat;
+        double lon = it.lon;
 
-        if (!GetSingleWaypoint( (*it).GUID, &waypoint ))
+        if (!GetSingleWaypoint( it.GUID, &waypoint ))
             continue;
-        if (lat == waypoint.m_lat && lon == waypoint.m_lon && waypoint.m_MarkName.IsSameAs((*it).Name))
+        if (lat == waypoint.m_lat && lon == waypoint.m_lon && waypoint.m_MarkName.IsSameAs(it.Name))
             continue;
 
-        long index = m_panel->m_lPositions->FindItem(0, (*it).ID);
+        long index = m_panel->m_lPositions->FindItem(0, it.ID);
         if (index < 0) {
             // corrupted data
             continue;
@@ -459,15 +459,12 @@ void WeatherRouting::Render(piDC &dc, PlugIn_ViewPort &vp)
         wxString name = waypoint.m_MarkName;
         lat = waypoint.m_lat;
         lon = waypoint.m_lon;
-        (*it).lat = lat;
-        (*it).lon = lon;
+        it.lat = lat;
+        it.lon = lon;
 
         // XXX FIXME there's already this name, update m_ConfigurationDialog source
-        long exist = m_panel->m_lPositions->FindItem(0, name);
-        if (exist == -1 || exist == index) {
-            m_panel->m_lPositions->SetItem(index, POSITION_NAME, name);
-            m_panel->m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
-        }
+        m_panel->m_lPositions->SetItem(index, POSITION_NAME, name);
+        m_panel->m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
         m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
         m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
         m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
