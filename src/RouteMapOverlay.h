@@ -121,7 +121,10 @@ private:
 
     int m_overlaylist, m_overlaylist_projection;
 
-    std::list<PlotData> last_destination_plotdata, last_cursor_plotdata;
+    bool clear_destination_plotdata; // should be volatile
+    std::list<PlotData> last_destination_plotdata;
+
+    std::list<PlotData> last_cursor_plotdata;
 
     LineBuffer wind_barb_cache;
     double wind_barb_cache_scale;

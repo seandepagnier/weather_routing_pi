@@ -49,7 +49,8 @@ void *RouteMapOverlayThread::Entry()
         if(!m_RouteMapOverlay.Propagate())
             wxThread::Sleep(50);
         else {
-            m_RouteMapOverlay.UpdateCursorPosition();
+            // don't do it inside worker thread, race
+            // m_RouteMapOverlay.UpdateCursorPosition();
             m_RouteMapOverlay.UpdateDestination();
             wxThread::Sleep(5);
         }
@@ -62,7 +63,8 @@ RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_overlaylist(0), current_cache_origin_size(0)
+      m_bUpdated(false), m_overlaylist(0),
+      clear_destination_plotdata(false),current_cache_origin_size(0)
 {
 }
 
@@ -597,8 +599,6 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort 
     if(!pos)
         return;
 
-    Lock();
-
     /* ComfortDisplay Customization
      * ------------------------------------------------
      * To get weather data (wind, current, waves) on a
@@ -609,10 +609,10 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort 
     std::list<PlotData> plot = GetPlotData(false);
     std::list<PlotData>::reverse_iterator itt = plot.rbegin();
     if (itt == plot.rend()) {
-        Unlock();
         return;
     }
 
+    Lock();
     wxColor lc = sailingConditionColor(sailingConditionLevel(*itt));
 
     /* draw lines to this route */
@@ -649,7 +649,6 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
     if(!pos)
         return;
     
-    Lock();
     std::list<PlotData> plot = GetPlotData(cursor_route);
     
     for(std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); )  {
@@ -680,7 +679,6 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
         dc.DrawCircle( r.x, r.y, 7 );
         break;
     }
-    Unlock();
 }
 
 void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
@@ -1216,6 +1214,10 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
 std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 {
     std::list<PlotData> &plotdata = cursor_route ? last_cursor_plotdata : last_destination_plotdata;
+    if (!cursor_route && clear_destination_plotdata ) {
+        clear_destination_plotdata  = false;
+        plotdata.clear();
+    }
     if(plotdata.empty()) {
         Position *next = cursor_route ? last_cursor_position : last_destination_position;
 
@@ -1392,6 +1394,8 @@ void RouteMapOverlay::Clear()
     RouteMap::Clear();
     last_cursor_position = NULL;
     last_destination_position = NULL;
+    clear_destination_plotdata = false;
+    // clear_cursor_plotdata = false;
     last_cursor_plotdata.clear();
     last_destination_plotdata.clear();
     m_UpdateOverlay = true;
@@ -1399,6 +1403,7 @@ void RouteMapOverlay::Clear()
 
 void RouteMapOverlay::UpdateCursorPosition()
 {
+    // only called in main thread, no race
     Position *last_last_cursor_position = last_cursor_position;
     last_cursor_position = ClosestPosition(last_cursor_lat, last_cursor_lon, &m_cursor_time);
     if(last_last_cursor_position != last_cursor_position)
@@ -1428,9 +1433,9 @@ void RouteMapOverlay::UpdateDestination()
     Position *last_last_destination_position = last_destination_position;
     bool done = ReachedDestination();
     if(done) {
+        Lock();
         delete destination_position;
         destination_position = 0;
-        Lock();
         /* this doesn't happen often, so can be slow.. for each position in the last
            isochron, we try to propagate to the destination */
         IsoChronList::iterator iit = origin.end();
@@ -1469,8 +1474,11 @@ void RouteMapOverlay::UpdateDestination()
         m_EndTime = wxDateTime(); // invalid
     }
 
-    if(last_last_destination_position != last_destination_position)
-        last_destination_plotdata.clear();
+    if(last_last_destination_position != last_destination_position) {
+        // we can't clear because we are inside a worker thread
+        // and there's a race with GetPlotData
+        clear_destination_plotdata = true;
+    }
 
     m_bUpdated = true;
     m_UpdateOverlay = true;
