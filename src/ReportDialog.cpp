@@ -99,6 +99,15 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         page += _("Average Wind") + wxString(_T(": ")) + wxString::Format
             (_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::AVGWIND)) + _T(" ")
 	    + _("knots") + _T("<dt>");
+        
+        // CUSTOMIZATION
+        // Add max wind. I think this is more important than the average
+        // wind as it gives an indication on how strong will be the sailing
+        // conditions, and if the crew has sufficient experience to handle it.
+        page += _("Maximum Wind") + wxString(_T(": ")) \
+                + wxString::Format(_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::MAXWIND)) \
+                + _T(" ") + _("knots") + _T("<dt>");;
+        
         page += _("Average Swell") + wxString(_T(": ")) + wxString::Format
             (_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::AVGSWELL)) + _T(" ")
 	    + _("meters") + _T("<dt>");
