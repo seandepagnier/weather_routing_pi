@@ -541,17 +541,16 @@ void WeatherRouting::AddPosition(double lat, double lon)
 
 void WeatherRouting::AddPosition(double lat, double lon, wxString name)
 {
-    for(auto it = RouteMap::Positions.begin(); it != RouteMap::Positions.end(); it++) {
-        if((*it).GUID.IsEmpty() && (*it).Name == name) {
+    for(auto &it: RouteMap::Positions) {
+        if(it.GUID.IsEmpty() && it.Name == name) {
             wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),
                                  _("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
             if(mdlg.ShowModal() == wxID_YES) {
-                long index = m_panel->m_lPositions->FindItem(0, (*it).ID);
+                long index = m_panel->m_lPositions->FindItem(0, it.ID);
                 assert(index >=0);
 
-                (*it).lat = lat;
-                (*it).lon = lon;
-                (*it).GUID = wxEmptyString;  // no more an O waypoint
+                it.lat = lat;
+                it.lon = lon;
                 m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
                 m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
                 m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
@@ -586,15 +585,17 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name, wxString
     if (GUID.IsEmpty())
         return AddPosition(lat, lon, name);
 
-    for(auto it = RouteMap::Positions.begin();it != RouteMap::Positions.end(); it++) {
-        if((*it).GUID.IsEmpty() /*&& !(*it).NameIsSameAs(name)*/)
+    for(auto &it : RouteMap::Positions) {
+        if(it.GUID.IsEmpty())
             continue;
 
-        if((*it).GUID.IsSameAs(GUID)) {
+        if(it.GUID.IsSameAs(GUID)) {
             // wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),_("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
-            long index = m_panel->m_lPositions->FindItem(0, (*it).ID);
-            (*it).lat = lat;
-            (*it).lon = lon;
+            long index = m_panel->m_lPositions->FindItem(0, it.ID);
+            assert(index >=0);
+
+            it.lat = lat;
+            it.lon = lon;
             m_panel->m_lPositions->SetItem(index, POSITION_NAME, name);
             m_panel->m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
             m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
@@ -2509,10 +2510,11 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
 
     // already waiting?
     for(std::list<RouteMapOverlay*>::iterator it = m_WaitingRouteMaps.begin();
-        it != m_WaitingRouteMaps.end(); it++)
+                it != m_WaitingRouteMaps.end(); it++) {
         if(*it == routemapoverlay)
             return;
 
+    }
     routemapoverlay->Reset();
     m_RoutesToRun++;
     m_WaitingRouteMaps.push_back(routemapoverlay);
@@ -2532,9 +2534,8 @@ void WeatherRouting::Stop()
 {
     /* stop all the threads at once, rather than waiting for each one before
        telling the next to stop */
-    for(std::list<RouteMapOverlay*>::iterator it = m_RunningRouteMaps.begin();
-        it != m_RunningRouteMaps.end(); it++)
-        (*it)->Stop();
+    for (auto it : m_RunningRouteMaps) 
+        it->Stop();
 
     wxProgressDialog *progressdialog = NULL;
 
