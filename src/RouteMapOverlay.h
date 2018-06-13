@@ -54,22 +54,12 @@ public:
     ~RouteMapOverlay();
 
     bool SetCursorLatLon(double lat, double lon);
-    void RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
-                        wrDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
 
-    void RenderPolarChangeMarks(bool cursor_route,  wrDC &dc, PlugIn_ViewPort &vp);
-    void RenderBoatOnCourse(bool cursor_route,  wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
-    
-    // Customization ComfortDisplay
-    void RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
-    int sailingConditionLevel(const PlotData &plot) const;
     static wxColour sailingConditionColor(int level);
     static wxString sailingConditionText(int level);
-    
-    // Customization WindBarbsOnRoute
-    void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
+
     void RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp);
 
     void RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp);
@@ -105,6 +95,19 @@ public:
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent,
                               wrDC &dc, PlugIn_ViewPort &vp);
+
+    void RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
+                        wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderPolarChangeMarks(bool cursor_route,  wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderBoatOnCourse(bool cursor_route,  wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
+
+    // Customization ComfortDisplay
+    void RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
+
+    // Customization WindBarbsOnRoute
+    void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
+    int sailingConditionLevel(const PlotData &plot) const;
+
     virtual bool TestAbort() { return Finished(); }
 
     RouteMapOverlayThread *m_Thread;
