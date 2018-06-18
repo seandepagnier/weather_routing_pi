@@ -825,7 +825,11 @@ bool Polar::InsideCrossOverContour(float H, float VW, bool optimize_tacking)
         SailingWindSpeed &ws1 = wind_speeds[VW1i], &ws2 = wind_speeds[VW2i];
         VMGAngle(ws1, ws2, VW, H);
     }
-    return CrossOverRegion.Contains(fabs(H), VW);
+    // XXX?
+    H = fabs(H);
+    if (H > 180.)
+        H -= 180.;
+    return CrossOverRegion.Contains(H, VW);
 }
 
 float SailboatTransformSpeed(double W, double VW, double eta)
