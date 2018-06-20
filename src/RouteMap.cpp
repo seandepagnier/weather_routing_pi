@@ -383,9 +383,10 @@ static inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 }
 
 #define EPSILON (2e-11)
+
 Position::Position(double latitude, double longitude, Position *p,
-                   double pheading, double pbearing, int sp, int t, int dm)
-    : RoutePoint(latitude, longitude, sp, t), parent_heading(pheading),
+                   double pheading, double pbearing, int sp, int t, int dm, bool df)
+    : RoutePoint(latitude, longitude, sp, t, df), parent_heading(pheading),
       parent_bearing(pbearing), parent(p), propagated(false), copied(false), data_mask(dm)
 {
     lat -= fmod(lat, EPSILON);
@@ -393,7 +394,8 @@ Position::Position(double latitude, double longitude, Position *p,
 }
 
 Position::Position(Position *p)
-    : RoutePoint(p->lat, p->lon, p->polar, p->tacks), parent_heading(p->parent_heading),
+    : RoutePoint(p->lat, p->lon, p->polar, p->tacks, p->grib_is_data_deficient),
+      parent_heading(p->parent_heading),
       parent_bearing(p->parent_bearing), parent(p->parent),
       propagated(p->propagated), copied(true), data_mask(p->data_mask)
 {
@@ -586,11 +588,14 @@ bool RoutePoint::GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration 
 
     climatology_wind_atlas atlas;
     int data_mask = 0; // not used for plotting yet
+    bool old = configuration.grib_is_data_deficient;
+    configuration.grib_is_data_deficient = grib_is_data_deficient;
     if(!ReadWindAndCurrents(configuration, this, data.WG, data.VWG,
                             data.W, data.VW, data.C, data.VC, atlas, data_mask)) {
         // I don't think this can ever be hit, because the data should have been there
         // for the position be be created in the first place
         printf("Wind/Current data failed for position!!!\n");
+        configuration.grib_is_data_deficient = old;
         return false;
     }
 
@@ -601,6 +606,7 @@ bool RoutePoint::GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration 
         data.VBG *= 3600 / dt;
 
     OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
+    configuration.grib_is_data_deficient = old;
     return true;
 }
 
@@ -963,7 +969,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 continue;
         }
 
-        rp = new Position(dlat, dlon, this, H, B, newpolar, tacks + tacked, data_mask);
+        rp = new Position(dlat, dlon, this, H, B, newpolar, tacks + tacked, data_mask,
+                    configuration.grib_is_data_deficient );
     }
     add_position:
 

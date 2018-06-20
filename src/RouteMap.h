@@ -40,8 +40,8 @@ typedef std::list<IsoRoute*> IsoRouteList;
 class PlotData;
 class RoutePoint {
 public:
-    RoutePoint(double latitude = 0., double longitude = 0., int sp = -1, int t=0) : 
-        lat(latitude), lon(longitude), polar(sp), tacks(t) {}
+    RoutePoint(double latitude = 0., double longitude = 0., int sp = -1, int t=0, bool d = false) :
+        lat(latitude), lon(longitude), polar(sp), tacks(t), grib_is_data_deficient(d) {}
 
     virtual ~RoutePoint() {};
 
@@ -49,6 +49,8 @@ public:
     double lon;
     int polar; /* which polar in the boat we are using */
     int tacks; /* how many times we have tacked to get to this position */
+
+    bool grib_is_data_deficient;
 
     bool GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data);
     bool GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
@@ -75,11 +77,11 @@ class Position: public RoutePoint
 {
 public:
     Position(double latitude, double longitude, Position *p=NULL,
-             double pheading=NAN, double pbearing=NAN, int sp=-1, int t=0, int dm=0);
+             double pheading=NAN, double pbearing=NAN, int sp=-1,
+             int t=0, int dm=0, bool df = false);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
-
 
     bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
 
