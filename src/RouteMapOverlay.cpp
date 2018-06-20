@@ -64,7 +64,11 @@ RouteMapOverlay::RouteMapOverlay()
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
       m_bUpdated(false), m_overlaylist(0),
-      clear_destination_plotdata(false),current_cache_origin_size(0)
+      clear_destination_plotdata(false),
+      wind_barb_cache_scale(NAN),
+      wind_barb_cache_origin_size(0),
+      current_cache_scale(NAN),
+      current_cache_origin_size(0)
 {
 }
 
@@ -806,10 +810,10 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
     bool nocache = (double)r.width*(double)r.height > (double)(vp.rv_rect.width*vp.rv_rect.height*4) ||
         vp.m_projection_type != PI_PROJECTION_MERCATOR;
 
-    if(origin.size() != wind_barb_cache_origin_size ||
+    if(nocache || origin.size() != wind_barb_cache_origin_size ||
        vp.view_scale_ppm != wind_barb_cache_scale ||
-       vp.m_projection_type != wind_barb_cache_projection ||
-        nocache) {
+       vp.m_projection_type != wind_barb_cache_projection)
+    {
 
         wxStopWatch timer;
         static double step = 36.0;
@@ -994,10 +998,9 @@ void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
     bool nocache = (double)r.width*(double)r.height > (double)(vp.rv_rect.width*vp.rv_rect.height*9) ||
         vp.m_projection_type != PI_PROJECTION_MERCATOR;
 
-    if(origin.size() != current_cache_origin_size ||
+    if(nocache || origin.size() != current_cache_origin_size ||
        vp.view_scale_ppm != current_cache_scale ||
-       vp.m_projection_type != current_cache_projection ||
-        nocache) {
+       vp.m_projection_type != current_cache_projection) {
 
         wxStopWatch timer;
         static double step = 80.0;
