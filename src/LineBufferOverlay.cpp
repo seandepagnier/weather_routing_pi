@@ -49,7 +49,7 @@ void LineBuffer::Finalize()
     buffer.clear();
 }
 
-void LineBuffer::pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south)
+void LineBuffer::pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south, bool head)
 {
     // transform vertexes by angle
     float sa = sinf( ang ), ca = cosf( ang );
@@ -57,12 +57,21 @@ void LineBuffer::pushTransformedBuffer(LineBuffer &buffer, int x, int y, double 
     float m[2][2] = {{ ca, -sa},
                      { sa,  ca}};
 
-    if(south)
-        m[0][0] = -m[0][0], m[1][0] = -m[1][0];
+    if(south) {
+        m[0][0] = -m[0][0];
+        m[1][0] = -m[1][0];
+    }
+    if(head) {
+        // Calculate the offset to put the head
+        // of the arrow on the point (and not the
+        // middle of the arrow).
+        x += (int)(0.5 * 35 * sa);
+        y -= (int)(0.5 * 35 * ca);
+    }
 
     for(int i=0; i < 2*buffer.count; i+=2) {
         float *k = buffer.lines + 2*i;
-        pushLine(k[0]*m[0][0] + k[1]*m[0][1] + x, k[0]*m[1][0] + k[1]*m[1][1] + y,
+        pushLine(k[0]*m[0][0] + k[1]*m[0][1] + x , k[0]*m[1][0] + k[1]*m[1][1] + y,
                  k[2]*m[0][0] + k[3]*m[0][1] + x, k[2]*m[1][0] + k[3]*m[1][1] + y);
     }
 }
@@ -203,7 +212,7 @@ LineBufferOverlay::LineBufferOverlay()
 
 }
 
-void LineBufferOverlay::pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y, double vkn, double ang, bool south)
+void LineBufferOverlay::pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y, double vkn, double ang, bool south, bool head)
 {
     int cacheidx;
 
@@ -219,7 +228,7 @@ void LineBufferOverlay::pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y,
         cacheidx = 13;
     else 
         return;
-    buffer.pushTransformedBuffer(m_WindArrowCache[cacheidx], x, y, ang, south);
+    buffer.pushTransformedBuffer(m_WindArrowCache[cacheidx], x, y, ang, south, head);
 }
 
 void LineBufferOverlay::pushSingleArrow( LineBuffer &buffer, int x, int y, double vkn, double ang, bool south)

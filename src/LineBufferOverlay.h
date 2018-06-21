@@ -35,7 +35,7 @@ public:
     void pushLine( float x0, float y0, float x1, float y1 );
     void Finalize();
 
-    void pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south=false);
+    void pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south=false, bool head=false);
     void draw(wxDC *dc);
     void drawTransformed(wxDC *dc, wxPoint offset, double ang);
 
@@ -58,7 +58,7 @@ class LineBufferOverlay
 {
 public:
     LineBufferOverlay();
-    void pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y, double vkn, double ang, bool south=false);
+    void pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y, double vkn, double ang, bool south=false, bool head=false);
     void pushSingleArrow( LineBuffer &buffer, int x, int y, double vkn, double ang, bool south=false);
 private:
 
