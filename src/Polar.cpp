@@ -500,14 +500,16 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
     if(!optimize_tacking && (W < degree_steps[0] || W > degree_steps[degree_steps.size()-1]))
         return NAN;
 
-    if(bound)
-        if(VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW)
-            return NAN;
+    if(bound && (VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW))
+        return NAN;
 
     unsigned int W1i = degree_step_index[(int)floor(W)];
-    unsigned int W2i = degree_steps.size() == 1 ? 0 : W1i+1;
+    unsigned int W2i = W1i +1;
+    if (W2i > degree_steps.size() - 1)
+        W2i = W1i;
 
-    double W1 = degree_steps[W1i], W2 = degree_steps[W2i];
+    double W1 = degree_steps[W1i];
+    double W2 = degree_steps[W2i];
 
     int VW1i, VW2i;
     ClosestVWi(VW, VW1i, VW2i);
