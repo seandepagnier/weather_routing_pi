@@ -452,6 +452,10 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         SetColor(dc, Darken(DestinationColor), true);
         SetWidth(dc, RouteThickness/2, true);
         RenderBoatOnCourse(false, time, dc, vp);
+
+        // Start WindBarbsOnRoute customization
+        if (settingsdialog.m_cbDisplayWindBarbsOnRoute->GetValue())
+            RenderWindBarbsOnRoute(dc, vp);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
