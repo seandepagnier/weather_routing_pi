@@ -803,6 +803,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             configuration.polar_failed = true;
             continue;
         }
+        if (polar == -1)
+            polar = newpolar;
         
         if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
                              B, VB, BG, VBG, dist, newpolar))
