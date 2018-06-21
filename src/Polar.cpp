@@ -827,6 +827,10 @@ bool Polar::InsideCrossOverContour(float H, float VW, bool optimize_tacking)
         SailingWindSpeed &ws1 = wind_speeds[VW1i], &ws2 = wind_speeds[VW2i];
         VMGAngle(ws1, ws2, VW, H);
     }
+    // rounding error, XXX what about overlapping ?
+    if(VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW)
+        return false;
+
     // XXX?
     H = fabs(H);
     if (H > 180.)
