@@ -978,22 +978,25 @@ void WeatherRouting::OnDeletePosition( wxCommandEvent& event )
     if(index < 0)
         return;
 
-    wxListItem it;
-    it.SetId(index);
-    it.SetColumn(0);
-    it.SetMask(wxLIST_MASK_TEXT); // Note use of the mask, somehow it's required for this to work correctly on windows
-    m_panel->m_lPositions->GetItem(it);
-    wxString name = it.GetText();
+    wxListItem item;
+    item.SetId(index);
+    item.SetColumn(0);
+    item.SetMask(wxLIST_MASK_TEXT); // Note use of the mask, somehow it's required for this to work correctly on windows
+    m_panel->m_lPositions->GetItem(item);
+
+    long ID = m_panel->m_lPositions->GetItemData(index);
+    assert(ID >=0);
 
     for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
-        it != RouteMap::Positions.end(); it++)
-        if((*it).Name == name) {
+        it != RouteMap::Positions.end(); it++) {
+        if((*it).ID == ID) {
+            wxString name = (*it).Name;
+            m_ConfigurationDialog.RemoveSource(name);
+            m_ConfigurationBatchDialog.RemoveSource(name);
             RouteMap::Positions.erase(it);
             break;
         }
-
-    m_ConfigurationDialog.RemoveSource(name);
-    m_ConfigurationBatchDialog.RemoveSource(name);
+    }
     m_panel->m_lPositions->DeleteItem(index);
 
     UpdateConfigurations();
