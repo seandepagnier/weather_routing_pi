@@ -1636,18 +1636,24 @@ void RouteMapOverlay::UpdateDestination()
         }
         Unlock();
 
-        if(!wxFinite(mindt)) {
-            goto not_able_to_propagate;
+        if(isinf(mindt)) {
+            // destination is between two isochrons
+            // but propagate can't reach it (land or boundaries in the way).
+            // Use an upper bound time for EndTime, not defined times are too much
+            // trouble later.
+            m_EndTime = isochron->time +wxTimeSpan(0, 0, isochron->delta);
+            last_destination_position = ClosestPosition(configuration.EndLat, configuration.EndLon);
         }
-        destination_position = new Position(configuration.EndLat, configuration.EndLon,
+        else {
+            destination_position = new Position(configuration.EndLat, configuration.EndLon,
                                             endp, minH, NAN, endp->polar, endp->tacks + mintacked,
                                             mindata_mask);
 
-        m_EndTime = isochron->time + wxTimeSpan::Milliseconds(1000*mindt);
-
-        last_destination_position = destination_position;
-    } else {
-    not_able_to_propagate:
+            m_EndTime = isochron->time +wxTimeSpan::Milliseconds(1000*mindt);
+            last_destination_position = destination_position;
+        }
+    }
+    else {
         last_destination_position = ClosestPosition(configuration.EndLat, configuration.EndLon);
 
         m_EndTime = wxDateTime(); // invalid
