@@ -867,6 +867,13 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
         wxPoint p;
         GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
         
+        // available
+        //   WG VWG : winds over ground
+        //   W VW : winds over water
+        //   C VC : current
+        //
+        //   BG VBG : boat speed over ground
+        //   B  VB  : boat speed over water
         float windSpeed = it->VW;
         float windDirection = it->W; // heading_resolve(it->B - it->W);
         
