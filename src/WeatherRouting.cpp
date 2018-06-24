@@ -459,6 +459,7 @@ void WeatherRouting::Render(piDC &dc, PlugIn_ViewPort &vp)
         wxString name = waypoint.m_MarkName;
         lat = waypoint.m_lat;
         lon = waypoint.m_lon;
+        it.Name = name;
         it.lat = lat;
         it.lon = lon;
 
