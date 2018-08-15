@@ -77,9 +77,9 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
 
         page += _("Boat Filename") + _T(" ") + wxFileName(c.boatFileName).GetName() + _T("<dt>");
         page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
-        page += _("Leaving ") + (*it)->StartTime().Format(_T("%x %X")) + _T("<dt>");
+        page += _("Leaving ") + FormatTime((*it)->StartTime()) + _T("<dt>");
         if (d) {
-            page += _("Arriving ") + (*it)->EndTime().Format(_T("%x %X")) + _T("<dt>");
+            page += _("Arriving ") + FormatTime((*it)->EndTime()) + _T("<dt>");
             page += _("Duration ") + ((*it)->EndTime() - (*it)->StartTime()).Format() + _T("<dt>");
         }
         page += _T("<p>");
@@ -145,6 +145,27 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
     }
 
     m_htmlConfigurationReport->SetPage(page);
+}
+
+wxDateTime ReportDialog::DisplayedTime(wxDateTime t)
+{
+    wxDateTime display_time = t;
+    if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+        display_time = t.FromUTC();
+    return display_time;
+}
+
+wxString ReportDialog::FormatTime(wxDateTime t)
+{
+    wxString r = DisplayedTime(t).Format(_T("%x %X"));
+#if 0
+    // XXX add this?
+    if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+        r += _(" (local)");
+    else
+        r += _T(" (UTC)");
+#endif
+    return r;
 }
 
 void ReportDialog::GenerateRoutesReport()
@@ -213,7 +234,7 @@ void ReportDialog::GenerateRoutesReport()
             }
         }
 
-        page += _("<dt>Fastest configuration ") + fastest->StartTime().Format(_T("%x %X"));
+        page += _("<dt>Fastest configuration ") + FormatTime(fastest->StartTime());
         page += wxString(_T(" ")) + _("avg speed") + wxString::Format
             (_T(": %.2f "), fastest->RouteInfo(RouteMapOverlay::AVGSPEED))
 	    + _("knots");
@@ -247,8 +268,8 @@ void ReportDialog::GenerateRoutesReport()
                     break;
 
                 RouteMapOverlay *r = it->second;
-                wxDateTime s = r->StartTime();
-                wxDateTime e = r->EndTime();
+                wxDateTime s = DisplayedTime(r->StartTime());
+                wxDateTime e = DisplayedTime(r->EndTime());
                 // merge downwind
                 for(; it != sort_by_start.end(); it++) {
                     RouteMapOverlay *r = it->second;
@@ -283,7 +304,7 @@ void ReportDialog::GenerateRoutesReport()
         }
         page += RouteMapOverlay::sailingConditionText(best_sailing_comfort);
         page += _T(" on ");
-        page += best_comfort_date.Format(_T("%x %X")) + _T(" UTC");
+        page += FormatTime(best_comfort_date);
         
         page += _T("<dt>");
         page += _("Cyclones") + wxString(_T(": "));
@@ -354,7 +375,7 @@ void ReportDialog::GenerateRoutesReport()
                 if(!first)
                     page += _(" and ");
                 first = false;
-                page += (*it2)->StartTime().Format(_T("%x"));
+                page += DisplayedTime((*it2)->StartTime()).Format(_T("%x"));
 
                 if(++it2 == cyclone_safe_routes.end())
                     break;
@@ -365,7 +386,7 @@ void ReportDialog::GenerateRoutesReport()
                 while(*it2 && ++it2 != cyclone_safe_routes.end());
 
                 it2--;
-                page += _(" to ") + (*it2)->StartTime().Format(_T("%x"));
+                page += _(" to ") + DisplayedTime((*it2)->StartTime()).Format(_T("%x"));
             }
         }
     cyclonesfailed:;
