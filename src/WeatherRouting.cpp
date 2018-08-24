@@ -2037,11 +2037,12 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
         return;
     }
 
-    PlugIn_Track* newTrack = new PlugIn_Track;
-    newTrack->m_NameString = _("Weather Route");
-
     // XXX double check time is really end time, not start time off by one.
     RouteMapConfiguration c = routemapoverlay.GetConfiguration();
+
+    PlugIn_Track* newTrack = new PlugIn_Track;
+    newTrack->m_NameString = _("Weather Route") + " (" + c.Start + ")";
+
 
     for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
