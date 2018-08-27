@@ -452,6 +452,10 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         SetColor(dc, Darken(DestinationColor), true);
         SetWidth(dc, RouteThickness/2, true);
         RenderBoatOnCourse(false, time, dc, vp);
+
+        // Start WindBarbsOnRoute customization
+        if (settingsdialog.m_cbDisplayWindBarbsOnRoute->GetValue())
+            RenderWindBarbsOnRoute(dc, vp);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
@@ -694,19 +698,14 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
      * OpenCPN's licence
      * March, 2018
      */
-    
+    if (vp.bValid == false)
+        return;
+
     RouteMapConfiguration configuration = GetConfiguration();
-    
-    
+
     // Create a specific viewport at position (0,0)
     // to draw the winds barbs, and then translate it
     PlugIn_ViewPort nvp = vp;
-    nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
-    nvp.pix_width = 0;
-    nvp.pix_height = 0;
-    nvp.rotation = 0;
-    nvp.skew = 0;
-    
     // calculate wind barbs along the route by looping
     // over [GetPlotData(false)] list which contains lat,
     // lon, wind info for each points, only if needed.
@@ -725,17 +724,10 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         double VW = it->VW;
         double W = it->W;
         
-        // Calculate the offset to put the head
-        // of the arrow on the route (and not the
-        // middle of the arrow) for readability.
-        int xOffset, yOffset;
-        xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
-        yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
-        
         // Draw barbs
         g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
-            wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
-            deg2rad(W) + nvp.rotation, it->lat < 0
+            wind_barb_route_cache, p.x, p.y, VW,
+            deg2rad(W) + nvp.rotation, it->lat < 0, true
         );
     }
     wind_barb_route_cache.Finalize();
@@ -753,12 +745,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
 #ifdef ocpnUSE_GL
     else
     {
-        // Translate and rotate the matrix
-        // anyway, event if cached
-        glPushMatrix();
-        glTranslated(point.x, point.y, 0);
-        glRotated(vp.rotation*180/M_PI, 0, 0, 1);
-        
         // Anti-aliasing options to render
         // wind barbs at best quality (copy from grip_pi)
         glEnable(GL_BLEND);
@@ -772,15 +758,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     }
 #endif
     
-    if(dc.GetDC()) {
-        // Draw the wind barbs with a correction
-        // in all cases on position and rotation
-        LineBuffer tb;
-        tb.pushTransformedBuffer(wind_barb_route_cache, point.x, point.y, vp.rotation);
-        tb.Finalize();
-        tb.draw(dc.GetDC());
-    } else
-        wind_barb_route_cache.draw(NULL);
+    wind_barb_route_cache.draw(dc.GetDC());
 
 #ifdef ocpnUSE_GL
     if(!dc.GetDC()) {
