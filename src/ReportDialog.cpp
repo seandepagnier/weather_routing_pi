@@ -274,7 +274,8 @@ void ReportDialog::GenerateRoutesReport()
         int best_sailing_comfort = 6;
         for(std::multimap< wxDateTime, RouteMapOverlay * >::iterator it3 = sort_by_start.begin(); it3 != sort_by_start.end(); it3++) {
             RouteMapOverlay *r = it3->second;
-            if (best_comfort_date < r->StartTime() && best_sailing_comfort > r->RouteInfo(RouteMapOverlay::COMFORT))
+            if (!best_comfort_date.IsValid() ||
+                (best_comfort_date < r->StartTime() && best_sailing_comfort > r->RouteInfo(RouteMapOverlay::COMFORT)))
             {
                 best_comfort_date = r->StartTime();
                 best_sailing_comfort = r->RouteInfo(RouteMapOverlay::COMFORT);
