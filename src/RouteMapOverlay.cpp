@@ -745,6 +745,10 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
 #ifdef ocpnUSE_GL
     else
     {
+        // Mandatory to avoid display issue when moving map
+        // (map disappear to show a gray background...)
+        glPushMatrix();
+        
         // Anti-aliasing options to render
         // wind barbs at best quality (copy from grip_pi)
         glEnable(GL_BLEND);
