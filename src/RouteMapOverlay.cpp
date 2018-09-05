@@ -454,8 +454,9 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         RenderBoatOnCourse(false, time, dc, vp);
 
         // Start WindBarbsOnRoute customization
-        if (settingsdialog.m_cbDisplayWindBarbsOnRoute->GetValue())
-            RenderWindBarbsOnRoute(dc, vp);
+        int lineWidth = settingsdialog.m_sWindBarbsOnRouteThickness->GetValue();
+        if (lineWidth > 0)
+            RenderWindBarbsOnRoute(dc, vp, lineWidth);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
@@ -688,7 +689,7 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
     }
 }
 
-void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp, int lineWidth)
 {
     /* Method to render wind barbs on the route that has been generated
      * by WeatherRouting plugin. The idead is to visualize the wind
@@ -701,9 +702,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     
     if (vp.bValid == false)
         return;
-    
-    // Config line width of the wind barb
-    int lineWidth = 4;
 
     RouteMapConfiguration configuration = GetConfiguration();
 
