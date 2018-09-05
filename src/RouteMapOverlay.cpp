@@ -727,14 +727,15 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp, int 
         wxPoint p;
         GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
         
-        double VW = it->VW;
-        double W = it->W;
+        // Calculate apparent wind direction
+        float apparentWindSpeed = Polar::VelocityApparentWind(it->VB, it->W, it->VW);
+        float apparentWindDirection = Polar::DirectionApparentWind(apparentWindSpeed, it->VB, it->W, it->VW);
         
         // Draw barbs
         g_barbsOnRoute_LineBufferOverlay.setLineWidth(lineWidth);
         g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
-            wind_barb_route_cache, p.x, p.y, VW,
-            deg2rad(W) + nvp.rotation, it->lat < 0, true
+            wind_barb_route_cache, p.x, p.y, apparentWindSpeed,
+            deg2rad(apparentWindDirection) + nvp.rotation, it->lat < 0, true
         );
     }
     wind_barb_route_cache.Finalize();
