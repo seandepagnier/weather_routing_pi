@@ -98,7 +98,7 @@ void LineBuffer::draw(wxDC *dc)
 
 void WindBarbLineBuffer::pushPetiteBarbule( int b, int lineWidth )
 {
-    pushLine( 0, b, -(4 * (lineWidth/DEFAULT_WIND_ARROW_SIZE_FACTOR)), b - 2 );
+    pushLine( 0, b, -(5 * (lineWidth/DEFAULT_WIND_ARROW_SIZE_FACTOR)), b - 2 );
 }
 
 void WindBarbLineBuffer::pushGrandeBarbule( int b, int lineWidth )

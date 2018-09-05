@@ -105,7 +105,7 @@ private:
     void RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
 
     // Customization WindBarbsOnRoute
-    void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp, int lineWidth);
     int sailingConditionLevel(const PlotData &plot) const;
 
     virtual bool TestAbort() { return Finished(); }

@@ -171,6 +171,7 @@ class SettingsDialogBase : public wxDialog
 		wxStaticText* m_staticText75;
 		wxStaticText* m_staticText70;
 		wxStaticText* m_staticText71;
+		wxStaticText* m_staticText711;
 		wxStaticText* m_staticText115;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
@@ -190,12 +191,12 @@ class SettingsDialogBase : public wxDialog
 		wxSpinCtrl* m_sRouteThickness;
 		wxSpinCtrl* m_sIsoChronThickness;
 		wxSpinCtrl* m_sAlternateRouteThickness;
+		wxSpinCtrl* m_sWindBarbsOnRouteThickness;
 		wxCheckBox* m_cbDisplayCursorRoute;
 		wxCheckBox* m_cbAlternatesForAll;
 		wxCheckBox* m_cbMarkAtPolarChange;
 		wxCheckBox* m_cbDisplayCurrent;
 		wxCheckBox* m_cbDisplayWindBarbs;
-		wxCheckBox* m_cbDisplayWindBarbsOnRoute;
 		wxCheckBox* m_cbDisplayComfort;
 		wxSpinCtrl* m_sConcurrentThreads;
 		wxCheckListBox* m_cblFields;
