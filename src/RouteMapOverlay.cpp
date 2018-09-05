@@ -698,8 +698,12 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
      * OpenCPN's licence
      * March, 2018
      */
+    
     if (vp.bValid == false)
         return;
+    
+    // Config line width of the wind barb
+    int lineWidth = 4;
 
     RouteMapConfiguration configuration = GetConfiguration();
 
@@ -725,6 +729,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         double W = it->W;
         
         // Draw barbs
+        g_barbsOnRoute_LineBufferOverlay.setLineWidth(lineWidth);
         g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
             wind_barb_route_cache, p.x, p.y, VW,
             deg2rad(W) + nvp.rotation, it->lat < 0, true
@@ -757,11 +762,11 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
         
         glColor3ub(colour.Red(), colour.Green(), colour.Blue());
-        glLineWidth(2);
+        glLineWidth(lineWidth);
         glEnableClientState(GL_VERTEX_ARRAY);
     }
 #endif
-    
+
     wind_barb_route_cache.draw(dc.GetDC());
 
 #ifdef ocpnUSE_GL

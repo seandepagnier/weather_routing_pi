@@ -27,6 +27,10 @@
 
 #include <list>
 
+#define DEFAULT_WIND_ARROW_SIZE 26
+#define DEFAULT_WIND_ARROW_SIZE_FACTOR 2.3
+#define DEFAULT_WIND_ARROW_LINE_WIDTH 2
+
 class LineBuffer {
 public:
     LineBuffer() { count = 0; lines = NULL; }
@@ -35,7 +39,7 @@ public:
     void pushLine( float x0, float y0, float x1, float y1 );
     void Finalize();
 
-    void pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south=false, bool head=false);
+    void pushTransformedBuffer(LineBuffer &buffer, int x, int y, double ang, bool south=false, bool head=false, int lineWidth=DEFAULT_WIND_ARROW_SIZE);
     void draw(wxDC *dc);
     void drawTransformed(wxDC *dc, wxPoint offset, double ang);
 
@@ -49,21 +53,24 @@ private:
 class WindBarbLineBuffer : public LineBuffer
 {
 public:
-    void pushPetiteBarbule( int b );
-    void pushGrandeBarbule( int b );
-    void pushTriangle( int b );
+    void pushPetiteBarbule( int b, int lineWidth=DEFAULT_WIND_ARROW_SIZE );
+    void pushGrandeBarbule( int b, int lineWidth=DEFAULT_WIND_ARROW_SIZE );
+    void pushTriangle( int b, int lineWidth=DEFAULT_WIND_ARROW_SIZE );
 };
 
 class LineBufferOverlay
 {
 public:
     LineBufferOverlay();
+    void setLineBuffer();
+    void setLineWidth(int lineWidth);
     void pushWindArrowWithBarbs(LineBuffer &buffer, int x, int y, double vkn, double ang, bool south=false, bool head=false);
     void pushSingleArrow( LineBuffer &buffer, int x, int y, double vkn, double ang, bool south=false);
 private:
 
     WindBarbLineBuffer m_WindArrowCache[14];
     LineBuffer m_SingleArrow[14];
+    int m_lineWidth;
 };
 
 extern LineBufferOverlay g_LineBufferOverlay;
