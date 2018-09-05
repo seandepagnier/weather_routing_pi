@@ -108,8 +108,8 @@ void WindBarbLineBuffer::pushGrandeBarbule( int b, int lineWidth )
 
 void WindBarbLineBuffer::pushTriangle( int b, int lineWidth )
 {
-    pushLine( 0, b,     -10, b - 4 );
-    pushLine( 0, b - 8, -10, b - 4 );
+    pushLine( 0, b,     -(10 * (lineWidth/DEFAULT_WIND_ARROW_SIZE_FACTOR)), b - 4 );
+    pushLine( 0, b - 8, -(10 * (lineWidth/DEFAULT_WIND_ARROW_SIZE_FACTOR)), b - 4 );
 }
 
 
@@ -191,22 +191,22 @@ void LineBufferOverlay::setLineBuffer()
     m_WindArrowCache[8].pushGrandeBarbule( b2 + (4 * m_lineWidth), m_lineWidth );
     m_WindArrowCache[8].pushGrandeBarbule( b2 + (6 * m_lineWidth), m_lineWidth );
     // 50 ktn
-    m_WindArrowCache[9].pushTriangle( b1 + 4 );
+    m_WindArrowCache[9].pushTriangle( b1 + (2 * m_lineWidth), m_lineWidth );
     // 60 ktn
-    m_WindArrowCache[10].pushTriangle( b1 + 4 );
-    m_WindArrowCache[10].pushGrandeBarbule( b1 + 8 );
+    m_WindArrowCache[10].pushTriangle( b1 + (2 * m_lineWidth), m_lineWidth );
+    m_WindArrowCache[10].pushGrandeBarbule( b1 + (4 * m_lineWidth), m_lineWidth );
     // 70 ktn
-    m_WindArrowCache[11].pushTriangle( b1 + 4 );
-    m_WindArrowCache[11].pushGrandeBarbule( b1 + 8 );
-    m_WindArrowCache[11].pushGrandeBarbule( b1 + 12 );
+    m_WindArrowCache[11].pushTriangle( b1 + (2 * m_lineWidth), m_lineWidth );
+    m_WindArrowCache[11].pushGrandeBarbule( b1 + (4 * m_lineWidth), m_lineWidth );
+    m_WindArrowCache[11].pushGrandeBarbule( b1 + (6 * m_lineWidth), m_lineWidth );
     // 80 ktn
-    m_WindArrowCache[12].pushTriangle( b1 + 4 );
-    m_WindArrowCache[12].pushGrandeBarbule( b1 + 8 );
-    m_WindArrowCache[12].pushGrandeBarbule( b1 + 12 );
-    m_WindArrowCache[12].pushGrandeBarbule( b1 + 16 );
+    m_WindArrowCache[12].pushTriangle( b1 + (2 * m_lineWidth), m_lineWidth );
+    m_WindArrowCache[12].pushGrandeBarbule( b1 + (4 * m_lineWidth), m_lineWidth );
+    m_WindArrowCache[12].pushGrandeBarbule( b1 + (6 * m_lineWidth), m_lineWidth );
+    m_WindArrowCache[12].pushGrandeBarbule( b1 + (8 * m_lineWidth), m_lineWidth );
     // > 90 ktn
-    m_WindArrowCache[13].pushTriangle( b1 + 4 );
-    m_WindArrowCache[13].pushTriangle( b1 + 12 );
+    m_WindArrowCache[13].pushTriangle( b1 + (2 * m_lineWidth), m_lineWidth );
+    m_WindArrowCache[13].pushTriangle( b1 + (6 * m_lineWidth), m_lineWidth );
 
     for(i=0; i<14; i++)
         m_WindArrowCache[i].Finalize();
