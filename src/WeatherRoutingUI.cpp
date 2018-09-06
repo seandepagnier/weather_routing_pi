@@ -2602,7 +2602,7 @@ FilterRoutesDialogBase::~FilterRoutesDialogBase()
 
 CursorPositionDialog::CursorPositionDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxSize( 400,-1 ), wxDefaultSize );
 	
 	wxFlexGridSizer* fgSizer90;
 	fgSizer90 = new wxFlexGridSizer( 0, 1, 0, 0 );
