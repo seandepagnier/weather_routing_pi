@@ -1485,3 +1485,45 @@ void RouteMapOverlay::UpdateDestination()
     m_bUpdated = true;
     m_UpdateOverlay = true;
 }
+
+
+// CUSTOMIZATION
+
+Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, double cursorLon, PlotData &posData)
+{
+    /* Method to find the closest calculated position of the boat on
+     * the weather route based on the cursor position
+     */
+    
+    double dist = INFINITY;
+    PlotData tempData;
+    Position *pos = last_destination_position;
+    Position *newPos = NULL;
+    Position *p;
+    
+    // Get position first
+    for(p = pos; p && p->parent; p = p->parent)
+    {
+        // Calculate distance
+        // Almost like a plan (x,y) because of small distance -- is that correct?
+        double tempDist = sqrt( pow(cursorLat - p->lat, 2) + pow(cursorLon - p->lon, 2) );
+        if (tempDist < dist)
+        {
+            dist = tempDist;
+            newPos = p;
+        }
+    }
+    
+    // Get data if position was founded
+    if (newPos != NULL)
+    {
+        std::list<PlotData> plot = GetPlotData(false);
+        for ( std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); it++)
+        {
+            if (it->lat == newPos->lat && it->lon == newPos->lon)
+                posData = *it;
+        }
+    }
+    
+    return newPos;
+}

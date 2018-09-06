@@ -88,6 +88,9 @@ public:
 
     Position *GetLastCursorPosition() { return last_cursor_position; }
     wxDateTime GetLastCursorTime() { return m_cursor_time; }
+    
+    // CUSTOMIZATION
+    Position *getClosestRoutePositionFromCursor(double cursorLat, double cursorLon, PlotData &posData);
 
     bool m_UpdateOverlay;
     bool m_bEndRouteVisible;
