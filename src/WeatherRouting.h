@@ -88,6 +88,7 @@ public:
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
     CursorPositionDialog m_CursorPositionDialog;
+    RoutePositionDialog m_RoutePositionDialog;
     BoatDialog m_BoatDialog;
 
     void SetConfigurationRoute(WeatherRoute *weatherroute);
@@ -115,6 +116,7 @@ public:
     void UpdateColumns();
 
     void UpdateCursorPositionDialog();
+    void UpdateRoutePositionDialog();
 
     SettingsDialog m_SettingsDialog;
 
@@ -158,6 +160,8 @@ private:
     void OnReport( wxCommandEvent& event );
     void OnPlot( wxCommandEvent& event );
     void OnCursorPosition( wxCommandEvent& event );
+    // CUSTOMIZATION
+    void OnRoutePosition( wxCommandEvent& event );
     void OnManual( wxCommandEvent& event );
     void OnInformation( wxCommandEvent& event );
     void OnAbout( wxCommandEvent& event );
