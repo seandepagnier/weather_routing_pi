@@ -1670,21 +1670,10 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
         } else
             EndTime = _T("N/A");
         
-        if(starttime.IsValid() && endtime.IsValid()) {
-            wxTimeSpan span = endtime - starttime;
-            int days = span.GetDays();
-            span -= wxTimeSpan::Days(days);
-            int hours = span.GetHours();
-            span -= wxTimeSpan::Hours(hours);
-            double minutes = (double)span.GetSeconds().ToLong()/60.0;
-            span -= wxTimeSpan::Minutes(span.GetMinutes());
-            int seconds = (double)span.GetSeconds().ToLong();
-        
-            Time = (days ? wxString::Format(_T("%dd "), days) : _T("")) +
-                (hours || days ? wxString::Format(_T("%02d:%02d"), hours, (int)round(minutes)) :
-                 wxString::Format(_T("%02d %02d"), (int)floor(minutes), seconds));
-        } else
-            Time = _("N/A");
+        // REFACTORING
+        // I decided to dedicate a function for displaying the difference
+        // between two TimeDate as it is usefull in some other part of the code.
+        Time = calculateTimeDelta(starttime, endtime);
 
         Distance =  wxString::Format
             (_T("%.0f/%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE),
