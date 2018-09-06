@@ -42,7 +42,7 @@ StatisticsDialog::StatisticsDialog(wxWindow *parent)
 #ifndef __WXOSX__
     : StatisticsDialogBase(parent)
 #else
-    : StatisticsDialogBase(parent, wxID_ANY, _("Cursor Position"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP)
+    : StatisticsDialogBase(parent, wxID_ANY, _("Weather Routing Statistics"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP)
 #endif
 {
     SetRouteMapOverlays(std::list<RouteMapOverlay*>());
