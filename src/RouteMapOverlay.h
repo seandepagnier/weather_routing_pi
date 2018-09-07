@@ -55,7 +55,8 @@ public:
 
     bool SetCursorLatLon(double lat, double lon);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
-                wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
+                wrDC &dc, PlugIn_ViewPort &vp, bool justendroute,
+                Position* positionOnRoute=NULL);
 
     static wxColour sailingConditionColor(int level);
     static wxString sailingConditionText(int level);

@@ -127,7 +127,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
       m_bShowSettings(false), m_bShowStatistics(false),
       m_bShowReport(false), m_bShowPlot(false),
-      m_bShowFilter(false), m_weather_routing_pi(plugin)
+      m_bShowFilter(false), m_weather_routing_pi(plugin),
+      m_positionOnRoute(NULL)
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -385,7 +386,7 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
     std::list<RouteMapOverlay *>currentroutemaps = CurrentRouteMaps();
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++) {
-        (*it)->Render(time, m_SettingsDialog, dc, vp, false);
+        (*it)->Render(time, m_SettingsDialog, dc, vp, false, m_positionOnRoute);
         
         if(it == currentroutemaps.begin() &&
            m_SettingsDialog.m_cbDisplayWindBarbs->GetValue())
@@ -631,6 +632,8 @@ void WeatherRouting::UpdateRoutePositionDialog()
     Position *closestPosition = rmo->getClosestRoutePositionFromCursor(m_weather_routing_pi.m_cursor_lat,
                                           m_weather_routing_pi.m_cursor_lon,
                                           data);
+    // Store position to display it
+    m_positionOnRoute = closestPosition;
 
     // TRIP DURATION
     wxDateTime startTime = configuration.StartTime;
