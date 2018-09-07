@@ -104,6 +104,10 @@ void SettingsDialog::LoadSettings()
     pConf->Read( _T("WindBarbsOnRouteThickness"), &WindBarbsOnRouteThickness,
                 WindBarbsOnRouteThickness);
     m_sWindBarbsOnRouteThickness->SetValue(WindBarbsOnRouteThickness);
+    bool WindBarbsOnRouteApparent = m_cbDisplayApparentWindBarbs->GetValue();
+    pConf->Read( _T("WindBarbsOnRouteApparent"), &WindBarbsOnRouteApparent,
+                WindBarbsOnRouteApparent);
+    m_cbDisplayApparentWindBarbs->SetValue(WindBarbsOnRouteApparent);
     
     // ComfortOnRoute Customization
     bool DisplayComfortOnRoute = m_cbDisplayComfort->GetValue();
@@ -160,6 +164,7 @@ void SettingsDialog::SaveSettings( )
     pConf->Write( _T("DisplayWindBarbs"), m_cbDisplayWindBarbs->GetValue());
     // WindBarbsOnRoute Customization
     pConf->Write( _T("WindBarbsOnRouteThickness"), m_sWindBarbsOnRouteThickness->GetValue());
+    pConf->Write( _T("WindBarbsOnRouteApparent"), m_cbDisplayApparentWindBarbs->GetValue());
     pConf->Write( _T("DisplayComfortOnRoute"), m_cbDisplayComfort->GetValue());
     pConf->Write( _T("DisplayCurrent"), m_cbDisplayCurrent->GetValue());
 

@@ -426,6 +426,9 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_cbDisplayWindBarbs = new wxCheckBox( sbSizer25->GetStaticBox(), wxID_ANY, _("Display Wind Barbs"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_cbDisplayWindBarbs, 0, wxALL, 5 );
 	
+	m_cbDisplayApparentWindBarbs = new wxCheckBox( sbSizer25->GetStaticBox(), wxID_ANY, _("Apparent Wind for Barbs On Route (not True Wind)"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer82->Add( m_cbDisplayApparentWindBarbs, 0, wxALL, 5 );
+	
 	m_cbDisplayComfort = new wxCheckBox( sbSizer25->GetStaticBox(), wxID_ANY, _("Display Sailing Comfort on Route"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_cbDisplayComfort, 0, wxALL, 5 );
 	
@@ -507,6 +510,7 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_cbMarkAtPolarChange->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayCurrent->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayWindBarbs->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbDisplayApparentWindBarbs->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayComfort->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cblFields->Connect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_cbUseLocalTime->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
@@ -527,6 +531,7 @@ SettingsDialogBase::~SettingsDialogBase()
 	m_cbMarkAtPolarChange->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayCurrent->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayWindBarbs->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbDisplayApparentWindBarbs->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayComfort->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cblFields->Disconnect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_cbUseLocalTime->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );

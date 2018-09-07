@@ -459,8 +459,9 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
         // Start WindBarbsOnRoute customization
         int lineWidth = settingsdialog.m_sWindBarbsOnRouteThickness->GetValue();
+        bool apparent = settingsdialog.m_cbDisplayApparentWindBarbs->GetValue();
         if (lineWidth > 0)
-            RenderWindBarbsOnRoute(dc, vp, lineWidth);
+            RenderWindBarbsOnRoute(dc, vp, lineWidth, apparent);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
@@ -693,7 +694,8 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
     }
 }
 
-void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp, int lineWidth)
+void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp, int lineWidth,
+                                             bool apparentWind)
 {
     /* Method to render wind barbs on the route that has been generated
      * by WeatherRouting plugin. The idead is to visualize the wind
@@ -727,23 +729,48 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp, int 
         wxPoint p;
         GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
         
-        // Calculate apparent wind direction
-        float apparentWindSpeed = Polar::VelocityApparentWind(it->VB, it->W, it->VW);
-        float apparentWindDirection = Polar::DirectionApparentWind(apparentWindSpeed, it->VB, it->W, it->VW);
+        float windSpeed = it->VW;
+        float windDirection = it->W; // heading_resolve(it->B - it->W);
+        
+        // By default, display true wind
+        float finalWindSpeed = windSpeed;
+        float finalWindDirection = windDirection;
+        
+        if (apparentWind)
+        {
+            finalWindSpeed = Polar::VelocityApparentWind(it->VB,
+                                                         heading_resolve(it->B - windDirection),
+                                                         windSpeed);
+            finalWindDirection = heading_resolve(
+                it->B -
+                Polar::DirectionApparentWind(finalWindSpeed, it->VB,
+                                             heading_resolve(it->B - windDirection),
+                                             it->VW));
+        }
         
         // Draw barbs
         g_barbsOnRoute_LineBufferOverlay.setLineWidth(lineWidth);
-        g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
-            wind_barb_route_cache, p.x, p.y, apparentWindSpeed,
-            deg2rad(apparentWindDirection) + nvp.rotation, it->lat < 0, true
-        );
+        g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_route_cache,
+                                                                p.x, p.y, finalWindSpeed,
+                                                                deg2rad(finalWindDirection)
+                                                                +nvp.rotation, it->lat < 0, true);
     }
     wind_barb_route_cache.Finalize();
     
     // Draw the wind barbs
     wxPoint point;
     GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
-    wxColour colour(170, 0, 170);
+    wxColour colour;
+    if (apparentWind)
+    {
+        wxColour blue(20, 83, 186);
+        colour = blue;
+    }
+    else
+    {
+        wxColour purple(170, 0, 170);
+        colour = purple;
+    }
     
     if(dc.GetDC())
     {
