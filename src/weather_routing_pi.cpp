@@ -473,6 +473,7 @@ void weather_routing_pi::OnCursorLatLonTimer( wxTimerEvent & )
             refresh = true;
 
     m_pWeather_Routing->UpdateCursorPositionDialog();
+    m_pWeather_Routing->UpdateRoutePositionDialog();
 
     if(refresh) {
         RequestRefresh(m_parent_window);

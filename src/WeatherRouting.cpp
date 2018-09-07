@@ -118,6 +118,8 @@ int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     : WeatherRoutingBase(parent), m_panel(NULL), m_ConfigurationDialog(*this),
       m_ConfigurationBatchDialog(this), m_CursorPositionDialog(this),
+      // CUSTOMIZATION
+      m_RoutePositionDialog(this),
       m_BoatDialog(*this),
       m_SettingsDialog(this), m_StatisticsDialog(this), m_ReportDialog(*this),
       m_PlotDialog(*this), m_FilterRoutesDialog(this),
@@ -510,6 +512,18 @@ static void CursorPositionDialogMessage(CursorPositionDialog &dlg, wxString msg)
     dlg.Fit();
 }
 
+static void RoutePositionDialogMessage(RoutePositionDialog &dlg, wxString msg)
+{
+    dlg.m_stPosition->SetLabel(msg);
+    dlg.m_stPosition->Fit();
+    dlg.m_stTime->SetLabel(_T(""));
+    dlg.m_stPolar->SetLabel(_T(""));
+    dlg.m_stSailChanges->SetLabel(_T(""));
+    dlg.m_stTacks->SetLabel(_T(""));
+    dlg.m_stWeatherData->SetLabel(_T(""));
+    dlg.Fit();
+}
+
 void WeatherRouting::UpdateCursorPositionDialog()
 {
     CursorPositionDialog &dlg = m_CursorPositionDialog;
@@ -535,12 +549,12 @@ void WeatherRouting::UpdateCursorPositionDialog()
 
     dlg.m_stTime->SetLabel(display_time.Format(_T("%x %H:%M")));
 
+    RouteMapConfiguration configuration = rmo->GetConfiguration();
     wxString pos = wxString::Format(_T("%4.2f%c %4.2f%c"),
                                     fabs(p->lat), p->lat < 0 ? 'S' : 'N',
                                     fabs(p->lon), p->lon < 0 ? 'W' : 'E');
     dlg.m_stPosition->SetLabel(pos);
 
-    RouteMapConfiguration configuration = rmo->GetConfiguration();
     if(p->polar == -1)
         dlg.m_stPolar->SetLabel(wxEmptyString);
     else {
@@ -572,6 +586,145 @@ void WeatherRouting::UpdateCursorPositionDialog()
     if(p->data_mask & Position::DATA_DEFICIENT_CURRENT)
         weatherdata += data_deficient + current;
 
+    dlg.m_stWeatherData->SetLabel(weatherdata);
+    dlg.Fit();
+}
+
+void WeatherRouting::UpdateRoutePositionDialog()
+{
+    /* New method to display information on the weather route
+     * (like time, duration, position, wind, speed, etc.)
+     * based on cursor position of the user.
+     * This is complementary with the plot chart.
+     */
+    
+    RoutePositionDialog &dlg = m_RoutePositionDialog;
+    if(!dlg.IsShown())
+        return;
+    
+    std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
+    if(currentroutemaps.size() != 1) {
+        RoutePositionDialogMessage(dlg, _("Select exactly 1 configuration"));
+        return;
+    }
+    
+    RouteMapOverlay *rmo = currentroutemaps.front();
+    Position *p = rmo->GetLastCursorPosition();
+    if(!p) {
+        RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
+        return;
+    }
+    wxDateTime display_time = rmo->GetLastCursorTime();
+    
+    if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
+        display_time = display_time.FromUTC();
+    
+    dlg.m_stTime->SetLabel(display_time.Format(_T("%x %H:%M")));
+    
+    RouteMapConfiguration configuration = rmo->GetConfiguration();
+    
+    // CUSTOMIZATION
+    // -------------------------
+    // Get access to the closest point between the cursor location
+    // and the weather routing computed point.
+    PlotData data;
+    Position *closestPosition = rmo->getClosestRoutePositionFromCursor(m_weather_routing_pi.m_cursor_lat,
+                                          m_weather_routing_pi.m_cursor_lon,
+                                          data);
+
+    // TRIP DURATION
+    wxDateTime startTime = configuration.StartTime;
+    wxDateTime cursorTime = data.time;
+    
+    if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
+    {
+        startTime = startTime.FromUTC();
+        cursorTime = data.time.FromUTC();
+    }
+    wxString duration = calculateTimeDelta(startTime, cursorTime);
+    dlg.m_stDuration->SetLabel(duration);
+    
+    // POSITION
+    wxString pos = wxString::Format(_T("%4.2f%c %4.2f%c"),
+                                    fabs(data.lat), data.lat < 0 ? 'S' : 'N',
+                                    fabs(data.lon), data.lon < 0 ? 'W' : 'E');
+    dlg.m_stPosition->SetLabel(pos);
+    
+    // POLAR
+    if(closestPosition->polar == -1)
+        dlg.m_stPolar->SetLabel(wxEmptyString);
+    else {
+        wxFileName fn = configuration.boat.Polars[closestPosition->polar].FileName;
+        dlg.m_stPolar->SetLabel(fn.GetFullName());
+    }
+    
+    // SAIL CHANGES
+    dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), closestPosition->SailChanges()));
+    
+    // TACKS
+    dlg.m_stTacks->SetLabel(wxString::Format(_T("%d"), closestPosition->tacks));
+    
+    // BOAT SPEED
+    dlg.m_stBoatSpeed->SetLabel(wxString::Format(_T("%.1f knts"), data.VB));
+    
+    // WIND SPEED
+    //RouteInfo(RouteMapOverlay::COMFORT);
+    dlg.m_stTWS->SetLabel(wxString::Format(_T("%.0f knts"), data.VW));
+    
+    // WIND: TRUE WIND ANGLE
+    // For wind direction, specify if it is
+    // coming from starboard or port side.
+    double windDirection = heading_resolve(data.B - data.W);
+    wxString windDirectionLabel;
+    if (windDirection <= 0)
+        windDirectionLabel = wxString::Format(_T("%.0f\u00B0 starboard"), fabs(windDirection));
+    else
+        windDirectionLabel = wxString::Format(_T("%.0f\u00B0 port"), fabs(windDirection));
+    dlg.m_stTWA->SetLabel(windDirectionLabel);
+    
+    // WIND: APPARENT WIND SPEED
+    float apparentWindSpeed = Polar::VelocityApparentWind(data.VB, windDirection, data.VW);
+    dlg.m_stAWS->SetLabel(wxString::Format(_T("%.0f knts"), apparentWindSpeed));
+    
+    // WIND: APPARENT WIND SPEED
+    float apparentWindDirection = Polar::DirectionApparentWind(apparentWindSpeed, data.VB,
+                                                               windDirection, data.VW);
+    wxString apparentWindDirectionLabel;
+    if (apparentWindDirection <= 0)
+        apparentWindDirectionLabel = wxString::Format(_T("%.0f\u00B0 starboard"),
+                                                      fabs(apparentWindDirection));
+    else
+        apparentWindDirectionLabel = wxString::Format(_T("%.0f\u00B0 port"),
+                                                      fabs(apparentWindDirection));
+    dlg.m_stAWA->SetLabel(apparentWindDirectionLabel);
+    
+    // WAVES
+    dlg.m_stWaves->SetLabel(wxString::Format(_T("%.0f m"), data.WVHT));
+    
+    // WIND GUST
+    dlg.m_stWindGust->SetLabel(wxString::Format(_T("%.0f knts"), data.VW_GUST));
+    
+    // CLIMATOLOGY DATA
+    wxString weatherdata;
+    wxString grib = _("Grib") + _T(" ");
+    wxString climatology = _("Climatology") + _T(" ");
+    wxString data_deficient = _("Data Deficient") + _T(" ");
+    wxString wind = _("Wind") + _T(" ");
+    wxString current = _("Current") + _T(" ");
+    
+    if(closestPosition->data_mask & Position::GRIB_WIND)
+        weatherdata += grib + wind;
+    if(closestPosition->data_mask & Position::CLIMATOLOGY_WIND)
+        weatherdata += climatology + wind;
+    if(closestPosition->data_mask & Position::DATA_DEFICIENT_WIND)
+        weatherdata += data_deficient + wind;
+    if(closestPosition->data_mask & Position::GRIB_CURRENT)
+        weatherdata += grib + current;
+    if(closestPosition->data_mask & Position::CLIMATOLOGY_CURRENT)
+        weatherdata += climatology + current;
+    if(closestPosition->data_mask & Position::DATA_DEFICIENT_CURRENT)
+        weatherdata += data_deficient + current;
+    
     dlg.m_stWeatherData->SetLabel(weatherdata);
     dlg.Fit();
 }
@@ -1185,6 +1338,13 @@ void WeatherRouting::OnCursorPosition( wxCommandEvent& event )
     UpdateCursorPositionDialog();
 }
 
+// CUSTOMIZATION
+void WeatherRouting::OnRoutePosition( wxCommandEvent& event )
+{
+    m_RoutePositionDialog.Show(!m_RoutePositionDialog.IsShown());
+    UpdateRoutePositionDialog();
+}
+
 void WeatherRouting::OnManual ( wxCommandEvent& event )
 {
     wxLaunchDefaultBrowser("https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:plugins:weather:weather_routing");    
@@ -1670,21 +1830,10 @@ void WeatherRoute::Update(WeatherRouting *wr, bool stateonly)
         } else
             EndTime = _T("N/A");
         
-        if(starttime.IsValid() && endtime.IsValid()) {
-            wxTimeSpan span = endtime - starttime;
-            int days = span.GetDays();
-            span -= wxTimeSpan::Days(days);
-            int hours = span.GetHours();
-            span -= wxTimeSpan::Hours(hours);
-            double minutes = (double)span.GetSeconds().ToLong()/60.0;
-            span -= wxTimeSpan::Minutes(span.GetMinutes());
-            int seconds = (double)span.GetSeconds().ToLong();
-        
-            Time = (days ? wxString::Format(_T("%dd "), days) : _T("")) +
-                (hours || days ? wxString::Format(_T("%02d:%02d"), hours, (int)round(minutes)) :
-                 wxString::Format(_T("%02d %02d"), (int)floor(minutes), seconds));
-        } else
-            Time = _("N/A");
+        // REFACTORING
+        // I decided to dedicate a function for displaying the difference
+        // between two TimeDate as it is usefull in some other part of the code.
+        Time = calculateTimeDelta(starttime, endtime);
 
         Distance =  wxString::Format
             (_T("%.0f/%.0f"), routemapoverlay->RouteInfo(RouteMapOverlay::DISTANCE),
