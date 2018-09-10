@@ -671,8 +671,8 @@ class RoutePositionDialog : public wxDialog
 		wxStaticText* m_staticText128;
 		wxStaticText* m_staticText12816;
 		wxStaticText* m_staticText1281;
-		wxStaticText* m_staticText12811;
 		wxStaticText* m_staticText12812;
+		wxStaticText* m_staticText12811;
 		wxStaticText* m_staticText12813;
 		wxStaticText* m_staticText12814;
 		wxStaticText* m_staticText12815;
@@ -689,8 +689,8 @@ class RoutePositionDialog : public wxDialog
 		wxStaticText* m_stPosition;
 		wxStaticText* m_stBoatSpeed;
 		wxStaticText* m_stTWS;
-		wxStaticText* m_stTWA;
 		wxStaticText* m_stAWS;
+		wxStaticText* m_stTWA;
 		wxStaticText* m_stAWA;
 		wxStaticText* m_stWaves;
 		wxStaticText* m_stWindGust;

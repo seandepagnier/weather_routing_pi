@@ -2750,14 +2750,6 @@ RoutePositionDialog::RoutePositionDialog( wxWindow* parent, wxWindowID id, const
 	m_stTWS->Wrap( 120 );
 	fgSizer91->Add( m_stTWS, 0, wxALL, 5 );
 	
-	m_staticText12811 = new wxStaticText( this, wxID_ANY, _("True Wind Angle (TWA)"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText12811->Wrap( -1 );
-	fgSizer91->Add( m_staticText12811, 0, wxALL, 5 );
-	
-	m_stTWA = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
-	m_stTWA->Wrap( 120 );
-	fgSizer91->Add( m_stTWA, 0, wxALL, 5 );
-	
 	m_staticText12812 = new wxStaticText( this, wxID_ANY, _("Apparent Wind Speed (AWS)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText12812->Wrap( -1 );
 	fgSizer91->Add( m_staticText12812, 0, wxALL, 5 );
@@ -2765,6 +2757,14 @@ RoutePositionDialog::RoutePositionDialog( wxWindow* parent, wxWindowID id, const
 	m_stAWS = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
 	m_stAWS->Wrap( 120 );
 	fgSizer91->Add( m_stAWS, 0, wxALL, 5 );
+	
+	m_staticText12811 = new wxStaticText( this, wxID_ANY, _("True Wind Angle (TWA)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12811->Wrap( -1 );
+	fgSizer91->Add( m_staticText12811, 0, wxALL, 5 );
+	
+	m_stTWA = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stTWA->Wrap( 120 );
+	fgSizer91->Add( m_stTWA, 0, wxALL, 5 );
 	
 	m_staticText12813 = new wxStaticText( this, wxID_ANY, _("Apparent Wind Angle (AWA)"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText12813->Wrap( -1 );

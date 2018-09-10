@@ -216,6 +216,9 @@ private:
     wxFileName m_FileName;
     
     wxSize m_size;
+    
+    // CUSTOMIZATION
+    Position *m_positionOnRoute;
 };
 
 #endif
