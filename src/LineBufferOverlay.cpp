@@ -153,9 +153,9 @@ void LineBufferOverlay::setLineBuffer()
 
         arrow.pushLine( 0, dec,  0, dec - windArrowSize );   // hampe
         // Right arrow
-        arrow.pushLine(0, dec - ceil(m_lineWidth / 2 * sqrt(2)), round(dec/4 + (m_lineWidth / 2 * sqrt(2))), round(dec/2));
+        arrow.pushLine(0, dec - ceil(m_lineWidth / 2 * sqrt(2)), round(dec/4 + (m_lineWidth / 2 * sqrt(2))), round(dec/2.));
         // Left arrow
-        arrow.pushLine(0, dec - ceil(m_lineWidth / 2 * sqrt(2)), round(-dec/4 - (m_lineWidth / 2 * sqrt(2))), round(dec/2));
+        arrow.pushLine(0, dec - ceil(m_lineWidth / 2 * sqrt(2)), round(-dec/4 - (m_lineWidth / 2 * sqrt(2))), round(dec/2.));
     }
 
     float alpha = 0.38;

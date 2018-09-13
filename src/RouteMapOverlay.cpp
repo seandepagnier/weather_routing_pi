@@ -1139,7 +1139,8 @@ void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
 #endif
                 double VW = d*VW1 + (1-d)*VW2;
 
-                g_LineBufferOverlay.pushSingleArrow(current_cache, x, y, VW, deg2rad(W+180), lat < 0 );
+                g_LineBufferOverlay.pushSingleArrow(current_cache, x, y, VW,
+                                                           deg2rad(W+180) + nvp.rotation, lat < 0 );
 
                 }
             skip:;
