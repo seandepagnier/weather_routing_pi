@@ -52,6 +52,11 @@ std::cout << x << std::endl; } while (0)
 #ifndef _WEATHER_ROUTINGPI_H_
 #define _WEATHER_ROUTINGPI_H_
 
+#ifndef __OCPN__ANDROID__
+#define GetDateCtrlValue GetValue
+#define GetTimeCtrlValue GetValue
+#endif
+
 #include "version.h"
 
 #define     MY_API_VERSION_MAJOR    1

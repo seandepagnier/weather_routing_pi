@@ -359,11 +359,13 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
         return;
 
     if(!dc.GetDC()) {
+#ifndef __OCPN__ANDROID__
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_HINT_BIT ); //Save state
         glEnable( GL_LINE_SMOOTH );
-        glEnable( GL_BLEND );
         glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
         glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+#endif
+        glEnable( GL_BLEND );
     }
 
     wxDateTime time = m_ConfigurationDialog.m_GribTimelineTime;
@@ -397,8 +399,10 @@ void WeatherRouting::Render(wrDC &dc, PlugIn_ViewPort &vp)
 
     m_ConfigurationBatchDialog.Render(dc, vp);
 
+#ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glPopAttrib();
+#endif
 }
 
 void WeatherRouting::UpdateDisplaySettings()

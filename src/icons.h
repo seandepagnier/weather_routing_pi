@@ -14,7 +14,7 @@ extern void initialize_images(void);
 
 extern wxBitmap *_img_WeatherRouting;
 
-#ifdef WEATHER_ROUTING_USE_SVG
+#ifdef OCPN_USE_SVG
 extern wxString _svg_weather_routing;
 extern wxString _svg_weather_routing_rollover;
 extern wxString _svg_weather_routing_toggled;

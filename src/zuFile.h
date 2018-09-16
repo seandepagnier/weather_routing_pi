@@ -31,7 +31,11 @@ extern "C" {
 #include <ctype.h>
 
 #include <zlib.h>
+#ifdef __ANDROID__
+    #define BZ_OK                0
+#else
 #include <bzlib.h>
+#endif
 
 #define ZU_COMPRESS_AUTO  -1
 #define ZU_COMPRESS_NONE   0

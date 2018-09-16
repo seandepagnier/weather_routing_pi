@@ -347,7 +347,7 @@ void ConfigurationDialog::Update()
         GET_CHOICE(End);
 
         if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end()) {
-            if(m_dpStartDate->GetValue().IsValid()) {
+            if(m_dpStartDate->GetDateCtrlValue().IsValid()) {
                 int h, m, s;
                 bool reset = false;
 
@@ -364,7 +364,7 @@ void ConfigurationDialog::Update()
                     m = datetime.GetMinute();
                     s = datetime.GetSecond();
                 }
-                configuration.StartTime = m_dpStartDate->GetValue();
+                configuration.StartTime = m_dpStartDate->GetDateCtrlValue();
                 m_dpStartDate->SetForegroundColour(wxColour(0, 0, 0));
                 if(reset) {
                     // ... and add it afterwards
@@ -376,9 +376,9 @@ void ConfigurationDialog::Update()
         }
 
         if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) != m_edited_controls.end()) {
-            configuration.StartTime.SetHour(m_tpTime->GetValue().GetHour());
-            configuration.StartTime.SetMinute(m_tpTime->GetValue().GetMinute());
-            configuration.StartTime.SetSecond(m_tpTime->GetValue().GetSecond());
+            configuration.StartTime.SetHour(m_tpTime->GetTimeCtrlValue().GetHour());
+            configuration.StartTime.SetMinute(m_tpTime->GetTimeCtrlValue().GetMinute());
+            configuration.StartTime.SetSecond(m_tpTime->GetTimeCtrlValue().GetSecond());
             m_tpTime->SetForegroundColour(wxColour(0, 0, 0));
         }
 

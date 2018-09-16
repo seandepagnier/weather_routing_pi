@@ -4,18 +4,22 @@
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
 
+IF(NOT QT_ANDROID)
+
 # build a CPack driven installer package
 #include (InstallRequiredSystemLibraries)
 
 SET(CPACK_PACKAGE_NAME "${PACKAGE_NAME}")
 SET(CPACK_PACKAGE_VENDOR "opencpn.org")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_NAME} ${PACKAGE_VERSION})
+SET(PACKAGE_VERSION "${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}.${PLUGIN_VERSION_PATCH}" )
 SET(CPACK_PACKAGE_VERSION ${PACKAGE_VERSION})
 SET(CPACK_PACKAGE_VERSION_MAJOR ${PLUGIN_VERSION_MAJOR})
 SET(CPACK_PACKAGE_VERSION_MINOR ${PLUGIN_VERSION_MINOR})
 SET(CPACK_PACKAGE_VERSION_PATCH ${PLUGIN_VERSION_PATCH})
 SET(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};${PACKAGE_NAME};ALL;/")
 SET(CPACK_PACKAGE_EXECUTABLES OpenCPN ${PACKAGE_NAME})
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_CONTACT})
 
 IF(WIN32)
 # to protect against confusable windows users, let us _not_ generate zip packages
@@ -162,7 +166,7 @@ configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/pkg_background.jpg
  # Patch the pkgproj.in file to make the output package name conform to Xxx-Plugin_x.x.pkg format
  #  Key is:
  #  <key>NAME</key>
- #  <string>${VERBOSE_NAME}-Plugin_${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}.${PLUGIN_VERSION_PATCH}</string>
+ #  <string>${VERBOSE_NAME}-Plugin_${VERSION_MAJOR}.${VERSION_MINOR}</string>
 
  configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/${PACKAGE_NAME}.pkgproj.in
             ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}.pkgproj)
@@ -181,5 +185,18 @@ configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/pkg_background.jpg
 
 ENDIF(APPLE)
 
+IF(WIN32)
+  SET(CPACK_PACKAGE_FILE_NAME "${PACKAGE_NAME}-${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}-win32.exe" )
+  MESSAGE(STATUS "FILE: ${CPACK_PACKAGE_FILE_NAME}")
+  add_custom_command(OUTPUT ${CPACK_PACKAGE_FILE_NAME}
+	  COMMAND signtool sign /v /f \\cert\\OpenCPNSPC.pfx /d http://www.opencpn.org /t http://timestamp.verisign.com/scripts/timstamp.dll ${CPACK_PACKAGE_FILE_NAME}
+	  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	  DEPENDS ${PACKAGE_NAME}
+	  COMMENT "Code-Signing: ${CPACK_PACKAGE_FILE_NAME}")
+  ADD_CUSTOM_TARGET(codesign COMMENT "code signing: Done."
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${CPACK_PACKAGE_FILE_NAME} )
+
+ENDIF(WIN32)
 ENDIF(NOT STANDALONE MATCHES "BUNDLED")
 
+ENDIF(NOT QT_ANDROID)

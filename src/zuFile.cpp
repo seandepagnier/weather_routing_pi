@@ -63,10 +63,12 @@ ZUFILE * zu_open(const char *fname, const char *mode, int type)
 			f->type = ZU_COMPRESS_GZIP;
 			//fprintf(stderr,"ZU_COMPRESS_GZIP\n");
 		}
+#ifndef __ANDROID__
 		else if (!strcmp(buf, ".bz2") || !strcmp(buf, ".bz")) {
 			f->type = ZU_COMPRESS_BZIP;
 			//fprintf(stderr,"ZU_COMPRESS_BZIP\n");
 		}
+#endif
 		else {
 			f->type = ZU_COMPRESS_NONE;
 			//fprintf(stderr,"ZU_COMPRESS_NONE\n");
@@ -84,6 +86,7 @@ ZUFILE * zu_open(const char *fname, const char *mode, int type)
         case ZU_COMPRESS_GZIP :
             f->zfile = (void *) gzopen(f->fname, mode);
             break;
+#ifndef __ANDROID__
         case ZU_COMPRESS_BZIP :
             f->faux = fopen(f->fname, mode);
             if (f->faux) {
@@ -98,6 +101,7 @@ ZUFILE * zu_open(const char *fname, const char *mode, int type)
                 f->zfile = NULL;
             }
             break;
+#endif
         default :
             f->zfile = NULL;
     }
@@ -121,13 +125,16 @@ int  zu_read(ZUFILE *f, void *buf, long len)
         case ZU_COMPRESS_GZIP :
             nb = gzread((gzFile)(f->zfile), buf, len);
             break;
+#ifndef __ANDROID__
         case ZU_COMPRESS_BZIP :
             nb = BZ2_bzRead(&bzerror,(BZFILE*)(f->zfile), buf, len);
             break;
+#endif
     }
     f->pos += nb;
     return nb;
 }
+
 //----------------------------------------------------
 char *zu_gets(ZUFILE *f, char *buf, int len)
 {
@@ -143,6 +150,7 @@ char *zu_gets(ZUFILE *f, char *buf, int len)
             if((ret = gzgets((gzFile)(f->zfile), buf, len)))
                 nb = strlen(buf);
             break;
+#ifndef __ANDROID__
         case ZU_COMPRESS_BZIP :
             nb = BZ2_bzRead(&bzerror,(BZFILE*)(f->zfile), buf, len-1);
             for(int i=0; i<nb; i++)
@@ -156,6 +164,7 @@ char *zu_gets(ZUFILE *f, char *buf, int len)
                 buf[nb] = '\0';
                 ret = buf;
             }
+#endif
     }
     f->pos += nb;
     return ret;
@@ -177,12 +186,14 @@ int zu_close(ZUFILE *f)
                 case ZU_COMPRESS_GZIP :
                     gzclose((gzFile)(f->zfile));
                     break;
+#ifndef __ANDROID__
                 case ZU_COMPRESS_BZIP :
                     BZ2_bzReadClose (&bzerror,(BZFILE*)(f->zfile));
                     if (f->faux) {
                         fclose(f->faux);
                     }
                     break;
+#endif
             }
         }
         free(f);
@@ -238,6 +249,7 @@ int zu_seek(ZUFILE *f, long offset, int whence)
             if (res >= 0)
                 res = 0;
             break;
+#ifndef __ANDROID__
         case ZU_COMPRESS_BZIP :
             if (whence==SEEK_SET  &&  offset >= f->pos) {
                 res = zu_bzSeekForward(f, offset-f->pos);
@@ -260,10 +272,12 @@ int zu_seek(ZUFILE *f, long offset, int whence)
                 res = zu_bzSeekForward(f, offset);
             }
             break;
+#endif
     }
     return res;
 }
 
+#ifndef __ANDROID__
 //-----------------------------------------------------------------
 int  zu_bzSeekForward(ZUFILE *f, unsigned long nbytes_)
 // for internal use
@@ -286,7 +300,7 @@ int  zu_bzSeekForward(ZUFILE *f, unsigned long nbytes_)
 
     return nbread==nbytes_ ? 0 : -1;
 }
-
+#endif
 //-----------------------------------------------------------------
 void   zu_rewind(ZUFILE *f)
 {
