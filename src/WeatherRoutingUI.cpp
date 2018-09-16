@@ -122,6 +122,10 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	m_mCursorPosition = new wxMenuItem( m_mView, wxID_ANY, wxString( _("&Cursor Position") ) , wxEmptyString, wxITEM_NORMAL );
 	m_mView->Append( m_mCursorPosition );
 	
+	wxMenuItem* m_mRoutePosition;
+	m_mRoutePosition = new wxMenuItem( m_mView, wxID_ANY, wxString( _("&Route Position") ) , wxEmptyString, wxITEM_NORMAL );
+	m_mView->Append( m_mRoutePosition );
+	
 	m_menubar3->Append( m_mView, _("&View") ); 
 	
 	m_mHelp = new wxMenu();
@@ -172,6 +176,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	this->Connect( m_mReport->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnReport ) );
 	this->Connect( m_mPlot->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnPlot ) );
 	this->Connect( m_mCursorPosition->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnCursorPosition ) );
+	this->Connect( m_mRoutePosition->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnRoutePosition ) );
 	this->Connect( m_mInformation->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
 	this->Connect( m_mManual->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnManual ) );
 	this->Connect( m_mAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
@@ -207,6 +212,7 @@ WeatherRoutingBase::~WeatherRoutingBase()
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnReport ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnPlot ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnCursorPosition ) );
+	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnRoutePosition ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnInformation ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnManual ) );
 	this->Disconnect( wxID_ANY, wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnAbout ) );
@@ -387,6 +393,13 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_sAlternateRouteThickness = new wxSpinCtrl( sbSizer25->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10, 0 );
 	fgSizer42->Add( m_sAlternateRouteThickness, 0, wxALL, 5 );
 	
+	m_staticText711 = new wxStaticText( sbSizer25->GetStaticBox(), wxID_ANY, _("Wind Barbs On Route Thickness"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText711->Wrap( -1 );
+	fgSizer42->Add( m_staticText711, 0, wxALL, 5 );
+	
+	m_sWindBarbsOnRouteThickness = new wxSpinCtrl( sbSizer25->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 6, 2 );
+	fgSizer42->Add( m_sWindBarbsOnRouteThickness, 0, wxALL, 5 );
+	
 	
 	fgSizer18->Add( fgSizer42, 1, wxEXPAND, 5 );
 	
@@ -413,8 +426,8 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_cbDisplayWindBarbs = new wxCheckBox( sbSizer25->GetStaticBox(), wxID_ANY, _("Display Wind Barbs"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_cbDisplayWindBarbs, 0, wxALL, 5 );
 	
-	m_cbDisplayWindBarbsOnRoute = new wxCheckBox( sbSizer25->GetStaticBox(), wxID_ANY, _("Display Wind Barbs On Route"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer82->Add( m_cbDisplayWindBarbsOnRoute, 0, wxALL, 5 );
+	m_cbDisplayApparentWindBarbs = new wxCheckBox( sbSizer25->GetStaticBox(), wxID_ANY, _("Apparent Wind for Barbs On Route (not True Wind)"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer82->Add( m_cbDisplayApparentWindBarbs, 0, wxALL, 5 );
 	
 	m_cbDisplayComfort = new wxCheckBox( sbSizer25->GetStaticBox(), wxID_ANY, _("Display Sailing Comfort on Route"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer82->Add( m_cbDisplayComfort, 0, wxALL, 5 );
@@ -491,12 +504,13 @@ SettingsDialogBase::SettingsDialogBase( wxWindow* parent, wxWindowID id, const w
 	m_sRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_sIsoChronThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_sAlternateRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_sWindBarbsOnRouteThickness->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_cbDisplayCursorRoute->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbAlternatesForAll->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbMarkAtPolarChange->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayCurrent->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayWindBarbs->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_cbDisplayWindBarbsOnRoute->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbDisplayApparentWindBarbs->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayComfort->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cblFields->Connect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_cbUseLocalTime->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
@@ -511,12 +525,13 @@ SettingsDialogBase::~SettingsDialogBase()
 	m_sRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_sIsoChronThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_sAlternateRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
+	m_sWindBarbsOnRouteThickness->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( SettingsDialogBase::OnUpdateSpin ), NULL, this );
 	m_cbDisplayCursorRoute->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbAlternatesForAll->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbMarkAtPolarChange->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayCurrent->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayWindBarbs->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
-	m_cbDisplayWindBarbsOnRoute->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
+	m_cbDisplayApparentWindBarbs->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cbDisplayComfort->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdate ), NULL, this );
 	m_cblFields->Disconnect( wxEVT_COMMAND_CHECKLISTBOX_TOGGLED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
 	m_cbUseLocalTime->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( SettingsDialogBase::OnUpdateColumns ), NULL, this );
@@ -2598,7 +2613,7 @@ FilterRoutesDialogBase::~FilterRoutesDialogBase()
 
 CursorPositionDialog::CursorPositionDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
-	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxSize( 400,-1 ), wxDefaultSize );
 	
 	wxFlexGridSizer* fgSizer90;
 	fgSizer90 = new wxFlexGridSizer( 0, 1, 0, 0 );
@@ -2672,12 +2687,159 @@ CursorPositionDialog::CursorPositionDialog( wxWindow* parent, wxWindowID id, con
 	
 	this->SetSizer( fgSizer90 );
 	this->Layout();
-	fgSizer90->Fit( this );
 	
 	this->Centre( wxBOTH );
 }
 
 CursorPositionDialog::~CursorPositionDialog()
+{
+}
+
+RoutePositionDialog::RoutePositionDialog( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxSize( 400,-1 ), wxDefaultSize );
+	
+	wxFlexGridSizer* fgSizer90;
+	fgSizer90 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer90->SetFlexibleDirection( wxBOTH );
+	fgSizer90->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxFlexGridSizer* fgSizer91;
+	fgSizer91 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer91->AddGrowableCol( 1 );
+	fgSizer91->SetFlexibleDirection( wxBOTH );
+	fgSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_staticText134 = new wxStaticText( this, wxID_ANY, _("Time"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText134->Wrap( -1 );
+	fgSizer91->Add( m_staticText134, 0, wxALL, 5 );
+	
+	m_stTime = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stTime->Wrap( -1 );
+	fgSizer91->Add( m_stTime, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticDuration = new wxStaticText( this, wxID_ANY, _("Duration"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticDuration->Wrap( -1 );
+	fgSizer91->Add( m_staticDuration, 0, wxALL, 5 );
+	
+	m_stDuration = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stDuration->Wrap( -1 );
+	fgSizer91->Add( m_stDuration, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticText128 = new wxStaticText( this, wxID_ANY, _("Position"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText128->Wrap( -1 );
+	fgSizer91->Add( m_staticText128, 0, wxALL, 5 );
+	
+	m_stPosition = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stPosition->Wrap( 120 );
+	fgSizer91->Add( m_stPosition, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticText12816 = new wxStaticText( this, wxID_ANY, _("Boat Speed"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12816->Wrap( -1 );
+	fgSizer91->Add( m_staticText12816, 0, wxALL, 5 );
+	
+	m_stBoatSpeed = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stBoatSpeed->Wrap( 120 );
+	fgSizer91->Add( m_stBoatSpeed, 0, wxALL, 5 );
+	
+	m_staticText1281 = new wxStaticText( this, wxID_ANY, _("True Wind Speed (TWS)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1281->Wrap( -1 );
+	fgSizer91->Add( m_staticText1281, 0, wxALL, 5 );
+	
+	m_stTWS = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stTWS->Wrap( 120 );
+	fgSizer91->Add( m_stTWS, 0, wxALL, 5 );
+	
+	m_staticText12812 = new wxStaticText( this, wxID_ANY, _("Apparent Wind Speed (AWS)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12812->Wrap( -1 );
+	fgSizer91->Add( m_staticText12812, 0, wxALL, 5 );
+	
+	m_stAWS = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stAWS->Wrap( 120 );
+	fgSizer91->Add( m_stAWS, 0, wxALL, 5 );
+	
+	m_staticText12811 = new wxStaticText( this, wxID_ANY, _("True Wind Angle (TWA)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12811->Wrap( -1 );
+	fgSizer91->Add( m_staticText12811, 0, wxALL, 5 );
+	
+	m_stTWA = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stTWA->Wrap( 120 );
+	fgSizer91->Add( m_stTWA, 0, wxALL, 5 );
+	
+	m_staticText12813 = new wxStaticText( this, wxID_ANY, _("Apparent Wind Angle (AWA)"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12813->Wrap( -1 );
+	fgSizer91->Add( m_staticText12813, 0, wxALL, 5 );
+	
+	m_stAWA = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stAWA->Wrap( 120 );
+	fgSizer91->Add( m_stAWA, 0, wxALL, 5 );
+	
+	m_staticText12814 = new wxStaticText( this, wxID_ANY, _("Waves Height"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12814->Wrap( -1 );
+	fgSizer91->Add( m_staticText12814, 0, wxALL, 5 );
+	
+	m_stWaves = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stWaves->Wrap( 120 );
+	fgSizer91->Add( m_stWaves, 0, wxALL, 5 );
+	
+	m_staticText12815 = new wxStaticText( this, wxID_ANY, _("Wind Gust"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText12815->Wrap( -1 );
+	fgSizer91->Add( m_staticText12815, 0, wxALL, 5 );
+	
+	m_stWindGust = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
+	m_stWindGust->Wrap( 120 );
+	fgSizer91->Add( m_stWindGust, 0, wxALL, 5 );
+	
+	m_staticText124 = new wxStaticText( this, wxID_ANY, _("Polar"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText124->Wrap( -1 );
+	fgSizer91->Add( m_staticText124, 0, wxALL, 5 );
+	
+	m_stPolar = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stPolar->Wrap( -1 );
+	fgSizer91->Add( m_stPolar, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticText130 = new wxStaticText( this, wxID_ANY, _("Sail Changes"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText130->Wrap( -1 );
+	fgSizer91->Add( m_staticText130, 0, wxALL, 5 );
+	
+	m_stSailChanges = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stSailChanges->Wrap( -1 );
+	fgSizer91->Add( m_stSailChanges, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticText126 = new wxStaticText( this, wxID_ANY, _("Tacks"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText126->Wrap( -1 );
+	fgSizer91->Add( m_staticText126, 0, wxALL, 5 );
+	
+	m_stTacks = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stTacks->Wrap( -1 );
+	fgSizer91->Add( m_stTacks, 0, wxALL|wxEXPAND, 5 );
+	
+	m_staticText122 = new wxStaticText( this, wxID_ANY, _("Weather Data"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText122->Wrap( -1 );
+	fgSizer91->Add( m_staticText122, 0, wxALL, 5 );
+	
+	m_stWeatherData = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_stWeatherData->Wrap( -1 );
+	fgSizer91->Add( m_stWeatherData, 0, wxALL|wxEXPAND, 5 );
+	
+	
+	fgSizer90->Add( fgSizer91, 1, wxEXPAND, 5 );
+	
+	m_sdbSizer5 = new wxStdDialogButtonSizer();
+	m_sdbSizer5OK = new wxButton( this, wxID_OK );
+	m_sdbSizer5->AddButton( m_sdbSizer5OK );
+	m_sdbSizer5->Realize();
+	
+	fgSizer90->Add( m_sdbSizer5, 1, wxEXPAND, 5 );
+	
+	
+	this->SetSizer( fgSizer90 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+}
+
+RoutePositionDialog::~RoutePositionDialog()
 {
 }
 

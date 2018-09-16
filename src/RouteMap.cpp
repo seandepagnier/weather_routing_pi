@@ -136,6 +136,11 @@ static bool GribWind(RouteMapConfiguration &configuration, double lat, double lo
         return false;
 
     VWG *= 3.6 / 1.852; // knots
+#if 0
+    // test
+    VWG = 0.;
+    WG = 0.;
+#endif
     return true;
 }
 
@@ -196,12 +201,15 @@ static inline bool Current(RouteMapConfiguration &configuration,
    The wind data is calculated from the ground not the sea,
    it is then converted to speed over water which the boat can feel.
 
-   C   - Sea Current Direction over ground
-   VC  - Velocity of Current
    WG  - Wind direction over ground
    VWG - Velocity of wind over ground
+   C   - Sea Current Direction over ground
+   VC  - Velocity of Current
+
    WA  - Angle of wind relative to true north
-   VW - velocity of wind over water
+   VW - velocity of wind over water.
+
+   Wind and current direction are from x ie 180 is wind/current from the south
 */
 static void OverWater(double WG, double VWG, double C, double VC, double &WA, double &VW)
 {
@@ -443,7 +451,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
                 for(int i=0; i<windatlas_count; i++) {
                     double WG = i*360/windatlas_count;
                     double VWG = speeds[i]*configuration.WindStrength;
-                    OverWater(WG, VWG, C, VC, atlas.W[i], atlas.VW[i]);
+                    OverWater(WG, VWG, C, -VC, atlas.W[i], atlas.VW[i]);
                 }
 
                 /* find most likely wind direction */
@@ -495,7 +503,7 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
     }
     VWG *= configuration.WindStrength;
 
-    OverWater(WG, VWG, C, VC, W, VW);
+    OverWater(WG, VWG, C, -VC, W, VW);
     return true;
 }
 

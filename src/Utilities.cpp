@@ -25,10 +25,13 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <wx/wx.h>
 
 #include "tinyxml/tinyxml.h"
 
 #include "Utilities.h"
+
+
 double deg2rad(double degrees)
 {
   return M_PI * degrees / 180.0;
@@ -109,6 +112,32 @@ bool AttributeBool(TiXmlElement *e, const char *name, bool def)
 {
     return AttributeInt(e, name, def) != 0;
 }
+
+wxString calculateTimeDelta(wxDateTime startTime, wxDateTime endTime)
+{
+    wxString timeStr;
+    if(startTime.IsValid() && endTime.IsValid())
+    {
+        wxTimeSpan span = endTime - startTime;
+        int days = span.GetDays();
+        span -= wxTimeSpan::Days(days);
+        int hours = span.GetHours();
+        span -= wxTimeSpan::Hours(hours);
+        double minutes = (double)span.GetSeconds().ToLong()/60.0;
+        span -= wxTimeSpan::Minutes(span.GetMinutes());
+        int seconds = (double)span.GetSeconds().ToLong();
+        
+        timeStr = (days ? wxString::Format(_T("%dd "), days) : _T("")) +
+        (hours || days ? wxString::Format(_T("%02d:%02d"), hours, (int)round(minutes)) :
+         wxString::Format(_T("%02d %02d"), (int)floor(minutes), seconds));
+    }
+    else
+    {
+        timeStr = _("N/A");
+    }
+    return timeStr;
+}
+
 
 #ifdef __MINGW32__
 char *strtok_r(char *str, const char *delim, char **save)
