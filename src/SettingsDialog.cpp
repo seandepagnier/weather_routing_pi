@@ -44,8 +44,9 @@ const wxString SettingsDialog::column_names[] = {"", "Boat", "Start", "Start Tim
                                                  "Avg Wind", "Max Wind", "Max Wind Gust",
                                                  "Avg Current", "Max Current",
                                                  "Avg Swell", "Max Swell",
-                                                 "Upwind Percentage",
-                                                 "Port Starboard", "Tacks", "State"};
+                                                 "Upwind Percentage", "Port Starboard",
+                                                 "Tacks", "Sailing Comfort",
+                                                 "State"};
 
 SettingsDialog::SettingsDialog( wxWindow *parent )
 #ifndef __WXOSX__

@@ -281,7 +281,7 @@ void ConfigurationDialog::OnResetAdvanced( wxCommandEvent& event )
     m_cIntegrator->SetSelection(0);
     m_sWindStrength->SetValue(100);
     m_sTackingTime->SetValue(0);
-    m_sSafetyMarginLand->SetValue(2.);
+    m_sSafetyMarginLand->SetValue(0.);
 
     m_sFromDegree->SetValue(0);
     m_sToDegree->SetValue(180);
@@ -347,43 +347,43 @@ void ConfigurationDialog::Update()
         GET_CHOICE(End);
 
         if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end()) {
-            if(m_dpStartDate->GetDateCtrlValue().IsValid()) {
-                int h, m, s;
-                bool reset = false;
-
-                if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) == m_edited_controls.end()) {
-                    // We must preserve the time in case only date but not time, is being changed by the user...
-                    // configuration.StartTime is UTC, m_dpStartDate Local or UTC so adjust  
-                   wxDateTime datetime = configuration.StartTime;
-
-                   reset = true;
-                   if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
-                       datetime = datetime.FromUTC();
-
-                    h = datetime.GetHour();
-                    m = datetime.GetMinute();
-                    s = datetime.GetSecond();
-                }
-                configuration.StartTime = m_dpStartDate->GetDateCtrlValue();
-                m_dpStartDate->SetForegroundColour(wxColour(0, 0, 0));
-                if(reset) {
-                    // ... and add it afterwards
-                    configuration.StartTime.SetHour(h);
-                    configuration.StartTime.SetMinute(m);
-                    configuration.StartTime.SetSecond(s);
-                }
-            }
+            if(!m_dpStartDate->GetDateCtrlValue().IsValid())
+                continue;
+            // We must preserve the time in case only date but not time, is being changed by the user...
+            // configuration.StartTime is UTC, m_dpStartDate Local or UTC so adjust  
+            wxDateTime time = configuration.StartTime;
+            if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+                time = time.FromUTC();
+            
+            wxDateTime date = m_dpStartDate->GetDateCtrlValue();
+            // ... and add it afterwards
+            date.SetHour(time.GetHour());
+            date.SetMinute(time.GetMinute());
+            date.SetSecond(time.GetSecond());
+            
+            if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+                date = date.ToUTC();
+            
+            configuration.StartTime = date;
+            m_dpStartDate->SetForegroundColour(wxColour(0, 0, 0));
         }
 
         if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) != m_edited_controls.end()) {
-            configuration.StartTime.SetHour(m_tpTime->GetTimeCtrlValue().GetHour());
-            configuration.StartTime.SetMinute(m_tpTime->GetTimeCtrlValue().GetMinute());
-            configuration.StartTime.SetSecond(m_tpTime->GetTimeCtrlValue().GetSecond());
+            // must use correct data on UTC conversion to preserve Daylight Savings Time changes across dates
+            wxDateTime time = configuration.StartTime;
+            if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+                time = time.FromUTC();
+
+            time.SetHour(m_tpTime->GetTimeCtrlValue().GetHour());
+            time.SetMinute(m_tpTime->GetTimeCtrlValue().GetMinute());
+            time.SetSecond(m_tpTime->GetTimeCtrlValue().GetSecond());
+
+            if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
+                time = time.ToUTC();
+
+            configuration.StartTime = time;
             m_tpTime->SetForegroundColour(wxColour(0, 0, 0));
         }
-
-        if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
-            configuration.StartTime = configuration.StartTime.ToUTC();
 
         if(!m_tBoat->GetValue().empty()) {
             configuration.boatFileName = m_tBoat->GetValue();

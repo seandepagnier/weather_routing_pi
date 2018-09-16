@@ -48,26 +48,18 @@ class RouteMapOverlay : public RouteMap
 public:
     enum RouteInfoType {DISTANCE, AVGSPEED, MAXSPEED, AVGSPEEDGROUND, MAXSPEEDGROUND,
                         AVGWIND, MAXWIND, MAXWINDGUST, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
-                        PERCENTAGE_UPWIND, PORT_STARBOARD, TACKS};
+                        PERCENTAGE_UPWIND, PORT_STARBOARD, TACKS, COMFORT};
 
     RouteMapOverlay();
     ~RouteMapOverlay();
 
     bool SetCursorLatLon(double lat, double lon);
-    void RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
-                        wrDC &dc, PlugIn_ViewPort &vp);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
 
-    void RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_ViewPort &vp);
-    void RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
-    
-    // Customization ComfortDisplay
-    void RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
-    int sailingConditionLevel(const PlotData &plot) const;
-    
-    // Customization WindBarbsOnRoute
-    void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
+    static wxColour sailingConditionColor(int level);
+    static wxString sailingConditionText(int level);
+
     void RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp);
 
     void RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp);
@@ -103,6 +95,19 @@ public:
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent,
                               wrDC &dc, PlugIn_ViewPort &vp);
+
+    void RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
+                        wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderPolarChangeMarks(bool cursor_route,  wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderBoatOnCourse(bool cursor_route,  wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
+
+    // Customization ComfortDisplay
+    void RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
+
+    // Customization WindBarbsOnRoute
+    void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
+    int sailingConditionLevel(const PlotData &plot) const;
+
     virtual bool TestAbort() { return Finished(); }
 
     RouteMapOverlayThread *m_Thread;
@@ -121,7 +126,10 @@ private:
 
     int m_overlaylist, m_overlaylist_projection;
 
-    std::list<PlotData> last_destination_plotdata, last_cursor_plotdata;
+    bool clear_destination_plotdata; // should be volatile
+    std::list<PlotData> last_destination_plotdata;
+
+    std::list<PlotData> last_cursor_plotdata;
 
     LineBuffer wind_barb_cache;
     double wind_barb_cache_scale;
@@ -130,6 +138,9 @@ private:
     
     // Customization WindBarbsOnRoute
     LineBuffer wind_barb_route_cache;
+    
+    // Customization Sailing Comfort
+    int m_sailingComfort;
 
     LineBuffer current_cache;
     double current_cache_scale;

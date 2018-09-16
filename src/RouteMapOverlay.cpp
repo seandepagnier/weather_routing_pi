@@ -49,7 +49,8 @@ void *RouteMapOverlayThread::Entry()
         if(!m_RouteMapOverlay.Propagate())
             wxThread::Sleep(50);
         else {
-            m_RouteMapOverlay.UpdateCursorPosition();
+            // don't do it inside worker thread, race
+            // m_RouteMapOverlay.UpdateCursorPosition();
             m_RouteMapOverlay.UpdateDestination();
             wxThread::Sleep(5);
         }
@@ -62,7 +63,8 @@ RouteMapOverlay::RouteMapOverlay()
     : m_UpdateOverlay(true), m_bEndRouteVisible(false), m_Thread(NULL),
       last_cursor_lat(0), last_cursor_lon(0),
       last_cursor_position(NULL), destination_position(NULL), last_destination_position(NULL),
-      m_bUpdated(false), m_overlaylist(0), current_cache_origin_size(0)
+      m_bUpdated(false), m_overlaylist(0),
+      clear_destination_plotdata(false),current_cache_origin_size(0)
 {
 }
 
@@ -435,38 +437,44 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         if(!justendroute && settingsdialog.m_cbDisplayCursorRoute->GetValue()) {
             SetColor(dc, CursorColor, true);
             SetWidth(dc, RouteThickness, true);
-            RenderCourse(last_cursor_position, dc, vp);
+            RenderCourse(true, dc, vp);
 
             if(MarkAtPolarChange) {
                 SetColor(dc, Darken(CursorColor), true);
                 SetWidth(dc, (RouteThickness+1)/2, true);
-                RenderPolarChangeMarks(last_cursor_position, dc, vp);
+                RenderPolarChangeMarks(true, dc, vp);
             }
         }
         SetColor(dc, DestinationColor, true);
         SetWidth(dc, RouteThickness, true);
         bool confortOnRoute = settingsdialog.m_cbDisplayComfort->GetValue();
-        RenderCourse(last_destination_position, dc, vp, confortOnRoute);
+        RenderCourse(false , dc, vp, confortOnRoute);
         SetColor(dc, Darken(DestinationColor), true);
         SetWidth(dc, RouteThickness/2, true);
-        RenderBoatOnCourse(last_destination_position, time, dc, vp);
+        RenderBoatOnCourse(false, time, dc, vp);
+
+        // Start WindBarbsOnRoute customization
+        if (settingsdialog.m_cbDisplayWindBarbsOnRoute->GetValue())
+            RenderWindBarbsOnRoute(dc, vp);
         
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
             SetWidth(dc, (RouteThickness+1)/2, true);
-            RenderPolarChangeMarks(last_destination_position, dc, vp);
+            RenderPolarChangeMarks(false, dc, vp);
         }
     }
 }
 
 
-void RouteMapOverlay::RenderPolarChangeMarks(Position *pos, wrDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp)
 {
+    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
+
     if(!pos)
         return;
     
     Lock();
-    
+
     /* draw lines to this route */
     Position *p;
     if(!dc.GetDC())
@@ -519,27 +527,26 @@ int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
     // AW   - Apparent Wind Direction from the boat (0 = upwind)
     // VW   - Velocity of wind over water
     //WVHT - Swell (if available)
-    double MAX_WV = 27;     // Vigilant over 27knts/7B
-    double MAX_AW = 30;      // Upwind
+    double MAX_WV = 27;     // Vigilant over 27knts == 7B
+    double MAX_AW = 35;     // Upwind start at 35° from wind
     double MAX_WVHT = 5;    // No more than 5m waves
     
-    // Use a exp function for wind as difficulty sailing comfort
-    // is exponentially degraded with wind speed.
-    // Over 30knts, it starts to be difficult
+    // Wind impact exponentially on sailing comfort
+    // We propose a power 3 function as difficulties increase exponentially
+    // Over 30knts, it starts to be tough
     double WV = plot.VW;
-    double WV_normal = exp((1.32*WV-MAX_WV)/MAX_WV)-exp(-1);
-    if (WV_normal > 1)
-        WV_normal = 1.0;
-    
-    // Use a normal distribution to set the maximum difficulty at 30° upwind,
-    // and reduce when we go downwind. Also, take into account that sailing
-    // on the wind becomes much more difficult when wind speed increases.
+    double WV_normal = pow(WV/MAX_WV, 3);
+   
+    // Wind direction impact on sailing comfort.
+    // Ex: if you decide to sail upwind with 30knts, it is not the same
+    // conditions as if you sail downwind (impact of waves, heel, and more).
+    // Use a normal distribution to set the maximum difficulty at 35° upwind,
+    // and reduce when we go downwind.
     double AW = heading_resolve(plot.B-plot.W);
-    double AW_normal = ((1/((0.67*MAX_AW)*sqrt(2*M_PI))) * \
-                        exp(-(pow(AW-MAX_AW, 2))/(2*pow(0.67*MAX_AW,2))) * \
-                      75.19) * WV_normal;
-    if (AW_normal > 1)
-        AW_normal = 1.0;
+    double teta = 30;
+    double mu = 35;
+    double amp = 20;
+    double AW_normal = amp * (1/(teta*pow((2*M_PI), 0.5))) * exp(-pow(AW-mu, 2)/(2*pow(teta,2)));
     
     // If available, add swell conditions in comfort model.
     // Use same exponential function for swell as sailing
@@ -547,23 +554,16 @@ int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
     double WVHT = plot.WVHT;
     double WVHT_normal = 0.0;
     if (WVHT > 0)
-        WVHT_normal = exp((1.32*WVHT-MAX_WVHT)/MAX_WVHT)-exp(-1);
-    if (WVHT_normal > 1)
-        WVHT_normal = 1;
+        WVHT_normal = pow(WVHT/MAX_WVHT, 2);
     
     // Calculate score
     // Use an OR function X,Y E [0,1], f(X,Y) = 1-(1-X)(1-Y)
-    double WV_coef = 1.0;
-    double AW_coef = 0.6;
-    double WVHT_coef = 0.5;
-    level_calc = 1 - (1 - WV_coef * WV_normal) * \
-                (1 - AW_coef * AW_normal) *      \
-                (1 - WVHT_coef * WVHT_normal);
+    level_calc = 1 - (1 - WV_normal * (1 + AW_normal) * (1 + WVHT_normal));
     
     if (level_calc <= 0.5)
         // Light conditions, enjoy ;-)
         return 1;
-    if (level_calc > 0.5 && level_calc < 1)
+    if (level_calc > 0.5 &&  level_calc < 1)
         // Can be tough
         return 2;
     if (level_calc >= 1)
@@ -572,7 +572,7 @@ int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
     return 0;
 }
 
-static wxColour sailingConditionColor(int level)
+wxColour RouteMapOverlay::sailingConditionColor(int level)
 {
     switch (level) {
     case 1:
@@ -585,22 +585,27 @@ static wxColour sailingConditionColor(int level)
     return *wxBLACK;
 }
 
+wxString RouteMapOverlay::sailingConditionText(int level)
+{
+    if (level == 1)
+        return _T("Good");
+    if (level == 2)
+        return _T("Bumpy");
+    if (level == 3)
+        return _T("Difficult");
+    return _T("N/A");
+}
+
 // -----------------------------------------------------
 
 
-void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
-                                   bool comfortRoute)
+void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp,
+        bool comfortRoute)
 {
+    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
     if(!pos)
         return;
 
-    Lock();
-
-    /* draw lines to this route */
-    Position *p;
-    if(!dc.GetDC())
-        glBegin(GL_LINES);
-    
     /* ComfortDisplay Customization
      * ------------------------------------------------
      * To get weather data (wind, current, waves) on a
@@ -609,9 +614,18 @@ void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
      * Thanks Sean for your help :-)
      */
     std::list<PlotData> plot = GetPlotData(false);
-    std::list<PlotData>::reverse_iterator itt =  plot.rbegin();
+    std::list<PlotData>::reverse_iterator itt = plot.rbegin();
+    if (itt == plot.rend()) {
+        return;
+    }
 
+    Lock();
     wxColor lc = sailingConditionColor(sailingConditionLevel(*itt));
+
+    /* draw lines to this route */
+    Position *p;
+    if(!dc.GetDC())
+        glBegin(GL_LINES);
     for(p = pos; (p && p->parent) && (itt != plot.rend()); p = p->parent)
     {
         if (comfortRoute)
@@ -623,14 +637,14 @@ void RouteMapOverlay::RenderCourse(Position *pos, wrDC &dc, PlugIn_ViewPort &vp,
         } else
             DrawLine(p, p->parent, dc, vp);
     }
-    
+
     if(!dc.GetDC())
         glEnd();
     Unlock();
 }
 
 
-void RouteMapOverlay::RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &dc,
+void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrDC &dc,
                                          PlugIn_ViewPort &vp)
 {
     /* Dedicated method to render the boat circle
@@ -638,57 +652,40 @@ void RouteMapOverlay::RenderBoatOnCourse(Position *pos, wxDateTime time, wrDC &d
      * color of the maker, and avoid to generate twice
      * (1 normally, 1 for polar changed -- to avoid)
      */
+    Position *pos = cursor_route ? last_cursor_position : last_destination_position;
     if(!pos)
         return;
     
-    Lock();
+    std::list<PlotData> plot = GetPlotData(cursor_route);
     
-    Position *p;
-    
-    /* render boat on optimal course at time */
-    IsoChronList::iterator it = origin.begin();
-    
-    /* get route iso for this position */
-    for(p=pos->parent; p; p=p->parent)
-        if(++it == origin.end()) {
-            Unlock();
-            return;
-        }
-    if(it != origin.begin())
-        it--;
-    
-    for(p = pos; p->parent; p = p->parent) {
-        wxDateTime ittime = (*it)->time;
-        wxPoint r;
+    for(std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); )  {
+        wxDateTime ittime = it->time;
         
-        if(time >= ittime) {
-            wxDateTime timestart = (*it)->time;
-            it++;
-            wxDateTime timeend = (*it)->time;
-            
-            wxTimeSpan span = timeend - timestart, cspan = time - timestart;
-            double d = cspan.GetSeconds().ToDouble() / span.GetSeconds().ToDouble();
-            
-            if(d > 1)
-                // d = 1; // draw at end??
-                break; // don't draw if grib time is after end
-            
-            GetCanvasPixLL(&vp, &r,
-                           p->parent->lat + d*(p->lat - p->parent->lat),
-                           p->parent->lon + d*heading_resolve(p->lon - p->parent->lon));
-            
-        } else if(it == origin.begin())
-            //GetCanvasPixLL(&vp, &r, p->parent->lat, p->parent->lon);
-            break; // don't draw if time is before start
-        else {
-            it--;
+        wxDateTime timestart = ittime;
+        double plat = it->lat;
+        double plon = it->lon;
+        it++;
+        if (it == plot.end())
+            break;
+
+        wxDateTime timeend = it->time;
+        if (!(time >= timestart && time <= timeend))
             continue;
-        }
-        
+
+        wxTimeSpan span = timeend - timestart, cspan = time - timestart;
+        double d = cspan.GetSeconds().ToDouble() / span.GetSeconds().ToDouble();
+
+        if(d > 1)
+            // d = 1; // draw at end??
+           break; // don't draw if grib time is after end
+
+        wxPoint r;
+        GetCanvasPixLL(&vp, &r,
+                           plat + d*(it->lat - plat), plon + d*heading_resolve(it->lon - plon));
+
         dc.DrawCircle( r.x, r.y, 7 );
         break;
     }
-    Unlock();
 }
 
 void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
@@ -701,30 +698,25 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
      * OpenCPN's licence
      * March, 2018
      */
-    
-    RouteMapConfiguration configuration = GetConfiguration();
-    
-    // if no route has been calculated by
-    // WeatherRouting, then stops the method.
-    // ([origin] is a list of all isochrons)
-    if (origin.size() < 2)
+    if (vp.bValid == false)
         return;
-    
+
+    RouteMapConfiguration configuration = GetConfiguration();
+
     // Create a specific viewport at position (0,0)
     // to draw the winds barbs, and then translate it
     PlugIn_ViewPort nvp = vp;
-    nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
-    nvp.pix_width = 0;
-    nvp.pix_height = 0;
-    nvp.rotation = 0;
-    nvp.skew = 0;
-    
     // calculate wind barbs along the route by looping
     // over [GetPlotData(false)] list which contains lat,
     // lon, wind info for each points, only if needed.
     std::list<PlotData> plot = GetPlotData(false);
-    std::list<PlotData>::iterator it;
-    for (it = plot.begin(); it != plot.end(); it++)
+
+    // if no route has been calculated by WeatherRouting, 
+    // then stops the method.
+    if (plot.empty())
+        return;
+
+    for ( std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); it++)
     {
         wxPoint p;
         GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
@@ -732,17 +724,10 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
         double VW = it->VW;
         double W = it->W;
         
-        // Calculate the offset to put the head
-        // of the arrow on the route (and not the
-        // middle of the arrow) for readability.
-        int xOffset, yOffset;
-        xOffset = (int)(0.5 * 35 * sin(deg2rad(W)));
-        yOffset = (int)(0.5 * 35 * cos(deg2rad(W)));
-        
         // Draw barbs
         g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(
-            wind_barb_route_cache, p.x + xOffset, p.y - yOffset, VW,
-            deg2rad(W) + vp.rotation, it->lat < 0
+            wind_barb_route_cache, p.x, p.y, VW,
+            deg2rad(W) + nvp.rotation, it->lat < 0, true
         );
     }
     wind_barb_route_cache.Finalize();
@@ -760,12 +745,6 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
 #ifdef ocpnUSE_GL
     else
     {
-        // Translate and rotate the matrix
-        // anyway, event if cached
-        glPushMatrix();
-        glTranslated(point.x, point.y, 0);
-        glRotated(vp.rotation*180/M_PI, 0, 0, 1);
-        
         // Anti-aliasing options to render
         // wind barbs at best quality (copy from grip_pi)
         glEnable(GL_BLEND);
@@ -779,15 +758,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
     }
 #endif
     
-    if(dc.GetDC()) {
-        // Draw the wind barbs with a correction
-        // in all cases on position and rotation
-        LineBuffer tb;
-        tb.pushTransformedBuffer(wind_barb_route_cache, point.x, point.y, vp.rotation);
-        tb.Finalize();
-        tb.draw(dc.GetDC());
-    } else
-        wind_barb_route_cache.draw(NULL);
+    wind_barb_route_cache.draw(dc.GetDC());
 
 #ifdef ocpnUSE_GL
     if(!dc.GetDC()) {
@@ -1224,6 +1195,10 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
 std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
 {
     std::list<PlotData> &plotdata = cursor_route ? last_cursor_plotdata : last_destination_plotdata;
+    if (!cursor_route && clear_destination_plotdata ) {
+        clear_destination_plotdata  = false;
+        plotdata.clear();
+    }
     if(plotdata.empty()) {
         Position *next = cursor_route ? last_cursor_position : last_destination_position;
 
@@ -1275,6 +1250,7 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
     std::list<PlotData> &plotdata = GetPlotData(cursor_route);
 
     double total = 0, count = 0, lat0 = 0, lon0 = 0;
+    int comfort = 0, current_comfort = 0;
     for(std::list<PlotData>::iterator it=plotdata.begin(); it!=plotdata.end(); it++)
     {
         switch(type) {
@@ -1333,6 +1309,13 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
             if(heading_resolve(it->B - it->W) > 0)
                 total++;
             break;
+        // CUSTOMIZATION
+        // Comfort on route
+        case COMFORT:
+            current_comfort = sailingConditionLevel(*it);
+            if (current_comfort > comfort)
+                comfort = current_comfort;
+            break;
         default:
             break;
         }
@@ -1351,6 +1334,8 @@ double RouteMapOverlay::RouteInfo(enum RouteInfoType type, bool cursor_route)
             total += DistGreatCircle_Plugin(lat0, lon0, configuration.EndLat, configuration.EndLon);
         }
         return total;
+    case COMFORT:
+        return comfort;
     case PERCENTAGE_UPWIND:
     case PORT_STARBOARD:
         total *= 100.0;
@@ -1400,6 +1385,8 @@ void RouteMapOverlay::Clear()
     RouteMap::Clear();
     last_cursor_position = NULL;
     last_destination_position = NULL;
+    clear_destination_plotdata = false;
+    // clear_cursor_plotdata = false;
     last_cursor_plotdata.clear();
     last_destination_plotdata.clear();
     m_UpdateOverlay = true;
@@ -1407,6 +1394,7 @@ void RouteMapOverlay::Clear()
 
 void RouteMapOverlay::UpdateCursorPosition()
 {
+    // only called in main thread, no race
     Position *last_last_cursor_position = last_cursor_position;
     last_cursor_position = ClosestPosition(last_cursor_lat, last_cursor_lon, &m_cursor_time);
     if(last_last_cursor_position != last_cursor_position)
@@ -1436,9 +1424,9 @@ void RouteMapOverlay::UpdateDestination()
     Position *last_last_destination_position = last_destination_position;
     bool done = ReachedDestination();
     if(done) {
+        Lock();
         delete destination_position;
         destination_position = 0;
-        Lock();
         /* this doesn't happen often, so can be slow.. for each position in the last
            isochron, we try to propagate to the destination */
         IsoChronList::iterator iit = origin.end();
@@ -1477,8 +1465,11 @@ void RouteMapOverlay::UpdateDestination()
         m_EndTime = wxDateTime(); // invalid
     }
 
-    if(last_last_destination_position != last_destination_position)
-        last_destination_plotdata.clear();
+    if(last_last_destination_position != last_destination_position) {
+        // we can't clear because we are inside a worker thread
+        // and there's a race with GetPlotData
+        clear_destination_plotdata = true;
+    }
 
     m_bUpdated = true;
     m_UpdateOverlay = true;

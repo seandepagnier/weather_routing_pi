@@ -56,7 +56,7 @@ public:
         AvgSpeed, MaxSpeed, AvgSpeedGround, MaxSpeedGround,
         AvgWind, MaxWind, MaxWindGust,
         AvgCurrent, MaxCurrent, AvgSwell, MaxSwell, UpwindPercentage, PortStarboard,
-        Tacks, State;
+        Tacks, State, Comfort;
     RouteMapOverlay *routemapoverlay;
 };
 
@@ -74,7 +74,7 @@ public:
     enum {VISIBLE=0, BOAT, START, STARTTIME, END, ENDTIME, TIME, DISTANCE,
           AVGSPEED, MAXSPEED, AVGSPEEDGROUND, MAXSPEEDGROUND,
           AVGWIND, MAXWIND, MAXWINDGUST, AVGCURRENT, MAXCURRENT, AVGSWELL, MAXSWELL,
-          UPWIND_PERCENTAGE, PORT_STARBOARD, TACKS, STATE, NUM_COLS};
+          UPWIND_PERCENTAGE, PORT_STARBOARD, TACKS, COMFORT, STATE, NUM_COLS};
     long columns[NUM_COLS];
     static const wxString column_names[NUM_COLS];
     int sashpos;
@@ -109,7 +109,7 @@ public:
     void UpdateDisplaySettings();
 
     void AddPosition(double lat, double lon);
-    void AddPosition(double lat, double lon, wxString name);
+    void AddPosition(double lat, double lon, wxString name, wxString GUID = wxEmptyString);
 
     void CursorRouteChanged();
     void UpdateColumns();

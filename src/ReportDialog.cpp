@@ -73,15 +73,14 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         }
 
         RouteMapConfiguration c = (*it)->GetConfiguration();
-        std::list<PlotData> p = (*it)->GetPlotData();
         Position *d = (*it)->GetDestination();
 
         page += _("Boat Filename") + _T(" ") + wxFileName(c.boatFileName).GetName() + _T("<dt>");
         page += _("Route from ") + c.Start + _(" to ") + c.End + _T("<dt>");
-        page += _("Leaving ") + c.StartTime.Format(_T("%x %X")) + _T("<dt>");
+        page += _("Leaving ") + (*it)->StartTime().Format(_T("%x %X")) + _T("<dt>");
         if (d) {
             page += _("Arriving ") + (*it)->EndTime().Format(_T("%x %X")) + _T("<dt>");
-            page += _("Duration ") + ((*it)->EndTime() - c.StartTime).Format() + _T("<dt>");
+            page += _("Duration ") + ((*it)->EndTime() - (*it)->StartTime()).Format() + _T("<dt>");
         }
         page += _T("<p>");
         double distance = DistGreatCircle_Plugin(c.StartLat, c.StartLon, c.EndLat, c.EndLon);
@@ -100,6 +99,15 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         page += _("Average Wind") + wxString(_T(": ")) + wxString::Format
             (_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::AVGWIND)) + _T(" ")
 	    + _("knots") + _T("<dt>");
+        
+        // CUSTOMIZATION
+        // Add max wind. I think this is more important than the average
+        // wind as it gives an indication on how strong will be the sailing
+        // conditions, and if the crew has sufficient experience to handle it.
+        page += _("Maximum Wind") + wxString(_T(": ")) \
+                + wxString::Format(_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::MAXWIND)) \
+                + _T(" ") + _("knots") + _T("<dt>");;
+        
         page += _("Average Swell") + wxString(_T(": ")) + wxString::Format
             (_T(" %.2f"), (*it)->RouteInfo(RouteMapOverlay::AVGSWELL)) + _T(" ")
 	    + _("meters") + _T("<dt>");
@@ -111,8 +119,14 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
              (_T("%d/%d"), (int)port_starboard, 100-(int)port_starboard)) + _T("<dt>");
 
         if (d) {
-            page += _("Number of tacks") + wxString::Format(_T(": %d "), d->tacks) + _T("<dt>\n");
+            page += _("Number of tacks") + wxString::Format(_T(": %d "), d->tacks) + _T("<dt>");
         }
+        
+        // CUSTOMIZATION
+        // Display sailing comfort in the report
+        page += ("Sailing comfort") + wxString(_T(": ")) \
+                + (*it)->sailingConditionText((*it)->RouteInfo(RouteMapOverlay::COMFORT)) \
+                + _T("<dt>\n");
 
         /* determine if currents significantly improve this (boat over ground speed average is 10% or
            more faster than boat over water)  then attempt to determine which current based on lat/lon
@@ -250,7 +264,26 @@ void ReportDialog::GenerateRoutesReport()
                 page += s.Format(_T("%d %B ")) + _("to") + e.Format(_T(" %d %B"));
             }
         }
-
+        
+        // CUSTOMIZATION
+        // Display the best option to travel in order
+        // to get the most comfortable sailing
+        page += _T("<dt>");
+        page += _("Best Sailing Comfort") + wxString(_T(": "));
+        wxDateTime best_comfort_date;
+        int best_sailing_comfort = 6;
+        for(std::multimap< wxDateTime, RouteMapOverlay * >::iterator it3 = sort_by_start.begin(); it3 != sort_by_start.end(); it3++) {
+            RouteMapOverlay *r = it3->second;
+            if (best_comfort_date < r->StartTime() && best_sailing_comfort > r->RouteInfo(RouteMapOverlay::COMFORT))
+            {
+                best_comfort_date = r->StartTime();
+                best_sailing_comfort = r->RouteInfo(RouteMapOverlay::COMFORT);
+            }
+        }
+        page += RouteMapOverlay::sailingConditionText(best_sailing_comfort);
+        page += _T(" on ");
+        page += best_comfort_date.Format(_T("%x %X")) + _T(" UTC");
+        
         page += _T("<dt>");
         page += _("Cyclones") + wxString(_T(": "));
 
