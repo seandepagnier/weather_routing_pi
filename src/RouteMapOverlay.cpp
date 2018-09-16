@@ -313,7 +313,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
         }
 
-        if(!std::isnan(configuration.StartLon)) {
+        if(!std::isnan(configuration.EndLat)) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
             SetColor(dc, *wxRED, true);
