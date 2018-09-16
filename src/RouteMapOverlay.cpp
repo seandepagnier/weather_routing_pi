@@ -27,7 +27,7 @@
 #include <wx/glcanvas.h>
 
 #include "ocpn_plugin.h"
-#include "wrdc.h"
+#include "plugingl/pidc.h"
 #include "wx/jsonreader.h"
 #include "wx/jsonwriter.h"
 
@@ -123,7 +123,7 @@ void RouteMapOverlay::DeleteThread()
     m_Thread = NULL;
 }
 
-static void SetColor(wrDC &dc, wxColour c, bool penifgl = false)
+static void SetColor(piDC &dc, wxColour c, bool penifgl = false)
 {
     if(!dc.GetDC()) {
         glColor4ub(c.Red(), c.Green(), c.Blue(), c.Alpha());
@@ -135,7 +135,7 @@ static void SetColor(wrDC &dc, wxColour c, bool penifgl = false)
     dc.SetPen(pen);
 }
 
-static void SetWidth(wrDC &dc, int w, bool penifgl = false)
+static void SetWidth(piDC &dc, int w, bool penifgl = false)
 {
     if(!dc.GetDC()) {
         glLineWidth(w);
@@ -148,7 +148,7 @@ static void SetWidth(wrDC &dc, int w, bool penifgl = false)
 }
 
 void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
-                               wrDC &dc, PlugIn_ViewPort &vp)
+                               piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint p1p, p2p;
     GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
@@ -163,7 +163,7 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
 }
 
 void RouteMapOverlay::DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
-                               wrDC &dc, PlugIn_ViewPort &vp)
+                               piDC &dc, PlugIn_ViewPort &vp)
 {
 #if 0
     double p1plon, p2plon;
@@ -221,7 +221,7 @@ static wxColour TransparentColor(wxColor c)
 
 
 void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
-                                     wrDC &dc, PlugIn_ViewPort &vp)
+                                     piDC &dc, PlugIn_ViewPort &vp)
 {
     SkipPosition *s = r->skippoints;
     if(!s)
@@ -253,7 +253,7 @@ void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour
 }
 
 void RouteMapOverlay::RenderAlternateRoute(IsoRoute *r, bool each_parent,
-                                           wrDC &dc, PlugIn_ViewPort &vp)
+                                           piDC &dc, PlugIn_ViewPort &vp)
 {
     Position *pos = r->skippoints->point;
     wxColor black = wxColour(0, 0, 0, 192), tblack = TransparentColor(black);
@@ -285,7 +285,7 @@ static wxColour Darken(wxColour c)
 }
 
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
-                             wrDC &dc, PlugIn_ViewPort &vp, bool justendroute)
+                             piDC &dc, PlugIn_ViewPort &vp, bool justendroute)
 {
     dc.SetPen(*wxBLACK); // reset pen
     dc.SetBrush( *wxTRANSPARENT_BRUSH); // reset brush
@@ -466,7 +466,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 }
 
 
-void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn_ViewPort &vp)
 {
     Position *pos = cursor_route ? last_cursor_position : last_destination_position;
 
@@ -599,7 +599,7 @@ wxString RouteMapOverlay::sailingConditionText(int level)
 // -----------------------------------------------------
 
 
-void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp,
+void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort &vp,
         bool comfortRoute)
 {
     Position *pos = cursor_route ? last_cursor_position : last_destination_position;
@@ -644,7 +644,7 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort 
 }
 
 
-void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrDC &dc,
+void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, piDC &dc,
                                          PlugIn_ViewPort &vp)
 {
     /* Dedicated method to render the boat circle
@@ -688,7 +688,7 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, wrD
     }
 }
 
-void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp)
 {
     /* Method to render wind barbs on the route that has been generated
      * by WeatherRouting plugin. The idead is to visualize the wind
@@ -768,7 +768,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp)
 #endif
 }
 
-void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
 {
     if(origin.size() < 2) // no map to work with
         return;
@@ -956,7 +956,7 @@ void RouteMapOverlay::RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp)
 #endif
 }
 
-void RouteMapOverlay::RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp)
+void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
 {
     if(origin.size() < 2) // no map to work with
         return;

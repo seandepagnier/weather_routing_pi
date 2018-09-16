@@ -50,12 +50,6 @@ SET(SRC_WEATHER_ROUTING
             src/GribRecord.cpp
 )
 
-#IF(WIN32)
-SET(SRC_JSON
-            src/wxJSON/jsonval.cpp
-            src/wxJSON/jsonreader.cpp
-            src/wxJSON/jsonwriter.cpp)
-#ENDIF(WIN32)
 
 SET(SRC_LIBTESS2
   src/libtess2/bucketalloc.c
@@ -66,29 +60,9 @@ SET(SRC_LIBTESS2
   src/libtess2/sweep.c
   src/libtess2/tess.c)
 
-IF(UNIX)
- INCLUDE("cmake/FindTinyXML.cmake")
- FIND_PACKAGE(TinyXML QUIET)
-ENDIF(UNIX)
 
-SET(SRC ${SRC_WEATHER_ROUTING} ${SRC_JSON} ${SRC_LIBTESS2})
+SET(SRC ${SRC_WEATHER_ROUTING} ${SRC_LIBTESS2})
 
-IF(TINYXML_FOUND)
- message (STATUS "Building with system tinyxml")
- INCLUDE_DIRECTORIES(${TINYXML_INCLUDE_DIR})
- ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
- TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${TINYXML_LIBRARIES})
-ELSE(TINYXML_FOUND)
- message (STATUS "Building with embedded tinyxml")
- INCLUDE_DIRECTORIES(src/tinyxml/)
- SET(SRC_LTINYXML
-            src/tinyxml/tinyxml.cpp
-            src/tinyxml/tinyxmlparser.cpp
-            src/tinyxml/tinyxmlerror.cpp
- )
- ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC} ${SRC_LTINYXML})
-ENDIF(TINYXML_FOUND)
-ADD_DEFINITIONS(-DTIXML_USE_STL)
 
 IF(NOT UNIX)
     SET(SRC_BZIP
@@ -115,6 +89,10 @@ ENDIF(NOT UNIX)
 IF(MINGW)
     TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lwxzlib-2.8")
 ENDIF(MINGW)
+
+INCLUDE("cmake/PluginJSON.cmake")
+INCLUDE("cmake/PluginXML.cmake")
+INCLUDE("cmake/PluginGL.cmake")
 
 INCLUDE("cmake/PluginInstall.cmake")
 INCLUDE("cmake/PluginLocalization.cmake")

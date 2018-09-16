@@ -65,7 +65,7 @@ std::cout << x << std::endl; } while (0)
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
 
 #include "ocpn_plugin.h"
-#include "wrdc.h"
+#include "plugingl/pidc.h"
 
 /* make some warnings go away */
 #ifdef MIN

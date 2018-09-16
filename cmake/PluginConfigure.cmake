@@ -90,7 +90,6 @@ include  ("VERSION.cmake")
 #  thereby allowing building from a read-only source tree.
 IF(NOT SKIP_VERSION_CONFIG)
     configure_file(${PROJECT_SOURCE_DIR}/cmake/version.h.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/include/version.h)
-    configure_file(cmake/wxWTranslateCatalog.h.in ${PROJECT_SOURCE_DIR}/src/wxWTranslateCatalog.h)
     INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/include)
 ENDIF(NOT SKIP_VERSION_CONFIG)
 
@@ -102,6 +101,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
 #  IF NOT DEBUGGING CFLAGS="-O2 -march=native"
 IF(NOT MSVC)
+ ADD_DEFINITIONS( "-fvisibility=hidden" )
  IF(PROFILING)
   ADD_DEFINITIONS( "-Wall -g -fprofile-arcs -ftest-coverage -fexceptions -fPIC" )
  ELSE(PROFILING)
@@ -210,6 +210,7 @@ IF(QT_ANDROID)
   IF(USE_GLES2)
     MESSAGE (STATUS "Using GLESv2 for Android")
     ADD_DEFINITIONS(-DUSE_ANDROID_GLES2)
+    ADD_DEFINITIONS(-DocpnUSE_GLES2)
     ADD_DEFINITIONS(-DUSE_GLSL)
   ENDIF(USE_GLES2)
 

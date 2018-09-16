@@ -33,7 +33,7 @@
 struct RouteMapConfiguration;
 class WeatherRouting;
 class weather_routing_pi;
-class wrDC;
+class piDC;
 
 struct BatchDestination
 {
@@ -53,7 +53,7 @@ public:
     ConfigurationBatchDialog(WeatherRouting *parent);
     ~ConfigurationBatchDialog() { ClearSources(); }
 
-    void Render(wrDC &dc, PlugIn_ViewPort &vp);
+    void Render(piDC &dc, PlugIn_ViewPort &vp);
     void AddSource(wxString name);
     void RemoveSource(wxString name);
     void ClearSources();

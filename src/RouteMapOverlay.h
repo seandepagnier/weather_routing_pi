@@ -28,7 +28,7 @@
 
 class PlugIn_ViewPort;
 
-class wrDC;
+class piDC;
 class RouteMapOverlay;
 class SettingsDialog;
 
@@ -55,14 +55,14 @@ public:
 
     bool SetCursorLatLon(double lat, double lon);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
-                wrDC &dc, PlugIn_ViewPort &vp, bool justendroute);
+                piDC &dc, PlugIn_ViewPort &vp, bool justendroute);
 
     static wxColour sailingConditionColor(int level);
     static wxString sailingConditionText(int level);
 
-    void RenderWindBarbs(wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp);
 
-    void RenderCurrent(wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderCurrent(piDC &dc, PlugIn_ViewPort &vp);
 
     void GetLLBounds(double &latmin, double &latmax, double &lonmin, double &lonmax);
     void RequestGrib(wxDateTime time);
@@ -94,18 +94,18 @@ public:
 
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent,
-                              wrDC &dc, PlugIn_ViewPort &vp);
+                              piDC &dc, PlugIn_ViewPort &vp);
 
     void RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
-                        wrDC &dc, PlugIn_ViewPort &vp);
-    void RenderPolarChangeMarks(bool cursor_route,  wrDC &dc, PlugIn_ViewPort &vp);
-    void RenderBoatOnCourse(bool cursor_route,  wxDateTime time, wrDC &dc, PlugIn_ViewPort &vp);
+                        piDC &dc, PlugIn_ViewPort &vp);
+    void RenderPolarChangeMarks(bool cursor_route,  piDC &dc, PlugIn_ViewPort &vp);
+    void RenderBoatOnCourse(bool cursor_route,  wxDateTime time, piDC &dc, PlugIn_ViewPort &vp);
 
     // Customization ComfortDisplay
-    void RenderCourse(bool cursor_route, wrDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
+    void RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort &vp, bool comfortRoute = false);
 
     // Customization WindBarbsOnRoute
-    void RenderWindBarbsOnRoute(wrDC &dc, PlugIn_ViewPort &vp);
+    void RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp);
     int sailingConditionLevel(const PlotData &plot) const;
 
     virtual bool TestAbort() { return Finished(); }
@@ -113,10 +113,10 @@ private:
     RouteMapOverlayThread *m_Thread;
     wxMutex routemutex;
 
-    void SetPointColor(wrDC &dc, Position *p);
-    void DrawLine(Position *p1, Position *p2, wrDC &dc, PlugIn_ViewPort &vp);
+    void SetPointColor(piDC &dc, Position *p);
+    void DrawLine(Position *p1, Position *p2, piDC &dc, PlugIn_ViewPort &vp);
     void DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
-                  wrDC &dc, PlugIn_ViewPort &vp);
+                  piDC &dc, PlugIn_ViewPort &vp);
 
     double last_cursor_lat, last_cursor_lon;
     Position *last_cursor_position, *destination_position, *last_destination_position;
