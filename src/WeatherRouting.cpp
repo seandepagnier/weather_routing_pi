@@ -2431,7 +2431,7 @@ void WeatherRouting::Start(RouteMapOverlay *routemapoverlay)
         PlugIn_GSHHS_CrossesLand(0, 0, 0, 0);
 
     /* same with grib */
-    if(!configuration.RouteGUID.IsEmpty())
+    if(!configuration.RouteGUID.IsEmpty() && configuration.UseGrib)
         SendPluginMessage( wxS("GRIB_VALUES_REQUEST"), _T("") );
 
     if(configuration.ClimatologyType != RouteMapConfiguration::DISABLED) {

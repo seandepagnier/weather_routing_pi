@@ -124,7 +124,7 @@ static double Swell(RouteMapConfiguration &configuration, double lat, double lon
 {
     WR_GribRecordSet *grib = configuration.grib;
 
-    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
        wxJSONValue r = RequestGRIB(configuration.time, "SWELL", lat, lon);
        if (!r.HasMember(_T("SWELL")))
            return 0;
@@ -152,7 +152,7 @@ static double Gust(RouteMapConfiguration &configuration, double lat, double lon)
     WR_GribRecordSet *grib = configuration.grib;
     double gust;
 
-    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
        wxJSONValue r = RequestGRIB(configuration.time, "GUST", lat, lon);
        if (!r.HasMember(_T("GUST")))
            return NAN;
@@ -179,7 +179,7 @@ static bool GribWind(RouteMapConfiguration &configuration, double lat, double lo
 {
     WR_GribRecordSet *grib = configuration.grib;
 
-    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
        wxJSONValue r = RequestGRIB(configuration.time, "WIND SPEED", lat, lon);
        if (!r.HasMember(_T("WIND SPEED")))
            return false;
@@ -213,7 +213,7 @@ static bool GribCurrent(RouteMapConfiguration &configuration, double lat, double
 {
     WR_GribRecordSet *grib = configuration.grib;
 
-    if(!grib && !configuration.RouteGUID.IsEmpty()) {
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
        wxJSONValue r = RequestGRIB(configuration.time, "CURRENT SPEED", lat, lon);
        if (!r.HasMember(_T("CURRENT SPEED")))
            return false;
