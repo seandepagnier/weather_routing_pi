@@ -2341,7 +2341,7 @@ void WeatherRouting::Reset()
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         weatherroute->routemapoverlay->Reset();
     }
-
+    m_positionOnRoute = NULL;
     UpdateDialogs();
 
     GetParent()->Refresh();
