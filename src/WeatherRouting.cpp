@@ -602,7 +602,8 @@ void WeatherRouting::UpdateRoutePositionDialog()
     RoutePositionDialog &dlg = m_RoutePositionDialog;
     if(!dlg.IsShown())
         return;
-    
+
+    m_positionOnRoute = NULL;
     std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
     if(currentroutemaps.size() != 1) {
         RoutePositionDialogMessage(dlg, _("Select exactly 1 configuration"));
