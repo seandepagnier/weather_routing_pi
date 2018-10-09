@@ -219,7 +219,7 @@ private:
     int m_RoutesToRun;
     bool m_bSkipUpdateCurrentItems;
 
-    bool m_bShowConfiguration, m_bShowConfigurationBatch;
+    bool m_bShowConfiguration, m_bShowConfigurationBatch, m_bShowRoutePosition;
     bool m_bShowSettings, m_bShowStatistics, m_bShowReport, m_bShowPlot, m_bShowFilter;
 
     wxPoint m_downPos, m_startPos, m_startMouse;

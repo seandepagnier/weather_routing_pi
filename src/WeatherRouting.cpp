@@ -125,8 +125,8 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
       m_PlotDialog(*this), m_FilterRoutesDialog(this),
       m_bRunning(false), m_RoutesToRun(0), m_bSkipUpdateCurrentItems(false),
       m_bShowConfiguration(false), m_bShowConfigurationBatch(false),
-      m_bShowSettings(false), m_bShowStatistics(false),
-      m_bShowReport(false), m_bShowPlot(false),
+      m_bShowRoutePosition(false), m_bShowSettings(false),
+      m_bShowStatistics(false), m_bShowReport(false), m_bShowPlot(false),
       m_bShowFilter(false), m_weather_routing_pi(plugin),
       m_positionOnRoute(NULL)
 {
@@ -679,7 +679,8 @@ void WeatherRouting::UpdateRoutePositionDialog()
     RoutePositionDialog &dlg = m_RoutePositionDialog;
     if(!dlg.IsShown())
         return;
-    
+
+    m_positionOnRoute = NULL;
     std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
     if(currentroutemaps.size() != 1) {
         RoutePositionDialogMessage(dlg, _("Select exactly 1 configuration"));
@@ -1337,6 +1338,7 @@ bool WeatherRouting::Show(bool show)
         m_ReportDialog.Show(m_bShowReport);
         m_PlotDialog.Show(m_bShowPlot);
         m_FilterRoutesDialog.Show(m_bShowFilter);
+        m_RoutePositionDialog.Show(m_bShowRoutePosition);
     } else {
         m_bShowConfiguration = m_ConfigurationDialog.IsShown();
         m_ConfigurationDialog.Hide();
@@ -1358,6 +1360,9 @@ bool WeatherRouting::Show(bool show)
 
         m_bShowFilter = m_FilterRoutesDialog.IsShown();
         m_FilterRoutesDialog.Hide();
+
+        m_bShowRoutePosition = m_RoutePositionDialog.IsShown();
+        m_RoutePositionDialog.Hide();
     }
 
     return WeatherRoutingBase::Show(show);
@@ -2415,7 +2420,7 @@ void WeatherRouting::Reset()
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         weatherroute->routemapoverlay->Reset();
     }
-
+    m_positionOnRoute = NULL;
     UpdateDialogs();
 
     GetParent()->Refresh();
