@@ -172,7 +172,11 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 #define SET_SPIN(FIELD) \
     SET_SPIN_VALUE(FIELD, (*it).FIELD)
 
+#ifdef __OCPN__ANDROID__
 #define NO_EDITED_CONTROLS 1
+#else
+#define NO_EDITED_CONTROLS 0
+#endif
 
 void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> configurations)
 {
