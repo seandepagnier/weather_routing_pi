@@ -451,9 +451,10 @@ bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 }
 
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
-{
+{    
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
         piDC dc;
+        dc.SetVP(vp);
         m_pWeather_Routing->Render(dc, *vp);
         return true;
     }

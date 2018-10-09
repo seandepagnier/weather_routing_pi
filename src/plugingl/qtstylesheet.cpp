@@ -53,11 +53,11 @@ subcontrol-position: bottom;\
 subcontrol-origin: margin;\
 }\
 QCheckBox {\
-spacing: 25px;\
+spacing: 18px;\
 }\
 QCheckBox::indicator {\
-width: 30px;\
-height: 30px;\
+width: 20px;\
+height: 20px;\
 }\
 QTreeWidget QScrollBar:vertical {\
     border: 0px solid grey;\

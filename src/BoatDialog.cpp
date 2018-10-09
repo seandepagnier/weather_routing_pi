@@ -73,8 +73,13 @@ BoatDialog::BoatDialog(WeatherRouting &weatherrouting)
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting/BoatDialog" ) );
 
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#else
     // hack to adjust items
     SetSize(wxSize(w, h));
+#endif
 }
 
 BoatDialog::~BoatDialog()
@@ -209,9 +214,7 @@ void BoatDialog::OnMouseEventsPolarPlot( wxMouseEvent& event )
 
 void BoatDialog::OnPaintPlot(wxPaintEvent& event)
 {
-    wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
-    if(!window)
-        return;
+    wxWindow *window = m_PlotWindow;
 
     wxPaintDC dc(window);
     dc.SetBackgroundMode(wxTRANSPARENT);
@@ -505,9 +508,7 @@ static int CalcPolarPoints(wxPoint p0, wxPoint p1)
 
 void BoatDialog::OnPaintCrossOverChart(wxPaintEvent& event)
 {
-    wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
-    if(!window)
-        return;
+    wxWindow *window = m_CrossOverChart;
     wxPaintDC dc(window);
     dc.SetBackgroundMode(wxTRANSPARENT);
 
@@ -792,10 +793,11 @@ void BoatDialog::OnUpPolar( wxCommandEvent& event )
     if(index < 1)
         return;
 
+#ifndef __OCPN__ANDROID__
     m_Boat.Polars.insert(m_Boat.Polars.begin() + index - 1,
                          m_Boat.Polars.at(index));
     m_Boat.Polars.erase(m_Boat.Polars.begin() + index + 1);
-
+#endif
     RepopulatePolars();
 
     m_lPolars->SetItemState( index - 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
@@ -807,10 +809,11 @@ void BoatDialog::OnDownPolar( wxCommandEvent& event )
     if(index < 0 || index + 1 >= (long)m_Boat.Polars.size())
         return;
 
+#ifndef __OCPN__ANDROID__
     m_Boat.Polars.insert(m_Boat.Polars.begin() + index + 2,
                          m_Boat.Polars.at(index));
     m_Boat.Polars.erase(m_Boat.Polars.begin() + index);
-
+#endif
     RepopulatePolars();
 
     m_lPolars->SetItemState( index + 1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED );
@@ -913,7 +916,9 @@ void BoatDialog::OnRemovePolar( wxCommandEvent& event )
     long index = -1, lastindex = -1, count = 0;
 
     while((index = m_lPolars->GetNextItem(index, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)) != -1) {
+#ifndef __OCPN__ANDROID__
         m_Boat.Polars.erase(m_Boat.Polars.begin() + index - count++);
+#endif
         lastindex = index;
     }
 

@@ -50,7 +50,10 @@ PlotDialog::PlotDialog( WeatherRouting &weatherrouting )
 #endif
       m_WeatherRouting(weatherrouting)
 {
-    
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#endif    
 }
 
 PlotDialog::~PlotDialog()
@@ -198,9 +201,7 @@ static wxString ReadableTime(int seconds)
 
 void PlotDialog::OnPaintPlot(wxPaintEvent& event)
 {
-    wxWindow *window = dynamic_cast<wxWindow*>(event.GetEventObject());
-    if(!window)
-        return;
+    wxWindow *window = m_PlotWindow;
 
     double position = m_sPosition->GetValue() / 100.0;
     double scale = 100.0 / m_sScale->GetValue();

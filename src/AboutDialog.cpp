@@ -40,6 +40,10 @@ AboutDialog::AboutDialog( wxWindow *parent )
 {
     m_stVersion->SetLabel(wxString::Format(_T("%d.%d"),
                                            PLUGIN_VERSION_MAJOR, PLUGIN_VERSION_MINOR));
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#endif
 }
 
 void AboutDialog::OnAboutAuthor( wxCommandEvent& event )

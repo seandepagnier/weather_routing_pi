@@ -42,9 +42,6 @@ SET(SRC_WEATHER_ROUTING
             src/WeatherRoutingUI.cpp
             src/icons.cpp
 
-            src/wrdc.cpp
-            src/TexFont.cpp
-
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
@@ -62,7 +59,7 @@ SET(SRC_LIBTESS2
 
 
 SET(SRC ${SRC_WEATHER_ROUTING} ${SRC_LIBTESS2})
-
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 
 IF(NOT UNIX)
     SET(SRC_BZIP

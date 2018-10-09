@@ -55,10 +55,15 @@ ConfigurationDialog::ConfigurationDialog(WeatherRouting &weatherrouting)
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
 
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#else
     wxPoint p = GetPosition();
     pConf->Read ( _T ( "ConfigurationX" ), &p.x, p.x);
     pConf->Read ( _T ( "ConfigurationY" ), &p.y, p.y);
     SetPosition(p);
+#endif
 }
 
 ConfigurationDialog::~ConfigurationDialog( )
@@ -166,6 +171,8 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 
 #define SET_SPIN(FIELD) \
     SET_SPIN_VALUE(FIELD, (*it).FIELD)
+
+#define NO_EDITED_CONTROLS 1
 
 void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> configurations)
 {
@@ -317,13 +324,13 @@ void ConfigurationDialog::SetStartDateTime(wxDateTime datetime)
            } while(0)
 
 #define GET_SPIN(FIELD) \
-    if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_s##FIELD) != m_edited_controls.end()) {                                     \
+    if(NO_EDITED_CONTROLS || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_s##FIELD) != m_edited_controls.end()) {                                     \
         configuration.FIELD = m_s##FIELD->GetValue(); \
         m_s##FIELD->SetForegroundColour(wxColour(0, 0, 0));  \
     }
 
 #define GET_CHOICE(FIELD) \
-    if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_c##FIELD) != m_edited_controls.end()) \
+    if(NO_EDITED_CONTROLS || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_c##FIELD) != m_edited_controls.end()) \
         if(m_c##FIELD->GetValue() != wxEmptyString) { \
             configuration.FIELD = m_c##FIELD->GetValue(); \
             if(m_c##FIELD->GetString(m_c##FIELD->GetCount() - 1) == wxEmptyString) \
@@ -346,7 +353,7 @@ void ConfigurationDialog::Update()
         GET_CHOICE(Start);
         GET_CHOICE(End);
 
-        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end()) {
+        if(NO_EDITED_CONTROLS || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_dpStartDate) != m_edited_controls.end()) {
             if(!m_dpStartDate->GetDateCtrlValue().IsValid())
                 continue;
             // We must preserve the time in case only date but not time, is being changed by the user...
@@ -368,7 +375,7 @@ void ConfigurationDialog::Update()
             m_dpStartDate->SetForegroundColour(wxColour(0, 0, 0));
         }
 
-        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) != m_edited_controls.end()) {
+        if(NO_EDITED_CONTROLS || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_tpTime) != m_edited_controls.end()) {
             // must use correct data on UTC conversion to preserve Daylight Savings Time changes across dates
             wxDateTime time = configuration.StartTime;
             if(m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue())
@@ -390,7 +397,7 @@ void ConfigurationDialog::Update()
             m_tBoat->SetForegroundColour(wxColour(0, 0, 0));
         }
 
-        if(std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepHours) != m_edited_controls.end() || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepMinutes) != m_edited_controls.end() || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepSeconds) != m_edited_controls.end()) {
+        if(NO_EDITED_CONTROLS || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepHours) != m_edited_controls.end() || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepMinutes) != m_edited_controls.end() || std::find(m_edited_controls.begin(), m_edited_controls.end(), (wxObject*)m_sTimeStepSeconds) != m_edited_controls.end()) {
             configuration.DeltaTime = 60*(60*m_sTimeStepHours->GetValue()
                                    + m_sTimeStepMinutes->GetValue())
                 + m_sTimeStepSeconds->GetValue();

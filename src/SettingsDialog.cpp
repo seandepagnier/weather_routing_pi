@@ -145,6 +145,10 @@ void SettingsDialog::LoadSettings()
     pConf->Read ( _T ( "SettingsDialogX" ), &p.x, p.x);
     pConf->Read ( _T ( "SettingsDialogY" ), &p.y, p.y);
     SetPosition(p);
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#endif
 }
 
 void SettingsDialog::SaveSettings( )
@@ -196,6 +200,11 @@ void SettingsDialog::OnUpdateColumns( wxCommandEvent& event )
 
 void SettingsDialog::OnHelp( wxCommandEvent& event )
 {
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#endif
+
     wxMessageDialog mdlg(this, _("\
 Cursor Route -- optimal route closest to the cursor\n\
 Destination Route -- optimal route to the desired destination\n\

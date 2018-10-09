@@ -31,6 +31,10 @@
 #include <wx/fileconf.h>
 #include <wx/collpane.h>
 
+#ifdef __OCPN__ANDROID__
+#include <wx/qt/private/wxQtGesture.h>
+#endif
+
 #include "WeatherRoutingUI.h"
 #include "ConfigurationDialog.h"
 #include "ConfigurationBatchDialog.h"
@@ -82,9 +86,16 @@ public:
     WeatherRouting(wxWindow *parent, weather_routing_pi &plugin);
     ~WeatherRouting();
 
+#ifdef __OCPN__ANDROID__ 
+    void OnEvtPanGesture( wxQT_PanGestureEvent &event);
+#endif
+    void OnLeftDown( wxMouseEvent& event );
+    void OnLeftUp( wxMouseEvent& event );
+    void OnDownTimer( wxTimerEvent & );
+
     void Reset();
 
-    void Render(wrDC &dc, PlugIn_ViewPort &vp);
+    void Render(piDC &dc, PlugIn_ViewPort &vp);
     ConfigurationDialog m_ConfigurationDialog;
     ConfigurationBatchDialog m_ConfigurationBatchDialog;
     CursorPositionDialog m_CursorPositionDialog;
@@ -210,6 +221,9 @@ private:
 
     bool m_bShowConfiguration, m_bShowConfigurationBatch;
     bool m_bShowSettings, m_bShowStatistics, m_bShowReport, m_bShowPlot, m_bShowFilter;
+
+    wxPoint m_downPos, m_startPos, m_startMouse;
+    wxTimer m_tDownTimer;
 
     weather_routing_pi &m_weather_routing_pi;
 

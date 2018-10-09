@@ -66,6 +66,7 @@ std::cout << x << std::endl; } while (0)
 
 #include "ocpn_plugin.h"
 #include "plugingl/pidc.h"
+#include "plugingl/qtstylesheet.h"
 
 /* make some warnings go away */
 #ifdef MIN

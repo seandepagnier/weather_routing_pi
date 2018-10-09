@@ -52,6 +52,10 @@ FilterRoutesDialog::FilterRoutesDialog(WeatherRouting *weatherrouting)
     for(int i=0; i<NUM_FILTERS; i++)
         m_cCategory->Append(FilterNames[i]);
     m_cCategory->SetSelection(0);
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#endif
 }
 
 void FilterRoutesDialog::OnCategory( wxCommandEvent& event )

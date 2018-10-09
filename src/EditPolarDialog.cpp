@@ -58,6 +58,11 @@ void EditPolarDialog::SetPolarIndex(int i)
     RebuildTrueWindSpeeds();
     RebuildGrid();
     m_lMeasurements->DeleteAllItems();
+
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#endif
 }
 
 void EditPolarDialog::OnPolarGridChanged( wxGridEvent& event )

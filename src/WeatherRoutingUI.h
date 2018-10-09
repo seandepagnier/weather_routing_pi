@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Mar 29 2018)
+// C++ code generated with wxFormBuilder (version May 19 2018)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -32,6 +32,7 @@
 #include <wx/clrpicker.h>
 #include <wx/spinctrl.h>
 #include <wx/checkbox.h>
+#include <wx/scrolwin.h>
 #include <wx/checklst.h>
 #include <wx/dialog.h>
 #include <wx/combobox.h>
@@ -42,7 +43,6 @@
 #include <wx/choice.h>
 #include <wx/valtext.h>
 #include <wx/notebook.h>
-#include <wx/scrolwin.h>
 #include <wx/slider.h>
 #include <wx/radiobut.h>
 #include <wx/statline.h>
@@ -79,6 +79,14 @@ class WeatherRoutingBase : public wxFrame
 		wxMenuItem* m_mExportAll;
 		wxMenu* m_mView;
 		wxMenu* m_mHelp;
+		wxMenuItem* m_mEdit1;
+		wxMenuItem* m_mCompute1;
+		wxMenuItem* m_mComputeAll1;
+		wxMenuItem* m_mDelete1;
+		wxMenuItem* m_mGoTo1;
+		wxMenuItem* m_mStop1;
+		wxMenuItem* m_mBatch1;
+		wxMenu* m_menu1;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
@@ -116,10 +124,16 @@ class WeatherRoutingBase : public wxFrame
 	
 	public:
 		wxMenuItem* m_mDeleteAll;
+		wxMenu* m_mContextMenu;
 		
 		WeatherRoutingBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxCLOSE_BOX|wxFRAME_FLOAT_ON_PARENT|wxFRAME_NO_TASKBAR|wxRESIZE_BORDER|wxSYSTEM_MENU|wxTAB_TRAVERSAL );
 		
 		~WeatherRoutingBase();
+		
+		void WeatherRoutingBaseOnContextMenu( wxMouseEvent &event )
+		{
+			this->PopupMenu( m_mContextMenu, event.GetPosition() );
+		}
 	
 };
 
@@ -136,6 +150,8 @@ class WeatherRoutingPanel : public wxPanel
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnEditPositionClick( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnLeftUp( wxMouseEvent& event ) { event.Skip(); }
+		virtual void OnLeftDown( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnPositionKeyDown( wxListEvent& event ) { event.Skip(); }
 		virtual void OnEditConfigurationClick( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnWeatherRoutesListLeftDown( wxMouseEvent& event ) { event.Skip(); }
@@ -167,6 +183,7 @@ class SettingsDialogBase : public wxDialog
 	private:
 	
 	protected:
+		wxScrolledWindow* m_scrolledWindow4;
 		wxStaticText* m_staticText74;
 		wxStaticText* m_staticText73;
 		wxStaticText* m_staticText75;

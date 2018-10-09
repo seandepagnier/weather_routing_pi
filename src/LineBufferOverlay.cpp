@@ -89,7 +89,7 @@ void LineBuffer::draw(wxDC *dc)
                 dc->DrawLine( l[0], l[1], l[2], l[3] );
         }
     } else {                       // OpenGL mode
-#ifdef ocpnUSE_GL
+#if defined(ocpnUSE_GL) && !defined(__OCPN__ANDROID__)
         glVertexPointer(2, GL_FLOAT, 2*sizeof(float), lines);
         glDrawArrays(GL_LINES, 0, 2*count);
 #endif

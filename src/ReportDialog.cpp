@@ -51,6 +51,10 @@ ReportDialog::ReportDialog( WeatherRouting &weatherrouting )
 {
     m_bReportStale = true;
     SetRouteMapOverlays(std::list<RouteMapOverlay*>());
+#ifdef __OCPN__ANDROID__
+    wxSize sz = ::wxGetDisplaySize();
+    SetSize(0, 0, sz.x, sz.y-40);
+#endif
 }
 
 void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverlays)
