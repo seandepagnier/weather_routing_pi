@@ -28,7 +28,7 @@ install:
         echo 'export PATH="/usr/local/opt/gettext/bin:$PATH"' >> ~/.bash_profile;
         wget http://s.sudre.free.fr/Software/files/Packages.dmg;
         hdiutil attach Packages.dmg;
-        sudo installer -pkg "/Volumes/Packages 1.2.3/Install Packages.pkg" -target "/";
+        sudo installer -pkg "/Volumes/Packages 1.2.4/Install Packages.pkg" -target "/";
       fi
 
 script:
