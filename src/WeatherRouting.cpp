@@ -94,7 +94,7 @@ const wxString WeatherRouting::column_names[NUM_COLS] = {"Visible", "Boat", "Sta
 static int sortcol, sortorder = 1;
 // sort callback. Sort by body.
 #if wxCHECK_VERSION(2, 9, 0)
-int wxCALLBACK SortWeatherRoutes(long item1, long item2, wxIntPtr list)
+int wxCALLBACK SortWeatherRoutes(wxIntPtr item1, wxIntPtr item2, wxIntPtr list)
 #else
 int wxCALLBACK SortWeatherRoutes(long item1, long item2, long list)
 #endif            
@@ -1037,8 +1037,13 @@ void WeatherRouting::OnWeatherRouteSort( wxListEvent& event )
             UpdateItem(index);
         }
         RequestRefresh( GetParent() );
-    } else
+    } else {
+#if wxCHECK_VERSION(2, 9, 0)
+        m_panel->m_lWeatherRoutes->SortItems(SortWeatherRoutes, (wxIntPtr)m_panel->m_lWeatherRoutes);
+#else
         m_panel->m_lWeatherRoutes->SortItems(SortWeatherRoutes, (long)m_panel->m_lWeatherRoutes);
+#endif
+    }
 }
 
 void WeatherRouting::OnWeatherRouteSelected( )
