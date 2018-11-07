@@ -80,8 +80,6 @@
 #include "weather_routing_pi.h"
 
 #include "georef.h"
-#include "wx/jsonreader.h"
-#include "wx/jsonwriter.h"
 
 #define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
 
@@ -1376,10 +1374,10 @@ void IsoRoute::FindIsoRouteBounds(double bounds[4])
     SkipPosition *s = skippoints->next;
     while(s != skippoints) {
         p = s->point;
-        bounds[MINLAT] = MIN(p->lat, bounds[MINLAT]);
-        bounds[MAXLAT] = MAX(p->lat, bounds[MAXLAT]);
-        bounds[MINLON] = MIN(p->lon, bounds[MINLON]);
-        bounds[MAXLON] = MAX(p->lon, bounds[MAXLON]);
+        bounds[MINLAT] = wxMin(p->lat, bounds[MINLAT]);
+        bounds[MAXLAT] = wxMax(p->lat, bounds[MAXLAT]);
+        bounds[MINLON] = wxMin(p->lon, bounds[MINLON]);
+        bounds[MAXLON] = wxMax(p->lon, bounds[MAXLON]);
             
         if(p->lat == bounds[MAXLAT])
             maxlat = s;

@@ -28,9 +28,7 @@
 
 #include "ocpn_plugin.h"
 #include "plugingl/pidc.h"
-#include "wx/jsonreader.h"
-#include "wx/jsonwriter.h"
-
+#include "json/json.h"
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
@@ -1251,20 +1249,18 @@ void RouteMapOverlay::GetLLBounds(double &latmin, double &latmax, double &lonmin
 
 void RouteMapOverlay::RequestGrib(wxDateTime time)
 {
-    wxJSONValue v;
+    Json::Value v;
     time = time.FromUTC();
-    v[_T("Day")] = time.GetDay();
-    v[_T("Month")] = time.GetMonth();
-    v[_T("Year")] = time.GetYear();
-    v[_T("Hour")] = time.GetHour();
-    v[_T("Minute")] = time.GetMinute();
-    v[_T("Second")] = time.GetSecond();
+    v["Day"] = time.GetDay();
+    v["Month"] = time.GetMonth();
+    v["Year"] = time.GetYear();
+    v["Hour"] = time.GetHour();
+    v["Minute"] = time.GetMinute();
+    v["Second"] = time.GetSecond();
     
-    wxJSONWriter w;
-    wxString out;
-    w.Write(v, out);
+    Json::FastWriter w;
 
-    SendPluginMessage(wxString(_T("GRIB_TIMELINE_RECORD_REQUEST")), out);
+    SendPluginMessage("GRIB_TIMELINE_RECORD_REQUEST", w.write(v));
 
     Lock();
     m_bNeedsGrib = false;
