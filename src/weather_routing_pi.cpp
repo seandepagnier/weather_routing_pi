@@ -34,7 +34,7 @@
 #include "WeatherRouting.h"
 #include "weather_routing_pi.h"
 
-wxJSONValue g_ReceivedJSONMsg;
+Json::Value g_ReceivedJSONMsg;
 wxString    g_ReceivedMessage;
 
 // Define minimum and maximum versions of the grib plugin supported
@@ -223,13 +223,10 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 {
     if(message_id == _T("GRIB_VALUES"))
     {
-        wxJSONValue  root;
-        wxJSONReader reader;
+        Json::Value  root;
+        Json::Reader  reader;
         //wxString    sLogMessage;
-        int numErrors = reader.Parse( message_body, &root );
-        if ( numErrors > 0 )  {
-        }
-        else {
+        if (reader.parse( static_cast<std::string>(message_body), root )) {
             g_ReceivedJSONMsg = root;
             g_ReceivedMessage = message_body;
         }
@@ -345,10 +342,6 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         }
     }
     else if(message_id == wxS("WEATHER_ROUTING_PI")) {
-        // construct the JSON root object
-        wxJSONValue  root;
-        // construct a JSON parser
-        wxJSONReader reader;
         // now read the JSON text and store it in the 'root' structure
         Json::Value  root;
         Json::Reader  reader;
@@ -423,21 +416,20 @@ void weather_routing_pi::NewWR()
     m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
     m_pWeather_Routing->Move(p);
 
-    SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
-    SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
+    SendPluginMessage("GRIB_TIMELINE_REQUEST", "");
+    SendPluginMessage("CLIMATOLOGY_REQUEST", "");
 
     if(ODVersionNewerThan( 1, 1, 15)) {
-        wxJSONValue jMsg;
-        wxJSONWriter writer;
-        wxString MsgString;
-        jMsg[wxT("Source")] = wxT("WEATHER_ROUTING_PI");
-        jMsg[wxT("Type")] = wxT("Request");
-        jMsg[wxT("Msg")] = wxS("GetAPIAddresses");
-        jMsg[wxT("MsgId")] = wxS("GetAPIAddresses");
-        writer.Write( jMsg, MsgString );
-        SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+        Json::Value jMsg;
+        Json::FastWriter writer;
+
+        jMsg["Source"] = "WEATHER_ROUTING_PI";
+        jMsg["Type"] = "Request";
+        jMsg["Msg"] = "GetAPIAddresses";
+        jMsg["MsgId"] = "GetAPIAddresses";
+        SendPluginMessage( "OCPN_DRAW_PI", writer.write( jMsg ) );
     }
-    
+
     m_pWeather_Routing->Reset();
     
 }

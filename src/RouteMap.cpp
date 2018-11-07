@@ -85,36 +85,35 @@
 
 long RouteMapPosition::s_ID = 0;
 
-extern wxJSONValue g_ReceivedJSONMsg;
+extern Json::Value g_ReceivedJSONMsg;
 extern wxString    g_ReceivedMessage;
 
-static wxJSONValue RequestGRIB(const wxDateTime &t, const wxString &what, double lat, double lon)
+static Json::Value RequestGRIB(const wxDateTime &t, const wxString &what, double lat, double lon)
 {
-    wxJSONValue error;
-    wxJSONValue v;
-    wxJSONWriter writer;
-    wxString    MsgString;
+    Json::Value error;
+    Json::Value v;
+    Json::FastWriter writer;
     // brain dead wx is expecting time in local time
     wxDateTime time = t.FromUTC();
     if (!time.IsValid())
         return error;
 
-    v[_T("Day")] = time.GetDay();
-    v[_T("Month")] = time.GetMonth();
-    v[_T("Year")] = time.GetYear();
-    v[_T("Hour")] = time.GetHour();
-    v[_T("Minute")] = time.GetMinute();
-    v[_T("Second")] = time.GetSecond();
+    v["Day"] = time.GetDay();
+    v["Month"] = time.GetMonth();
+    v["Year"] = time.GetYear();
+    v["Hour"] = time.GetHour();
+    v["Minute"] = time.GetMinute();
+    v["Second"] = time.GetSecond();
 
-    v[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
-    v[wxT("Type")] = wxT("Request");
-    v[wxT("Msg")] = wxS("GRIB_VALUES_REQUEST");
-    v[wxS("lat")] = lat;
-    v[wxS("lon")] = lon;
+    v["Source"] = "WEATHER_ROUTING_PI";
+    v["Type"] = "Request";
+    v["Msg"] = "GRIB_VALUES_REQUEST";
+    v["lat"] = lat;
+    v["lon"] = lon;
     v[what] = 1;
-    writer.Write( v, MsgString );
-    SendPluginMessage( wxS("GRIB_VALUES_REQUEST"), MsgString );
-    if(g_ReceivedMessage != wxEmptyString && g_ReceivedJSONMsg[wxT("Type")].AsString() == _T("Reply")) {
+
+    SendPluginMessage( "GRIB_VALUES_REQUEST", writer.write( v) );
+    if(g_ReceivedMessage != wxEmptyString && g_ReceivedJSONMsg["Type"].asString() == "Reply") {
         return g_ReceivedJSONMsg;
     }
     return error;
@@ -125,10 +124,10 @@ static double Swell(RouteMapConfiguration &configuration, double lat, double lon
     WR_GribRecordSet *grib = configuration.grib;
 
     if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
-       wxJSONValue r = RequestGRIB(configuration.time, "SWELL", lat, lon);
-       if (!r.HasMember(_T("SWELL")))
+       Json::Value r = RequestGRIB(configuration.time, "SWELL", lat, lon);
+       if (!r.isMember("SWELL"))
            return 0;
-       return r[_T("SWELL")].AsDouble();
+       return r["SWELL"].asDouble();
     }
 
     if(!grib)
@@ -153,10 +152,10 @@ static double Gust(RouteMapConfiguration &configuration, double lat, double lon)
     double gust;
 
     if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
-       wxJSONValue r = RequestGRIB(configuration.time, "GUST", lat, lon);
-       if (!r.HasMember(_T("GUST")))
+       Json::Value r = RequestGRIB(configuration.time, "GUST", lat, lon);
+       if (!r.isMember("GUST"))
            return NAN;
-       gust =  r[_T("GUST")].AsDouble();
+       gust =  r["GUST"].asDouble();
     }
     else if(!grib)
         return NAN;
@@ -180,14 +179,14 @@ static bool GribWind(RouteMapConfiguration &configuration, double lat, double lo
     WR_GribRecordSet *grib = configuration.grib;
 
     if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
-       wxJSONValue r = RequestGRIB(configuration.time, "WIND SPEED", lat, lon);
-       if (!r.HasMember(_T("WIND SPEED")))
+       Json::Value r = RequestGRIB(configuration.time, "WIND SPEED", lat, lon);
+       if (!r.isMember("WIND SPEED"))
            return false;
-       VWG = r[_T("WIND SPEED")].AsDouble();
+       VWG = r["WIND SPEED"].asDouble();
 
-       if (!r.HasMember(_T("WIND DIR")))
+       if (!r.isMember("WIND DIR"))
            return false;
-       WG = r[_T("WIND DIR")].AsDouble();
+       WG = r["WIND DIR"].asDouble();
     }
     else if(!grib)
         return false;
@@ -214,14 +213,14 @@ static bool GribCurrent(RouteMapConfiguration &configuration, double lat, double
     WR_GribRecordSet *grib = configuration.grib;
 
     if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
-       wxJSONValue r = RequestGRIB(configuration.time, "CURRENT SPEED", lat, lon);
-       if (!r.HasMember(_T("CURRENT SPEED")))
+       Json::Value r = RequestGRIB(configuration.time, "CURRENT SPEED", lat, lon);
+       if (!r.isMember("CURRENT SPEED"))
            return false;
-       VC = r[_T("CURRENT SPEED")].AsDouble();
+       VC = r["CURRENT SPEED"].asDouble();
 
-       if (!r.HasMember(_T("CURRENT DIR")))
+       if (!r.isMember("CURRENT DIR"))
            return false;
-       C = r[_T("CURRENT DIR")].AsDouble();
+       C = r["CURRENT DIR"].asDouble();
     }
     else if(!grib)
         return false;
