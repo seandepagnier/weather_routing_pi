@@ -85,6 +85,7 @@ ENDIF(DEFINED _wx_selected_config)
 MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
 include  ("VERSION.cmake")
+configure_file(${PROJECT_SOURCE_DIR}/cmake/wxWTranslateCatalog.h.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/include/wxWTranslateCatalog.h)
 
 #  Do the version.h configuration into the build output directory,
 #  thereby allowing building from a read-only source tree.
