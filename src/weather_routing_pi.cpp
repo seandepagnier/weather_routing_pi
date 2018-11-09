@@ -428,10 +428,10 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
     m_pWeather_Routing->Reset();
 }
 
-bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
+bool weather_routing_pi::RenderOverlay(wxDC &wxdc, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
-        piDC dc(dc);
+        piDC dc(wxdc);
         m_pWeather_Routing->Render(dc, *vp);
         return true;
     }
