@@ -375,7 +375,7 @@ void BoatPlan::BoatSteadyState(double W, double VW, double &B, double &VB, doubl
 
         double drag = boat.FrictionDrag(VB) + boat.WakeDrag(VB);
 
-        if(wxIsNaN(drag)) {
+        if(std::isnan(drag)) {
             VB = 0;
             return;
         }

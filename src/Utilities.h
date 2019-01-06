@@ -40,9 +40,6 @@
 # define INFINITY std::numeric_limits<double>::infinity ()
 # endif
 
-//#define isnan _isnan
-//#define isinf(x) (!_finite(x) && !_isnan(x))
-
 inline double trunc(double d){ return (d>0) ? floor(d) : ceil(d) ; }
 inline double round(double n) { return n < 0.0 ? ceil(n - 0.5) : floor(n + 0.5); }
 
@@ -61,8 +58,6 @@ char *strtok_r(char *str, const char *delim, char **save);
 #endif
 
 #include <cmath>
-//using std::isnan;
-//using std::isinf;
 
 /* min must have correct paren to make predence correct */
 #ifdef MIN

@@ -1051,7 +1051,7 @@ void WeatherRouting::OnGoTo( wxCommandEvent& event )
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++) {
         RouteMapConfiguration configuration = (*it)->GetConfiguration();
-        if(wxIsNaN(configuration.StartLat)) continue;
+        if(std::isnan(configuration.StartLat)) continue;
         avg_lat += configuration.StartLat + configuration.EndLat;
         avg_lonx = cos(deg2rad(configuration.StartLon)) + cos(deg2rad(configuration.EndLon));
         avg_lony = sin(deg2rad(configuration.StartLon)) + sin(deg2rad(configuration.EndLon));
@@ -1066,7 +1066,7 @@ void WeatherRouting::OnGoTo( wxCommandEvent& event )
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++) {
         RouteMapConfiguration configuration = (*it)->GetConfiguration();
-        if(wxIsNaN(configuration.StartLat)) continue;
+        if(std::isnan(configuration.StartLat)) continue;
         double distance;
         DistanceBearingMercator_Plugin(avg_lat, avg_lon,
                                        configuration.StartLat, configuration.StartLon,
