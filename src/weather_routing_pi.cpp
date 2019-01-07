@@ -126,6 +126,9 @@ int weather_routing_pi::Init(void)
       m_waypoint_menu_id = AddCanvasMenuItem (new wxMenuItem(&dummy_menu, -1, _("Weather Route Position")), this, "Waypoint" );
       SetCanvasMenuItemViz(m_waypoint_menu_id, false, "Waypoint");
 
+      m_route_menu_id = AddCanvasMenuItem (new wxMenuItem(&dummy_menu, -1, _("Weather Route Analysis")), this, "Route" );
+      SetCanvasMenuItemViz(m_route_menu_id, false, "Route");
+
       //    And load the configuration items
       LoadConfig();
 
@@ -438,6 +441,8 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
             return;
         m_pWeather_Routing->AddPosition(wp->m_lat, wp->m_lon, wp->m_MarkName, wp->m_GUID);
     }
+    else if(id == m_route_menu_id)
+        ;
     m_pWeather_Routing->Reset();
 }
 
@@ -548,4 +553,5 @@ void weather_routing_pi::ShowMenuItems(bool show)
     SetToolbarItemState( m_leftclick_tool_id, show );
     SetCanvasMenuItemViz(m_position_menu_id, show);
     SetCanvasMenuItemViz(m_waypoint_menu_id, show, "Waypoint");
+    SetCanvasMenuItemViz(m_route_menu_id, show, "Route");
 }

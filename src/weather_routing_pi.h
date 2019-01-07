@@ -147,6 +147,7 @@ private:
       int              m_leftclick_tool_id;
       int              m_position_menu_id;
       int              m_waypoint_menu_id;
+      int              m_route_menu_id;
 
       wxTimer m_tCursorLatLon;
 };
