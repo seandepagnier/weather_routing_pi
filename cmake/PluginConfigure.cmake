@@ -85,6 +85,7 @@ ENDIF(DEFINED _wx_selected_config)
 MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
 include  ("VERSION.cmake")
+configure_file(${PROJECT_SOURCE_DIR}/cmake/wxWTranslateCatalog.h.in ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/include/wxWTranslateCatalog.h)
 
 #  Do the version.h configuration into the build output directory,
 #  thereby allowing building from a read-only source tree.
@@ -95,7 +96,7 @@ ENDIF(NOT SKIP_VERSION_CONFIG)
 
 SET(PLUGIN_VERSION "${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}.${PLUGIN_VERSION_PATCH}" )
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
+INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
 # SET(PROFILING 1)
 
@@ -275,13 +276,6 @@ IF(NOT WIN32)
  ENDIF(NOT APPLE)
 
 ENDIF(NOT WIN32)
-
-
-# Add some definitions to satisfy MS
-IF(WIN32)
-    ADD_DEFINITIONS(-D__MSVC__)
-    ADD_DEFINITIONS(-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_DEPRECATE)
-ENDIF(WIN32)
 
 # Let cmake find additional modules private
 LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})

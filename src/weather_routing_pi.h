@@ -77,8 +77,7 @@ std::cout << x << std::endl; } while (0)
 #undef MAX
 #endif
 
-#include "wx/jsonreader.h"
-#include "wx/jsonwriter.h"
+#include "json/json.h"
 
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition

@@ -46,27 +46,25 @@
 #define CLIMATOLOGY_MIN_MAJOR 0
 #define CLIMATOLOGY_MIN_MINOR 10
 
-static wxJSONValue g_ReceivedODVersionJSONMsg;
+static Json::Value g_ReceivedODVersionJSONMsg;
 static bool ODVersionNewerThan(int major, int minor, int patch)
 {
-    wxJSONValue jMsg;
-    wxJSONWriter writer;
-    wxString    MsgString;
-    jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
-    jMsg[wxT("Type")] = wxT("Request");
-    jMsg[wxT("Msg")] = wxS("Version");
-    jMsg[wxT("MsgId")] = wxS("version");
-    writer.Write( jMsg, MsgString );
-    SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+    Json::Value jMsg;
+    Json::FastWriter writer;
+    jMsg["Source"] = "WEATHER_ROUTING_PI";
+    jMsg["Type"] = "Request";
+    jMsg["Msg"] = "Version";
+    jMsg["MsgId"] = "version";
+    SendPluginMessage( wxS("OCPN_DRAW_PI"), writer.write( jMsg ) );
 
-    if(g_ReceivedODVersionJSONMsg.Size() <= 0)
+    if(g_ReceivedODVersionJSONMsg.size() <= 0)
         return false;
-    if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() > major) return true;
-    if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() == major &&
-        g_ReceivedODVersionJSONMsg[wxS("Minor")].AsInt() > minor) return true;
-    if(g_ReceivedODVersionJSONMsg[wxS("Major")].AsInt() == major &&
-        g_ReceivedODVersionJSONMsg[wxS("Minor")].AsInt() == minor &&
-        g_ReceivedODVersionJSONMsg[wxS("Patch")].AsInt() >= patch) return true;
+    if(g_ReceivedODVersionJSONMsg["Major"].asInt() > major) return true;
+    if(g_ReceivedODVersionJSONMsg["Major"].asInt() == major &&
+        g_ReceivedODVersionJSONMsg["Minor"].asInt() > minor) return true;
+    if(g_ReceivedODVersionJSONMsg["Major"].asInt() == major &&
+        g_ReceivedODVersionJSONMsg["Minor"].asInt() == minor &&
+        g_ReceivedODVersionJSONMsg["Patch"].asInt() >= patch) return true;
     return false;
 }
 
@@ -216,16 +214,16 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 {
     if(message_id == _T("GRIB_TIMELINE"))
     {
-        wxJSONReader r;
-        wxJSONValue v;
-        r.Parse(message_body, &v);
+        Json::Reader r;
+        Json::Value v;
+        r.parse(static_cast<std::string>(message_body), v);
 
-        if (v[_T("Day")].AsInt() != -1) {
+        if (v["Day"].asInt() != -1) {
             wxDateTime time;
         
             time.Set
-              (v[_T("Day")].AsInt(), (wxDateTime::Month)v[_T("Month")].AsInt(), v[_T("Year")].AsInt(),
-               v[_T("Hour")].AsInt(), v[_T("Minute")].AsInt(), v[_T("Second")].AsInt());
+              (v["Day"].asInt(), (wxDateTime::Month)v["Month"].asInt(), v["Year"].asInt(),
+               v["Hour"].asInt(), v["Minute"].asInt(), v["Second"].asInt());
 
             if (m_pWeather_Routing && time.IsValid()) {
                 m_pWeather_Routing->m_ConfigurationDialog.m_GribTimelineTime = time.ToUTC();
@@ -236,16 +234,16 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
     }
     if(message_id == _T("GRIB_TIMELINE_RECORD"))
     {
-        wxJSONReader r;
-        wxJSONValue v;
-        r.Parse(message_body, &v);
+        Json::Reader r;
+        Json::Value v;
+        r.parse(static_cast<std::string>(message_body), v);
 
         static bool shown_warnings;
         if(!shown_warnings) {
             shown_warnings = true;
 
-            int grib_version_major = v[_T("GribVersionMajor")].AsInt();
-            int grib_version_minor = v[_T("GribVersionMinor")].AsInt();
+            int grib_version_major = v["GribVersionMajor"].asInt();
+            int grib_version_minor = v["GribVersionMinor"].asInt();
 
             int grib_version = 1000*grib_version_major + grib_version_minor;
             int grib_min =     1000*GRIB_MIN_MAJOR     + GRIB_MIN_MINOR;
@@ -261,7 +259,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             }
         }
 
-        wxString sptr = v[_T("TimelineSetPtr")].AsString();
+        wxString sptr = v["TimelineSetPtr"].asString();
         wxCharBuffer bptr = sptr.To8BitData();
         const char* ptr = bptr.data();
 
@@ -282,16 +280,16 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         if(!m_pWeather_Routing)
             return; /* not ready */
 
-        wxJSONReader r;
-        wxJSONValue v;
-        r.Parse(message_body, &v);
+        Json::Reader r;
+        Json::Value v;
+        r.parse(static_cast<std::string>(message_body), v);
 
         static bool shown_warnings;
         if(!shown_warnings) {
             shown_warnings = true;
 
-            int climatology_version_major = v[_T("ClimatologyVersionMajor")].AsInt();
-            int climatology_version_minor = v[_T("ClimatologyVersionMinor")].AsInt();
+            int climatology_version_major = v["ClimatologyVersionMajor"].asInt();
+            int climatology_version_minor = v["ClimatologyVersionMinor"].asInt();
 
             int climatology_version = 1000*climatology_version_major + climatology_version_minor;
             int climatology_min =     1000*CLIMATOLOGY_MIN_MAJOR     + CLIMATOLOGY_MIN_MINOR;
@@ -308,13 +306,13 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             }
         }
 
-        wxString sptr = v[_T("ClimatologyDataPtr")].AsString();
+        wxString sptr = v["ClimatologyDataPtr"].asString();
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyData);
 
-        sptr = v[_T("ClimatologyWindAtlasDataPtr")].AsString();
+        sptr = v["ClimatologyWindAtlasDataPtr"].asString();
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyWindAtlasData);
 
-        sptr = v[_T("ClimatologyCycloneTrackCrossingsPtr")].AsString();
+        sptr = v["ClimatologyCycloneTrackCrossingsPtr"].asString();
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyCycloneTrackCrossings);
 
         if(m_pWeather_Routing) {
@@ -327,34 +325,27 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 
 
     if(message_id == wxS("WEATHER_ROUTING_PI")) {
-        // construct the JSON root object
-        wxJSONValue  root;
-        // construct a JSON parser
-        wxJSONReader reader;
         // now read the JSON text and store it in the 'root' structure
+        Json::Value  root;
+        Json::Reader  reader;
         // check for errors before retreiving values...
-        int numErrors = reader.Parse( message_body, &root );
-        if ( numErrors > 0 ) {
-            wxLogMessage(_T("weather_routing_pi: Error parsing JSON message - "));
-            const wxArrayString& errors = reader.GetErrors();
-            for(int i = 0; i < (int)errors.GetCount(); i++) {
-                wxLogMessage( errors.Item( i ) );
-                return;
-            }
+        if (!reader.parse( static_cast<std::string>(message_body), root )) {
+            wxLogMessage(_T("weather_routing_pi: Error parsing JSON message - ") 
+                 +reader.getFormattedErrorMessages() + " : " + message_body );
         }
         
-        if(root[wxS("Type")].AsString() == wxS("Response") && root[wxS("Source")].AsString() == wxS("OCPN_DRAW_PI")) {
-            if(root[wxS("Msg")].AsString() == wxS("Version") ) {
-                if(root[wxS("MsgId")].AsString() == wxS("version"))
+        if(root["Type"].asString() == "Response" && root["Source"].asString() == "OCPN_DRAW_PI") {
+            if(root["Msg"].asString() == "Version" ) {
+                if(root["MsgId"].asString() == "version")
                     g_ReceivedODVersionJSONMsg = root;
             } else
-            if(root[wxS("Msg")].AsString() == wxS("GetAPIAddresses") ) {
-                wxString sptr = root[_T("OD_FindClosestBoundaryLineCrossing")].AsString();
+            if(root["Msg"].asString() == "GetAPIAddresses" ) {
+                wxString sptr = root["OD_FindClosestBoundaryLineCrossing"].asString();
                 sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ODFindClosestBoundaryLineCrossing);
             }
-            else if (root[wxS("Msg")].AsString() == wxS("FindPointInAnyBoundary") ) {
-              if (root[wxS("MsgId")].AsString() == wxS("exist")) {
-                 b_in_boundary_reply = root[wxS("Found")].AsBool() == true;
+            else if (root["Msg"].asString() == "FindPointInAnyBoundary" ) {
+              if (root["MsgId"].asString() == "exist") {
+                 b_in_boundary_reply = root["Found"].asBool() == true;
                  // if (b_in_boundary_reply) printf("collision with %s\n", (const char*)root[wxS("GUID")].AsString().mb_str());
               }
             }
@@ -367,25 +358,23 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 // use JSON msg rather than binary it's not time sensitive.
 bool weather_routing_pi::InBoundary(double lat, double lon)
 {
-    wxJSONValue jMsg;
-    wxJSONWriter writer;
-    wxString    MsgString;
+    Json::Value jMsg;
+    Json::FastWriter writer;
 
-    jMsg[wxS("Source")] = wxS("WEATHER_ROUTING_PI");
-    jMsg[wxT("Type")] = wxT("Request");
+    jMsg["Source"] = "WEATHER_ROUTING_PI";
+    jMsg["Type"] = "Request";
 
-    jMsg[wxT("Msg")] = wxS("FindPointInAnyBoundary");
-    jMsg[wxT("MsgId")] = wxS("exist");
+    jMsg["Msg"] = "FindPointInAnyBoundary";
+    jMsg["MsgId"] = "exist";
 
-    jMsg[wxS("lat")] = lat;
-    jMsg[wxS("lon")] = lon;
+    jMsg["lat"] = lat;
+    jMsg["lon"] = lon;
 
-    jMsg[wxS("BoundaryState")] = wxT("Active");
-    jMsg[wxS("BoundaryType")] = wxT("Exclusion");
+    jMsg["BoundaryState"] = "Active";
+    jMsg["BoundaryType"] = "Exclusion";
 
-    writer.Write( jMsg, MsgString );
     b_in_boundary_reply = false;
-    SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+    SendPluginMessage( "OCPN_DRAW_PI", writer.write( jMsg ) );
 
     return b_in_boundary_reply;
 }
@@ -412,15 +401,14 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
         SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
 
         if(ODVersionNewerThan( 1, 1, 15)) {
-            wxJSONValue jMsg;
-            wxJSONWriter writer;
-            wxString MsgString;
-            jMsg[wxT("Source")] = wxT("WEATHER_ROUTING_PI");
-            jMsg[wxT("Type")] = wxT("Request");
-            jMsg[wxT("Msg")] = wxS("GetAPIAddresses");
-            jMsg[wxT("MsgId")] = wxS("GetAPIAddresses");
-            writer.Write( jMsg, MsgString );
-            SendPluginMessage( wxS("OCPN_DRAW_PI"), MsgString );
+            Json::Value jMsg;
+            Json::FastWriter writer;
+
+            jMsg["Source"] = "WEATHER_ROUTING_PI";
+            jMsg["Type"] = "Request";
+            jMsg["Msg"] = "GetAPIAddresses";
+            jMsg["MsgId"] = "GetAPIAddresses";
+            SendPluginMessage( wxS("OCPN_DRAW_PI"), writer.write( jMsg) );
         }
         
         m_pWeather_Routing->Reset();
@@ -440,10 +428,10 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
     m_pWeather_Routing->Reset();
 }
 
-bool weather_routing_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
+bool weather_routing_pi::RenderOverlay(wxDC &wxdc, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
-        piDC dc(dc);
+        piDC dc(wxdc);
         m_pWeather_Routing->Render(dc, *vp);
         return true;
     }
@@ -523,10 +511,15 @@ wxString weather_routing_pi::StandardPath()
 #ifdef __WXOSX__
     // Compatibility with pre-OCPN-4.2; move config dir to
     // ~/Library/Preferences/opencpn if it exists
-    wxString oldPath = (std_path.GetUserConfigDir() + s + _T("plugins") + s + _T("weather_routing"));
-    if (wxDirExists(oldPath) && !wxDirExists(stdPath)) {
-		wxLogMessage("weather_routing_pi: moving config dir %s to %s", oldPath, stdPath);
-		wxRenameFile(oldPath, stdPath);
+    {
+        wxStandardPathsBase& std_path = wxStandardPathsBase::Get();
+        wxString s = wxFileName::GetPathSeparator();
+        // should be ~/Library/Preferences/opencpn
+        wxString oldPath = (std_path.GetUserConfigDir() +s + _T("plugins") +s + _T("weather_routing"));
+        if (wxDirExists(oldPath) && !wxDirExists(stdPath)) {
+		    wxLogMessage("weather_routing_pi: moving config dir %s to %s", oldPath, stdPath);
+		    wxRenameFile(oldPath, stdPath);
+        }
     }
 #endif
 
