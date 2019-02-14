@@ -17,16 +17,12 @@ install:
       fi
     - if [[ "$TRAVIS_OS_NAME" == "osx" ]];
       then
-        brew install cairo libexif libarchive;
-        wget http://opencpn.navnux.org/build_deps/cairo_macos107.tar.xz;
-        tar xJf cairo_macos107.tar.xz -C /tmp;
-        wget http://opencpn.navnux.org/build_deps/wx_opencpn_macos107.tar.xz;
-        tar xJf wx_opencpn_macos107.tar.xz -C /tmp;
-        wget http://opencpn.navnux.org/build_deps/libarchive_macos107.tar.xz;
-        tar xJf libarchive_macos107.tar.xz -C /tmp;
+        brew install cairo libexif xz libarchive;
+        wget http://opencpn.navnux.org/build_deps/wx312_opencpn50_macos109.tar.xz;
+        tar xJf wx312_opencpn50_macos109.tar.xz -C /tmp;
         export PATH="/usr/local/opt/gettext/bin:$PATH";
         echo 'export PATH="/usr/local/opt/gettext/bin:$PATH"' >> ~/.bash_profile;
-        wget http://s.sudre.free.fr/Software/files/Packages.dmg;
+        wget http://opencpn.navnux.org/build_deps/Packages.dmg;
         hdiutil attach Packages.dmg;
         sudo installer -pkg "/Volumes/Packages 1.2.5/Install Packages.pkg" -target "/";
       fi
@@ -45,14 +41,10 @@ script:
     fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]];
     then
-        cmake -DOCPN_USE_LIBCPP=ON -DwxWidgets_CONFIG_EXECUTABLE=/tmp/wx_opencpn_macos107/bin/wx-config -DwxWidgets_CONFIG_OPTIONS="--prefix=/tmp/wx_opencpn_macos107" -DLibArchive_INCLUDE_DIR=/tmp/libarchive_macos107/include -DLibArchive_LIBRARY=/tmp/libarchive_macos107/lib/libarchive.dylib -DCAIRO_INCLUDE_DIR=/tmp/cairo_macos107/include -DCAIRO_LIBRARY=/tmp/cairo_macos107/lib/libcairo.dylib -DCMAKE_INSTALL_PREFIX=/tmp/opencpn ..;
-        make -s;
-        mkdir -p /tmp/opencpn/bin/OpenCPN.app/Contents/MacOS/;
-        chmod 644 /usr/local/lib/lib*.dylib;
-        cp /tmp/libarchive_macos107/lib/libarchive.16.dylib /tmp/opencpn/bin/OpenCPN.app/Contents/MacOS/;
-        cp /tmp/cairo_macos107/lib/libcairo.2.dylib /tmp/opencpn/bin/OpenCPN.app/Contents/MacOS/;
-        make install;
+        cmake -DwxWidgets_CONFIG_EXECUTABLE=/tmp/wx312_opencpn50_macos109/bin/wx-config -DwxWidgets_CONFIG_OPTIONS="--prefix=/tmp/wx312_opencpn50_macos109" -DCMAKE_INSTALL_PREFIX=/tmp/opencpn -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 ..;
+        make -sj2;
         make create-pkg;
+        ls -l;
      fi
 
 notifications:
