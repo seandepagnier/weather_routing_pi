@@ -435,6 +435,48 @@ void WeatherRouting::Render(piDC &dc, PlugIn_ViewPort &vp)
     if (vp.bValid == false)
         return;
 
+    // polling is bad
+    bool work = false;
+    for(auto &it :RouteMap::Positions) {
+        if (it.GUID.IsEmpty())
+            continue;
+
+        PlugIn_Waypoint waypoint;
+        double lat = it.lat;
+        double lon = it.lon;
+
+        if (!GetSingleWaypoint( it.GUID, &waypoint ))
+            continue;
+        if (lat == waypoint.m_lat && lon == waypoint.m_lon && waypoint.m_MarkName.IsSameAs(it.Name))
+            continue;
+
+        long index = m_panel->m_lPositions->FindItem(0, it.ID);
+        if (index < 0) {
+            // corrupted data
+            continue;
+        }
+
+        wxString name = waypoint.m_MarkName;
+        lat = waypoint.m_lat;
+        lon = waypoint.m_lon;
+        it.Name = name;
+        it.lat = lat;
+        it.lon = lon;
+
+        // XXX FIXME there's already this name, update m_ConfigurationDialog source
+        m_panel->m_lPositions->SetItem(index, POSITION_NAME, name);
+        m_panel->m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
+        m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+        m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
+        m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+        m_panel->m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
+        work = true;
+    }
+    if (work) {
+        UpdateConfigurations();
+        Reset();
+    }
+
     if(!dc.GetDC()) {
 #ifndef __OCPN__ANDROID__
         glPushAttrib(GL_LINE_BIT | GL_ENABLE_BIT | GL_HINT_BIT ); //Save state
@@ -497,30 +539,75 @@ void WeatherRouting::AddPosition(double lat, double lon)
         AddPosition(lat, lon, pd.GetValue());
 }
 
-void WeatherRouting::AddPosition(double lat, double lon, wxString name, wxString GUID)
+void WeatherRouting::AddPosition(double lat, double lon, wxString name)
 {
-    for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
-        it != RouteMap::Positions.end(); it++) {
-        if((*it).Name == name) {
+    for(auto it = RouteMap::Positions.begin(); it != RouteMap::Positions.end(); it++) {
+        if((*it).GUID.IsEmpty() && (*it).Name == name) {
             wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),
                                  _("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
             if(mdlg.ShowModal() == wxID_YES) {
-                long index = m_panel->m_lPositions->FindItem(0, name);
+                long index = m_panel->m_lPositions->FindItem(0, (*it).ID);
+                assert(index >=0);
+
                 (*it).lat = lat;
                 (*it).lon = lon;
-                (*it).GUID = wxEmptyString;
+                (*it).GUID = wxEmptyString;  // no more an O waypoint
                 m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
                 m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
                 m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
                 m_panel->m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
+                UpdateConfigurations();
             }
+            return;
+        }
+    }
+    
+    RouteMapPosition p(name, lat, lon);
+    RouteMap::Positions.push_back(p);
+    UpdateConfigurations();
 
+    wxListItem item;
+    long index = m_panel->m_lPositions->InsertItem(m_panel->m_lPositions->GetItemCount(), item);
+
+    m_panel->m_lPositions->SetItem(index, POSITION_NAME, name);
+    m_panel->m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
+    m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+    m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
+    m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+    m_panel->m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
+
+    m_panel->m_lPositions->SetItemData(index, p.ID);
+    m_ConfigurationDialog.AddSource(name);
+    m_ConfigurationBatchDialog.AddSource(name);
+}
+
+void WeatherRouting::AddPosition(double lat, double lon, wxString name, wxString GUID)
+{
+    if (GUID.IsEmpty())
+        return AddPosition(lat, lon, name);
+
+    for(auto it = RouteMap::Positions.begin();it != RouteMap::Positions.end(); it++) {
+        if((*it).GUID.IsEmpty() /*&& !(*it).NameIsSameAs(name)*/)
+            continue;
+
+        if((*it).GUID.IsSameAs(GUID)) {
+            // wxMessageDialog mdlg(this, _("This name already exists, replace?\n"),_("Weather Routing"), wxYES | wxNO | wxICON_WARNING);
+            long index = m_panel->m_lPositions->FindItem(0, (*it).ID);
+            (*it).lat = lat;
+            (*it).lon = lon;
+            m_panel->m_lPositions->SetItem(index, POSITION_NAME, name);
+            m_panel->m_lPositions->SetColumnWidth(POSITION_NAME, wxLIST_AUTOSIZE);
+            m_panel->m_lPositions->SetItem(index, POSITION_LAT, wxString::Format(_T("%.5f"), lat));
+            m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
+            m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
+            m_panel->m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
             UpdateConfigurations();
             return;
         }
     }
     
-    RouteMap::Positions.push_back(RouteMapPosition(name, lat, lon, GUID));
+    RouteMapPosition p(name, lat, lon, GUID);
+    RouteMap::Positions.push_back(p);
     UpdateConfigurations();
 
     wxListItem item;
@@ -532,7 +619,7 @@ void WeatherRouting::AddPosition(double lat, double lon, wxString name, wxString
     m_panel->m_lPositions->SetColumnWidth(POSITION_LAT, wxLIST_AUTOSIZE);
     m_panel->m_lPositions->SetItem(index, POSITION_LON, wxString::Format(_T("%.5f"), lon));
     m_panel->m_lPositions->SetColumnWidth(POSITION_LON, wxLIST_AUTOSIZE);
-    
+    m_panel->m_lPositions->SetItemData(index, p.ID);
 
     m_ConfigurationDialog.AddSource(name);
     m_ConfigurationBatchDialog.AddSource(name);
@@ -892,22 +979,25 @@ void WeatherRouting::OnDeletePosition( wxCommandEvent& event )
     if(index < 0)
         return;
 
-    wxListItem it;
-    it.SetId(index);
-    it.SetColumn(0);
-    it.SetMask(wxLIST_MASK_TEXT); // Note use of the mask, somehow it's required for this to work correctly on windows
-    m_panel->m_lPositions->GetItem(it);
-    wxString name = it.GetText();
+    wxListItem item;
+    item.SetId(index);
+    item.SetColumn(0);
+    item.SetMask(wxLIST_MASK_TEXT); // Note use of the mask, somehow it's required for this to work correctly on windows
+    m_panel->m_lPositions->GetItem(item);
+
+    long ID = m_panel->m_lPositions->GetItemData(index);
+    assert(ID >=0);
 
     for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
-        it != RouteMap::Positions.end(); it++)
-        if((*it).Name == name) {
+        it != RouteMap::Positions.end(); it++) {
+        if((*it).ID == ID) {
+            wxString name = (*it).Name;
+            m_ConfigurationDialog.RemoveSource(name);
+            m_ConfigurationBatchDialog.RemoveSource(name);
             RouteMap::Positions.erase(it);
             break;
         }
-
-    m_ConfigurationDialog.RemoveSource(name);
-    m_ConfigurationBatchDialog.RemoveSource(name);
+    }
     m_panel->m_lPositions->DeleteItem(index);
 
     UpdateConfigurations();
@@ -1606,9 +1696,8 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 double lat = AttributeDouble(e, "Latitude", NAN);
                 double lon = AttributeDouble(e, "Longitude", NAN);
             
-                for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
-                    it != RouteMap::Positions.end(); it++) {
-                    if((*it).Name == name) {
+                if (GUID.IsEmpty()) for(auto it : RouteMap::Positions) {
+                    if (it.Name == name) {
                         static bool warnonce = true;
                         if(warnonce) {
                             warnonce = false;
@@ -1623,87 +1712,87 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 AddPosition(lat, lon, name, GUID);
             
             skipadd:;
-            } else
-                if(!strcmp(e->Value(), "Configuration")) {
-                    RouteMapConfiguration configuration;
-                    configuration.RouteGUID = wxString::FromUTF8(e->Attribute("GUID"));
-                    configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
-                    wxDateTime date;
-                    date.ParseISODate(wxString::FromUTF8(e->Attribute("StartDate")));
-                    wxDateTime time;
-                    time.ParseISOTime(wxString::FromUTF8(e->Attribute("StartTime")));
-                    if(date.IsValid()) {
-                        if(time.IsValid()) {
-                            date.SetHour(time.GetHour());
-                            date.SetMinute(time.GetMinute());
-                            date.SetSecond(time.GetSecond());
-                        }
-                        configuration.StartTime = date;
-                    } else
-                        configuration.StartTime = wxDateTime::Now();
+            } 
+            else if(!strcmp(e->Value(), "Configuration")) {
+                RouteMapConfiguration configuration;
+                configuration.RouteGUID = wxString::FromUTF8(e->Attribute("GUID"));
+                configuration.Start = wxString::FromUTF8(e->Attribute("Start"));
+                wxDateTime date;
+                date.ParseISODate(wxString::FromUTF8(e->Attribute("StartDate")));
+                wxDateTime time;
+                time.ParseISOTime(wxString::FromUTF8(e->Attribute("StartTime")));
+                if(date.IsValid()) {
+                    if(time.IsValid()) {
+                        date.SetHour(time.GetHour());
+                        date.SetMinute(time.GetMinute());
+                        date.SetSecond(time.GetSecond());
+                    }
+                    configuration.StartTime = date;
+                } else
+                    configuration.StartTime = wxDateTime::Now();
             
-                    configuration.End = wxString::FromUTF8(e->Attribute("End"));
-                    configuration.DeltaTime = AttributeDouble(e, "dt", 0);
+                configuration.End = wxString::FromUTF8(e->Attribute("End"));
+                configuration.DeltaTime = AttributeDouble(e, "dt", 0);
             
-                    configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
-                    if(!wxFileName::FileExists(configuration.boatFileName)) {
-                        configuration.boatFileName = weather_routing_pi::StandardPath() +
+                configuration.boatFileName = wxString::FromUTF8(e->Attribute("Boat"));
+                if(!wxFileName::FileExists(configuration.boatFileName)) {
+                    configuration.boatFileName = weather_routing_pi::StandardPath() +
 			                             _T("boats") +
 						     wxFileName::GetPathSeparator() +
 						     configuration.boatFileName;
-                        if(!wxFileName::FileExists(configuration.boatFileName)) {
+                    if(!wxFileName::FileExists(configuration.boatFileName)) {
 
-                            configuration.boatFileName = _T("");
+                        configuration.boatFileName = _T("");
 			}
-		    }
+		}
             
-                    configuration.Integrator = (RouteMapConfiguration::IntegratorType)
-                        AttributeInt(e, "Integrator", 0);
+                configuration.Integrator = (RouteMapConfiguration::IntegratorType)
+                    AttributeInt(e, "Integrator", 0);
 
-                    configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 90);
-                    configuration.MaxCourseAngle = AttributeDouble(e, "MaxCourseAngle", 180);
-                    configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 120);
-                    configuration.MaxTrueWindKnots = AttributeDouble(e, "MaxTrueWindKnots", 100);
-                    configuration.MaxApparentWindKnots = AttributeDouble(e, "MaxApparentWindKnots", 100);
+                configuration.MaxDivertedCourse = AttributeDouble(e, "MaxDivertedCourse", 90);
+                configuration.MaxCourseAngle = AttributeDouble(e, "MaxCourseAngle", 180);
+                configuration.MaxSearchAngle = AttributeDouble(e, "MaxSearchAngle", 120);
+                configuration.MaxTrueWindKnots = AttributeDouble(e, "MaxTrueWindKnots", 100);
+                configuration.MaxApparentWindKnots = AttributeDouble(e, "MaxApparentWindKnots", 100);
 
-                    configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
-                    configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
-                    configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
-                    configuration.WindVSCurrent = AttributeDouble(e, "WindVSCurrent", 0);
+                configuration.MaxSwellMeters = AttributeDouble(e, "MaxSwellMeters", 20);
+                configuration.MaxLatitude = AttributeDouble(e, "MaxLatitude", 90);
+                configuration.TackingTime = AttributeDouble(e, "TackingTime", 0);
+                configuration.WindVSCurrent = AttributeDouble(e, "WindVSCurrent", 0);
 
-                    configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
-                    configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 2);
-                    configuration.CycloneDays = AttributeInt(e, "CycloneDays", 0);
+                configuration.AvoidCycloneTracks = AttributeBool(e, "AvoidCycloneTracks", false);
+                configuration.CycloneMonths = AttributeInt(e, "CycloneMonths", 2);
+                configuration.CycloneDays = AttributeInt(e, "CycloneDays", 0);
 
-                    configuration.UseGrib = AttributeBool(e, "UseGrib", true);
-                    configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
-                        AttributeInt(e, "ClimatologyType", RouteMapConfiguration::CUMULATIVE_MAP);
-                    configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
-                    configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
+                configuration.UseGrib = AttributeBool(e, "UseGrib", true);
+                configuration.ClimatologyType = (RouteMapConfiguration::ClimatologyDataType)
+                    AttributeInt(e, "ClimatologyType", RouteMapConfiguration::CUMULATIVE_MAP);
+                configuration.AllowDataDeficient = AttributeBool(e, "AllowDataDeficient", false);
+                configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
 
-                    configuration.DetectLand = AttributeBool(e, "DetectLand", true);
-                    configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 2.);
-                    configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
-                    configuration.Currents = AttributeBool(e, "Currents", true);
-                    configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
-                    
-                    configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
-                    configuration.Anchoring = AttributeBool(e, "Anchoring", false);
+                configuration.DetectLand = AttributeBool(e, "DetectLand", true);
+                configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 2.);
+                configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
+                configuration.Currents = AttributeBool(e, "Currents", true);
+                configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
+                
+                configuration.InvertedRegions = AttributeBool(e, "InvertedRegions", false);
+                configuration.Anchoring = AttributeBool(e, "Anchoring", false);
 
-                    configuration.FromDegree = AttributeDouble(e, "FromDegree", 0);
-                    configuration.ToDegree = AttributeDouble(e, "ToDegree", 180);
-                    configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5);
+                configuration.FromDegree = AttributeDouble(e, "FromDegree", 0);
+                configuration.ToDegree = AttributeDouble(e, "ToDegree", 180);
+                configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5);
 
-                    if(configuration.boatFileName == lastboatFileName)
-                        configuration.boat = lastboat;
+                if(configuration.boatFileName == lastboatFileName)
+                    configuration.boat = lastboat;
             
-                    AddConfiguration(configuration);
+                AddConfiguration(configuration);
 
-                    lastboatFileName = configuration.boatFileName;
-                    m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
-                    lastboat = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration().boat;
-                } else
-                    FAIL(_("Unrecognized xml node"));
+                lastboatFileName = configuration.boatFileName;
+                m_WeatherRoutes.back()->routemapoverlay->LoadBoat();
+                lastboat = m_WeatherRoutes.back()->routemapoverlay->GetConfiguration().boat;
+            } else
+                FAIL(_("Unrecognized xml node"));
         }
     }
 

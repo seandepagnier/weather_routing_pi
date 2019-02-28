@@ -60,7 +60,7 @@ std::cout << x << std::endl; } while (0)
 #include "version.h"
 
 #define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    13
+#define     MY_API_VERSION_MINOR    15
 
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
 
@@ -146,6 +146,7 @@ private:
       int              m_display_width, m_display_height;
       int              m_leftclick_tool_id;
       int              m_position_menu_id;
+      int              m_waypoint_menu_id;
 
       wxTimer m_tCursorLatLon;
 };

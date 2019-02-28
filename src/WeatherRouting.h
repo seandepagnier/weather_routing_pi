@@ -73,7 +73,7 @@ private:
     WeatherRoutingPanel *m_panel;
     
 public:
-    enum {POSITION_NAME=0, POSITION_LAT, POSITION_LON};
+    enum {POSITION_NAME=0, POSITION_LAT, POSITION_LON };
 
     enum {VISIBLE=0, BOAT, START, STARTTIME, END, ENDTIME, TIME, DISTANCE,
           AVGSPEED, MAXSPEED, AVGSPEEDGROUND, MAXSPEEDGROUND,
@@ -121,7 +121,8 @@ public:
     void UpdateDisplaySettings();
 
     void AddPosition(double lat, double lon);
-    void AddPosition(double lat, double lon, wxString name, wxString GUID = wxEmptyString);
+    void AddPosition(double lat, double lon, wxString name);
+    void AddPosition(double lat, double lon, wxString name, wxString GUID);
 
     void CursorRouteChanged();
     void UpdateColumns();

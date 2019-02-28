@@ -280,11 +280,13 @@ typedef std::list<IsoChron*> IsoChronList;
 
 struct RouteMapPosition {
     RouteMapPosition(wxString n, double lat0, double lon0, wxString guid = wxEmptyString)
-    : Name(n), GUID(guid), lat(lat0), lon(lon0) {}
+    : Name(n), GUID(guid), lat(lat0), lon(lon0) {ID = ++s_ID;}
 
     wxString Name;
     wxString GUID;
     double lat, lon;
+    long  ID;
+    static long s_ID;
 };
 
 struct RouteMapConfiguration {

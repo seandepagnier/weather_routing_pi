@@ -36,12 +36,19 @@
 #endif
 #endif
 
+#ifdef __WXMSW__
+#ifdef MAKING_PLUGIN
+#  define DECL_IMP     __declspec(dllimport)
+#endif
+#endif
 
 #include <wx/xml/xml.h>
 
 #ifdef ocpnUSE_SVG
-#include "wxsvg/include/wxSVG/svg.h"
+#include "wxSVG/svg.h"
 #endif // ocpnUSE_SVG
+
+#include <memory>
 
 class wxGLContext;
 
@@ -50,7 +57,7 @@ class wxGLContext;
 //    PlugIns conforming to API Version less then the most modern will also
 //    be correctly supported.
 #define API_VERSION_MAJOR           1
-#define API_VERSION_MINOR           15
+#define API_VERSION_MINOR           16
 
 //    Fwd Definitions
 class       wxFileConfig;
@@ -462,7 +469,6 @@ class DECL_EXP opencpn_plugin_18 : public opencpn_plugin
 
             virtual bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
             virtual bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
-
             virtual void SetPluginMessage(wxString &message_id, wxString &message_body);
             virtual void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
 
@@ -530,6 +536,14 @@ public:
     opencpn_plugin_115(void *pmgr);
     virtual ~opencpn_plugin_115();
 
+};
+
+class DECL_EXP opencpn_plugin_116 : public opencpn_plugin_115
+{
+public:
+    opencpn_plugin_116(void *pmgr);
+    virtual ~opencpn_plugin_116();
+    virtual bool RenderGLOverlayMultiCanvas(wxGLContext *pcontext, PlugIn_ViewPort *vp, int max_canvas);
 };
 
 //------------------------------------------------------------------
@@ -771,8 +785,8 @@ extern  DECL_EXP wxString GetLocaleCanonicalName();
 
 
 class PI_S57Obj;
-
 WX_DECLARE_LIST(PI_S57Obj, ListOfPI_S57Obj);
+
 
 // ----------------------------------------------------------------------------
 // PlugInChartBaseGL
@@ -1214,10 +1228,14 @@ private:
     bool m_b_complete;
 };
 
-//DECLARE_EVENT_TYPE(wxEVT_DOWNLOAD_EVENT, -1)
-//extern const wxEventType DECL_EXP wxEVT_DOWNLOAD_EVENT;
 
-extern WXDLLIMPEXP_CORE const wxEventType wxEVT_DOWNLOAD_EVENT;
+//extern WXDLLIMPEXP_CORE const wxEventType wxEVT_DOWNLOAD_EVENT;
+
+#ifdef MAKING_PLUGIN
+extern   DECL_IMP wxEventType wxEVT_DOWNLOAD_EVENT;
+#else
+extern   DECL_EXP wxEventType wxEVT_DOWNLOAD_EVENT;
+#endif
 
 // API 1.14 Extra canvas Support
 
@@ -1233,5 +1251,49 @@ extern DECL_EXP wxFont* FindOrCreateFont_PlugIn( int point_size, wxFontFamily fa
                     wxFontStyle style, wxFontWeight weight, bool underline = false,
                     const wxString &facename = wxEmptyString,
                     wxFontEncoding encoding = wxFONTENCODING_DEFAULT );
+
+extern DECL_EXP int PlugInGetMinAvailableGshhgQuality();
+extern DECL_EXP int PlugInGetMaxAvailableGshhgQuality();
+
+extern DECL_EXP void PlugInHandleAutopilotRoute(bool enable);
+
+// API 1.16
+//
+/**
+ * Return the plugin data directory for a given directory name.
+ *
+ * On Linux, the returned data path is an existing directory ending in
+ * "opencpn/plugins/<plugin_name>" where the last part is the plugin_name
+ * argument. The prefix part is one of the directories listed in the
+ * environment variable XDG_DATA_DIRS, by default
+ * ~/.local/share:/usr/local/share:/usr/share.
+ *
+ * On other platforms, the returned value is GetSharedDataDir() +
+ * "/opencpn/plugins/" + plugin_name (with native path separators)
+ * if that path exists.
+ *
+ * Return "" if no existing directory is found.
+ */
+extern DECL_EXP wxString GetPluginDataDir(const char* plugin_name);
+
+//  Support for MUI MultiCanvas model
+
+extern DECL_EXP wxWindow* PluginGetFocusCanvas();
+extern DECL_EXP wxWindow* PluginGetOverlayRenderCanvas();
+
+extern "C"  DECL_EXP void CanvasJumpToPosition( wxWindow *canvas, double lat, double lon, double scale);
+extern "C"  DECL_EXP  int AddCanvasMenuItem(wxMenuItem *pitem, opencpn_plugin *pplugin, const char *name = "");
+extern "C"  DECL_EXP void RemoveCanvasMenuItem(int item, const char *name = "");      // Fully remove this item
+extern "C"  DECL_EXP void SetCanvasMenuItemViz(int item, bool viz, const char *name = ""); // Temporarily change context menu options
+extern "C"  DECL_EXP void SetCanvasMenuItemGrey(int item, bool grey, const char *name = "");
+
+// Extra waypoints, routes and tracks
+extern DECL_EXP wxString GetSelectedWaypointGUID_Plugin(  );
+extern DECL_EXP wxString GetSelectedRouteGUID_Plugin( );
+extern DECL_EXP wxString GetSelectedTrackGUID_Plugin( );
+
+extern DECL_EXP std::unique_ptr<PlugIn_Waypoint> GetWaypoint_Plugin( const wxString& ); // doublon with GetSingleWaypoint
+extern DECL_EXP std::unique_ptr<PlugIn_Route> GetRoute_Plugin( const wxString& );
+extern DECL_EXP std::unique_ptr<PlugIn_Track> GetTrack_Plugin( const wxString& );
 
 #endif //_PLUGIN_H_
