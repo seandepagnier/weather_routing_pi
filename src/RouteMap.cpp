@@ -83,6 +83,7 @@
 
 #define distance(X, Y) sqrt((X)*(X) + (Y)*(Y)) // much faster than hypot
 
+long RouteMapPosition::s_ID = 0;
 
 static double Swell(RouteMapConfiguration &configuration, double lat, double lon)
 {
@@ -2385,16 +2386,34 @@ void IsoChron::ResetDrawnFlag()
 bool RouteMapConfiguration::Update()
 {
     bool havestart = false, haveend = false;
-    for(std::list<RouteMapPosition>::iterator it = RouteMap::Positions.begin();
-        it != RouteMap::Positions.end(); it++) {
-        if(Start == (*it).Name) {
-            StartLat = (*it).lat;
-            StartLon = (*it).lon;
+    PlugIn_Waypoint waypoint;
+
+    if (!RouteGUID.IsEmpty()) {
+        havestart = true;
+        haveend = true;
+    }
+    else for(const auto &it : RouteMap::Positions ) {
+        if(Start == it.Name) {
+            double lat = it.lat;
+            double lon = it.lon;
+            if (!it.GUID.IsEmpty() && GetSingleWaypoint( it.GUID, &waypoint )) {
+                lat = waypoint.m_lat;
+                lon = waypoint.m_lon;
+            }
+            StartLat = lat;
+            StartLon = lon;
+                
             havestart = true;
         }
-        if(End == (*it).Name) {
-            EndLat = (*it).lat;
-            EndLon = (*it).lon;
+        if(End == it.Name) {
+            double lat = it.lat;
+            double lon = it.lon;
+            if (!it.GUID.IsEmpty() && GetSingleWaypoint( it.GUID, &waypoint )) {
+                lat = waypoint.m_lat;
+                lon = waypoint.m_lon;
+            }
+            EndLat = lat;
+            EndLon = lon;
             haveend = true;
         }
     }

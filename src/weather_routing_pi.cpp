@@ -121,7 +121,10 @@ int weather_routing_pi::Init(void)
       wxMenu dummy_menu;
       m_position_menu_id = AddCanvasContextMenuItem
           (new wxMenuItem(&dummy_menu, -1, _("Weather Route Position")), this );
-      SetCanvasContextMenuItemViz(m_position_menu_id, false);
+      SetCanvasMenuItemViz(m_position_menu_id, false);
+
+      m_waypoint_menu_id = AddCanvasMenuItem (new wxMenuItem(&dummy_menu, -1, _("Weather Route Position")), this, "Waypoint" );
+      SetCanvasMenuItemViz(m_waypoint_menu_id, false, "Waypoint");
 
       //    And load the configuration items
       LoadConfig();
@@ -422,9 +425,19 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
     if(!m_pWeather_Routing)
         return;
 
-    if(id == m_position_menu_id)
+    if(id == m_position_menu_id) {
         m_pWeather_Routing->AddPosition(m_cursor_lat, m_cursor_lon);
-
+    }
+    else if(id == m_waypoint_menu_id) {
+        wxString GUID = GetSelectedWaypointGUID_Plugin();
+        if (GUID.IsEmpty())
+          return;
+        std::unique_ptr<PlugIn_Waypoint> w = GetWaypoint_Plugin( GUID);
+        PlugIn_Waypoint *wp = w.get();
+        if (wp == nullptr)
+            return;
+        m_pWeather_Routing->AddPosition(wp->m_lat, wp->m_lon, wp->m_MarkName, wp->m_GUID);
+    }
     m_pWeather_Routing->Reset();
 }
 
@@ -533,5 +546,6 @@ wxString weather_routing_pi::StandardPath()
 void weather_routing_pi::ShowMenuItems(bool show)
 {
     SetToolbarItemState( m_leftclick_tool_id, show );
-    SetCanvasContextMenuItemViz(m_position_menu_id, show);
+    SetCanvasMenuItemViz(m_position_menu_id, show);
+    SetCanvasMenuItemViz(m_waypoint_menu_id, show, "Waypoint");
 }
