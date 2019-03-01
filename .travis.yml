@@ -27,7 +27,6 @@ install:
         sudo installer -pkg "/Volumes/Packages 1.2.5/Install Packages.pkg" -target "/";
       fi
 
-
 script:
   - if [[ "${COVERITY_SCAN_BRANCH}" == 1 ]];
     then
