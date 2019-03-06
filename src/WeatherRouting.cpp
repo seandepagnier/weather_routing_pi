@@ -2366,6 +2366,8 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
 
     // XXX double check time is really end time, not start time off by one.
     RouteMapConfiguration c = routemapoverlay.GetConfiguration();
+    newPath->m_StartString = c.Start;
+    newPath->m_EndString = c.End;
 
     for(auto const &it : plotdata) {
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
