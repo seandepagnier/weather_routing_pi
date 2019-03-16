@@ -791,6 +791,11 @@ void WeatherRouting::UpdateRoutePositionDialog()
     Position *closestPosition = rmo->getClosestRoutePositionFromCursor(m_weather_routing_pi.m_cursor_lat,
                                           m_weather_routing_pi.m_cursor_lon,
                                           data);
+    if(!closestPosition) {
+        RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
+        return;
+    }
+
     // Store position to display it
     m_positionOnRoute = closestPosition;
 
