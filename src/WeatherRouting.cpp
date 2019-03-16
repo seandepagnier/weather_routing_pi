@@ -767,7 +767,7 @@ void WeatherRouting::UpdateRoutePositionDialog()
     if(!dlg.IsShown())
         return;
 
-    m_positionOnRoute = NULL;
+    m_positionOnRoute = nullptr;
     std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
     if(currentroutemaps.size() != 1) {
         RoutePositionDialogMessage(dlg, _("Select exactly 1 configuration"));
@@ -780,12 +780,6 @@ void WeatherRouting::UpdateRoutePositionDialog()
         RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
         return;
     }
-    wxDateTime display_time = rmo->GetLastCursorTime();
-    
-    if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
-        display_time = display_time.FromUTC();
-    
-    dlg.m_stTime->SetLabel(display_time.Format(_T("%x %H:%M")));
     
     RouteMapConfiguration configuration = rmo->GetConfiguration();
     
@@ -809,6 +803,8 @@ void WeatherRouting::UpdateRoutePositionDialog()
         startTime = startTime.FromUTC();
         cursorTime = data.time.FromUTC();
     }
+    dlg.m_stTime->SetLabel(cursorTime.Format(_T("%x %H:%M")));
+
     wxString duration = calculateTimeDelta(startTime, cursorTime);
     dlg.m_stDuration->SetLabel(duration);
     
