@@ -767,7 +767,7 @@ void WeatherRouting::UpdateRoutePositionDialog()
     if(!dlg.IsShown())
         return;
 
-    m_positionOnRoute = NULL;
+    m_positionOnRoute = nullptr;
     std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
     if(currentroutemaps.size() != 1) {
         RoutePositionDialogMessage(dlg, _("Select exactly 1 configuration"));
@@ -780,12 +780,6 @@ void WeatherRouting::UpdateRoutePositionDialog()
         RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
         return;
     }
-    wxDateTime display_time = rmo->GetLastCursorTime();
-    
-    if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
-        display_time = display_time.FromUTC();
-    
-    dlg.m_stTime->SetLabel(display_time.Format(_T("%x %H:%M")));
     
     RouteMapConfiguration configuration = rmo->GetConfiguration();
     
@@ -797,6 +791,11 @@ void WeatherRouting::UpdateRoutePositionDialog()
     Position *closestPosition = rmo->getClosestRoutePositionFromCursor(m_weather_routing_pi.m_cursor_lat,
                                           m_weather_routing_pi.m_cursor_lon,
                                           data);
+    if(!closestPosition) {
+        RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
+        return;
+    }
+
     // Store position to display it
     m_positionOnRoute = closestPosition;
 
@@ -809,6 +808,8 @@ void WeatherRouting::UpdateRoutePositionDialog()
         startTime = startTime.FromUTC();
         cursorTime = data.time.FromUTC();
     }
+    dlg.m_stTime->SetLabel(cursorTime.Format(_T("%x %H:%M")));
+
     wxString duration = calculateTimeDelta(startTime, cursorTime);
     dlg.m_stDuration->SetLabel(duration);
     
@@ -1050,7 +1051,7 @@ void WeatherRouting::OnGoTo( wxCommandEvent& event )
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++) {
         RouteMapConfiguration configuration = (*it)->GetConfiguration();
-        if(wxIsNaN(configuration.StartLat)) continue;
+        if(std::isnan(configuration.StartLat)) continue;
         avg_lat += configuration.StartLat + configuration.EndLat;
         avg_lonx = cos(deg2rad(configuration.StartLon)) + cos(deg2rad(configuration.EndLon));
         avg_lony = sin(deg2rad(configuration.StartLon)) + sin(deg2rad(configuration.EndLon));
@@ -1065,7 +1066,7 @@ void WeatherRouting::OnGoTo( wxCommandEvent& event )
     for(std::list<RouteMapOverlay*>::iterator it = currentroutemaps.begin();
         it != currentroutemaps.end(); it++) {
         RouteMapConfiguration configuration = (*it)->GetConfiguration();
-        if(wxIsNaN(configuration.StartLat)) continue;
+        if(std::isnan(configuration.StartLat)) continue;
         double distance;
         DistanceBearingMercator_Plugin(avg_lat, avg_lon,
                                        configuration.StartLat, configuration.StartLon,
@@ -2357,22 +2358,24 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
         return;
     }
 
-    PlugIn_Track* newTrack = new PlugIn_Track;
+    PlugIn_Track* newPath = new PlugIn_Track;
     wxDateTime display_time = routemapoverlay.StartTime();
     if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
         display_time = display_time.FromUTC();
 
-    newTrack->m_NameString = _("Weather Route ") + " ("  +display_time.Format(_T("%x %H:%M")) + ")";
+    newPath->m_NameString = _("Weather Route ") + " ("  +display_time.Format(_T("%x %H:%M")) + ")";
 
     // XXX double check time is really end time, not start time off by one.
     RouteMapConfiguration c = routemapoverlay.GetConfiguration();
+    newPath->m_StartString = c.Start;
+    newPath->m_EndString = c.End;
 
-    for(std::list<PlotData>::iterator it = plotdata.begin(); it != plotdata.end(); it++) {
+    for(auto const &it : plotdata) {
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
-            ((*it).lat, heading_resolve((*it).lon), _T("circle"), _("Weather Route Point"));
+            (it.lat, heading_resolve(it.lon), _T("circle"), _("Weather Route Point"));
 
-        newPoint->m_CreateTime = (*it).time;
-        newTrack->pWaypointList->Append(newPoint);
+        newPoint->m_CreateTime = it.time;
+        newPath->pWaypointList->Append(newPoint);
     }
 
     // last point, missing if config didn't succeed
@@ -2381,15 +2384,15 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
         PlugIn_Waypoint*  newPoint = new PlugIn_Waypoint
             (p->lat, p->lon, _T("circle"), _("Weather Route Destination"));
         newPoint->m_CreateTime =  routemapoverlay.EndTime();
-        newTrack->pWaypointList->Append(newPoint);
+        newPath->pWaypointList->Append(newPoint);
     }
 
-    AddPlugInTrack(newTrack);
+    AddPlugInTrack(newPath);
     // not done PlugIn_Track DTOR
-    newTrack->pWaypointList->DeleteContents( true );
-    newTrack->pWaypointList->Clear();
+    newPath->pWaypointList->DeleteContents( true );
+    newPath->pWaypointList->Clear();
 
-    delete newTrack;
+    delete newPath;
 
     GetParent()->Refresh();
 }

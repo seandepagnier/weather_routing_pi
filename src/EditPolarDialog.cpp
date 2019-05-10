@@ -223,7 +223,7 @@ void EditPolarDialog::RebuildGrid()
 
         for(unsigned int j = 0; j<GetPolar()->degree_steps.size(); j++) {
             double v = GetPolar()->wind_speeds[i].orig_speeds[j];
-            wxString str = wxIsNaN(v) ? "" : v==0 ? "0.0" : wxString::Format(_T("%4.1f"), v);
+            wxString str = std::isnan(v) ? "" : v==0 ? "0.0" : wxString::Format(_T("%4.1f"), v);
             m_gPolar->SetCellValue(j, i, str);
         }
     }

@@ -119,7 +119,7 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
             (_T(" %.2f%%"), (*it)->RouteInfo(RouteMapOverlay::PERCENTAGE_UPWIND)) + _T("<dt>");
         double port_starboard = (*it)->RouteInfo(RouteMapOverlay::PORT_STARBOARD);
         page += _("Port/Starboard") + wxString(_T(": ")) +
-            (wxIsNaN(port_starboard) ? _T("nan") : wxString::Format
+            (std::isnan(port_starboard) ? _T("nan") : wxString::Format
              (_T("%d/%d"), (int)port_starboard, 100-(int)port_starboard)) + _T("<dt>");
 
         if (d) {
