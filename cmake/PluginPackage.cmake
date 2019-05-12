@@ -160,9 +160,6 @@ MESSAGE (STATUS "*** Staging to build PlugIn OSX Package ***")
 configure_file(${PROJECT_SOURCE_DIR}/cmake/gpl.txt
             ${CMAKE_CURRENT_BINARY_DIR}/license.txt COPYONLY)
 
-configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/pkg_background.jpg
-            ${CMAKE_CURRENT_BINARY_DIR}/pkg_background.jpg COPYONLY)
-
  # Patch the pkgproj.in file to make the output package name conform to Xxx-Plugin_x.x.pkg format
  #  Key is:
  #  <key>NAME</key>
