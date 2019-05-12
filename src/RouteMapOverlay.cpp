@@ -303,7 +303,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
     if(!justendroute) {
         RouteMapConfiguration configuration = GetConfiguration();
 
-        if(!wxIsNaN(configuration.StartLat)) {
+        if(!std::isnan(configuration.StartLat)) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
             SetColor(dc, *wxBLUE, true);
@@ -313,7 +313,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             dc.DrawLine(r.x-10, r.y+7, r.x+10, r.y+7);
         }
 
-        if(!wxIsNaN(configuration.StartLon)) {
+        if(!std::isnan(configuration.EndLat)) {
             wxPoint r;
             GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
             SetColor(dc, *wxRED, true);
@@ -1560,13 +1560,11 @@ Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, d
      */
     
     double dist = INFINITY;
-    PlotData tempData;
     Position *pos = last_destination_position;
-    Position *newPos = NULL;
-    Position *p;
+    Position *newPos = nullptr;
     
     // Get position first
-    for(p = pos; p && p->parent; p = p->parent)
+    for(Position *p = pos; p && p->parent; p = p->parent)
     {
         // Calculate distance
         // Almost like a plan (x,y) because of small distance -- is that correct?
@@ -1579,15 +1577,18 @@ Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, d
     }
     
     // Get data if position was founded
-    if (newPos != NULL)
+    if (newPos)
     {
         std::list<PlotData> plot = GetPlotData(false);
-        for ( std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); it++)
+        for ( const auto &it : plot)
         {
-            if (it->lat == newPos->lat && it->lon == newPos->lon)
-                posData = *it;
+            if (it.lat == newPos->lat && it.lon == newPos->lon)
+            {
+                posData = it;
+                return newPos;
+            }
         }
     }
     
-    return newPos;
+    return nullptr;
 }
