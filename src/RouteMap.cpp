@@ -680,13 +680,22 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     Position *rp;
 
     double bearing1 = NAN, bearing2 = NAN;
-    if(parent && configuration.MaxSearchAngle < 180) {
+    if(!configuration.slow_start && parent && configuration.MaxSearchAngle < 180) {
         bearing1 = heading_resolve( parent_bearing - configuration.MaxSearchAngle);
         bearing2 = heading_resolve( parent_bearing + configuration.MaxSearchAngle);
     }
+    std::list<double> &active = configuration.DegreeSteps;
+    std::list<double> start;
+    if (configuration.slow_start) {
+        for(double step = 0.; step <= 180.; step += 1.0) {
+            start.push_back(step);
+            if(step > 0 && step < 180) start.push_back(360-step);
+        }
+        start.sort();
+        active = start;
+    }
 
-    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
-        it != configuration.DegreeSteps.end(); it++) {
+    for(std::list<double>::iterator it = active.begin();it != active.end(); it++) {
 
         double H = heading_resolve(*it);
         double B, VB, BG, VBG;
@@ -761,7 +770,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         if(configuration.positive_longitudes && dlon < 0)
             dlon += 360;
 
-        if(configuration.MaxCourseAngle < 180) {
+        if(!configuration.slow_start && configuration.MaxCourseAngle < 180) {
             double bearing;
             // this is faster than gc distance, and actually works better in higher latitudes
             double d1 = dlat - configuration.StartLat, d2 = dlon - configuration.StartLon;
@@ -772,7 +781,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 continue;
         }
 
-        if(configuration.MaxDivertedCourse < 180) {
+        if(!configuration.slow_start && configuration.MaxDivertedCourse < 180) {
             double bearing, dist;
             double bearing1, dist1;
 
@@ -2549,6 +2558,11 @@ bool RouteMap::Propagate()
 
     // request the next grib
     // in a different thread (grib record averaging going in parallel)
+
+    m_Configuration.slow_start = false;
+    if (origin.empty() && (configuration.DetectBoundary || configuration.DetectLand))
+        m_Configuration.slow_start = true;
+
     m_NewGrib = 0;
     m_SharedNewGrib.SetGribRecordSet(0);
     m_NewTime += wxTimeSpan(0, 0, configuration.DeltaTime);
