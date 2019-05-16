@@ -862,7 +862,12 @@ void WeatherRouting::UpdateRoutePositionDialog()
     dlg.m_stTacks->SetLabel(wxString::Format(_T("%d"), closestPosition->tacks));
     
     // BOAT SPEED
-    dlg.m_stBoatSpeed->SetLabel(wxString::Format(_T("%.1f knts"), data.VB));
+    if (std::abs(data.VB - data.VBG) > 0.1) {
+        dlg.m_stBoatSpeed->SetLabel(wxString::Format(_T("%.1f knts (SOW), %.1f knts (SOG)"), data.VB, data.VBG));
+    }
+    else {
+        dlg.m_stBoatSpeed->SetLabel(wxString::Format(_T("%.1f knts"), data.VB));
+    }
     
     // WIND SPEED
     //RouteInfo(RouteMapOverlay::COMFORT);

@@ -2847,8 +2847,8 @@ RoutePositionDialog::RoutePositionDialog( wxWindow* parent, wxWindowID id, const
 	m_staticText12816->Wrap( -1 );
 	fgSizer91->Add( m_staticText12816, 0, wxALL, 5 );
 	
-	m_stBoatSpeed = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 120,-1 ), 0 );
-	m_stBoatSpeed->Wrap( 120 );
+	m_stBoatSpeed = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 150,-1 ), 0 );
+	m_stBoatSpeed->Wrap( 150 );
 	fgSizer91->Add( m_stBoatSpeed, 0, wxALL, 5 );
 	
 	m_staticText1281 = new wxStaticText( this, wxID_ANY, _("True Wind Speed (TWS)"), wxDefaultPosition, wxDefaultSize, 0 );
