@@ -1656,6 +1656,7 @@ void RouteMapOverlay::UpdateDestination()
                                             mindata_mask);
 
             m_EndTime = isochron->time +wxTimeSpan::Milliseconds(1000*mindt);
+            isochron->delta = mindt;
             last_destination_position = destination_position;
         }
     }
