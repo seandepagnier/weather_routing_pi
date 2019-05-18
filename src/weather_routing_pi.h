@@ -91,10 +91,10 @@ class weather_routing_pi : public wxEvtHandler, public opencpn_plugin_115
 {
 public:
       weather_routing_pi(void *ppimgr);
-      ~weather_routing_pi(void);
+      ~weather_routing_pi();
 
-      int Init(void);
-      bool DeInit(void);
+      int Init();
+      bool DeInit();
 
       int GetAPIVersionMajor();
       int GetAPIVersionMinor();
@@ -109,9 +109,9 @@ public:
       bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
       bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
 
-      void SetDefaults(void);
+      void SetDefaults();
 
-      int GetToolbarToolCount(void);
+      int GetToolbarToolCount();
 
       void SetCursorLatLon(double lat, double lon);
 
@@ -131,10 +131,11 @@ public:
 
 private:
       void OnCursorLatLonTimer( wxTimerEvent & );
+      void RequestOcpnDrawSetting();
       void NewWR();
 
-      bool LoadConfig(void);
-      bool SaveConfig(void);
+      bool LoadConfig();
+      bool SaveConfig();
 
       bool	       b_in_boundary_reply;
 

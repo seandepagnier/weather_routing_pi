@@ -94,12 +94,12 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
                               ( weather_routing_pi::OnCursorLatLonTimer ), NULL, this);
 }
 
-weather_routing_pi::~weather_routing_pi(void)
+weather_routing_pi::~weather_routing_pi()
 {
       delete _img_WeatherRouting;
 }
 
-int weather_routing_pi::Init(void)
+int weather_routing_pi::Init()
 {
       AddLocaleCatalog( _T("opencpn-weather_routing_pi") );
 
@@ -145,7 +145,7 @@ int weather_routing_pi::Init(void)
             );
 }
 
-bool weather_routing_pi::DeInit(void)
+bool weather_routing_pi::DeInit()
 {
     m_tCursorLatLon.Stop();
     if(m_pWeather_Routing)
@@ -201,11 +201,11 @@ Weather Routing features include:\n\
 ");
 }
 
-void weather_routing_pi::SetDefaults(void)
+void weather_routing_pi::SetDefaults()
 {
 }
 
-int weather_routing_pi::GetToolbarToolCount(void)
+int weather_routing_pi::GetToolbarToolCount()
 {
       return 1;
 }
@@ -335,10 +335,21 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyCycloneTrackCrossings);
 
         if(m_pWeather_Routing) {
-            m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable
-                (RouteMap::ClimatologyData!=NULL);
-            m_pWeather_Routing->m_ConfigurationDialog.m_cbAvoidCycloneTracks->Enable
-                (RouteMap::ClimatologyCycloneTrackCrossings!=NULL);
+            if (RouteMap::ClimatologyData == nullptr) {
+                m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable(false);
+            }
+            else {
+                m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable(true);
+            }
+            m_pWeather_Routing->m_ConfigurationDialog.m_cbAvoidCycloneTracks->Enable(RouteMap::ClimatologyCycloneTrackCrossings!=nullptr);
+        }
+    }
+    else if (message_id == wxS("OCPN_DRAW_PI_READY_FOR_REQUESTS")) {
+        if (message_body == "FALSE") {
+            RouteMap::ODFindClosestBoundaryLineCrossing = nullptr;
+        }
+        else if (message_body == "TRUE" && m_pWeather_Routing) {
+            RequestOcpnDrawSetting();
         }
     }
     else if(message_id == wxS("WEATHER_ROUTING_PI")) {
@@ -406,6 +417,20 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 {
 }
 
+void weather_routing_pi::RequestOcpnDrawSetting()
+{
+    if(ODVersionNewerThan( 1, 1, 15)) {
+        Json::Value jMsg;
+        Json::FastWriter writer;
+
+        jMsg["Source"] = "WEATHER_ROUTING_PI";
+        jMsg["Type"] = "Request";
+        jMsg["Msg"] = "GetAPIAddresses";
+        jMsg["MsgId"] = "GetAPIAddresses";
+        SendPluginMessage( "OCPN_DRAW_PI", writer.write( jMsg ) );
+    }
+}
+
 void weather_routing_pi::NewWR()
 {
     if(m_pWeather_Routing)
@@ -418,20 +443,8 @@ void weather_routing_pi::NewWR()
 
     SendPluginMessage("GRIB_TIMELINE_REQUEST", "");
     SendPluginMessage("CLIMATOLOGY_REQUEST", "");
-
-    if(ODVersionNewerThan( 1, 1, 15)) {
-        Json::Value jMsg;
-        Json::FastWriter writer;
-
-        jMsg["Source"] = "WEATHER_ROUTING_PI";
-        jMsg["Type"] = "Request";
-        jMsg["Msg"] = "GetAPIAddresses";
-        jMsg["MsgId"] = "GetAPIAddresses";
-        SendPluginMessage( "OCPN_DRAW_PI", writer.write( jMsg ) );
-    }
-
+    RequestOcpnDrawSetting();
     m_pWeather_Routing->Reset();
-    
 }
 
 void weather_routing_pi::OnToolbarToolCallback(int id)
@@ -510,7 +523,7 @@ void weather_routing_pi::OnCursorLatLonTimer( wxTimerEvent & )
     }
 }
 
-bool weather_routing_pi::LoadConfig(void)
+bool weather_routing_pi::LoadConfig()
 {
       wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
 
@@ -521,7 +534,7 @@ bool weather_routing_pi::LoadConfig(void)
       return true;
 }
 
-bool weather_routing_pi::SaveConfig(void)
+bool weather_routing_pi::SaveConfig()
 {
       wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
 
