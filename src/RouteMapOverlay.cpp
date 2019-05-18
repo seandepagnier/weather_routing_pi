@@ -1686,35 +1686,30 @@ Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, d
      */
     
     double dist = INFINITY;
-    Position *pos = last_destination_position;
-    Position *newPos = nullptr;
-    
-    // Get position first
-    for(Position *p = pos; p && p->parent; p = p->parent)
+    std::list<PlotData> plot = GetPlotData(false);
+    bool found = false;
+    for ( const auto &it : plot)
     {
         // Calculate distance
         // Almost like a plan (x,y) because of small distance -- is that correct?
-        double tempDist = sqrt( pow(cursorLat - p->lat, 2) + pow(cursorLon - p->lon, 2) );
+        double tempDist = sqrt( pow(cursorLat -it.lat, 2) + pow(cursorLon -it.lon, 2) );
         if (tempDist < dist)
         {
+            posData = it;
             dist = tempDist;
-            newPos = p;
+            found = true;
         }
     }
+    if (!found)
+        return nullptr;
     
-    // Get data if position was founded
-    if (newPos)
+    // Get full position
+    Position *pos = last_destination_position;
+    for(Position *p = pos; p && p->parent; p = p->parent)
     {
-        std::list<PlotData> plot = GetPlotData(false);
-        for ( const auto &it : plot)
-        {
-            if (it.lat == newPos->lat && it.lon == newPos->lon)
-            {
-                posData = it;
-                return newPos;
-            }
+        if (p->lat == posData.lat && p->lon == posData.lon ) {
+            return p;
         }
     }
-    
     return nullptr;
 }
