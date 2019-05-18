@@ -848,10 +848,10 @@ void WeatherRouting::UpdateRoutePositionDialog()
     dlg.m_stPosition->SetLabel(pos);
     
     // POLAR
-    if(closestPosition->polar == -1)
+    if(data.polar == -1)
         dlg.m_stPolar->SetLabel(wxEmptyString);
     else {
-        wxFileName fn = configuration.boat.Polars[closestPosition->polar].FileName;
+        wxFileName fn = configuration.boat.Polars[data.polar].FileName;
         dlg.m_stPolar->SetLabel(fn.GetFullName());
     }
     
@@ -859,7 +859,7 @@ void WeatherRouting::UpdateRoutePositionDialog()
     dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), closestPosition->SailChanges()));
     
     // TACKS
-    dlg.m_stTacks->SetLabel(wxString::Format(_T("%d"), closestPosition->tacks));
+    dlg.m_stTacks->SetLabel(wxString::Format(_T("%d"), data.tacks));
     
     // BOAT SPEED
     if (std::abs(data.VB - data.VBG) > 0.1) {
