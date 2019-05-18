@@ -128,7 +128,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
       m_bShowRoutePosition(false), m_bShowSettings(false),
       m_bShowStatistics(false), m_bShowReport(false), m_bShowPlot(false),
       m_bShowFilter(false), m_weather_routing_pi(plugin),
-      m_positionOnRoute(NULL)
+      m_positionOnRoute(nullptr)
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
@@ -2584,7 +2584,7 @@ void WeatherRouting::Reset()
             reinterpret_cast<WeatherRoute*>(wxUIntToPtr(m_panel->m_lWeatherRoutes->GetItemData(i)));
         weatherroute->routemapoverlay->Reset();
     }
-    m_positionOnRoute = NULL;
+    m_positionOnRoute = nullptr;
     UpdateDialogs();
 
     GetParent()->Refresh();

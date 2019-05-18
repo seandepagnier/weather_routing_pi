@@ -376,7 +376,7 @@ static wxColour Darken(wxColour c)
 
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                              piDC &dc, PlugIn_ViewPort &vp, bool justendroute,
-                             Position* positionOnRoute)
+                             RoutePoint* positionOnRoute)
 {
     dc.SetPen(*wxBLACK); // reset pen
     dc.SetBrush( *wxTRANSPARENT_BRUSH); // reset brush

@@ -235,7 +235,7 @@ private:
     wxSize m_size;
     
     // CUSTOMIZATION
-    Position *m_positionOnRoute;
+    RoutePoint *m_positionOnRoute;
 };
 
 #endif
