@@ -803,12 +803,6 @@ void WeatherRouting::UpdateRoutePositionDialog()
     }
     
     RouteMapOverlay *rmo = currentroutemaps.front();
-    Position *p = rmo->GetLastCursorPosition();
-    if(!p) {
-        RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
-        return;
-    }
-    
     RouteMapConfiguration configuration = rmo->GetConfiguration();
     
     // CUSTOMIZATION
