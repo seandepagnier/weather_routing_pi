@@ -685,6 +685,7 @@ class RoutePositionDialog : public wxDialog
 		wxStaticText* m_staticText134;
 		wxStaticText* m_staticDuration;
 		wxStaticText* m_staticText128;
+		wxStaticText* m_staticText128161;
 		wxStaticText* m_staticText12816;
 		wxStaticText* m_staticText1281;
 		wxStaticText* m_staticText12812;
@@ -703,6 +704,7 @@ class RoutePositionDialog : public wxDialog
 		wxStaticText* m_stTime;
 		wxStaticText* m_stDuration;
 		wxStaticText* m_stPosition;
+		wxStaticText* m_stBoatCourse;
 		wxStaticText* m_stBoatSpeed;
 		wxStaticText* m_stTWS;
 		wxStaticText* m_stAWS;
@@ -715,7 +717,7 @@ class RoutePositionDialog : public wxDialog
 		wxStaticText* m_stTacks;
 		wxStaticText* m_stWeatherData;
 
-		RoutePositionDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Route Position"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 404,322 ), long style = wxDEFAULT_DIALOG_STYLE );
+		RoutePositionDialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Route Position"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 410,470 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~RoutePositionDialog();
 
 };

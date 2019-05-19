@@ -865,6 +865,14 @@ void WeatherRouting::UpdateRoutePositionDialog()
     else {
         dlg.m_stBoatSpeed->SetLabel(wxString::Format(_T("%.1f knts"), data.VB));
     }
+
+    // BEARING
+    if (std::abs(data.B - data.BG) >= 5) {
+        dlg.m_stBoatCourse->SetLabel(wxString::Format(_T("%.0f \u00B0T (COW), %.0f \u00B0T (COG)"), positive_degrees(data.B), positive_degrees(data.BG)));
+    }
+    else {
+        dlg.m_stBoatCourse->SetLabel(wxString::Format(_T("%.0f \u00B0T"), positive_degrees(data.B)));
+    }
     
     // WIND SPEED
     //RouteInfo(RouteMapOverlay::COMFORT);

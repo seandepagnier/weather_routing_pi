@@ -2883,6 +2883,14 @@ RoutePositionDialog::RoutePositionDialog( wxWindow* parent, wxWindowID id, const
 	m_stPosition->Wrap( 120 );
 	fgSizer91->Add( m_stPosition, 0, wxALL|wxEXPAND, 5 );
 
+	m_staticText128161 = new wxStaticText( this, wxID_ANY, _("Course"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText128161->Wrap( -1 );
+	fgSizer91->Add( m_staticText128161, 0, wxALL, 5 );
+
+	m_stBoatCourse = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 150,-1 ), 0 );
+	m_stBoatCourse->Wrap( 150 );
+	fgSizer91->Add( m_stBoatCourse, 0, wxALL, 5 );
+
 	m_staticText12816 = new wxStaticText( this, wxID_ANY, _("Boat Speed"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText12816->Wrap( -1 );
 	fgSizer91->Add( m_staticText12816, 0, wxALL, 5 );
