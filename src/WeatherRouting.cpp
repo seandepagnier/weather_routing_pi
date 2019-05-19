@@ -813,13 +813,18 @@ void WeatherRouting::UpdateRoutePositionDialog()
     Position *closestPosition = rmo->getClosestRoutePositionFromCursor(m_weather_routing_pi.m_cursor_lat,
                                           m_weather_routing_pi.m_cursor_lon,
                                           data);
-    if(!closestPosition) {
-        RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
-        return;
-    }
 
     // Store position to display it
     m_positionOnRoute = closestPosition;
+    if (!closestPosition && data.time.IsValid()) {
+        m_positionOnRoute = &m_savedPosition;
+        m_savedPosition = data;
+    }
+
+    if (!m_positionOnRoute) {
+        RoutePositionDialogMessage(dlg, _("Cursor outside computed route map"));
+        return;
+    }
 
     // TRIP DURATION
     wxDateTime startTime = configuration.StartTime;
@@ -849,8 +854,6 @@ void WeatherRouting::UpdateRoutePositionDialog()
         dlg.m_stPolar->SetLabel(fn.GetFullName());
     }
     
-    // SAIL CHANGES
-    dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), closestPosition->SailChanges()));
     
     // TACKS
     dlg.m_stTacks->SetLabel(wxString::Format(_T("%d"), data.tacks));
@@ -907,21 +910,25 @@ void WeatherRouting::UpdateRoutePositionDialog()
     wxString data_deficient = _("Data Deficient") + _T(" ");
     wxString wind = _("Wind") + _T(" ");
     wxString current = _("Current") + _T(" ");
-    
-    if(closestPosition->data_mask & Position::GRIB_WIND)
-        weatherdata += grib + wind;
-    if(closestPosition->data_mask & Position::CLIMATOLOGY_WIND)
-        weatherdata += climatology + wind;
-    if(closestPosition->data_mask & Position::DATA_DEFICIENT_WIND)
-        weatherdata += data_deficient + wind;
-    if(closestPosition->data_mask & Position::GRIB_CURRENT)
-        weatherdata += grib + current;
-    if(closestPosition->data_mask & Position::CLIMATOLOGY_CURRENT)
-        weatherdata += climatology + current;
-    if(closestPosition->data_mask & Position::DATA_DEFICIENT_CURRENT)
-        weatherdata += data_deficient + current;
-    
-    dlg.m_stWeatherData->SetLabel(weatherdata);
+    if (closestPosition) {
+        // SAIL CHANGES
+        dlg.m_stSailChanges->SetLabel(wxString::Format(_T("%d"), closestPosition->SailChanges()));
+
+        if(closestPosition->data_mask & Position::GRIB_WIND)
+            weatherdata += grib + wind;
+        if(closestPosition->data_mask & Position::CLIMATOLOGY_WIND)
+            weatherdata += climatology + wind;
+        if(closestPosition->data_mask & Position::DATA_DEFICIENT_WIND)
+            weatherdata += data_deficient + wind;
+        if(closestPosition->data_mask & Position::GRIB_CURRENT)
+            weatherdata += grib + current;
+        if(closestPosition->data_mask & Position::CLIMATOLOGY_CURRENT)
+            weatherdata += climatology + current;
+        if(closestPosition->data_mask & Position::DATA_DEFICIENT_CURRENT)
+            weatherdata += data_deficient + current;
+
+        dlg.m_stWeatherData->SetLabel(weatherdata);
+    }
     dlg.Fit();
 }
 

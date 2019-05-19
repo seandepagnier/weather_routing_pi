@@ -236,6 +236,7 @@ private:
     
     // CUSTOMIZATION
     RoutePoint *m_positionOnRoute;
+    RoutePoint m_savedPosition;
 };
 
 #endif

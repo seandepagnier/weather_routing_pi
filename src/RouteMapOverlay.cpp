@@ -1688,6 +1688,7 @@ Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, d
     double dist = INFINITY;
     std::list<PlotData> plot = GetPlotData(false);
     bool found = false;
+    posData.time = wxInvalidDateTime;
     for ( const auto &it : plot)
     {
         // Calculate distance
