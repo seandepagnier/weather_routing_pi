@@ -27,6 +27,7 @@
 #include "LineBufferOverlay.h"
 
 class PlugIn_ViewPort;
+class PlugIn_Route;
 
 class piDC;
 class RouteMapOverlay;
@@ -56,7 +57,7 @@ public:
     bool SetCursorLatLon(double lat, double lon);
     void Render(wxDateTime time, SettingsDialog &settingsdialog,
                 piDC &dc, PlugIn_ViewPort &vp, bool justendroute,
-                Position* positionOnRoute=NULL);
+                RoutePoint* positionOnRoute=nullptr);
 
     static wxColour sailingConditionColor(int level);
     static wxString sailingConditionText(int level);
@@ -95,6 +96,7 @@ public:
 
     bool m_UpdateOverlay;
     bool m_bEndRouteVisible;
+    void RouteAnalysis(PlugIn_Route *proute);
 
 private:
     void RenderAlternateRoute(IsoRoute *r, bool each_parent,
@@ -119,8 +121,8 @@ private:
     wxMutex routemutex;
 
     void SetPointColor(piDC &dc, Position *p);
-    void DrawLine(Position *p1, Position *p2, piDC &dc, PlugIn_ViewPort &vp);
-    void DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
+    void DrawLine(RoutePoint *p1, RoutePoint *p2, piDC &dc, PlugIn_ViewPort &vp);
+    void DrawLine(RoutePoint *p1, wxColour &color1, RoutePoint *p2, wxColour &color2,
                   piDC &dc, PlugIn_ViewPort &vp);
 
     double last_cursor_lat, last_cursor_lon;

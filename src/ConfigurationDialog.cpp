@@ -186,6 +186,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_CHOICE(Start);
 
+
     bool ult = m_WeatherRouting.m_SettingsDialog.m_cbUseLocalTime->GetValue();
 #define STARTTIME (ult ? it->StartTime.FromUTC() : it->StartTime)
 
@@ -204,6 +205,18 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     m_tBoat->SetSelection(l, l);
 
     SET_CHOICE(End);
+
+    // if there's a GUID it's an OpenCPN route, for now disable start and end
+    // which would invalidate the it
+    bool oRoute = false;
+    for(auto it : configurations ) {
+        if (!it.RouteGUID.IsEmpty()) {
+            oRoute = true;
+            break;
+        }
+    }
+    m_cStart->Enable(!oRoute);
+    m_cEnd->Enable(!oRoute);
 
     SET_SPIN(FromDegree);
     SET_SPIN(ToDegree);

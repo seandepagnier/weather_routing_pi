@@ -72,8 +72,6 @@
 #include <math.h>
 #include <map>
 
-#include "ocpn_plugin.h"
-
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMap.h"
@@ -85,9 +83,51 @@
 
 long RouteMapPosition::s_ID = 0;
 
+extern Json::Value g_ReceivedJSONMsg;
+extern wxString    g_ReceivedMessage;
+
+static Json::Value RequestGRIB(const wxDateTime &t, const wxString &what, double lat, double lon)
+{
+    Json::Value error;
+    Json::Value v;
+    Json::FastWriter writer;
+    // brain dead wx is expecting time in local time
+    wxDateTime time = t.FromUTC();
+    if (!time.IsValid())
+        return error;
+
+    v["Day"] = time.GetDay();
+    v["Month"] = time.GetMonth();
+    v["Year"] = time.GetYear();
+    v["Hour"] = time.GetHour();
+    v["Minute"] = time.GetMinute();
+    v["Second"] = time.GetSecond();
+
+    v["Source"] = "WEATHER_ROUTING_PI";
+    v["Type"] = "Request";
+    v["Msg"] = "GRIB_VALUES_REQUEST";
+    v["lat"] = lat;
+    v["lon"] = lon;
+    v[what] = 1;
+
+    SendPluginMessage( "GRIB_VALUES_REQUEST", writer.write( v) );
+    if(g_ReceivedMessage != wxEmptyString && g_ReceivedJSONMsg["Type"].asString() == "Reply") {
+        return g_ReceivedJSONMsg;
+    }
+    return error;
+}
+
 static double Swell(RouteMapConfiguration &configuration, double lat, double lon)
 {
     WR_GribRecordSet *grib = configuration.grib;
+
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
+       Json::Value r = RequestGRIB(configuration.time, "SWELL", lat, lon);
+       if (!r.isMember("SWELL"))
+           return 0;
+       return r["SWELL"].asDouble();
+    }
+
     if(!grib)
         return 0;
 
@@ -107,14 +147,23 @@ static double Swell(RouteMapConfiguration &configuration, double lat, double lon
 static double Gust(RouteMapConfiguration &configuration, double lat, double lon)
 {
     WR_GribRecordSet *grib = configuration.grib;
-    if(!grib)
-        return NAN;
+    double gust;
 
-    GribRecord *grh = grib->m_GribRecordPtrArray[Idx_WIND_GUST];
-    if(!grh)
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
+       Json::Value r = RequestGRIB(configuration.time, "GUST", lat, lon);
+       if (!r.isMember("GUST"))
+           return NAN;
+       gust =  r["GUST"].asDouble();
+    }
+    else if(!grib)
         return NAN;
+    else {
+        GribRecord *grh = grib->m_GribRecordPtrArray[Idx_WIND_GUST];
+        if(!grh)
+            return NAN;
 
-    double gust = grh->getInterpolatedValue(lon, lat, true );
+        gust = grh->getInterpolatedValue(lon, lat, true );
+    }
     if(gust == GRIB_NOTDEF)
         return NAN;
     gust *= 3.6 / 1.852; // knots
@@ -126,10 +175,21 @@ static bool GribWind(RouteMapConfiguration &configuration, double lat, double lo
                             double &WG, double &VWG)
 {
     WR_GribRecordSet *grib = configuration.grib;
-    if(!grib)
+
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
+       Json::Value r = RequestGRIB(configuration.time, "WIND SPEED", lat, lon);
+       if (!r.isMember("WIND SPEED"))
+           return false;
+       VWG = r["WIND SPEED"].asDouble();
+
+       if (!r.isMember("WIND DIR"))
+           return false;
+       WG = r["WIND DIR"].asDouble();
+    }
+    else if(!grib)
         return false;
 
-    if(!GribRecord::getInterpolatedValues(VWG, WG,
+    else if(!GribRecord::getInterpolatedValues(VWG, WG,
                                           grib->m_GribRecordPtrArray[Idx_WIND_VX],
                                           grib->m_GribRecordPtrArray[Idx_WIND_VY], lon, lat))
         return false;
@@ -149,10 +209,21 @@ static bool GribCurrent(RouteMapConfiguration &configuration, double lat, double
                                double &C, double &VC)
 {
     WR_GribRecordSet *grib = configuration.grib;
-    if(!grib)
+
+    if(!grib && !configuration.RouteGUID.IsEmpty() && configuration.UseGrib) {
+       Json::Value r = RequestGRIB(configuration.time, "CURRENT SPEED", lat, lon);
+       if (!r.isMember("CURRENT SPEED"))
+           return false;
+       VC = r["CURRENT SPEED"].asDouble();
+
+       if (!r.isMember("CURRENT DIR"))
+           return false;
+       C = r["CURRENT DIR"].asDouble();
+    }
+    else if(!grib)
         return false;
 
-    if(!GribRecord::getInterpolatedValues(VC, C,
+    else if(!GribRecord::getInterpolatedValues(VC, C,
                                           grib->m_GribRecordPtrArray[Idx_SEACURRENT_VX],
                                           grib->m_GribRecordPtrArray[Idx_SEACURRENT_VY],
                                           lon, lat))
@@ -312,20 +383,21 @@ static inline int TestIntersectionXY(double x1, double y1, double x2, double y2,
 }
 
 #define EPSILON (2e-11)
+
 Position::Position(double latitude, double longitude, Position *p,
-                   double pheading, double pbearing, int sp, int t, int dm)
-    : lat(latitude), lon(longitude), parent_heading(pheading), parent_bearing(pbearing),
-      polar(sp), tacks(t),
-      parent(p), propagated(false), copied(false), data_mask(dm)
+                   double pheading, double pbearing, int sp, int t, int dm, bool df)
+    : RoutePoint(latitude, longitude, sp, t, df), parent_heading(pheading),
+      parent_bearing(pbearing), parent(p), propagated(false), copied(false), data_mask(dm)
 {
     lat -= fmod(lat, EPSILON);
     lon -= fmod(lon, EPSILON);
 }
 
 Position::Position(Position *p)
-    : lat(p->lat), lon(p->lon), parent_heading(p->parent_heading), parent_bearing(p->parent_bearing),
-      polar(p->polar), tacks(p->tacks),
-      parent(p->parent), propagated(p->propagated), copied(true), data_mask(p->data_mask)
+    : RoutePoint(p->lat, p->lon, p->polar, p->tacks, p->grib_is_data_deficient),
+      parent_heading(p->parent_heading),
+      parent_bearing(p->parent_bearing), parent(p->parent),
+      propagated(p->propagated), copied(true), data_mask(p->data_mask)
 {
 }
 
@@ -418,7 +490,7 @@ struct climatology_wind_atlas
     double W[8], VW[8], storm, calm, directions[8];
 };
 
-static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Position *p,
+static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, RoutePoint *p,
 /* normal data */
  double &WG, double &VWG, double &W, double &VW, double &C, double &VC,
  climatology_wind_atlas &atlas, int &data_mask)
@@ -495,10 +567,10 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
             data_mask |= Position::GRIB_WIND | Position::DATA_DEFICIENT_WIND;
             break;
         }
-
-        p = p->parent;
-        if(!p)
+        Position *n = dynamic_cast<Position*>(p);
+        if(!n || !n->parent)
             return false;
+        p = n->parent;
     }
     VWG *= configuration.WindStrength;
 
@@ -507,19 +579,27 @@ static inline bool ReadWindAndCurrents(RouteMapConfiguration &configuration, Pos
 }
 
 /* get data from a position for plotting */
-bool Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
+bool RoutePoint::GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data)
 {
+    data.lat = lat;
+    data.lon = lon;
+    data.tacks = tacks;
+    data.polar = polar;
+
     data.WVHT = Swell(configuration, lat, lon);
     data.VW_GUST = Gust(configuration, lat, lon);
-    data.tacks = tacks;
+    data.delta = dt;
 
     climatology_wind_atlas atlas;
     int data_mask = 0; // not used for plotting yet
+    bool old = configuration.grib_is_data_deficient;
+    configuration.grib_is_data_deficient = grib_is_data_deficient;
     if(!ReadWindAndCurrents(configuration, this, data.WG, data.VWG,
                             data.W, data.VW, data.C, data.VC, atlas, data_mask)) {
         // I don't think this can ever be hit, because the data should have been there
         // for the position be be created in the first place
         printf("Wind/Current data failed for position!!!\n");
+        configuration.grib_is_data_deficient = old;
         return false;
     }
 
@@ -530,17 +610,18 @@ bool Position::GetPlotData(Position *next, double dt, RouteMapConfiguration &con
         data.VBG *= 3600 / dt;
 
     OverWater(data.BG, data.VBG, data.C, data.VC, data.B, data.VB);
+    configuration.grib_is_data_deficient = old;
     return true;
 }
 
-bool Position::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
+bool RoutePoint::GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask)
 {
     double WG, VWG, C, VC;
     climatology_wind_atlas atlas;
     return ReadWindAndCurrents(configuration, this, WG, VWG, W, VW, C, VC, atlas, data_mask);
 }
 
-bool Position::GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask)
+bool RoutePoint::GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask)
 {
     double WG, VWG, W, VW;
     climatology_wind_atlas atlas;
@@ -621,7 +702,13 @@ bool rk_step(Position *p, double timeseconds, double BG, double dist, double H,
     return true;
 }
 
-void DeletePoints(Position *point)
+/* propagate to the end position in the configuration, and return the number of seconds it takes */
+double Position::PropagateToEnd(RouteMapConfiguration &cf, double &H, int &data_mask)
+{
+    return PropagateToPoint(cf.EndLat, cf.EndLon, cf, H, data_mask, true);
+}
+
+static void DeletePoints(Position *point)
 {
     Position *p = point;
     do {
@@ -673,7 +760,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             return false;
     }
 
-    double timeseconds = configuration.DeltaTime;
+    double timeseconds = configuration.UsedDeltaTime;
     double dist;
 
     bool first_avoid = true;
@@ -685,8 +772,9 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         bearing2 = heading_resolve( parent_bearing + configuration.MaxSearchAngle);
     }
 
-    for(std::list<double>::iterator it = configuration.DegreeSteps.begin();
+    for(auto it = configuration.DegreeSteps.begin();
         it != configuration.DegreeSteps.end(); it++) {
+
 
         double H = heading_resolve(*it);
         double B, VB, BG, VBG;
@@ -719,6 +807,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             configuration.polar_failed = true;
             continue;
         }
+        if (polar == -1)
+            polar = newpolar;
         
         if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
                              B, VB, BG, VBG, dist, newpolar))
@@ -885,7 +975,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 continue;
         }
 
-        rp = new Position(dlat, dlon, this, H, B, newpolar, tacks + tacked, data_mask);
+        rp = new Position(dlat, dlon, this, H, B, newpolar, tacks + tacked, data_mask,
+                    configuration.grib_is_data_deficient );
     }
     add_position:
 
@@ -912,8 +1003,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
     return true;
 }
 
-/* propagate to the end position in the configuration, and return the number of seconds it takes */
-double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask)
+double RoutePoint::PropagateToPoint(double dlat, double dlon, RouteMapConfiguration &configuration,
+                             double &H, int &data_mask, bool end)
 {
     double S = Swell(configuration, lat, lon);
     if(S > configuration.MaxSwellMeters)
@@ -925,8 +1016,10 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
     double WG, VWG, W, VW, C, VC;
     climatology_wind_atlas atlas;
     if(!ReadWindAndCurrents(configuration, this,
-                            WG, VWG, W, VW, C, VC, atlas, data_mask))
+                            WG, VWG, W, VW, C, VC, atlas, data_mask)) {
+        if (!end) configuration.wind_data_failed = true;
         return NAN;
+    }
 
     if(VW > configuration.MaxTrueWindKnots)
         return NAN;
@@ -934,15 +1027,17 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
     /* todo: we should make sure we don't tack if we are already at the max tacks,
        possibly perform other tests and/or switch sail polar? */
     double bearing, dist;
-    ll_gc_ll_reverse(lat, lon, configuration.EndLat, configuration.EndLon, &bearing, &dist);
+    ll_gc_ll_reverse(lat, lon, dlat, dlon, &bearing, &dist);
 
     /* figure out bearing and distance to go, because it is a non-linear problem if compounded
        with currents solve iteratively (without currents only one iteration will ever occur */
     double B, VB, BG = W, VBG;
     int iters = 0;
     H = 0;
+    int newpolar = polar;
     bool old = configuration.OptimizeTacking;
-    configuration.OptimizeTacking = true;
+    if (end)
+        configuration.OptimizeTacking = true;
     do {
         /* make our correction in range */
         while(bearing - BG > 180)
@@ -955,13 +1050,13 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
 
         double dummy_dist; // not used
 
-        int newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S, configuration.OptimizeTacking);
+        newpolar = configuration.boat.TrySwitchPolar(polar, VW, H, S, configuration.OptimizeTacking);
         if(newpolar == -1) {
             configuration.polar_failed = true;
             configuration.OptimizeTacking = old;
             return NAN;
         }
-        
+
         if(!ComputeBoatSpeed(configuration, 0, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
                              B, VB, BG, VBG, dummy_dist, newpolar)
                 || ++iters == 10 // give up
@@ -976,24 +1071,25 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
        the maximum boat speed once, and using that before computing boat speed for
        this angle, but for now, we don't worry because propagating to the end is a
        small amount of total computation */
-    if(dist / VBG > configuration.DeltaTime / 3600.0)
+    if(end && dist / VBG > configuration.UsedDeltaTime / 3600.0)
         return NAN;
-    
+
     /* quick test first to avoid slower calculation */
     if(VB + VW > configuration.MaxApparentWindKnots &&
        Polar::VelocityApparentWind(VB, H, VW) > configuration.MaxApparentWindKnots)
         return NAN;
 
-#if 1
     /* landfall test if we are within 60 miles (otherwise it's very slow) */
-    if(configuration.DetectLand && dist < 60
-       && CrossesLand(configuration.EndLat, configuration.EndLon))
+    if(configuration.DetectLand && dist < 60 && CrossesLand(dlat, dlon)) {
+        if (!end) configuration.land_crossing = true;
         return NAN;
-#endif
+    }
 
     /* Boundary test */
-    if(configuration.DetectBoundary && EntersBoundary(configuration.EndLat, configuration.EndLon))
+    if(configuration.DetectBoundary && EntersBoundary(dlat, dlon)) {
+        if (!end) configuration.boundary_crossing = true;
         return NAN;
+    }
 
     /* crosses cyclone track(s)? */
     if(configuration.AvoidCycloneTracks &&
@@ -1006,6 +1102,7 @@ double Position::PropagateToEnd(RouteMapConfiguration &configuration, double &H,
         if(crossings > 0)
             return NAN;
     }
+    polar = newpolar;
 
     return 3600.0 * dist / VBG;
 }
@@ -1015,7 +1112,7 @@ double Position::Distance(Position *p)
     return DistGreatCircle(lat, lon, p->lat, p->lon);
 }
 
-bool Position::CrossesLand(double dlat, double dlon)
+bool RoutePoint::CrossesLand(double dlat, double dlon)
 {
     return PlugIn_GSHHS_CrossesLand(lat, lon, dlat, dlon);
 }
@@ -1028,12 +1125,14 @@ int Position::SailChanges()
     return (polar != parent->polar) + parent->SailChanges();
 }
 
-bool Position::EntersBoundary(double dlat, double dlon)
+bool RoutePoint::EntersBoundary(double dlat, double dlon)
 {
     struct FindClosestBoundaryLineCrossing_t t;
     t.dStartLat = lat, t.dStartLon = heading_resolve(lon);
     t.dEndLat = dlat, t.dEndLon = heading_resolve(dlon);
     t.sBoundaryState = wxT("Active");
+
+    // we request any type
     return RouteMap::ODFindClosestBoundaryLineCrossing(&t);
 }
 
@@ -1336,7 +1435,7 @@ bool IsoRoute::ApplyCurrents(GribRecordSet *grib, wxDateTime time, RouteMapConfi
 
     bool ret = false;
     Position *p = skippoints->point;
-    double timeseconds = configuration.DeltaTime;
+    double timeseconds = configuration.UsedDeltaTime;
     do {
         double C, VC;
         if(configuration.Currents && Current(grib, configuration.ClimatologyType,
@@ -2271,8 +2370,8 @@ typedef  wxWeakRef<Shared_GribRecordSet> Shared_GribRecordSetRef;
 static std::map<time_t, Shared_GribRecordSetRef> grib_key;
 static wxMutex s_key_mutex;
 
-IsoChron::IsoChron(IsoRouteList r, wxDateTime t, Shared_GribRecordSet &g, bool grib_is_data_deficient)
-    : routes(r), time(t), m_SharedGrib(g), m_Grib(0), m_Grib_is_data_deficient(grib_is_data_deficient)
+IsoChron::IsoChron(IsoRouteList r, wxDateTime t, double d, Shared_GribRecordSet &g, bool grib_is_data_deficient)
+    : routes(r), time(t), delta(d), m_SharedGrib(g), m_Grib(0), m_Grib_is_data_deficient(grib_is_data_deficient)
 {
     m_Grib = m_SharedGrib.GetGribRecordSet();
     if (m_Grib ) {
@@ -2389,8 +2488,16 @@ bool RouteMapConfiguration::Update()
     PlugIn_Waypoint waypoint;
 
     if (!RouteGUID.IsEmpty()) {
-        havestart = true;
-        haveend = true;
+        if (!StartGUID.IsEmpty() && GetSingleWaypoint( StartGUID, &waypoint )) {
+            StartLat = waypoint.m_lat;
+            StartLon = waypoint.m_lon;
+            havestart = true;
+        }
+        if (!EndGUID.IsEmpty() && GetSingleWaypoint( EndGUID, &waypoint )) {
+            EndLat = waypoint.m_lat;
+            EndLon = waypoint.m_lon;
+            haveend = true;
+        }
     }
     else for(const auto &it : RouteMap::Positions ) {
         if(Start == it.Name) {
@@ -2431,17 +2538,21 @@ bool RouteMapConfiguration::Update()
     ll_gc_ll_reverse(StartLat, StartLon, EndLat, EndLon, &StartEndBearing, 0);
 
     DegreeSteps.clear();
-
-    // ensure validity
-    FromDegree = wxMax(wxMin(FromDegree, 180), 0);
-    ToDegree = wxMax(wxMin(ToDegree, 180), 0);
-    if(FromDegree > ToDegree) FromDegree = ToDegree;
-    ByDegrees = wxMax(wxMin(ByDegrees, 60), .1);
+    if (RouteGUID.IsEmpty()) {
+        // ensure validity
+        FromDegree = wxMax(wxMin(FromDegree, 180), 0);
+        ToDegree = wxMax(wxMin(ToDegree, 180), 0);
+        if(FromDegree > ToDegree) FromDegree = ToDegree;
+        ByDegrees = wxMax(wxMin(ByDegrees, 60), .1);
     
-    for(double step=FromDegree; step <= ToDegree; step += ByDegrees) {
-        DegreeSteps.push_back(step);
-        if(step > 0 && step < 180)
-            DegreeSteps.push_back(360-step);
+        for(double step=FromDegree; step <= ToDegree; step += ByDegrees) {
+            DegreeSteps.push_back(step);
+            if(step > 0 && step < 180)
+                DegreeSteps.push_back(360-step);
+        }
+    }
+    else {
+        DegreeSteps.push_back(0.);
     }
     DegreeSteps.sort();
 
@@ -2524,6 +2635,7 @@ bool RouteMap::Propagate()
         return false;
     }
 
+    //
     RouteMapConfiguration configuration = m_Configuration;
     configuration.polar_failed = false;
     configuration.wind_data_failed = false;
@@ -2534,10 +2646,10 @@ bool RouteMap::Propagate()
     bool grib_is_data_deficient = false;
         
     if(m_Configuration.AllowDataDeficient &&
-       (!m_NewGrib ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
-        !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]) &&
-       origin.size() &&
+        ( !m_NewGrib ||
+          !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VX] ||
+          !m_NewGrib->m_GribRecordPtrArray[Idx_WIND_VY]
+        ) && origin.size() &&
        /*m_Configuration.ClimatologyType <= RouteMapConfiguration::CURRENTS_ONLY &&*/
        m_Configuration.UseGrib) {
         SetNewGrib(origin.back()->m_Grib);
@@ -2546,12 +2658,15 @@ bool RouteMap::Propagate()
 
     Shared_GribRecordSet shared_grib = m_SharedNewGrib;
     wxDateTime time = m_NewTime;
+    double delta;
+
+    m_NewGrib = 0;
+    m_SharedNewGrib.SetGribRecordSet(0);
 
     // request the next grib
     // in a different thread (grib record averaging going in parallel)
-    m_NewGrib = 0;
-    m_SharedNewGrib.SetGribRecordSet(0);
-    m_NewTime += wxTimeSpan(0, 0, configuration.DeltaTime);
+    delta = configuration.DeltaTime;
+    m_NewTime += wxTimeSpan(0, 0, delta);
     m_bNeedsGrib = configuration.UseGrib;
 
     Unlock();
@@ -2565,6 +2680,7 @@ bool RouteMap::Propagate()
     } else {
         configuration.grib = origin.back()->m_Grib;
         configuration.time = origin.back()->time;
+        configuration.UsedDeltaTime = origin.back()->delta;
         configuration.grib_is_data_deficient = origin.back()->m_Grib_is_data_deficient;
         // will the grib data work for us?
         if(m_Configuration.UseGrib &&
@@ -2594,31 +2710,20 @@ bool RouteMap::Propagate()
         for(IsoRouteList::iterator it = merged.begin(); it != merged.end(); ++it)
             (*it)->ReduceClosePoints();
 
-        update = new IsoChron(merged, time, shared_grib, grib_is_data_deficient);
+        update = new IsoChron(merged, time, delta, shared_grib, grib_is_data_deficient);
     }
 
     Lock();
     if(update) {
         origin.push_back(update);
         if(update->Contains(m_Configuration.EndLat, m_Configuration.EndLon)) {
-            m_bFinished = true;
-            m_bReachedDestination = true;
+            SetFinished(true);
         }
     } else
         m_bFinished = true;
 
     // take note of possible failure reasons
-    if(configuration.polar_failed)
-        m_bPolarFailed = true;
-
-    if(configuration.wind_data_failed)
-        m_bNoData = true;
-
-    if(configuration.boundary_crossing)
-        m_bBoundaryCrossing = true;
-
-    if(configuration.land_crossing)
-        m_bLandCrossing = true;
+    UpdateStatus(configuration);
 
     Unlock();
 
@@ -2683,7 +2788,7 @@ void RouteMap::Reset()
     m_SharedNewGrib.SetGribRecordSet(0);
     
     m_NewTime = m_Configuration.StartTime;
-    m_bNeedsGrib = m_Configuration.UseGrib;
+    m_bNeedsGrib = m_Configuration.UseGrib && m_Configuration.RouteGUID.IsEmpty();
     m_ErrorMsg = wxEmptyString;
 
     m_bReachedDestination = false;

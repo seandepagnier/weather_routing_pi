@@ -34,6 +34,9 @@
 #include "WeatherRouting.h"
 #include "weather_routing_pi.h"
 
+Json::Value g_ReceivedJSONMsg;
+wxString    g_ReceivedMessage;
+
 // Define minimum and maximum versions of the grib plugin supported
 #define GRIB_MAX_MAJOR 4
 #define GRIB_MAX_MINOR 1
@@ -91,12 +94,12 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
                               ( weather_routing_pi::OnCursorLatLonTimer ), NULL, this);
 }
 
-weather_routing_pi::~weather_routing_pi(void)
+weather_routing_pi::~weather_routing_pi()
 {
       delete _img_WeatherRouting;
 }
 
-int weather_routing_pi::Init(void)
+int weather_routing_pi::Init()
 {
       AddLocaleCatalog( _T("opencpn-weather_routing_pi") );
 
@@ -126,6 +129,9 @@ int weather_routing_pi::Init(void)
       m_waypoint_menu_id = AddCanvasMenuItem (new wxMenuItem(&dummy_menu, -1, _("Weather Route Position")), this, "Waypoint" );
       SetCanvasMenuItemViz(m_waypoint_menu_id, false, "Waypoint");
 
+      m_route_menu_id = AddCanvasMenuItem (new wxMenuItem(&dummy_menu, -1, _("Weather Route Analysis")), this, "Route" );
+      // SetCanvasMenuItemViz(m_route_menu_id, false, "Route");
+
       //    And load the configuration items
       LoadConfig();
 
@@ -139,7 +145,7 @@ int weather_routing_pi::Init(void)
             );
 }
 
-bool weather_routing_pi::DeInit(void)
+bool weather_routing_pi::DeInit()
 {
     m_tCursorLatLon.Stop();
     if(m_pWeather_Routing)
@@ -195,11 +201,11 @@ Weather Routing features include:\n\
 ");
 }
 
-void weather_routing_pi::SetDefaults(void)
+void weather_routing_pi::SetDefaults()
 {
 }
 
-int weather_routing_pi::GetToolbarToolCount(void)
+int weather_routing_pi::GetToolbarToolCount()
 {
       return 1;
 }
@@ -215,7 +221,17 @@ void weather_routing_pi::SetCursorLatLon(double lat, double lon)
 
 void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
 {
-    if(message_id == _T("GRIB_TIMELINE"))
+    if(message_id == _T("GRIB_VALUES"))
+    {
+        Json::Value  root;
+        Json::Reader  reader;
+        //wxString    sLogMessage;
+        if (reader.parse( static_cast<std::string>(message_body), root )) {
+            g_ReceivedJSONMsg = root;
+            g_ReceivedMessage = message_body;
+        }
+    }
+    else if(message_id == _T("GRIB_TIMELINE"))
     {
         Json::Reader r;
         Json::Value v;
@@ -235,7 +251,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             }
         }
     }
-    if(message_id == _T("GRIB_TIMELINE_RECORD"))
+    else if(message_id == _T("GRIB_TIMELINE_RECORD"))
     {
         Json::Reader r;
         Json::Value v;
@@ -278,7 +294,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             }
         }
     }
-    if(message_id == _T("CLIMATOLOGY"))
+    else if(message_id == _T("CLIMATOLOGY"))
     {
         if(!m_pWeather_Routing)
             return; /* not ready */
@@ -319,15 +335,24 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         sscanf(sptr.To8BitData().data(), "%p", &RouteMap::ClimatologyCycloneTrackCrossings);
 
         if(m_pWeather_Routing) {
-            m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable
-                (RouteMap::ClimatologyData!=NULL);
-            m_pWeather_Routing->m_ConfigurationDialog.m_cbAvoidCycloneTracks->Enable
-                (RouteMap::ClimatologyCycloneTrackCrossings!=NULL);
+            if (RouteMap::ClimatologyData == nullptr) {
+                m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable(false);
+            }
+            else {
+                m_pWeather_Routing->m_ConfigurationDialog.m_cClimatologyType->Enable(true);
+            }
+            m_pWeather_Routing->m_ConfigurationDialog.m_cbAvoidCycloneTracks->Enable(RouteMap::ClimatologyCycloneTrackCrossings!=nullptr);
         }
     }
-
-
-    if(message_id == wxS("WEATHER_ROUTING_PI")) {
+    else if (message_id == wxS("OCPN_DRAW_PI_READY_FOR_REQUESTS")) {
+        if (message_body == "FALSE") {
+            RouteMap::ODFindClosestBoundaryLineCrossing = nullptr;
+        }
+        else if (message_body == "TRUE" && m_pWeather_Routing) {
+            RequestOcpnDrawSetting();
+        }
+    }
+    else if(message_id == wxS("WEATHER_ROUTING_PI")) {
         // now read the JSON text and store it in the 'root' structure
         Json::Value  root;
         Json::Reader  reader;
@@ -392,30 +417,40 @@ void weather_routing_pi::ShowPreferencesDialog( wxWindow* parent )
 {
 }
 
+void weather_routing_pi::RequestOcpnDrawSetting()
+{
+    if(ODVersionNewerThan( 1, 1, 15)) {
+        Json::Value jMsg;
+        Json::FastWriter writer;
+
+        jMsg["Source"] = "WEATHER_ROUTING_PI";
+        jMsg["Type"] = "Request";
+        jMsg["Msg"] = "GetAPIAddresses";
+        jMsg["MsgId"] = "GetAPIAddresses";
+        SendPluginMessage( "OCPN_DRAW_PI", writer.write( jMsg ) );
+    }
+}
+
+void weather_routing_pi::NewWR()
+{
+    if(m_pWeather_Routing)
+      return;
+
+    m_pWeather_Routing = new WeatherRouting(m_parent_window, *this);
+    wxPoint p = m_pWeather_Routing->GetPosition();
+    m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
+    m_pWeather_Routing->Move(p);
+
+    SendPluginMessage("GRIB_TIMELINE_REQUEST", "");
+    SendPluginMessage("CLIMATOLOGY_REQUEST", "");
+    RequestOcpnDrawSetting();
+    m_pWeather_Routing->Reset();
+}
+
 void weather_routing_pi::OnToolbarToolCallback(int id)
 {
-    if(!m_pWeather_Routing) {
-        m_pWeather_Routing = new WeatherRouting(m_parent_window, *this);
-        wxPoint p = m_pWeather_Routing->GetPosition();
-        m_pWeather_Routing->Move(0,0);        // workaround for gtk autocentre dialog behavior
-        m_pWeather_Routing->Move(p);
-
-        SendPluginMessage(wxString(_T("GRIB_TIMELINE_REQUEST")), _T(""));
-        SendPluginMessage(wxString(_T("CLIMATOLOGY_REQUEST")), _T(""));
-
-        if(ODVersionNewerThan( 1, 1, 15)) {
-            Json::Value jMsg;
-            Json::FastWriter writer;
-
-            jMsg["Source"] = "WEATHER_ROUTING_PI";
-            jMsg["Type"] = "Request";
-            jMsg["Msg"] = "GetAPIAddresses";
-            jMsg["MsgId"] = "GetAPIAddresses";
-            SendPluginMessage( wxS("OCPN_DRAW_PI"), writer.write( jMsg) );
-        }
-        
-        m_pWeather_Routing->Reset();
-    }
+    if(!m_pWeather_Routing)
+        NewWR();
 
     m_pWeather_Routing->Show(!m_pWeather_Routing->IsShown());
 }
@@ -423,7 +458,7 @@ void weather_routing_pi::OnToolbarToolCallback(int id)
 void weather_routing_pi::OnContextMenuItemCallback(int id)
 {
     if(!m_pWeather_Routing)
-        return;
+        NewWR();
 
     if(id == m_position_menu_id) {
         m_pWeather_Routing->AddPosition(m_cursor_lat, m_cursor_lon);
@@ -432,11 +467,16 @@ void weather_routing_pi::OnContextMenuItemCallback(int id)
         wxString GUID = GetSelectedWaypointGUID_Plugin();
         if (GUID.IsEmpty())
           return;
-        std::unique_ptr<PlugIn_Waypoint> w = GetWaypoint_Plugin( GUID);
+        std::unique_ptr<PlugIn_Waypoint> w = GetWaypoint_Plugin(GUID);
         PlugIn_Waypoint *wp = w.get();
         if (wp == nullptr)
             return;
         m_pWeather_Routing->AddPosition(wp->m_lat, wp->m_lon, wp->m_MarkName, wp->m_GUID);
+    }
+    else if(id == m_route_menu_id) {
+        wxString GUID = GetSelectedRouteGUID_Plugin();
+
+        m_pWeather_Routing->AddRoute(GUID);
     }
     m_pWeather_Routing->Reset();
 }
@@ -483,7 +523,7 @@ void weather_routing_pi::OnCursorLatLonTimer( wxTimerEvent & )
     }
 }
 
-bool weather_routing_pi::LoadConfig(void)
+bool weather_routing_pi::LoadConfig()
 {
       wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
 
@@ -494,7 +534,7 @@ bool weather_routing_pi::LoadConfig(void)
       return true;
 }
 
-bool weather_routing_pi::SaveConfig(void)
+bool weather_routing_pi::SaveConfig()
 {
       wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
 
@@ -548,4 +588,5 @@ void weather_routing_pi::ShowMenuItems(bool show)
     SetToolbarItemState( m_leftclick_tool_id, show );
     SetCanvasMenuItemViz(m_position_menu_id, show);
     SetCanvasMenuItemViz(m_waypoint_menu_id, show, "Waypoint");
+    //SetCanvasMenuItemViz(m_route_menu_id, show, "Route");
 }

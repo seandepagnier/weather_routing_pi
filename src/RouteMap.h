@@ -37,46 +37,60 @@ class IsoRoute;
 
 typedef std::list<IsoRoute*> IsoRouteList;
 
-struct PlotData
+class PlotData;
+class RoutePoint {
+public:
+    RoutePoint(double latitude = 0., double longitude = 0., int sp = -1, int t=0, bool d = false) :
+        lat(latitude), lon(longitude), polar(sp), tacks(t), grib_is_data_deficient(d) {}
+
+    virtual ~RoutePoint() {};
+
+    double lat;
+    double lon;
+    int polar; /* which polar in the boat we are using */
+    int tacks; /* how many times we have tacked to get to this position */
+
+    bool grib_is_data_deficient;
+
+    bool GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data);
+    bool GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
+    bool GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask);
+
+    bool CrossesLand(double dlat, double dlon);
+    bool EntersBoundary(double dlat, double dlon);
+    double PropagateToPoint(double dlat, double dlon, RouteMapConfiguration &cf, double &H, int &data_mask, bool end = true);
+};
+
+class PlotData : public RoutePoint
 {
+public:
     wxDateTime time;
-    double lat, lon;
+    double delta;
     double VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
     double VW_GUST;
-    int tacks;
 };
 
 class SkipPosition;
 
 /* circular linked list node for positions which take equal time to reach */
-class Position
+class Position: public RoutePoint
 {
 public:
     Position(double latitude, double longitude, Position *p=NULL,
-             double pheading=NAN, double pbearing=NAN, int sp=-1, int t=0, int dm=0);
+             double pheading=NAN, double pbearing=NAN, int sp=-1,
+             int t=0, int dm=0, bool df = false);
     Position(Position *p);
 
     SkipPosition *BuildSkipList();
 
-    bool GetPlotData(Position *next, double dt,
-                     RouteMapConfiguration &configuration, PlotData &data);
-    bool GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
-    bool GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask);
-
     bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
-    double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
 
     double Distance(Position *p);
-    bool CrossesLand(double dlat, double dlon);
     int SailChanges();
-    bool EntersBoundary(double dlat, double dlon);
-    
-    double lat, lon;
-
+    double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
+   
     double parent_heading; /* angle relative to true wind we sailed from parent to this position */
     double parent_bearing; /* angle relative to north */
-    int polar; /* which polar in the boat we are using */
-    int tacks; /* how many times we have tacked to get to this position */
 
     Position *parent; /* previous position in time */
     Position *prev, *next; /* doubly linked circular list of positions */
@@ -260,7 +274,7 @@ protected:
 class IsoChron
 {
 public:
-    IsoChron(IsoRouteList r, wxDateTime t, Shared_GribRecordSet &g, bool grib_is_data_deficient);
+    IsoChron(IsoRouteList r, wxDateTime t, double d, Shared_GribRecordSet &g, bool grib_is_data_deficient);
     ~IsoChron();
 
     void PropagateIntoList(IsoRouteList &routelist, RouteMapConfiguration &configuration);
@@ -271,6 +285,7 @@ public:
 
     IsoRouteList routes;
     wxDateTime time;
+    double delta;
     Shared_GribRecordSet m_SharedGrib;
     WR_GribRecordSet *m_Grib;
     bool m_Grib_is_data_deficient;
@@ -289,15 +304,23 @@ struct RouteMapPosition {
     static long s_ID;
 };
 
+
 struct RouteMapConfiguration {
-    RouteMapConfiguration () : StartLon(0), EndLon(0), grib_is_data_deficient(false) {} /* avoid waiting forever in update longitudes */
+    RouteMapConfiguration () : StartLon(0), EndLon(0), 
+          grib(nullptr), grib_is_data_deficient(false) {} /* avoid waiting forever in update longitudes */
     bool Update();
 
     wxString RouteGUID;       /* Route GUID if any */
-    wxString Start, End;
+    wxString Start;
+    wxString StartGUID;
+
+    wxString End;
+    wxString EndGUID;
+
     wxDateTime StartTime;
 
-    double DeltaTime; /* time in seconds between propagations */
+    double DeltaTime; /* default time in seconds between propagations */
+    double UsedDeltaTime; /* time in seconds between propagations */
 
     Boat boat;
     wxString boatFileName;
@@ -405,6 +428,26 @@ public:
     }
 
 protected:
+
+    void SetFinished(bool destination ) {
+       m_bReachedDestination = destination;
+       m_bFinished = true;
+    }
+
+    void UpdateStatus(const RouteMapConfiguration &configuration) {
+       if(configuration.polar_failed)
+          m_bPolarFailed = true;
+
+        if(configuration.wind_data_failed)
+           m_bNoData = true;
+
+        if(configuration.boundary_crossing)
+           m_bBoundaryCrossing = true;
+
+        if(configuration.land_crossing)
+           m_bLandCrossing = true;
+    }
+
     virtual void Clear();
     bool ReduceList(IsoRouteList &merged, IsoRouteList &routelist, RouteMapConfiguration &configuration);
     Position *ClosestPosition(double lat, double lon, wxDateTime *t=0, double *dist=0);
