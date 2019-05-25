@@ -21,7 +21,7 @@ install:
 
   # install dependencies:
   - choco install poedit
-
+  
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/nsis-3.04-setup.exe
   - cmd: nsis-3.04-setup.exe /S
 
