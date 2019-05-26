@@ -33,7 +33,7 @@
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "SettingsDialog.h"
-
+#include "georef.h"
 
 RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
     : wxThread(wxTHREAD_JOINABLE), m_RouteMapOverlay(routemapoverlay)
@@ -43,7 +43,17 @@ RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
 
 void *RouteMapOverlayThread::Entry()
 {
-    while(!TestDestroy() && !m_RouteMapOverlay.Finished())
+    RouteMapConfiguration cf = m_RouteMapOverlay.GetConfiguration();
+
+    if (!cf.RouteGUID.IsEmpty()) {
+        std::unique_ptr<PlugIn_Route> rte = GetRoute_Plugin(cf.RouteGUID);
+        PlugIn_Route *proute = rte.get();
+        if (proute == nullptr)
+           return 0;
+
+        m_RouteMapOverlay.RouteAnalysis(proute);
+    }
+    else while(!TestDestroy() && !m_RouteMapOverlay.Finished()) {
         if(!m_RouteMapOverlay.Propagate())
             wxThread::Sleep(50);
         else {
@@ -52,7 +62,7 @@ void *RouteMapOverlayThread::Entry()
             m_RouteMapOverlay.UpdateDestination();
             wxThread::Sleep(5);
         }
-
+    }
 //    m_RouteMapOverlay.m_Thread = NULL;
     return 0;
 }
@@ -115,6 +125,76 @@ bool RouteMapOverlay::Start(wxString &error)
     return true;
 }
 
+void RouteMapOverlay::RouteAnalysis(PlugIn_Route *proute)
+{
+    std::list<PlotData> &plotdata = last_destination_plotdata;
+    RouteMapConfiguration configuration =  GetConfiguration();
+
+    configuration.polar_failed = false;
+    configuration.wind_data_failed = false;
+    configuration.boundary_crossing = false;
+    configuration.land_crossing = false;
+
+    wxPlugin_WaypointListNode *pwpnode = proute->pWaypointList->GetFirst();
+    PlugIn_Waypoint *pwp;
+    wxDateTime curtime;
+
+    RoutePoint rte, *next;
+    PlotData data;
+    data.time = configuration.StartTime;
+    curtime = data.time;
+    double dt = configuration.DeltaTime; //UsedDeltaTime;
+    // VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
+    // double VW_GUST;
+    data.WVHT = 0;
+    data.VW_GUST = 0;
+    data.delta = dt;
+    bool ok = true;
+    data.lat = configuration.StartLat, data.lon = configuration.StartLon;
+    while( pwpnode ) {
+        pwp = pwpnode->GetData();
+        configuration.time = data.time;
+        data.lat = pwp->m_lat, data.lon = pwp->m_lon;
+        double eta = dt;
+        pwpnode = pwpnode->GetNext(); //PlugInWaypoint
+        if (pwpnode == nullptr)
+            break;
+
+        int data_mask = 0;
+        double H;
+        pwp = pwpnode->GetData();
+        rte.lat = pwp->m_lat, rte.lon = pwp->m_lon;
+        next = &rte;
+        eta = data.PropagateToPoint(rte.lat, rte.lon, configuration, H, data_mask, false);
+        if(std::isnan(eta)) {
+            ok = false;
+            eta = dt;
+        }
+        // ll_gc_ll_reverse(data.lat, data.lon, next->lat, next->lon, &data.BG, &data.VBG);
+        curtime += wxTimeSpan(0, 0, eta);
+        if (!configuration.wind_data_failed) {
+            data.GetPlotData(next, eta, configuration, data);
+            plotdata.push_back(data);
+        }
+        if (!ok)
+            break;
+        data.time = curtime;
+    }
+    Lock();
+    m_bUpdated = true;
+    m_UpdateOverlay = true;
+    last_destination_position = new Position(data.lat, data.lon,
+                                            nullptr, /*minH*/ NAN, NAN, data.polar, true , 0);
+
+    last_cursor_plotdata = last_destination_plotdata;
+    if (ok) {
+        m_EndTime = data.time;
+    }
+    SetFinished(ok);
+    UpdateStatus(configuration);
+    Unlock();
+}
+
 void RouteMapOverlay::DeleteThread()
 {
     if(!m_Thread)
@@ -151,7 +231,7 @@ static void SetWidth(piDC &dc, int w, bool penifgl = false)
     dc.SetPen(pen);
 }
 
-void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
+void RouteMapOverlay::DrawLine(RoutePoint *p1, RoutePoint *p2,
                                piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint p1p, p2p;
@@ -167,7 +247,7 @@ void RouteMapOverlay::DrawLine(Position *p1, Position *p2,
         dc.StrokeLine(p1p.x, p1p.y, p2p.x, p2p.y);
 }
 
-void RouteMapOverlay::DrawLine(Position *p1, wxColour &color1, Position *p2, wxColour &color2,
+void RouteMapOverlay::DrawLine(RoutePoint *p1, wxColour &color1, RoutePoint *p2, wxColour &color2,
                                piDC &dc, PlugIn_ViewPort &vp)
 {
 #if 0
@@ -296,7 +376,7 @@ static wxColour Darken(wxColour c)
 
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                              piDC &dc, PlugIn_ViewPort &vp, bool justendroute,
-                             Position* positionOnRoute)
+                             RoutePoint* positionOnRoute)
 {
     dc.SetPen(*wxBLACK); // reset pen
     dc.SetBrush( *wxTRANSPARENT_BRUSH); // reset brush
@@ -509,20 +589,24 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
     if(!pos)
         return;
     
-    Lock();
+    std::list<PlotData> plot = GetPlotData(cursor_route);
+    std::list<PlotData>::iterator itt =  plot.begin();
+    if (itt == plot.end()) {
+        return;
+    }
 
-    /* draw lines to this route */
-    Position *p;
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glBegin(GL_LINES);
 #endif    
-    int polar = pos->polar;
-    for(p = pos; p && p->parent; p = p->parent) {
-        if(p->polar == polar)
+    
+    int polar = itt->polar;
+    for(; itt != plot.end(); itt++)
+    {
+        if(itt->polar == polar)
             continue;
         wxPoint r;
-        GetCanvasPixLL(&vp, &r, p->lat, p->lon);
+        GetCanvasPixLL(&vp, &r, itt->lat, itt->lon);
         int s = 6;
 #ifndef __OCPN__ANDROID__
         if(!dc.GetDC()) {
@@ -533,13 +617,12 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
         } else
 #endif
             dc.DrawRectangle(r.x-s, r.y-s, 2*s, 2*s);
-        polar = p->polar;
+        polar = itt->polar;
     }
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glEnd();
 #endif
-    Unlock();
 }
 
 /* Customization ComfortDisplay
@@ -646,6 +729,27 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
     if(!pos)
         return;
 
+    Lock();
+
+    bool rte = !GetConfiguration().RouteGUID.IsEmpty();
+    if (cursor_route == true) {
+        // never draw comfort if cursor route
+        assert(comfortRoute == false);
+        if (!rte) {
+            if(!dc.GetDC())
+                glBegin(GL_LINES);
+
+            for(Position *p = pos; p && p->parent; p = p->parent)
+                DrawLine(p, p->parent, dc, vp);
+
+            if(!dc.GetDC())
+                glEnd();
+        }
+        Unlock();
+        return;
+    }
+    Unlock();
+
     /* ComfortDisplay Customization
      * ------------------------------------------------
      * To get weather data (wind, current, waves) on a
@@ -655,36 +759,39 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
      */
     std::list<PlotData> plot = GetPlotData(false);
     std::list<PlotData>::reverse_iterator itt = plot.rbegin();
+    std::list<PlotData>::reverse_iterator inext = itt;
+
     if (itt == plot.rend()) {
         return;
     }
 
-    Lock();
     wxColor lc = sailingConditionColor(sailingConditionLevel(*itt));
 
     /* draw lines to this route */
-    Position *p;
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glBegin(GL_LINES);
 #endif
-    for(p = pos; (p && p->parent) && (itt != plot.rend()); p = p->parent)
+
+    /* end point if reached is not in GetPlotData */
+    RoutePoint *to, from;
+    for(to = pos; itt != plot.rend(); inext = itt, itt++, to = &(*itt))
     {
+        RoutePoint *from = &(*inext);
         if (comfortRoute)
         {
             wxColor c = sailingConditionColor(sailingConditionLevel(*itt));
-            DrawLine(p, lc, p->parent, c, dc, vp);
+            DrawLine(to, c, from, lc, dc, vp);
             lc = c;
-            itt++;
-        } else
-            DrawLine(p, p->parent, dc, vp);
+        } 
+        else 
+            DrawLine(to, from, dc, vp);
     }
 
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glEnd();
 #endif
-    Unlock();
 }
 
 
@@ -702,7 +809,7 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, piD
     
     std::list<PlotData> plot = GetPlotData(cursor_route);
     
-    for(std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); )  {
+    for(auto it = plot.begin(); it != plot.end(); )  {
         wxDateTime ittime = it->time;
         
         wxDateTime timestart = ittime;
@@ -767,6 +874,13 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
         wxPoint p;
         GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
         
+        // available
+        //   WG VWG : winds over ground
+        //   W VW : winds over water
+        //   C VC : current
+        //
+        //   BG VBG : boat speed over ground
+        //   B  VB  : boat speed over water
         float windSpeed = it->VW;
         float windDirection = it->W; // heading_resolve(it->B - it->W);
         
@@ -939,6 +1053,7 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
+                p.grib_is_data_deficient = configuration.grib_is_data_deficient;
                 v1 = p.GetWindData(configuration, W1, VW1, data_mask1);
 
                 it++;
@@ -946,6 +1061,7 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
+                p.grib_is_data_deficient = configuration.grib_is_data_deficient;
                 v2 = p.GetWindData(configuration, W2, VW2, data_mask2);
                 if (!v1 || !v2) {
                     // not valid data
@@ -1126,6 +1242,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
+                p.grib_is_data_deficient = configuration.grib_is_data_deficient;
                 bool v1, v2;
                 
                 v1 = p.GetCurrentData(configuration, W1, VW1, data_mask1);
@@ -1135,6 +1252,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib = (*it)->m_Grib;
                 configuration.time = (*it)->time;
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
+                p.grib_is_data_deficient = configuration.grib_is_data_deficient;
                 v2 = p.GetCurrentData(configuration, W2, VW2, data_mask2);
                 if (!v1 || !v2) {
                     goto skip;
@@ -1301,12 +1419,12 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
             configuration.time = (*it)->time;
             //printf("grib time %p %d\n", configuration.grib, configuration.time);
 
+            configuration.UsedDeltaTime = (*it)->delta;
             PlotData data;
 
-            double dt = configuration.DeltaTime;
+            double dt = configuration.UsedDeltaTime;
             data.time = (*it)->time;
 
-            data.lat = pos->lat, data.lon = pos->lon;
             if(pos->GetPlotData(next, dt, configuration, data))
                 plotdata.push_front(data);
 
@@ -1518,23 +1636,31 @@ void RouteMapOverlay::UpdateDestination()
             configuration.grib_is_data_deficient = isochron->m_Grib_is_data_deficient;
             
             configuration.time = isochron->time;
+            configuration.UsedDeltaTime = isochron->delta;
             (*it)->PropagateToEnd(configuration, mindt, endp, minH,
                                   mintacked, mindata_mask);
         }
         Unlock();
 
-        if(!wxFinite(mindt)) {
-            goto not_able_to_propagate;
+        if(isinf(mindt)) {
+            // destination is between two isochrons
+            // but propagate can't reach it (land or boundaries in the way).
+            // Use an upper bound time for EndTime, not defined times are too much
+            // trouble later.
+            m_EndTime = isochron->time +wxTimeSpan(0, 0, isochron->delta);
+            last_destination_position = ClosestPosition(configuration.EndLat, configuration.EndLon);
         }
-        destination_position = new Position(configuration.EndLat, configuration.EndLon,
+        else {
+            destination_position = new Position(configuration.EndLat, configuration.EndLon,
                                             endp, minH, NAN, endp->polar, endp->tacks + mintacked,
                                             mindata_mask);
 
-        m_EndTime = isochron->time + wxTimeSpan::Milliseconds(1000*mindt);
-
-        last_destination_position = destination_position;
-    } else {
-    not_able_to_propagate:
+            m_EndTime = isochron->time +wxTimeSpan::Milliseconds(1000*mindt);
+            isochron->delta = mindt;
+            last_destination_position = destination_position;
+        }
+    }
+    else {
         last_destination_position = ClosestPosition(configuration.EndLat, configuration.EndLon);
 
         m_EndTime = wxDateTime(); // invalid
@@ -1560,35 +1686,31 @@ Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, d
      */
     
     double dist = INFINITY;
-    Position *pos = last_destination_position;
-    Position *newPos = nullptr;
-    
-    // Get position first
-    for(Position *p = pos; p && p->parent; p = p->parent)
+    std::list<PlotData> plot = GetPlotData(false);
+    bool found = false;
+    posData.time = wxInvalidDateTime;
+    for ( const auto &it : plot)
     {
         // Calculate distance
         // Almost like a plan (x,y) because of small distance -- is that correct?
-        double tempDist = sqrt( pow(cursorLat - p->lat, 2) + pow(cursorLon - p->lon, 2) );
+        double tempDist = sqrt( pow(cursorLat -it.lat, 2) + pow(cursorLon -it.lon, 2) );
         if (tempDist < dist)
         {
+            posData = it;
             dist = tempDist;
-            newPos = p;
+            found = true;
         }
     }
+    if (!found)
+        return nullptr;
     
-    // Get data if position was founded
-    if (newPos)
+    // Get full position
+    Position *pos = last_destination_position;
+    for(Position *p = pos; p && p->parent; p = p->parent)
     {
-        std::list<PlotData> plot = GetPlotData(false);
-        for ( const auto &it : plot)
-        {
-            if (it.lat == newPos->lat && it.lon == newPos->lon)
-            {
-                posData = it;
-                return newPos;
-            }
+        if (p->lat == posData.lat && p->lon == posData.lon ) {
+            return p;
         }
     }
-    
     return nullptr;
 }
