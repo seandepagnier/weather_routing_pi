@@ -21,7 +21,7 @@ install:
 
   # install dependencies:
   - choco install poedit
-
+  
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/nsis-3.04-setup.exe
   - cmd: nsis-3.04-setup.exe /S
 
@@ -54,7 +54,8 @@ artifacts:
 deploy:
   description: 'release created by AppVeyor CI'
   provider: GitHub
-  auth_token: '%GitHub_auth_token%'
+  auth_token:  # '%GitHub_auth_token%'
+    secure: Vk+FNwtmUELJOqrUp9biHAL9KG1AcrlFr+d4pNh54e7PEVpn+s5AcsGSqV0WxaFZ
   artifact: installer
   draft: true
   prerelease: true
