@@ -1,11 +1,13 @@
 clone_folder: c:\project\weather_routing_pi
-shallow_clone: true
+shallow_clone: false
+clone_depth: 10
+
 image:
 - Visual Studio 2017
 
-platform: 
+platform:
 # - x64
-- Win32
+  - Win32
 
 configuration: Release
 test: OFF
@@ -17,11 +19,12 @@ install:
   - set WXWIN=C:\wxWidgets-3.1.2
   - set wxWidgets_ROOT_DIR=%WXWIN%
   - set wxWidgets_LIB_DIR=%WXWIN%\lib\vc_dll
-  - cmd: SET PATH=%PATH%;%WXWIN%;%wxWidgets_LIB_DIR%;C:\Program Files (x86)\Poedit\Gettexttools\bin;
+  - cmd: SET PATH=%PATH%;%WXWIN%;%wxWidgets_LIB_DIR%;C:\Program Files (x86)\Poedit\Gettexttools\bin
 
   # install dependencies:
   - choco install poedit
-  
+  - choco install git
+
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/nsis-3.04-setup.exe
   - cmd: nsis-3.04-setup.exe /S
 
@@ -33,19 +36,18 @@ install:
 
 before_build:
   - cd c:\project\weather_routing_pi
-  - cd buildwin
-  - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/PVW32Con.exe
-  - cd ..
-  - mkdir build
-  - cd build
+  - rm -rf build && mkdir build && cd build
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.99.1405-vc141_xp/opencpn.lib
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/OpenCPN_buildwin-4.99a.7z
   - cmd: 7z x -y OpenCPN_buildwin-4.99a.7z -oc:\project\weather_routing_pi\buildwin
   - cmake -T v141_xp ..
 
 build_script:
-  # - cmake --build . --config debug
   - cmake --build . --target package --config release
+  - python -m ensurepip
+  - python -m pip install -q setuptools
+  - python -m pip install -q cloudsmith-cli
+  - bash ../build/appveyor-upload.sh
 
 artifacts:
   - path: 'build\*.exe'
@@ -54,9 +56,9 @@ artifacts:
 deploy:
   description: 'release created by AppVeyor CI'
   provider: GitHub
-  auth_token:  # '%GitHub_auth_token%'
-    secure: Vk+FNwtmUELJOqrUp9biHAL9KG1AcrlFr+d4pNh54e7PEVpn+s5AcsGSqV0WxaFZ
-  artifact: installer
+  auth_token: #'%GitHub_auth_token%'
+    secure: xkR09Y0VQ7A10kp+h6v9UjIeLVkf1VQ9O+AFyd62qUDI1IRh7Llagre2fI/cDPTW	rh0wUA7/Vv1UVnuV8abbLwTEnDZcH6qUJLhzlMKYZdnSx7EDP6CxcMfXSWM/0EdB
+  artifact: installer,portable
   draft: true
   prerelease: true
   on:
