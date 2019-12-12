@@ -28,9 +28,6 @@
 #ifndef _ODCATTRANS_H_
 #define _ODCATTRANS_H_
 
-#ifndef _TPCATTRANS_H_
-#define _TPCATTRANS_H_
-
 #ifndef WXINTL_NO_GETTEXT_MACRO
 #ifdef _
 #undef _

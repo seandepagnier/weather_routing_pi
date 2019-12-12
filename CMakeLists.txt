@@ -91,35 +91,37 @@ set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/ver
 
 include("cmake/PluginSetup.cmake")
 
+#========Below is specific to the plugins =================
+
 set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-option(OD_CXX11 "Use c++11" OFF)
+# option(OD_CXX11 "Use c++11" OFF)
 
-if(OD_CXX11)
-  message(STATUS "Attempting to use c++11")
-  include(CheckCXXCompilerFlag)
-  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-  if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    set(Testplugin_USE_CXX11 ON)
-  elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    set(Testplugin_USE_CXX11 ON)
-  else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-    set(Testplugin_USE_CXX11 OFF)
-  endif()
-else()
-  set(Testplugin_USE_CXX11 OFF)
-endif()
+# if(OD_CXX11)
+#  message(STATUS "Attempting to use c++11")
+#  include(CheckCXXCompilerFlag)
+#  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+#  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+#  if(COMPILER_SUPPORTS_CXX11)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#    set(Testplugin_USE_CXX11 ON)
+#  elseif(COMPILER_SUPPORTS_CXX0X)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+#    set(Testplugin_USE_CXX11 ON)
+#  else()
+#    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+#    set(Testplugin_USE_CXX11 OFF)
+#  endif()
+#else()
+#  set(Testplugin_USE_CXX11 OFF)
+#endif()
 
-if(Testplugin_USE_CXX11)
-  message(STATUS "Allowing use of c++11")
-  add_definitions(-DTestplugin_USE_CXX11)
-endif()
+#if(Testplugin_USE_CXX11)
+#  message(STATUS "Allowing use of c++11")
+#  add_definitions(-DTestplugin_USE_CXX11)
+#endif()
 
 message(STATUS "CMAKE version: ${CMAKE_VERSION}")
 if(CMAKE_VERSION VERSION_GREATER 3.4)
@@ -161,29 +163,91 @@ endif()
 
 include("cmake/PluginConfigure.cmake")
 
-add_definitions(-DUSE_S57)
+add_definitions(-DUSE_S57)  #???
 
-set(SRCS
-    src/tpdc.cpp
-    src/tpControlDialogDef.cpp
-    src/tpControlDialogImpl.cpp
-    src/tpicons.cpp
-    src/tpJSON.cpp
-    src/testplugin_pi.cpp
-    src/tpUtils.cpp)
+#======== From cmakelists.txt  weather_routing_pi
 
-set(HDRS
-    include/testplugin_pi.h
-    include/tpicons.h
-    include/tpControlDialogDef.h
-    include/tpControlDialogImpl.h
-    include/tpIconCombo.h
-    include/tpJSON.h
-    include/tpdc.h
-    include/tpUtils.h)
+IF(WEATHER_ROUTING_USE_SVG)
+  ADD_DEFINITIONS(-DWEATHER_ROUTING_USE_SVG)
+ENDIF(WEATHER_ROUTING_USE_SVG)
 
-set(OCPNSRC ocpnsrc/TexFont.cpp)
-set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
+SET(SRC_WEATHER_ROUTING
+            src/weather_routing_pi.cpp
+            src/WeatherRouting.cpp
+            src/ConfigurationDialog.cpp
+            src/SettingsDialog.cpp
+            src/PlotDialog.cpp
+            src/BoatDialog.cpp
+            src/StatisticsDialog.cpp
+            src/ReportDialog.cpp
+            src/FilterRoutesDialog.cpp
+            src/ConfigurationBatchDialog.cpp
+            src/EditPolarDialog.cpp
+            src/AboutDialog.cpp
+            src/Polar.cpp
+            src/Boat.cpp
+            src/RouteMap.cpp
+            src/RouteMapOverlay.cpp
+            src/Utilities.cpp
+            src/LineBufferOverlay.cpp
+            src/PolygonRegion.cpp
+            src/WeatherRoutingUI.cpp
+            src/icons.cpp
+
+            src/zuFile.cpp
+            src/georef.c
+            src/GribRecord.cpp
+)
+
+SET(SRC_LIBTESS2
+  src/libtess2/bucketalloc.c
+  src/libtess2/dict.c
+  src/libtess2/geom.c
+  src/libtess2/mesh.c
+  src/libtess2/priorityq.c
+  src/libtess2/sweep.c
+  src/libtess2/tess.c)
+
+SET(SRC ${SRC_WEATHER_ROUTING} ${SRC_LIBTESS2})
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
+
+IF(NOT UNIX)
+    SET(SRC_BZIP
+            src/bzip2/bzlib.c
+            src/bzip2/blocksort.c
+            src/bzip2/compress.c
+            src/bzip2/crctable.c
+            src/bzip2/decompress.c
+            src/bzip2/huffman.c
+            src/bzip2/randtable.c
+    )
+    ADD_LIBRARY(LIB_BZIP_WR STATIC ${SRC_BZIP})
+    TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP_WR )
+    INCLUDE_DIRECTORIES(${PLUGIN_SOURCE_DIR}/src/bzip2)
+ENDIF(NOT UNIX)
+			
+#IF(NOT UNIX)
+#    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
+#    INCLUDE_DIRECTORIES(src/bzip2)
+#ENDIF(NOT UNIX)
+
+IF(WIN32)
+  IF(MSVC)
+    INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/buildwin/include)
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
+  ELSE()
+    # MINGW
+#    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lwxzlib-2.8")
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lz")
+  ENDIF()
+ENDIF()
+
+
+
+#======== Above from cmakelists.txt  weather_routing_pi=========
+#=========Below from cmakelists.txt testplugin==================
+ set(OCPNSRC ocpnsrc/TexFont.cpp)
+ set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
 
 set(EXTSRC)
 
@@ -205,68 +269,78 @@ set(LIBHDRS
 option(TESTPLUGIN_USE_SVG "Use SVG graphics" ON)
 add_definitions(-DTESTPLUGIN_USE_SVG)
 
-IF(APPLE)
-    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" OFF)
-ELSE(APPLE)
-    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" ON)
-ENDIF(APPLE)
+#IF(APPLE)
+#    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" OFF)
+#ELSE(APPLE)
+#    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" ON)
+#ENDIF(APPLE)
 
-IF(TP_JSON_SCHEMA_VALIDATOR)
-    MESSAGE(STATUS "Using JSON Schema validation - warning this changes the 'flavour' of the executable and it may not be compatible with OpenCPN")
-    ADD_DEFINITIONS(-DTP_JSON_SCHEMA_VALIDATOR)
-    MESSAGE(STATUS "Adding JSON Schema validation")
+#IF(TP_JSON_SCHEMA_VALIDATOR)
+#    MESSAGE(STATUS "Using JSON Schema validation - warning this changes the 'flavour' of the executable and it may not be compatible with OpenCPN")
+#    ADD_DEFINITIONS(-DTP_JSON_SCHEMA_VALIDATOR)
+#    MESSAGE(STATUS "Adding JSON Schema validation")
 
-    SET(EXTSRC
-        ${EXTSRC}
-        extsrc/json-schema-validator/json-schema-draft7.json.cpp
-        extsrc/json-schema-validator/json-uri.cpp
-        extsrc/json-schema-validator/json-validator.cpp
-    )
-    SET(EXTINCLUDE
-        ${EXTINCLUDE}
-        extinclude/nlohmann/json.hpp
-        extinclude/json-schema-validator/json-schema.hpp
-    )
-    INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/extinclude/json-schema-validator)
-ELSE(TP_JSON_SCHEMA_VALIDATOR)
-    MESSAGE(STATUS "Not using JSON Schema validation - warning invalid JSON 'may' cause unexpected crashes")
-ENDIF(TP_JSON_SCHEMA_VALIDATOR)
+#    SET(EXTSRC
+#        ${EXTSRC}
+#        extsrc/json-schema-validator/json-schema-draft7.json.cpp
+#        extsrc/json-schema-validator/json-uri.cpp
+#        extsrc/json-schema-validator/json-validator.cpp
+#    )
+#    SET(EXTINCLUDE
+#        ${EXTINCLUDE}
+#        extinclude/nlohmann/json.hpp
+#        extinclude/json-schema-validator/json-schema.hpp
+#    )
+#    INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/extinclude/json-schema-validator)
+#ELSE(TP_JSON_SCHEMA_VALIDATOR)
+#    MESSAGE(STATUS "Not using JSON Schema validation - warning invalid JSON 'may' cause unexpected crashes")
+#ENDIF(TP_JSON_SCHEMA_VALIDATOR)
 
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/extinclude)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/lz4)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/bitmaps)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/extinclude)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/lz4)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/bitmaps)
 
-add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC})
+#add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${OCPNSRC} ${EX#TSRC} ${LIBSSRC})
 
-add_definitions(-DTIXML_USE_STL)
+#add_definitions(-DTIXML_USE_STL)
 
-IF(UNIX AND NOT APPLE)
-  IF(TP_JSON_SCHEMA_VALIDATOR)
-    # Change OS/ABI to be UNIX - System V to make it run with OCPN
-    SET(lib_name lib${PACKAGE_NAME}.so)
-    MESSAGE(STATUS "lib-name: ${lib_name}")
-    FIND_FILE(elfedit elfedit)
-    IF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-      MESSAGE(STATUS "Will ensure OS/ABI is set to 0 to match OCPN")
-      ADD_CUSTOM_COMMAND(
-        TARGET ${PACKAGE_NAME}
-        POST_BUILD
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-        DEPENDS ${PACKAGE_NAME}
-        COMMENT " Running post build action on ${lib_name}."
-        COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) '
-      )
-    ELSE(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-      MESSAGE(STATUS "Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
-    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
-ENDIF(UNIX AND NOT APPLE)
+#IF(UNIX AND NOT APPLE)
+#  IF(TP_JSON_SCHEMA_VALIDATOR)
+#    # Change OS/ABI to be UNIX - System V to make it run with OCPN
+#    SET(lib_name lib${PACKAGE_NAME}.so)
+#    MESSAGE(STATUS "lib-name: ${lib_name}")
+#    FIND_FILE(elfedit elfedit)
+#    IF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#      MESSAGE(STATUS "Will ensure OS/ABI is set to 0 to match OCPN")
+#      ADD_CUSTOM_COMMAND(
+#        TARGET ${PACKAGE_NAME}
+#        POST_BUILD
+#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#        DEPENDS ${PACKAGE_NAME}
+#        COMMENT " Running post build action on ${lib_name}."
+#        COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) '
+#      )
+#    ELSE(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#      MESSAGE(STATUS "Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
+#    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
+#ENDIF(UNIX AND NOT APPLE)
 
-include("cmake/PluginInstall.cmake")
-include("cmake/PluginLocalization.cmake")
-include("cmake/PluginPackage.cmake")
+#include("cmake/PluginInstall.cmake")
+#include("cmake/PluginLocalization.cmake")
+#include("cmake/PluginPackage.cmake")
+
+#==========Above is from Testplugin cmakelists.txt ========
+#==========Below is from WxRoute cmakelists.txt========
+INCLUDE("cmake/PluginJSON.cmake")
+INCLUDE("cmake/PluginXML.cmake")
+INCLUDE("cmake/PluginGL.cmake")
+
+INCLUDE("cmake/PluginInstall.cmake")
+INCLUDE("cmake/PluginLocalization.cmake")
+INCLUDE("cmake/PluginPackage.cmake")
