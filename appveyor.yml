@@ -43,7 +43,7 @@ before_build:
   - cmake -T v141_xp ..
 
 build_script:
-  - cmake --build . --target package --config release
+  - cmake --build . --target package --config Release
   - python -m ensurepip
   - python -m pip install -q setuptools
   - python -m pip install -q cloudsmith-cli

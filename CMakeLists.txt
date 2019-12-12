@@ -245,8 +245,8 @@ ENDIF()
 
 #======== Above from cmakelists.txt  weather_routing_pi=========
 #=========Below from cmakelists.txt testplugin==================
- set(OCPNSRC ocpnsrc/TexFont.cpp)
- set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
+# set(OCPNSRC ocpnsrc/TexFont.cpp)
+# set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
 
 #set(EXTSRC)
 
@@ -254,19 +254,19 @@ ENDIF()
 #    extinclude/nlohmann/json.hpp
 #    extinclude/ODAPI.h)
 
-set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+#set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
-set(LIBHDRS
-    libs/GL/include/gl.h
-    libs/GL/include/gl_private.h
-    libs/GL/include/glext.h
-    libs/GL/include/glu.h
-    libs/wx/include/json_defs.h
-    libs/wx/include/jsonreader.h
-    libs/wx/include/jsonval.h
-    libs/wx/include/jsonwriter.h)
-option(TESTPLUGIN_USE_SVG "Use SVG graphics" ON)
-add_definitions(-DTESTPLUGIN_USE_SVG)
+#set(LIBHDRS
+#    libs/GL/include/gl.h
+#    libs/GL/include/gl_private.h
+#    libs/GL/include/glext.h
+#    libs/GL/include/glu.h
+#    libs/wx/include/json_defs.h
+#    libs/wx/include/jsonreader.h
+#    libs/wx/include/jsonval.h
+#    libs/wx/include/jsonwriter.h)
+#option(TESTPLUGIN_USE_SVG "Use SVG graphics" ON)
+#add_definitions(-DTESTPLUGIN_USE_SVG)
 
 #IF(APPLE)
 #    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" OFF)
