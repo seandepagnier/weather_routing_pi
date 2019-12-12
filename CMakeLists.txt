@@ -91,7 +91,7 @@ set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/ver
 
 include("cmake/PluginSetup.cmake")
 
-#========Below is specific to the plugins =================
+#========Below is specific to the plugin and is from testplugin  =================
 
 set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
 
@@ -163,7 +163,7 @@ endif()
 
 include("cmake/PluginConfigure.cmake")
 
-add_definitions(-DUSE_S57)  #???
+add_definitions(-DUSE_S57)  #???  What is this for? Needed?
 
 #======== From cmakelists.txt  weather_routing_pi
 
@@ -171,7 +171,7 @@ IF(WEATHER_ROUTING_USE_SVG)
   ADD_DEFINITIONS(-DWEATHER_ROUTING_USE_SVG)
 ENDIF(WEATHER_ROUTING_USE_SVG)
 
-SET(SRC_WEATHER_ROUTING
+SET(SRCS
             src/weather_routing_pi.cpp
             src/WeatherRouting.cpp
             src/ConfigurationDialog.cpp
@@ -193,7 +193,6 @@ SET(SRC_WEATHER_ROUTING
             src/PolygonRegion.cpp
             src/WeatherRoutingUI.cpp
             src/icons.cpp
-
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
@@ -208,7 +207,7 @@ SET(SRC_LIBTESS2
   src/libtess2/sweep.c
   src/libtess2/tess.c)
 
-SET(SRC ${SRC_WEATHER_ROUTING} ${SRC_LIBTESS2})
+SET(SRC ${SRCS} ${SRC_LIBTESS2})
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 
 IF(NOT UNIX)
@@ -249,11 +248,11 @@ ENDIF()
  set(OCPNSRC ocpnsrc/TexFont.cpp)
  set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
 
-set(EXTSRC)
+#set(EXTSRC)
 
-set(EXTINCLUDE
-    extinclude/nlohmann/json.hpp
-    extinclude/ODAPI.h)
+#set(EXTINCLUDE
+#    extinclude/nlohmann/json.hpp
+#    extinclude/ODAPI.h)
 
 set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
