@@ -245,8 +245,8 @@ ENDIF()
 
 #======== Above from cmakelists.txt  weather_routing_pi=========
 #=========Below from cmakelists.txt testplugin==================
-# set(OCPNSRC ocpnsrc/TexFont.cpp)
-# set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
+set(OCPNSRC ocpnsrc/TexFont.cpp)
+set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
 
 #set(EXTSRC)
 
