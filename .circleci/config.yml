@@ -53,24 +53,24 @@ workflows:
   version: 2
   build_all:
     jobs:
-      - build-debian:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
-      - build-flatpak:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
-      - build-macos:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
+#      - build-debian:
+#          filters:
+#            branches:
+#              ignore:
+#                - devel
+#                - tmp
+#      - build-flatpak:
+#          filters:
+#            branches:
+#              ignore:
+#                - devel
+#                - tmp
+#      - build-macos:
+#          filters:
+#            branches:
+#              ignore:
+#                - devel
+#                - tmp
       - build-mingw:
           filters:
             branches:
