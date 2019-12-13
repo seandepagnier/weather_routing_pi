@@ -43,7 +43,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
 if(NOT WIN32 AND NOT APPLE)
-  add_definitions("-Wall -Wno-unused -fexceptions -rdynamic -fvisibility=hidden")
+# Added -fPIC at Jon's suggestion to fix  issue when compiling json_value.cpp as it is not being compiled with '-fPIC'
+  add_definitions("-Wall -Wno-unused -fexceptions -rdynamic  -fPIC -fvisibility=hidden")
   add_definitions(" -fno-strict-aliasing")
   message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")

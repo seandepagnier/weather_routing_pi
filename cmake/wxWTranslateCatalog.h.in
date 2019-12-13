@@ -38,5 +38,5 @@
     #define _(s) wxGetTranslation(wxT(s), wxT("opencpn-${PROJECT_NAME}"))
 #endif // wxCHECK_VERSION(3,0,0)
 #endif // WXINTL_NO_GETTEXT_MACRO
-
 #endif
+#endif  

@@ -211,7 +211,7 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2})
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 
 IF(NOT UNIX)
-    SET(SRC_BZIP
+    SET(SRC_BZIP	
             src/bzip2/bzlib.c
             src/bzip2/blocksort.c
             src/bzip2/compress.c
@@ -225,10 +225,10 @@ IF(NOT UNIX)
     INCLUDE_DIRECTORIES(${PLUGIN_SOURCE_DIR}/src/bzip2)
 ENDIF(NOT UNIX)
 			
-#IF(NOT UNIX)
-#    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
-#    INCLUDE_DIRECTORIES(src/bzip2)
-#ENDIF(NOT UNIX)
+IF(NOT UNIX)
+    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
+    INCLUDE_DIRECTORIES(src/bzip2)
+ENDIF(NOT UNIX)
 
 IF(WIN32)
   IF(MSVC)
@@ -245,8 +245,8 @@ ENDIF()
 
 #======== Above from cmakelists.txt  weather_routing_pi=========
 #=========Below from cmakelists.txt testplugin==================
-set(OCPNSRC ocpnsrc/TexFont.cpp)
-set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
+# set(OCPNSRC ocpnsrc/TexFont.cpp)
+# set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
 
 #set(EXTSRC)
 
