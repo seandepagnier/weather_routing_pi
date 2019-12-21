@@ -15,7 +15,7 @@ jobs:
            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main"
            | sudo tee -a /etc/apt/sources.list
        - run: cat /etc/apt/sources.list
-       - run: ci/circleci-build-debian.sh
+       - run: bash ci/circleci-build-debian.sh
        - run: bash ci/circleci-upload.sh
    build-flatpak:
      machine:
@@ -25,7 +25,7 @@ jobs:
        - CLOUDSMITH_PKG_EXT: gz
      steps:
        - checkout
-       - run: ci/circleci-build-flatpak.sh
+       - run: bash ci/circleci-build-flatpak.sh
        - run: bash ci/circleci-upload.sh
    build-mingw:
      docker:
@@ -36,7 +36,7 @@ jobs:
      steps:
        - run: su -c "dnf install -q -y git openssh-clients openssh-server"
        - checkout
-       - run: ci/circleci-build-mingw.sh
+       - run: bash ci/circleci-build-mingw.sh
        - run: bash ci/circleci-upload.sh
    build-macos:
      macos:
@@ -46,7 +46,7 @@ jobs:
        - CLOUDSMITH_PKG_EXT: pkg
      steps:
        - checkout
-       - run: ci/circleci-build-macos.sh
+       - run: bash ci/circleci-build-macos.sh
        - run: bash ci/circleci-upload.sh
 workflows:
   version: 2
