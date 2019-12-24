@@ -27,6 +27,8 @@ jobs:
        - checkout
        - run: bash ci/circleci-build-flatpak.sh
        - run: bash ci/circleci-upload.sh
+       - store_test_results:
+           path: ~/test-results
    build-mingw:
      docker:
          - image: fedora:29
@@ -48,6 +50,8 @@ jobs:
        - checkout
        - run: bash ci/circleci-build-macos.sh
        - run: bash ci/circleci-upload.sh
+       - store_test_results:
+           path: ~/test-results	   
 workflows:
   version: 2
   build_all:
