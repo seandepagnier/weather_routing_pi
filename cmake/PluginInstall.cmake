@@ -185,7 +185,7 @@ if(APPLE)
     message("Generating data directory")
   endif()
 
-  file(GLOB PACKAGE_DATA_FILES ${CMAKE_SOURCE_DIR}/data/*)
+  file(GLOB_RECURSE PACKAGE_DATA_FILES LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/data/*)
 
   foreach(_currentDataFile ${PACKAGE_DATA_FILES})
     message(STATUS "copying: ${_currentDataFile}")
