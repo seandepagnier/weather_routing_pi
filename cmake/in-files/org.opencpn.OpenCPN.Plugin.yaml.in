@@ -18,6 +18,5 @@ modules:
         cxxflags: -fPIC
     sources:
        - type: git
-#         url: git://${GIT_REPOSITORY_HOST}/${GIT_REPOSITORY_DIR}${GIT_REPOSITORY_NAME}
-          url: https://${GIT_REPOSITORY_HOST}/${GIT_REPOSITORY_DIR}${GIT_REPOSITORY_NAME}
+         url: git://${GIT_REPOSITORY_HOST}/${GIT_REPOSITORY_DIR}${GIT_REPOSITORY_NAME}
          branch: ${GIT_REPOSITORY_BRANCH}
