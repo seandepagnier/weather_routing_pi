@@ -164,9 +164,9 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
 
     /* if the boats or polars directories did not previously exist, populate them */
     if (forceCopyBoats)
-        CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/boats"), boatsdir);
+        CopyDataFiles(GetPluginDataDir("weather_routing_pi") + _T("plugins/weather_routing_pi/data/boats"), boatsdir);
     if (forceCopyPolars)
-        CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/polars"), polarsdir);
+        CopyDataFiles(GetPluginDataDir("weather_routing_pi") + _T("plugins/weather_routing_pi/data/polars"), polarsdir);
 
     int confVersion;
     pConf->Read ( _T ( "ConfigVersion" ), &confVersion, 0);
@@ -205,11 +205,11 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
                      result.GetCount();
                  i++) {
 	        if (result[i] == 0) {
-		    CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/boats"), boatsdir);
-		    CopyDataFiles(*GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/polars"), polarsdir);
+                CopyDataFiles(GetPluginDataDir("weather_routing_pi") + _T("plugins/weather_routing_pi/data/boats"), boatsdir);
+                CopyDataFiles(GetPluginDataDir("weather_routing_pi") + _T("plugins/weather_routing_pi/data/polars"), polarsdir);
 		}
 		else if (result[i] == 1) {
-		    wxString cfg = *GetpSharedDataLocation() + _T("plugins/weather_routing_pi/data/") + _T("WeatherRoutingConfiguration.xml");
+            wxString cfg = GetPluginDataDir("weather_routing_pi") + _T("plugins/weather_routing_pi/data/") + _T("WeatherRoutingConfiguration.xml");
 		    if (wxFileName::FileExists(cfg))
 			wxCopyFile(cfg, m_default_configuration_path);
 		}
@@ -1575,7 +1575,7 @@ void WeatherRouting::OnManual ( wxCommandEvent& event )
 
 void WeatherRouting::OnInformation ( wxCommandEvent& event )
 {
-    wxString infolocation = *GetpSharedDataLocation()
+    wxString infolocation = GetPluginDataDir("weather_routing_pi")
         + _T("plugins/weather_routing_pi/data/") + _("WeatherRoutingInformation.html");
     wxLaunchDefaultBrowser(_T("file://") + infolocation);
 }
