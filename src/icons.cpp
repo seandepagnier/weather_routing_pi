@@ -8,7 +8,7 @@
 
 wxBitmap *_img_WeatherRouting;
 
-#ifdef OCPN_USE_SVG
+#ifdef PLUGIN_USE_SVG
 #include "ocpn_plugin.h"
 wxString _svg_weather_routing;
 wxString _svg_weather_routing_rollover;
@@ -22,7 +22,7 @@ void initialize_images(void)
 		_img_WeatherRouting = new wxBitmap(wxImage(sm));
 	}
 
-#ifdef OCPN_USE_SVG
+#ifdef PLUGIN_USE_SVG
     wxFileName fn;
     fn.SetPath(GetPluginDataDir("weather_routing_pi"));
     fn.AppendDir(_T("plugins"));
