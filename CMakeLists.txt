@@ -55,7 +55,7 @@ set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weather_routing.html")
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing Plugin optimizes weather routing")
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
-option(PLUGIN_USE_SVG "Use SVG graphics" OFF)
+option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
 set(CMAKE_CXX_STANDARD 11)
 
