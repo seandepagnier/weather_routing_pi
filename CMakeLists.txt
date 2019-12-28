@@ -55,7 +55,7 @@ set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weather_routing.html")
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing Plugin optimizes weather routing")
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
-option(PLUGIN_USE_SVG "Use SVG graphics" ON)
+option(PLUGIN_USE_SVG "Use SVG graphics" OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -167,9 +167,16 @@ include("cmake/PluginConfigure.cmake")
 
 add_definitions(-DUSE_S57)  #???  What is this for? Needed?
 
-#======== From cmakelists.txt  weather_routing_pi
+IF(PLUGIN_USE_SVG)
+    MESSAGE(STATUS "SVG support enabled...")
+    IF(NOT QT_ANDROID)
+        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
+    ENDIF(NOT QT_ANDROID)
+ENDIF(PLUGIN_USE_SVG)
 
-ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
+
+
+#======== From cmakelists.txt  weather_routing_pi
 
 SET(SRCS
             src/weather_routing_pi.cpp
