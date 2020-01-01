@@ -1009,7 +1009,7 @@ void BoatDialog::RepopulatePolars()
 #if 0
     if(m_Boat.Polars.size() == 0) {
         Polar generic_polar;
-        wxString message, generic_polar_path = *GetpSharedDataLocation()
+        wxString message, generic_polar_path = GetPluginDataDir("weather_routing_pi")
             + _T("plugins/weather_routing_pi/data/polars/60ft_mono.pol");
         bool success = generic_polar.Open(generic_polar_path, message);
         if(success)

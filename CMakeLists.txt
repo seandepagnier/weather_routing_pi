@@ -22,9 +22,9 @@ set(PACKAGE_CONTACT "Sean d'Epagnier")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "1")
+set(VERSION_PATCH "2")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "2019-05-26")
+set(VERSION_DATE "2019-12-27")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -41,7 +41,8 @@ if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
 #  set(GIT_REPOSITORY_BRANCH "master")
-  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
+  set(GIT_REPOSITORY_BRANCH "api-1.16")
+  #  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
 # else()
 #  set(GIT_REPOSITORY_HOST "git.eclipse.com.au")
 #  set(GIT_REPOSITORY_DIR "")
@@ -55,6 +56,7 @@ set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weather_routing.html")
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing Plugin optimizes weather routing")
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
+option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -166,11 +168,16 @@ include("cmake/PluginConfigure.cmake")
 
 add_definitions(-DUSE_S57)  #???  What is this for? Needed?
 
-#======== From cmakelists.txt  weather_routing_pi
+IF(PLUGIN_USE_SVG)
+    MESSAGE(STATUS "SVG support enabled...")
+    IF(NOT QT_ANDROID)
+        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
+    ENDIF(NOT QT_ANDROID)
+ENDIF(PLUGIN_USE_SVG)
 
-IF(WEATHER_ROUTING_USE_SVG)
-  ADD_DEFINITIONS(-DWEATHER_ROUTING_USE_SVG)
-ENDIF(WEATHER_ROUTING_USE_SVG)
+
+
+#======== From cmakelists.txt  weather_routing_pi
 
 SET(SRCS
             src/weather_routing_pi.cpp
