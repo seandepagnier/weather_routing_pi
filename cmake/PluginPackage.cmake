@@ -125,7 +125,7 @@ if(NOT STANDALONE MATCHES "BUNDLED")
 
     # Patch the pkgproj.in file to make the output package name conform to Xxx-Plugin_x.x.pkg format Key is: <key>NAME</key> <string>${VERBOSE_NAME}-Plugin_${VERSION_MAJOR}.${VERSION_MINOR}</string>
 
-    configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/${PACKAGE_NAME}.pkgproj.in ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}.pkgproj)
+    configure_file(${PROJECT_SOURCE_DIR}/buildosx/InstallOSX/plugin.pkgproj.in ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}.pkgproj)
 
     add_custom_command(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}-Plugin_${PACKAGE_VERSION}_${OCPN_MIN_VERSION}.pkg
