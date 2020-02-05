@@ -19,6 +19,7 @@ set(PACKAGE_NAME "weather_routing_pi")
 set(VERBOSE_NAME "WeatherRouting")
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
+set(COMMON_NAME "WeatherRouting")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")

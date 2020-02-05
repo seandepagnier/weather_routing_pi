@@ -64,7 +64,7 @@ cat $xml
 echo 'substituting xmal file stuff'
 while read line; do
     line=${line//--pkg_repo--/$PKG_REPO}
-    line=${line//--name--/$tarball_name}
+    line=${line//--name--/$COMMON_NAME}
     line=${line//--version--/$VERSION}
     line=${line//--filename--/$tarball_basename}
     echo $line
