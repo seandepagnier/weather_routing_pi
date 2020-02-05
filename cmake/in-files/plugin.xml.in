@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <opencpn-plugin version="1">
-  <name> ${PACKAGE} </name>
+  <name> ${COMMON_NAME} </name>
   <version> ${PACKAGE_VERSION} </version>
   <release> ${PROJECT_VERSION_TWEAK} </release>
   <summary> ${XML_SUMMARY} </summary>
