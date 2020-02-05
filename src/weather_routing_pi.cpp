@@ -184,7 +184,7 @@ wxBitmap *weather_routing_pi::GetPlugInBitmap()
 
 wxString weather_routing_pi::GetCommonName()
 {
-      return _(PLUGIN_COMMON_NAME);
+      return _T("WeatherRouting");
 }
 
 wxString weather_routing_pi::GetShortDescription()
