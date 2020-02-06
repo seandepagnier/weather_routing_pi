@@ -32,7 +32,7 @@ set(OCPN_API_VERSION_MINOR "16")
 set(TP_COMMENT "  * Release for O5 using CI")
 
 set(PARENT "opencpn")
-set(PACKAGE "weatherrouting")
+set(PACKAGE "weather_routing")
 #set(GIT_USER "seandepagnier")
 set(GIT_USER "rgleason")
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
