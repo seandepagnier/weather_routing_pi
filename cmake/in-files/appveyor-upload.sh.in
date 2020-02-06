@@ -6,7 +6,7 @@
 set -xe
 
 STABLE_REPO='@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-prod'
-UNSTABLE_REPO='@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-beta'
+UNSTABLE_REPO='@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@'
 STABLE_PKG_REPO='@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-pkg'
 
 if test "@APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH@" != "true"
@@ -61,7 +61,7 @@ cat $xml
 
 # There is no sed available in git bash. This is nasty, but seems
 # to work:
-echo 'substituting xmal file stuff'
+echo 'substituting xmal file stuff from appveyor-upload.sh.in'
 while read line; do
     line=${line//--pkg_repo--/$PKG_REPO}
     line=${line//--name--/$tarball_name}

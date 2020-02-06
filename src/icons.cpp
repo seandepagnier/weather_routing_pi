@@ -25,8 +25,6 @@ void initialize_images(void)
 #ifdef PLUGIN_USE_SVG
     wxFileName fn;
     fn.SetPath(GetPluginDataDir("weather_routing_pi"));
-    fn.AppendDir(_T("plugins"));
-    fn.AppendDir(_T("weather_routing_pi"));
     fn.AppendDir(_T("data"));
     fn.SetFullName(_T("weather_routing_pi.svg"));
     _svg_weather_routing = fn.GetFullPath();

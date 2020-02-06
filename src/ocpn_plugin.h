@@ -40,15 +40,16 @@
 #ifdef MAKING_PLUGIN
 #  define DECL_IMP     __declspec(dllimport)
 #endif
-#endif
+#endif    
 
 #include <wx/xml/xml.h>
 
 #ifdef ocpnUSE_SVG
-#include <wx/bitmap.h>
+#include "wxSVG/svg.h"
 #endif // ocpnUSE_SVG
 
 #include <memory>
+#include <vector>
 
 class wxGLContext;
 
@@ -543,7 +544,10 @@ class DECL_EXP opencpn_plugin_116 : public opencpn_plugin_115
 public:
     opencpn_plugin_116(void *pmgr);
     virtual ~opencpn_plugin_116();
-    virtual bool RenderGLOverlayMultiCanvas(wxGLContext *pcontext, PlugIn_ViewPort *vp, int max_canvas);
+    virtual bool RenderGLOverlayMultiCanvas(wxGLContext *pcontext, PlugIn_ViewPort *vp, int canvasIndex);
+    virtual bool RenderOverlayMultiCanvas(wxDC &dc, PlugIn_ViewPort *vp, int canvasIndex);
+    virtual void PrepareContextMenu( int canvasIndex);
+
 };
 
 //------------------------------------------------------------------
@@ -731,6 +735,10 @@ extern DECL_EXP wxString getUsrDistanceUnit_Plugin( int unit = -1 );
 extern DECL_EXP wxString getUsrSpeedUnit_Plugin( int unit = -1 );
 extern DECL_EXP wxString GetNewGUID();
 extern "C" DECL_EXP bool PlugIn_GSHHS_CrossesLand(double lat1, double lon1, double lat2, double lon2);
+/**
+ * Start playing a sound file asynchronously. Supported formats depends
+ * on sound backend.
+ */
 extern DECL_EXP void PlugInPlaySound( wxString &sound_file );
 
 
@@ -785,8 +793,8 @@ extern  DECL_EXP wxString GetLocaleCanonicalName();
 
 
 class PI_S57Obj;
-WX_DECLARE_LIST(PI_S57Obj, ListOfPI_S57Obj);
 
+WX_DECLARE_LIST(PI_S57Obj, ListOfPI_S57Obj);
 
 // ----------------------------------------------------------------------------
 // PlugInChartBaseGL
@@ -1081,6 +1089,11 @@ extern DECL_EXP wxColour GetFontColour_PlugIn(wxString TextElement);
 extern DECL_EXP double GetCanvasTilt();
 extern DECL_EXP void SetCanvasTilt(double tilt);
 
+/**
+ * Start playing a sound file asynchronously. Supported formats depends
+ * on sound backend. The deviceIx is only used on platforms using the
+ * portaudio sound backend where -1 indicates the default device.
+ */
 extern DECL_EXP bool PlugInPlaySoundEx( wxString &sound_file, int deviceIndex=-1 );
 extern DECL_EXP void AddChartDirectory( wxString &path );
 extern DECL_EXP void ForceChartDBUpdate();
@@ -1276,6 +1289,8 @@ extern DECL_EXP void PlugInHandleAutopilotRoute(bool enable);
  */
 extern DECL_EXP wxString GetPluginDataDir(const char* plugin_name);
 
+extern DECL_EXP bool ShuttingDown( void );
+
 //  Support for MUI MultiCanvas model
 
 extern DECL_EXP wxWindow* PluginGetFocusCanvas();
@@ -1287,13 +1302,31 @@ extern "C"  DECL_EXP void RemoveCanvasMenuItem(int item, const char *name = "");
 extern "C"  DECL_EXP void SetCanvasMenuItemViz(int item, bool viz, const char *name = ""); // Temporarily change context menu options
 extern "C"  DECL_EXP void SetCanvasMenuItemGrey(int item, bool grey, const char *name = "");
 
-// Extra waypoints, routes and tracks
-extern DECL_EXP wxString GetSelectedWaypointGUID_Plugin(  );
+// Extract waypoints, routes and tracks
+extern DECL_EXP wxString GetSelectedWaypointGUID_Plugin( );
 extern DECL_EXP wxString GetSelectedRouteGUID_Plugin( );
 extern DECL_EXP wxString GetSelectedTrackGUID_Plugin( );
 
 extern DECL_EXP std::unique_ptr<PlugIn_Waypoint> GetWaypoint_Plugin( const wxString& ); // doublon with GetSingleWaypoint
 extern DECL_EXP std::unique_ptr<PlugIn_Route> GetRoute_Plugin( const wxString& );
 extern DECL_EXP std::unique_ptr<PlugIn_Track> GetTrack_Plugin( const wxString& );
+
+extern DECL_EXP wxWindow* GetCanvasUnderMouse( );
+extern DECL_EXP int GetCanvasIndexUnderMouse( );
+//extern DECL_EXP std::vector<wxWindow *> GetCanvasArray();
+extern DECL_EXP wxWindow *GetCanvasByIndex( int canvasIndex );
+extern DECL_EXP int GetCanvasCount( );
+extern DECL_EXP bool CheckMUIEdgePan_PlugIn( int x, int y, bool dragging, int margin, int delta, int canvasIndex );
+extern DECL_EXP void SetMUICursor_PlugIn( wxCursor *pCursor, int canvasIndex );
+
+enum SDDMFORMAT
+{
+    DEGREES_DECIMAL_MINUTES = 0,
+    DECIMAL_DEGREES,
+    DEGREES_MINUTES_SECONDS,
+    END_SDDMFORMATS
+};
+
+extern DECL_EXP int GetLatLonFormat(void);
 
 #endif //_PLUGIN_H_
