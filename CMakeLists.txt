@@ -16,10 +16,13 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 set(PACKAGE_NAME "weather_routing_pi")
-set(VERBOSE_NAME "WeatherRouting")
+# VERBOSE_NAME is the same as the plugin Common Name
+set(VERBOSE_NAME "WeatherRouting") 
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
-set(COMMON_NAME "WeatherRouting")
+# set(COMMON_NAME "WeatherRouting")   #use to test.
+#Don't change this, sets getcommonname "Common Plugin Name" in weather_routing_pi.cpp
+#Must remain the same Common Name as the legacy unmanaged plugins to avoid duplication.
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
@@ -32,7 +35,7 @@ set(OCPN_API_VERSION_MINOR "16")
 set(TP_COMMENT "  * Release for O5 using CI")
 
 set(PARENT "opencpn")
-set(PACKAGE "weather_routing")
+set(PACKAGE "weather_routing")  #used for Package name
 #set(GIT_USER "seandepagnier")
 set(GIT_USER "rgleason")
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
