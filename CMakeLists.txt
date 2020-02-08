@@ -19,7 +19,7 @@ set(PACKAGE_NAME "weather_routing_pi")
 set(VERBOSE_NAME "WeatherRouting") 
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
-# set(COMMON_NAME "WeatherRouting")
+set(COMMON_NAME "WeatherRouting")
 # Don't change this, sets getcommonname "Common Plugin Name" in weather_routing_pi.cpp
 # Must remain the same Common Name as the legacy unmanaged plugins to avoid duplication.
 # VERBOSE_NAME should be the same as the plugin "Common Name"
