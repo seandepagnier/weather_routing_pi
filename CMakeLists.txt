@@ -19,10 +19,10 @@ set(PACKAGE_NAME "weather_routing_pi")
 set(VERBOSE_NAME "WeatherRouting") 
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
-set(COMMON_NAME "WeatherRouting")
-#Don't change this, sets getcommonname "Common Plugin Name" in weather_routing_pi.cpp
-#Must remain the same Common Name as the legacy unmanaged plugins to avoid duplication.
-# VERBOSE_NAME is the same as the plugin Common Name
+# set(COMMON_NAME "WeatherRouting")
+# Don't change this, sets getcommonname "Common Plugin Name" in weather_routing_pi.cpp
+# Must remain the same Common Name as the legacy unmanaged plugins to avoid duplication.
+# VERBOSE_NAME should be the same as the plugin "Common Name"
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
@@ -55,7 +55,7 @@ endif()
 set(CLOUDSMITH_USER "rick-gleason")
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")
-set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weather_routing.html")
+set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherrouting.html")
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing Plugin optimizes weather routing")
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
