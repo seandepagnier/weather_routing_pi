@@ -40,7 +40,7 @@ jobs:
      steps:
        - checkout
        - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ buster main"
+           echo "deb-src http://ftp.us.debian.org/debian buster main"
            | sudo tee -a /etc/apt/sources.list
        - run: >
            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ buster-updates main"
