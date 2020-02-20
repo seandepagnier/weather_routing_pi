@@ -1,5 +1,53 @@
 version: 2
 jobs:
+   build-xenial:
+     docker:
+       - image: circleci/buildpack-deps:xenial-scm
+     environment:
+       - OCPN_TARGET:  xenial
+     steps:
+       - checkout
+       - run: >
+           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial main"
+           | sudo tee -a /etc/apt/sources.list
+       - run: >
+           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main"
+           | sudo tee -a /etc/apt/sources.list
+       - run: cat /etc/apt/sources.list
+       - run: ci/circleci-build-debian.sh
+       - run: ci/circleci-upload.sh
+   build-bionic:
+     docker:
+       - image: circleci/buildpack-deps:bionic-scm
+     environment:
+       - OCPN_TARGET:  bionic
+     steps:
+       - checkout
+       - run: >
+           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic main"
+           | sudo tee -a /etc/apt/sources.list
+       - run: >
+           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates main"
+           | sudo tee -a /etc/apt/sources.list
+       - run: cat /etc/apt/sources.list
+       - run: ci/circleci-build-debian.sh
+       - run: ci/circleci-upload.sh
+   build-buster:
+     docker:
+       - image: circleci/buildpack-deps:buster-scm
+     environment:
+       - OCPN_TARGET:  buster
+     steps:
+       - checkout
+       - run: >
+           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ buster main"
+           | sudo tee -a /etc/apt/sources.list
+       - run: >
+           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ buster-updates main"
+           | sudo tee -a /etc/apt/sources.list
+       - run: cat /etc/apt/sources.list
+       - run: ci/circleci-build-debian.sh
+       - run: ci/circleci-upload.sh
    build-debian:
      docker:
        - image: circleci/buildpack-deps:xenial-scm
@@ -29,6 +77,16 @@ jobs:
        - run: bash ci/circleci-upload.sh
        - store_test_results:
            path: ~/test-results
+   build-fedora:
+     docker:
+         - image: fedora:29
+     environment:
+       - OCPN_TARGET:  fedora
+     steps:
+       - run: su -c "dnf install -q -y git openssh-clients openssh-server"
+       - checkout
+       - run: ci/circleci-build-fedora.sh
+       - run: ci/circleci-upload.sh
    build-mingw:
      docker:
          - image: fedora:29
@@ -56,7 +114,19 @@ workflows:
   version: 2
   build_all:
     jobs:
-      - build-debian:
+      - build-xenial:
+          filters:
+            branches:
+              ignore:
+                - devel
+                - tmp
+      - build-bionic:
+          filters:
+            branches:
+              ignore:
+                - devel
+                - tmp
+      - build-buster:
           filters:
             branches:
               ignore:
@@ -68,7 +138,7 @@ workflows:
               ignore:
                 - devel
                 - tmp
-      - build-macos:
+      - build-fedora:
           filters:
             branches:
               ignore:
@@ -80,3 +150,9 @@ workflows:
               ignore:
                 - devel
                 - tmp
+      - build-macos:
+          filters:
+            branches:
+              ignore:
+                - devel
+                - tmp				
