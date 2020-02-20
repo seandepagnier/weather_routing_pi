@@ -3,6 +3,8 @@
 # ---------------------------------------------------------------------------
 # CMake-CI Number: 0.0.001  
 #    - 2/19/2020 added Update build to create all 10 environments needed for beta testing.
+#    - 2/19/2020 fixed debian build
+#    - 2/19/2020 Add raspian build capability
 #
 # define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
@@ -27,8 +29,8 @@ set(COMMON_NAME "WeatherRouting")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "3")
-set(VERSION_TWEAK "2")
+set(VERSION_PATCH "4")
+set(VERSION_TWEAK "0")
 set(VERSION_DATE "02/19/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
