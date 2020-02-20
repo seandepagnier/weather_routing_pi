@@ -43,7 +43,7 @@ jobs:
            echo "deb-src http://ftp.us.debian.org/debian buster main"
            | sudo tee -a /etc/apt/sources.list
        - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ buster-updates main"
+           echo "deb-src http://ftp.us.debian.org/debian buster-updates main"
            | sudo tee -a /etc/apt/sources.list
        - run: cat /etc/apt/sources.list
        - run: ci/circleci-build-debian.sh
