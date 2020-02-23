@@ -74,6 +74,7 @@ COMMON_NAME_SUB=@COMMON_NAME@
 echo $COMMON_NAME_SUB
 
 echo $tarball_name
+echo $tarball
 
 sudo sed -i -e "s|--pkg_repo--|$PKG_REPO|"  $xml
 sudo sed -i -e "s|--name--|$COMMON_NAME_SUB|" $xml
