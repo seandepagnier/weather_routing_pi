@@ -77,7 +77,7 @@ echo $tarball_name
 echo $tarball
 
 sudo sed -i -e "s|--pkg_repo--|$PKG_REPO|"  $xml
-sudo sed -i -e "s|--name--|$tarball|" $xml
+sudo sed -i -e "s|--name--|$tarball_name|" $xml
 sudo sed -i -e "s|--version--|$VERSION|" $xml
 sudo sed -i -e "s|--filename--|$tarball_basename|" $xml
 
