@@ -70,6 +70,9 @@ else
     PKG_REPO="$UNSTABLE_REPO"
 fi
 
+COMMON_NAME_SUB=@COMMON_NAME
+echo $COMMON_NAME_SUB
+
 sudo sed -i -e "s|--pkg_repo--|$PKG_REPO|"  $xml
 sudo sed -i -e "s|--name--|$COMMON_NAME|" $xml
 sudo sed -i -e "s|--version--|$VERSION|" $xml
