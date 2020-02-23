@@ -1,27 +1,6 @@
 language: cpp
 matrix:
   include:
-    - env:
-    - OCPN_TARGET=stretch-armhf
-    - OCPN_BRANCH=ci
-    - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
-    - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
-    - DOCKER_IMAGE=raspbian/stretch
-    services:
-    - docker
-    script:
-    - "./ci/travis-build-raspbian-armhf.sh"
-  - env:
-    - OCPN_TARGET=buster-armhf
-    - OCPN_BRANCH=ci
-    - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
-    - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
-    - DOCKER_IMAGE=opencpn/raspbian-buster:plugin_build_tooling
-    services:
-    - docker
-    script:
-    - "./ci/travis-build-raspbian-armhf.sh"
-
   - dist: trusty
     compiler: gcc
   - os: osx
