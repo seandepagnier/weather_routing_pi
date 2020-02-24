@@ -29,7 +29,7 @@ script:
     then 
       echo "Don't build on coverty_scan branch."; 
       exit 0; 
-  fi
+    fi
   - mkdir build && cd build
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; 
     then 
@@ -40,14 +40,13 @@ script:
         cmake -DwxWidgets_CONFIG_EXECUTABLE=/tmp/wx312_opencpn50_macos109/bin/wx-config -DwxWidgets_CONFIG_OPTIONS="--prefix=/tmp/wx312_opencpn50_macos109" -DCMAKE_INSTALL_PREFIX=/tmp/opencpn -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 .. && make -sj2 && make create-pkg; 
       fi
     - ls -l;
-    notifications:
+notifications:
     email: false
     git:
     depth: 10
     before_install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
-    - if [ "${#OAUTH_ACCESS_TOKEN}" != 0 ]; then (echo OAUTH_ACCESS_TOKEN=${OAUTH_ACCESS_TOKEN}
-    > ~/.dropbox_uploader); fi
+    - if [ "${#OAUTH_ACCESS_TOKEN}" != 0 ]; then (echo OAUTH_ACCESS_TOKEN=${OAUTH_ACCESS_TOKEN} > ~/.dropbox_uploader); fi
 addons:
   apt:
     sources:
