@@ -65,7 +65,7 @@ if [ -n "$tag" ]; then
     REPO="$STABLE_REPO"
     PKG_REPO="$STABLE_PKG_REPO"
 else
-    VERSION="1.13.5.0+${BUILD_ID}.${commit}"
+    VERSION="1.13.5.1+${BUILD_ID}.${commit}"
     REPO="$UNSTABLE_REPO"
     PKG_REPO="$UNSTABLE_REPO"
 fi
@@ -96,8 +96,12 @@ cloudsmith push raw --republish --no-wait-for-sync \
     --summary "weather_routing opencpn plugin metadata for automatic installation" \
     $REPO $xml
 
+# No need to upload package for flatpk, it is exactly the same as tarball    
+if [${OCPN_TARGET} != "flatpak"]
+then     
 cloudsmith push raw --republish --no-wait-for-sync \
     --name weather_routing-msvc-10.0.18363.${PKG_EXT} \
     --version ${VERSION} \
     --summary "weather_routing .${PKG_EXT} installation package" \
     $PKG_REPO $pkg
+fi
