@@ -65,13 +65,19 @@ if [ -n "$tag" ]; then
     REPO="$STABLE_REPO"
     PKG_REPO="$STABLE_PKG_REPO"
 else
-    VERSION="1.13.3.1+${BUILD_ID}.${commit}"
+    VERSION="1.13.5.0+${BUILD_ID}.${commit}"
     REPO="$UNSTABLE_REPO"
     PKG_REPO="$UNSTABLE_REPO"
 fi
 
+COMMON_NAME_SUB=WeatherRouting
+echo $COMMON_NAME_SUB
+
+echo $tarball_name
+echo $tarball
+
 sudo sed -i -e "s|--pkg_repo--|$PKG_REPO|"  $xml
-sudo sed -i -e "s|--name--|$COMMON_NAME|" $xml
+sudo sed -i -e "s|--name--|$tarball_name|" $xml
 sudo sed -i -e "s|--version--|$VERSION|" $xml
 sudo sed -i -e "s|--filename--|$tarball_basename|" $xml
 
@@ -79,16 +85,16 @@ cat $xml
 ls -l build
 
 cloudsmith push raw --republish --no-wait-for-sync \
-    --name weather_routing-msvc-10.0.18363-metadata \
-    --version ${VERSION} \
-    --summary "weather_routing opencpn plugin metadata for automatic installation" \
-    $REPO $xml
-
-cloudsmith push raw --republish --no-wait-for-sync \
     --name $tarball_name \
     --version ${VERSION} \
     --summary "weather_routing opencpn plugin tarball for automatic installation" \
     $REPO $tarball
+
+cloudsmith push raw --republish --no-wait-for-sync \
+    --name weather_routing-msvc-10.0.18363-metadata \
+    --version ${VERSION} \
+    --summary "weather_routing opencpn plugin metadata for automatic installation" \
+    $REPO $xml
 
 cloudsmith push raw --republish --no-wait-for-sync \
     --name weather_routing-msvc-10.0.18363.${PKG_EXT} \
