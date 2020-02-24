@@ -5,6 +5,28 @@ matrix:
     compiler: gcc
   - os: osx
     compiler: clang
+    
+  - env:
+    - OCPN_TARGET=stretch-armhf
+    - OCPN_BRANCH=ci
+    - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
+    - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
+    - DOCKER_IMAGE=raspbian/stretch
+    services:
+    - docker
+    script:
+    - "./ci/travis-build-raspbian-armhf.sh"
+  - env:
+    - OCPN_TARGET=buster-armhf
+    - OCPN_BRANCH=ci
+    - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
+    - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
+    - DOCKER_IMAGE=opencpn/raspbian-buster:plugin_build_tooling
+    services:
+    - docker
+    script:
+    - "./ci/travis-build-raspbian-armhf.sh"
+
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; 
     then 
@@ -29,8 +51,8 @@ script:
     then 
       echo "Don't build on coverty_scan branch."; 
       exit 0; 
-  fi
-  - mkdir build && cd build
+    fi
+  - cd build
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; 
     then 
       cmake -DCMAKE_BUILD_TYPE=Release ../ && make -sj2 && sudo make package; 
@@ -40,14 +62,13 @@ script:
         cmake -DwxWidgets_CONFIG_EXECUTABLE=/tmp/wx312_opencpn50_macos109/bin/wx-config -DwxWidgets_CONFIG_OPTIONS="--prefix=/tmp/wx312_opencpn50_macos109" -DCMAKE_INSTALL_PREFIX=/tmp/opencpn -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 .. && make -sj2 && make create-pkg; 
       fi
     - ls -l;
-    notifications:
+notifications:
     email: false
     git:
     depth: 10
     before_install:
     - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
-    - if [ "${#OAUTH_ACCESS_TOKEN}" != 0 ]; then (echo OAUTH_ACCESS_TOKEN=${OAUTH_ACCESS_TOKEN}
-    > ~/.dropbox_uploader); fi
+    - if [ "${#OAUTH_ACCESS_TOKEN}" != 0 ]; then (echo OAUTH_ACCESS_TOKEN=${OAUTH_ACCESS_TOKEN} > ~/.dropbox_uploader); fi
 addons:
   apt:
     sources:

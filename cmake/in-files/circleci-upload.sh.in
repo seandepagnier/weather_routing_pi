@@ -96,8 +96,12 @@ cloudsmith push raw --republish --no-wait-for-sync \
     --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
     $REPO $xml
 
+# No need to upload package for flatpk, it is exactly the same as tarball    
+if [${OCPN_TARGET} != "flatpak"]
+then     
 cloudsmith push raw --republish --no-wait-for-sync \
     --name @PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@.${PKG_EXT} \
     --version ${VERSION} \
     --summary "@PACKAGE@ .${PKG_EXT} installation package" \
     $PKG_REPO $pkg
+fi

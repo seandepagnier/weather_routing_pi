@@ -5,6 +5,18 @@
 
 # bailout on errors and echo commands.
 set -xe
+
+#STABLE_REPO='@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-stable'
+#UNSTABLE_REPO='@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-unstable'
+
+STABLE_REPO=${OCPN_STABLE_REPO}
+UNSTABLE_REPO=${OCPN_UNSTABLE_REPO}
+
+echo "Check 0.5"
+echo $STABLE_REPO
+echo $UNSTABLE_REPO
+
+
 sudo apt-get -qq update
 
 DOCKER_SOCK="unix:///var/run/docker.sock"
@@ -53,15 +65,7 @@ sudo apt-get install python3-pip python3-setuptools
 
 #  Upload to cloudsmith
 
-STABLE_REPO=${OCPN_STABLE_REPO}
-UNSTABLE_REPO=${OCPN_UNSTABLE_REPO}
 
-#UNSTABLE_REPO=${CLOUDSMITH_UNSTABLE_REPO:-'david-register/ocpn-plugins-unstable'}
-#STABLE_REPO=${CLOUDSMITH_STABLE_REPO:-'david-register/ocpn-plugins-stable'}
-
-echo "Check 0.5"
-echo $STABLE_REPO
-echo $UNSTABLE_REPO
 
 if [ -z "$CLOUDSMITH_API_KEY" ]; then
     echo 'Cannot deploy to cloudsmith, missing $CLOUDSMITH_API_KEY'
