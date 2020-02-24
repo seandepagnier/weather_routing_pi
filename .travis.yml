@@ -8,7 +8,7 @@ matrix:
     
   - env:
     - OCPN_TARGET=stretch-armhf
-    - OCPN_BRANCH=ci
+    - OCPN_BRANCH=master
     - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
     - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
     - DOCKER_IMAGE=raspbian/stretch
@@ -18,7 +18,7 @@ matrix:
     - "./ci/travis-build-raspbian-armhf.sh"
   - env:
     - OCPN_TARGET=buster-armhf
-    - OCPN_BRANCH=ci
+    - OCPN_BRANCH=master
     - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
     - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
     - DOCKER_IMAGE=opencpn/raspbian-buster:plugin_build_tooling
