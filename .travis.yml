@@ -67,29 +67,29 @@ matrix:
 #  - ls -l;
 # =========
 
-notifications:
-  email: false
-git:
-  depth: 10
+#notifications:
+#  email: false
+#git:
+#  depth: 10
 #before_install:
 #- if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
 #- if [ "${#OAUTH_ACCESS_TOKEN}" != 0 ]; then (echo OAUTH_ACCESS_TOKEN=${OAUTH_ACCESS_TOKEN} > ~/.dropbox_uploader); fi
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
+#addons:
+#  apt:
+#    sources:
+#    - ubuntu-toolchain-r-test
 #    packages:
 #    - gcc-6
 #    - g++-6
-deploy:
-- provider: releases
-  api_key:
-    secure: "ZMJNkbf1QxwivytkWLiEZ5G4Q3WaXBTpFEwXe/GGgkA3qg/HNw7a0tSZAkLRIx/BohsrNIRRaCyETTpdv0pVcAByQmtenFVpChqzhdxln2QbIcZMJKRO/IsKnzj03zhJdIv/VQ+J56qVsIZGEL2AVl/zn5FHpKb7cYYpldJrSq7o5gb+N3EdhJ5Ksaw0r/TjYiWr7+M87T1ZBY5D+LzCGngYVTEG1XhPPLKzSd1w4JzRnyZ1IgVRh7dRmjzOhQyAOaRPUCr51Xh1eb6iHLq8d4uLHxHDscuiIHwqXhLEF/82ECtn9n6mbP3hxoCE/9CYcJsd2Z3r5hwgKoIqvMDyBJuiy8+j5WC5fcHq81OtRtFoYJSLLQlgjCtec3aOeuYfPkZCcw2HbF6udIdm3Xo5uLonIolMMq7YT7sh20INOOXVi0m+/9FBIXjPsfQDsX0FW0RfAWk4AJFnPARV3xKReNlQntuX4WORILeDCAmneob0jF7kP8W/u65mnTguic/2qsCVAeJRepfIon6i1+VmQO2n8b9S7XC6aHRN99Bi4uy5NePyl20Rqw8nCP/nn2SENgIQahPio+4vFX7B44hYdI87cFuKvvINOJxNup9IggQ4XYdVSCtD0u8sMfm4KT2O0NpPnYdqqB0V/KLfOhDm3UmmEqxEh86q/JPh3WCMyFc="
+#deploy:
+#- provider: releases
+#  api_key:
+#    secure: "ZMJNkbf1QxwivytkWLiEZ5G4Q3WaXBTpFEwXe/GGgkA3qg/HNw7a0tSZAkLRIx/BohsrNIRRaCyETTpdv0pVcAByQmtenFVpChqzhdxln2QbIcZMJKRO/IsKnzj03zhJdIv/VQ+J56qVsIZGEL2AVl/zn5FHpKb7cYYpldJrSq7o5gb+N3EdhJ5Ksaw0r/TjYiWr7+M87T1ZBY5D+LzCGngYVTEG1XhPPLKzSd1w4JzRnyZ1IgVRh7dRmjzOhQyAOaRPUCr51Xh1eb6iHLq8d4uLHxHDscuiIHwqXhLEF/82ECtn9n6mbP3hxoCE/9CYcJsd2Z3r5hwgKoIqvMDyBJuiy8+j5WC5fcHq81OtRtFoYJSLLQlgjCtec3aOeuYfPkZCcw2HbF6udIdm3Xo5uLonIolMMq7YT7sh20INOOXVi0m+/9FBIXjPsfQDsX0FW0RfAWk4AJFnPARV3xKReNlQntuX4WORILeDCAmneob0jF7kP8W/u65mnTguic/2qsCVAeJRepfIon6i1+VmQO2n8b9S7XC6aHRN99Bi4uy5NePyl20Rqw8nCP/nn2SENgIQahPio+4vFX7B44hYdI87cFuKvvINOJxNup9IggQ4XYdVSCtD0u8sMfm4KT2O0NpPnYdqqB0V/KLfOhDm3UmmEqxEh86q/JPh3WCMyFc="
 #"ZMJNkbf1QxwivytkWLiEZ5G4Q3WaXBTpFEwXe/GGgkA3qg/HNw7a0tSZAkLRIx/BohsrNIRRaCyETTpdv0pVcAByQmtenFVpChqzhdxln2QbIcZMJKRO/IsKnzj03zhJdIv/VQ+J56qVsIZGEL2AVl/zn5FHpKb7cYYpldJrSq7o5gb+N3EdhJ5Ksaw0r/TjYiWr7+M87T1ZBY5D+LzCGngYVTEG1XhPPLKzSd1w4JzRnyZ1IgVRh7dRmjzOhQyAOaRPUCr51Xh1eb6iHLq8d4uLHxHDscuiIHwqXhLEF/82ECtn9n6mbP3hxoCE/9CYcJsd2Z3r5hwgKoIqvMDyBJuiy8+j5WC5fcHq81OtRtFoYJSLLQlgjCtec3aOeuYfPkZCcw2HbF6udIdm3Xo5uLonIolMMq7YT7sh20INOOXVi0m+/9FBIXjPsfQDsX0FW0RfAWk4AJFnPARV3xKReNlQntuX4WORILeDCAmneob0jF7kP8W/u65mnTguic/2qsCVAeJRepfIon6i1+VmQO2n8b9S7XC6aHRN99Bi4uy5NePyl20Rqw8nCP/nn2SENgIQahPio+4vFX7B44hYdI87cFuKvvINOJxNup9IggQ4XYdVSCtD0u8sMfm4KT2O0NpPnYdqqB0V/KLfOhDm3UmmEqxEh86q/JPh3WCMyFc="
-  file_glob: true
-  file: "$TRAVIS_BUILD_DIR/build/*.{deb,rpm,dmg,txz,pkg,pkg.tar.xz}"
-  skip_cleanup: true
-  on:
-    repo: rgleason/weather_routing_pi 
-    tags: true
-    all_branches: true
+#  file_glob: true
+#  file: "$TRAVIS_BUILD_DIR/build/*.{deb,rpm,dmg,txz,pkg,pkg.tar.xz}"
+#  skip_cleanup: true
+#  on:
+#    repo: rgleason/weather_routing_pi 
+#    tags: true
+#    all_branches: true
