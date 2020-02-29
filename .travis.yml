@@ -1,10 +1,10 @@
 language: cpp
 matrix:
   include:
-  - dist: trusty
-    compiler: gcc
-  - os: osx
-    compiler: clang
+#  - dist: trusty
+#    compiler: gcc
+#  - os: osx
+#    compiler: clang
     
   - env:
     - OCPN_TARGET=stretch-armhf
