@@ -1,13 +1,11 @@
 # ---------------------------------------------------------------------------
 # Author:      jongough aka. Jon Gough Copyright: License:     wxWidgets License
 # ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.001  
-#    - 2/19/2020 added Update build to create all 10 environments needed for beta testing.
-#    - 2/19/2020 fixed debian build
-#    - 2/19/2020 Add raspian build capability
-#    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
-#    - 3/1/2020  fix raspian xml target-url with if-then
-#
+
+##
+## ----- Modify section below to include all the details for your plugin ----- ##
+##
+
 # define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
@@ -21,46 +19,42 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 set(PACKAGE_NAME "weather_routing_pi")
-set(VERBOSE_NAME "WeatherRouting") 
-set(TITLE_NAME "weatherrouting")
+set(VERBOSE_NAME "WeatherRouting")
+set(COMMON_NAME "WeatherRouting")  #search plugin_pi.cpp with "GetCommonName"
+set(TITLE_NAME "weatherrouging")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
-set(COMMON_NAME "WeatherRouting")
-# Don't change this, sets getcommonname "Common Plugin Name" in weather_routing_pi.cpp
-# Must remain the same Common Name as the legacy unmanaged plugins to avoid duplication.
-# VERBOSE_NAME should be the same as the plugin "Common Name"
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "5")
-set(VERSION_TWEAK "3")
-set(VERSION_DATE "02/29/2020")
+set(VERSION_TWEAK "4")
+set(VERSION_DATE "03/19/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
 set(TP_COMMENT "  * Release for O5 using CI")
 
 set(PARENT "opencpn")
-set(PACKAGE "weather_routing")  #used for Package name
-#set(GIT_USER "seandepagnier")
+set(PACKAGE "weather_routing") #used for Package Name
+#set(GIT_USER "jongough")
 set(GIT_USER "rgleason")
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
 message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
+# This if allows for setting up your own local webserver with git on it for testing purposes
 if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-#  set(GIT_REPOSITORY_BRANCH "master")
-  set(GIT_REPOSITORY_BRANCH "api-1.16")
-  #  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
-# else()
+  set(GIT_REPOSITORY_BRANCH "master")
+#else()
 #  set(GIT_REPOSITORY_HOST "git.eclipse.com.au")
 #  set(GIT_REPOSITORY_DIR "")
 #  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
 endif()
-# set(CLOUDSMITH_USER "sean-depagnier")
+#set(CLOUDSMITH_USER "jon-gough")
 set(CLOUDSMITH_USER "rick-gleason")
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")
-set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
+set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing Plugin optimizes weather routing")
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
@@ -70,6 +64,14 @@ set(CMAKE_CXX_STANDARD 11)
 
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
+
+##
+## ----- Modify section above to include all the details for your plugin ----- ##
+##
+
+##
+## ----- Modify section below if there are special requirements for the plugin ----- ##
+##
 
 set(PACKAGE_NAME ${PACKAGE}_pi)
 set(PACKAGE_FILE_NAME "${PARENT}-plugin-${PACKAGE}")
@@ -98,51 +100,40 @@ set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWi
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 set(PKG_NVR ${PACKAGE_NAME}-${PROJECT_VERSION}-${OCPN_MIN_VERSION}-${OCPN_API_VERSION_MAJOR}.${OCPN_API_VERSION_MINOR})
-
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
-    set(PKG_URL
- "https://dl.cloudsmith.io/public/@pkg_repo@/raw/names/@name@/versions/@version@/@filename@")
-
- else(CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
- # This version works for the other environments
-    set(PKG_URL
- "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/versions/--version--/--filename--")
-
- endif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
+set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/versions/--version--/--filename--")
 
 include("cmake/PluginSetup.cmake")
 
-#========Below is specific to the plugin and is from testplugin  =================
-
+#========Below is specific to the plugin and is from testplugin ===																			  
 set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-# option(OD_CXX11 "Use c++11" OFF)
+option(OD_CXX11 "Use c++11" OFF)
 
-# if(OD_CXX11)
-#  message(STATUS "Attempting to use c++11")
-#  include(CheckCXXCompilerFlag)
-#  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-#  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-#  if(COMPILER_SUPPORTS_CXX11)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#    set(Testplugin_USE_CXX11 ON)
-#  elseif(COMPILER_SUPPORTS_CXX0X)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-#    set(Testplugin_USE_CXX11 ON)
-#  else()
-#    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-#    set(Testplugin_USE_CXX11 OFF)
-#  endif()
-#else()
-#  set(Testplugin_USE_CXX11 OFF)
-#endif()
+if(OD_CXX11)
+  message(STATUS "Attempting to use c++11")
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+  if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(Testplugin_USE_CXX11 ON)
+  elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    set(Testplugin_USE_CXX11 ON)
+  else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    set(Testplugin_USE_CXX11 OFF)
+  endif()
+else()
+  set(Testplugin_USE_CXX11 OFF)
+endif()
 
-#if(Testplugin_USE_CXX11)
-#  message(STATUS "Allowing use of c++11")
-#  add_definitions(-DTestplugin_USE_CXX11)
-#endif()
+if(Testplugin_USE_CXX11)
+  message(STATUS "Allowing use of c++11")
+  add_definitions(-DTestplugin_USE_CXX11)
+endif()
 
 message(STATUS "CMAKE version: ${CMAKE_VERSION}")
 if(CMAKE_VERSION VERSION_GREATER 3.4)
@@ -180,22 +171,24 @@ if(CMAKE_VERSION VERSION_GREATER 3.9)
   endif()
 endif()
 
-# SET_DIRECTORY_PROPERTIES(dummy ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/include/version.h)
+##
+## ----- Modify section above if there are special requirements for the plugin ----- ##
+##
+
 
 include("cmake/PluginConfigure.cmake")
 
-add_definitions(-DUSE_S57)  #???  What is this for? Needed?
+##
+## ----- Change below to match project requirements ----- ##
+##
 
-IF(PLUGIN_USE_SVG)
-    MESSAGE(STATUS "SVG support enabled...")
-    IF(NOT QT_ANDROID)
-        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
-    ENDIF(NOT QT_ANDROID)
-ENDIF(PLUGIN_USE_SVG)
+add_definitions(-DUSE_S57)
+	  
 
 
-
+								   
 #======== From cmakelists.txt  weather_routing_pi
+																						 
 
 SET(SRCS
             src/weather_routing_pi.cpp
@@ -235,7 +228,6 @@ SET(SRC_LIBTESS2
 
 SET(SRC ${SRCS} ${SRC_LIBTESS2})
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
-
 IF(NOT UNIX)
     SET(SRC_BZIP	
             src/bzip2/bzlib.c
@@ -266,21 +258,42 @@ IF(WIN32)
     TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lz")
   ENDIF()
 ENDIF()
-
-
-
 #======== Above from cmakelists.txt  weather_routing_pi=========
-#=========Below from cmakelists.txt testplugin==================
-# set(OCPNSRC ocpnsrc/TexFont.cpp)
-# set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
+#=========Below from cmakelists.txt testplugin==================									
+#    src/tpdc.cpp
+#    src/tpControlDialogDef.cpp
+#    src/tpControlDialogImpl.cpp
+#    src/tpicons.cpp
+#    src/tpJSON.cpp
+#    src/testplugin_pi.cpp
+#    src/tpUtils.cpp)
 
-#set(EXTSRC)
+#set(HDRS
+#    include/testplugin_pi.h
+#    include/tpicons.h
+#    include/tpControlDialogDef.h
+#    include/tpControlDialogImpl.h
+#    include/tpIconCombo.h
+#    include/tpJSON.h
+#    include/tpdc.h
+#    include/tpUtils.h)
+#======== Above from cmakelists.txt  weather_routing_pi=========
+
+#=========Below from cmakelists.txt testplugin==================
+#set(OCPNSRC ocpnsrc/TexFont.cpp)
+#set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
 
 #set(EXTINCLUDE
 #    extinclude/nlohmann/json.hpp
 #    extinclude/ODAPI.h)
+					 
+					 
+						  
+					  
+					  
 
 #set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+										  
 
 #set(LIBHDRS
 #    libs/GL/include/gl.h
@@ -291,8 +304,9 @@ ENDIF()
 #    libs/wx/include/jsonreader.h
 #    libs/wx/include/jsonval.h
 #    libs/wx/include/jsonwriter.h)
+										
 #option(TESTPLUGIN_USE_SVG "Use SVG graphics" ON)
-#add_definitions(-DTESTPLUGIN_USE_SVG)
+#add_definitions(-DPLUGIN_USE_SVG)
 
 #IF(APPLE)
 #    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" OFF)
@@ -330,7 +344,7 @@ ENDIF()
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/lz4)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/bitmaps)
 
-#add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${OCPNSRC} ${EX#TSRC} ${LIBSSRC})
+#add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC})
 
 #add_definitions(-DTIXML_USE_STL)
 
@@ -356,16 +370,14 @@ ENDIF()
 #  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
 #ENDIF(UNIX AND NOT APPLE)
 
-#include("cmake/PluginInstall.cmake")
-#include("cmake/PluginLocalization.cmake")
-#include("cmake/PluginPackage.cmake")
+##
+## ----- Change above to match project requirements ----- ##
+##
 
-#==========Above is from Testplugin cmakelists.txt ========
-#==========Below is from WxRoute cmakelists.txt========
-INCLUDE("cmake/PluginJSON.cmake")
-INCLUDE("cmake/PluginXML.cmake")
-INCLUDE("cmake/PluginGL.cmake")
+##
+## ----- do not change - needed to build app ----- ##
+##
 
-INCLUDE("cmake/PluginInstall.cmake")
-INCLUDE("cmake/PluginLocalization.cmake")
-INCLUDE("cmake/PluginPackage.cmake")
+include("cmake/PluginInstall.cmake")
+include("cmake/PluginLocalization.cmake")
+include("cmake/PluginPackage.cmake")
