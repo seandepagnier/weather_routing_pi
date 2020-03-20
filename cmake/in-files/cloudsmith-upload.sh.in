@@ -50,6 +50,8 @@ BUILD_ID=${CIRCLE_BUILD_NUM:-1}
 commit=$(git rev-parse --short=7 HEAD) || commit="unknown"
 tag=$(git tag --contains HEAD)
 
+ls -la
+pwd
 xml=$(ls $HOME/project/build/*.xml)
 cat $xml
 tarball=$(ls $HOME/project/build/*.tar.gz)
@@ -85,16 +87,16 @@ cat $xml
 ls -l build
 
 cloudsmith push raw --republish --no-wait-for-sync \
-    --name $tarball_name \
-    --version ${VERSION} \
-    --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
-    $REPO $tarball
-
-cloudsmith push raw --republish --no-wait-for-sync \
     --name @PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@-metadata \
     --version ${VERSION} \
     --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
     $REPO $xml
+
+cloudsmith push raw --republish --no-wait-for-sync \
+    --name $tarball_name \
+    --version ${VERSION} \
+    --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
+    $REPO $tarball
 
 # No need to upload package for flatpk, it is exactly the same as tarball    
 if [${OCPN_TARGET} != "flatpak"]
