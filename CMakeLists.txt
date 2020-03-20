@@ -9,7 +9,7 @@
 #    - 3/1/2020  fix raspian xml target-url with if-then
 #
 # define minimum cmake version
-#cmake_minimum_required(VERSION 2.8.12.2)  #for trusty
+# cmake_minimum_required(VERSION 2.8.12.2)  #for trusty
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
   if(POLICY CMP0043)
@@ -270,15 +270,15 @@ ENDIF()
 #======== Above from cmakelists.txt  weather_routing_pi=========
 #=========Below from cmakelists.txt testplugin==================
 
-set(LIBHDRS
-    libs/GL/include/gl.h
-    libs/GL/include/gl_private.h
-    libs/GL/include/glext.h
-    libs/GL/include/glu.h
-    libs/wx/include/json_defs.h
-    libs/wx/include/jsonreader.h
-    libs/wx/include/jsonval.h
-    libs/wx/include/jsonwriter.h)
+#set(LIBHDRS
+#    libs/GL/include/gl.h
+#    libs/GL/include/gl_private.h
+#    libs/GL/include/glext.h
+#    libs/GL/include/glu.h
+#    libs/wx/include/json_defs.h
+#    libs/wx/include/jsonreader.h
+#    libs/wx/include/jsonval.h
+#    libs/wx/include/jsonwriter.h)
 	
 #option(TESTPLUGIN_USE_SVG "Use SVG graphics" ON)
 #add_definitions(-DTESTPLUGIN_USE_SVG)
@@ -292,7 +292,7 @@ set(LIBHDRS
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/lz4)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/bitmaps)
 #add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${OCPNSRC} ${EX#TSRC} ${LIBSSRC})
-add_library(${PACKAGE_NAME} SHARED ${HDRS} )
+#add_library(${PACKAGE_NAME} SHARED ${HDRS} )
 
 #add_definitions(-DTIXML_USE_STL)
 
