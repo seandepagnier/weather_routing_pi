@@ -9,7 +9,8 @@
 #    - 3/1/2020  fix raspian xml target-url with if-then
 #
 # define minimum cmake version
-cmake_minimum_required(VERSION 3.1.1)
+cmake_minimum_required(VERSION 2.8.12.2)  #for trusty
+#cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
   if(POLICY CMP0043)
     cmake_policy(SET CMP0043 NEW)
