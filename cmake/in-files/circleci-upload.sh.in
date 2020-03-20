@@ -14,9 +14,9 @@
 
 set -xe
 
-STABLE_REPO=${CLOUDSMITH_STABLE_REPO:-'rick-gleason/opencpn-plugins-prod'}
-UNSTABLE_REPO=${CLOUDSMITH_UNSTABLE_REPO:-'rick-gleason/opencpn-plugins-beta'}
-STABLE_PKG_REPO=${CLOUDSMITH_PKG_REPO:-'rick-gleason/opencpn-plugins-pkg'}
+STABLE_REPO=${CLOUDSMITH_STABLE_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-prod'}
+UNSTABLE_REPO=${CLOUDSMITH_UNSTABLE_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-beta'}
+STABLE_PKG_REPO=${CLOUDSMITH_PKG_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-pkg'}
 PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
 
 if [ -z "$CIRCLECI" ]; then
@@ -56,7 +56,7 @@ tarball=$(ls $HOME/project/build/*.tar.gz)
 tarball_basename=${tarball##*/}
 
 source $HOME/project/build/pkg_version.sh
-tarball_name=weather_routing-${PKG_TARGET}-${PKG_TARGET_VERSION}-tarball
+tarball_name=@PACKAGE@-${PKG_TARGET}-${PKG_TARGET_VERSION}-tarball
 pkg=$(ls $HOME/project/build/*.${PKG_EXT})
 
 source $HOME/project/build/pkg_version.sh
@@ -65,12 +65,12 @@ if [ -n "$tag" ]; then
     REPO="$STABLE_REPO"
     PKG_REPO="$STABLE_PKG_REPO"
 else
-    VERSION="1.13.5.2+${BUILD_ID}.${commit}"
+    VERSION="@PROJECT_VERSION@+${BUILD_ID}.${commit}"
     REPO="$UNSTABLE_REPO"
     PKG_REPO="$UNSTABLE_REPO"
 fi
 
-COMMON_NAME_SUB=WeatherRouting
+COMMON_NAME_SUB=@COMMON_NAME@
 echo $COMMON_NAME_SUB
 
 echo $tarball_name
@@ -87,21 +87,21 @@ ls -l build
 cloudsmith push raw --republish --no-wait-for-sync \
     --name $tarball_name \
     --version ${VERSION} \
-    --summary "weather_routing opencpn plugin tarball for automatic installation" \
+    --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
     $REPO $tarball
 
 cloudsmith push raw --republish --no-wait-for-sync \
-    --name weather_routing-msvc-10.0.18363-metadata \
+    --name @PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@-metadata \
     --version ${VERSION} \
-    --summary "weather_routing opencpn plugin metadata for automatic installation" \
+    --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
     $REPO $xml
 
 # No need to upload package for flatpk, it is exactly the same as tarball    
 if [${OCPN_TARGET} != "flatpak"]
 then     
 cloudsmith push raw --republish --no-wait-for-sync \
-    --name weather_routing-msvc-10.0.18363.${PKG_EXT} \
+    --name @PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@.${PKG_EXT} \
     --version ${VERSION} \
-    --summary "weather_routing .${PKG_EXT} installation package" \
+    --summary "@PACKAGE@ .${PKG_EXT} installation package" \
     $PKG_REPO $pkg
 fi

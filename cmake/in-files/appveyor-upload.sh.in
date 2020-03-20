@@ -61,7 +61,7 @@ cat $xml
 
 # There is no sed available in git bash. This is nasty, but seems
 # to work:
-echo 'substituting xmal file stuff'
+echo 'substituting xmal file stuff from appveyor-upload.sh.in'
 while read line; do
     line=${line//--pkg_repo--/$PKG_REPO}
     line=${line//--name--/$tarball_name}

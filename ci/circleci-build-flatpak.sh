@@ -14,12 +14,12 @@
 set -xe
 ##sudo apt-get -qq update
 
-# PLUGIN=bsb4
+PLUGIN=bsb4
 
 DOCKER_SOCK="unix:///var/run/docker.sock"
-if [-n "$TRAVIS" ]; then
+if [[ -n "$TRAVIS" ]]; then
     TOPDIR=/opencpn-ci
-elif [ -n "$CIRCLECI" ]; then
+elif [[ -n "$CIRCLECI" ]]; then
    TOPDIR=/root/project
 else
    TOPDIR=/opencpn-ci
@@ -28,7 +28,7 @@ fi
 echo "DOCKER_OPTS=\"-H tcp://127.0.0.1:2375 -H $DOCKER_SOCK -s devicemapper\"" \
     | sudo tee /etc/default/docker > /dev/null
 
-if [ -n "$CIRCLECI" ]; then
+if [[ -n "$CIRCLECI" ]]; then
     sudo service docker restart;
     sleep 5;
     sudo docker pull fedora:28;
@@ -46,7 +46,7 @@ if [ "" = "$DOCKER_CONTAINER_ID" ]; then
 fi
 
 docker logs $DOCKER_CONTAINER_ID
-if [ -n "$CIRCLECI" ]; then
+if [[ -n "$CIRCLECI" ]]; then
   docker exec -ti $DOCKER_CONTAINER_ID /bin/bash -xec \
     "export CIRCLECI=$CIRCLECI;
     bash -xe $TOPDIR/ci/docker-build-flatpak.sh 28;
@@ -59,7 +59,7 @@ fi
 
 docker ps -a
 
-if [ -n "$CIRCLECI" ]; then
+if [[ -n "$CIRCLECI" ]]; then
     docker stop $DOCKER_CONTAINER_ID
     docker rm -v $DOCKER_CONTAINER_ID
 fi

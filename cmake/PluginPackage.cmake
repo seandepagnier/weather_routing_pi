@@ -129,7 +129,7 @@ if(NOT STANDALONE MATCHES "BUNDLED")
 
     add_custom_command(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}-Plugin_${PACKAGE_VERSION}_${OCPN_MIN_VERSION}.pkg
-      COMMAND /usr/local/bin/packagesbuild -F ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}.pkgproj
+      COMMAND /usr/local/bin/packagesbuild --verbose -F ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/${VERBOSE_NAME}.pkgproj
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       DEPENDS ${PACKAGE_NAME}
       COMMENT "create-pkg [${PACKAGE_NAME}]: Generating pkg file.")

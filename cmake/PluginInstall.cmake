@@ -189,6 +189,7 @@ if(APPLE)
 
   foreach(_currentDataFile ${PACKAGE_DATA_FILES})
     message(STATUS "copying: ${_currentDataFile}")
+    #configure_file(${_currentDataFile} ${CMAKE_CURRENT_BINARY_DIR}/data COPYONLY)
     file(COPY ${_currentDataFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
   endforeach(_currentDataFile)
 
