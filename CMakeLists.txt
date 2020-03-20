@@ -223,15 +223,45 @@ SET(SRCS
 )
 
 SET(SRC_LIBTESS2
-  src/libtess2/bucketalloc.c
-  src/libtess2/dict.c
-  src/libtess2/geom.c
-  src/libtess2/mesh.c
-  src/libtess2/priorityq.c
-  src/libtess2/sweep.c
-  src/libtess2/tess.c)
+             src/libtess2/bucketalloc.c
+             src/libtess2/dict.c
+             src/libtess2/geom.c
+             src/libtess2/mesh.c
+             src/libtess2/priorityq.c
+             src/libtess2/sweep.c
+             src/libtess2/tess.c
+)
+  
+ SET(SRC_PLUGINGL
+             src/plugingl/linmath.h
+             src/plugingl/pidc.h
+             src/plugingl/qtstylesheet.h
+             src/plugingl/TexFont.h
+)
 
-SET(SRC ${SRCS} ${SRC_LIBTESS2})
+ SET (SRC_TINYXML
+             src/tinyxml/tinystr.h
+			 src/tinyxml/tinyxml.h
+)
+
+# SET  (SRC_ZLIB
+             src/zlib-1.2.3/zconf.h
+             src/zlib-1.2.3/zlib.h
+)
+
+# SET  (SRC_bzip2
+             src/bzip2/blocksort.c
+			 src/bzip2/bzlib.c
+			 src/bzip2/bzlib_private.h
+			 src/bzip2/compress.c
+			 src/bzip2/crctable.c
+			 src/bzip2/decompress.c
+			 src/bzip2/huffman.c
+			 src/bzip2/randtable.c
+)
+			 
+
+SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGING} ${TINYXML} )
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 
 IF(NOT UNIX)
