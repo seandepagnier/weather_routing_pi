@@ -25,9 +25,8 @@ set(VERBOSE_NAME "WeatherRouting")
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(COMMON_NAME "WeatherRouting")
-# Don't change this, sets getcommonname "Common Plugin Name" in weather_routing_pi.cpp
-# Must remain the same Common Name as the legacy unmanaged plugins to avoid duplication.
-# VERBOSE_NAME should be the same as the plugin "Common Name"
+# Search "getcommonname"in weather_routing_pi.cpp 
+# for the "CommonName" to avoid unmanaged plugins duplication.
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
@@ -41,16 +40,14 @@ set(TP_COMMENT "  * Release for O5 using CI")
 
 set(PARENT "opencpn")
 set(PACKAGE "weather_routing")  #used for Package name
-#set(GIT_USER "seandepagnier")
+#set(GIT_USER "seandepagnier")  #for Sean
 set(GIT_USER "rgleason")
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
 message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
 if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-#  set(GIT_REPOSITORY_BRANCH "master")
-  set(GIT_REPOSITORY_BRANCH "api-1.16")
-  #  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
+  set(GIT_REPOSITORY_BRANCH "master")
 # else()
 #  set(GIT_REPOSITORY_HOST "git.eclipse.com.au")
 #  set(GIT_REPOSITORY_DIR "")
@@ -271,16 +268,6 @@ ENDIF()
 
 #======== Above from cmakelists.txt  weather_routing_pi=========
 #=========Below from cmakelists.txt testplugin==================
-# set(OCPNSRC ocpnsrc/TexFont.cpp)
-# set(OCPNHDRS ocpninclude/ocpn_plugin.h ocpninclude/pluginmanager.h ocpninclude/TexFont.h)
-
-#set(EXTSRC)
-
-#set(EXTINCLUDE
-#    extinclude/nlohmann/json.hpp
-#    extinclude/ODAPI.h)
-
-#set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
 #set(LIBHDRS
 #    libs/GL/include/gl.h
@@ -294,33 +281,6 @@ ENDIF()
 #option(TESTPLUGIN_USE_SVG "Use SVG graphics" ON)
 #add_definitions(-DTESTPLUGIN_USE_SVG)
 
-#IF(APPLE)
-#    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" OFF)
-#ELSE(APPLE)
-#    OPTION(TP_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" ON)
-#ENDIF(APPLE)
-
-#IF(TP_JSON_SCHEMA_VALIDATOR)
-#    MESSAGE(STATUS "Using JSON Schema validation - warning this changes the 'flavour' of the executable and it may not be compatible with OpenCPN")
-#    ADD_DEFINITIONS(-DTP_JSON_SCHEMA_VALIDATOR)
-#    MESSAGE(STATUS "Adding JSON Schema validation")
-
-#    SET(EXTSRC
-#        ${EXTSRC}
-#        extsrc/json-schema-validator/json-schema-draft7.json.cpp
-#        extsrc/json-schema-validator/json-uri.cpp
-#        extsrc/json-schema-validator/json-validator.cpp
-#    )
-#    SET(EXTINCLUDE
-#        ${EXTINCLUDE}
-#        extinclude/nlohmann/json.hpp
-#        extinclude/json-schema-validator/json-schema.hpp
-#    )
-#    INCLUDE_DIRECTORIES(BEFORE ${PROJECT_SOURCE_DIR}/extinclude/json-schema-validator)
-#ELSE(TP_JSON_SCHEMA_VALIDATOR)
-#    MESSAGE(STATUS "Not using JSON Schema validation - warning invalid JSON 'may' cause unexpected crashes")
-#ENDIF(TP_JSON_SCHEMA_VALIDATOR)
-
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/extinclude)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
@@ -333,32 +293,6 @@ ENDIF()
 #add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${OCPNSRC} ${EX#TSRC} ${LIBSSRC})
 
 #add_definitions(-DTIXML_USE_STL)
-
-#IF(UNIX AND NOT APPLE)
-#  IF(TP_JSON_SCHEMA_VALIDATOR)
-#    # Change OS/ABI to be UNIX - System V to make it run with OCPN
-#    SET(lib_name lib${PACKAGE_NAME}.so)
-#    MESSAGE(STATUS "lib-name: ${lib_name}")
-#    FIND_FILE(elfedit elfedit)
-#    IF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#      MESSAGE(STATUS "Will ensure OS/ABI is set to 0 to match OCPN")
-#      ADD_CUSTOM_COMMAND(
-#        TARGET ${PACKAGE_NAME}
-#        POST_BUILD
-#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#        DEPENDS ${PACKAGE_NAME}
-#        COMMENT " Running post build action on ${lib_name}."
-#        COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) '
-#      )
-#    ELSE(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#      MESSAGE(STATUS "Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
-#    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
-#ENDIF(UNIX AND NOT APPLE)
-
-#include("cmake/PluginInstall.cmake")
-#include("cmake/PluginLocalization.cmake")
-#include("cmake/PluginPackage.cmake")
 
 #==========Above is from Testplugin cmakelists.txt ========
 #==========Below is from WxRoute cmakelists.txt========

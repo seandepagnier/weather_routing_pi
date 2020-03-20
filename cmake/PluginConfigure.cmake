@@ -18,7 +18,7 @@ endif(NOT SKIP_VERSION_CONFIG)
 message(STATUS "*.in files generated in ${CMAKE_CURRENT_BINARY_DIR}")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/plugin.xml.in ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}.xml)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/pkg_version.sh.in ${CMAKE_CURRENT_BINARY_DIR}/pkg_version.sh)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/circleci-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/circleci-upload.sh @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/cloudsmith-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/cloudsmith-upload.sh @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/appveyor-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/appveyor-upload.sh @ONLY)
 
 message(STATUS "Checking OCPN_FLATPAK: ${OCPN_FLATPAK}")
