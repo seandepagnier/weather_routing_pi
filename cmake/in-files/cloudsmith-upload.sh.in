@@ -7,20 +7,40 @@
 # repo. If there is a tag pointing to current commit it goes
 # to stable, otherwise to unstable.
 #
-# If the environment variable CLOUDSMITH_STABLE_REPO exists it is
-# used as the stable repo, defaulting to the hardcoded STABLE_REPO
-# value. Likewise for CLOUDSMITH_UNSTABLE_REPO and UNSTABLE_REPO.
+# If the environment variable CLOUDSMITH_PROD_REPO exists it is
+# used as the production repo, defaulting to the hardcoded PROD_REPO
+# value. Likewise for CLOUDSMITH_BETA_REPO and BETA_REPO and
+# CLOUDSMIT_ALPHA_RERP and ALPHA_REPO
 #
 
 set -xe
 
-STABLE_REPO=${CLOUDSMITH_STABLE_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-prod'}
-UNSTABLE_REPO=${CLOUDSMITH_UNSTABLE_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-beta'}
-STABLE_PKG_REPO=${CLOUDSMITH_PKG_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-pkg'}
-PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
+PROD_REPO=${CLOUDSMITH_PROD_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-prod'}
+BETA_REPO=${CLOUDSMITH_BETA_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-beta'}
+ALPHA_REPO=${CLOUDSMITH_ALPHA_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-alpha'}
 
-if [ -z "$CIRCLECI" ]; then
+if [ -z "$CIRCLECI" ] && [ -z "$TRAVIS" ] && [ -z "$APPVEYOR" ]; then
     exit 0;
+fi
+
+if [ "$CIRCLECI" ]; then
+    BUILD_ID=${CIRCLE_BUILD_NUM:-1}
+    BUILD_DIR=$HOME/project/build
+    BUILD_BRANCH=$CIRCLE_BRANCH
+    BUILD_TAG=$CIRCLE_TAG
+    PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
+elif [ "$TRAVIS" ]; then
+    BUILD_ID=${TRAVIS_BUILD_NUM:-1}
+    BUILD_DIR=$TRAVIS_BUILD_DIR/build
+    BUILD_BRANCH=$TRAVIS_BRANCH
+    BUILD_TAG=$TRAVIS_TAG
+    PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
+else
+    BUILD_ID=${APPVEYOR_BUILD_NUMBER:-1}
+    BUILD_DIR=.
+    BUILD_BRANCH=$APPVEYOR_REPO_BRANCH
+    BUILD_TAG=$APPVEYOR_REPO_TAG_NAME
+    PKG_EXT=${CLOUDSMITH_PKG_EXT:-'exe'}
 fi
 
 set +x
@@ -30,105 +50,107 @@ if [ -z "$CLOUDSMITH_API_KEY" ]; then
 fi
 set -x
 
-if pyenv versions 2>&1 >/dev/null; then
-    pyenv global 3.7.0
-    python -m pip install cloudsmith-cli
-    pyenv rehash
-elif dnf --version 2>&1 >/dev/null; then
-    sudo dnf install python3-pip python3-setuptools
-    sudo python3 -m pip install -q cloudsmith-cli
-elif apt-get --version 2>&1 >/dev/null; then
-    sudo apt-get install python3-pip python3-setuptools
-    sudo python3 -m pip install -q cloudsmith-cli
-else
-    sudo -H python3 -m ensurepip
-    sudo -H python3 -m pip install -q setuptools
-    sudo -H python3 -m pip install -q cloudsmith-cli
+if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
+    if pyenv versions 2>&1 >/dev/null; then
+        pyenv versions
+        if ! pyenv global 3.7.1 2>&1 >/dev/null; then
+        pyenv global 3.7.0
+        fi
+        #pyenv global 3.7.1
+        python3 -m pip install -q cloudsmith-cli
+        pyenv rehash
+    elif dnf --version 2>&1 >/dev/null; then
+        sudo dnf install python3-pip python3-setuptools
+        sudo python3 -m pip install -q cloudsmith-cli
+    elif apt-get --version 2>&1 >/dev/null; then
+        COUNTER=0
+        until
+            sudo apt-get install python3-pip python3-setuptools
+        do
+            if [ "$COUNTER" -gt  "20" ]; then
+                exit -1
+            fi
+            sleep 5
+            ((COUNTER++))
+        done
+        sudo python3 -m pip install -q cloudsmith-cli
+    else
+        sudo -H python3 -m ensurepip
+        sudo -H python3 -m pip install -q setuptools
+        sudo -H python3 -m pip install -q cloudsmith-cli
+    fi
 fi
 
-#From recent Testplugin
-#if pyenv versions 2>&1 >/dev/null; then
-#    pyenv versions
-#    if ! pyenv global 3.7.1 2>&1 >/dev/null; then
-#      pyenv global 3.7.0
-#    fi
-#    pyenv_array=()
-#    while IFS= read -r line; do
-#        pyenv_array+=( "$line" )
-#        echo $line
-#    done < <( pyenv versions )
-#    pyenv_array_len=${#pyenv_array[@]}
-#    pyenv global ${pyenv_array[${#pyenv_array[@]}-1]}
-#    pyenv global ${pyenv_array[${#pyenv_array[@]}-2]}
-#    echo $pyenv_array_len
-#    #pyenv global 3.7.1
-#    python3 -m pip install -q cloudsmith-cli
-#    pyenv rehash
-#elif dnf --version 2>&1 >/dev/null; then
-#    sudo dnf install python3-pip python3-setuptools
-#    sudo python3 -m pip install -q cloudsmith-cli
-#elif apt-get --version 2>&1 >/dev/null; then
-#    COUNTER=0
-#    until
-#        sudo apt-get install python3-pip python3-setuptools
-#    do
-#        if [ "$COUNTER" -gt  "20" ]; then
-#            exit -1
-#        fi
-#        sleep 5
-#        ((COUNTER++))
-#    done
-#    sudo python3 -m pip install -q cloudsmith-cli
-#else
-#    sudo -H python3 -m ensurepip
-#    sudo -H python3 -m pip install -q setuptools
-#    sudo -H python3 -m pip install -q cloudsmith-cli
-#fi
-
-
-BUILD_ID=${CIRCLE_BUILD_NUM:-1}
 commit=$(git rev-parse --short=7 HEAD) || commit="unknown"
 tag=$(git tag --contains HEAD)
 
 ls -la
 pwd
-xml=$(ls $HOME/project/build/*.xml)
+xml=$(ls $BUILD_DIR/*.xml)
 cat $xml
-tarball=$(ls $HOME/project/build/*.tar.gz)
+tarball=$(ls $BUILD_DIR/*.tar.gz)
 tarball_basename=${tarball##*/}
+echo $tarball
+echo $tarball_basename
 
-source $HOME/project/build/pkg_version.sh
-tarball_name=@PACKAGE@-${PKG_TARGET}-${PKG_TARGET_VERSION}-tarball
-pkg=$(ls $HOME/project/build/*.${PKG_EXT})
+source $BUILD_DIR/pkg_version.sh
+tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
+pkg=$(ls $BUILD_DIR/*.${PKG_EXT})
 
-source $HOME/project/build/pkg_version.sh
-if [ -n "$tag" ]; then
-    VERSION="$tag"
-    REPO="$STABLE_REPO"
-    PKG_REPO="$STABLE_PKG_REPO"
+source $BUILD_DIR/pkg_version.sh
+echo $BUILD_BRANCH
+echo $BUILD_TAG
+echo ${#BUILD_TAG}
+
+BUILD_BRANCH_LOWER=`echo $BUILD_BRANCH | tr '[A-Z]' '[a-z]'`
+if [ "$BUILD_BRANCH_LOWER" = "master" ]; then
+    echo "In master branch "
+    if [ -n "$BUILD_TAG"  ]; then
+        echo "building with tag"
+        VERSION=$BUILD_TAG
+        REPO="$PROD_REPO"
+    else
+        VERSION="@PROJECT_VERSION@+${BUILD_ID}.${commit}"
+        echo "building without tag"
+        REPO="$BETA_REPO"
+    fi
 else
-    VERSION="@PROJECT_VERSION@+${BUILD_ID}.${commit}"
-    REPO="$UNSTABLE_REPO"
-    PKG_REPO="$UNSTABLE_REPO"
+    echo "In non master branch " $BUILD_BRANCH
+    if [ -n "$BUILD_TAG" ]; then
+        echo "buildnig with tag"
+        VERSION=$BUILD_TAG
+        REPO="$BETA_REPO"
+    else
+        echo "building without tag"
+        VERSION="@PROJECT_VERSION@+${BUILD_ID}.${commit}"
+        REPO="$ALPHA_REPO"
+    fi
+fi
+echo $VERSION
+echo $REPO
+
+if [ "$APPVEYOR" ]; then
+    echo 'substituting xml file variables for windows build'
+    while read line; do
+        line=${line//--pkg_repo--/$REPO}
+        line=${line//--name--/$tarball_name}
+        line=${line//--version--/$VERSION}
+        line=${line//--filename--/$tarball_basename}
+        echo $line
+    done < $xml > xml.tmp && cat xml.tmp && cp xml.tmp $xml && rm xml.tmp
+else
+    echo 'substituting xml file variables for non-windows build'
+    sudo sed -i -e "s|--pkg_repo--|$REPO|"  $xml
+    sudo sed -i -e "s|--name--|$tarball_name|" $xml
+    sudo sed -i -e "s|--version--|$VERSION|" $xml
+    sudo sed -i -e "s|--filename--|$tarball_basename|" $xml
 fi
 
-COMMON_NAME_SUB=@COMMON_NAME@
-echo $COMMON_NAME_SUB
-
-echo $tarball_name
-echo $tarball
-
-sudo sed -i -e "s|--pkg_repo--|$REPO|"  $xml
-sudo sed -i -e "s|--name--|$tarball_name|" $xml
-sudo sed -i -e "s|--version--|$VERSION|" $xml
-sudo sed -i -e "s|--filename--|$tarball_basename|" $xml
-
-echo $VERSION
 cat $xml
-ls -l build
+ls -l $BUILD_DIR
 
 cloudsmith push raw --republish --no-wait-for-sync \
-    --name @PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@-metadata \
+    --name @PACKAGE_NAME@-@PKG_TARGET@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
     --version ${VERSION} \
     --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
     $REPO $xml
@@ -139,12 +161,10 @@ cloudsmith push raw --republish --no-wait-for-sync \
     --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
     $REPO $tarball
 
-# No need to upload package for flatpk, it is exactly the same as tarball    
-if [${OCPN_TARGET} != "flatpak"]
-then     
-cloudsmith push raw --republish --no-wait-for-sync \
-    --name @PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@.${PKG_EXT} \
-    --version ${VERSION} \
-    --summary "@PACKAGE@ .${PKG_EXT} installation package" \
-    $PKG_REPO $pkg
+if [ "${PKG_EXT}" != "gz" ]; then
+    cloudsmith push raw --republish --no-wait-for-sync \
+        --name opencpn-package-@PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+        --version ${VERSION} \
+        --summary "@PACKAGE@ .${PKG_EXT} installation package" \
+        $REPO $pkg
 fi

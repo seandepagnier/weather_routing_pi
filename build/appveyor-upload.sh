@@ -55,7 +55,7 @@ else
     REPO="$UNSTABLE_REPO"
     PKG_REPO="$UNSTABLE_REPO"
 fi
-tarball_name=weather_routing-${PKG_TARGET}-${PKG_TARGET_VERSION}-tarball
+tarball_name=weather_routing_pi-${PKG_TARGET}-${PKG_TARGET_VERSION}-tarball
 
 cat $xml
 
@@ -75,23 +75,23 @@ cat $xml
 cloudsmith push raw \
     --republish \
     --no-wait-for-sync \
-    --name weather_routing-msvc-10.0.18363-metadata \
+    --name weather_routing_pi-msvc-10.0.18363-metadata \
     --version ${VERSION} \
-    --summary "weather_routing opencpn plugin metadata for automatic installation" \
+    --summary "weather_routing_pi opencpn plugin metadata for automatic installation" \
     $REPO ./$xml
 
 cloudsmith push raw  \
     --republish \
     --no-wait-for-sync \
-    --name weather_routing-msvc-10.0.18363-tarball \
+    --name weather_routing_pi-msvc-10.0.18363-tarball \
     --version ${VERSION} \
-    --summary "weather_routing opencpn plugin tarball for automatic installation" \
+    --summary "weather_routing_pi opencpn plugin tarball for automatic installation" \
     $REPO $tarball
 
 cloudsmith push raw \
     --republish \
     --no-wait-for-sync \
-    --name weather_routing-msvc-10.0.18363-installer \
+    --name weather_routing_pi-msvc-10.0.18363-installer \
     --version ${VERSION} \
-    --summary "weather_routing installation package" \
+    --summary "weather_routing_pi installation package" \
     $PKG_REPO ./$exe

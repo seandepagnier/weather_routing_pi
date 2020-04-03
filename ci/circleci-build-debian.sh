@@ -15,16 +15,16 @@ rm -f ./*all.deb
 
 tag=$(git tag --contains HEAD)
 
+if [ -n "$BUILD_GTK3" ]; then
+  sudo update-alternatives --set wx-config /usr/lib/*-linux-*/wx/config/gtk3-unicode-3.0
+fi
+
 if [ -n "$tag" ]; then
-  cmake -DCMAKE_BUILD_TYPE=Release ..
+  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
 else
-  cmake -DCMAKE_BUILD_TYPE=Debug ..
+  cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/usr/local ..
 fi
 
 make -j2
 make package
 ls -l
-
-# install cloudsmith-cli, used in upload.
-sudo apt-get install python3-pip python3-setuptools
-sudo python3 -m pip install -q cloudsmith-cli

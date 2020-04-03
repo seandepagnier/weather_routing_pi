@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: opencpn-plugin-draw
-Source: https://github.com/jongough/ocpn_draw_pi
+Upstream-Name: opencpn-plugin-testplugin
+Source: https://github.com/jongough/testplugin_pi
 
 Files: *
 Copyright: 2019 Jon Gough <jon.gough@eclipsesystems.com.au>
@@ -26,4 +26,3 @@ License: GPL-2.0+
  .
  On Debian systems, the complete text of the GNU General
  Public License version 2 can be found in "/usr/share/common-licenses/GPL-2".
-

@@ -1,4 +1,4 @@
-clone_folder: c:\project\weather_routing_pi
+clone_folder: c:\project\testplugin_pi
 shallow_clone: false
 clone_depth: 10
 
@@ -11,6 +11,9 @@ platform:
 
 configuration: Release
 test: OFF
+
+environment:
+  OCPN_TARGET: MSVC
 
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
@@ -35,11 +38,11 @@ install:
   - set
 
 before_build:
-  - cd c:\project\weather_routing_pi
+  - cd c:\project\testplugin_pi
   - rm -rf build && mkdir build && cd build
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.99.1405-vc141_xp/opencpn.lib
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/OpenCPN_buildwin-4.99a.7z
-  - cmd: 7z x -y OpenCPN_buildwin-4.99a.7z -oc:\project\weather_routing_pi\buildwin
+  - cmd: 7z x -y OpenCPN_buildwin-4.99a.7z -oc:\project\testplugin_pi\buildwin
   - cmake -T v141_xp ..
 
 build_script:
@@ -47,20 +50,19 @@ build_script:
   - python -m ensurepip
   - python -m pip install -q setuptools
   - python -m pip install -q cloudsmith-cli
-  - bash ../build/appveyor-upload.sh
+  - bash ../build/cloudsmith-upload.sh
 
 artifacts:
   - path: 'build\*.exe'
     name: installer
 
 deploy:
-  #description: 'release created by AppVeyor CI'
-  #provider: GitHub
-  #auth_token: #'%GitHub_auth_token%'  xkR09Y0VQ7A10kp+h6v9UjIeLVkf1VQ9O+AFyd62qUDI1IRh7Llagre2fI/cDPTW
-  #  secure: xkR09Y0VQ7A10kp+h6v9UjIeLVkf1VQ9O+AFyd62qUDI1IRh7Llagre2fI/cDPTW	rh0wUA7/Vv1UVnuV8abbLwTEnDZcH6qUJLhzlMKYZdnSx7EDP6CxcMfXSWM/0EdB
-  #artifact: installer,portable
-  #draft: true
-  #prerelease: true
-  #on:
-    #appveyor_repo_tag: true # deploy on tag push only
-    #configuration: Release  # Debug contains non-redist MS DLLs
+  description: 'release created by AppVeyor CI'
+  provider: GitHub
+  auth_token: '%GitHub_auth_token%'
+  artifact: installer,portable
+  draft: true
+  prerelease: true
+  on:
+    appveyor_repo_tag: true # deploy on tag push only
+    configuration: Release  # Debug contains non-redist MS DLLs

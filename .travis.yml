@@ -1,95 +1,27 @@
 language: cpp
+
 matrix:
   include:
-#  - dist: trusty
-#    compiler: gcc
-#  - os: osx
-#    compiler: clang
-    
   - env:
     - OCPN_TARGET=stretch-armhf
     - OCPN_BRANCH=master
-    - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
-    - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
     - DOCKER_IMAGE=raspbian/stretch
     services:
     - docker
     script:
-    - "./ci/travis-build-raspbian-armhf.sh"
-
+    - bash ./ci/travis-build-raspbian-armhf.sh
   - env:
     - OCPN_TARGET=buster-armhf
     - OCPN_BRANCH=master
-    - OCPN_STABLE_REPO=rick-gleason/opencpn-plugins-prod
-    - OCPN_UNSTABLE_REPO=rick-gleason/opencpn-plugins-beta
     - DOCKER_IMAGE=opencpn/raspbian-buster:plugin_build_tooling
     services:
     - docker
     script:
-    - "./ci/travis-build-raspbian-armhf.sh"
-# ========
-#install:
-#
-#    - if [[ "$TRAVIS_OS_NAME" == "linux" ]];
-#      then
-#        sudo apt-get -qq update;
-#        sudo apt-get install libwxgtk3.0-dev libwxgtk3.0-0 libgps-dev libglu1-mesa-dev libgtk2.0-dev libbz2-dev libtinyxml-dev;
-#        sudo apt-get install libexpat1-dev libcairo2-dev;
-#        sudo apt-get install rpm;
-#      fi
-#    - if [[ "$TRAVIS_OS_NAME" == "osx" ]];
-#      then
-#        brew install cairo libexif xz libarchive;
-#        wget http://opencpn.navnux.org/build_deps/wx312_opencpn50_macos109.tar.xz;
-#        tar xJf wx312_opencpn50_macos109.tar.xz -C /tmp;
-#        export PATH="/usr/local/opt/gettext/bin:$PATH";
-#        echo 'export PATH="/usr/local/opt/gettext/bin:$PATH"' >> ~/.bash_profile;
-#        wget http://opencpn.navnux.org/build_deps/Packages.dmg;
-#        hdiutil attach Packages.dmg;
-#        sudo installer -pkg "/Volumes/Packages 1.2.5/Install Packages.pkg" -target "/";
-#      fi
-#
-#script:
-#  - if [[ "${COVERITY_SCAN_BRANCH}" == 1 ]];
-#    then
-#      echo "Don't build on coverty_scan branch.";
-#      exit 0;
-#    fi
-#  - cd build
-#  - if [[ "$TRAVIS_OS_NAME" == "linux" ]];
-#    then
-#       cmake -DCMAKE_BUILD_TYPE=Release ../ && make -sj2 package;
-#    fi
-#  - if [[ "$TRAVIS_OS_NAME" == "osx" ]];
-#    then
-#        cmake -DwxWidgets_CONFIG_EXECUTABLE=/tmp/wx312_opencpn50_macos109/bin/wx-config -DwxWidgets_CONFIG_OPTIONS="--prefix=/tmp/wx312_opencpn50_macos109" -DCMAKE_INSTALL_PREFIX=/tmp/opencpn -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 .. && make -sj2 && make create-pkg;
-#     fi
-#  - ls -l;
-# =========
-
-#notifications:
-#  email: false
-#git:
-#  depth: 10
-#before_install:
-#- if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
-#- if [ "${#OAUTH_ACCESS_TOKEN}" != 0 ]; then (echo OAUTH_ACCESS_TOKEN=${OAUTH_ACCESS_TOKEN} > ~/.dropbox_uploader); fi
-#addons:
-#  apt:
-#    sources:
-#    - ubuntu-toolchain-r-test
-#    packages:
-#    - gcc-6
-#    - g++-6
-#deploy:
-#- provider: releases
-#  api_key:
-#    secure: "ZMJNkbf1QxwivytkWLiEZ5G4Q3WaXBTpFEwXe/GGgkA3qg/HNw7a0tSZAkLRIx/BohsrNIRRaCyETTpdv0pVcAByQmtenFVpChqzhdxln2QbIcZMJKRO/IsKnzj03zhJdIv/VQ+J56qVsIZGEL2AVl/zn5FHpKb7cYYpldJrSq7o5gb+N3EdhJ5Ksaw0r/TjYiWr7+M87T1ZBY5D+LzCGngYVTEG1XhPPLKzSd1w4JzRnyZ1IgVRh7dRmjzOhQyAOaRPUCr51Xh1eb6iHLq8d4uLHxHDscuiIHwqXhLEF/82ECtn9n6mbP3hxoCE/9CYcJsd2Z3r5hwgKoIqvMDyBJuiy8+j5WC5fcHq81OtRtFoYJSLLQlgjCtec3aOeuYfPkZCcw2HbF6udIdm3Xo5uLonIolMMq7YT7sh20INOOXVi0m+/9FBIXjPsfQDsX0FW0RfAWk4AJFnPARV3xKReNlQntuX4WORILeDCAmneob0jF7kP8W/u65mnTguic/2qsCVAeJRepfIon6i1+VmQO2n8b9S7XC6aHRN99Bi4uy5NePyl20Rqw8nCP/nn2SENgIQahPio+4vFX7B44hYdI87cFuKvvINOJxNup9IggQ4XYdVSCtD0u8sMfm4KT2O0NpPnYdqqB0V/KLfOhDm3UmmEqxEh86q/JPh3WCMyFc="
-#"ZMJNkbf1QxwivytkWLiEZ5G4Q3WaXBTpFEwXe/GGgkA3qg/HNw7a0tSZAkLRIx/BohsrNIRRaCyETTpdv0pVcAByQmtenFVpChqzhdxln2QbIcZMJKRO/IsKnzj03zhJdIv/VQ+J56qVsIZGEL2AVl/zn5FHpKb7cYYpldJrSq7o5gb+N3EdhJ5Ksaw0r/TjYiWr7+M87T1ZBY5D+LzCGngYVTEG1XhPPLKzSd1w4JzRnyZ1IgVRh7dRmjzOhQyAOaRPUCr51Xh1eb6iHLq8d4uLHxHDscuiIHwqXhLEF/82ECtn9n6mbP3hxoCE/9CYcJsd2Z3r5hwgKoIqvMDyBJuiy8+j5WC5fcHq81OtRtFoYJSLLQlgjCtec3aOeuYfPkZCcw2HbF6udIdm3Xo5uLonIolMMq7YT7sh20INOOXVi0m+/9FBIXjPsfQDsX0FW0RfAWk4AJFnPARV3xKReNlQntuX4WORILeDCAmneob0jF7kP8W/u65mnTguic/2qsCVAeJRepfIon6i1+VmQO2n8b9S7XC6aHRN99Bi4uy5NePyl20Rqw8nCP/nn2SENgIQahPio+4vFX7B44hYdI87cFuKvvINOJxNup9IggQ4XYdVSCtD0u8sMfm4KT2O0NpPnYdqqB0V/KLfOhDm3UmmEqxEh86q/JPh3WCMyFc="
-#  file_glob: true
-#  file: "$TRAVIS_BUILD_DIR/build/*.{deb,rpm,dmg,txz,pkg,pkg.tar.xz}"
-#  skip_cleanup: true
-#  on:
-#    repo: rgleason/weather_routing_pi 
-#    tags: true
-#    all_branches: true
+    - bash ./ci/travis-build-raspbian-armhf.sh
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: bash ./ci/cloudsmith-upload.sh
+  on:
+    tags: false
+    all_branches: true

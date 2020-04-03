@@ -113,11 +113,9 @@ jobs:
        - CLOUDSMITH_PKG_EXT: gz
      steps:
        - checkout
-       - run: chmod a+x ci/*.sh
+#       - run: chmod a+x ci/*.sh
        - run: bash ci/circleci-build-flatpak.sh
        - run: bash ci/cloudsmith-upload.sh
-       - store_test_results:
-           path: ~/test-results
    build-fedora:
      docker:
          - image: fedora:29
@@ -152,8 +150,6 @@ jobs:
        - run: chmod a+x ci/*.sh
        - run: bash ci/circleci-build-macos.sh
        - run: bash ci/cloudsmith-upload.sh
-       - store_test_results:
-           path: ~/test-results	   
 workflows:
   version: 2
   build_all:
@@ -165,50 +161,50 @@ workflows:
                - devel
                - tmp
       - build-xenial:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
+         filters:
+           branches:
+             ignore:
+               - devel
+               - tmp
       - build-bionic:
-          filters:
-            branches:
+         filters:
+           branches:
              ignore:
               - devel
               - tmp
       - build-bionic-gtk3:
          filters:
            branches:
-              ignore:
-                - devel
-                - tmp
+             ignore:
+               - devel
+               - tmp
       - build-buster:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
+         filters:
+           branches:
+             ignore:
+               - devel
+               - tmp
       - build-flatpak:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
+         filters:
+           branches:
+             ignore:
+               - devel
+               - tmp
       - build-fedora:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
+         filters:
+           branches:
+             ignore:
+               - devel
+               - tmp
       - build-mingw:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
+         filters:
+           branches:
+             ignore:
+               - devel
+               - tmp
       - build-macos:
-          filters:
-            branches:
-              ignore:
-                - devel
-                - tmp
+         filters:
+           branches:
+             ignore:
+               - devel
+               - tmp

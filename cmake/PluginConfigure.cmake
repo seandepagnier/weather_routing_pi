@@ -2,9 +2,10 @@
 # Author:      Jon Gough (Based on the work of Sean D'Epagnier and Pavel Kalian) Copyright:   2019 License:     GPLv3+
 # ---------------------------------------------------------------------------
 
-set(PLUGIN_SOURCE_DIR .)
-
 message(STATUS "*** Staging to build ${PACKAGE_NAME} ***")
+
+set(PLUGIN_SOURCE_DIR .)
+message(STATUS "Set PLUGIN_SOURCE_DIR to: ${PLUGIN_SOURCE_DIR}")
 
 # Do the version.h & wxWTranslateCatalog configuration into the build output directory, thereby allowing building from a read-only source tree.
 if(NOT SKIP_VERSION_CONFIG)
@@ -15,11 +16,23 @@ if(NOT SKIP_VERSION_CONFIG)
 endif(NOT SKIP_VERSION_CONFIG)
 
 # configure xml file for circleci
+message(STATUS "OCPN_TARGET: $ENV{OCPN_TARGET}")
+if(NOT DEFINED ENV{OCPN_TARGET})
+    set($ENV{OCPN_TARGET} ${PKG_TARGET})
+    message(STATUS "Setting OCPN_TARGET")
+endif(NOT DEFINED ENV{OCPN_TARGET})
+if($ENV{OCPN_TARGET} MATCHES "(.*)gtk3")
+    set(PKG_TARGET_FULL "${PKG_TARGET}-gtk3")
+    message(STATUS "Found gtk3")
+else($ENV{OCPN_TARGET} MATCHES "(.*)gtk3")
+    set(PKG_TARGET_FULL "${PKG_TARGET}")
+endif($ENV{OCPN_TARGET} MATCHES "(.*)gtk3")
+
+message(STATUS "PKG_TARGET_FULL: ${PKG_TARGET_FULL}")
 message(STATUS "*.in files generated in ${CMAKE_CURRENT_BINARY_DIR}")
-configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/plugin.xml.in ${CMAKE_CURRENT_BINARY_DIR}/${PLUGIN_NAME}.xml)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/plugin.xml.in ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGING_NAME}.xml)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/pkg_version.sh.in ${CMAKE_CURRENT_BINARY_DIR}/pkg_version.sh)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/cloudsmith-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/cloudsmith-upload.sh @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/appveyor-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/appveyor-upload.sh @ONLY)
 
 message(STATUS "Checking OCPN_FLATPAK: ${OCPN_FLATPAK}")
 if(OCPN_FLATPAK_CONFIG)
@@ -27,6 +40,7 @@ if(OCPN_FLATPAK_CONFIG)
 
   message(STATUS "Done OCPN_FLATPAK CONFIG")
   message(STATUS "Directory used: ${CMAKE_CURRENT_BINARY_DIR}/flatpak")
+  message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
   return()
 endif(OCPN_FLATPAK_CONFIG)
 
@@ -35,16 +49,15 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 include_directories(${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/src)
 
 # SET(PROFILING 1)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   add_definitions("-DDEBUG_BUILD")
   set(CMAKE_INSTALL_DO_STRIP FALSE)
   set(CPACK_DEBIAN_DEBUGINFO_PACKAGE YES)
   message(STATUS "DEBUG available")
-endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
 if(NOT WIN32 AND NOT APPLE)
-# Added -fPIC at Jon's suggestion to fix  issue when compiling json_value.cpp as it is not being compiled with '-fPIC'
-  add_definitions("-Wall -Wno-unused -fexceptions -rdynamic  -fPIC -fvisibility=hidden")
+  add_definitions("-Wall -Wno-unused -fexceptions -rdynamic -fvisibility=hidden")
   add_definitions(" -fno-strict-aliasing")
   message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
