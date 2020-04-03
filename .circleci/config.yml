@@ -113,7 +113,7 @@ jobs:
        - CLOUDSMITH_PKG_EXT: gz
      steps:
        - checkout
-#       - run: chmod a+x ci/*.sh
+       - run: chmod a+x ci/*.sh
        - run: bash ci/circleci-build-flatpak.sh
        - run: bash ci/cloudsmith-upload.sh
    build-fedora:
