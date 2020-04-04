@@ -293,7 +293,7 @@ IF(NOT UNIX)
     )
     ADD_LIBRARY(LIB_BZIP_WR STATIC ${SRC_BZIP})
     TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP_WR )
-    INCLUDE_DIRECTORIES(${PLUGIN_SOURCE_DIR}/src/bzip2)
+    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/bzip2)
 ENDIF(NOT UNIX)
 			
 IF(NOT UNIX)
@@ -318,6 +318,8 @@ ENDIF()
 ## ----- Change below to match project requirements ----- ##
 ##
 #========REMOVE LN 194 to LN 296 from Testplugin_pi
+include("cmake/PluginGL.cmake")
+include("cmake/PluginJSON.cmake")
 ##
 ## ----- Change above to match project requirements ----- ##
 ##
