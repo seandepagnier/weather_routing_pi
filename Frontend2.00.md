@@ -64,6 +64,9 @@ testplugin_pi/src
    - After add_definitions(-DUSE_S57) comment out all testplugin "set(.."
    - From Ln 190 to Ln 296 remove everything between "Change below and change above to match project requirements.
 1. You may have to copy/move some of the files in your cmake.save directory over to cmake if your plugin depends on those files.   
+
+Down to here and pushed. Below is old.
+
 1. Check that buildosx/InstallOSX/plugin_pi.pkgproj.in exists
    - PluginPackage.cmake Ln 184 has a configure_file to make this file.
    - File inside is generic and uses a variable for plugin project name (7x's inside file).
