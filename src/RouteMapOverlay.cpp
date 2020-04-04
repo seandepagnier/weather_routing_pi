@@ -28,7 +28,7 @@
 
 #include "ocpn_plugin.h"
 #include "plugingl/pidc.h"
-#include "json/json.h"
+#include "jsoncpp/json/json.h"
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
