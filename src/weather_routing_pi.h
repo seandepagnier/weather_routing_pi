@@ -77,7 +77,7 @@ std::cout << x << std::endl; } while (0)
 #undef MAX
 #endif
 
-#include "jsoncpp/json/json.h"
+#include "json/json.h"
 
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition

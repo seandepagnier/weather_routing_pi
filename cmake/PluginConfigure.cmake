@@ -4,8 +4,9 @@
 
 message(STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
-set(PLUGIN_SOURCE_DIR .)
-message(STATUS "Set PLUGIN_SOURCE_DIR to: ${PLUGIN_SOURCE_DIR}")
+# Jon gough recent change
+# set(PLUGIN_SOURCE_DIR .)
+# message(STATUS "Set PLUGIN_SOURCE_DIR to: ${PLUGIN_SOURCE_DIR}")
 
 # Do the version.h & wxWTranslateCatalog configuration into the build output directory, thereby allowing building from a read-only source tree.
 if(NOT SKIP_VERSION_CONFIG)
