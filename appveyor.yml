@@ -1,4 +1,4 @@
-clone_folder: c:\project\testplugin_pi
+clone_folder: c:\project\weather_routing_pi
 shallow_clone: false
 clone_depth: 10
 
@@ -38,7 +38,7 @@ install:
   - set
 
 before_build:
-  - cd c:\project\testplugin_pi
+  - cd c:\project\weather_routing_pi
   - rm -rf build && mkdir build && cd build
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.99.1405-vc141_xp/opencpn.lib
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/OpenCPN_buildwin-4.99a.7z

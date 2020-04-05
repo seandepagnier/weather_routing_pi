@@ -110,7 +110,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 set(PKG_NVR ${PACKAGE_NAME}-${PROJECT_VERSION})
 set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/versions/--version--/--filename--")
 
-#----INCLUDE-----
+#----INCLUDE CMAKE #1 -----
 include("cmake/PluginSetup.cmake")
 
 if(DEFINED ENV{OCPN_TARGET})
@@ -189,7 +189,7 @@ endif()
 ## ----- Modify section above if there are special requirements for the plugin ----- ##
 ##
 
-#------INCLUDE--------
+#------INCLUDE CMAKE #2--------
 include("cmake/PluginConfigure.cmake")
 
 ##
@@ -276,9 +276,8 @@ SET(SRC_LIBTESS2
 #			 src/bzip2/huffman.c
 #			 src/bzip2/randtable.c
 #)
-			 
 
-SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGING} ${TINYXML} )
+SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} )
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 
 IF(NOT UNIX)
@@ -295,7 +294,7 @@ IF(NOT UNIX)
     TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP_WR )
     INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/bzip2)
 ENDIF(NOT UNIX)
-			
+
 IF(NOT UNIX)
     INCLUDE_DIRECTORIES(src/zlib-1.2.3)
     INCLUDE_DIRECTORIES(src/bzip2)
@@ -320,6 +319,8 @@ ENDIF()
 #========REMOVE LN 194 to LN 296 from Testplugin_pi
 
 # Jon identified these were missing causing json/json.h and other problems.
+
+#----INCLUDE CMAKE #3 & #4 -----
 include("cmake/PluginGL.cmake")
 include("cmake/PluginJSON.cmake")
 
@@ -330,7 +331,7 @@ include("cmake/PluginJSON.cmake")
 ##
 ## ----- do not change - needed to build app ----- ##
 ##
-
+#----INCLUDE CMAKE #5,6 & 7 -----
 include("cmake/PluginInstall.cmake")
 include("cmake/PluginLocalization.cmake")
 include("cmake/PluginPackage.cmake")
