@@ -13,6 +13,9 @@ sudo gdebi -n ./*all.deb  || :
 sudo apt-get --allow-unauthenticated install -f
 rm -f ./*all.deb
 
+sudo apt-get install libglu1-mesa-dev   
+# from weather_routing  branch:master ci/circleci-build-trusty.sh
+
 tag=$(git tag --contains HEAD)
 
 if [ -n "$BUILD_GTK3" ]; then
