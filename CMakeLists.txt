@@ -319,7 +319,6 @@ ENDIF()
 #========REMOVE LN 194 to LN 296 from Testplugin_pi
 
 # Jon identified these were missing causing json/json.h and other problems.
-
 #----INCLUDE CMAKE #3 & #4 -----
 include("cmake/PluginGL.cmake")
 include("cmake/PluginJSON.cmake")
