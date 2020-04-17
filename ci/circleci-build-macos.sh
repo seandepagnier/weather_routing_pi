@@ -6,22 +6,20 @@
 
 # Fix broken ruby on the CircleCI image:
 if [ -n "$CI" ]; then
-    curl -fsSL \
-        https://raw.githubusercontent.com/Homebrew/install/master/uninstall \
-        > uninstall
-    chmod 755 uninstall
-    ./uninstall -f
-    inst="https://raw.githubusercontent.com/Homebrew/install/master/install"
-    /usr/bin/ruby -e "$(curl -fsSL $inst)"
+ 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 fi
-
 
 set -xe
 
 set -o pipefail
-for pkg in cairo libexif xz libarchive python3 wget cmake; do
+for pkg in cairo libexif xz libarchive wget cmake; do
     brew list $pkg 2>/dev/null | head -10 || brew install $pkg
 done
+	brew unlink python@2
+	brew upgrade python
+	brew ls python3
+	brew install wget
+	brew install cmake
 
 wget -q http://opencpn.navnux.org/build_deps/wx312_opencpn50_macos109.tar.xz
 tar xJf wx312_opencpn50_macos109.tar.xz -C /tmp
