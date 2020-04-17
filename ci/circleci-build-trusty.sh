@@ -5,16 +5,13 @@
 #
 set -xe
 sudo apt-get -qq update
-sudo apt-get install devscripts equivs gdebi
+sudo apt-get install devscripts equivs gdebi libglu1-mesa-dev
 
 rm -rf build && mkdir build && cd build
 mk-build-deps ../ci/control
 sudo gdebi -n ./*all.deb  || :
 sudo apt-get --allow-unauthenticated install -f
 rm -f ./*all.deb
-
-sudo apt-get install libglu1-mesa-dev   
-# from weather_routing  branch:master ci/circleci-build-trusty.sh
 
 tag=$(git tag --contains HEAD)
 

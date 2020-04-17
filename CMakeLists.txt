@@ -1,7 +1,25 @@
 # ---------------------------------------------------------------------------
 # Author:      jongough aka. Jon Gough Copyright: License:     wxWidgets License
 # ---------------------------------------------------------------------------
-
+##---------------------------------------------------------------------------
+## Author:      Mauro Calvi
+##***************************************************************************
+## *   Copyright (C) 2010 by Sean d'Epagnier                              *
+## *   This program is free software; you can redistribute it and/or modify  *
+## *   it under the terms of the GNU General Public License as published by  *
+## *   the Free Software Foundation; either version 2 of the License, or     *
+## *   (at your option) any later version.                                   *
+## *                                                                         *
+## *   This program is distributed in the hope that it will be useful,       *
+## *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+## *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+## *   GNU General Public License for more details.                          *
+## *                                                                         *
+## *   You should have received a copy of the GNU General Public License     *
+## *   along with this program; if not, write to the                         *
+## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
+## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx          *
+## ***   
 ##
 ## ----- Modify section below to include all the details for your plugin ----- ##
 ##
@@ -32,7 +50,6 @@ set(VERSION_DATE "04/03/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
-set(TP_COMMENT "  * Release for O5 using CI")
 
 set(PARENT "opencpn")
 #set(GIT_USER "jongough")
@@ -42,7 +59,7 @@ set(GIT_USER "rgleason")
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
 message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
 message(STATUS "TRAVIS: ${TRAVIS}, Env TRAVIS: $ENV{TRAVIS}")
-# This allows setup of your own local webserver with git on it for testing purposes.
+# This 'if' allows setup of a local webserver with git for testing
 if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
@@ -61,22 +78,29 @@ else()
 endif()
 message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
 
+
+#set(CLOUDSMITH_USER "sean-depagnier") 
 #set(CLOUDSMITH_USER "jon-gough")
 set(CLOUDSMITH_USER "rick-gleason")
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
-set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")
+#set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
+set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Rick's customization
+# Prod builds repository url
+#set(PROD "unstable") #original repos
+set(PROD "prod")  #Standard Repos
+
+# Beta builds repository url
+#set(BETA "stable") #original Repos
+set(BETA "beta")       #Standard Repos
+
+# Alpha builds repository url
+#set(ALPHA "pkg") #original Repos 
+set(ALPHA "alpha") #Standard Repos
 
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
-set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
-option(PLUGIN_USE_SVG "Use SVG graphics" ON)
-
-set(CMAKE_CXX_STANDARD 11)
-
-# Prefer libGL.so to libOpenGL.so, see CMP0072
-set(OpenGL_GL_PREFERENCE "LEGACY")
-
+#set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
 ##
 ## ----- Modify section above to include all the details for your plugin ----- ##
 ##
@@ -84,6 +108,9 @@ set(OpenGL_GL_PREFERENCE "LEGACY")
 ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
+option(PLUGIN_USE_SVG "Use SVG graphics" ON)
+
+set(CMAKE_CXX_STANDARD 11)
 
 if(NOT ${PACKAGE} MATCHES "(.*)_pi")
   set(PACKAGE_NAME ${PACKAGE}_pi)
@@ -102,8 +129,12 @@ set(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message(STATUS "${VERBOSE_NAME} Version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
 message(STATUS "OPCN_FLATPAK: ${OCPN_FLATPAK}")
 
+# Prefer libGL.so to libOpenGL.so, see CMP0072
+set(OpenGL_GL_PREFERENCE "LEGACY")
 # Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
+option(USE_GL "Enable OpenGL support" OFF)
+message(STATUS "USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build" FORCE)
@@ -115,8 +146,10 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 set(PKG_NVR ${PACKAGE_NAME}-${PROJECT_VERSION})
 set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/versions/--version--/--filename--")
 
-#----INCLUDE CMAKE #1 -----
+#INCLUDE ------------------------------
 include("cmake/PluginSetup.cmake")
+#INCLUDE ------------------------------
+
 
 if(DEFINED ENV{OCPN_TARGET})
     set(PACKAGING_NAME "${PKG_NVR}_${PKG_TARGET}-${PKG_TARGET_VERSION}-$ENV{OCPN_TARGET}")
@@ -194,14 +227,16 @@ endif()
 ## ----- Modify section above if there are special requirements for the plugin ----- ##
 ##
 
-#------INCLUDE CMAKE #2--------
-include("cmake/PluginConfigure.cmake")
+#INCLUDE -----------------------------------------
+INCLUDE("cmake/PluginConfigure.cmake")
+#INCLUDE-----------------------------------------
 
 ##
 ## ----- Change below to match project requirements ----- ##
 ##
 
-add_definitions(-DUSE_S57)
+#  add_definitions(-DUSE_S57)
+# What is this for?
 
 #======== Below from cmakelists.txt  testplugin_pi
 #========REMOVE LN 194 to LN 296 from testplugin_pi
@@ -282,8 +317,9 @@ SET(SRC_LIBTESS2
 #			 src/bzip2/randtable.c
 #)
 
-SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} )
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
+# Commented out doubles
+#SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} )
+#ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
@@ -317,16 +353,46 @@ IF(WIN32)
 ENDIF()
 
 #======== Above from cmakelists.txt  weather_routing_pi=========
-
+#========REMOVE LN 194 to LN 296 from Testplugin_pi
 ##
 ## ----- Change below to match project requirements ----- ##
 ##
-#========REMOVE LN 194 to LN 296 from Testplugin_pi
+
 
 # Jon identified these were missing causing json/json.h and other problems.
 #----INCLUDE CMAKE #3 & #4 -----
 include("cmake/PluginGL.cmake")
 include("cmake/PluginJSON.cmake")
+
+# From squiddio!!
+##================================================================================
+## Required to collect all the set( headers and SRCS  - Adjust as required
+## This add_library  is used in the conditionals below.
+##================================================================================
+##    add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
+##================================================================================
+
+ADD_DEFINITIONS(-DTIXML_USE_STL)
+IF(UNIX AND NOT APPLE)
+    INCLUDE("cmake/FindTinyXML.cmake")
+    FIND_PACKAGE(TinyXML QUIET)
+ENDIF(UNIX AND NOT APPLE)
+
+IF(TINYXML_FOUND)
+    message (STATUS "Building with system tinyxml")
+    INCLUDE_DIRECTORIES(${TINYXML_INCLUDE_DIR})
+    ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${SRC_NMEA0183})
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${TINYXML_LIBRARIES} )
+ELSE(TINYXML_FOUND)
+    message (STATUS "Building with embedded tinyxml")
+    SET(SRC_LTINYXML
+    src/tinyxml.h
+    src/tinystr.h
+      )
+    ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${SRC_NMEA0183} ${SRC_LTINYXML})
+ENDIF(TINYXML_FOUND)
+
+# Above from Squiddio
 
 ##
 ## ----- Change above to match project requirements ----- ##
@@ -335,7 +401,7 @@ include("cmake/PluginJSON.cmake")
 ##
 ## ----- do not change - needed to build app ----- ##
 ##
-#----INCLUDE CMAKE #5,6 & 7 -----
+#INCLUDE CMAKE #5,6 & 7 -----
 include("cmake/PluginInstall.cmake")
 include("cmake/PluginLocalization.cmake")
 include("cmake/PluginPackage.cmake")

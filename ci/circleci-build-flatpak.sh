@@ -14,7 +14,7 @@
 set -xe
 ##sudo apt-get -qq update
 
-# PLUGIN=bsb4
+#PLUGIN=bsb4
 
 DOCKER_SOCK="unix:///var/run/docker.sock"
 if [ -n "$TRAVIS" ]; then

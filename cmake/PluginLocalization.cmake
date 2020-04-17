@@ -92,7 +92,7 @@ macro(GETTEXT_BUILD_MO)
         FILES ${_gmoFile}
         DESTINATION ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES
         RENAME ${PACKAGE_NAME}.mo)
-      message(STATUS "Install language files to: ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES renamed to: ${PACKAGE_NAME}.mo")	  
+      message(STATUS "Install language files to: ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES renamed to: ${PACKAGE_NAME}.mo")
     endif(APPLE)
 
     set(_gmoFiles ${_gmoFiles} ${_gmoFile})

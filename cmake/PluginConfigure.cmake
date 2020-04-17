@@ -4,7 +4,6 @@
 
 message(STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
-# Jon gough recent change
 # Do the version.h & wxWTranslateCatalog configuration into the build output directory, thereby allowing building from a read-only source tree.
 if(NOT SKIP_VERSION_CONFIG)
   set(BUILD_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
@@ -140,7 +139,7 @@ set(wxWidgets_USE_LIBS
 option(USE_GL "Enable OpenGL support" ON)
 
 # Search for opengles, short of running a program to test the speed of acceleration, I simply use gles on "native linux" arm systems
-if(ARCH MATCHES "arm*" AND (NOT QT_ANDROID))
+if(ARCH MATCHES "arm*" AND (NOT QT_ANDROID) AND USE_GL MATCHES "ON")
   find_path(OPENGLESv1_INCLUDE_DIR GLES/gl.h)
   if(OPENGLESv1_INCLUDE_DIR)
     message(STATUS "Found OpenGLESv1")
@@ -158,7 +157,7 @@ if(ARCH MATCHES "arm*" AND (NOT QT_ANDROID))
 endif()
 
 # Building for QT_ANDROID involves a cross-building environment, So the include directories, flags, etc must be stated explicitly without trying to locate them on the host build system.
-if(QT_ANDROID)
+if(QT_ANDROID AND USE_GL MATCHES "ON")
   message(STATUS "Using GLESv1 for Android")
   add_definitions(-DocpnUSE_GLES)
   add_definitions(-DocpnUSE_GL)
@@ -169,15 +168,16 @@ if(QT_ANDROID)
 
   set(wxWidgets_USE_LIBS ${wxWidgets_USE_LIBS} gl)
   add_subdirectory(src/glshim)
-endif(QT_ANDROID)
+endif(QT_ANDROID AND USE_GL MATCHES "ON")
 
 if((NOT OPENGLES_FOUND) AND (NOT QT_ANDROID))
 
-  if(USE_GL)
+  if(USE_GL MATCHES "ON")
+    message(STATUS "Finding package OpenGL")
     find_package(OpenGL)
-  else(USE_GL)
+  else(USE_GL MATCHES "ON")
     message(STATUS "OpenGL disabled by option...")
-  endif(USE_GL)
+  endif(USE_GL MATCHES "ON")
 
   if(OPENGL_FOUND)
 

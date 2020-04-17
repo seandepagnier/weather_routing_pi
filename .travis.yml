@@ -9,7 +9,6 @@ matrix:
     services:
     - docker
     script:
-#    - bash ./ci/travis-build-raspbian-armhf.sh
     - travis_wait 40 sleep infinity & bash ./ci/travis-build-raspbian-armhf.sh
   - env:
     - OCPN_TARGET=buster-armhf
@@ -18,7 +17,6 @@ matrix:
     services:
     - docker
     script:
-#    - bash ./ci/travis-build-raspbian-armhf.sh
     - travis_wait 40 sleep infinity & bash ./ci/travis-build-raspbian-armhf.sh
 deploy:
   provider: script
