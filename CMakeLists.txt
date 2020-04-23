@@ -23,7 +23,9 @@
 ##
 ## ----- Modify section below to include all the details for your plugin ----- ##
 ##
-
+## ====FRONTEND 2==============
+## 
+##  
 # define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
@@ -85,17 +87,12 @@ set(CLOUDSMITH_USER "rick-gleason")
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
 set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Rick's customization
+#set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
 
-# Prod builds repository url
-#set(PROD "unstable") #original repos
+# Set Cloudsmith upload repository suffix for each catalog
+
 set(PROD "prod")  #Standard Repos
-
-# Beta builds repository url
-#set(BETA "stable") #original Repos
-set(BETA "beta")       #Standard Repos
-
-# Alpha builds repository url
-#set(ALPHA "pkg") #original Repos 
+set(BETA "beta")  #Standard Repos
 set(ALPHA "alpha") #Standard Repos
 
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
@@ -111,6 +108,7 @@ set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
 ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
+
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -150,10 +148,9 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 set(PKG_NVR ${PACKAGE_NAME}-${PROJECT_VERSION})
 set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/versions/--version--/--filename--")
 
-#INCLUDE CMAKE #1 ------------------------------
-include("cmake/PluginSetup.cmake")
-#-----------------------------------------------
-
+#========================================================
+INCLUDE("cmake/PluginSetup.cmake")
+#========================================================
 
 if(DEFINED ENV{OCPN_TARGET})
     set(PACKAGING_NAME "${PKG_NVR}_${PKG_TARGET}-${PKG_TARGET_VERSION}-$ENV{OCPN_TARGET}")
@@ -231,9 +228,9 @@ endif()
 ## ----- Modify section above if there are special requirements for the plugin ----- ##
 ##
 
-#INCLUDE CMAKE #2 -----------------------------------------
+#===========================================================
 INCLUDE("cmake/PluginConfigure.cmake")
-#INCLUDE-----------------------------------------
+#===========================================================
 
 ##
 ## ----- Change below to match project requirements ----- ##

@@ -1,210 +1,267 @@
 ---
 version: 2
 jobs:
-   build-trusty:
-     docker:
-       - image: circleci/buildpack-deps:trusty-scm
-     environment:
-       - OCPN_TARGET:  trusty
-     steps:
-       - checkout
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ trusty main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: cat /etc/apt/sources.list
-       - run: chmod a+x ci/*.sh
-       - run: ci/circleci-build-trusty.sh
-       - run: ci/cloudsmith-upload.sh
-   build-xenial:
-     docker:
-       - image: circleci/buildpack-deps:xenial-scm
-     environment:
-       - OCPN_TARGET:  xenial
-     steps:
-       - checkout
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: cat /etc/apt/sources.list
-       - run: chmod a+x ci/*.sh
-       - run: ci/circleci-build-debian.sh
-       - run: ci/cloudsmith-upload.sh
-   build-bionic:
-     docker:
-       - image: circleci/buildpack-deps:bionic-scm
-     environment:
-       - OCPN_TARGET:  bionic
-     steps:
-       - checkout
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: cat /etc/apt/sources.list
-       - run: chmod a+x ci/*.sh
-       - run: ci/circleci-build-debian.sh
-       - run: ci/cloudsmith-upload.sh
-   build-bionic-gtk3:
-     docker:
-       - image: circleci/buildpack-deps:bionic-scm
-     environment:
-       - BUILD_GTK3: 1
-       - OCPN_TARGET:  bionic-gtk3
-     steps:
-       - checkout
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: cat /etc/apt/sources.list
-       - run: chmod a+x ci/*.sh
-       - run: ci/circleci-build-debian.sh
-       - run: ci/cloudsmith-upload.sh
-   build-buster:
-     docker:
-       - image: circleci/buildpack-deps:buster-scm
-     environment:
-       - OCPN_TARGET:  buster
-     steps:
-       - checkout
-       - run: >
-           echo "deb-src http://ftp.us.debian.org/debian buster main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: >
-           echo "deb-src http://ftp.us.debian.org/debian buster-updates main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: cat /etc/apt/sources.list
-       - run: chmod a+x ci/*.sh
-       - run: ci/circleci-build-debian.sh
-       - run: ci/cloudsmith-upload.sh
-   build-debian:
-     docker:
-       - image: circleci/buildpack-deps:xenial-scm
-     environment:
-       - OCPN_TARGET:  xenial
-       - CLOUDSMITH_PKG_EXT: deb
-     steps:
-       - checkout
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: >
-           echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main"
-           | sudo tee -a /etc/apt/sources.list
-       - run: cat /etc/apt/sources.list
-       - run: chmod a+x ci/*.sh
-       - run: bash ci/circleci-build-debian.sh
-       - run: bash ci/cloudsmith-upload.sh
-   build-flatpak:
-     machine:
-       image: circleci/classic:201808-01
-     environment:
-       - OCPN_TARGET:  flatpak
-       - CLOUDSMITH_PKG_EXT: gz
-     steps:
-       - checkout
-       - run: chmod a+x ci/*.sh
-       - run: bash ci/circleci-build-flatpak.sh
-       - run: bash ci/cloudsmith-upload.sh
-   build-fedora:
-     docker:
-         - image: fedora:29
-     environment:
-       - OCPN_TARGET:  fedora
-     steps:
-       - run: su -c "dnf install -q -y git openssh-clients openssh-server"
-       - checkout
-       - run: chmod a+x ci/*.sh
-       - run: ci/circleci-build-fedora.sh
-       - run: ci/cloudsmith-upload.sh
-   build-mingw:
-     docker:
-         - image: fedora:29
-     environment:
-       - OCPN_TARGET:  mingw
-       - CLOUDSMITH_PKG_EXT: exe
-     steps:
-       - run: su -c "dnf install -q -y git openssh-clients openssh-server"
-       - checkout
-       - run: chmod a+x ci/*.sh
-       - run: bash ci/circleci-build-mingw.sh
-       - run: bash ci/cloudsmith-upload.sh
-   build-macos:
-     macos:
-       xcode: "10.0.0"
-     environment:
-       - OCPN_TARGET:  macos
-       - CLOUDSMITH_PKG_EXT: pkg
-     steps:
-       - checkout
-       - run: chmod a+x ci/*.sh
-       - run: bash ci/circleci-build-macos.sh
-       - run: bash ci/cloudsmith-upload.sh
+    build-armhf-stretch:
+        machine: true
+        environment:
+        - OCPN_TARGET=stretch-armhf
+        - DOCKER_IMAGE=jongough/raspbian-stretch:latest
+        - BUILD_FLAGS=-j3
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run: ci/circleci-build-raspbian-armhf.sh
+        - run: ci/cloudsmith-upload.sh
+    build-armhf-buster:
+        machine: true
+        environment:
+        - OCPN_TARGET=buster-armhf
+        - DOCKER_IMAGE=jongough/raspbian-buster:plugin_build_tooling_current
+        - BUILD_FLAGS=-j3
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run: ci/circleci-build-raspbian-armhf.sh
+        - run: ci/cloudsmith-upload.sh
+    build-trusty:
+        docker:
+        - image: circleci/buildpack-deps:trusty-scm
+        environment:
+        - OCPN_TARGET:  trusty
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ trusty main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-trusty.sh
+        - run: ci/cloudsmith-upload.sh
+    build-xenial:
+        docker:
+        - image: circleci/buildpack-deps:xenial-scm
+        environment:
+        - OCPN_TARGET:  xenial
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - run: ci/cloudsmith-upload.sh
+    build-bionic:
+        docker:
+        - image: circleci/buildpack-deps:bionic-scm
+        environment:
+        - OCPN_TARGET:  bionic
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - run: ci/cloudsmith-upload.sh
+    build-bionic-gtk3:
+        docker:
+        - image: circleci/buildpack-deps:bionic-scm
+        environment:
+        - BUILD_GTK3: 1
+        - OCPN_TARGET:  bionic-gtk3
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - run: ci/cloudsmith-upload.sh
+    build-buster:
+        docker:
+        - image: circleci/buildpack-deps:buster-scm
+        environment:
+        - OCPN_TARGET:  buster
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian buster main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian buster-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - run: ci/cloudsmith-upload.sh
+    build-focal:
+        docker:
+        - image: circleci/buildpack-deps:focal-scm
+        environment:
+        - OCPN_TARGET:  focal
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - run: ci/cloudsmith-upload.sh
+#    build-debian:
+#        docker:
+#        - image: circleci/buildpack-deps:xenial-scm
+#        environment:
+#        - OCPN_TARGET:  xenial
+#        - CLOUDSMITH_PKG_EXT: deb
+#        steps:
+#        - checkout
+#        - run: >
+#            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial main"
+#            | sudo tee -a /etc/apt/sources.list
+#        - run: >
+#            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main"
+#            | sudo tee -a /etc/apt/sources.list
+#        - run: cat /etc/apt/sources.list
+#        - run: chmod a+x ci/*.sh
+#        - run: bash ci/circleci-build-debian.sh
+#        - run: bash ci/cloudsmith-upload.sh
+    build-flatpak:
+        machine:
+            image: circleci/classic:201808-01
+        environment:
+        - OCPN_TARGET:  flatpak
+        - CLOUDSMITH_PKG_EXT: gz
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-flatpak.sh
+        - run: bash ci/cloudsmith-upload.sh
+    build-fedora:
+        docker:
+        - image: fedora:29
+        environment:
+        - OCPN_TARGET:  fedora
+        steps:
+        - run: su -c "dnf install -q -y git openssh-clients openssh-server"
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-fedora.sh
+        - run: ci/cloudsmith-upload.sh
+    build-mingw:
+        docker:
+        - image: fedora:29
+        environment:
+        - OCPN_TARGET:  mingw
+        - CLOUDSMITH_PKG_EXT: exe
+        steps:
+        - run: su -c "dnf install -q -y git openssh-clients openssh-server"
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-mingw.sh
+        - run: bash ci/cloudsmith-upload.sh
+    build-macos:
+        macos:
+            xcode: "10.0.0"
+        environment:
+        - OCPN_TARGET:  macos
+        - CLOUDSMITH_PKG_EXT: pkg
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-macos.sh
+        - run: bash ci/cloudsmith-upload.sh
 workflows:
-  version: 2
-  build_all:
-    jobs:
-      - build-trusty:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
-      - build-xenial:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
-      - build-bionic:
-         filters:
-           branches:
-             ignore:
-              - devel
-              - tmp
-      - build-bionic-gtk3:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
-      - build-buster:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
-      - build-flatpak:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
-      - build-fedora:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
-      - build-mingw:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
-      - build-macos:
-         filters:
-           branches:
-             ignore:
-               - devel
-               - tmp
+    version: 2
+    build_all:
+        jobs:
+        - build-armhf-stretch:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-armhf-buster:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-trusty:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-xenial:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-bionic:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-bionic-gtk3:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-buster:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-focal:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-flatpak:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-fedora:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-mingw:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+        - build-macos:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp

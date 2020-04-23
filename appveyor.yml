@@ -49,7 +49,11 @@ before_build:
   - cmake -T v141_xp ..
 
 build_script:
+  - cmake -G "Visual Studio 15 2017"   ..
   - cmake --build . --target package --config Release
+  - cmake --build . --target install --config RelWithDebInfo
+  - cmake --build . --target package --config RelWithDebInfo
+  - choco install git
   - python -m ensurepip
   - python -m pip install -q setuptools
   - python -m pip install -q cloudsmith-cli

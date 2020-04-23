@@ -10,7 +10,7 @@
 # If the environment variable CLOUDSMITH_PROD_REPO exists it is
 # used as the production repo, defaulting to the hardcoded PROD_REPO
 # value. Likewise for CLOUDSMITH_BETA_REPO and BETA_REPO and
-# CLOUDSMITH_ALPHA_REPO and ALPHA_REPO
+# CLOUDSMIT_ALPHA_RERP and ALPHA_REPO
 #
 
 set -xe
@@ -54,7 +54,9 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
     if pyenv versions 2>&1 >/dev/null; then
         pyenv versions
         if ! pyenv global 3.7.1 2>&1 >/dev/null; then
-        pyenv global 3.7.0
+            if ! pyenv global 3.7.0 2>&1>/dev/null; then
+                pyenv global 3.5.2
+            fi
         fi
         #pyenv global 3.7.1
         python3 -m pip install --upgrade pip
@@ -98,7 +100,6 @@ source $BUILD_DIR/pkg_version.sh
 tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
 pkg=$(ls $BUILD_DIR/*.${PKG_EXT})
 
-# source $BUILD_DIR/pkg_version.sh
 echo $BUILD_BRANCH
 echo $BUILD_TAG
 echo ${#BUILD_TAG}
@@ -159,26 +160,20 @@ if [ "$TRAVIS" ] || [ "$CIRCLECI" ]; then
     mkdir build_tar
     cp $tarball_tar build_tar/.
     cd build_tar
-    ls -l
     tar -xf $tarball_tar
     rm *.tar
     cp ../metadata.xml .
-    ls -l
     tar -cf build_tarfile.tar *
     tar -tf build_tarfile.tar
     rm ../$tarball_tar
-    ls -l ../
     cp build_tarfile.tar ../$tarball_tar
     cd ..
-    ls -l
     rm -rf build_tar
 else
     tar -rf $tarball_tar metadata.xml
 fi
-ls -l
 tar -tf $tarball_tar
 gzip $tarball_tar
-ls -l
 cd $cur_dir
 pwd
 ls -la

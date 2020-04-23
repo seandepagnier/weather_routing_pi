@@ -2,7 +2,11 @@
 -----------------------------------------------------
 #### Important: 
 1. Make these changes on a new branch "frontend1" or "ci" (if possible).
-1. Keep your currently working "master" branch intact. 
+1. Keep your currently working "master" branch intact.
+1. Create a new branch EG: git checkout -b master-frontend2 master
+1. Work in the new branch.
+
+#### Preparation: 
 1. Rename CMakeLists.txt ----> CMakeLists.save.txt for reference
 1. Rename appveyor.yml ----> appveyor.save.yml for reference
 1. Rename .travis.yml ----> .travis.save.yml for reference
@@ -21,78 +25,68 @@
 #### Add these Directories + Sub-directories + Files
 
 Copy the following directories and files from testplugin_pi to the same location in the plugin directory you are working on:
-testplugin_pi/.circleci
-testplugin_pi/api-16
-testplugin_pi/ci
-testplugin_pi/cmake
-testplugin_pi/buildosx
-testplugin_pi/debian
-testplugin_pi/mingw
-
-NOTE: testplugin_pi/lib was copied over to weather_routing
+- testplugin_pi/.circleci
+- testplugin_pi/api-16
+- testplugin_pi/ci
+- testplugin_pi/cmake
+- testplugin_pi/buildosx
+- testplugin_pi/debian
+- testplugin_pi/mingw
 
 #### Files
-testplugin_pi/CMakeLists.txt
-testplugin_pi/appveyor.yml
-testplugin_pi/.travis.yml
+- testplugin_pi/appveyor.yml
+- testplugin_pi/.travis.yml
+- testplugin_pi/CMakeLists.txt
 
 #### Directories NOT needed
 The following directories and files are not needed from testplugin_pi
-testplugin_pi/data
-testplugin_pi/forms
-testplugin_pi/extinclude
-testplugin_pi/extsrc
-testplugin_pi/include
-testplugin_pi/lib
-testplugin_pi/ocpninclude
-testplugin_pi/ocpnsrc
-testplugin_pi/src
-
+- testplugin_pi/data
+- testplugin_pi/forms
+- testplugin_pi/extinclude
+- testplugin_pi/extsrc
+- testplugin_pi/include
+- testplugin_pi/lib
+- testplugin_pi/ocpninclude
+- testplugin_pi/ocpnsrc
+- testplugin_pi/src
 
 # CHANGES REQUIRED
 ----------------------------------------------------------------
 1. Rename CMakeLists.txt, appveyor.yml, .travis.yml adding  .save for reference.
 1. Modify CMakeLists.txt file, following the in-line notes
- (not completed, draft from FrontEnd1.00).
-   - Modify Plugin Specifics & Git details Ln 20 to 40.
-   - Determine CommonName and enter properly.
-   - Edit Cloudsmith User about Ln 66
-   - Edit Cloudsmith Base Repository if necessary Ln 67
-   - Edit XMl Info, Summary and Description Ln 70 to 75
-   - Modify/configure below about Ln 217 to match project requirements
-   - For Weatherrouting example. Copy and paste all  "set(SRCS_"  down to "ADD_LIBRARY (LIB BZIP..."
-   - After add_definitions(-DUSE_S57) comment out all testplugin "set(.."
-   - From Ln 190 to Ln 296 remove everything between "Change below and change above to match project requirements.
-1. You may have to copy/move some of the files in your cmake.save directory over to cmake if your plugin depends on those files.   
-
-Down to here and pushed. Below is old.
-
-1. Check that buildosx/InstallOSX/plugin_pi.pkgproj.in exists
-   - PluginPackage.cmake Ln 184 has a configure_file to make this file.
-   - File inside is generic and uses a variable for plugin project name (7x's inside file).
-1. Modify flatpak\org.opencpn.OpenCPN.Plugin.oesenc.yaml filename
-   - Rename to <verbose_name> and rename all 3 instances of previous name to <verbose_name>.
-   - See Line 233 for more instructions.
-1. Modify cmake/PluginConfigure.cmake: Ln 56 -Only if necessary (squiddio req'd) 
-   - Change to SET(wxWidgets_USE_LIBS base core net xml html adv aui)
-   - adding 'aui' due to errors for aui.
-1. Modify src/squiddioPrefsDialogBase.h
-   - Removed first line: #include "wxWTranslateCatalog.h" due to errors.
-   - "cmake/wxWTranslateCatalog.h.in" is not working right now.
-1. First get the ci/environment scripts working on Circleci, Appveyor and .travis-ci
-1. Then get the uploads to Cloudsmith working. Also see CMakeLists.txt Ln 66
-   - Example Cloudsmith path uploads
+   - Modify Plugin Specifics about Line 20 to 75.
+   - Enter the 5 name types
+   - Determine CommonName by searching <plugin>_pi.cpp for "GetCommon" and enter that into set(CommonName)
+   - Enter the current version numbers and data
+   - Enter Parent, Package and Git User. Git Repository
+   - Enter Cloudsmith User and (optional) Cloudsmith Base Repository 
+   - Enter XML Info_url, Summary and Description
+   - In the section that replaces testplugin specific code:
+     - Modify/configure the set(SRCS and HDRS and 'Include' Directories using CMakeLists.save.txt
+     - Modify/configure 'Set(SRCS & HDRS' Directories using CMakeLists.save.txt
+     - Modify/configure 'Add Library' listings for the plugin.
+     - Make sure all your necesary libraries are found.
+     - Add/Modify a statement like this to join all of your project's set(
+       - EG: add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${NMEA0183} ${LIBSSRC})
+1. Cmake Files are somewhat generic, but often can be plugin specific, depending on the plugin.
+   - Review the cmake.save files one by one with the new ones and make necessary adjustments.
+   - Configuring this is not simple and requires knowledge about the plugin operation.
+1. Next get the ci/environment scripts working on Circleci, Appveyor and .travis-ci
+1. Then get the uploads to Cloudsmith working.
+   - Configuration of uploads to Cloudsmith destinations:
+     - ci\cloudsmith-upload.sh points to  ..cmake\in-files\cloudsmith-upload.sh.in
+     - See for standard repository directories.
+       - @CLOUDSMITH_BASE_REPOSITORY@-prod
+       - @CLOUDSMITH_BASE_REPOSITORY@-beta
+       - @CLOUDSMITH_BASE_REPOSITORY@-alpha
+     - Default 'CLOUDSMITH_BASE_REPOSTORY' is your 'Github Repository', set in CMakeLists.txt
+     - In your free Cloudsmith Account set up the prod, beta and alpha 'open source" repositories.
+     - See the instrustions in the Developer's Manual wiki.
+   - For custom Cloudsmith repository destinations, modify if needed.
+     - Example custom Cloudsmith path uploads
+     - Mauro's repositories https://cloudsmith.io/~mauro-calvi/repos/
      - OCPN_STABLE_REPO=mauro-calvi/squiddio-stable
      - OCPN_UNSTABLE_REPO=mauro-calvi/squiddio-pi
      - OCPN_PKG_REPO=mauro-calvi/squiddio-manual
-     - Mauro's repositories https://cloudsmith.io/~mauro-calvi/repos/
-   - Script path for uploads
-     - .travis.yml ---> ci/travis-build-raspbian-armhf.sh 
-     - appveyor.yml ---> ci/appveyor-uploads.sh
-     - circleci scripts --->ci/circleci-upload.sh generally except trusty.
-   - Configure uploads to Cloudsmith
-     - ci/circleci-upload.sh modify Cloudsmith destinations
-     - ci/appveyor-uploads.sh modify Cloudsmith destinations
-     - ci/travis-build-raspbian-armhf.sh -modify Cloudsmith destinations
+    
    
-  
