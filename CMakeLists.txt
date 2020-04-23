@@ -113,11 +113,11 @@ set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
-
+option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 set(CMAKE_CXX_STANDARD 11)
 
-option(PLUGIN_USE_SVG "Use SVG graphics" ON)
-
+# Prefer libGL.so to libOpenGL.so, see CMP0072
+set(OpenGL_GL_PREFERENCE "LEGACY")
 
 if(NOT ${PACKAGE} MATCHES "(.*)_pi")
   set(PACKAGE_NAME ${PACKAGE}_pi)
@@ -136,8 +136,6 @@ set(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message(STATUS "${VERBOSE_NAME} Version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
 message(STATUS "OPCN_FLATPAK: ${OCPN_FLATPAK}")
 
-# Prefer libGL.so to libOpenGL.so, see CMP0072
-set(OpenGL_GL_PREFERENCE "LEGACY")
 
 # Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
@@ -244,29 +242,6 @@ INCLUDE("cmake/PluginConfigure.cmake")
 ##
 
 add_definitions(-DUSE_S57)
-# What is this for?
-
-#From older Master cmakelists.txt
-#IF(PLUGIN_USE_SVG)
-#    MESSAGE(STATUS "SVG support enabled...")
-#    IF(NOT QT_ANDROID)
-#        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
-#    ENDIF(NOT QT_ANDROID)
-#ENDIF(PLUGIN_USE_SVG)
-
-
-
-#======== Below from cmakelists.txt  testplugin_pi
-#========REMOVE LN 194 to LN 296 from testplugin_pi
-#set(SRCS
-#set(HDRS
-#  down to end of
-#    ELSE(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#      MESSAGE(STATUS "Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
-#    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
-#ENDIF(UNIX AND NOT APPLE)
-#======== Above from cmakelists.txt  testplugin_pi
 
 #======== Below from cmakelists.txt  weather_routing_pi
 
@@ -377,6 +352,19 @@ SET(SRC_LIBTESS2
 #			 src/jsoncpp/json_value.cpp
 #			 src/jsoncpp/json_writer.cpp
 #)
+		# Added and tried by Rick 
+#SET (SRC_JSON
+#   src/jsoncpp/json/json.h
+#   src/jsoncpp/json/assertions.h
+#   src/jsoncpp/json/autolink.h
+#   src/jsoncpp/json/config.h
+#   src/jsoncpp/json/forwards.h
+#   src/jsoncpp/json/reader.h
+#   src/jsoncpp/json/value.h
+#   src/jsoncpp/json/writer.h
+#   src/jsoncpp/json_batchallocator.h
+#   src/jsoncpp/json_tool.h)  #rick added
+         				  
 
 # Commented out doubles
 # SET(SRC ${SRCS} ${SRC_LIBTESS2})
@@ -384,7 +372,7 @@ SET(SRC_LIBTESS2
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${BZIP2} ${JSONCPP} )
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${ZLIB} ${BZIP2} ${JSONCPP} )
 
-SET(SRC ${SRCS}  ${HDRS} ${SRC_LIBTESS2} ${SRC_PLUGINGL} ${SRC_TINYXML})
+SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} ${SRC_TINYXML} ${SRC_PLUGINGL})
 
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
