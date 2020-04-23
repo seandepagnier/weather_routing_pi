@@ -1,6 +1,12 @@
 # ---------------------------------------------------------------------------
 # Author:      jongough aka. Jon Gough Copyright: License:     wxWidgets License
 # ---------------------------------------------------------------------------
+# CMake-CI Number: 0.0.003  
+#    - 2/19/2020 added Update build to create all 10 environments needed for beta testing.
+#    - 2/19/2020 fixed debian build
+#    - 2/19/2020 Add raspian build capability
+#    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
+#    - 3/1/2020  fix raspian xml target-url with if-then
 ##---------------------------------------------------------------------------
 ## Author:      Sean d'Epagnier
 ##***************************************************************************
@@ -48,7 +54,7 @@ set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "6")
 set(VERSION_TWEAK "1")
-set(VERSION_DATE "04/03/2020")
+set(VERSION_DATE "04/23/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -87,19 +93,17 @@ set(CLOUDSMITH_USER "rick-gleason")
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
 set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Rick's customization
-#set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
 
 # Set Cloudsmith upload repository suffix for each catalog
-
 set(PROD "prod")  #Standard Repos
 set(BETA "beta")  #Standard Repos
 set(ALPHA "alpha") #Standard Repos
 
+# Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
 
-#set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
 
 ##
 ## ----- Modify section above to include all the details for your plugin ----- ##
@@ -108,10 +112,12 @@ set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
 ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
+set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
+
+set(CMAKE_CXX_STANDARD 11)
 
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
-set(CMAKE_CXX_STANDARD 11)
 
 if(NOT ${PACKAGE} MATCHES "(.*)_pi")
   set(PACKAGE_NAME ${PACKAGE}_pi)
@@ -132,10 +138,11 @@ message(STATUS "OPCN_FLATPAK: ${OCPN_FLATPAK}")
 
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
-# Don't use local version of GLU library
 
+# Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
-option(USE_GL "Enable OpenGL support" OFF)
+
+option(USE_GL "Enable OpenGL support" ON)
 message(STATUS "USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -144,7 +151,6 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# set(PKG_NVR ${PACKAGE_NAME}-${PROJECT_VERSION}-${OCPN_MIN_VERSION}-${OCPN_API_VERSION_MAJOR}.${OCPN_API_VERSION_MINOR})
 set(PKG_NVR ${PACKAGE_NAME}-${PROJECT_VERSION})
 set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/versions/--version--/--filename--")
 
@@ -163,30 +169,31 @@ set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-option(Plugin_CXX11 "Use c++11" OFF)
+#option(Plugin_CXX11 "Use c++11" OFF)
 
-if(Plugin_CXX11)
-  message(STATUS "Attempting to use c++11")
-  include(CheckCXXCompilerFlag)
-  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-  if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    set(Plugin_USE_CXX11 ON)
-  elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    set(Plugin_USE_CXX11 ON)
-  else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-    set(Plugin_USE_CXX11 OFF)
-  endif()
-else()
-  set(Plugin_USE_CXX11 OFF)
-endif()
+# Master version of cmakelists.txt has this commented out
+#if(Plugin_CXX11)
+#  message(STATUS "Attempting to use c++11")
+#  include(CheckCXXCompilerFlag)
+#  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+#  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+#  if(COMPILER_SUPPORTS_CXX11)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#    set(Plugin_USE_CXX11 ON)
+#  elseif(COMPILER_SUPPORTS_CXX0X)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+#    set(Plugin_USE_CXX11 ON)
+#  else()
+#    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+#    set(Plugin_USE_CXX11 OFF)
+#  endif()
+#else()
+#  set(Plugin_USE_CXX11 OFF)
+#endif()
 
-if(Plugin_USE_CXX11)
-  message(STATUS "Allowing use of c++11")
-endif()
+#if(Plugin_USE_CXX11)
+#  message(STATUS "Allowing use of c++11")
+#endif()
 
 message(STATUS "CMAKE version: ${CMAKE_VERSION}")
 if(CMAKE_VERSION VERSION_GREATER 3.4)
@@ -239,6 +246,16 @@ INCLUDE("cmake/PluginConfigure.cmake")
 add_definitions(-DUSE_S57)
 # What is this for?
 
+#From older Master cmakelists.txt
+#IF(PLUGIN_USE_SVG)
+#    MESSAGE(STATUS "SVG support enabled...")
+#    IF(NOT QT_ANDROID)
+#        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
+#    ENDIF(NOT QT_ANDROID)
+#ENDIF(PLUGIN_USE_SVG)
+
+
+
 #======== Below from cmakelists.txt  testplugin_pi
 #========REMOVE LN 194 to LN 296 from testplugin_pi
 #set(SRCS
@@ -290,17 +307,17 @@ SET(SRC_LIBTESS2
              src/libtess2/tess.c
 )
   
-# SET(SRC_PLUGINGL
-#             src/plugingl/linmath.h
-#             src/plugingl/pidc.h
-#             src/plugingl/qtstylesheet.h
-#             src/plugingl/TexFont.h
-#)
+ SET(SRC_PLUGINGL
+             src/plugingl/linmath.h
+             src/plugingl/pidc.h
+             src/plugingl/qtstylesheet.h
+             src/plugingl/TexFont.h
+)
 
-# SET (SRC_TINYXML
-#             src/tinyxml/tinystr.h
-#			 src/tinyxml/tinyxml.h
-#)
+ SET (SRC_TINYXML
+             src/tinyxml/tinystr.h
+			 src/tinyxml/tinyxml.h
+)
 
 # SET  (SRC_ZLIB
 #             src/zlib-1.2.3/zconf.h
@@ -325,49 +342,55 @@ SET(SRC_LIBTESS2
 #)
 
 # Commented out doubles
+# SET(SRC ${SRCS} ${SRC_LIBTESS2})
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} )
-# SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${ZLIB} ${BZIP2} ${JSONCPP} )
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${BZIP2} ${JSONCPP} )
-# SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${BZIP2})
-SET(SRC ${SRCS} ${SRC_LIBTESS2})
+# SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${ZLIB} ${BZIP2} ${JSONCPP} )
 
-#ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
+SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML})
+
+##================================================================================
+## Required to collect all the set( headers and SRCS  - Adjust as required
+## This add_library  is used in the conditionals below.
+##================================================================================
+## EG:   add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
+##================================================================================
+
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
 
-#INCLUDE_DIRECTORIES(src/zlib-1.2.3)
-#INCLUDE_DIRECTORIES(src/bzip2)
 
-#IF(NOT UNIX)
-#    SET(SRC_BZIP	
-#            src/bzip2/bzlib.c
-#            src/bzip2/blocksort.c
-#            src/bzip2/compress.c
-#            src/bzip2/crctable.c
-#            src/bzip2/decompress.c
-#            src/bzip2/huffman.c
-#            src/bzip2/randtable.c
-#			src/bzip2/bzlib_private.h
-#    )
-#    ADD_LIBRARY(LIB_BZIP_WR STATIC ${SRC_BZIP})
-#    TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP_WR )
-#    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/bzip2)
-#ENDIF(NOT UNIX)
+IF(NOT UNIX)
+    SET(SRC_BZIP	
+            src/bzip2/bzlib.c
+            src/bzip2/blocksort.c
+            src/bzip2/compress.c
+            src/bzip2/crctable.c
+            src/bzip2/decompress.c
+            src/bzip2/huffman.c
+            src/bzip2/randtable.c
+			src/bzip2/bzlib_private.h
+    )
+    ADD_LIBRARY(LIB_BZIP_WR STATIC ${SRC_BZIP})
+    TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP_WR )
+    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/bzip2)
+ENDIF(NOT UNIX)
 
-#IF(NOT UNIX)
-#    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
-#    INCLUDE_DIRECTORIES(src/bzip2)
-#ENDIF(NOT UNIX)
+IF(NOT UNIX)
+    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
+    INCLUDE_DIRECTORIES(src/bzip2)
+ENDIF(NOT UNIX)
 
-#IF(WIN32)
-#  IF(MSVC)
-#    INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/buildwin/include)
-#    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
-#  ELSE()
-#    # MINGW
-##    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lwxzlib-2.8")
-#    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lz")
-#  ENDIF()
-#ENDIF()
+IF(WIN32)
+  IF(MSVC)
+    INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/buildwin/include)
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
+  ELSE()
+    # MINGW
+#    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lwxzlib-2.8")
+    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lz")
+  ENDIF()
+ENDIF()
 
 #======== Above from cmakelists.txt  weather_routing_pi=========
 #========REMOVE LN 194 to LN 296 from Testplugin_pi
@@ -376,56 +399,19 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2})
 ##
 
 
-
-
-# From squiddio!!
-##================================================================================
-## Required to collect all the set( headers and SRCS  - Adjust as required
-## This add_library  is used in the conditionals below.
-##================================================================================
-##    add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
-##================================================================================
-
-ADD_DEFINITIONS(-DTIXML_USE_STL)
-
-#IF(UNIX AND NOT APPLE)
-#    INCLUDE("cmake/FindTinyXML.cmake")
-#    FIND_PACKAGE(TinyXML QUIET)
-#ENDIF(UNIX AND NOT APPLE)
-
-#IF(TINYXML_FOUND)
-#    message (STATUS "Building with system tinyxml")
-#    INCLUDE_DIRECTORIES(${TINYXML_INCLUDE_DIR})
-##    ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${SRC_NMEA0183})
-#	ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
-#    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${TINYXML_LIBRARIES} )
-#ELSE(TINYXML_FOUND)
-#    message (STATUS "Building with embedded tinyxml")
-#    SET(SRC_LTINYXML
-#    src/tinyxml/tinyxml.h
-#    src/tinyxml/tinystr.h
-#      )
-#    ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${SRC_NMEA0183} ${SRC_LTINYXML})
-#	ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
-#ENDIF(TINYXML_FOUND)
-
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
-
-# Above from Squiddio
-
 ##
 ## ----- Change above to match project requirements ----- ##
 ##
 
 # Jon identified these were missing causing json/json.h and other problems.
 #----INCLUDE CMAKE #3 & #4 -----
-include("cmake/PluginGL.cmake")
-include("cmake/PluginJSON.cmake")
-include("cmake/PluginXML.cmake")
+INCLUDE("cmake/PluginJSON.cmake")
+INCLUDE("cmake/PluginXML.cmake")
+INCLUDE("cmake/PluginGL.cmake")
 ##
 ## ----- do not change - needed to build app ----- ##
 ##
 #INCLUDE CMAKE #5,6 & 7 -----
-include("cmake/PluginInstall.cmake")
-include("cmake/PluginLocalization.cmake")
-include("cmake/PluginPackage.cmake")
+INCLUDE("cmake/PluginInstall.cmake")
+INCLUDE("cmake/PluginLocalization.cmake")
+INCLUDE("cmake/PluginPackage.cmake")
