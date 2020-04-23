@@ -297,6 +297,41 @@ SET(SRCS
             src/GribRecord.cpp
 )
 
+# Added and tried by Rick
+SET (HDRS
+            src/weather_routing_pi.h
+            src/WeatherRouting.h
+            src/ConfigurationDialog.h
+            src/SettingsDialog.h
+            src/PlotDialog.h
+            src/BoatDialog.h
+            src/StatisticsDialog.h
+            src/ReportDialog.h
+            src/FilterRoutesDialog.h
+            src/ConfigurationBatchDialog.h
+            src/EditPolarDialog.h
+            src/AboutDialog.h
+            src/Polar.h
+            src/Boat.h
+            src/RouteMap.h
+            src/RouteMapOverlay.h
+            src/Utilities.h
+            src/LineBufferOverlay.h
+            src/PolygonRegion.h
+            src/WeatherRoutingUI.h
+            src/icons.h
+            src/zuFile.h
+            src/georef.h
+            src/GribRecord.h
+# recently by rick			
+            src/tinyxml/tinyxml.h
+            src/tinyxml/tinystr.h
+            src/jsoncpp/json/json.h
+#			api-16/ocpn_plugin.h
+
+)   #added by Rick
+
+
 SET(SRC_LIBTESS2
              src/libtess2/bucketalloc.c
              src/libtess2/dict.c
@@ -314,10 +349,12 @@ SET(SRC_LIBTESS2
              src/plugingl/TexFont.h
 )
 
+# added by rick
  SET (SRC_TINYXML
              src/tinyxml/tinystr.h
 			 src/tinyxml/tinyxml.h
-)
+)  
+
 
 # SET  (SRC_ZLIB
 #             src/zlib-1.2.3/zconf.h
@@ -347,7 +384,7 @@ SET(SRC_LIBTESS2
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${BZIP2} ${JSONCPP} )
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${ZLIB} ${BZIP2} ${JSONCPP} )
 
-SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML})
+SET(SRC ${SRCS}  ${HDRS} ${SRC_LIBTESS2} ${SRC_PLUGINGL} ${SRC_TINYXML})
 
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
