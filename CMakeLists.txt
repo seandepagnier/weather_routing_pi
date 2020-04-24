@@ -381,7 +381,7 @@ SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} ${SRC_TINYXML} ${SRC_PLUGINGL})
 ## EG:   add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
 ##================================================================================
 
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
+ADD_LIBRARY(${PACKAGE_NAME} STATIC ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
 
 
