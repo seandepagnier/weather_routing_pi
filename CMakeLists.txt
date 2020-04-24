@@ -1,11 +1,28 @@
-# ---------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough        wxWidgets License
-# ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.003
-# Remove "libs"  from testplugin not used.
-#----------------------------------------------------------------------------
-# Plugin Author: Sean d'Epagnier   GLPv2
+
+##---------------------------------------------------------------------------
+## Author:      Sean d'Epagnier
+##***************************************************************************
+## *   Copyright (C) 2010 by Sean d'Epagnier                              *
+## *   This program is free software; you can redistribute it and/or modify  *
+## *   it under the terms of the GNU General Public License as published by  *
+## *   the Free Software Foundation; either version 2 of the License, or     *
+## *   (at your option) any later version.                                   *
+## *                                                                         *
+## *   This program is distributed in the hope that it will be useful,       *
+## *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+## *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+## *   GNU General Public License for more details.                          *
+## *                                                                         *
+## *   You should have received a copy of the GNU General Public License     *
+## *   along with this program; if not, write to the                         *
+## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
+## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
+# Frontend2 Author: Jon Gough  
+# ---------------------------------------------------------------------------
+# CMake-CI Number: 0.0.003  
+## ---------------------------------------------------------------------------
+# ----- Modify section below to include all the details for your plugin ----- ##
 
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
@@ -40,8 +57,11 @@ set(PARENT "opencpn")
 set(PACKAGE "weather_routing")  #used for Package name
 #set(GIT_USER "seandepagnier")  #for Sean
 set(GIT_USER "rgleason")
+
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
 message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
+
+# Allows setup of a local webserver with git for testing
 if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
@@ -51,15 +71,26 @@ if($ENV{CIRCLECI})
 #  set(GIT_REPOSITORY_DIR "")
 #  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
 endif()
+message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
+
 # set(CLOUDSMITH_USER "sean-depagnier")
 set(CLOUDSMITH_USER "rick-gleason")
+
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
-set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")
+set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins") #Rick's customization
+
+# Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing Plugin optimizes weather routing")
+
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
+
+##
+## ----- Modify above to include all the plugin details --------- ##
+## ----- Modify below for plugin special requirements------------ ##
+##
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -152,9 +183,13 @@ endif()
 
 # SET_DIRECTORY_PROPERTIES(dummy ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/include/version.h)
 
+#
+# ----- Modify section above for special plugin requirements----- ##
 #=================================================================================
 INCLUDE("cmake/PluginConfigure.cmake")
 #=================================================================================
+# ----- Change below to match project requirements ----- ##
+#
 
 add_definitions(-DUSE_S57)  #???  What is this for? Needed?
 
@@ -165,9 +200,7 @@ IF(PLUGIN_USE_SVG)
     ENDIF(NOT QT_ANDROID)
 ENDIF(PLUGIN_USE_SVG)
 
-
-
-#======== From cmakelists.txt  weather_routing_pi
+#======== Below from cmakelists.txt  weather_routing_pi
 
 SET(SRCS
             src/weather_routing_pi.cpp
@@ -196,6 +229,37 @@ SET(SRCS
             src/GribRecord.cpp
 )
 
+# Added and tried by Rick
+SET (HDRS
+            src/weather_routing_pi.h
+            src/WeatherRouting.h
+            src/ConfigurationDialog.h
+            src/SettingsDialog.h
+            src/PlotDialog.h
+            src/BoatDialog.h
+            src/StatisticsDialog.h
+            src/ReportDialog.h
+            src/FilterRoutesDialog.h
+            src/ConfigurationBatchDialog.h
+            src/EditPolarDialog.h
+            src/AboutDialog.h
+            src/Polar.h
+            src/Boat.h
+            src/RouteMap.h
+            src/RouteMapOverlay.h
+            src/Utilities.h
+            src/LineBufferOverlay.h
+            src/PolygonRegion.h
+            src/WeatherRoutingUI.h
+            src/icons.h
+            src/zuFile.h
+            src/georef.h
+            src/GribRecord.h
+            src/tinyxml/tinyxml.h
+            src/tinyxml/tinystr.h
+            src/jsoncpp/json/json.h
+)
+
 SET(SRC_LIBTESS2
              src/libtess2/bucketalloc.c
              src/libtess2/dict.c
@@ -215,7 +279,7 @@ SET(SRC_LIBTESS2
 
  SET (SRC_TINYXML
              src/tinyxml/tinystr.h
-			 src/tinyxml/tinyxml.h
+             src/tinyxml/tinyxml.h
 )
 
 # SET  (SRC_ZLIB
@@ -233,10 +297,39 @@ SET(SRC_LIBTESS2
 #			 src/bzip2/huffman.c
 #			 src/bzip2/randtable.c
 #)
-			 
 
-SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} )
+# Added and tried by Rick
+# SET   (SRC_JSONCPP
+#			 src/jsoncpp/json_reader.cpp
+#			 src/jsoncpp/json_value.cpp
+#			 src/jsoncpp/json_writer.cpp
+#)
+
+# Added and tried by Rick 
+# SET (SRC_JSON
+#   src/jsoncpp/json/json.h
+#   src/jsoncpp/json/assertions.h
+#   src/jsoncpp/json/autolink.h
+#   src/jsoncpp/json/config.h
+#   src/jsoncpp/json/forwards.h
+#   src/jsoncpp/json/reader.h
+#   src/jsoncpp/json/value.h
+#   src/jsoncpp/json/writer.h
+#   src/jsoncpp/json_batchallocator.h
+#   src/jsoncpp/json_tool.h
+#)
+
+SET(SRC ${SRCS} ${SRC_LIBTESS2} ${SRC_PLUGINGL} ${SRC_TINYXML} )
+
+##================================================================================
+## Required to collect all the set( headers and SRCS  - Adjust as required
+## This add_library  is used in the conditionals below.
+##================================================================================
+## EG:   add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
+##================================================================================
+
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
+#Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
@@ -269,13 +362,19 @@ IF(WIN32)
   ENDIF()
 ENDIF()
 
+#--------Above from cmakelists.txt  weather_routing_pi------------
+#--------REMOVE LN 194 to LN 296 from Testplugin_pi---------------
+#------- Change below to match project requirements --------------
 
-#======== Above from cmakelists.txt  weather_routing_pi=========
-#==========Below is from WxRoute cmakelists.txt========
+# Jon identified these were missing causing json/json.h and other problems.
+#----INCLUDE CMAKE #3 & #4 -----
 INCLUDE("cmake/PluginJSON.cmake")
 INCLUDE("cmake/PluginXML.cmake")
 INCLUDE("cmake/PluginGL.cmake")
-
+#
+# ----- Do not change - needed to build app ----- ##
+#
+#INCLUDE CMAKE #5,6 & 7 -----
 INCLUDE("cmake/PluginInstall.cmake")
 INCLUDE("cmake/PluginLocalization.cmake")
 INCLUDE("cmake/PluginPackage.cmake")
