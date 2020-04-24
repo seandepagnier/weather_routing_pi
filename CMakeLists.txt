@@ -1,15 +1,12 @@
 # ---------------------------------------------------------------------------
-# Author:      jongough aka. Jon Gough Copyright: License:     wxWidgets License
+# Frontend2 Author: Jon Gough        wxWidgets License
 # ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.001  
-#    - 2/19/2020 added Update build to create all 10 environments needed for beta testing.
-#    - 2/19/2020 fixed debian build
-#    - 2/19/2020 Add raspian build capability
-#    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
-#    - 3/1/2020  fix raspian xml target-url with if-then
-#
-# define minimum cmake version
-# cmake_minimum_required(VERSION 2.8.12.2)  #for trusty
+# CMake-CI Number: 0.0.003
+# Remove "libs"  from testplugin not used.
+#----------------------------------------------------------------------------
+# Plugin Author: Sean d'Epagnier   GLPv2
+#-----------------------------------------------------------------------------
+
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
   if(POLICY CMP0043)
@@ -108,39 +105,14 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
 
  endif(CMAKE_SYSTEM_PROCESSOR MATCHES "arm*")
 
-include("cmake/PluginSetup.cmake")
-
+#=================================================================================
+INCLUDE("cmake/PluginSetup.cmake")
+#=================================================================================
 #========Below is specific to the plugin and is from testplugin  =================
 
 set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-
-# option(OD_CXX11 "Use c++11" OFF)
-
-# if(OD_CXX11)
-#  message(STATUS "Attempting to use c++11")
-#  include(CheckCXXCompilerFlag)
-#  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-#  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-#  if(COMPILER_SUPPORTS_CXX11)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#    set(Testplugin_USE_CXX11 ON)
-#  elseif(COMPILER_SUPPORTS_CXX0X)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-#    set(Testplugin_USE_CXX11 ON)
-#  else()
-#    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-#    set(Testplugin_USE_CXX11 OFF)
-#  endif()
-#else()
-#  set(Testplugin_USE_CXX11 OFF)
-#endif()
-
-#if(Testplugin_USE_CXX11)
-#  message(STATUS "Allowing use of c++11")
-#  add_definitions(-DTestplugin_USE_CXX11)
-#endif()
 
 message(STATUS "CMAKE version: ${CMAKE_VERSION}")
 if(CMAKE_VERSION VERSION_GREATER 3.4)
@@ -180,7 +152,9 @@ endif()
 
 # SET_DIRECTORY_PROPERTIES(dummy ADDITIONAL_MAKE_CLEAN_FILES ${PROJECT_SOURCE_DIR}/include/version.h)
 
-include("cmake/PluginConfigure.cmake")
+#=================================================================================
+INCLUDE("cmake/PluginConfigure.cmake")
+#=================================================================================
 
 add_definitions(-DUSE_S57)  #???  What is this for? Needed?
 
@@ -296,37 +270,7 @@ IF(WIN32)
 ENDIF()
 
 
-
 #======== Above from cmakelists.txt  weather_routing_pi=========
-#=========Below from cmakelists.txt testplugin==================
-
-#set(LIBHDRS
-#    libs/GL/include/gl.h
-#    libs/GL/include/gl_private.h
-#    libs/GL/include/glext.h
-#    libs/GL/include/glu.h
-#    libs/wx/include/json_defs.h
-#    libs/wx/include/jsonreader.h
-#    libs/wx/include/jsonval.h
-#    libs/wx/include/jsonwriter.h)
-	
-#option(TESTPLUGIN_USE_SVG "Use SVG graphics" ON)
-#add_definitions(-DTESTPLUGIN_USE_SVG)
-
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/extinclude)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/lz4)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/bitmaps)
-#add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${OCPNSRC} ${EX#TSRC} ${LIBSSRC})
-#add_library(${PACKAGE_NAME} SHARED ${HDRS} )
-
-#add_definitions(-DTIXML_USE_STL)
-
-#==========Above is from Testplugin cmakelists.txt ========
 #==========Below is from WxRoute cmakelists.txt========
 INCLUDE("cmake/PluginJSON.cmake")
 INCLUDE("cmake/PluginXML.cmake")
