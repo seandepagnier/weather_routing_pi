@@ -1,12 +1,3 @@
-# ---------------------------------------------------------------------------
-# Author:      jongough aka. Jon Gough Copyright: License:     wxWidgets License
-# ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.003  
-#    - 2/19/2020 added Update build to create all 10 environments needed for beta testing.
-#    - 2/19/2020 fixed debian build
-#    - 2/19/2020 Add raspian build capability
-#    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
-#    - 3/1/2020  fix raspian xml target-url with if-then
 ##---------------------------------------------------------------------------
 ## Author:      Sean d'Epagnier
 ##***************************************************************************
@@ -24,15 +15,19 @@
 ## *   You should have received a copy of the GNU General Public License     *
 ## *   along with this program; if not, write to the                         *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
-## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx          *
-## ***   
-##
-## ----- Modify section below to include all the details for your plugin ----- ##
-##
-## ====FRONTEND 2==============
-## 
-##  
-# define minimum cmake version
+## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
+#-----------------------------------------------------------------------------
+# Frontend2 Author: Jon Gough  
+# ---------------------------------------------------------------------------
+# CMake-CI Number: 0.0.004  
+#    - 2/19/2020 10 environments needed for beta testing.
+#    - 2/19/2020 fix debian build
+#    - 2/19/2020 Add raspian build
+#    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
+#    - 3/1/2020  fix raspian xml target-url with if-then
+# ---------------------------------------------------------------------------
+# ----- Modify section below to include all the details for your plugin ----- ##
+
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
   if(POLICY CMP0043)
@@ -44,8 +39,9 @@ if(COMMAND cmake_policy)
   endif(POLICY CMP0077)
 endif(COMMAND cmake_policy)
 
-set(VERBOSE_NAME "WeatherRouting") 
-set(COMMON_NAME "WeatherRouting")  # Search "getcommonname"in weather_routing_pi.cpp 
+set(VERBOSE_NAME "WeatherRouting")
+# Search "getcommonname"in weather_routing_pi.cpp  
+set(COMMON_NAME "WeatherRouting")  
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(PACKAGE "weather_routing_pi")
@@ -67,7 +63,8 @@ set(GIT_USER "rgleason")
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
 message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
 message(STATUS "TRAVIS: ${TRAVIS}, Env TRAVIS: $ENV{TRAVIS}")
-# This 'if' allows setup of a local webserver with git for testing
+
+# Allows setup of a local webserver with git for testing
 if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
@@ -91,6 +88,7 @@ message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
 set(CLOUDSMITH_USER "rick-gleason")
 
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
+#set(CLOUDSMITH_BASE_REPOSITORY "weather_routing_pi")  #Jon Gough's customization
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
 set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Rick's customization
 
@@ -104,16 +102,14 @@ set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
 
-
-##
-## ----- Modify section above to include all the details for your plugin ----- ##
-##
-
-##
-## ----- Modify section below if there are special requirements for the plugin ----- ##
-##
 set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
+
+##
+## ----- Modify above to include all the plugin details --------- ##
+## ----- Modify below for plugin special requirements------------ ##
+##
+
 set(CMAKE_CXX_STANDARD 11)
 
 # Prefer libGL.so to libOpenGL.so, see CMP0072
@@ -136,11 +132,11 @@ set(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message(STATUS "${VERBOSE_NAME} Version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
 message(STATUS "OPCN_FLATPAK: ${OCPN_FLATPAK}")
 
-
 # Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
 
-option(USE_GL "Enable OpenGL support" ON)
+# Not in Master branch. Question still needed? on or off?
+# option(USE_GL "Enable OpenGL support" ON)
 message(STATUS "USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -229,17 +225,13 @@ if(CMAKE_VERSION VERSION_GREATER 3.9)
   endif()
 endif()
 
-##
-## ----- Modify section above if there are special requirements for the plugin ----- ##
-##
-
+#
+# ----- Modify section above for special plugin requirements----- ##
 #===========================================================
 INCLUDE("cmake/PluginConfigure.cmake")
 #===========================================================
-
-##
-## ----- Change below to match project requirements ----- ##
-##
+# ----- Change below to match project requirements ----- ##
+#
 
 add_definitions(-DUSE_S57)
 
@@ -298,14 +290,10 @@ SET (HDRS
             src/zuFile.h
             src/georef.h
             src/GribRecord.h
-# recently by rick			
             src/tinyxml/tinyxml.h
             src/tinyxml/tinystr.h
             src/jsoncpp/json/json.h
-#			api-16/ocpn_plugin.h
-
-)   #added by Rick
-
+)
 
 SET(SRC_LIBTESS2
              src/libtess2/bucketalloc.c
@@ -352,7 +340,7 @@ SET(SRC_LIBTESS2
 #			 src/jsoncpp/json_value.cpp
 #			 src/jsoncpp/json_writer.cpp
 #)
-		# Added and tried by Rick 
+# Added and tried by Rick 
 #SET (SRC_JSON
 #   src/jsoncpp/json/json.h
 #   src/jsoncpp/json/assertions.h
@@ -372,8 +360,8 @@ SET(SRC_LIBTESS2
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${BZIP2} ${JSONCPP} )
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${ZLIB} ${BZIP2} ${JSONCPP} )
 
-SET(SRC ${SRCS} ${SRC_LIBTESS2})
-#SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
+#SET(SRC ${SRCS} ${SRC_LIBTESS2})
+SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
 #SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} ${SRC_TINYXML} ${SRC_PLUGINGL})
 
 ##================================================================================
@@ -419,25 +407,18 @@ IF(WIN32)
   ENDIF()
 ENDIF()
 
-#======== Above from cmakelists.txt  weather_routing_pi=========
-#========REMOVE LN 194 to LN 296 from Testplugin_pi
-##
-## ----- Change below to match project requirements ----- ##
-##
-
-
-##
-## ----- Change above to match project requirements ----- ##
-##
+#--------Above from cmakelists.txt  weather_routing_pi------------
+#--------REMOVE LN 194 to LN 296 from Testplugin_pi---------------
+#------- Change below to match project requirements --------------
 
 # Jon identified these were missing causing json/json.h and other problems.
 #----INCLUDE CMAKE #3 & #4 -----
 INCLUDE("cmake/PluginJSON.cmake")
 INCLUDE("cmake/PluginXML.cmake")
 INCLUDE("cmake/PluginGL.cmake")
-##
-## ----- do not change - needed to build app ----- ##
-##
+#
+# ----- Do not change - needed to build app ----- ##
+#
 #INCLUDE CMAKE #5,6 & 7 -----
 INCLUDE("cmake/PluginInstall.cmake")
 INCLUDE("cmake/PluginLocalization.cmake")
