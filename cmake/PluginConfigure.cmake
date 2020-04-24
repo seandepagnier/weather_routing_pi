@@ -105,7 +105,7 @@ else(MSVC)
 endif(MSVC)
 
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
-set(BUILD_SHARED_LIBS TRUE)
+set(BUILD_SHARED_LIBS FALSE)
 
 # Allow multiprocess compile
 if(MSVC)
@@ -319,7 +319,5 @@ if(QT_ANDROID)
   )
 
 endif(QT_ANDROID)
-
-set(BUILD_SHARED_LIBS TRUE)
 
 find_package(Gettext REQUIRED)
