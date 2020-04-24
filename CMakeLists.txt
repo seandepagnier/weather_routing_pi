@@ -335,13 +335,14 @@ SET(SRC_LIBTESS2
 #			 src/bzip2/randtable.c
 #)
 
-#SET   (SRC_JSONCPP
+# SET   (SRC_JSONCPP
 #			 src/jsoncpp/json_reader.cpp
 #			 src/jsoncpp/json_value.cpp
 #			 src/jsoncpp/json_writer.cpp
 #)
+
 # Added and tried by Rick 
-#SET (SRC_JSON
+# SET (SRC_JSON
 #   src/jsoncpp/json/json.h
 #   src/jsoncpp/json/assertions.h
 #   src/jsoncpp/json/autolink.h
