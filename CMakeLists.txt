@@ -373,8 +373,8 @@ SET(SRC_LIBTESS2
 # SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${ZLIB} ${BZIP2} ${JSONCPP} )
 
 #SET(SRC ${SRCS} ${SRC_LIBTESS2})
-SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
-#SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} ${SRC_TINYXML} ${SRC_PLUGINGL})
+#SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
+SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} ${SRC_TINYXML} ${SRC_PLUGINGL})
 
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
