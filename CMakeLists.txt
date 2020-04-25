@@ -49,8 +49,8 @@ set(PACKAGE "weather_routing_pi")
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "6")
-set(VERSION_TWEAK "2")
-set(VERSION_DATE "04/24/2020")
+set(VERSION_TWEAK "4")
+set(VERSION_DATE "04/26/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -73,19 +73,30 @@ elseif($ENV{TRAVIS})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
   set(GIT_REPOSITORY_BRANCH "$ENV{TRAVIS_BRANCH}")
+elseif($ENV{APPVEYOR})
+  set(GIT_REPOSITORY_HOST "github.com")
+  set(GIT_REPOSITORY_DIR "${GIT_USER}/")
+  set(GIT_REPOSITORY_BRANCH "$ENV{APPVEYOR_REPO_BRANCH}")
 else()
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-  set(GIT_REPOSITORY_BRANCH "master")
-#  set(GIT_REPOSITORY_HOST "git.eclipse.com.au")
-#  set(GIT_REPOSITORY_DIR "")
-#  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
+  # Get the current working branch
+  execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_REPOSITORY_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+  if(${GIT_REPOSITORY_BRANCH} EQUAL "")
+    message(STATUS "Setting default GIT repository branch - master")
+    set(GIT_REPOSITORY_BRANCH "master")
+  endif()
 endif()
 message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
 
 #set(CLOUDSMITH_USER "sean-depagnier") 
-#set(CLOUDSMITH_USER "jon-gough")
-set(CLOUDSMITH_USER "rick-gleason")
+set(CLOUDSMITH_USER "jon-gough")
+#set(CLOUDSMITH_USER "rick-gleason")
 
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "weather_routing_pi")  #Jon Gough's customization
@@ -372,7 +383,7 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
 ## EG:   add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
 ##================================================================================
 
-ADD_LIBRARY(${PACKAGE_NAME} STATIC ${SRC})
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
 
 
