@@ -49,8 +49,8 @@ set(PACKAGE "weather_routing_pi")
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "6")
-set(VERSION_TWEAK "2")
-set(VERSION_DATE "04/24/2020")
+set(VERSION_TWEAK "3")
+set(VERSION_DATE "04/26/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -372,7 +372,7 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
 ## EG:   add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
 ##================================================================================
 
-ADD_LIBRARY(${PACKAGE_NAME} STATIC ${SRC})
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
 
 
