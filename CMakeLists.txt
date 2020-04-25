@@ -95,8 +95,8 @@ endif()
 message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
 
 #set(CLOUDSMITH_USER "sean-depagnier") 
-set(CLOUDSMITH_USER "jon-gough")
-#set(CLOUDSMITH_USER "rick-gleason")
+#set(CLOUDSMITH_USER "jon-gough")
+set(CLOUDSMITH_USER "rick-gleason")
 
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "weather_routing_pi")  #Jon Gough's customization
