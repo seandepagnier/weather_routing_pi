@@ -320,6 +320,4 @@ if(QT_ANDROID)
 
 endif(QT_ANDROID)
 
-set(BUILD_SHARED_LIBS TRUE)
-
 find_package(Gettext REQUIRED)
