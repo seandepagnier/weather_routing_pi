@@ -105,7 +105,7 @@ else(MSVC)
 endif(MSVC)
 
 set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
-set(BUILD_SHARED_LIBS FALSE)
+set(BUILD_SHARED_LIBS TRUE)
 
 # Allow multiprocess compile
 if(MSVC)
