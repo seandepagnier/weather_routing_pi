@@ -1349,11 +1349,6 @@ void piDC::DrawPolygon( int n, wxPoint points[], wxCoord xoffset, wxCoord yoffse
 #endif
 
 #ifdef USE_ANDROID_GLES2
-        if(n > 4)
-            DrawPolygonTessellated( n, points, xoffset, yoffset);
-        else{           // n = 3 or 4, most common case for pre-tesselated shapes
-
-
             //  Grow the work buffer as necessary
             if( workBufSize < (size_t)n*2 ){
                 workBuf = (float *)realloc(workBuf, (n*4) * sizeof(float));
@@ -1433,9 +1428,6 @@ void piDC::DrawPolygon( int n, wxPoint points[], wxCoord xoffset, wxCoord yoffse
             mat4x4_identity(IM);
             GLint matlocf = glGetUniformLocation(pi_color_tri_shader_program,"TransformMatrix");
             glUniformMatrix4fv( matlocf, 1, GL_FALSE, (const GLfloat*)IM);
-
-        }
-
 
 #else
 
@@ -1617,101 +1609,6 @@ void pi_odc_endCallbackD_GLSL(void *data)
 
 
 #endif          //#ifdef ocpnUSE_GL
-
-void piDC::DrawPolygonTessellated( int n, wxPoint points[], wxCoord xoffset, wxCoord yoffset )
-{
-    if( dc )
-        dc->DrawPolygon( n, points, xoffset, yoffset );
-#ifdef ocpnUSE_GL
-    else {
-#if !defined(ocpnUSE_GLES) || defined(USE_ANDROID_GLES2) // tessalator in glues is broken
-        if( n < 5 )
-# endif
-        {
-            DrawPolygon( n, points, xoffset, yoffset );
-            return;
-        }
-
-
-
-#ifdef USE_ANDROID_GLES2
-        m_tobj = gluNewTess();
-        s_odc_tess_vertex_idx = 0;
-
-        gluTessCallback( m_tobj, GLU_TESS_VERTEX_DATA, (_GLUfuncptr) &pi_odc_vertexCallbackD_GLSL  );
-        gluTessCallback( m_tobj, GLU_TESS_BEGIN_DATA, (_GLUfuncptr) &pi_odc_beginCallbackD_GLSL  );
-        gluTessCallback( m_tobj, GLU_TESS_END_DATA, (_GLUfuncptr) &pi_odc_endCallbackD_GLSL  );
-        gluTessCallback( m_tobj, GLU_TESS_COMBINE_DATA, (_GLUfuncptr) &pi_odc_combineCallbackD );
-        //s_tessVP = vp;
-
-        gluTessNormal( m_tobj, 0, 0, 1);
-        gluTessProperty( m_tobj, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO );
-
-        if( ConfigureBrush() ) {
-            gluTessBeginPolygon( m_tobj, this );
-            gluTessBeginContour( m_tobj );
-
-            for( int i = 0; i < n; i++ ) {
-                double *p = new double[6];
-                p[0] = points[i].x, p[1] = points[i].y, p[2] = 0;
-                gluTessVertex(m_tobj, p, p);
-                //odc_combine_work_data.push_back(p);
-
-            }
-            gluTessEndContour( m_tobj );
-            gluTessEndPolygon( m_tobj );
-        }
-
-        gluDeleteTess(m_tobj);
-
-
-//         for(std::list<double*>::iterator i = odc_combine_work_data.begin(); i!=odc_combine_work_data.end(); i++)
-//             delete [] *i;
-//         odc_combine_work_data.clear();
-
-    }
-#else
-        static GLUtesselator *tobj = NULL;
-        if( ! tobj ) tobj = gluNewTess();
-
-        gluTessCallback( tobj, GLU_TESS_VERTEX, (_GLUfuncptr) &piDCvertexCallback );
-        gluTessCallback( tobj, GLU_TESS_BEGIN, (_GLUfuncptr) &piDCbeginCallback );
-        gluTessCallback( tobj, GLU_TESS_END, (_GLUfuncptr) &piDCendCallback );
-        gluTessCallback( tobj, GLU_TESS_COMBINE, (_GLUfuncptr) &piDCcombineCallback );
-        gluTessCallback( tobj, GLU_TESS_ERROR, (_GLUfuncptr) &piDCerrorCallback );
-
-        gluTessNormal( tobj, 0, 0, 1);
-        gluTessProperty( tobj, GLU_TESS_WINDING_RULE, GLU_TESS_WINDING_NONZERO );
-
-        if( ConfigureBrush() ) {
-            gluTessBeginPolygon( tobj, NULL );
-            gluTessBeginContour( tobj );
-
-            for( int i = 0; i < n; i++ ) {
-                GLvertex* vertex = new GLvertex();
-                pi_gTesselatorVertices.Add( vertex );
-                vertex->info.x = (GLdouble) points[i].x;
-                vertex->info.y = (GLdouble) points[i].y;
-                vertex->info.z = (GLdouble) 0.0;
-                vertex->info.r = (GLdouble) 0.0;
-                vertex->info.g = (GLdouble) 0.0;
-                vertex->info.b = (GLdouble) 0.0;
-                gluTessVertex( tobj, (GLdouble*)vertex, (GLdouble*)vertex );
-            }
-            gluTessEndContour( tobj );
-            gluTessEndPolygon( tobj );
-        }
-
-        for( unsigned int i=0; i<pi_gTesselatorVertices.Count(); i++ )
-            delete (GLvertex*)pi_gTesselatorVertices.Item(i);
-        pi_gTesselatorVertices.Clear();
-
-        gluDeleteTess(tobj);
-
-    }
-#endif
-#endif
-}
 
 void piDC::StrokePolygon( int n, wxPoint points[], wxCoord xoffset, wxCoord yoffset, float scale )
 {
