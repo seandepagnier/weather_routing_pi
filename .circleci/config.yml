@@ -10,7 +10,9 @@ jobs:
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
-        - run: ci/circleci-build-raspbian-armhf.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
         - run: ci/cloudsmith-upload.sh
     build-armhf-buster:
         machine: true
@@ -21,7 +23,9 @@ jobs:
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
-        - run: ci/circleci-build-raspbian-armhf.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
         - run: ci/cloudsmith-upload.sh
     build-trusty:
         docker:
@@ -92,23 +96,6 @@ jobs:
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
         - run: ci/cloudsmith-upload.sh
-    build-buster:
-        docker:
-        - image: circleci/buildpack-deps:buster-scm
-        environment:
-        - OCPN_TARGET:  buster
-        steps:
-        - checkout
-        - run: >
-            echo "deb-src http://ftp.us.debian.org/debian buster main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: >
-            echo "deb-src http://ftp.us.debian.org/debian buster-updates main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: cat /etc/apt/sources.list
-        - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-debian.sh
-        - run: ci/cloudsmith-upload.sh
     build-focal:
         docker:
         - image: circleci/buildpack-deps:focal-scm
@@ -126,24 +113,23 @@ jobs:
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
         - run: ci/cloudsmith-upload.sh
-#    build-debian:
-#        docker:
-#        - image: circleci/buildpack-deps:xenial-scm
-#        environment:
-#        - OCPN_TARGET:  xenial
-#        - CLOUDSMITH_PKG_EXT: deb
-#        steps:
-#        - checkout
-#        - run: >
-#            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial main"
-#            | sudo tee -a /etc/apt/sources.list
-#        - run: >
-#            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ xenial-updates main"
-#            | sudo tee -a /etc/apt/sources.list
-#        - run: cat /etc/apt/sources.list
-#        - run: chmod a+x ci/*.sh
-#        - run: bash ci/circleci-build-debian.sh
-#        - run: bash ci/cloudsmith-upload.sh
+    build-buster:
+        docker:
+        - image: circleci/buildpack-deps:buster-scm
+        environment:
+        - OCPN_TARGET:  buster
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian buster main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian buster-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - run: ci/cloudsmith-upload.sh
     build-flatpak:
         machine:
             image: circleci/classic:201808-01
@@ -229,13 +215,13 @@ workflows:
                     ignore:
                     - devel
                     - tmp
-        - build-buster:
+        - build-focal:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
-        - build-focal:
+        - build-buster:
             filters:
                 branches:
                     ignore:

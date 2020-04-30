@@ -70,6 +70,12 @@ endif(GETTEXT_MSGMERGE_EXECUTABLE)
 
 set(_gmoFiles)
 macro(GETTEXT_BUILD_MO)
+  file(MAKE_DIRECTORY "Resources")
+  message(STATUS "Creating Resources directory")
+  add_custom_target(
+      create_resources_dir ALL
+      COMMAND ${CMAKE_COMMAND} -E make_directory "./Resources"
+    )
   foreach(_poFile ${ARGN})
     get_filename_component(_absFile ${_poFile} ABSOLUTE)
     get_filename_component(_poBasename ${_absFile} NAME_WE)
@@ -83,15 +89,10 @@ macro(GETTEXT_BUILD_MO)
       COMMENT "${I18N_NAME}-i18n [${_poBasename}]: Created mo file.")
 
     if(APPLE)
-      install(
-        FILES ${_gmoFile}
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/OpenCPN.app/Contents/Resources/${_poBasename}.lproj
-        RENAME ${PACKAGE_NAME}.mo)
+      install(FILES ${_gmoFile} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/OpenCPN.app/Contents/Resources/${_poBasename}.lproj RENAME ${PACKAGE_NAME}.mo)
+      message(STATUS "Install language files to: ${CMAKE_INSTALL_PREFIX}/bin/OpenCPN.app/Contents/Resources/${_poBasename}.lproj renamed to: ${PACKAGE_NAME}.mo")
     else(APPLE)
-      install(
-        FILES ${_gmoFile}
-        DESTINATION ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES
-        RENAME ${PACKAGE_NAME}.mo)
+      install(FILES ${_gmoFile} DESTINATION ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES RENAME ${PACKAGE_NAME}.mo)
       message(STATUS "Install language files to: ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES renamed to: ${PACKAGE_NAME}.mo")
     endif(APPLE)
 
@@ -102,9 +103,8 @@ endmacro(GETTEXT_BUILD_MO)
 if(GETTEXT_MSGFMT_EXECUTABLE)
   file(GLOB PACKAGE_PO_FILES po/*.po)
   gettext_build_mo(${PACKAGE_PO_FILES})
-  add_custom_target(
-    ${I18N_NAME}-i18n
-    COMMENT "${PACKAGE_NAME}-i18n: Done."
-    DEPENDS ${_gmoFiles})
+  add_custom_target(${I18N_NAME}-i18n COMMENT "${PACKAGE_NAME}-i18n: Done." DEPENDS ${_gmoFiles})
   add_dependencies(${PACKAGE_NAME} ${I18N_NAME}-i18n)
 endif(GETTEXT_MSGFMT_EXECUTABLE)
+file(MAKE_DIRECTORY "Resources")
+message(STATUS "Creating Resources directory")
