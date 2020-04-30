@@ -385,7 +385,6 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
 # Modify/configure 'Include' Directories below for the Plugin
 ##=============================================================
 ## EG  (from Testplugin) also in cmake/Plugin_____.cmake files
-															
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
