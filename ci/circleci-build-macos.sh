@@ -30,7 +30,7 @@ test -z "$TRAVIS_TAG" && CI_BUILD=OFF || CI_BUILD=ON
 cmake -DOCPN_CI_BUILD=$CI_BUILD \
   -DwxWidgets_CONFIG_EXECUTABLE=/tmp/wx312_opencpn50_macos109/bin/wx-config \
   -DwxWidgets_CONFIG_OPTIONS="--prefix=/tmp/wx312_opencpn50_macos109" \
-  -DCMAKE_INSTALL_PREFIX="/" \
+  -DCMAKE_INSTALL_PREFIX=/tmp/opencpn \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
   ..
 make -sj2
