@@ -373,7 +373,6 @@ SET(SRC_LIBTESS2
 # Testplugin has this line, so just added it
 add_definitions(-DPLUGIN_USE_SVG)
 
-
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
 ## This add_library  can be used in conditionals below.
