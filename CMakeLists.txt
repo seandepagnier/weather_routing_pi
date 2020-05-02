@@ -122,6 +122,11 @@ set(XML_DESCRIPTION "WR features include: optimal routing subject to various con
 # set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
+##
+## ----- Modify above to include all the plugin details --------- ##
+## ----- Modify below for plugin special requirements------------ ##
+##
+
 set(CMAKE_CXX_STANDARD 11)
 
 
@@ -171,7 +176,6 @@ else(DEFINED ENV{OCPN_TARGET})
     set(PACKAGING_NAME "${PKG_NVR}_${PKG_TARGET}-${PKG_TARGET_VERSION}")
 endif(DEFINED ENV{OCPN_TARGET})
 message(STATUS "PACKAGING_NAME: ${PACKAGING_NAME}")
-
 
 set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
 
@@ -250,6 +254,14 @@ INCLUDE("cmake/PluginConfigure.cmake")
 # ----- Change below to match project requirements ----- ##
 
 add_definitions(-DUSE_S57)
+
+# From master branch - is this workiing? necessary?
+IF(PLUGIN_USE_SVG)
+    MESSAGE(STATUS "SVG support enabled...")
+    IF(NOT QT_ANDROID)
+        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
+    ENDIF(NOT QT_ANDROID)
+ENDIF(PLUGIN_USE_SVG)
 
 #======== Below from cmakelists.txt  weather_routing_pi
 # ----Remember to Add your project Set(SRCS and set(HDRS  etc..
@@ -418,9 +430,6 @@ add_definitions(-DTIXML_USE_STL)
 #    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
 #  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
 #ENDIF(UNIX AND NOT APPLE)
-
-
-
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
