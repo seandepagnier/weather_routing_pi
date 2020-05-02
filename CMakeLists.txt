@@ -111,8 +111,10 @@ set(ALPHA "alpha") #Standard Repos
 
 # Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
-set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
-set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
+set(XML_SUMMARY "Compute optimal routes based on weather and constraints.")
+set(XML_DESCRIPTION "Weather Routing features include:\n\
+  optimal routing subject to various constraints based on weather data\n\
+  automatic boat polar computation\n\")
 
 ##
 ## ----- Modify above to include all the plugin details --------- ##
