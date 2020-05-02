@@ -43,16 +43,9 @@ if(UNIX)
 endif(UNIX)
 
 if(APPLE)
-  install(
-    TARGETS ${PACKAGE_NAME}
-    RUNTIME
-    LIBRARY DESTINATION ${CMAKE_BINARY_DIR}/OpenCPN.app/Contents/SharedSupport/plugins)
-  install(
-    TARGETS ${PACKAGE_NAME}
-    RUNTIME
-    LIBRARY DESTINATION ${CMAKE_BINARY_DIR}/OpenCPN.app/Contents/PlugIns)
+  install(TARGETS ${PACKAGE_NAME} RUNTIME LIBRARY DESTINATION OpenCPN.app/Contents/PlugIns)
   if(EXISTS ${PROJECT_SOURCE_DIR}/data)
-    install(DIRECTORY data DESTINATION ${CMAKE_BINARY_DIR}/OpenCPN.app/Contents/SharedSupport/plugins/${PACKAGE_NAME})
+    install(DIRECTORY data DESTINATION OpenCPN.app/Contents/SharedSupport/plugins/${PACKAGE_NAME})
   endif()
 
   find_package(ZLIB REQUIRED)
@@ -192,10 +185,19 @@ if(APPLE)
     file(COPY ${_currentDataFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
   endforeach(_currentDataFile)
 
+  if(EXISTS ${PROJECT_SOURCE_DIR}/UserIcons)
+      file(GLOB_RECURSE PACKAGE_DATA_FILES LIST_DIRECTORIES true ${CMAKE_SOURCE_DIR}/UserIcons/*)
+
+      foreach(_currentDataFile ${PACKAGE_DATA_FILES})
+          message(STATUS "copying: ${_currentDataFile}")
+          file(COPY ${_currentDataFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/UserIcons)
+      endforeach(_currentDataFile)
+  endif()
+
   install(
     TARGETS ${PACKAGE_NAME}
     RUNTIME
-    LIBRARY DESTINATION ${PACKAGE_NAME}/${PACKAGE_NAME})
-  message(STATUS "Install Target: ${PACKAGE_NAME}/${PACKAGE_NAME}")
+    LIBRARY DESTINATION OpenCPN.app/Contents/PlugIns)
+    message(STATUS "Install Target: OpenCPN.app/Contents/PlugIns")
 
 endif(APPLE)

@@ -19,12 +19,13 @@
 #-----------------------------------------------------------------------------
 # Frontend2 Author: Jon Gough  
 # ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.004  
+# CMake-CI Number: 0.0.005  
 #    - 2/19/2020 10 environments needed for beta testing.
 #    - 2/19/2020 fix debian build
 #    - 2/19/2020 Add raspian build
 #    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
 #    - 3/1/2020  fix raspian xml target-url with if-then
+#    - 3/30/2020 MacOS build fixed 12 env
 # ---------------------------------------------------------------------------
 # ----- Modify section below to include all the details for your plugin ----- ##
 
@@ -40,7 +41,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 set(VERBOSE_NAME "WeatherRouting")
-# Search "getcommonname"in weather_routing_pi.cpp  
+# Search "getcommonname"in weather_routing_pi.cpp
 set(COMMON_NAME "WeatherRouting")  
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
@@ -49,8 +50,8 @@ set(PACKAGE "weather_routing_pi")
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "6")
-set(VERSION_TWEAK "2")
-set(VERSION_DATE "04/24/2020")
+set(VERSION_TWEAK "5")
+set(VERSION_DATE "04/30/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -64,7 +65,7 @@ set(GIT_REPOSITORY_NAME "weather_routing_pi")
 message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
 message(STATUS "TRAVIS: ${TRAVIS}, Env TRAVIS: $ENV{TRAVIS}")
 
-# Allows setup of a local webserver with git for testing
+# Permits setup of a local webserver with git for testing
 if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
@@ -73,13 +74,24 @@ elseif($ENV{TRAVIS})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
   set(GIT_REPOSITORY_BRANCH "$ENV{TRAVIS_BRANCH}")
+elseif($ENV{APPVEYOR})
+  set(GIT_REPOSITORY_HOST "github.com")
+  set(GIT_REPOSITORY_DIR "${GIT_USER}/")
+  set(GIT_REPOSITORY_BRANCH "$ENV{APPVEYOR_REPO_BRANCH}")
 else()
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-  set(GIT_REPOSITORY_BRANCH "master")
-#  set(GIT_REPOSITORY_HOST "git.eclipse.com.au")
-#  set(GIT_REPOSITORY_DIR "")
-#  set(GIT_REPOSITORY_BRANCH "cmake_flatpak_test")
+  # Get the current working branch
+  execute_process(
+    COMMAND git rev-parse --abbrev-ref HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_REPOSITORY_BRANCH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+  if(${GIT_REPOSITORY_BRANCH} EQUAL "")
+    message(STATUS "Setting default GIT repository branch - master")
+    set(GIT_REPOSITORY_BRANCH "master")
+  endif()
 endif()
 message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
 
@@ -102,18 +114,16 @@ set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")
 set(XML_SUMMARY "Plugin to complete optimal routing with weather files")
 set(XML_DESCRIPTION "Weather_Routing optimizes weather routing")
 
-set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
-option(PLUGIN_USE_SVG "Use SVG graphics" ON)
-
 ##
 ## ----- Modify above to include all the plugin details --------- ##
 ## ----- Modify below for plugin special requirements------------ ##
 ##
 
+# set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
+option(PLUGIN_USE_SVG "Use SVG graphics" ON)
+
 set(CMAKE_CXX_STANDARD 11)
 
-# Prefer libGL.so to libOpenGL.so, see CMP0072
-set(OpenGL_GL_PREFERENCE "LEGACY")
 
 if(NOT ${PACKAGE} MATCHES "(.*)_pi")
   set(PACKAGE_NAME ${PACKAGE}_pi)
@@ -132,11 +142,14 @@ set(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message(STATUS "${VERBOSE_NAME} Version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
 message(STATUS "OPCN_FLATPAK: ${OCPN_FLATPAK}")
 
+# Prefer libGL.so to libOpenGL.so, see CMP0072
+set(OpenGL_GL_PREFERENCE "LEGACY")
 # Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
 
-# Not in Master branch. Question still needed? on or off?
-# option(USE_GL "Enable OpenGL support" ON)
+# Not found in Master branch. Question still needed? on or off?
+# Testplugin has OFF
+option(USE_GL "Enable OpenGL support" ON)
 message(STATUS "USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -159,35 +172,39 @@ else(DEFINED ENV{OCPN_TARGET})
 endif(DEFINED ENV{OCPN_TARGET})
 message(STATUS "PACKAGING_NAME: ${PACKAGING_NAME}")
 
+
 set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
 
+# Settings and Options
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-#option(Plugin_CXX11 "Use c++11" OFF)
+option(Plugin_CXX11 "Use c++11" OFF) #Wass commented out
 
-# Master version of cmakelists.txt has this commented out
-#if(Plugin_CXX11)
-#  message(STATUS "Attempting to use c++11")
-#  include(CheckCXXCompilerFlag)
-#  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-#  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-#  if(COMPILER_SUPPORTS_CXX11)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#    set(Plugin_USE_CXX11 ON)
-#  elseif(COMPILER_SUPPORTS_CXX0X)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-#    set(Plugin_USE_CXX11 ON)
-#  else()
-#    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-#    set(Plugin_USE_CXX11 OFF)
-#  endif()
-#else()
-#  set(Plugin_USE_CXX11 OFF)
-#endif()
+# Master version of cmakelists.txt has the below commented out
+# Testplugin has this on!!  Trying to turn this back on this time.
+# Check on compiler support
+if(Plugin_CXX11)
+  message(STATUS "Attempting to use c++11")
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
+  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+  if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    set(Plugin_USE_CXX11 ON)
+  elseif(COMPILER_SUPPORTS_CXX0X)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    set(Plugin_USE_CXX11 ON)
+  else()
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    set(Plugin_USE_CXX11 OFF)
+  endif()
+else()
+  set(Plugin_USE_CXX11 OFF)
+endif()
 
-#if(Plugin_USE_CXX11)
-#  message(STATUS "Allowing use of c++11")
-#endif()
+if(Plugin_USE_CXX11)
+  message(STATUS "Allowing use of c++11")
+endif()
 
 message(STATUS "CMAKE version: ${CMAKE_VERSION}")
 if(CMAKE_VERSION VERSION_GREATER 3.4)
@@ -225,17 +242,17 @@ if(CMAKE_VERSION VERSION_GREATER 3.9)
   endif()
 endif()
 
-#
+# -------Section above is directly from Testplugin --------------#
 # ----- Modify section above for special plugin requirements----- ##
 #===========================================================
 INCLUDE("cmake/PluginConfigure.cmake")
 #===========================================================
 # ----- Change below to match project requirements ----- ##
-#
 
 add_definitions(-DUSE_S57)
 
 #======== Below from cmakelists.txt  weather_routing_pi
+# ----Remember to Add your project Set(SRCS and set(HDRS  etc..
 
 SET(SRCS
             src/weather_routing_pi.cpp
@@ -318,7 +335,6 @@ SET(SRC_LIBTESS2
 			 src/tinyxml/tinyxml.h
 )  
 
-
 # SET  (SRC_ZLIB
 #             src/zlib-1.2.3/zconf.h
 #             src/zlib-1.2.3/zlib.h
@@ -354,27 +370,30 @@ SET(SRC_LIBTESS2
 #   src/jsoncpp/json_batchallocator.h
 #   src/jsoncpp/json_tool.h)  #rick added
          				  
-
-# Commented out doubles
-# SET(SRC ${SRCS} ${SRC_LIBTESS2})
-# SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} )
-# SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${BZIP2} ${JSONCPP} )
-# SET(SRC ${SRCS} ${SRC_LIBTESS2} ${PLUGINGL} ${TINYXML} ${ZLIB} ${BZIP2} ${JSONCPP} )
-
-#SET(SRC ${SRCS} ${SRC_LIBTESS2})
-SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
-#SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} ${SRC_TINYXML} ${SRC_PLUGINGL})
+# Testplugin has this line, so just added it
+add_definitions(-DPLUGIN_USE_SVG)
 
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
-## This add_library  is used in the conditionals below.
+## This add_library  can be used in conditionals below.
 ##================================================================================
-## EG:   add_library(${PACKAGE_NAME} SHARED ${SRCS}  ${SRC_NMEA0183})
+SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
 ##================================================================================
+
+##=============================================================
+# Modify/configure 'Include' Directories below for the Plugin
+##=============================================================
+## EG  (from Testplugin) also in cmake/Plugin_____.cmake files
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
+
 
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
 
+# Used in textplugin. Just added.
+add_definitions(-DTIXML_USE_STL)
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
@@ -390,20 +409,24 @@ IF(NOT UNIX)
     ADD_LIBRARY(LIB_BZIP_WR STATIC ${SRC_BZIP})
     TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP_WR )
     INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/bzip2)
+#	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
 ENDIF(NOT UNIX)
 
 IF(NOT UNIX)
     INCLUDE_DIRECTORIES(src/zlib-1.2.3)
     INCLUDE_DIRECTORIES(src/bzip2)
+#	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
 ENDIF(NOT UNIX)
 
 IF(WIN32)
   IF(MSVC)
     INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/buildwin/include)
+	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
     TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
   ELSE()
     # MINGW
 #    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lwxzlib-2.8")
+	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
     TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lz")
   ENDIF()
 ENDIF()
