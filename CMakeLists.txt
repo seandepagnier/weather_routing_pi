@@ -112,9 +112,7 @@ set(ALPHA "alpha") #Standard Repos
 # Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
 set(XML_SUMMARY "Compute optimal routes based on weather and constraints.")
-set(XML_DESCRIPTION "Weather Routing features include:\n\
-  optimal routing subject to various constraints based on weather data\n\
-  automatic boat polar computation\n\")
+set(XML_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")
 
 ##
 ## ----- Modify above to include all the plugin details --------- ##
@@ -396,6 +394,33 @@ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 
 # Used in textplugin. Just added.
 add_definitions(-DTIXML_USE_STL)
+
+#JSON Validator: Every plugin that uses JSON for passing messages should use a validator.  A JSON validator is much like an XML validator, the validator allows the system to ignore non-conformant messages.  The JSON validator changes the OSABI flavor of the Linux executable so there is code to change it back.
+
+#IF(UNIX AND NOT APPLE)
+#  IF(TP_JSON_SCHEMA_VALIDATOR)
+#    # Change OS/ABI to be UNIX - System V to make it run with OCPN
+#    SET(lib_name lib${PACKAGE_NAME}.so)
+#    MESSAGE(STATUS "lib-name: ${lib_name}")
+#    FIND_FILE(elfedit elfedit)
+#    IF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#      MESSAGE(STATUS "Will ensure OS/ABI is set to 0 to match OCPN")
+#      ADD_CUSTOM_COMMAND(
+#        TARGET ${PACKAGE_NAME}
+#        POST_BUILD
+#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#        DEPENDS ${PACKAGE_NAME}
+#        COMMENT " Running post build action on ${lib_name}."
+#        COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) '
+#      )
+#    ELSE(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#      MESSAGE(STATUS "Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
+#    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
+#ENDIF(UNIX AND NOT APPLE)
+
+
+
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
