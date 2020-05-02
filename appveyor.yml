@@ -12,6 +12,9 @@ platform:
 configuration: Release
 test: OFF
 
+environment:
+  OCPN_TARGET: MSVC
+
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 
@@ -36,6 +39,9 @@ install:
 
 before_build:
   - cd c:\project\weather_routing_pi
+  - cd buildwin
+  - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/PVW32Con.exe
+  - cd ..  
   - rm -rf build && mkdir build && cd build
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.99.1405-vc141_xp/opencpn.lib
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/OpenCPN_buildwin-4.99a.7z
@@ -43,24 +49,27 @@ before_build:
   - cmake -T v141_xp ..
 
 build_script:
+  - cmake -G "Visual Studio 15 2017"   ..
   - cmake --build . --target package --config Release
+  - cmake --build . --target install --config RelWithDebInfo
+  - cmake --build . --target package --config RelWithDebInfo
+  - choco install git
   - python -m ensurepip
   - python -m pip install -q setuptools
   - python -m pip install -q cloudsmith-cli
-  - bash ../build/appveyor-upload.sh
+  - bash ../build/cloudsmith-upload.sh
 
 artifacts:
   - path: 'build\*.exe'
     name: installer
 
 deploy:
-  #description: 'release created by AppVeyor CI'
-  #provider: GitHub
-  #auth_token: #'%GitHub_auth_token%'  xkR09Y0VQ7A10kp+h6v9UjIeLVkf1VQ9O+AFyd62qUDI1IRh7Llagre2fI/cDPTW
-  #  secure: xkR09Y0VQ7A10kp+h6v9UjIeLVkf1VQ9O+AFyd62qUDI1IRh7Llagre2fI/cDPTW	rh0wUA7/Vv1UVnuV8abbLwTEnDZcH6qUJLhzlMKYZdnSx7EDP6CxcMfXSWM/0EdB
-  #artifact: installer,portable
-  #draft: true
-  #prerelease: true
-  #on:
-    #appveyor_repo_tag: true # deploy on tag push only
-    #configuration: Release  # Debug contains non-redist MS DLLs
+  description: 'release created by AppVeyor CI'
+  provider: GitHub
+  auth_token: '%GitHub_auth_token%'
+  artifact: installer,portable
+  draft: true
+  prerelease: true
+  on:
+    appveyor_repo_tag: true # deploy on tag push only
+    configuration: Release  # Debug contains non-redist MS DLLs
