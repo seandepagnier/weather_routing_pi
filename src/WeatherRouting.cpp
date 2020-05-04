@@ -424,8 +424,10 @@ void WeatherRouting::CopyDataFiles(wxString from, wxString to)
         const wxString fileTo = to + next;
         if (wxDirExists(fileFrom))
             CopyDataFiles(fileFrom, fileTo);
-        else
+        else{
+            wxLogMessage( _T("WeatherRouting copy file: " + fileFrom + _T(" to ") + fileTo));
 	    wxCopyFile(fileFrom, fileTo);
+        }
         b = dir.GetNext(&next);
     }
 }
