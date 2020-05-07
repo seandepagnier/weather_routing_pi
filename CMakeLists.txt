@@ -19,14 +19,16 @@
 #-----------------------------------------------------------------------------
 # Frontend2 Author: Jon Gough  
 # ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.005  
+# CMake-CI Number: 0.0.006  
 #    - 2/19/2020 10 environments needed for beta testing.
 #    - 2/19/2020 fix debian build
 #    - 2/19/2020 Add raspian build
 #    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
 #    - 3/1/2020  fix raspian xml target-url with if-then
 #    - 3/30/2020 MacOS build fixed 12 env
-# ---------------------------------------------------------------------------
+#    - Reverse dates here
+#    - 2/05/2020 MacOS final fix- JG
+# ----------------------------------------------------------------------------
 # ----- Modify section below to include all the details for your plugin ----- ##
 
 cmake_minimum_required(VERSION 3.1.1)
@@ -70,14 +72,17 @@ if($ENV{CIRCLECI})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
   set(GIT_REPOSITORY_BRANCH "$ENV{CIRCLE_BRANCH}")
+  set(GIT_REPOSITORY_TAG "$ENV{CIRCLE_TAG}")
 elseif($ENV{TRAVIS})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
   set(GIT_REPOSITORY_BRANCH "$ENV{TRAVIS_BRANCH}")
+  set(GIT_REPOSITORY_TAG "$ENV{TRAVIS_TAG}")
 elseif($ENV{APPVEYOR})
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
   set(GIT_REPOSITORY_BRANCH "$ENV{APPVEYOR_REPO_BRANCH}")
+  set(GIT_REPOSITORY_TAG "$ENV{APPVEYOR_REPO_TAG_NAME}")
 else()
   set(GIT_REPOSITORY_HOST "github.com")
   set(GIT_REPOSITORY_DIR "${GIT_USER}/")
@@ -92,15 +97,27 @@ else()
     message(STATUS "Setting default GIT repository branch - master")
     set(GIT_REPOSITORY_BRANCH "master")
   endif()
+  execute_process(
+    COMMAND git tag --contains
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_REPOSITORY_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
 endif()
 message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
+message(STATUS "Git Tag: ${GIT_REPOSITORY_TAG}")
+if("${GIT_REPOSITORY_BRANCH}" EQUAL "")
+  set(GIT_BRANCH_OR_TAG "TAG")
+else()
+  set(GIT_BRANCH_OR_TAG "BRANCH")
+endif()
 
 #set(CLOUDSMITH_USER "sean-depagnier") 
 #set(CLOUDSMITH_USER "jon-gough")
 set(CLOUDSMITH_USER "rick-gleason")
 
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
-#set(CLOUDSMITH_BASE_REPOSITORY "weather_routing_pi")  #Jon Gough's customization
+#set(CLOUDSMITH_BASE_REPOSITORY "weather_routing")  #Jon Gough's customization
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
 set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Rick's customization
 
@@ -147,6 +164,7 @@ set(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 message(STATUS "${VERBOSE_NAME} Version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
 message(STATUS "OPCN_FLATPAK: ${OCPN_FLATPAK}")
 
+#------Settings
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
 # Don't use local version of GLU library
@@ -156,6 +174,7 @@ set(USE_LOCAL_GLU FALSE)
 # Testplugin has OFF
 option(USE_GL "Enable OpenGL support" ON)
 message(STATUS "USE_GL: ${USE_GL}")
+#------End Settings
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build" FORCE)

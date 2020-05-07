@@ -9,7 +9,7 @@ sudo apt-get install devscripts equivs
 
 rm -rf build && mkdir build && cd build
 mk-build-deps ../ci/control
-sudo apt-get install  ./*all.deb  || :
+sudo apt-get --allow-unauthenticated install ./*all.deb  || :
 sudo apt-get --allow-unauthenticated install -f
 rm -f ./*all.deb
 

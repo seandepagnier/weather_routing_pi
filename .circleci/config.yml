@@ -185,69 +185,95 @@ workflows:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-armhf-buster:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-trusty:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-xenial:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-bionic:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-bionic-gtk3:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-focal:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-buster:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-flatpak:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-fedora:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-mingw:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
         - build-macos:
             filters:
                 branches:
                     ignore:
                     - devel
                     - tmp
+                tags:
+                    only: /.*/
+
+

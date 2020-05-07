@@ -98,7 +98,7 @@ echo $tarball_basename
 
 source $BUILD_DIR/pkg_version.sh
 tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
-if [ -Z $BUILD_DIR/*.${PKG_EXT} ]; then
+if [ "$(ls $BUILD_DIR/*.${PKG_EXT})" ]; then
     pkg=$(ls $BUILD_DIR/*.${PKG_EXT})
 else
     pkg=""
@@ -107,6 +107,17 @@ fi
 echo $BUILD_BRANCH
 echo $BUILD_TAG
 echo ${#BUILD_TAG}
+if [ "$BUILD_TAG" = "" ] && [ "$tag" != "" ]; then
+    BUILD_TAG=$tag
+    echo "Build tag: $BUILD_TAG"
+fi
+if [ "$BUILD_BRANCH" = "" ]; then
+    build_commit=$(git show -s --format=%d $BUILD_TAG)
+    is_master=$(echo $build_commit | awk '/\/master/ {print}')
+    if [ "$is_master" != "" ]; then
+        BUILD_BRANCH="master"
+    fi
+fi
 
 BUILD_BRANCH_LOWER=`echo $BUILD_BRANCH | tr '[A-Z]' '[a-z]'`
 if [ "$BUILD_BRANCH_LOWER" = "master" ]; then
@@ -123,7 +134,7 @@ if [ "$BUILD_BRANCH_LOWER" = "master" ]; then
 else
     echo "In non master branch " $BUILD_BRANCH
     if [ -n "$BUILD_TAG" ]; then
-        echo "buildnig with tag"
+        echo "building with tag"
         VERSION=$BUILD_TAG
         REPO="$BETA_REPO"
     else
@@ -194,7 +205,7 @@ cloudsmith push raw --republish --no-wait-for-sync \
     --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
     $REPO $tarball
 
-if [ "${PKG_EXT}" != "gz" && $pkg != "" ]; then
+if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
     cloudsmith push raw --republish --no-wait-for-sync \
         --name opencpn-package-@PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
         --version ${VERSION} \

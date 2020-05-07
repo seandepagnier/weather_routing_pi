@@ -19,4 +19,4 @@ modules:
     sources:
        - type: git
          url: git://${GIT_REPOSITORY_HOST}/${GIT_REPOSITORY_DIR}${GIT_REPOSITORY_NAME}
-         branch: ${GIT_REPOSITORY_BRANCH}
+         ${GIT_BRANCH_OR_TAG}: ${GIT_REPOSITORY_BRANCH}
