@@ -1642,7 +1642,7 @@ void RouteMapOverlay::UpdateDestination()
         }
         Unlock();
 
-        if(isinf(mindt)) {
+        if(std::isinf(mindt)) {
             // destination is between two isochrons
             // but propagate can't reach it (land or boundaries in the way).
             // Use an upper bound time for EndTime, not defined times are too much

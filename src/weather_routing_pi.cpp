@@ -85,7 +85,7 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 #include "icons.h"
 
 weather_routing_pi::weather_routing_pi(void *ppimgr)
-      :opencpn_plugin_115(ppimgr)
+      :opencpn_plugin_116(ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
@@ -111,7 +111,7 @@ int weather_routing_pi::Init()
 
       m_pWeather_Routing = NULL;
 
-#ifdef OCPN_USE_SVG
+#ifdef PLUGIN_USE_SVG
       m_leftclick_tool_id = InsertPlugInToolSVG(_T( "WeatherRouting" ),
           _svg_weather_routing, _svg_weather_routing_rollover, _svg_weather_routing_toggled,
           wxITEM_CHECK, _("Weather Routing"), _T( "" ), NULL, WEATHER_ROUTING_TOOL_POSITION, 0, this);
@@ -184,7 +184,8 @@ wxBitmap *weather_routing_pi::GetPlugInBitmap()
 
 wxString weather_routing_pi::GetCommonName()
 {
-      return _("WeatherRouting");
+  //   return _T("WeatherRouting");
+    return _T(PLUGIN_COMMON_NAME);
 }
 
 wxString weather_routing_pi::GetShortDescription()

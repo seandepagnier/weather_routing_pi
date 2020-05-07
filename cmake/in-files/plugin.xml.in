@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin version="1">
+  <name> ${COMMON_NAME} </name>
+  <version> ${PACKAGE_VERSION} </version>
+  <release> ${PROJECT_VERSION_TWEAK} </release>
+  <summary> ${XML_SUMMARY} </summary>
+
+  <api-version> ${OCPN_API_VERSION_MAJOR}.${OCPN_API_VERSION_MINOR} </api-version>
+  <open-source> yes </open-source>
+  <author> ${PACKAGE_CONTACT} </author>
+  <source> https://github.com/${GIT_USER}/${GIT_REPOSITORY_NAME} </source>
+
+  <description>
+    ${XML_DESCRIPTION}
+  </description>
+
+  <target>${PKG_TARGET_FULL}</target>
+  <target-version>${PKG_TARGET_VERSION}</target-version>
+  <tarball-url>
+    ${PKG_URL}
+  </tarball-url>
+  <info-url> ${XML_INFO_URL} </info-url>
+</plugin>
