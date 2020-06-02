@@ -4,6 +4,86 @@
 
 message(STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
+message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
+message(STATUS "TRAVIS: ${TRAVIS}, Env TRAVIS: $ENV{TRAVIS}")
+
+set(GIT_REPOSITORY "")
+
+if($ENV{CIRCLECI})
+    set(GIT_REPOSITORY "$ENV{CIRCLE_PROJECT_USERNAME}/$ENV{CIRCLE_PROJECT_REPONAME}")
+    set(GIT_REPOSITORY_BRANCH "$ENV{CIRCLE_BRANCH}")
+    set(GIT_REPOSITORY_TAG "$ENV{CIRCLE_TAG}")
+elseif($ENV{TRAVIS})
+    set(GIT_REPOSITORY "$ENV{TRAVIS_REPO_SLUG}")
+    set(GIT_REPOSITORY_BRANCH "$ENV{TRAVIS_BRANCH}")
+    set(GIT_REPOSITORY_TAG "$ENV{TRAVIS_TAG}")
+elseif($ENV{APPVEYOR})
+    set(GIT_REPOSITORY "$ENV{APPVEYOR_REPO_NAME}")
+    set(GIT_REPOSITORY_BRANCH "$ENV{APPVEYOR_REPO_BRANCH}")
+    set(GIT_REPOSITORY_TAG "$ENV{APPVEYOR_REPO_TAG_NAME}")
+else()
+    # Get the current working branch
+    execute_process(
+        COMMAND git rev-parse --abbrev-ref HEAD
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REPOSITORY_BRANCH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+    if(${GIT_REPOSITORY_BRANCH} EQUAL "")
+        message(STATUS "Setting default GIT repository branch - master")
+        set(GIT_REPOSITORY_BRANCH "master")
+    endif()
+    execute_process(
+        COMMAND git tag --contains
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REPOSITORY_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+    execute_process(
+        COMMAND git remote
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REPOSITORY_REMOTE
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+    string(REGEX MATCH ".*[\n\r]" FIRST_LINE ${GIT_REPOSITORY_REMOTE})
+    if(NOT ${FIRST_LINE} STREQUAL "")
+        string(REGEX REPLACE "[\n\r]" "" GIT_REPOSITORY_REMOTE ${FIRST_LINE})
+    endif()
+    execute_process(
+        COMMAND git remote get-url ${GIT_REPOSITORY_REMOTE}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_REPOSITORY_URL
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+      )
+    string(FIND ${GIT_REPOSITORY_URL} ${GIT_REPOSITORY_SERVER} START_URL REVERSE)
+    string(LENGTH ${GIT_REPOSITORY_SERVER} STRING_LENGTH)
+    math(EXPR START_URL "${START_URL}+1+${STRING_LENGTH}")
+    string(LENGTH ${GIT_REPOSITORY_URL} STRING_LENGTH)
+    message(STATUS "START_URL: ${START_URL}, STRING_LENGTH: ${STRING_LENGTH}")
+    string(SUBSTRING ${GIT_REPOSITORY_URL} ${START_URL} ${STRING_LENGTH} GIT_REPOSITORY)
+endif()
+message(STATUS "GIT_REPOSITORY: ${GIT_REPOSITORY}")
+message(STATUS "Git Branch: \"${GIT_REPOSITORY_BRANCH}\"")
+message(STATUS "Git Tag: \"${GIT_REPOSITORY_TAG}\"")
+if("${GIT_REPOSITORY_BRANCH}" STREQUAL "")
+    set(GIT_BRANCH_OR_TAG "tag")
+    set(GIT_REPOSITORY_ITEM ${GIT_REPOSITORY_TAG})
+else()
+    set(GIT_BRANCH_OR_TAG "branch")
+    set(GIT_REPOSITORY_ITEM ${GIT_REPOSITORY_BRANCH})
+endif()
+message(STATUS "GIT_BRANCH_OR_TAG: ${GIT_BRANCH_OR_TAG}")
+message(STATUS "GIT_REPOSITORY_ITEM: ${GIT_REPOSITORY_ITEM}")
+
+if(NOT DEFINED CLOUDSMITH_BASE_REPOSITORY AND NOT ${GIT_REPOSITORY} STREQUAL "")
+    string(FIND ${GIT_REPOSITORY} "/"  START_NAME REVERSE)
+    math(EXPR START_NAME "${START_NAME}+1")
+    string(LENGTH ${GIT_REPOSITORY} STRING_LENGTH)
+    message(STATUS "START_NAME: ${START_NAME}, STRING_LENGTH: ${STRING_LENGTH}")
+    string(SUBSTRING ${GIT_REPOSITORY} ${START_NAME} ${STRING_LENGTH} CLOUDSMITH_BASE_REPOSITORY)
+endif()
+message(STATUS "CLOUDSMITH_BASE_REPOSITORY: ${CLOUDSMITH_BASE_REPOSITORY}")
+
 # Do the version.h & wxWTranslateCatalog configuration into the build output directory, thereby allowing building from a read-only source tree.
 if(NOT SKIP_VERSION_CONFIG)
   set(BUILD_INCLUDE_PATH ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY})
@@ -14,10 +94,10 @@ endif(NOT SKIP_VERSION_CONFIG)
 
 # configure xml file for circleci
 message(STATUS "OCPN_TARGET: $ENV{OCPN_TARGET}")
-if(NOT DEFINED ENV{OCPN_TARGET})
+if(NOT DEFINED $ENV{OCPN_TARGET})
     set($ENV{OCPN_TARGET} ${PKG_TARGET})
     message(STATUS "Setting OCPN_TARGET")
-endif(NOT DEFINED ENV{OCPN_TARGET})
+endif(NOT DEFINED $ENV{OCPN_TARGET})
 if($ENV{OCPN_TARGET} MATCHES "(.*)gtk3")
     set(PKG_TARGET_FULL "${PKG_TARGET}-gtk3")
     message(STATUS "Found gtk3")
@@ -31,7 +111,7 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/plugin.xml.in ${CMAKE_CURRENT_
 configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/pkg_version.sh.in ${CMAKE_CURRENT_BINARY_DIR}/pkg_version.sh)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/cloudsmith-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/cloudsmith-upload.sh @ONLY)
 
-message(STATUS "Checking OCPN_FLATPAK: ${OCPN_FLATPAK}")
+message(STATUS "Checking OCPN_FLATPAK_CONFIG: ${OCPN_FLATPAK_CONFIG}")
 if(OCPN_FLATPAK_CONFIG)
   configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/org.opencpn.OpenCPN.Plugin.yaml.in ${CMAKE_CURRENT_BINARY_DIR}/flatpak/org.opencpn.OpenCPN.Plugin.${PACKAGE}.yaml)
 
@@ -61,11 +141,11 @@ if(NOT WIN32 AND NOT APPLE)
     add_definitions(" -O0 -g")
     message(STATUS "Optimisation: -O0 -g")
   elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_definitions(" -O2 -march=native")
-    message(STATUS "Optimisation: -O2 -march=native")
+    add_definitions(" -O2 ")
+    message(STATUS "Optimisation: -O2")
   elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    add_definitions(" -O2 -march=native -g")
-    message(STATUS "Optimisation: -O2 -march=native -g")
+    add_definitions(" -O2 -g")
+    message(STATUS "Optimisation: -O2 -g")
   else(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
     add_definitions(" -O2")
     message(STATUS "Optimisation: -O2")

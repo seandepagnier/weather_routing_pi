@@ -8,7 +8,7 @@
   <api-version> ${OCPN_API_VERSION_MAJOR}.${OCPN_API_VERSION_MINOR} </api-version>
   <open-source> yes </open-source>
   <author> ${PACKAGE_CONTACT} </author>
-  <source> https://github.com/${GIT_USER}/${GIT_REPOSITORY_NAME} </source>
+  <source> https://github.com/${GIT_REPOSITORY} </source>
 
   <description>
     ${XML_DESCRIPTION}
@@ -16,6 +16,7 @@
 
   <target>${PKG_TARGET_FULL}</target>
   <target-version>${PKG_TARGET_VERSION}</target-version>
+  <target-arch>${ARCH}</target-arch>
   <tarball-url>
     ${PKG_URL}
   </tarball-url>
