@@ -2,20 +2,35 @@ language: cpp
 
 matrix:
   include:
+# The following 2 env: sections are now being done in circleci but are left here for examples
+#  - env:
+#    - OCPN_TARGET=stretch-armhf
+#    - DOCKER_IMAGE=raspbian/stretch
+#    - BUILD_FLAGS="-j2"
+#    - BUILD_ENV=raspbian
+#    services:
+#    - docker
+#    before_script:
+#    - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part1.sh
+#    script:
+#    - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part2.sh
+#  - env:
+#    - OCPN_TARGET=buster-armhf
+#    - DOCKER_IMAGE=jongough/raspbian-buster:plugin_build_tooling_current
+#    - BUILD_FLAGS=-j2
+#    - BUILD_ENV=raspbian
+#    services:
+#    - docker
+#    before_script:
+#    - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part1.sh
+#    script:
+#    - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part2.sh
+# The following env: section is for arm64 and cannot yet be run in circleci
   - env:
-    - OCPN_TARGET=stretch-armhf
-    - DOCKER_IMAGE=raspbian/stretch
-    - BUILD_FLAGS="-j2"
-    services:
-    - docker
-    before_script:
-    - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part1.sh
-    script:
-    - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part2.sh
-  - env:
-    - OCPN_TARGET=buster-armhf
-    - DOCKER_IMAGE=jongough/raspbian-buster:plugin_build_tooling_current
+    - OCPN_TARGET=bionic-armh64
+    - DOCKER_IMAGE=arm64v8/ubuntu:18.04
     - BUILD_FLAGS=-j2
+    - BUILD_ENV=ubuntu
     services:
     - docker
     before_script:
