@@ -1,3 +1,7 @@
+#
+# File is 'sourced' in script files to ensure the correct environment variables are created
+#
+
 VERSION=${PACKAGE_VERSION}.${PKG_RELEASE}
 VERSION_DATE="${GIT_COMMIT_DATE}"
 PKG_TARGET=${PKG_TARGET}

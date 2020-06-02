@@ -3,14 +3,15 @@
 #
 # Upload the .tar.gz and .xml artifacts to cloudsmith
 #
-# Builds are uploaded the either the stable or the unstable
-# repo. If there is a tag pointing to current commit it goes
-# to stable, otherwise to unstable.
+# Builds are uploaded to one of PROD, BETA or ALPHA repositories
+# The repository depends on the branch and use of tag to determine which repo.
+# ALPHA: Non-master branch no tag
+# BETA: Non-master branch with annotated tag
+# BETA: Master branch no tag
+# PROD: Master branch with annotated tag
 #
-# If the environment variable CLOUDSMITH_PROD_REPO exists it is
-# used as the production repo, defaulting to the hardcoded PROD_REPO
-# value. Likewise for CLOUDSMITH_BETA_REPO and BETA_REPO and
-# CLOUDSMIT_ALPHA_RERP and ALPHA_REPO
+# If this script is used on CIRCLECI, TRAVIS or APPVEYOR it will upload the correct files to the chosen repository
+# If this script is used locally it will build the correct artifacts but will not do the upload
 #
 
 set -xe
@@ -19,9 +20,7 @@ PROD_REPO=${CLOUDSMITH_PROD_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY
 BETA_REPO=${CLOUDSMITH_BETA_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-@BETA@'}
 ALPHA_REPO=${CLOUDSMITH_ALPHA_REPO:-'@CLOUDSMITH_USER@/@CLOUDSMITH_BASE_REPOSITORY@-@ALPHA@'}
 
-if [ -z "$CIRCLECI" ] && [ -z "$TRAVIS" ] && [ -z "$APPVEYOR" ]; then
-    exit 0;
-fi
+LOCAL_BUILD=false
 
 if [ "$CIRCLECI" ]; then
     BUILD_ID=${CIRCLE_BUILD_NUM:-1}
@@ -35,16 +34,23 @@ elif [ "$TRAVIS" ]; then
     BUILD_BRANCH=$TRAVIS_BRANCH
     BUILD_TAG=$TRAVIS_TAG
     PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
-else
+elif [ "$APPVEYOR" ]; then
     BUILD_ID=${APPVEYOR_BUILD_NUMBER:-1}
     BUILD_DIR=$(pwd)
     BUILD_BRANCH=$APPVEYOR_REPO_BRANCH
     BUILD_TAG=$APPVEYOR_REPO_TAG_NAME
     PKG_EXT=${CLOUDSMITH_PKG_EXT:-'exe'}
+else
+    BUILD_ID=${CIRCLE_BUILD_NUM:-1}
+    BUILD_DIR=.
+    BUILD_BRANCH=$CIRCLE_BRANCH
+    BUILD_TAG=$CIRCLE_TAG
+    PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
+    LOCAL_BUILD=true
 fi
 
 set +x
-if [ -z "$CLOUDSMITH_API_KEY" ]; then
+if [ -z "$CLOUDSMITH_API_KEY" ] && [ "$LOCAL_BUILD" = "false" ]; then
     echo 'Cannot deploy to cloudsmith, missing $CLOUDSMITH_API_KEY'
     exit 0
 fi
@@ -58,7 +64,7 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
                 pyenv global 3.5.2
             fi
         fi
-        #pyenv global 3.7.1
+       #pyenv global 3.7.1
         python3 -m pip install --upgrade pip
         python3 -m pip install -q cloudsmith-cli
         pyenv rehash
@@ -97,7 +103,12 @@ echo $tarball
 echo $tarball_basename
 
 source $BUILD_DIR/pkg_version.sh
-tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
+if [ -n "${OCPN_TARGET}" ]; then
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@_${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
+else
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@_${PKG_TARGET_VERSION}-tarball
+fi
+
 if [ "$(ls $BUILD_DIR/*.${PKG_EXT})" ]; then
     pkg=$(ls $BUILD_DIR/*.${PKG_EXT})
 else
@@ -146,7 +157,7 @@ fi
 echo $VERSION
 echo $REPO
 
-if [ "$APPVEYOR" ]; then
+if [ "$APPVEYOR" ] || [ LOCAL_BUILD=true ]; then
     echo 'substituting xml file variables for windows build'
     while read line; do
         line=${line//--pkg_repo--/$REPO}
@@ -154,7 +165,7 @@ if [ "$APPVEYOR" ]; then
         line=${line//--version--/$VERSION}
         line=${line//--filename--/$tarball_basename}
         echo $line
-    done < $xml > xml.tmp && cat xml.tmp && cp xml.tmp $xml && rm xml.tmp
+    done < "$xml" > xml.tmp && cat xml.tmp && cp xml.tmp $xml && rm xml.tmp
 else
     echo 'substituting xml file variables for non-windows build'
     sudo sed -i -e "s|--pkg_repo--|$REPO|"  $xml
@@ -166,11 +177,12 @@ fi
 cat $xml
 ls -l $BUILD_DIR
 cur_dir=$(pwd)
-gunzip $tarball
+gunzip -f $tarball
 cd $BUILD_DIR
+rm -f metadata.xml
 tarball_tar=$(ls *.tar)
 xml_here=$(ls *.xml)
-cp $xml_here metadata.xml
+cp -f $xml_here metadata.xml
 if [ "$TRAVIS" ] || [ "$CIRCLECI" ]; then
     mkdir build_tar
     cp $tarball_tar build_tar/.
@@ -188,27 +200,29 @@ else
     tar -rf $tarball_tar metadata.xml
 fi
 tar -tf $tarball_tar
-gzip $tarball_tar
+gzip -f $tarball_tar
 cd $cur_dir
 pwd
 ls -la
 
-cloudsmith push raw --republish --no-wait-for-sync \
-    --name @PACKAGE_NAME@-@PKG_TARGET@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
-    --version ${VERSION} \
-    --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
-    $REPO $xml
-
-cloudsmith push raw --republish --no-wait-for-sync \
-    --name $tarball_name \
-    --version ${VERSION} \
-    --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
-    $REPO $tarball
-
-if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
+if [ $LOCAL_BUILD = false ]; then
     cloudsmith push raw --republish --no-wait-for-sync \
-        --name opencpn-package-@PACKAGE@-@PKG_TARGET@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+        --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@_@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
         --version ${VERSION} \
-        --summary "@PACKAGE@ .${PKG_EXT} installation package" \
-        $REPO $pkg
+        --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
+        $REPO $xml
+
+    cloudsmith push raw --republish --no-wait-for-sync \
+        --name $tarball_name \
+        --version ${VERSION} \
+        --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
+        $REPO $tarball
+
+    if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
+        cloudsmith push raw --republish --no-wait-for-sync \
+            --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@_@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+            --version ${VERSION} \
+            --summary "@PACKAGE@ .${PKG_EXT} installation package" \
+            $REPO $pkg
+    fi
 fi
