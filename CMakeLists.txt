@@ -52,8 +52,8 @@ set(PACKAGE "weather_routing_pi")
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "7")
-set(VERSION_TWEAK "1")
-set(VERSION_DATE "06/05/2020")
+set(VERSION_TWEAK "2")
+set(VERSION_DATE "06/08/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -70,12 +70,13 @@ set(ALPHA "alpha") #Standard Repos
 
 #set(CLOUDSMITH_USER "sean-depagnier")
 #set(CLOUDSMITH_USER "jon-gough")
-set(CLOUDSMITH_USER "rick-gleason")
+#set(CLOUDSMITH_USER "rick-gleason")
+set(CLOUDSMITH_USER "opencpn")
 
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "weather_routing")  #Jon Gough's customization
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
-set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Rick's customization
+set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #Rick's customization
 
 # Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
