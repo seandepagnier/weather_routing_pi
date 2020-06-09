@@ -72,9 +72,10 @@ set(GIT_REPOSITORY_SERVER "github.com")
 #No longer needed, queried.
 set(GIT_USER "rgleason")
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
+
 ## Specifies Cloudsmith upload repository suffix for each catalog
-set(PROD "prod")  #Standard Repos
-set(BETA "beta")  #Standard Repos
+set(PROD "prod")   #Standard Repos
+set(BETA "beta")   #Standard Repos
 set(ALPHA "alpha") #Standard Repos
 
 #set(CLOUDSMITH_USER "sean-depagnier")
@@ -84,7 +85,6 @@ set(CLOUDSMITH_USER "opencpn")
 
 # Set if  Cloudsmith Base Repository name does not match your Git Repository name.
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
-#set(CLOUDSMITH_BASE_REPOSITORY "weather_routing")  #Jon Gough's customization
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Ricks's customization
 set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #without the _pi
 
@@ -315,6 +315,9 @@ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 # Used in textplugin. Just added.
 add_definitions(-DTIXML_USE_STL)
 
+# -------------------------------------------
+#  PI_JSON SCHEMA VALIDATOR  From Testplugin 
+# -------------------------------------------
 # Every plugin that uses JSON for passing messages should use a validator. The validator  allows the system to ignore non-conformant messages. 
 
 #if(UNIX AND NOT APPLE)
@@ -332,12 +335,16 @@ add_definitions(-DTIXML_USE_STL)
 #                DEPENDS ${PACKAGE_NAME}
 #                COMMENT " Running post build action on ${lib_name}."
 #                COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) ')
-#		
+#	   
 #        else(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
 #            message(STATUS "${CMLOC}Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
 #        endif(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
 #    endif(PI_JSON_SCHEMA_VALIDATOR)
 #endif(UNIX AND NOT APPLE)
+
+# ------------------------------------------
+#    End of JSON VALIDATOR From Testplugin 
+# -------------------------------------------
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
