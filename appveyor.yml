@@ -1,4 +1,4 @@
-clone_folder: c:\project\weather_routing_pi
+clone_folder: c:\project\ocpn_project
 shallow_clone: false
 clone_depth: 10
 
@@ -38,14 +38,14 @@ install:
   - set
 
 before_build:
-  - cd c:\project\weather_routing_pi
+  - cd c:\project\ocpn_project
   - cd buildwin
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/PVW32Con.exe
   - cd ..  
   - rm -rf build && mkdir build && cd build
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.99.1405-vc141_xp/opencpn.lib
   - ps: Start-FileDownload http://opencpn.navnux.org/build_deps/OpenCPN_buildwin-4.99a.7z
-  - cmd: 7z x -y OpenCPN_buildwin-4.99a.7z -oc:\project\weather_routing_pi\buildwin
+  - cmd: 7z x -y OpenCPN_buildwin-4.99a.7z -oc:\project\ocpn_project\buildwin
   - cmake -T v141_xp ..
 
 build_script:

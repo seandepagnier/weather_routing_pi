@@ -19,32 +19,38 @@
 #-----------------------------------------------------------------------------
 # Frontend2 Author: Jon Gough  
 # ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.006  
-#    - 2/19/2020 10 environments needed for beta testing.
-#    - 2/19/2020 fix debian build
-#    - 2/19/2020 Add raspian build
-#    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
-#    - 3/1/2020  fix raspian xml target-url with if-then
-#    - 3/30/2020 MacOS build fixed 12 env
-#    - Reverse dates here
-#    - 2/05/2020 MacOS final fix- JG
-# ----------------------------------------------------------------------------
-# ----- Modify section below to include all the details for your plugin ----- ##
+# CMake-CI Number: 0.0.009
+#    - 28/05/2020 Work on Local Build
+#    - 28/05/2020 Move CmakeLists code into PluginSetup.cmake
+#    - 30/05/2020 Minor Update for Arch
+#    - 09/06/2020 Fix gtk3 and new build naming  
+# ---------------------------------------------------------------------------
+## ----- When changing this file do NOT change the order in which sections occur        ----- ##
+## ----- Changes should only be made between the section blocks that identify where     ----- ##
+## ----- these changes should be. The whole configuration process relies on this        ----- ##
+## ----- sequence to be successful                                                      ----- ##
 
+##
+##----- Modify section below to include all the details for your plugin ----- ##
+##
+
+set(CMLOC "CMakeLists: ")
+
+# define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
-  if(POLICY CMP0043)
-    cmake_policy(SET CMP0043 NEW)
-  endif(POLICY CMP0043)
-  cmake_policy(SET CMP0048 NEW)
-  if(POLICY CMP0077)
-    cmake_policy(SET CMP0077 NEW)
-  endif(POLICY CMP0077)
+    if(POLICY CMP0043)
+        cmake_policy(SET CMP0043 NEW)
+    endif(POLICY CMP0043)
+    cmake_policy(SET CMP0048 NEW)
+    if(POLICY CMP0077)
+        cmake_policy(SET CMP0077 NEW)
+    endif(POLICY CMP0077)
 endif(COMMAND cmake_policy)
 
+# define plugin name, owner and versions
 set(VERBOSE_NAME "WeatherRouting")
-# Search "getcommonname"in weather_routing_pi.cpp
-set(COMMON_NAME "WeatherRouting")  
+set(COMMON_NAME "WeatherRouting")  # Search "getcommonname"in <plugin_pi>.cpp
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(PACKAGE "weather_routing_pi")
@@ -52,18 +58,21 @@ set(PACKAGE "weather_routing_pi")
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "7")
-set(VERSION_TWEAK "2")
-set(VERSION_DATE "06/08/2020")
+set(VERSION_TWEAK "3")
+set(VERSION_DATE "06/09/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
 
 set(PARENT "opencpn")
 
-# The next line allows for setting up your own local webserver with git on it for testing purposes, the default is github.com
+#Used to set up a local webserver with git loaded, for testing purposes.
 set(GIT_REPOSITORY_SERVER "github.com")
 
-# Set Cloudsmith upload repository suffix for each catalog
+#No longer needed, queried.
+#set(GIT_USER "rgleason")
+#set(GIT_REPOSITORY_NAME "testplugin_pi")
+## Specifies Cloudsmith upload repository suffix for each catalog
 set(PROD "prod")  #Standard Repos
 set(BETA "beta")  #Standard Repos
 set(ALPHA "alpha") #Standard Repos
@@ -73,10 +82,11 @@ set(ALPHA "alpha") #Standard Repos
 #set(CLOUDSMITH_USER "rick-gleason")
 set(CLOUDSMITH_USER "opencpn")
 
+# Set if  Cloudsmith Base Repository name does not match your Git Repository name.
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "weather_routing")  #Jon Gough's customization
-#set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
-set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #Rick's customization
+#set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Ricks's customization
+set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #without the _pi
 
 # Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
@@ -84,40 +94,37 @@ set(XML_SUMMARY "Compute optimal routes based on weather and constraints.")
 set(XML_DESCRIPTION "WR features include:\n\ optimal routing subject to various constraints based on weather data,\n\ automatic boat polar computation.")
 
 ##
-## ----- Modify above to include all the plugin details --------- ##
-## ----- Modify below for plugin special requirements------------ ##
+## ----- Modify section above to include all the details for your plugin ----- ##
 ##
 
 ##
-## ----- Modify above to include all the plugin details --------- ##
-## ----- Modify below for plugin special requirements------------ ##
+## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
 
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
 set(CMAKE_CXX_STANDARD 11)
 
-#------Settings
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
 # Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
-
-# Not found in Master branch. Question still needed? on or off?
-# Testplugin has OFF
-option(USE_GL "Enable OpenGL support" ON)
-message(STATUS "USE_GL: ${USE_GL}")
-#------End Settings
+option(USE_GL "Enable OpenGL support" ON)  #WxRoute requires on
+message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build" FORCE)
+    set(CMAKE_BUILD_TYPE
+        "Release"
+        CACHE STRING "Choose the type of build" FORCE)
 endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 
 ##
-## ----- The statement below is used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
+## ----- The statements below are used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
 ##
+
+project(${PACKAGE})
 
 #========================================================
 INCLUDE("cmake/PluginSetup.cmake")
@@ -131,23 +138,28 @@ INCLUDE("cmake/PluginSetup.cmake")
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
 
-# Settings and Options
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(Plugin_CXX11 "Use c++11" OFF) #Wass commented out
+##
+## ----- Modify section above if there are special requirements for the plugin ----- ##
+##
 
-# -------Section above is directly from Testplugin --------------#
-# ----- Modify section above for special plugin requirements----- ##
+##
+## ----- do not change next section - needed to configure build process ----- ##
+##
+
 #===========================================================
 INCLUDE("cmake/PluginConfigure.cmake")
 #===========================================================
-# ----- Change below to match project requirements ----- ##
+# ----- Change below to match project requirements for source, headers, etc. ----- ##
+#
 
 add_definitions(-DUSE_S57)
 
 # From master branch - is this workiing? necessary?
 IF(PLUGIN_USE_SVG)
-    MESSAGE(STATUS "SVG support enabled...")
+    MESSAGE(STATUS "${CMLOC}SVG support enabled...")
     IF(NOT QT_ANDROID)
         ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
     ENDIF(NOT QT_ANDROID)
@@ -285,11 +297,17 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
 ##=============================================================
 # Modify/configure 'Include' Directories below for the Plugin
 ##=============================================================
-## EG  (from Testplugin) also in cmake/Plugin_____.cmake files
+
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
 
+##
+## Statement below is required to collect all the set( headers and SRCS  - Adjust as required
+## This add_library  can be used in conditionals below.
+##
+##    SET(EXTSRC  ${EXTSRC}   etc   Can be in an if statement as below
+##
 
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
@@ -297,29 +315,29 @@ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 # Used in textplugin. Just added.
 add_definitions(-DTIXML_USE_STL)
 
-#JSON Validator: Every plugin that uses JSON for passing messages should use a validator.  A JSON validator is much like an XML validator, the validator allows the system to ignore non-conformant messages.  The JSON validator changes the OSABI flavor of the Linux executable so there is code to change it back.
+# Every plugin that uses JSON for passing messages should use a validator. The validator  allows the system to ignore non-conformant messages. 
 
-#IF(UNIX AND NOT APPLE)
-#  IF(TP_JSON_SCHEMA_VALIDATOR)
-#    # Change OS/ABI to be UNIX - System V to make it run with OCPN
-#    SET(lib_name lib${PACKAGE_NAME}.so)
-#    MESSAGE(STATUS "lib-name: ${lib_name}")
-#    FIND_FILE(elfedit elfedit)
-#    IF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#      MESSAGE(STATUS "Will ensure OS/ABI is set to 0 to match OCPN")
-#      ADD_CUSTOM_COMMAND(
-#        TARGET ${PACKAGE_NAME}
-#        POST_BUILD
-#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#        DEPENDS ${PACKAGE_NAME}
-#        COMMENT " Running post build action on ${lib_name}."
-#        COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) '
-#      )
-#    ELSE(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#      MESSAGE(STATUS "Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
-#    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
-#ENDIF(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE)
+    if(PI_JSON_SCHEMA_VALIDATOR)
+        # Change OS/ABI to be UNIX - System V to make it run with OCPN
+        set(lib_name lib${PACKAGE_NAME}.so)
+        message(STATUS "${CMLOC}lib-name: ${lib_name}")
+        find_file(elfedit elfedit)
+        if(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+            message(STATUS "${CMLOC}Will ensure OS/ABI is set to 0 to match OCPN")
+            add_custom_command(
+                TARGET ${PACKAGE_NAME}
+                POST_BUILD
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                DEPENDS ${PACKAGE_NAME}
+                COMMENT " Running post build action on ${lib_name}."
+                COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) ')
+		
+        else(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+            message(STATUS "${CMLOC}Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
+        endif(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+    endif(PI_JSON_SCHEMA_VALIDATOR)
+endif(UNIX AND NOT APPLE)
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
@@ -374,4 +392,8 @@ INCLUDE("cmake/PluginInstall.cmake")
 INCLUDE("cmake/PluginLocalization.cmake")
 INCLUDE("cmake/PluginPackage.cmake")
 get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
-message(STATUS "Libraries: ${OUT}")
+message(STATUS "${CMLOC}Libraries: ${OUT}")
+
+## ----- do not change section above - needed to configure build process ----- ##
+##
+					

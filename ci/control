@@ -21,6 +21,7 @@ Build-Depends: debhelper (>= 9),
  libwxgtk3.0-gtk3-dev | base-files (<< 10),
  libwxgtk-webview3.0-dev | libwxgtk-webview3.0-gtk3-dev | base-files (<< 11),
  libwxsvg-dev | base-files (<< 11),
+ librtlsdr-dev,
  portaudio19-dev,
  python3-pip,
  python3-setuptools

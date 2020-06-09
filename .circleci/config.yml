@@ -1,5 +1,5 @@
 ---
-version: 2
+version: 2.1
 jobs:
     build-armhf-stretch:
         machine: true
@@ -99,7 +99,7 @@ jobs:
         docker:
         - image: circleci/buildpack-deps:bionic-scm
         environment:
-        - BUILD_GTK3: 1
+        - BUILD_GTK3: true
         - OCPN_TARGET:  bionic-gtk3
         steps:
         - checkout
@@ -134,7 +134,7 @@ jobs:
         docker:
         - image: circleci/buildpack-deps:focal-scm
         environment:
-        - BUILD_GTK3: 1
+        - BUILD_GTK3: true
         - OCPN_TARGET: focal-gtk3
         steps:
         - checkout
