@@ -271,14 +271,15 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-        - build-focal:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
+# there is no focal gtk2 available so this will not be built
+#        - build-focal:
+#            filters:
+#                branches:
+#                    ignore:
+#                    - devel
+#                    - tmp
+#                tags:
+#                    only: /.*/
         - build-focal-gtk3:
             filters:
                 branches:
@@ -303,14 +304,15 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-        - build-fedora:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
+# Fedora is being removed from the supplied list of environments so don't build
+#        - build-fedora:
+#            filters:
+#                branches:
+#                    ignore:
+#                    - devel
+#                    - tmp
+#                tags:
+#                    only: /.*/
         - build-mingw:
             filters:
                 branches:
