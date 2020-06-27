@@ -33,6 +33,10 @@ elif [ "$TRAVIS" ]; then
     BUILD_DIR=$TRAVIS_BUILD_DIR/build
     BUILD_BRANCH=$TRAVIS_BRANCH
     BUILD_TAG=$TRAVIS_TAG
+    if [ "$BUILD_BRANCH" = "$BUILD_TAG" ]; then
+        # Travis makes BUILD_BRANCH = BUILD_TAG so make BUILD_BRANCH ""
+        BUILD_BRANCH=""
+    fi	  
     PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
 elif [ "$APPVEYOR" ]; then
     BUILD_ID=${APPVEYOR_BUILD_NUMBER:-1}
@@ -103,6 +107,7 @@ echo $tarball
 echo $tarball_basename
 
 source $BUILD_DIR/pkg_version.sh
+
 if [ -n "${OCPN_TARGET}" ]; then
     tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
 else
@@ -125,7 +130,7 @@ fi
 if [ "$BUILD_BRANCH" = "" ]; then
     build_commit=$(git show -s --format=%d $BUILD_TAG)
     is_master=$(echo $build_commit | awk '/\/master/ {print}')
-    if [ "$is_master" != "" ]; then
+    if [ "$is_master" != "" ] || [ "$TRAVIS" ]; then
         BUILD_BRANCH="master"
     fi
 fi

@@ -37,10 +37,4 @@ matrix:
     - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part1.sh
     script:
     - travis_wait 120 sleep infinity & bash ./ci/travis-build-raspbian-armhf-part2.sh
-deploy:
-  provider: script
-  skip_cleanup: true
-  script: bash ./ci/cloudsmith-upload.sh
-  on:
-    tags: false
-    all_branches: true
+    - bash ./ci/cloudsmith-upload.sh

@@ -21,6 +21,7 @@ foreach(POTLINE IN ITEMS ${HDRS})
     file(APPEND ${POTFILE}.test "${POTLINE}\n")
 endforeach(POTLINE)
 # convert crlf to lf for consistency and make copy_if_different work correctly
+file(WRITE ${POTFILE}.test "")
 configure_file(${POTFILE}.test ${POTFILE}.test NEWLINE_STYLE UNIX)
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${POTFILE}.test ${POTFILE} OUTPUT_QUIET ERROR_QUIET)
 

@@ -2,8 +2,8 @@
 # File is 'sourced' in script files to ensure the correct environment variables are created
 #
 
-VERSION=1.13.7.5.
-VERSION_DATE="2020-06-11 16:03:07 -0400"
+VERSION=1.13.9.0.
+VERSION_DATE="2020-06-18 21:49:24 -0400"
 PKG_TARGET=msvc
 PKG_TARGET_VERSION=10.0.18363
 
