@@ -36,7 +36,7 @@ elif [ "$TRAVIS" ]; then
     if [ "$BUILD_BRANCH" = "$BUILD_TAG" ]; then
         # Travis makes BUILD_BRANCH = BUILD_TAG so make BUILD_BRANCH ""
         BUILD_BRANCH=""
-    fi	  
+    fi
     PKG_EXT=${CLOUDSMITH_PKG_EXT:-'deb'}
 elif [ "$APPVEYOR" ]; then
     BUILD_ID=${APPVEYOR_BUILD_NUMBER:-1}
@@ -107,7 +107,6 @@ echo $tarball
 echo $tarball_basename
 
 source $BUILD_DIR/pkg_version.sh
-
 if [ -n "${OCPN_TARGET}" ]; then
     tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
 else
