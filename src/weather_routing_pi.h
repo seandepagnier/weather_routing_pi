@@ -59,9 +59,6 @@ std::cout << x << std::endl; } while (0)
 
 #include "version.h"
 
-#define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    16
-
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
 
 #include "ocpn_plugin.h"

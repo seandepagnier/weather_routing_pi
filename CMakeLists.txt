@@ -18,12 +18,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
 # Frontend2 Author: Jon Gough  
-# ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.009
-#    - 28/05/2020 Work on Local Build
-#    - 28/05/2020 Move CmakeLists code into PluginSetup.cmake
-#    - 30/05/2020 Minor Update for Arch
-#    - 09/06/2020 Fix gtk3 and new build naming  
+# Frontend2: v1.0.120					 
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
 ## ----- Changes should only be made between the section blocks that identify where     ----- ##
@@ -57,9 +52,9 @@ set(PACKAGE "weather_routing_pi")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "8")
-set(VERSION_TWEAK "0")
-set(VERSION_DATE "06/18/2020")
+set(VERSION_PATCH "9")
+set(VERSION_TWEAK "1")
+set(VERSION_DATE "07/02/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")

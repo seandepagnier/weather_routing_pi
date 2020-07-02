@@ -38,10 +38,9 @@ Copy the following directories and files from testplugin_pi to the same location
 - testplugin_pi/ci
 - testplugin_pi/cmake
 - testplugin_pi/buildosx
-- testplugin_pi/debian  (can be removed)
 - testplugin_pi/mingw
-- testplugin_pi/extinclude  Needed for json validation 
-- testplugin_pi/extsrc  Needed for json validation
+- testplugin_pi/extinclude  Needed for json validation  (certain plugins) Ocpn_draw, watchdog, weather_routing
+- testplugin_pi/extsrc  Needed for json validation (certain plugins)
 
 #### Files
 - testplugin_pi/appveyor.yml
@@ -78,34 +77,46 @@ The following directories and files are not needed from testplugin_pi
      - Make sure all your necesary libraries are found.
      - Add/Modify a statement like this to join all of your project's set(
        - EG: add_library(${PACKAGE_NAME} SHARED ${SRCS} ${HDRS} ${NMEA0183} ${LIBSSRC})
+1. API Number must be at least 1.16 for the new Plugin Manager, due to a change in how directories are found and location.
+1. API Names have been changed from MY_API_VERSION_MAJOR and MY_API_VERSION_MINOR, to OCPN_API_VERSION_MAJOR/MINOR
+     - OCPN_API_VERSION_MAJOR/MINOR are now used in cmake/in-files/version.h.in
+     - In the file [plugin_pi].cpp the are several lines which need to be changed from MY_API_VERSION_MAJOR/MINOR to 
+	   - EG: "return OCPN_API_VERSION_MAJOR;"
+       - EG: "return OCPN_API_VERSION_MINOR;"
+	 - Also in file [plugin_pi].cpp find   wxString [pluginname_pi]::GetCommonName() and change 
+	   - return _("[plugin-pi]");  to
+       - return _T(PLUGIN_COMMON_NAME);		
+     - In the file [plugin_pi].h there are several lines which need to be commented out.
+       - // #define     MY_API_VERSION_MAJOR    1
+       - // #define     MY_API_VERSION_MINOR    16
+       - Because the new values definitions are defined in cmake/in-files/version.h.in	   
 1. Cmake Files are somewhat generic, but often can be plugin specific, depending on the plugin.
    - Review the cmake.save files one by one with the new ones and make necessary adjustments.
    - Configuring this is not simple and requires knowledge about the plugin operation.
 1. Next get the ci/environment scripts working on Circleci, Appveyor and .travis-ci
 1. Then get the uploads to Cloudsmith working.
+   - First create your Cloudsmith Account, then join the OpenCPN Organization as a member of the Plugins Team.
+   - Once you are accepted as a member, you will be able to create three repositories for your plugin.
+   - The management of Cloudsmith has advised that Organizations will in the future be restricted to having repositories in the Organization's Folder, so it is best to start out that way.  
    - Configuration of uploads to Cloudsmith destinations:
      - ci\cloudsmith-upload.sh points to  ..cmake\in-files\cloudsmith-upload.sh.in
      - See for standard repository directories.
        - @CLOUDSMITH_BASE_REPOSITORY@-prod
        - @CLOUDSMITH_BASE_REPOSITORY@-beta
        - @CLOUDSMITH_BASE_REPOSITORY@-alpha
-     - Default 'CLOUDSMITH_BASE_REPOSTORY' is your 'Github Repository', set in CMakeLists.txt
-     - In your free Cloudsmith Account set up the prod, beta and alpha 'open source" repositories.
-     - See the instrustions in the Developer's Manual wiki.
+     - The Frontend2 defaults to 'CLOUDSMITH_BASE_REPOSTORY' = 'yoour Github Repository', however you should set this value in CMakeLists.txt as "opencpn"
+     - In the organization "OpenCPN" create [pluginname]-alpha, [pluginname]-beta and [pluginname]-alpha repositories.
+	 - Make sure that you select "Open Source", not just "public". It must be "Open Source"
+     - See the more detailed instructions in the Developer's Manual wiki.
    - For custom Cloudsmith repository destinations, modify if needed.
-     - Example custom Cloudsmith path uploads
-     - Mauro's repositories https://cloudsmith.io/~mauro-calvi/repos/
-     - OCPN_STABLE_REPO=mauro-calvi/squiddio-stable
-     - OCPN_UNSTABLE_REPO=mauro-calvi/squiddio-pi
-     - OCPN_PKG_REPO=mauro-calvi/squiddio-manual
 
-# Deployment 
-
+# DEPLOYMENT 
+----------------------------------------------------------------
 The current setup for Frontend2 plugins does this:
-    - No tag -> Alpha repository
-    - Non-Master branch tag -> Beta repository
+    - Non-Master branch no tag -> Alpha repository
+    - Non-Master branch with tag -> Beta repository
     - Master branch no tag -> Beta repository
-    - Master branch tag -> Prod repository
+    - Master branch with tag -> Prod repository
 
  There are several ways to issue a "tagged push"
     - See https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:developer_manual:pi_installer_procedure#deploy_to_prod_repository
@@ -126,9 +137,11 @@ Example:
   To https://github.com/xxxx/weatherfax_pi.git  
     * [new tag]           v1.9.5.10 -> v1.9.5.10
 1. git push origin master 
-   
-### Comparing Plugin Manager "Frontend2" in testplugin_pi to weatherfax_pi,
-to highlight the differences
+
+----------------------------------------------------------------   
+### Weatherfax_pi Differences  using testplugin_pi "Frontend2"
+
+Weatherfax_pi needs to have sound support for Windows and Mingw, additionally use with rtlsdr requires additional files. 
 
 1. circleci/config.yml  -same
 1. ci/ all scripts same except

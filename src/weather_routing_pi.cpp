@@ -23,6 +23,7 @@
  ***************************************************************************
  */
 
+
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 #include <wx/treectrl.h>
@@ -159,12 +160,12 @@ bool weather_routing_pi::DeInit()
 
 int weather_routing_pi::GetAPIVersionMajor()
 {
-      return MY_API_VERSION_MAJOR;
+      return OCPN_API_VERSION_MAJOR;
 }
 
 int weather_routing_pi::GetAPIVersionMinor()
 {
-      return MY_API_VERSION_MINOR;
+      return OCPN_API_VERSION_MINOR;
 }
 
 int weather_routing_pi::GetPlugInVersionMajor()
@@ -184,7 +185,6 @@ wxBitmap *weather_routing_pi::GetPlugInBitmap()
 
 wxString weather_routing_pi::GetCommonName()
 {
-  //   return _T("WeatherRouting");
     return _T(PLUGIN_COMMON_NAME);
 }
 
@@ -240,7 +240,7 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
 
         if (v["Day"].asInt() != -1) {
             wxDateTime time;
-        
+
             time.Set
               (v["Day"].asInt(), (wxDateTime::Month)v["Month"].asInt(), v["Year"].asInt(),
                v["Hour"].asInt(), v["Minute"].asInt(), v["Second"].asInt());
@@ -359,10 +359,10 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
         Json::Reader  reader;
         // check for errors before retreiving values...
         if (!reader.parse( static_cast<std::string>(message_body), root )) {
-            wxLogMessage(_T("weather_routing_pi: Error parsing JSON message - ") 
+            wxLogMessage(_T("weather_routing_pi: Error parsing JSON message - ")
                  +reader.getFormattedErrorMessages() + " : " + message_body );
         }
-        
+
         if(root["Type"].asString() == "Response" && root["Source"].asString() == "OCPN_DRAW_PI") {
             if(root["Msg"].asString() == "Version" ) {
                 if(root["MsgId"].asString() == "version")
@@ -493,7 +493,7 @@ bool weather_routing_pi::RenderOverlay(wxDC &wxdc, PlugIn_ViewPort *vp)
 }
 
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
-{    
+{
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
         piDC dc;
         dc.SetVP(vp);
