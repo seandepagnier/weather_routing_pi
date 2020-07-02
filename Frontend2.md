@@ -6,6 +6,7 @@ deployed directly to Cloudsmith repositories that are accessed by OpenCPN Plugin
 during installation. We call this configuration "Frontend 2".  This version is easier to configure.
 "Frontend 1" can be found in the current versions of Oesenc_pi and Vdr_pi. 
 
+
 # KEEP EXISTING DIRECTORIES AND FILES
 ----------------------------------------------------
 #### Important:
