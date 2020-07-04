@@ -156,6 +156,7 @@ if(APPLE)
         RUNTIME
         LIBRARY DESTINATION OpenCPN.app/Contents/PlugIns)
     message(STATUS "${CMLOC}Install Target: OpenCPN.app/Contents/PlugIns")
+
 endif(APPLE)
 
 set(CMLOC ${SAVE_CMLOC})

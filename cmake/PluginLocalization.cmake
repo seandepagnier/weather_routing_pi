@@ -91,14 +91,14 @@ macro(GETTEXT_BUILD_MO)
             install(
                 FILES ${_gmoFile}
                 DESTINATION OpenCPN.app/Contents/Resources/${_poBasename}.lproj
-                RENAME ${PACKAGE_NAME}.mo)
-            message(STATUS "${CMLOC}Install language files to: OpenCPN.app/Contents/Resources/${_poBasename}.lproj renamed to: opencpn-${PACKAGE_NAME}.mo")
+                RENAME opencpn-${PACKAGE_NAME}.mo)
+                message(STATUS "${CMLOC}Install language files to: OpenCPN.app/Contents/Resources/${_poBasename}.lproj renamed to: opencpn-${PACKAGE_NAME}.mo")
         else(APPLE)
             install(
                 FILES ${_gmoFile}
                 DESTINATION ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES
-                RENAME ${PACKAGE_NAME}.mo)
-            message(STATUS "${CMLOC}Install language files to: ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES renamed to: opencpn-${PACKAGE_NAME}.mo")
+                RENAME opencpn-${PACKAGE_NAME}.mo)
+                message(STATUS "${CMLOC}Install language files to: ${PREFIX_DATA}/locale/${_poBasename}/LC_MESSAGES renamed to: opencpn-${PACKAGE_NAME}.mo")
         endif(APPLE)
 
         set(_gmoFiles ${_gmoFiles} ${_gmoFile})
@@ -114,7 +114,5 @@ if(GETTEXT_MSGFMT_EXECUTABLE)
         DEPENDS ${_gmoFiles})
     add_dependencies(${PACKAGE_NAME} ${I18N_NAME}-i18n)
 endif(GETTEXT_MSGFMT_EXECUTABLE)
-file(MAKE_DIRECTORY "Resources")
-message(STATUS "${CMLOC}Creating Resources directory")
 
 set(CMLOC ${SAVE_CMLOC})

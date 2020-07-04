@@ -65,6 +65,7 @@ artifacts:
 #  provider: GitHub
 #  #auth_token: '%GitHub_auth_token%'
 #  auth_token:  '%git-ptoken-testplugin-into-appveyor%'
+
 #  artifact: installer,portable
 #  draft: true
 #  prerelease: true
