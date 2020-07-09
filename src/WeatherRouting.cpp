@@ -35,7 +35,7 @@
 
 #include <wx/glcanvas.h>
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 
 #include "Utilities.h"
 #include "Boat.h"

@@ -30,6 +30,8 @@
 ##
 
 set(CMLOC "CMakeLists: ")
+# Alec from watchdog
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
@@ -52,7 +54,7 @@ set(PACKAGE "weather_routing_pi")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "12")
+set(VERSION_PATCH "13")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE "07/09/2020")
 set(OCPN_MIN_VERSION "ov50")
@@ -316,6 +318,10 @@ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 # Used in textplugin. Just added.
 add_definitions(-DTIXML_USE_STL)
 
+# Alec from watchdog
+add_subdirectory(libs/tinyxml)
+target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
+
 # -------------------------------------------
 #  PI_JSON SCHEMA VALIDATOR  From Testplugin 
 # -------------------------------------------
@@ -390,7 +396,8 @@ ENDIF()
 # Jon identified these were missing causing json/json.h and other problems.
 #----INCLUDE CMAKE #3 & #4 -----
 INCLUDE("cmake/PluginJSON.cmake")
-INCLUDE("cmake/PluginXML.cmake")
+# Alec from watchdog see cmake_module and sub-directory
+# INCLUDE("cmake/PluginXML.cmake")
 INCLUDE("cmake/PluginGL.cmake")
 #
 # ----- Do not change - needed to build app ----- ##
