@@ -240,9 +240,10 @@ SET(SRC_LIBTESS2
 
 # added by rick
  SET (SRC_TINYXML
-             src/tinyxml/tinystr.h
-			 src/tinyxml/tinyxml.h
-)  
+      src/tinyxml/tinyxml.cpp
+			src/tinyxml/tinyxmlerror.cpp
+			src/tinyxml/tinyxmlparser.cpp
+)
 
 # SET  (SRC_ZLIB
 #             src/zlib-1.2.3/zconf.h
