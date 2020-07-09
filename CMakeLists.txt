@@ -52,9 +52,9 @@ set(PACKAGE "weather_routing_pi")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "11")
+set(VERSION_PATCH "12")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "07/03/2020")
+set(VERSION_DATE "07/09/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -216,11 +216,11 @@ SET (HDRS
             src/zuFile.h
             src/georef.h
             src/GribRecord.h
-            src/tinyxml/tinyxml.h
-            src/tinyxml/tinystr.h
-            src/jsoncpp/json/json.h
 )
+# Seems to work without this -Rick
+#            src/jsoncpp/json/json.h
 
+# Tried removing this, got many Tesselate Linker errors. Put back in.
 SET(SRC_LIBTESS2
              src/libtess2/bucketalloc.c
              src/libtess2/dict.c
@@ -230,20 +230,22 @@ SET(SRC_LIBTESS2
              src/libtess2/sweep.c
              src/libtess2/tess.c
 )
-  
- SET(SRC_PLUGINGL
-             src/plugingl/linmath.h
-             src/plugingl/pidc.h
-             src/plugingl/qtstylesheet.h
-             src/plugingl/TexFont.h
-)
 
-# added by rick
- SET (SRC_TINYXML
-      src/tinyxml/tinyxml.cpp
-			src/tinyxml/tinyxmlerror.cpp
-			src/tinyxml/tinyxmlparser.cpp
-)
+# added by rick - removed by rick pluginJSON.cmake   
+# SET(SRC_PLUGINGL
+#             src/plugingl/linmath.h
+#             src/plugingl/pidc.h
+#             src/plugingl/qtstylesheet.h
+#             src/plugingl/TexFont.h
+#)
+
+# added by rick - removed by rick pluginTINYXML.cmake does this
+# SET (SRC_TINYXML
+#    src/tinyxml/tinyxml.cpp
+#	src/tinyxml/tinyxmlerror.cpp
+#	src/tinyxml/tinyxmlparser.cpp
+#    src/tinyxml/tinyxml.h
+#)
 
 # SET  (SRC_ZLIB
 #             src/zlib-1.2.3/zconf.h
@@ -281,13 +283,16 @@ SET(SRC_LIBTESS2
 #   src/jsoncpp/json_tool.h)  #rick added
          				  
 # Testplugin has this line, so just added it
+
 add_definitions(-DPLUGIN_USE_SVG)
 
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
 ## This add_library  can be used in conditionals below.
 ##================================================================================
-SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
+# SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
+SET(SRC ${SRCS} ${SRC_LIBTESS2} )
+
 ##================================================================================
 
 ##=============================================================
