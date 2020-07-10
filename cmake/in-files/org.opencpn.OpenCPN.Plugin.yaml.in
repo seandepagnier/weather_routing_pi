@@ -6,6 +6,24 @@ build-extension: true
 separate-locales: false
 appstream-compose: false
 modules:
+  - name: tinyxml
+    builddir: false
+    no-autogen: true
+    buildsystem: simple
+    build-commands: 
+       - mkdir /run/build/tinyxml/build
+       - cd /run/build/tinyxml/build; cmake ..
+       - cd /run/build/tinyxml/build; make
+       - test -d /app/extensions/${PACKAGE}/lib || mkdir -p /app/extensions/${PACKAGE}/lib
+       - test -d /app/extensions/${PACKAGE}/include || mkdir -p /app/extensions/${PACKAGE}/include
+       - cp /run/build/tinyxml/build/libtinyxml.so  /app/extensions/${PACKAGE}/lib
+       - cp /run/build/tinyxml/tinyxml.h /app/extensions/${PACKAGE}/include
+    no-make-install: true
+    sources:
+       - type: git
+         url: https://github.com/leamas/tinyxml.git
+         branch: master
+
   - name: ${PACKAGE}
     no-autogen: true
     buildsystem: cmake
@@ -20,21 +38,3 @@ modules:
        - type: git
          url: git://${GIT_REPOSITORY_SERVER}/${GIT_REPOSITORY}
          ${GIT_BRANCH_OR_TAG}: ${GIT_REPOSITORY_ITEM}
-  - name: tinyxml
-    builddir: false
-    no-autogen: true
-    buildsystem: simple
-    build-commands: 
-       - mkdir /run/build/tinyxml/build
-       - cd /run/build/tinyxml/build; cmake ..
-       - cd /run/build/tinyxml/build; make
-       - cp /run/build/tinyxml/build/libtinyxml.so  $FLATPAK_DEST/lib
-       - cp /run/build/tinyxml/tinyxml.h $FLATPAK_DEST/include
-    no-make-install: 1
-    sources:
-       - type: git
-         url: https://github.com/leamas/tinyxml.git
-         branch: master
-
-
-
