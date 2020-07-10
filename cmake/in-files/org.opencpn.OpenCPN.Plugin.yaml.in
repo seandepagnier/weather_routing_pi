@@ -29,7 +29,7 @@ modules:
        - cd /run/build/tinyxml/build; cmake ..
        - cd /run/build/tinyxml/build; make
        - cp /run/build/tinyxml/build/libtinyxml.so  $FLATPAK_DEST/lib
-       - cp /run/build/tinyxml/tinyxml/tinyxml.h $FLATPAK_DEST/include
+       - cp /run/build/tinyxml/tinyxml.h $FLATPAK_DEST/include
     no-make-install: 1
     sources:
        - type: git
