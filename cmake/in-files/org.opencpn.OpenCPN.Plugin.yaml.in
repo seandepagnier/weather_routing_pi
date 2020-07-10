@@ -16,8 +16,8 @@ modules:
        - cd /run/build/tinyxml/build; make
        - test -d /app/extensions/${PACKAGE}/lib || mkdir -p /app/extensions/${PACKAGE}/lib
        - test -d /app/extensions/${PACKAGE}/include || mkdir -p /app/extensions/${PACKAGE}/include
-       - cp /run/build/tinyxml/build/libtinyxml.so  /app/extensions/${PACKAGE}/lib
-       - cp /run/build/tinyxml/tinyxml.h /app/extensions/${PACKAGE}/include
+       - cp /run/build/tinyxml/build/libtinyxml.so  $FLATPAK_DEST/lib
+       - cp /run/build/tinyxml/tinyxml.h $FLATPAK_DEST/include
     no-make-install: true
     sources:
        - type: git
