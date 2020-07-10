@@ -25,8 +25,8 @@ modules:
     no-autogen: true
     buildsystem: simple
     build-commands: 
-       - mkdir build
-       - cd build
+       - mkdir /run/build/tinyxml/build
+       - cd /run/build/tinyxml/build
        - cmake ..
        - make
        - cp libtinyxml.so  $FLATPAK_DEST/lib
