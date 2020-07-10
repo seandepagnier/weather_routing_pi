@@ -20,3 +20,24 @@ modules:
        - type: git
          url: git://${GIT_REPOSITORY_SERVER}/${GIT_REPOSITORY}
          ${GIT_BRANCH_OR_TAG}: ${GIT_REPOSITORY_ITEM}
+  - name: tinyxml
+    builddir: false
+    no-autogen: true
+    buildsystem: simple
+    build-commands: 
+       - mkdir build
+       - cd build
+       - cmake ..
+       - make
+       - cp libtinyxml.so  $FLATPAK_DEST/lib
+       - cp tinyxml/tinyxml.h $FLATPAK_DEST/include
+    no-make-install: 1
+    sources:
+       - type: "archive"
+         url: https://sourceforge.net/projects/tinyxml/files/tinyxml/2.6.2/tinyxml_2_6_2.tar.gz
+         sha256: a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd
+       - type: "patch"
+         path: ../flatpak/tinyxml/0001-Add-CMakeLists.txt.patch
+
+
+
