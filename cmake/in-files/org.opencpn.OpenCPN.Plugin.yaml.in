@@ -35,7 +35,7 @@ modules:
     sources:
        - type: "archive"
          url: https://sourceforge.net/projects/tinyxml/files/tinyxml/2.6.2/tinyxml_2_6_2.tar.gz
-         sha256: a2848f34fcd5d6cf47def00461fcb528a0484d8edef8208d6d2e2909dc61d9cd
+         sha256: 15bdfdcec58a7da30adc87ac2b078e4417dbe5392f3afb719f9ba6d062645593
        - type: "patch"
          path: ../flatpak/tinyxml/0001-Add-CMakeLists.txt.patch
 
