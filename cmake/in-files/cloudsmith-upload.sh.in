@@ -193,6 +193,7 @@ if [ "$TRAVIS" ] || [ "$CIRCLECI" ]; then
     cd build_tar
     tar -xf $tarball_tar
     rm *.tar
+    rm -rf root
     cp ../metadata.xml *
     tar -cf build_tarfile.tar *
     tar -tf build_tarfile.tar
