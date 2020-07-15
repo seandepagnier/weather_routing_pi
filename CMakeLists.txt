@@ -54,7 +54,7 @@ set(PACKAGE "weather_routing_pi")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "15")
+set(VERSION_PATCH "16")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE "07/15/2020")
 set(OCPN_MIN_VERSION "ov50")
