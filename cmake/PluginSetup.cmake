@@ -235,4 +235,17 @@ if(CMAKE_VERSION VERSION_GREATER 3.9)
     endif()
 endif()
 
+
+find_program(HAVE_LD_SO
+    PATHS /lib NO_DEFAULT_PATH
+    NAMES ld.so ld-linux.so.1  ld-linux.so.2
+)
+
+set(CMAKE_SKIP_BUILD_RPATH true)
+if (HAVE_LD_SO)   # linux.
+    message(STATUS Setting RPATH: \$ORIGIN:\$ORIGIN/..)
+    set(CMAKE_BUILD_RPATH "\$ORIGIN;\$ORIGIN/..")
+    set(CMAKE_INSTALL_RPATH "\$ORIGIN;\$ORIGIN/..")
+endif ()
+
 set(CMLOC ${SAVE_CMLOC})
