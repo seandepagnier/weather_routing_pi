@@ -52,7 +52,7 @@ set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(PACKAGE "weather_routing_pi")
 set(SHORT_DESCRIPTION "Compute optimal routes based on weather and constraints.")
-set(LONG_DESCRIPTION "WR features include:\n\ optimal routing subject to various constraints based on weather data,\n\ automatic boat polar computation.")				  
+set(LONG_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")				  
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
