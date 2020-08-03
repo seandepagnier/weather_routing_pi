@@ -194,7 +194,7 @@ if [ "$TRAVIS" ] || [ "$CIRCLECI" ]; then
     tar -xf $tarball_tar
     rm *.tar
     rm -rf root
-    cp ../metadata.xml *
+    cp ../metadata.xml .
     tar -cf build_tarfile.tar *
     tar -tf build_tarfile.tar
     rm ../$tarball_tar

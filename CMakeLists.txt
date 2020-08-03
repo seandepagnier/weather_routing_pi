@@ -18,19 +18,19 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
 # Frontend2 Author: Jon Gough  
-# Frontend2: v1.0.124					 
+# Frontend2: v1.0.132					 
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
 ## ----- Changes should only be made between the section blocks that identify where     ----- ##
 ## ----- these changes should be. The whole configuration process relies on this        ----- ##
 ## ----- sequence to be successful                                                      ----- ##
 
+
 ##
 ##----- Modify section below to include all the details for your plugin ----- ##
 ##
 
 set(CMLOC "CMakeLists: ")
-# Alec from watchdog
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # define minimum cmake version
@@ -51,12 +51,14 @@ set(COMMON_NAME "WeatherRouting")  # Search "getcommonname"in <plugin_pi>.cpp
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(PACKAGE "weather_routing_pi")
+set(SHORT_DESCRIPTION "Compute optimal routes based on weather and constraints.")
+set(LONG_DESCRIPTION "WR features include:\n\ optimal routing subject to various constraints based on weather data,\n\ automatic boat polar computation.")				  
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "16")
+set(VERSION_PATCH "17")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "07/15/2020")
+set(VERSION_DATE "08/03/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -64,19 +66,18 @@ set(OCPN_API_VERSION_MINOR "16")
 set(PARENT "opencpn")
 
 #Used to set up a local webserver with git loaded, for testing purposes.
-set(GIT_REPOSITORY_SERVER "github.com")
+#Now set in plugin configure, needed to build flatpak, also locally.
+#set(GIT_REPOSITORY_SERVER "github.com")
 
 #No longer needed, queried.
-set(GIT_USER "rgleason")
-set(GIT_REPOSITORY_NAME "weather_routing_pi")
+# set(GIT_USER "rgleason")
+# set(GIT_REPOSITORY_NAME "weather_routing_pi")
 
 ## Specifies Cloudsmith upload repository suffix for each catalog
 set(PROD "prod")   #Standard Repos
 set(BETA "beta")   #Standard Repos
 set(ALPHA "alpha") #Standard Repos
 
-#set(CLOUDSMITH_USER "sean-depagnier")
-#set(CLOUDSMITH_USER "jon-gough")
 #set(CLOUDSMITH_USER "rick-gleason")
 set(CLOUDSMITH_USER "opencpn")
 
@@ -87,14 +88,11 @@ set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #without the _pi
 
 # Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
-set(XML_SUMMARY "Compute optimal routes based on weather and constraints.")
-set(XML_DESCRIPTION "WR features include:\n\ optimal routing subject to various constraints based on weather data,\n\ automatic boat polar computation.")
+set(XML_SUMMARY ${SHORT_DESCRIPTION})
+set(XML_DESCRIPTION ${LONG_DESCRIPTION})
 
 ##
 ## ----- Modify section above to include all the details for your plugin ----- ##
-##
-
-##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
 
@@ -122,39 +120,38 @@ message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 ##
 
 project(${PACKAGE})
+#set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;")
+
+
 
 #========================================================
-INCLUDE("cmake/PluginSetup.cmake")
+include("PluginSetup")
 #========================================================
 
 ##
 ## ----- The above is used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
-##
-
-##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-option(Plugin_CXX11 "Use c++11" OFF) #Wass commented out
-##
-## ----- Modify section above if there are special requirements for the plugin ----- ##
-##
+option(Plugin_CXX11 "Use c++11" OFF) 
 
 ##
+## ----- Modify section above if there are special requirements for the plugin ----- ##
 ## ----- do not change next section - needed to configure build process ----- ##
 ##
 
 #===========================================================
-INCLUDE("cmake/PluginConfigure.cmake")
+include("PluginConfigure")
 #===========================================================
-# ----- Change below to match project requirements for source, headers, etc. ----- ##
+## ----- do not change section above - needed to configure build process ----- ##
+## ----- Change below to match project requirements for source, headers, etc. ----- ##
 #
 
 add_definitions(-DUSE_S57)
 
-# From master branch - is this workiing? necessary?
+# From master branch - is this working? necessary?
 IF(PLUGIN_USE_SVG)
     MESSAGE(STATUS "${CMLOC}SVG support enabled...")
     IF(NOT QT_ANDROID)
@@ -296,16 +293,34 @@ add_definitions(-DPLUGIN_USE_SVG)
 SET(SRC ${SRCS} ${SRC_LIBTESS2} )
 
 ##================================================================================
+## JSON Validation
+##================================================================================
+#if(APPLE)
+#    option(PI_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" OFF)
+#else(APPLE)
+#    option(PI_JSON_SCHEMA_VALIDATOR "Use JSON Schema validator" ON)
+#endif(APPLE)
+
+#if(PI_JSON_SCHEMA_VALIDATOR)
+#    message(STATUS "${CMLOC}Using JSON Schema validation - warning this changes the 'flavour' of the executable and it may not be compatible with OpenCPN")
+#    add_definitions(-DPI_JSON_SCHEMA_VALIDATOR)
+#    message(STATUS "${CMLOC}Adding JSON Schema validation")
+#    set(EXTSRC ${EXTSRC} extsrc/json-schema-validator/json-schema-draft7.json.cpp extsrc/json-schema-validator/json-uri.cpp extsrc/json-schema-validator/json-validator.cpp)
+#    set(EXTINCLUDE ${EXTINCLUDE} extinclude/nlohmann/json.hpp extinclude/json-schema-validator/json-schema.hpp)
+#    include_directories(BEFORE ${PROJECT_SOURCE_DIR}/extinclude/json-schema-validator)
+#else(PI_JSON_SCHEMA_VALIDATOR)
+#    message(STATUS "${CMLOC}Not using JSON Schema validation - warning invalid #JSON 'may' cause unexpected crashes")
+#endif(PI_JSON_SCHEMA_VALIDATOR)
+
 
 ##=============================================================
 # Modify/configure 'Include' Directories below for the Plugin
 ##=============================================================
-
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
-
 ##
+
 ## Statement below is required to collect all the set( headers and SRCS  - Adjust as required
 ## This add_library  can be used in conditionals below.
 ##
@@ -342,7 +357,6 @@ target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
 #                DEPENDS ${PACKAGE_NAME}
 #                COMMENT " Running post build action on ${lib_name}."
 #                COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) ')
-#	   
 #        else(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
 #            message(STATUS "${CMLOC}Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
 #        endif(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
@@ -395,20 +409,19 @@ ENDIF()
 
 # Jon identified these were missing causing json/json.h and other problems.
 #----INCLUDE CMAKE #3 & #4 -----
-INCLUDE("cmake/PluginJSON.cmake")
+include("PluginJSON")
 # Alec from watchdog see cmake_module and sub-directory
-# INCLUDE("cmake/PluginXML.cmake")
-INCLUDE("cmake/PluginGL.cmake")
+# include("cmake/PluginXML.cmake")
+include("PluginGL")
 #
 # ----- Do not change - needed to build app ----- ##
 #
 #INCLUDE CMAKE #5,6 & 7 -----
-INCLUDE("cmake/PluginInstall.cmake")
-INCLUDE("cmake/PluginLocalization.cmake")
-INCLUDE("cmake/PluginPackage.cmake")
+include("PluginInstall")
+include("PluginLocalization")
+include("PluginPackage")
 get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
 message(STATUS "${CMLOC}Libraries: ${OUT}")
 
 ## ----- do not change section above - needed to configure build process ----- ##
 ##
-					
