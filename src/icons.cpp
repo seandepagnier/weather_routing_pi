@@ -10,9 +10,9 @@ wxBitmap *_img_WeatherRouting;
 
 #ifdef PLUGIN_USE_SVG
 #include "ocpn_plugin.h"
-wxString _svg_weather_routing;
-wxString _svg_weather_routing_rollover;
-wxString _svg_weather_routing_toggled;
+   wxString _svg_weather_routing;
+   wxString _svg_weather_routing_rollover;
+   wxString _svg_weather_routing_toggled;
 #endif
 
 void initialize_images(void)
