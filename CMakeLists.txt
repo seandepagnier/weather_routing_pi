@@ -57,7 +57,7 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "18")
-set(VERSION_TWEAK "1")
+set(VERSION_TWEAK "2")
 set(VERSION_DATE "09/03/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -185,6 +185,8 @@ SET(SRCS
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
+			
+            api-16/ocpn_plugin.h
 )
 
 # Added and tried by Rick
@@ -317,6 +319,8 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2} )
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/api-16)
+
 ##
 
 ## Statement below is required to collect all the set( headers and SRCS  - Adjust as required
@@ -408,8 +412,8 @@ ENDIF()
 # Jon identified these were missing causing json/json.h and other problems.
 #----INCLUDE CMAKE #3 & #4 -----
 include("PluginJSON")
-# Alec from watchdog see cmake_module and sub-directory
-# include("PluginXML")
+
+# include("PluginXML") #Alec -added cmake_module and sub-directory. same as watchdog
 include("PluginGL")
 #
 # ----- Do not change - needed to build app ----- ##
