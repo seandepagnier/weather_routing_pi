@@ -190,16 +190,12 @@ wxString weather_routing_pi::GetCommonName()
 
 wxString weather_routing_pi::GetShortDescription()
 {
-    return _("Compute optimal routes based on weather and constraints.");
+    return _(PLUGIN_SHORT_DESCRIPTION);
 }
 
 wxString weather_routing_pi::GetLongDescription()
 {
-    return _("\
-Weather Routing features include:\n\
-  optimal routing subject to various constraints based on weather data\n\
-  automatic boat polar computation\n\
-");
+    return _(PLUGIN_LONG_DESCRIPTION);
 }
 
 void weather_routing_pi::SetDefaults()

@@ -11,8 +11,7 @@ This "Frontend2" configuration is found in jongough/testplugin_pi and is easier 
 "Frontend1" can be found in the current versions of bdbcat/Oesenc_pi and rgleason/Vdr_pi. 
 
 
-## KEEP EXISTING DIRECTORIES AND FILES
-_________________________________
+## RENAME EXISTING DIRECTORIES AND FILES
 
 #### Important:
 1. Make these changes on a new branch "frontend2" or "ci" (if possible).
@@ -35,8 +34,7 @@ _________________________________
 - Any other specific plugin directories essential to your plugin.
 
 
-## LIST of FOLDERS & FILES copied from TESTPLUGIN_PI
-_________________________________
+## FOLDERS & FILES copied from TESTPLUGIN_PI
 
 #### Add these Directories + Sub-directories + Files
 
@@ -69,7 +67,6 @@ The following directories and files are not needed from testplugin_pi
 
 
 ## CHANGES REQUIRED
-_________________________________
 
 1. Rename CMakeLists.txt, appveyor.yml, .travis.yml adding  .save for reference.
 1. Modify CMakeLists.txt file, following the in-line notes
@@ -124,8 +121,8 @@ _________________________________
    - For custom Cloudsmith repository destinations, modify if needed.
 
 
+
 ## DEPLOYMENT
-_________________________________
 
 The current setup for Frontend2 plugins does this:
 - Non-Master branch - Push with no tag -> Alpha repository
@@ -155,9 +152,10 @@ Example:
   - * [new tag]           v1.9.5.10 -> v1.9.5.10
 1. git push origin master 
 
+For information about building locally for local deployment refer to Read-Build.md
+
 
 ### Weatherfax_pi specific differences from testplugin_pi "Frontend2"
-_________________________________
    
 Weatherfax_pi needs to have sound support for Windows and Mingw, additionally use with rtlsdr requires additional files. 
 

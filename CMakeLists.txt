@@ -57,8 +57,8 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "18")
-set(VERSION_TWEAK "0")
-set(VERSION_DATE "08/03/2020")
+set(VERSION_TWEAK "1")
+set(VERSION_DATE "09/03/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -101,9 +101,9 @@ option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 set(CMAKE_CXX_STANDARD 11)
 
 # Prefer libGL.so to libOpenGL.so, see CMP0072
-set(OpenGL_GL_PREFERENCE "LEGACY")
+#set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
 # Don't use local version of GLU library
-set(USE_LOCAL_GLU FALSE)
+#set(USE_LOCAL_GLU FALSE)             #not operational
 option(USE_GL "Enable OpenGL support" ON)  #WxRoute requires on
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
@@ -120,8 +120,6 @@ message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 ##
 
 project(${PACKAGE})
-#set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;")
-
 
 
 #========================================================
@@ -411,7 +409,7 @@ ENDIF()
 #----INCLUDE CMAKE #3 & #4 -----
 include("PluginJSON")
 # Alec from watchdog see cmake_module and sub-directory
-# include("cmake/PluginXML.cmake")
+# include("PluginXML")
 include("PluginGL")
 #
 # ----- Do not change - needed to build app ----- ##

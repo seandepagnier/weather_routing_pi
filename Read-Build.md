@@ -1,49 +1,48 @@
 ## Weather Fax Plugin for OpenCPN
-_______________________________
 
 Implement weather fax ability for opencpn.  
 This includes retrieval via sound card (radio fax) as well as the internet, or local image files.
+
  
 ### Compiling
-_________________________________
 
 * git clone git://github.com/seandepagnier/weatherfax_pi.git
 
-Build Normally (linux)
+Normal Linux Build
 * mkdir build
 * cd build
 * cmake ..
 * make
 * sudo make install
 
-Build Normally (linux) and manually deploy to cloudsmith for testing
+Normal Linux Build and manually deploy to cloudsmith for testing
 * cmake -DCMAKE_BUILD_TYPE=Release ..
 * make -j4
 * make package
 * ./cloudsmith-upload.sh
 You will find xml and tarball files.
 
-Compiling Windows (visual studio) Opencpn v5:
+Windows (visual studio) Build
 * wxWidgets 3.1.2 required
 * cmake -T v141_xp ..
 * cmake --build . --target package --configure Release
 
-Another Windows using VS Command Prompt:
+Windows (Visual Studio) Build using VS Command Prompt:
 * wxWidgets 3.1.2 required 
 * cmake  -G "Visual Studio 15 2017" -T v141_xp ..
 * cmake --build . --config release --target package 
 It builds and creates ..tar.gz  files and xml.
 The tarball does not have the xml file
 
-Compiling Windows (visual studio) Opencpn v4:
+Windows visual studio) Build for Opencpn v4 (old):
 * wxWidgets 3.0.2 required 
 * cd ..
 * cd build
 * To produce a binary compatible with Windows XP, you must set the respective toolset
 * cmake -T v120_xp ..
 
+
 ###  Build tarball and metadate.xml locally to test.
-_________________________________
 
 Git clone the latest plugin, create a new build directory, go into that and issue the requisite commands. 
 
@@ -69,8 +68,8 @@ Under linux change the number of -j4 to how many processors you have,
 I use -j12 (6 real processors, 2 threads per processor AMD  Ryzen 5 1600). 
 Under windows VS will pick the number of processor automatically.
 
+
 ### Deployment Repository
-_________________________________
 
 The script cloudsmith-uploads.sh which is created at runtime from cmake/in-files/cloudsmith-upload.sh.in
 uploads the .tar.gz and .xml artifacts to cloudsmith
@@ -83,16 +82,18 @@ uploads the .tar.gz and .xml artifacts to cloudsmith
 If this script is used on CIRCLECI, TRAVIS or APPVEYOR it will upload the correct files to the chosen repository
 If this script is used locally it will build the correct artifacts but will not do the upload
 
-### To add your new Metadata xml to Plugin Manager Catalog
-_________________________________
 
+### Add Plugin to the Plugin Manager Catalog
+
+Add your new Metadata xml to Plugin Manager Catalog
 Make Pull Request to github.com/OpenCPN/Plugiins 
 
 After Circleci, Travis and Appveyor have built the environments and deployed to one of the Cloudsmith Repositories, the resultant metadata files (.xml) must be copied and pushed up too the plugins master branch github.com/OpenCPN/plugins to become part of the the master catalog. Jon Gough has provided some bash/python scripts that accomplish copy to your local branch to assist or you can simply do this part manually.
    
 Generally try not to use raw git commands unless really needed, In Linux & Windows install the 'beta' testing version (for free opensource work) SmartGit (sometimes it hasn't had all the capabilities of git).
 
-#### Using Smartgit  https://www.syntevo.com/smartgit/
+
+#### Use Smartgit  https://www.syntevo.com/smartgit/
 
 Initially Fork opencpn/plugins to your github remote account, single time.
 Start with a clean clone of the source (upstream) git, then keep using this until it becomes too much of a mess, then start over.
@@ -117,7 +118,8 @@ For the next change just start at the 'git pull upstream master' (just below the
 
 When you create the pull request to opencpn/plugins master branch (which adds new and removes old xml files for your build), the remote git will now do validation checking (you can do this locally if you want, just use the validate_xml.sh script) and the ocpn-plugins.xml build. Unless there is more than one person working on a plugin at one time and updating the same xml files there should be no collisions.
 
-#### Manual process (not using Smartgit).
+
+#### Use a Manual process (not using Smartgit).
 
 Initial Setup of Remote Fork and Local Repository
 1. From the web browser httpls/github.com/username/ "Fork" the OpenCPN/plugins repository to create your remote repository.
@@ -129,19 +131,20 @@ Set remote upstream and origin
 1. Git remote add origin https://github.com/username/plugins.git    Set the 'origin' remote
 
 Create a new local branch, i.e. rg_master or rg_beta or rg_alpha or rg_experimental using upstream/master
-1. Git checkout -b 'rg-master(for example)' upstream/master
+1. Example:   git checkout -b 'rg-master' upstream/master
 1. Now in the metadata folder remove/delete all of 'your' plugin files that are no longer wanted.
 1. Leave the other xml files from other plugins intact and without change.	
-1. Run 'download_xml_bash.sh' with the correct parameters for your cloudsmith repository and build.
+1. For Windows, if you have a firewall/antivirus, you must permitting scripts to run in your settings, 
 
-For Windows, after permitting scripts to run in your firewall/antivirus settings, 
-Use Git-Gui (bash prompt) from your local github/plugins' folder, to run Jon's bash script examples:
-1. ./download_xml_bash.sh <cloudsmith_repository> <plugin_version>  <cloudsmith_user>  <cloudsmith_level>	
-1. ./download_xml_bash.sh testplugin_pi 1.0.114.0 jon-gough prod
-1. ./download_xml_bash.sh weather-routing 1.13.8.0 opencpn prod
+Use the Git-Gui (bash prompt) from your local github/plugins' folder, to run Jon's bash script.
+1. Run: 'download_xml_bash.sh' with the correct parameters for your cloudsmith repository and build.
+1. Examples
+   1. ./download_xml_bash.sh <cloudsmith_repository> <plugin_version>  <cloudsmith_user>  <cloudsmith_level>	
+   1. ./download_xml_bash.sh testplugin_pi 1.0.114.0 jon-gough prod
+   1. ./download_xml_bash.sh weather-routing 1.13.8.0 opencpn prod
 
 Then add the changed files, commit and push to remote origin rg-master branch
-1. git add metadata/[pluginname]*.[version number]*.xml     Add the metadata files
+1. git add metadata/    To add the metadata files
 1. git commit -am "[pluginname] v[version number]"         Commit the metadata files
 1. git push -u origin rg-master    (Does the same as two commands 'git branch --set-upstream-to=origin/jg_master'  and 'git push')
 
@@ -152,13 +155,15 @@ When you are notified your PR has been accepted, we need to clean up our git plu
 1. git checkout master                       Checkout the local master branch
 1. git branch origin -d  [or -D] rg-master   Delete local rg-master
 1. git push --delete origin rg-master        Delete remote origin rg-master 
+
 Create an identical local copy of upstream/master as a new branch "rg-master"
 1. git checkout -b rg-master upstream/master
 
-### Windows Specific Libraries
-_________________________________
+
+### Windows Specific Libraries for Certain Plugins
 
 The Windows compilation of weatherfax_pi is dependent on these files 
+We can also use the "Extra" Folders for this - (need to augment this)
 
 1. Under windows, you must find the file "opencpn.lib" (Visual Studio) or "libopencpn.dll.a" (mingw) which is built in the build directory after compiling opencpn.  This file must be copied to the plugin directory.
 1. There are also some libraries and an external program needed:
@@ -166,8 +171,8 @@ The Windows compilation of weatherfax_pi is dependent on these files
    1. http://sourceforge.net/projects/opencpnplugins/files/opencpn_packaging_data/PVW32Con.exe/download (not an archive, this one just copy to buildwin)
    1. Unpack all these files into the buildwin directory as the compile is dependent on these.
 
+
 ### OSX Specific Libraries
-_________________________________
 
 The OS X compilation of weatherfax_pi is dependent on these files 
 
@@ -177,7 +182,7 @@ The OS X compilation of weatherfax_pi is dependent on these files
    1. Download this file and unzip it in the /usr/local directory as the compile is dependent on these.
    1. Then make create-pkg command will include the library in the package.
 
+
 ### License
-_________________________________
 
 The plugin code is licensed under the terms of the GPL v3+
