@@ -18,265 +18,143 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
 # Frontend2 Author: Jon Gough  
+# Frontend2: v1.0.120					 
 # ---------------------------------------------------------------------------
-# CMake-CI Number: 0.0.006  
-#    - 2/19/2020 10 environments needed for beta testing.
-#    - 2/19/2020 fix debian build
-#    - 2/19/2020 Add raspian build
-#    - 2/20/2020 fix execute ci/*.sh files  and increment version patch
-#    - 3/1/2020  fix raspian xml target-url with if-then
-#    - 3/30/2020 MacOS build fixed 12 env
-#    - Reverse dates here
-#    - 2/05/2020 MacOS final fix- JG
-# ----------------------------------------------------------------------------
-# ----- Modify section below to include all the details for your plugin ----- ##
+## ----- When changing this file do NOT change the order in which sections occur        ----- ##
+## ----- Changes should only be made between the section blocks that identify where     ----- ##
+## ----- these changes should be. The whole configuration process relies on this        ----- ##
+## ----- sequence to be successful                                                      ----- ##
 
+##
+##----- Modify section below to include all the details for your plugin ----- ##
+##
+
+set(CMLOC "CMakeLists: ")
+
+# define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
-  if(POLICY CMP0043)
-    cmake_policy(SET CMP0043 NEW)
-  endif(POLICY CMP0043)
-  cmake_policy(SET CMP0048 NEW)
-  if(POLICY CMP0077)
-    cmake_policy(SET CMP0077 NEW)
-  endif(POLICY CMP0077)
+    if(POLICY CMP0043)
+        cmake_policy(SET CMP0043 NEW)
+    endif(POLICY CMP0043)
+    cmake_policy(SET CMP0048 NEW)
+    if(POLICY CMP0077)
+        cmake_policy(SET CMP0077 NEW)
+    endif(POLICY CMP0077)
 endif(COMMAND cmake_policy)
 
+# define plugin name, owner and versions
 set(VERBOSE_NAME "WeatherRouting")
-# Search "getcommonname"in weather_routing_pi.cpp
-set(COMMON_NAME "WeatherRouting")  
+set(COMMON_NAME "WeatherRouting")  # Search "getcommonname"in <plugin_pi>.cpp
 set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(PACKAGE "weather_routing_pi")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "7")
+set(VERSION_PATCH "9")
 set(VERSION_TWEAK "1")
-set(VERSION_DATE "06/05/2020")
+set(VERSION_DATE "07/02/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
 
 set(PARENT "opencpn")
-#set(GIT_USER "jongough")
-#set(GIT_USER "seandepagnier")  #for Sean
+
+#Used to set up a local webserver with git loaded, for testing purposes.
+set(GIT_REPOSITORY_SERVER "github.com")
+
+#No longer needed, queried.
 set(GIT_USER "rgleason")
-
 set(GIT_REPOSITORY_NAME "weather_routing_pi")
-message(STATUS "CIRCLECI: ${CIRCLECLI}, Env CIRCLECI: $ENV{CIRCLECI}")
-message(STATUS "TRAVIS: ${TRAVIS}, Env TRAVIS: $ENV{TRAVIS}")
 
-# Permits setup of a local webserver with git for testing
-if($ENV{CIRCLECI})
-  set(GIT_REPOSITORY_HOST "github.com")
-  set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-  set(GIT_REPOSITORY_BRANCH "$ENV{CIRCLE_BRANCH}")
-  set(GIT_REPOSITORY_TAG "$ENV{CIRCLE_TAG}")
-elseif($ENV{TRAVIS})
-  set(GIT_REPOSITORY_HOST "github.com")
-  set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-  set(GIT_REPOSITORY_BRANCH "$ENV{TRAVIS_BRANCH}")
-  set(GIT_REPOSITORY_TAG "$ENV{TRAVIS_TAG}")
-elseif($ENV{APPVEYOR})
-  set(GIT_REPOSITORY_HOST "github.com")
-  set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-  set(GIT_REPOSITORY_BRANCH "$ENV{APPVEYOR_REPO_BRANCH}")
-  set(GIT_REPOSITORY_TAG "$ENV{APPVEYOR_REPO_TAG_NAME}")
-else()
-  set(GIT_REPOSITORY_HOST "github.com")
-  set(GIT_REPOSITORY_DIR "${GIT_USER}/")
-  # Get the current working branch
-  execute_process(
-    COMMAND git rev-parse --abbrev-ref HEAD
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_REPOSITORY_BRANCH
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-  if(${GIT_REPOSITORY_BRANCH} EQUAL "")
-    message(STATUS "Setting default GIT repository branch - master")
-    set(GIT_REPOSITORY_BRANCH "master")
-  endif()
-  execute_process(
-    COMMAND git tag --contains
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_REPOSITORY_TAG
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-endif()
-message(STATUS "Git Branch: ${GIT_REPOSITORY_BRANCH}")
-message(STATUS "Git Tag: ${GIT_REPOSITORY_TAG}")
-if("${GIT_REPOSITORY_BRANCH}" EQUAL "")
-  set(GIT_BRANCH_OR_TAG "TAG")
-else()
-  set(GIT_BRANCH_OR_TAG "BRANCH")
-endif()
-
-#set(CLOUDSMITH_USER "sean-depagnier") 
-#set(CLOUDSMITH_USER "jon-gough")
-set(CLOUDSMITH_USER "rick-gleason")
-
-#set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
-#set(CLOUDSMITH_BASE_REPOSITORY "weather_routing")  #Jon Gough's customization
-#set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Sean's customization
-set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Rick's customization
-
-# Set Cloudsmith upload repository suffix for each catalog
-set(PROD "prod")  #Standard Repos
-set(BETA "beta")  #Standard Repos
+## Specifies Cloudsmith upload repository suffix for each catalog
+set(PROD "prod")   #Standard Repos
+set(BETA "beta")   #Standard Repos
 set(ALPHA "alpha") #Standard Repos
+
+#set(CLOUDSMITH_USER "sean-depagnier")
+#set(CLOUDSMITH_USER "jon-gough")
+#set(CLOUDSMITH_USER "rick-gleason")
+set(CLOUDSMITH_USER "opencpn")
+
+# Set if  Cloudsmith Base Repository name does not match your Git Repository name.
+#set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
+#set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Ricks's customization
+set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #without the _pi
 
 # Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
 set(XML_SUMMARY "Compute optimal routes based on weather and constraints.")
-set(XML_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")
+set(XML_DESCRIPTION "WR features include:\n\ optimal routing subject to various constraints based on weather data,\n\ automatic boat polar computation.")
 
 ##
-## ----- Modify above to include all the plugin details --------- ##
-## ----- Modify below for plugin special requirements------------ ##
+## ----- Modify section above to include all the details for your plugin ----- ##
 ##
 
-# set(APPVEYOR_TEST_DEPLOY_TO_CLOUDSMITH "true")
+##
+## ----- Modify section below if there are special requirements for the plugin ----- ##
+##
+
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
-
-##
-## ----- Modify above to include all the plugin details --------- ##
-## ----- Modify below for plugin special requirements------------ ##
-##
 
 set(CMAKE_CXX_STANDARD 11)
 
-
-if(NOT ${PACKAGE} MATCHES "(.*)_pi")
-  set(PACKAGE_NAME ${PACKAGE}_pi)
-  set(PACKAGE_FILE_NAME "${PACKAGE}_pi")
-else(NOT ${PACKAGE} MATCHES "(.*)_pi")
-  set(PACKAGE_NAME ${PACKAGE})
-  set(PACKAGE_FILE_NAME "${PACKAGE}")
-endif(NOT ${PACKAGE} MATCHES "(.*)_pi")
-string(TOUPPER "${PACKAGE}" TITLE_NAME)
-
-project(${PACKAGE_NAME} VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK})
-message(STATUS "PROJECT_VERSION: ${PROJECT_VERSION}")
-
-set(PACKAGE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
-
-message(STATUS "${VERBOSE_NAME} Version: ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}.${VERSION_TWEAK}")
-message(STATUS "OPCN_FLATPAK: ${OCPN_FLATPAK}")
-
-#------Settings
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
 # Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
-
-# Not found in Master branch. Question still needed? on or off?
-# Testplugin has OFF
-option(USE_GL "Enable OpenGL support" ON)
-message(STATUS "USE_GL: ${USE_GL}")
-#------End Settings
+option(USE_GL "Enable OpenGL support" ON)  #WxRoute requires on
+message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build" FORCE)
+    set(CMAKE_BUILD_TYPE
+        "Release"
+        CACHE STRING "Choose the type of build" FORCE)
 endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 
-set(PKG_NVR ${PACKAGE_NAME}-${PROJECT_VERSION})
-set(PKG_URL "https://dl.cloudsmith.io/public/--pkg_repo--/raw/names/--name--/versions/--version--/--filename--")
+##
+## ----- The statements below are used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
+##
+
+project(${PACKAGE})
 
 #========================================================
 INCLUDE("cmake/PluginSetup.cmake")
 #========================================================
 
-if(DEFINED ENV{OCPN_TARGET})
-    set(PACKAGING_NAME "${PKG_NVR}_${PKG_TARGET}-${PKG_TARGET_VERSION}-$ENV{OCPN_TARGET}")
-else(DEFINED ENV{OCPN_TARGET})
-    set(PACKAGING_NAME "${PKG_NVR}_${PKG_TARGET}-${PKG_TARGET_VERSION}")
-endif(DEFINED ENV{OCPN_TARGET})
-message(STATUS "PACKAGING_NAME: ${PACKAGING_NAME}")
+##
+## ----- The above is used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
+##
 
-set(PLUGIN_NAME ${PACKAGE}-plugin-${PKG_TARGET}-${PKG_TARGET_VERSION})
+##
+## ----- Modify section below if there are special requirements for the plugin ----- ##
+##
 
-# Settings and Options
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(Plugin_CXX11 "Use c++11" OFF) #Wass commented out
+##
+## ----- Modify section above if there are special requirements for the plugin ----- ##
+##
 
-# Master version of cmakelists.txt has the below commented out
-# Testplugin has this on!!  Trying to turn this back on this time.
-# Check on compiler support
-if(Plugin_CXX11)
-  message(STATUS "Attempting to use c++11")
-  include(CheckCXXCompilerFlag)
-  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  check_cxx_compiler_flag("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
-  if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    set(Plugin_USE_CXX11 ON)
-  elseif(COMPILER_SUPPORTS_CXX0X)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    set(Plugin_USE_CXX11 ON)
-  else()
-    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
-    set(Plugin_USE_CXX11 OFF)
-  endif()
-else()
-  set(Plugin_USE_CXX11 OFF)
-endif()
+##
+## ----- do not change next section - needed to configure build process ----- ##
+##
 
-if(Plugin_USE_CXX11)
-  message(STATUS "Allowing use of c++11")
-endif()
-
-message(STATUS "CMAKE version: ${CMAKE_VERSION}")
-if(CMAKE_VERSION VERSION_GREATER 3.4)
-  set(ENABLE_CLANG_TIDY
-      OFF
-      CACHE BOOL "Add clang-tidy automatically to builds")
-  if(ENABLE_CLANG_TIDY)
-    find_program(
-      CLANG_TIDY_EXE
-      NAMES "clang-tidy"
-      PATHS /usr/local/opt/llvm/bin)
-    if(CLANG_TIDY_EXE)
-      message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-      # For more, see http://clang.llvm.org/extra/clang-tidy/ set(CLANG_TIDY_CHECKS "-*,modernize-*")
-      set(CLANG_TIDY_CHECKS "-*,performance-*")
-      set(CMAKE_CXX_CLANG_TIDY
-          "${CLANG_TIDY_EXE};-checks=${CLANG_TIDY_CHECKS};-header-filter='${CMAKE_SOURCE_DIR}/*'"
-          CACHE STRING "" FORCE)
-    else()
-      message(AUTHOR_WARNING "clang-tidy not found!")
-      set(CMAKE_CXX_CLANG_TIDY
-          ""
-          CACHE STRING "" FORCE) # delete it
-    endif()
-  endif()
-endif()
-
-if(CMAKE_VERSION VERSION_GREATER 3.9)
-  set(ENABLE_CPPCHECK
-      OFF
-      CACHE BOOL "Add cppcheck automatically to builds")
-  if(ENABLE_CPPCHECK)
-    find_program(CPPCHECK_EXECUTABLE NAMES "cppcheck")
-    set(CMAKE_CXX_CPPCHECK ${CPPCHECK_EXECUTABLE})
-  endif()
-endif()
-
-# -------Section above is directly from Testplugin --------------#
-# ----- Modify section above for special plugin requirements----- ##
 #===========================================================
 INCLUDE("cmake/PluginConfigure.cmake")
 #===========================================================
-# ----- Change below to match project requirements ----- ##
+# ----- Change below to match project requirements for source, headers, etc. ----- ##
+#
 
 add_definitions(-DUSE_S57)
 
 # From master branch - is this workiing? necessary?
 IF(PLUGIN_USE_SVG)
-    MESSAGE(STATUS "SVG support enabled...")
+    MESSAGE(STATUS "${CMLOC}SVG support enabled...")
     IF(NOT QT_ANDROID)
         ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
     ENDIF(NOT QT_ANDROID)
@@ -414,11 +292,17 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
 ##=============================================================
 # Modify/configure 'Include' Directories below for the Plugin
 ##=============================================================
-## EG  (from Testplugin) also in cmake/Plugin_____.cmake files
+
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
 
+##
+## Statement below is required to collect all the set( headers and SRCS  - Adjust as required
+## This add_library  can be used in conditionals below.
+##
+##    SET(EXTSRC  ${EXTSRC}   etc   Can be in an if statement as below
+##
 
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
@@ -426,29 +310,36 @@ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC})
 # Used in textplugin. Just added.
 add_definitions(-DTIXML_USE_STL)
 
-#JSON Validator: Every plugin that uses JSON for passing messages should use a validator.  A JSON validator is much like an XML validator, the validator allows the system to ignore non-conformant messages.  The JSON validator changes the OSABI flavor of the Linux executable so there is code to change it back.
+# -------------------------------------------
+#  PI_JSON SCHEMA VALIDATOR  From Testplugin 
+# -------------------------------------------
+# Every plugin that uses JSON for passing messages should use a validator. The validator  allows the system to ignore non-conformant messages. 
 
-#IF(UNIX AND NOT APPLE)
-#  IF(TP_JSON_SCHEMA_VALIDATOR)
-#    # Change OS/ABI to be UNIX - System V to make it run with OCPN
-#    SET(lib_name lib${PACKAGE_NAME}.so)
-#    MESSAGE(STATUS "lib-name: ${lib_name}")
-#    FIND_FILE(elfedit elfedit)
-#    IF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#      MESSAGE(STATUS "Will ensure OS/ABI is set to 0 to match OCPN")
-#      ADD_CUSTOM_COMMAND(
-#        TARGET ${PACKAGE_NAME}
-#        POST_BUILD
-#        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#        DEPENDS ${PACKAGE_NAME}
-#        COMMENT " Running post build action on ${lib_name}."
-#        COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) '
-#      )
-#    ELSE(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#      MESSAGE(STATUS "Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
-#    ENDIF(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
-#  ENDIF(TP_JSON_SCHEMA_VALIDATOR)
-#ENDIF(UNIX AND NOT APPLE)
+#if(UNIX AND NOT APPLE)
+#    if(PI_JSON_SCHEMA_VALIDATOR)
+#        # Change OS/ABI to be UNIX - System V to make it run with OCPN
+#        set(lib_name lib${PACKAGE_NAME}.so)
+#        message(STATUS "${CMLOC}lib-name: ${lib_name}")
+#        find_file(elfedit elfedit)
+#        if(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#            message(STATUS "${CMLOC}Will ensure OS/ABI is set to 0 to match OCPN")
+#            add_custom_command(
+#                TARGET ${PACKAGE_NAME}
+#                POST_BUILD
+#                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#                DEPENDS ${PACKAGE_NAME}
+#                COMMENT " Running post build action on ${lib_name}."
+#                COMMAND sh -c 'elfedit --input-osabi=Linux --output-osabi=none ${lib_name} || (echo 0) ')
+#	   
+#        else(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#            message(STATUS "${CMLOC}Cannot correct OS/ABI to match OCPN if it is generated incorrectly. Package binutils needed")
+#        endif(NOT (${elfedit} STREQUAL "elfedit-NOTFOUND"))
+#    endif(PI_JSON_SCHEMA_VALIDATOR)
+#endif(UNIX AND NOT APPLE)
+
+# ------------------------------------------
+#    End of JSON VALIDATOR From Testplugin 
+# -------------------------------------------
 
 IF(NOT UNIX)
     SET(SRC_BZIP	
@@ -503,4 +394,8 @@ INCLUDE("cmake/PluginInstall.cmake")
 INCLUDE("cmake/PluginLocalization.cmake")
 INCLUDE("cmake/PluginPackage.cmake")
 get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
-message(STATUS "Libraries: ${OUT}")
+message(STATUS "${CMLOC}Libraries: ${OUT}")
+
+## ----- do not change section above - needed to configure build process ----- ##
+##
+					

@@ -1,0 +1,15 @@
+# ---------------------------------------------------------------------------
+# Author:      Jon Gough Copyright:   2020 License:     GPLv3+
+# ---------------------------------------------------------------------------
+
+# This file contains changes needed during the make package process depending on the type of package being created
+
+if(CPACK_GENERATOR MATCHES "DEB")
+    set(CPACK_PACKAGE_FILE_NAME "@PACKAGING_NAME@")
+    if(CPACK_DEBIAN_PACKAGE_ARCHITECTURE MATCHES "x86_64")
+        set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE @ARCH_DEB@)
+    endif()
+else()
+    set(CPACK_PACKAGE_FILE_NAME "@PACKAGING_NAME_XML@")
+    set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE @ARCH@)
+endif()

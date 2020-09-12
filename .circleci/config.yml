@@ -1,5 +1,5 @@
 ---
-version: 2
+version: 2.1
 jobs:
     build-armhf-stretch:
         machine: true
@@ -7,6 +7,7 @@ jobs:
         - OCPN_TARGET=stretch-armhf
         - DOCKER_IMAGE=jongough/raspbian-stretch:latest
         - BUILD_FLAGS=-j3
+        - BUILD_ENV=raspbian
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
@@ -20,6 +21,22 @@ jobs:
         - OCPN_TARGET=buster-armhf
         - DOCKER_IMAGE=jongough/raspbian-buster:plugin_build_tooling_current
         - BUILD_FLAGS=-j3
+        - BUILD_ENV=raspbian
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - run: ci/cloudsmith-upload.sh
+    build-armhf-bionic-64:
+        machine: true
+        environment:
+        - OCPN_TARGET=bionic-arm64
+        - OCPN_BRANCH=master
+        - DOCKER_IMAGE=arm64v8/ubuntu:18.04
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=ubuntu
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
@@ -82,7 +99,7 @@ jobs:
         docker:
         - image: circleci/buildpack-deps:bionic-scm
         environment:
-        - BUILD_GTK3: 1
+        - BUILD_GTK3: true
         - OCPN_TARGET:  bionic-gtk3
         steps:
         - checkout
@@ -101,6 +118,24 @@ jobs:
         - image: circleci/buildpack-deps:focal-scm
         environment:
         - OCPN_TARGET:  focal
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - run: ci/cloudsmith-upload.sh
+    build-focal-gtk3:
+        docker:
+        - image: circleci/buildpack-deps:focal-scm
+        environment:
+        - BUILD_GTK3: true
+        - OCPN_TARGET: focal-gtk3
         steps:
         - checkout
         - run: >
@@ -195,6 +230,15 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
+# Currently circleci does not build armf64 correctly due to no suitable docker image
+#        - build-armhf-bionic-64:
+#            filters:
+#                branches:
+#                    ignore:
+#                    - devel
+#                    - tmp
+#                tags:
+#                    only: /.*/
         - build-trusty:
             filters:
                 branches:
@@ -227,7 +271,16 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-        - build-focal:
+# there is no focal gtk2 available so this will not be built
+#        - build-focal:
+#            filters:
+#                branches:
+#                    ignore:
+#                    - devel
+#                    - tmp
+#                tags:
+#                    only: /.*/
+        - build-focal-gtk3:
             filters:
                 branches:
                     ignore:
@@ -251,14 +304,15 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-        - build-fedora:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
+# Fedora is being removed from the supplied list of environments so don't build
+#        - build-fedora:
+#            filters:
+#                branches:
+#                    ignore:
+#                    - devel
+#                    - tmp
+#                tags:
+#                    only: /.*/
         - build-mingw:
             filters:
                 branches:
@@ -275,5 +329,4 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-
 
