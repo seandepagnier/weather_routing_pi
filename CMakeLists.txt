@@ -296,7 +296,7 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2} )
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/api-16)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 
 ##
 
