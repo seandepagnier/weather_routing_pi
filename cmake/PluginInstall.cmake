@@ -17,21 +17,20 @@ if(WIN32)
     if(MSVC)
         # TARGET_LINK_LIBRARIES(${PACKAGE_NAME} gdiplus.lib glu32.lib)
         target_link_libraries(${PACKAGE_NAME} ${OPENGL_LIBRARIES})
-
-        set(OPENCPN_IMPORT_LIB "${CMAKE_SOURCE_DIR}/api-16/opencpn.lib")
+        add_subdirectory(libs/ocpn-api)
+        target_link_libraries(${PACKAGE_NAME} ocpn::api)
+        message(STATUS "${CMLOC}Added ocpn-api for MSVC")
     endif(MSVC)
 
     if(MINGW)
         # assuming wxwidgets is compiled with unicode, this is needed for mingw headers
         add_definitions(" -DUNICODE")
         target_link_libraries(${PACKAGE_NAME} ${OPENGL_LIBRARIES})
-        # SET(OPENCPN_IMPORT_LIB "${PARENT}.dll")
         set(CMAKE_SHARED_LINKER_FLAGS "-L../buildwin")
-        # target_link_libraries(${PACKAGE_NAME} ${OPENGL_LIBRARIES})
-        set(OPENCPN_IMPORT_LIB "${CMAKE_SOURCE_DIR}/api-16/libopencpn.dll.a")
+        add_subdirectory(libs/ocpn-api)
+        target_link_libraries(${PACKAGE_NAME} ocpn::api)
+        message(STATUS "${CMLOC}Added ocpn-api for MINGW")
     endif(MINGW)
-
-    target_link_libraries(${PACKAGE_NAME} ${OPENCPN_IMPORT_LIB})
 endif(WIN32)
 
 if(UNIX)
@@ -59,13 +58,13 @@ if(APPLE)
 
 endif(APPLE)
 
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT QT_ANDROID)
     find_package(BZip2 REQUIRED)
     include_directories(${BZIP2_INCLUDE_DIR})
     find_package(ZLIB REQUIRED)
     include_directories(${ZLIB_INCLUDE_DIR})
     target_link_libraries(${PACKAGE_NAME} ${BZIP2_LIBRARIES} ${ZLIB_LIBRARY})
-endif(UNIX AND NOT APPLE)
+endif(UNIX AND NOT APPLE AND NOT QT_ANDROID)
 
 set(PARENT opencpn)
 
@@ -91,6 +90,11 @@ if(WIN32)
         set(INSTALL_DIRECTORY "plugins\\\\${PACKAGE_NAME}")
     endif(CMAKE_CROSSCOMPILING)
 
+    if(EXISTS ${PROJECT_SOURCE_DIR}/UserIcons)
+        install(DIRECTORY UserIcons DESTINATION "${INSTALL_DIRECTORY}")
+        message(STATUS "${CMLOC}Install UserIcons: ${INSTALL_DIRECTORY}")
+    endif(EXISTS ${PROJECT_SOURCE_DIR}/UserIcons)
+
     if(EXISTS ${PROJECT_SOURCE_DIR}/data)
         install(DIRECTORY data DESTINATION "${INSTALL_DIRECTORY}")
         message(STATUS "${CMLOC}Install Data: ${INSTALL_DIRECTORY}")
@@ -105,10 +109,8 @@ if(UNIX AND NOT APPLE)
     set(PREFIX_PARENTDATA ${PREFIX_DATA}/${PARENT})
     set(PREFIX_PARENTLIB ${PREFIX_LIB}/${PARENT})
     message(STATUS "${CMLOC}PREFIX_PARENTLIB: ${PREFIX_PARENTLIB}")
-    install(
-        TARGETS ${PACKAGE_NAME}
-        RUNTIME
-        LIBRARY DESTINATION ${PREFIX_PARENTLIB})
+    message(STATUS "${CMLOC}Library")
+    install(TARGETS ${PACKAGE_NAME} LIBRARY DESTINATION ${PREFIX_PARENTLIB})
 
     if(EXISTS ${PROJECT_SOURCE_DIR}/data)
         install(DIRECTORY data DESTINATION ${PREFIX_PARENTDATA}/plugins/${PACKAGE_NAME})

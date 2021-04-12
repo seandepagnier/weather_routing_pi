@@ -48,7 +48,7 @@ if(WIN32)
     set(CPACK_NSIS_PACKAGE_NAME "${PACKAGE_NAME}")
 
     # Let cmake find NSIS.template.in
-    set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/buildwin")
+    list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/buildwin")
 
     # These lines set the name of the Windows Start Menu shortcut and the icon that goes with it
     set(CPACK_NSIS_DISPLAY_NAME "OpenCPN ${PACKAGE_NAME}")
@@ -65,10 +65,10 @@ else(WIN32)
 endif(WIN32)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(CPACK_STRIP_FILES "")
+    set(CPACK_STRIP_FILES FALSE)
     message(STATUS "${CMLOC}Not stripping debug information from module")
 else(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-    set(CPACK_STRIP_FILES "${PACKAGE_NAME}")
+    set(CPACK_STRIP_FILES TRUE)
     message(STATUS "${CMLOC}Stripping debug information from module")
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
