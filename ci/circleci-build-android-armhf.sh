@@ -51,7 +51,7 @@ cmake  \
   ..
 
 
-make -j
+make
 make package
 
 #  All below for local docker build
