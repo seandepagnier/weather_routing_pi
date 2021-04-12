@@ -185,8 +185,6 @@ SET(SRCS
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
-			
-            api-16/ocpn_plugin.h
 )
 
 # Added and tried by Rick
