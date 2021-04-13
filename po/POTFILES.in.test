@@ -22,7 +22,6 @@ src/icons.cpp
 src/zuFile.cpp
 src/georef.c
 src/GribRecord.cpp
-api-16/ocpn_plugin.h
 src/weather_routing_pi.h
 src/WeatherRouting.h
 src/ConfigurationDialog.h
