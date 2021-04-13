@@ -342,12 +342,12 @@ ENDIF(NOT UNIX)
 IF(WIN32)
   IF(MSVC)
     INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/buildwin/include)
-	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
+	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/libs/jsoncpp)
     TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
   ELSE()
     # MINGW
 #    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lwxzlib-2.8")
-	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
+	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/libs/jsoncpp)
     TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lz")
   ENDIF()
 ENDIF()
@@ -358,7 +358,11 @@ ENDIF()
 
 # Jon identified these were missing causing json/json.h and other problems.
 #----INCLUDE CMAKE #3 & #4 -----
-include("PluginJSON")
+#include("PluginJSON")
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
+add_subdirectory(libs/jsoncpp)
+target_link_libraries(${PACKAGE_NAME} ${PACKAGE_NAME}_LIB_PLUGINJSON)
+
 
 # include("PluginXML") #Alec -added cmake_module and sub-directory. same as watchdog
 include("PluginGL")
