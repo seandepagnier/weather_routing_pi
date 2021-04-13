@@ -57,7 +57,7 @@
 #endif
 
 #include "linmath.h"
-#include "plugingl/pi_shaders.h"
+#include "pi_shaders.h"
 
 #ifdef __OCPN__ANDROID__
 #include "qdebug.h"

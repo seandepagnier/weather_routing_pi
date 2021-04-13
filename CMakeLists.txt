@@ -365,7 +365,10 @@ target_link_libraries(${PACKAGE_NAME} ${PACKAGE_NAME}_LIB_PLUGINJSON)
 
 
 # include("PluginXML") #Alec -added cmake_module and sub-directory. same as watchdog
-include("PluginGL")
+#include("PluginGL")
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
+add_subdirectory(libs/plugingl)
+target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
 
 # Added for android builds
 if(QT_ANDROID)
