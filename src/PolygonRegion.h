@@ -25,7 +25,7 @@
 
 #include <string>
 #include <list>
-#include "libtess2/tess.h"
+#include "tess.h"
 
 struct Point
 {

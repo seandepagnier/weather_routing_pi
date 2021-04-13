@@ -218,15 +218,16 @@ SET (HDRS
 #            src/jsoncpp/json/json.h
 
 # Tried removing this, got many Tesselate Linker errors. Put back in.
-SET(SRC_LIBTESS2
-             src/libtess2/bucketalloc.c
-             src/libtess2/dict.c
-             src/libtess2/geom.c
-             src/libtess2/mesh.c
-             src/libtess2/priorityq.c
-             src/libtess2/sweep.c
-             src/libtess2/tess.c
-)
+# Replaced by libtess2
+#SET(SRC_LIBTESS2
+#             src/libtess2/bucketalloc.c
+#             src/libtess2/dict.c
+#             src/libtess2/geom.c
+#             src/libtess2/mesh.c
+#             src/libtess2/priorityq.c
+#             src/libtess2/sweep.c
+#             src/libtess2/tess.c
+#)
 
 # added by rick - removed by rick pluginJSON.cmake   
 # SET(SRC_PLUGINGL
@@ -369,6 +370,10 @@ target_link_libraries(${PACKAGE_NAME} ${PACKAGE_NAME}_LIB_PLUGINJSON)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
 add_subdirectory(libs/plugingl)
 target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
+
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
+add_subdirectory(libs/libtess2)
+target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
 # Added for android builds
 if(QT_ANDROID)
