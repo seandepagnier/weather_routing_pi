@@ -163,7 +163,7 @@ fi
 echo $VERSION
 echo $REPO
 
-if [ "$APPVEYOR" ] || [ LOCAL_BUILD=true ]; then
+if [ "$APPVEYOR" ] || [ "$LOCAL_BUILD" = "true" ]; then
     echo 'substituting xml file variables for windows build'
     while read line; do
         line=${line//--pkg_repo--/$REPO}
