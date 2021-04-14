@@ -16,12 +16,11 @@ SET(SRC_BZIP
     src/decompress.c
     src/huffman.c
     src/randtable.c
-    src/bzlib_private.h
   )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library(LIB_BZIP_WR STATIC ${SRC_BZIP})
-target_include_directories(BZIP2 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(LIB_BZIP_WR PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(ocpn::bzip2 ALIAS LIB_BZIP_WR)
 
 set(CMLOC ${SAVE_CMLOC_BZIP2})
