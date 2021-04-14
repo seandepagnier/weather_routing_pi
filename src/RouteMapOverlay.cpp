@@ -27,7 +27,7 @@
 #include <wx/glcanvas.h>
 
 #include "ocpn_plugin.h"
-#include "plugingl/pidc.h"
+#include "pidc.h"
 #include "json/json.h"
 #include "Utilities.h"
 #include "Boat.h"
