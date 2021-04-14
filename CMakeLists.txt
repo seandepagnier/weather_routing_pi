@@ -214,73 +214,6 @@ SET (HDRS
             src/georef.h
             src/GribRecord.h
 )
-# Seems to work without this -Rick
-#            src/jsoncpp/json/json.h
-
-# Tried removing this, got many Tesselate Linker errors. Put back in.
-# Replaced by libtess2
-#SET(SRC_LIBTESS2
-#             src/libtess2/bucketalloc.c
-#             src/libtess2/dict.c
-#             src/libtess2/geom.c
-#             src/libtess2/mesh.c
-#             src/libtess2/priorityq.c
-#             src/libtess2/sweep.c
-#             src/libtess2/tess.c
-#)
-
-# added by rick - removed by rick pluginJSON.cmake   
-# SET(SRC_PLUGINGL
-#             src/plugingl/linmath.h
-#             src/plugingl/pidc.h
-#             src/plugingl/qtstylesheet.h
-#             src/plugingl/TexFont.h
-#)
-
-# added by rick - removed by rick pluginTINYXML.cmake does this
-# SET (SRC_TINYXML
-#    src/tinyxml/tinyxml.cpp
-#	src/tinyxml/tinyxmlerror.cpp
-#	src/tinyxml/tinyxmlparser.cpp
-#    src/tinyxml/tinyxml.h
-#)
-
-# SET  (SRC_ZLIB
-#             src/zlib-1.2.3/zconf.h
-#             src/zlib-1.2.3/zlib.h
-#)
-
-#SET  (SRC_BZIP2
-#            src/bzip2/blocksort.c
-#			 src/bzip2/bzlib.c
-#			 src/bzip2/bzlib_private.h
-#			 src/bzip2/compress.c
-#			 src/bzip2/crctable.c
-#			 src/bzip2/decompress.c
-#			 src/bzip2/huffman.c
-#			 src/bzip2/randtable.c
-#)
-
-# SET   (SRC_JSONCPP
-#			 src/jsoncpp/json_reader.cpp
-#			 src/jsoncpp/json_value.cpp
-#			 src/jsoncpp/json_writer.cpp
-#)
-
-# Added and tried by Rick 
-# SET (SRC_JSON
-#   src/jsoncpp/json/json.h
-#   src/jsoncpp/json/assertions.h
-#   src/jsoncpp/json/autolink.h
-#   src/jsoncpp/json/config.h
-#   src/jsoncpp/json/forwards.h
-#   src/jsoncpp/json/reader.h
-#   src/jsoncpp/json/value.h
-#   src/jsoncpp/json/writer.h
-#   src/jsoncpp/json_batchallocator.h
-#   src/jsoncpp/json_tool.h)  #rick added
-         				  
-# Testplugin has this line, so just added it
 
 add_definitions(-DPLUGIN_USE_SVG)
 
@@ -299,14 +232,6 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2} )
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 
-##
-
-## Statement below is required to collect all the set( headers and SRCS  - Adjust as required
-## This add_library  can be used in conditionals below.
-##
-##    SET(EXTSRC  ${EXTSRC}   etc   Can be in an if statement as below
-##
-
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
 #Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
 
@@ -318,39 +243,20 @@ add_subdirectory(libs/tinyxml)
 target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
 
 IF(NOT UNIX)
-    SET(SRC_BZIP	
-            src/bzip2/bzlib.c
-            src/bzip2/blocksort.c
-            src/bzip2/compress.c
-            src/bzip2/crctable.c
-            src/bzip2/decompress.c
-            src/bzip2/huffman.c
-            src/bzip2/randtable.c
-			src/bzip2/bzlib_private.h
-    )
-    ADD_LIBRARY(LIB_BZIP_WR STATIC ${SRC_BZIP})
-    TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} LIB_BZIP_WR )
-    INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/bzip2)
-#	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
-ENDIF(NOT UNIX)
-
-IF(NOT UNIX)
-    INCLUDE_DIRECTORIES(src/zlib-1.2.3)
-    INCLUDE_DIRECTORIES(src/bzip2)
-#	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/jsoncpp)
+    include_directories(src/zlib-1.2.3)
+    include_directories(libs/bzip2)
+    add_subdirectory(libs/bzip2)
+    target_link_libraries(${PACKAGE_NAME} ocpn::bzip2)
 ENDIF(NOT UNIX)
 
 IF(WIN32)
-  IF(MSVC)
-    INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/buildwin/include)
-	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
-  ELSE()
-    # MINGW
-#    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lwxzlib-2.8")
-	INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-    TARGET_LINK_LIBRARIES(${PACKAGE_NAME} "-lz")
-  ENDIF()
+    IF(MSVC)
+        include_directories(${CMAKE_SOURCE_DIR}/buildwin/include)
+        target_link_libraries(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
+    ELSE()
+        # MINGW
+        target_link_libraries(${PACKAGE_NAME} "-lz")
+    ENDIF()
 ENDIF()
 
 #--------Above from cmakelists.txt  weather_routing_pi------------
