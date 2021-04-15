@@ -30,7 +30,7 @@ extern "C" {
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <zlib.h>
+#include <zlib-1.2.3/zlib.h>
 #ifdef __ANDROID__
     #define BZ_OK                0
 #else

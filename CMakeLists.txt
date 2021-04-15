@@ -17,18 +17,14 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  
-# Frontend2: v1.0.132					 
+# Frontend2 Author: Jon Gough   v1.0.160					 
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
 ## ----- Changes should only be made between the section blocks that identify where     ----- ##
 ## ----- these changes should be. The whole configuration process relies on this        ----- ##
 ## ----- sequence to be successful                                                      ----- ##
 
-
-##
 ##----- Modify section below to include all the details for your plugin ----- ##
-##
 
 set(CMLOC "CMakeLists: ")
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -56,9 +52,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "19")
-set(VERSION_TWEAK "1")
-set(VERSION_DATE "13/04/2020")
+set(VERSION_PATCH "20")
+set(VERSION_TWEAK "0")
+set(VERSION_DATE "14/04/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -91,10 +87,8 @@ set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
 set(XML_DESCRIPTION ${LONG_DESCRIPTION})
 
-##
 ## ----- Modify section above to include all the details for your plugin ----- ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
-##
 
 option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
@@ -104,6 +98,7 @@ set(CMAKE_CXX_STANDARD 11)
 #set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
 # Don't use local version of GLU library
 #set(USE_LOCAL_GLU FALSE)             #not operational
+
 option(USE_GL "Enable OpenGL support" ON)  #WxRoute requires on
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
@@ -115,41 +110,30 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 
-##
 ## ----- The statements below are used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
-##
 
 project(${PACKAGE})
-
 
 #========================================================
 include("PluginSetup")
 #========================================================
-
-##
 ## ----- The above is used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
-##
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(Plugin_CXX11 "Use c++11" OFF) 
 
-##
 ## ----- Modify section above if there are special requirements for the plugin ----- ##
 ## ----- do not change next section - needed to configure build process ----- ##
-##
-
 #===========================================================
 include("PluginConfigure")
 #===========================================================
 ## ----- do not change section above - needed to configure build process ----- ##
 ## ----- Change below to match project requirements for source, headers, etc. ----- ##
-#
 
 add_definitions(-DUSE_S57)
 
-# From master branch - is this working? necessary?
 IF(PLUGIN_USE_SVG)
     MESSAGE(STATUS "${CMLOC}SVG support enabled...")
     IF(NOT QT_ANDROID)
@@ -187,32 +171,31 @@ SET(SRCS
             src/GribRecord.cpp
 )
 
-# Added and tried by Rick
 SET (HDRS
-            src/weather_routing_pi.h
-            src/WeatherRouting.h
-            src/ConfigurationDialog.h
-            src/SettingsDialog.h
-            src/PlotDialog.h
-            src/BoatDialog.h
-            src/StatisticsDialog.h
-            src/ReportDialog.h
-            src/FilterRoutesDialog.h
-            src/ConfigurationBatchDialog.h
-            src/EditPolarDialog.h
-            src/AboutDialog.h
-            src/Polar.h
-            src/Boat.h
-            src/RouteMap.h
-            src/RouteMapOverlay.h
-            src/Utilities.h
-            src/LineBufferOverlay.h
-            src/PolygonRegion.h
-            src/WeatherRoutingUI.h
-            src/icons.h
-            src/zuFile.h
-            src/georef.h
-            src/GribRecord.h
+            include/weather_routing_pi.h
+            include/WeatherRouting.h
+            include/ConfigurationDialog.h
+            include/SettingsDialog.h
+            include/PlotDialog.h
+            include/BoatDialog.h
+            include/StatisticsDialog.h
+            include/ReportDialog.h
+            include/FilterRoutesDialog.h
+            include/ConfigurationBatchDialog.h
+            include/EditPolarDialog.h
+            include/AboutDialog.h
+            include/Polar.h
+            include/Boat.h
+            include/RouteMap.h
+            include/RouteMapOverlay.h
+            include/Utilities.h
+            include/LineBufferOverlay.h
+            include/PolygonRegion.h
+            include/WeatherRoutingUI.h
+            include/icons.h
+            include/zuFile.h
+            include/georef.h
+            include/GribRecord.h
 )
 
 add_definitions(-DPLUGIN_USE_SVG)
@@ -221,8 +204,9 @@ add_definitions(-DPLUGIN_USE_SVG)
 ## Required to collect all the set( headers and SRCS  - Adjust as required
 ## This add_library  can be used in conditionals below.
 ##================================================================================
-# SET(SRC ${SRCS} ${SRC_LIBTESS2}  ${SRC_PLUGINGL} ${SRC_TINYXML})
-SET(SRC ${SRCS} ${SRC_LIBTESS2} )
+SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
+##=========================================
+
 
 ##=============================================================
 # Modify/configure 'Include' Directories below for the Plugin
@@ -232,13 +216,11 @@ SET(SRC ${SRCS} ${SRC_LIBTESS2} )
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude/wxcurl)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 
+##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
-#Add_Library (${PACKAGE_NAME} is used below. Cannot use same name.
-
-# Used in textplugin. Just added.
+##=================================================
 add_definitions(-DTIXML_USE_STL)
 
-# Alec from watchdog
 add_subdirectory(libs/tinyxml)
 target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
 
@@ -259,20 +241,12 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
-#--------Above from cmakelists.txt  weather_routing_pi------------
-#--------REMOVE LN 194 to LN 296 from Testplugin_pi---------------
 #------- Change below to match project requirements --------------
 
-# Jon identified these were missing causing json/json.h and other problems.
-#----INCLUDE CMAKE #3 & #4 -----
-#include("PluginJSON")
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 add_subdirectory(libs/jsoncpp)
 target_link_libraries(${PACKAGE_NAME} ${PACKAGE_NAME}_LIB_PLUGINJSON)
 
-
-# include("PluginXML") #Alec -added cmake_module and sub-directory. same as watchdog
-#include("PluginGL")
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
 add_subdirectory(libs/plugingl)
 target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
@@ -286,18 +260,18 @@ if(QT_ANDROID)
     include_directories(BEFORE ${qt_android_include})
 endif(QT_ANDROID)
 
-#
 # ----- Do not change - needed to build app ----- ##
-#
-#INCLUDE CMAKE #5,6 & 7 -----
+#========================================================
 include("PluginInstall")
 include("PluginLocalization")
 include("PluginPackage")
+#========================================================
+
 get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
 message(STATUS "${CMLOC}Libraries: ${OUT}")
 
 ## ----- do not change section above - needed to configure build process ----- ##
-##
+
 get_property(
     dirs
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
