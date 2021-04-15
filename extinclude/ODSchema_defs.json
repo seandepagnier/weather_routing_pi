@@ -1,0 +1,383 @@
+R"(
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "OD Schemas Defs",
+    "definitions": {
+        "schemahead": {
+            "description": "Standalone for simple queries or required for complex internactions as a part of the message",
+            "type": "object",
+            "properties": {
+                "Msg": {
+                    "description": "Message Name",
+                    "enum": [
+                        "Version",
+                        "GetAPIAddresses",
+                        "FindPathByGUID",
+                        "FindPointInAnyBoundary",
+                        "FindClosestBoundaryLineCrossing",
+                        "FindFirstBoundaryLineCrossing",
+                        "FindPointInBoundary",
+                        "FindPointInGuardZone",
+                        "BoundaryInformation",
+                        "CreateBoundaryPoint",
+                        "CreateBoundary",
+                        "CreateTextPoint",
+                        "DeleteBoundary",
+                        "DeleteBoundaryPoint",
+                        "DeleteTextPoint",
+                        "AddPointIcon",
+                        "DeletePointIcon"
+                    ]
+                },
+                "Type": {
+                "description": "Type of Message",
+                "enum": ["Request","Response"]
+                },
+                "Source": {
+                    "description": "Source of message",
+                    "type": "string"
+                    },
+                    "MsgId": {
+                    "description": "Message Name",
+                    "type": "string"
+                }
+            },
+            "required": ["Msg", "Type", "Source", "MsgId"],
+            "addtionalProperties": false
+        },
+        "LatLon": {
+            "description": "Used to describe Lat & Lon",
+            "oneOf": [
+                {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "Lat": {
+                                    "description": "Latitude of Boundary Point",
+                                    "type": "number",
+                                    "minimum": -90,
+                                    "maximum": 90
+                                },
+                                "Lon": {
+                                    "description": "Longitude of Boundary Point",
+                                    "type": "number",
+                                    "minimum": -180,
+                                    "maximum": 180
+                                }
+                            },
+                            "required": [
+                                "Lat", "Lon"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "allOf": [
+                        {
+                            "properties": {
+                                "lat": {
+                                    "description": "Latitude of Boundary Point",
+                                    "type": "number",
+                                    "minimum": -90,
+                                    "maximum": 90
+                                },
+                                "lon": {
+                                    "description": "Longitude of Boundary Point",
+                                    "type": "number",
+                                    "minimum": -180,
+                                    "maximum": 180
+                                }
+                            },
+                            "required": [
+                                "lat", "lon"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "StartLatLon": {
+            "description": "Used to describe Lat & Lon",
+            "type": "object",
+            "properties": {
+                "StartLat": {
+                    "description": "Latitude of Boundary Point",
+                    "type": "number",
+                    "minimum": -90,
+                    "maximum": 90
+                },
+                "StartLon": {
+                    "description": "Longitude of Boundary Point",
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+            }
+            },
+            "required": ["StartLat", "StartLon"]
+        },
+        "EndLatLon": {
+            "description": "Used to describe Lat & Lon",
+            "type": "object",
+            "properties": {
+                "EndLat": {
+                    "description": "Latitude of Boundary Point",
+                    "type": "number",
+                    "minimum": -90,
+                    "maximum": 90
+                },
+                "EndLon": {
+                    "description": "Longitude of Boundary Point",
+                    "type": "number",
+                    "minimum": -180,
+                    "maximum": 180
+                }
+            },
+            "required": ["EndLat", "EndLon"]
+        },
+        "ODPoint": {
+            "description": "Generic OD Point",
+            "allOf": [
+                {"ref": "#/definitions/LatLon"},
+                {
+                    "anyOf": [
+                        {"Name": {
+                            "description": "Boundary Point Name",
+                            "type": "string"}
+                        },
+                        {"ref": "#/definitions/LatLon"},
+                        {"IconName": {
+                            "description": "Boundary Point Icon Name",
+                            "type": "string"
+                            }
+                        },
+                        {"Visible": {
+                            "description": "Visibility of Boundary Point",
+                            "type": "boolean",
+                            "default": false
+                            }
+                        },
+                        {"RingsVisible": {
+                            "description": "Visibility of Boundary Point Range Rings",
+                            "type": "boolean",
+                            "default": false
+                            }
+                        },
+                        {"RingsNumber": {
+                            "description": "Number of Boundary Point Rings",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 10
+                            }
+                        },
+                        {"RingsSteps": {
+                            "description": "Steps between Boundary Point Rings",
+                            "type": "number",
+                            "minimum": 0.0
+                            }
+                        },
+                        {"RingUnits": {
+                            "description": "Boundary Point Range Ring Step Units",
+                            "enum": [0,1,2,3,4,5,6,7,8,9,10]
+                            }
+                        },
+                        {"RingsColour": {
+                            "description": "Boundary Point Range Rings Colour",
+                            "type": "string"
+                            }
+                        },
+                        {
+                            "HyperLinks": {
+                                "description": "Array of hyperlinks to local or internet documents",
+                                "type": "array",
+                                "Items": {
+                                    "allOf" : [
+                                        {
+                                            "LinkDescription": {
+                                            "description": "Text description of hyper link",
+                                            "type": "string"
+                                            }
+                                        },
+                                        {
+                                            "LinkURL": {
+                                            "description": "Actual Hyperlink",
+                                            "type": "string"
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "BoundaryPoint": {
+            "description": "Used to create a boundary point",
+            "allOf": [
+                {"$ref": "#/definitions/ODPoint"},
+                {"properties": {
+                    "BoundaryPointType": {
+                        "description": "Boundary Point Type",
+                        "type": "string",
+                        "enum": ["Exclusion", "Inclusion", "Neither"]
+                        }
+                    }
+                }
+            ]
+        },
+        "textpoint": {
+            "description": "Used to create a text point",
+            "type": "object",
+            "properties": {
+                "items": {
+                    "$ref": "#/definitions/ODPoint"
+                },
+                "Temporary": {
+                    "description": "Text point life, false - exists over restart, true - non persistent",
+                    "type": "boolean",
+                    "default": false
+                },
+                "GUID": {
+                    "description": "GUID of Text Point",
+                    "type": "string",
+                    "optional": true
+                },
+                "TextToDisplay": {
+                    "description": "Text Point Text",
+                    "type": "string"
+                },
+                "TextPosition": {
+                    "description": "Text Point Text Position",
+                    "enum": [0,1,2,3,4,5,6]
+                },
+                "TextColour": {
+                    "description": "Text Point Text Colour",
+                    "type": "string"
+                },
+                "BackgroundColour": {
+                    "description": "Text Point Text BackgroundColour",
+                    "type": "string"
+                },
+                "BackgroundTransparancy": {
+                    "description": "Text Point Text BackgroundTransparancy",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 255
+                },
+                "TextFont": {
+                    "description": "Text Point Font",
+                    "type": "string"
+                },
+                "TextPointDisplayTextWhen": {
+                    "description": "Text Point When To Display",
+                    "type": "string"
+                }
+            }
+        },
+        "ODObject": {
+            "description": "Used to delete an object",
+            "type": "object",
+            "properties": {
+                "items": {
+                    "$ref": "#/definitions/LatLon"
+                },
+                "GUID": {
+                    "description": "GUID of object",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "GUID"
+                ]
+        },
+        "PointIcon": {
+            "description": "Used to delete add an point icon",
+            "type": "object",
+            "properties": {
+                "PointIcon": {
+                    "description": "Point Icon in Base64",
+                    "type": "string",
+                    "optional": false
+                },
+                "PointIconName": {
+                    "description": "Point Icon name",
+                    "type": "string",
+                    "optional": false
+                },
+                "PointIconDescription": {
+                    "description": "Point Icon Description",
+                    "type": "string",
+                    "optional": false
+                }
+            },
+            "required": [
+                "PointIcon",
+                "PointIconName",
+                "PointIconDescription"
+            ]
+        },
+        "boundary": {
+            "description": "Used to create or modify a boundary",
+            "type": "object",
+            "allOf": [
+                {
+                    "anyOf": [
+                        {
+                            "properties": {
+                                "BoundaryName": {
+                                    "description": "Boundary Name",
+                                    "type": "string"
+                                },
+                                "Active": {
+                                    "description": "Is Boundary Active",
+                                    "type": "boolean",
+                                    "boolean": true
+                                },
+                                "Visible": {
+                                    "description": "Visibility of Boundary",
+                                    "type": "boolean",
+                                    "default": true
+                                },
+                                "Temporary": {
+                                    "description": "Boundary life, false - exists over restart, true - non persistent",
+                                    "type": "boolean",
+                                    "default": false
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "allOf": [
+                        {
+                            "properties" : {
+                                "BoundaryPoints": {
+                                    "description": "Array of boundary points needed to define a boundary",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/BoundaryPoint"
+                                    },
+                                    "minItems": 3,
+                                    "additionalItems": false
+                                },
+                                "BoundaryType": {
+                                    "description": "Boundary Type",
+                                    "enum": ["Exclusion","Inclusion","Neither","Any"]
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "FindPointInBoundary": {
+            "description": "Used to find a Lat/Lon in a given Boundary",
+            "type": "object",
+            "allOf": [
+                {"$ref": "#/definitions/LatLon"},
+                {"$ref": "#/definitions/ODObject"}
+            ]
+        }
+
+    }
+)"
