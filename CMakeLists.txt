@@ -54,7 +54,7 @@ set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "20")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "14/04/2020")
+set(VERSION_DATE "14/04/2021")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -122,7 +122,7 @@ include("PluginSetup")
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-option(Plugin_CXX11 "Use c++11" OFF) 
+option(Plugin_CXX11 "Use c++11" OFF)
 
 ## ----- Modify section above if there are special requirements for the plugin ----- ##
 ## ----- do not change next section - needed to configure build process ----- ##

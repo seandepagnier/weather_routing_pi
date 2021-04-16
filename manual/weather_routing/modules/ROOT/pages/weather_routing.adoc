@@ -1,13 +1,17 @@
 == Weather Routing Pi
 
-image::wr-icon.jpeg[]
+image::wr-icon.jpeg[wr-icon]
+
+Author: Sean D'Epagnier +
+Maintainers: Rick Gleason, Jon Gough and the Plugin Team +
+PI Manager Workflow: Testplugin
 
 === Links
 
 * Source: https://github.com/seandepagnier/weather_routing_pi +
+* Maintainer Source: https://github.com/rgleason/weather_routing_pi +
 * Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html +
-* Forum:
-http://www.cruisersforum.com/forums/f134/weather-routing-100060.html +
+* Forum: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html +
 
 === Purpose of Weather Routing (WR)
 
