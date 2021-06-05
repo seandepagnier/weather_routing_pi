@@ -53,7 +53,7 @@ PlotDialog::PlotDialog( WeatherRouting &weatherrouting )
 #ifdef __OCPN__ANDROID__
     wxSize sz = ::wxGetDisplaySize();
     SetSize(0, 0, sz.x, sz.y-40);
-#endif    
+#endif
 }
 
 PlotDialog::~PlotDialog()
@@ -207,6 +207,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
     double scale = 100.0 / m_sScale->GetValue();
 
     wxPaintDC dc(window);
+    dc.Clear();
     dc.SetBackgroundMode(wxTRANSPARENT);
 
     int w, h;
@@ -234,7 +235,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
             lx = x, ly = y;
         }
     }
-    
+
     // Cursor Customization
     // ----------------------------------------------------------------
     // Draw a cursor on the graph to show
@@ -245,7 +246,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
     {
         int x_cursor = w * (scale * ((cursorTime - m_mintime) / (m_maxtime - m_mintime) - \
                                      position) + position);
-        
+
         wxColor orange(255, 165, 0);
         wxPen cursorPen(orange, 3, wxPENSTYLE_DOT);
         dc.SetPen(cursorPen);
@@ -255,7 +256,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
 
     dc.SetTextForeground(*wxBLACK);
     dc.SetPen(wxPen(*wxBLACK, 1, wxPENSTYLE_DOT));
-    
+
     const double steps = 10;
     bool grid = true;
     for(double i=1/steps; i<1-1/steps; i+=1/steps) {
@@ -278,7 +279,7 @@ void PlotDialog::OnPaintPlot(wxPaintEvent& event)
         for(double i=1/steps; i<1-1/steps; i+=1/steps) {
             wxString value = wxString::Format(_T("%.1f"), (1-i)*(m_maxvalue[ci] - m_minvalue[ci]) + m_minvalue[ci]);
             wxSize s = dc.GetTextExtent(value);
-            int y = i*h; 
+            int y = i*h;
             dc.DrawText(value, x, y - s.y/2);
 
             if(s.x > maxx)
