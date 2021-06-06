@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough   v1.0.160					 
+# Frontend2 Author: Jon Gough   v1.0.167  7/05/2021					 
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
 ## ----- Changes should only be made between the section blocks that identify where     ----- ##
@@ -27,7 +27,6 @@
 ##----- Modify section below to include all the details for your plugin ----- ##
 
 set(CMLOC "CMakeLists: ")
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
@@ -53,11 +52,12 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "20")
-set(VERSION_TWEAK "0")
-set(VERSION_DATE "14/04/2021")
+set(VERSION_TWEAK "1")
+set(VERSION_DATE "06/06/2021")# DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
+set(TP_COMMENT "  * Release for O5 using CI")
 
 set(PARENT "opencpn")
 
@@ -103,9 +103,7 @@ option(USE_GL "Enable OpenGL support" ON)  #WxRoute requires on
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-    set(CMAKE_BUILD_TYPE
-        "Release"
-        CACHE STRING "Choose the type of build" FORCE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build" FORCE)
 endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
@@ -114,13 +112,16 @@ message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 
 project(${PACKAGE})
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+
 #========================================================
 include("PluginSetup")
 #========================================================
 ## ----- The above is used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE "Activate verbose mode for make files" ON)
 
 option(Plugin_CXX11 "Use c++11" OFF)
 
@@ -256,7 +257,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 add_subdirectory(libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
-# Added for android builds
+# Needed for android builds
 if(QT_ANDROID)
     include_directories(BEFORE ${qt_android_include})
 endif(QT_ANDROID)
@@ -267,16 +268,10 @@ include("PluginInstall")
 include("PluginLocalization")
 include("PluginPackage")
 #========================================================
-
-get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
-message(STATUS "${CMLOC}Libraries: ${OUT}")
-
 ## ----- do not change section above - needed to configure build process ----- ##
-
-get_property(
-    dirs
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    PROPERTY INCLUDE_DIRECTORIES)
+##
+message(STATUS "${CMLOC}include directories: ")
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
-    message(STATUS "${CMLOC}include dir='${dir}'")
+    message(STATUS "${CMLOC}dir='${dir}'")
 endforeach()

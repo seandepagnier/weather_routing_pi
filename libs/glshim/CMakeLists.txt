@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 2.6)
 
-#project(glesgl)
+set(SAVE_CMLOC_GLSHIM ${CMLOC})
+set(CMLOC "CMakeLists_GLSHIM: ")
 
+message(STATUS "${CMLOC}Building glshim")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -21,6 +23,4 @@ add_definitions(-g -std=c99 -funwind-tables -O2)
 include_directories(include)
 add_subdirectory(src)
 
-
-
-
+set(CMLOC ${SAVE_CMLOC_GLSHIM})

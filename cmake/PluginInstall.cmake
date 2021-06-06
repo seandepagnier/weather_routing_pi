@@ -76,8 +76,9 @@ endif(NOT CMAKE_INSTALL_PREFIX)
 message(STATUS "${CMLOC}*** Will install to ${CMAKE_INSTALL_PREFIX}  ***")
 set(PREFIX_DATA share)
 set(PREFIX_PKGDATA ${PREFIX_DATA}/${PACKAGE_NAME})
-# set(PREFIX_LIB "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
-set(PREFIX_LIB lib)
+#set(PREFIX_LIB "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
+#set(PREFIX_LIB lib)
+set(PREFIX_LIB ${LIB_INSTALL_DIR})
 
 if(WIN32)
     message(STATUS "${CMLOC}Install Prefix: ${CMAKE_INSTALL_PREFIX}")
@@ -134,7 +135,7 @@ if(APPLE)
     file(
         GLOB_RECURSE PACKAGE_DATA_FILES
         LIST_DIRECTORIES true
-        ${CMAKE_SOURCE_DIR}/data/*)
+        ${PROJECT_SOURCE_DIR}/data/*)
 
     foreach(_currentDataFile ${PACKAGE_DATA_FILES})
         message(STATUS "${CMLOC}copying: ${_currentDataFile}")
@@ -145,7 +146,7 @@ if(APPLE)
         file(
             GLOB_RECURSE PACKAGE_DATA_FILES
             LIST_DIRECTORIES true
-            ${CMAKE_SOURCE_DIR}/UserIcons/*)
+            ${PROJECT_SOURCE_DIR}/UserIcons/*)
 
         foreach(_currentDataFile ${PACKAGE_DATA_FILES})
             message(STATUS "${CMLOC}copying: ${_currentDataFile}")

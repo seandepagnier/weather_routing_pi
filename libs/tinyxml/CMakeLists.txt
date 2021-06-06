@@ -9,10 +9,10 @@ set(CMLOC "CMakeLists_TINYXML: ")
 
 message(STATUS "${CMLOC}Building TinyXML")
 set (SRC
-  src/tinyxml.cpp
-  src/tinyxmlerror.cpp
-  src/tinyxmlparser.cpp
-)
+src/tinyxml.cpp
+src/tinyxmlerror.cpp
+src/tinyxmlparser.cpp
+  )
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library(TINYXML STATIC ${SRC})
 target_compile_definitions(TINYXML PUBLIC -DTIXML_USE_STL)

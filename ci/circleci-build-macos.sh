@@ -23,6 +23,10 @@ echo 'export PATH="/usr/local/opt/gettext/bin:$PATH"' >> ~/.bash_profile
 
 export MACOSX_DEPLOYMENT_TARGET=10.9
 
+#wget -q http://opencpn.navnux.org/build_deps/Packages.dmg - unsupported link, replaced with below
+#curl -o Packages.dmg https://download.opencpn.org/s/SneCR3z9XM3aRc6/download
+#hdiutil attach Packages.dmg
+#sudo installer -pkg "/Volumes/Packages 1.2.5/Install Packages.pkg" -target "/"
 # use brew to get Packages.pkg
 if brew list --cask --versions packages; then
     version=$(pkg_version packages '--cask')
@@ -43,4 +47,7 @@ cmake \
   ..
 make -sj2
 make package
+
+# removed as fails to build
+# make create-pkg
 
