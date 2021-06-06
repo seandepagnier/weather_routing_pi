@@ -28,7 +28,7 @@ void initialize_images(void)
     fn.AppendDir(_T("data"));
     fn.SetFullName(_T("weather_routing_pi.svg"));
     _svg_weather_routing = fn.GetFullPath();
-    wxLogMessage(_T("Loading toolbar icon: ") + _svg_weather_routing); 
+    wxLogMessage(_T("Loading toolbar icon: ") + _svg_weather_routing_rollover); 
     fn.SetFullName(_T("weather_routing_pi_rollover.svg"));
     _svg_weather_routing_rollover = fn.GetFullPath();
     fn.SetFullName(_T("weather_routing_pi_toggled.svg"));

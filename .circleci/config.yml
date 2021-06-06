@@ -20,28 +20,28 @@ parameters:
         default: false
     run_build_xenial:
         type: boolean
-        default: false
+        default: true
     run_build_bionic:
         type: boolean
-        default: false
+        default: true
     run_build_bionic_gtk3:
         type: boolean
-        default: false
+        default: true
     run_build_focal:
         type: boolean
-        default: false
+        default: true
     run_build_focal_gtk3:
         type: boolean
-        default: false
+        default: true
     run_build_buster:
         type: boolean
-        default: false
+        default: true
     run_build_flatpack:
         type: boolean
-        default: false
+        default: true
     run_build_flatpack-arm64:
         type: boolean
-        default: false
+        default: true
     run_build_fedora:
         type: boolean
         default: false
@@ -50,7 +50,7 @@ parameters:
         default: false
     run_build_macos:
         type: boolean
-        default: false
+        default: true
     run_build_android_arm64:
         type: boolean
         default: false
