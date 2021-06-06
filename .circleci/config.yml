@@ -41,7 +41,7 @@ parameters:
         default: true
     run_build_fedora:
         type: boolean
-        default: true
+        default: false
     run_build_mingw:
         type: boolean
         default: true
