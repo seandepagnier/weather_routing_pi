@@ -61,6 +61,11 @@ fi
 
 cat build.sh
 
+if type nproc &> /dev/null
+then
+    BUILD_FLAGS="-j"$(nproc)
+fi
+
 docker exec -ti \
     $DOCKER_CONTAINER_ID /bin/bash -xec "bash -xe /ci-source/build.sh; rm -rf ci-source/build; mkdir ci-source/build; cd ci-source/build; cmake ..; make $BUILD_FLAGS; make package; chmod -R a+rw ../build;"
 

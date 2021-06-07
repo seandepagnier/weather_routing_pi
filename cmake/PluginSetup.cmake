@@ -6,7 +6,7 @@ set(SAVE_CMLOC ${CMLOC})
 set(CMLOC "PluginSetup: ")
 
 # Make sure cmake sub directory files can be found by cmake
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 if(NOT DEFINED GIT_REPOSITORY_SERVER)
     set(GIT_REPOSITORY_SERVER "github.com")
@@ -46,13 +46,13 @@ execute_process(
 if("${GIT_REPOSITORY_EXISTS}" STREQUAL "0")
     execute_process(
         COMMAND git log -1 --format=%h
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE GIT_HASH
         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
     execute_process(
         COMMAND git log -1 --format=%ci
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
         OUTPUT_VARIABLE GIT_COMMIT_DATE OUTPUT_STRIP_TRAILING_WHITESPACE)
 else()
     set(GIT_HASH "")
@@ -280,7 +280,7 @@ if(CMAKE_VERSION VERSION_GREATER 3.4)
             # For more, see http://clang.llvm.org/extra/clang-tidy/ set(CLANG_TIDY_CHECKS "-*,modernize-*")
             set(CLANG_TIDY_CHECKS "-*,performance-*")
             set(CMAKE_CXX_CLANG_TIDY
-                "${CLANG_TIDY_EXE};-checks=${CLANG_TIDY_CHECKS};-header-filter='${CMAKE_SOURCE_DIR}/*'"
+                "${CLANG_TIDY_EXE};-checks=${CLANG_TIDY_CHECKS};-header-filter='${PROJECT_SOURCE_DIR}/*'"
                 CACHE STRING "" FORCE)
         else()
             message(AUTHOR_WARNING "clang-tidy not found!")

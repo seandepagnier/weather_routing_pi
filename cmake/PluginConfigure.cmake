@@ -33,7 +33,7 @@ else()
         # Get the current working branch
         execute_process(
             COMMAND git rev-parse --abbrev-ref HEAD
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             OUTPUT_VARIABLE GIT_REPOSITORY_BRANCH
             OUTPUT_STRIP_TRAILING_WHITESPACE)
         if("${GIT_REPOSITORY_BRANCH}" STREQUAL "")
@@ -42,11 +42,11 @@ else()
         endif()
         execute_process(
             COMMAND git tag --contains
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             OUTPUT_VARIABLE GIT_REPOSITORY_TAG OUTPUT_STRIP_TRAILING_WHITESPACE)
         execute_process(
             COMMAND git status --porcelain -b
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
             OUTPUT_VARIABLE GIT_STATUS OUTPUT_STRIP_TRAILING_WHITESPACE)
         string(FIND ${GIT_STATUS} "..." START_TRACKED)
         if(NOT START_TRACKED EQUAL -1)
@@ -57,7 +57,7 @@ else()
             message(STATUS "${CMLOC}GIT_REPOSITORY_REMOTE: ${GIT_REPOSITORY_REMOTE}")
             execute_process(
                 COMMAND git remote get-url ${GIT_REPOSITORY_REMOTE}
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                 OUTPUT_VARIABLE GIT_REPOSITORY_URL OUTPUT_STRIP_TRAILING_WHITESPACE
                 ERROR_VARIABLE GIT_REMOTE_ERROR)
             if(NOT GIT_REMOTE_ERROR STREQUAL "")
@@ -188,14 +188,15 @@ message(STATUS "${CMLOC}PKG_BUILD_TARGET: ${PKG_TARGET}")
 message(STATUS "${CMLOC}PKG_BUILD_GTK: ${PKG_TARGET_GTK}")
 message(STATUS "${CMLOC}*.in files generated in ${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "${CMLOC}PACKAGING_NAME_XML: ${PACKAGING_NAME_XML}")
-configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/plugin.xml.in ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGING_NAME_XML}.xml)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/pkg_version.sh.in ${CMAKE_CURRENT_BINARY_DIR}/pkg_version.sh)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/cloudsmith-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/cloudsmith-upload.sh @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/PluginCPackOptions.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PluginCPackOptions.cmake @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/plugin.xml.in ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGING_NAME_XML}.xml)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/pkg_version.sh.in ${CMAKE_CURRENT_BINARY_DIR}/pkg_version.sh)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/cloudsmith-upload.sh.in ${CMAKE_CURRENT_BINARY_DIR}/cloudsmith-upload.sh @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/PluginCPackOptions.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PluginCPackOptions.cmake @ONLY)
 
 if(OCPN_FLATPAK_CONFIG)
-    message(STATUS "${CMLOC}Checking OCPN_FLATPAK_CONFIG: ${OCPN_FLATPAK_CONFIG}")
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/in-files/org.opencpn.OpenCPN.Plugin.yaml.in ${CMAKE_CURRENT_BINARY_DIR}/flatpak/org.opencpn.OpenCPN.Plugin.${PACKAGE}.yaml)
+    set(SDK_VER $ENV{SDK_VER})
+    message(STATUS "${CMLOC}Checking OCPN_FLATPAK_CONFIG: ${OCPN_FLATPAK_CONFIG}, SDK_VER: ${SDK_VER}")
+    configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/org.opencpn.OpenCPN.Plugin.yaml.in ${CMAKE_CURRENT_BINARY_DIR}/flatpak/org.opencpn.OpenCPN.Plugin.${PACKAGE}.yaml)
 
     message(STATUS "${CMLOC}Done OCPN_FLATPAK CONFIG")
     message(STATUS "${CMLOC}Directory used: ${CMAKE_CURRENT_BINARY_DIR}/flatpak")
@@ -220,7 +221,6 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInf
 endif(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
 
 if(NOT WIN32 AND NOT APPLE)
-    #add_definitions("-DUSE_ANDROID_GLES2")
     add_definitions("-Wall -Wno-unused -fexceptions -rdynamic -fvisibility=hidden")
     add_definitions(" -fno-strict-aliasing")
     message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
@@ -341,8 +341,8 @@ IF(DEFINED _wx_selected_config)
         MESSAGE (STATUS "${CMLOC}Using GLESv2 for Android")
         ADD_DEFINITIONS(-DUSE_ANDROID_GLES2)
         ADD_DEFINITIONS(-DUSE_GLSL)
-        include_directories( ${CMAKE_SOURCE_DIR}/libs/glshim/include/GLES )
-        set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} ${CMAKE_SOURCE_DIR}/libs/glshim/include/GLES)
+        include_directories( ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES )
+        set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES)
         set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} libs/glshim/include)
         target_link_libraries(${PACKAGE_NAME} gl_static::gl_static)
 
@@ -350,46 +350,18 @@ IF(DEFINED _wx_selected_config)
 ENDIF(DEFINED _wx_selected_config)
 
 # Building for QT_ANDROID involves a cross-building environment, So the include directories, flags, etc must be stated explicitly without trying to locate them on the host build system.
-IF(QT_ANDROID)
-    MESSAGE(STATUS "${CMLOC}Processing QT_ANDROID")
-    ADD_DEFINITIONS(-D__WXQT__)
-    ADD_DEFINITIONS(-D__OCPN__ANDROID__)
-    ADD_DEFINITIONS(-DOCPN_USE_WRAPPER)
-    ADD_DEFINITIONS(-DANDROID)
+if(QT_ANDROID AND USE_GL MATCHES "ON")
+    message(STATUS "${CMLOC}Using GLESv1 for Android")
+    add_definitions(-DocpnUSE_GLES)
+    add_definitions(-DocpnUSE_GL)
+    add_definitions(-DARMHF)
 
-    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-soname,libgorp.so ")
+    set(OPENGLES_FOUND "YES")
+    set(OPENGL_FOUND "YES")
 
-    add_subdirectory(libs/glshim)
-    target_link_libraries(${PACKAGE_NAME} gl_static::gl_static)
-
-    #set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-    SET(CMAKE_CXX_FLAGS "-pthread -fPIC")
-
-    ## Compiler flags
-    add_compile_options("-Wno-inconsistent-missing-override"
-    "-Wno-potentially-evaluated-expression"
-    "-Wno-overloaded-virtual"
-    "-Wno-unused-command-line-argument"
-    "-Wno-unknown-pragmas"
-      )
-
-    message(STATUS "${CMLOC}Adding libgorp.o shared library")
-    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-soname,libgorp.so ")
-    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")  ## Strip binary
-
-    SET(QT_LINUX "OFF")
-    SET(QT "ON")
-    SET(CMAKE_SKIP_BUILD_RPATH  TRUE)
-    ADD_DEFINITIONS(-DQT_WIDGETS_LIB)
-    if("$ENV{OCPN_TARGET}" STREQUAL "android-arm64")
-        MESSAGE(STATUS "${CMLOC}Adding definition -DARM64")
-        ADD_DEFINITIONS(-DARM64)
-    else()
-        MESSAGE(STATUS "${CMLOC}Adding definition -DARMHF")
-        ADD_DEFINITIONS(-DARMHF)
-    endif()
-
-ENDIF(QT_ANDROID)
+    set(wxWidgets_USE_LIBS ${wxWidgets_USE_LIBS} gl)
+    add_subdirectory(src/glshim)
+endif(QT_ANDROID AND USE_GL MATCHES "ON")
 
 if((NOT OPENGLES_FOUND) AND (NOT QT_ANDROID))
 

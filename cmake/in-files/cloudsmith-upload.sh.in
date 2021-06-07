@@ -67,10 +67,18 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
             if ! pyenv global 3.8.6 2>&1 >/dev/null; then
                 if ! pyenv global 3.7.1 2>&1 >/dev/null; then
                     if ! pyenv global 3.7.0 2>&1>/dev/null; then
-                        pyenv global 3.5.2
+                        sudo apt install software-properties-common
+                        sudo add-apt-repository ppa:deadsnakes/ppa -y
+                        sudo apt update
+                        sudo apt install -y python3.7
+                        sudo rm /usr/bin/python3
+                        sudo ln -s /usr/bin/python3.7 /usr/bin/python3
+                        sudo python3 -m pip install --upgrade pip
+                        pyenv global 3.7
                     fi
                 fi
             fi
+            pip install -U pip
             python3 -m pip install cloudsmith-cli
             pyenv rehash
         elif dnf --version 2>&1 >/dev/null; then
@@ -78,6 +86,12 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
             sudo python3 -m pip install -q cloudsmith-cli
         elif apt-get --version 2>&1 >/dev/null; then
             COUNTER=0
+            sudo apt install software-properties-common
+            sudo add-apt-repository ppa:deadsnakes/ppa -y
+            sudo apt update
+            sudo apt install -y python3.7
+            sudo rm /usr/bin/python3
+            sudo ln -s /usr/bin/python3.7 /usr/bin/python3
             until
                 sudo apt-get install python3-pip python3-setuptools
             do
@@ -87,6 +101,7 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
                 sleep 5
                 ((COUNTER++))
             done
+            sudo python3 -m pip install --upgrade pip
             sudo python3 -m pip install -q cloudsmith-cli
     #    else
     #        sudo -H python3 -m ensurepip
@@ -163,7 +178,7 @@ fi
 echo $VERSION
 echo $REPO
 
-if [ "$APPVEYOR" ] || [ "$LOCAL_BUILD" = "true" ]; then
+if [ "$APPVEYOR" ] || [ LOCAL_BUILD=true ]; then
     echo 'substituting xml file variables for windows build'
     while read line; do
         line=${line//--pkg_repo--/$REPO}
@@ -208,11 +223,20 @@ else
 fi
 tar -tf $tarball_tar
 gzip -f $tarball_tar
+pwd
 cd "$cur_dir"
 pwd
 ls -la
+ls -la ~/.
 
-if [ $LOCAL_BUILD = false ]; then
+if [ ! -z ${LOCAL_DEPLOY+x} ]; then
+    if [ -d "/home/circleci/circleci-output" ]; then
+        sudo cp build/*.gz ~/circleci-output
+        sudo cp build/*.deb ~/circleci-output
+    else
+        echo "Directory ~/circleci-output not found"
+    fi
+elif [ $LOCAL_BUILD = false ]; then
     cloudsmith push raw --republish --no-wait-for-sync \
         --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
         --version ${VERSION} \

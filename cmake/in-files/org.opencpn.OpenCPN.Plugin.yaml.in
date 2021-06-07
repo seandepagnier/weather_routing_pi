@@ -1,7 +1,7 @@
 id: org.opencpn.OpenCPN.Plugin.${PACKAGE}
 runtime: org.opencpn.OpenCPN
 runtime-version: master
-sdk: org.freedesktop.Sdk//18.08
+sdk: org.freedesktop.Sdk//${SDK_VER}
 build-extension: true
 separate-locales: false
 appstream-compose: false
@@ -15,7 +15,8 @@ modules:
         - -DOCPN_FLATPAK_BUILD=ON
     build-options:
         cflags: -fPIC
-        cxxflags: -fPIC
+        cxxflags: -fPIC -DFLATPAK
+        strip: true
     sources:
        - type: git
          url: git://${GIT_REPOSITORY_SERVER}/${GIT_REPOSITORY}
