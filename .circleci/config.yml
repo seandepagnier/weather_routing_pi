@@ -8,7 +8,7 @@ parameters:
 
     run_build_armhf_stretch:
         type: boolean
-         default: false
+        default: false
     run_build_armhf_buster:
         type: boolean
         default: false
