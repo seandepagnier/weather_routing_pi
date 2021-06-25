@@ -158,8 +158,8 @@ if(UNIX AND NOT APPLE)
     string(TOLOWER "${PKG_TARGET}" PKG_TARGET)
 
     # Generate architecturally uniques names for linux output packages
-    if(ARCH MATCHES "arm64")
-        set(PKG_TARGET_ARCH "-arm64")
+    if(ARCH MATCHES "aarch64")
+        set(PKG_TARGET_ARCH "-aarch64")
     elseif(ARCH MATCHES "armhf")
         set(PKG_TARGET_ARCH "-armhf")
     elseif(ARCH MATCHES "i386")
@@ -194,7 +194,15 @@ configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/cloudsmith-upload.sh.in ${CM
 configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/PluginCPackOptions.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/PluginCPackOptions.cmake @ONLY)
 
 if(OCPN_FLATPAK_CONFIG)
-    set(SDK_VER $ENV{SDK_VER})
+    #set(SDK_VER $ENV{SDK_VER})
+    #  Hack for temporary "beta" status of 20.08 runtime
+    #  See new substitution variable in cmake/in-files/org.opencpn.OpenCPN.Plugin.yaml.in
+    if("${SDK_VER}"  STREQUAL "20.08")
+        set(RUNTIME_VERSION "beta")
+    else("${SDK_VER}"  STREQUAL "20.08")
+        set(RUNTIME_VERSION "stable")
+    endif("${SDK_VER}"  STREQUAL "20.08")
+
     message(STATUS "${CMLOC}Checking OCPN_FLATPAK_CONFIG: ${OCPN_FLATPAK_CONFIG}, SDK_VER: ${SDK_VER}")
     configure_file(${PROJECT_SOURCE_DIR}/cmake/in-files/org.opencpn.OpenCPN.Plugin.yaml.in ${CMAKE_CURRENT_BINARY_DIR}/flatpak/org.opencpn.OpenCPN.Plugin.${PACKAGE}.yaml)
 
@@ -350,18 +358,47 @@ IF(DEFINED _wx_selected_config)
 ENDIF(DEFINED _wx_selected_config)
 
 # Building for QT_ANDROID involves a cross-building environment, So the include directories, flags, etc must be stated explicitly without trying to locate them on the host build system.
-if(QT_ANDROID AND USE_GL MATCHES "ON")
-    message(STATUS "${CMLOC}Using GLESv1 for Android")
-    add_definitions(-DocpnUSE_GLES)
-    add_definitions(-DocpnUSE_GL)
-    add_definitions(-DARMHF)
+IF(QT_ANDROID)
+    MESSAGE(STATUS "${CMLOC}Processing QT_ANDROID")
+    ADD_DEFINITIONS(-D__WXQT__)
+    ADD_DEFINITIONS(-D__OCPN__ANDROID__)
+    ADD_DEFINITIONS(-DOCPN_USE_WRAPPER)
+    ADD_DEFINITIONS(-DANDROID)
 
-    set(OPENGLES_FOUND "YES")
-    set(OPENGL_FOUND "YES")
+    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-soname,libgorp.so ")
 
-    set(wxWidgets_USE_LIBS ${wxWidgets_USE_LIBS} gl)
-    add_subdirectory(src/glshim)
-endif(QT_ANDROID AND USE_GL MATCHES "ON")
+    add_subdirectory(libs/glshim)
+    target_link_libraries(${PACKAGE_NAME} gl_static::gl_static)
+
+    #set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    SET(CMAKE_CXX_FLAGS "-pthread -fPIC")
+
+    ## Compiler flags
+    add_compile_options("-Wno-inconsistent-missing-override"
+    "-Wno-potentially-evaluated-expression"
+    "-Wno-overloaded-virtual"
+    "-Wno-unused-command-line-argument"
+    "-Wno-unknown-pragmas"
+    "-Wno-inconsistent-missing-override"
+      )
+
+    message(STATUS "${CMLOC}Adding libgorp.o shared library")
+    set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-soname,libgorp.so ")
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s")  ## Strip binary
+
+    SET(QT_LINUX "OFF")
+    SET(QT "ON")
+    SET(CMAKE_SKIP_BUILD_RPATH  TRUE)
+    ADD_DEFINITIONS(-DQT_WIDGETS_LIB)
+    if("$ENV{OCPN_TARGET}" STREQUAL "android-arm64")
+        MESSAGE(STATUS "${CMLOC}Adding definition -DARM64")
+        ADD_DEFINITIONS(-DARM64)
+    else()
+        MESSAGE(STATUS "${CMLOC}Adding definition -DARMHF")
+        ADD_DEFINITIONS(-DARMHF)
+    endif()
+
+ENDIF(QT_ANDROID)
 
 if((NOT OPENGLES_FOUND) AND (NOT QT_ANDROID))
 

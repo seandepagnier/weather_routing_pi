@@ -57,7 +57,6 @@ if [ -n "$CIRCLECI" ]; then
     export GIT_REPOSITORY_SERVER=\"$GIT_REPOSITORY_SERVER\";
     export OCPN_TARGET=$OCPN_TARGET;
     export FLATPAK_BRANCH=$FLATPAK_BRANCH;
-    export SDK_VER=$SDK_VER;
     bash -xe $TOPDIR/ci/docker-build-flatpak.sh 28;
          echo -ne \"------\nEND OPENCPN-CI BUILD\n\";"
 else
@@ -65,6 +64,8 @@ else
     "export CIRCLECI=true;
     export CIRCLE_BRANCH=updates;
     export OCPN_TARGET=flatpak;
+    export FLATPAK_BRANCH=$FLATPAK_BRANCH;
+    export SDK_VER=$SDK_VER;
     bash -xe $TOPDIR/ci/docker-build-flatpak.sh 28;
          echo -ne \"------\nEND OPENCPN-CI BUILD\n\";"
 fi
