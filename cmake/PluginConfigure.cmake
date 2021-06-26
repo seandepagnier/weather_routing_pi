@@ -160,6 +160,8 @@ if(UNIX AND NOT APPLE)
     # Generate architecturally uniques names for linux output packages
     if(ARCH MATCHES "aarch64")
         set(PKG_TARGET_ARCH "-aarch64")
+    elseif(ARCH MATCHES "arm64")
+        set(PKG_TARGET_ARCH "-arm64")
     elseif(ARCH MATCHES "armhf")
         set(PKG_TARGET_ARCH "-armhf")
     elseif(ARCH MATCHES "i386")
@@ -325,8 +327,6 @@ if(ARCH MATCHES "arm*"
         set(OPENGL_FOUND "YES")
 
         set(wxWidgets_USE_LIBS ${wxWidgets_USE_LIBS} gl)
-        add_subdirectory(libs/glshim)
-        target_link_libraries(${PACKAGE_NAME} gl_static::gl_static)
 
         set(OPENGL_LIBRARIES "GL_static" "EGL" "X11" "drm")
     endif()
@@ -351,8 +351,6 @@ IF(DEFINED _wx_selected_config)
         ADD_DEFINITIONS(-DUSE_GLSL)
         include_directories( ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES )
         set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES)
-        set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} libs/glshim/include)
-        target_link_libraries(${PACKAGE_NAME} gl_static::gl_static)
 
     ENDIF(_wx_selected_config MATCHES "androideabi-qt")
 ENDIF(DEFINED _wx_selected_config)
@@ -366,9 +364,6 @@ IF(QT_ANDROID)
     ADD_DEFINITIONS(-DANDROID)
 
     set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-soname,libgorp.so ")
-
-    add_subdirectory(libs/glshim)
-    target_link_libraries(${PACKAGE_NAME} gl_static::gl_static)
 
     #set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     SET(CMAKE_CXX_FLAGS "-pthread -fPIC")
