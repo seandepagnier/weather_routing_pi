@@ -37,14 +37,15 @@ mkdir -p build
 cd build
 
 rm -f CMakeCache.txt
+COMPDIR=$(find /opt/android -iname "android-ndk*")
 
 cmake  \
   -D_wx_selected_config=androideabi-qt-arm64 \
   -DwxQt_Build=build_android_release_64_static_O3 \
   -DQt_Build=build_arm64/qtbase \
-  -DCMAKE_AR=/opt/android/android-ndk-r20/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar \
-  -DCMAKE_CXX_COMPILER=/opt/android/android-ndk-r20/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++ \
-  -DCMAKE_C_COMPILER=/opt/android/android-ndk-r20/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang \
+  -DCMAKE_AR=$COMPDIR/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-ar \
+  -DCMAKE_CXX_COMPILER=$COMPDIR/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++ \
+  -DCMAKE_C_COMPILER=$COMPDIR/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang \
   -DOCPN_Android_Common=OCPNAndroidCommon-master \
   -DPREFIX=/ \
   ..

@@ -8,35 +8,41 @@ parameters:
 
     run_build_armhf_stretch:
         type: boolean
-        default: false
+        default: true
     run_build_armhf_buster:
         type: boolean
-        default: false
+        default: true
     run_build_armhf_bionic_64:
         type: boolean
-        default: false
+        default: true
     run_build_trusty:
         type: boolean
         default: false
     run_build_xenial:
         type: boolean
-        default: false
+        default: true
     run_build_bionic:
         type: boolean
-        default: false
+        default: true
     run_build_bionic_gtk3:
         type: boolean
-        default: false
+        default: true
     run_build_focal:
         type: boolean
-        default: false
+        default: true
     run_build_focal_gtk3:
         type: boolean
-        default: false
+        default: true
     run_build_buster:
         type: boolean
-        default: false
+        default: true
     run_build_flatpack:
+        type: boolean
+        default: false
+    run_build_flatpak_x86_1808:
+        type: boolean
+        default: true
+    run_build_flatpak_x86_2008:
         type: boolean
         default: true
     run_build_flatpack-arm64:
@@ -44,31 +50,33 @@ parameters:
         default: true
     run_build_fedora:
         type: boolean
-        default: false
+        default: true
     run_build_mingw:
         type: boolean
-        default: false
+        default: true
     run_build_macos:
         type: boolean
-        default: false
+        default: true
     run_build_android_arm64:
         type: boolean
-        default: false
+        default: true
     run_build_android_armhf:
         type: boolean
-        default: false
+        default: true
 
 orbs:
     cloudsmith: cloudsmith/cloudsmith@1.0.4
 
 jobs:
     build-armhf-stretch:
-        machine: true
+        machine:
+            image: ubuntu-2004:202104-01
         environment:
         - OCPN_TARGET=stretch-armhf
         - DOCKER_IMAGE=balenalib/raspberry-pi-debian:stretch
         - BUILD_FLAGS=-j3
         - BUILD_ENV=raspbian
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
@@ -78,14 +86,18 @@ jobs:
         - when:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
+            - cloudsmith/ensure-api-key
+            - cloudsmith/install-cli
             - run: ci/cloudsmith-upload.sh
     build-armhf-buster:
-        machine: true
+        machine:
+            image: ubuntu-2004:202104-01
         environment:
         - OCPN_TARGET=buster-armhf
         - DOCKER_IMAGE=balenalib/raspberry-pi-debian:buster
         - BUILD_FLAGS=-j3
         - BUILD_ENV=raspbian
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
@@ -95,6 +107,8 @@ jobs:
         - when:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
+            - cloudsmith/ensure-api-key
+            - cloudsmith/install-cli
             - run: ci/cloudsmith-upload.sh
     build-armhf-bionic-64:
         machine:
@@ -296,6 +310,23 @@ jobs:
             image: circleci/classic:201808-01
         environment:
         - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: stable
+        - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 20.08
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-flatpak.sh
+        - when:
+            condition: <<pipeline.parameters.run_workflow_deploy>>
+            steps:
+            - run: ci/cloudsmith-upload.sh
+    build-flatpak-x86-1808:
+        machine:
+            image: circleci/classic:201808-01
+        environment:
+        - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: stable
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 18.08
         steps:
@@ -306,9 +337,26 @@ jobs:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
             - run: ci/cloudsmith-upload.sh
-    build-flatpak-arm64:
+    build-flatpak-x86-2008:
         machine:
             image: circleci/classic:201808-01
+        environment:
+        - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: beta
+        - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 20.08
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-flatpak.sh
+        - when:
+            condition: <<pipeline.parameters.run_workflow_deploy>>
+            steps:
+            - run: ci/cloudsmith-upload.sh
+    build-flatpak-arm64:
+        machine:
+            image: ubuntu-2004:202101-01
+        resource_class: arm.medium
         environment:
         - OCPN_TARGET:  flatpak-arm64
         - FLATPAK_BRANCH: beta
@@ -436,17 +484,18 @@ workflows:
 #                    - tmp
 #                tags:
 #                    only: /.*/
-    build_4:
-        when: <<pipeline.parameters.run_build_trusty>>
-        jobs:
-        - build-trusty:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
+# Trusty is depricated so will not be built
+#    build_4:
+#        when: <<pipeline.parameters.run_build_trusty>>
+#        jobs:
+#        - build-trusty:
+#            filters:
+#                branches:
+#                    ignore:
+#                    - devel
+#                    - tmp
+#                tags:
+#                    only: /.*/
     build_5:
         when: <<pipeline.parameters.run_build_xenial>>
         jobs:
@@ -514,17 +563,18 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-    build_11:
-        when: <<pipeline.parameters.run_build_flatpack>>
-        jobs:
-        - build-flatpak:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
+# Removed as replaced by following flatpack builds
+#    build_11:
+#        when: <<pipeline.parameters.run_build_flatpack>>
+#        jobs:
+#        - build-flatpak:
+#            filters:
+#                branches:
+#                    ignore:
+#                    - devel
+#                    - tmp
+#                tags:
+#                    only: /.*/
     build_12:
         when: <<pipeline.parameters.run_build_flatpack-arm64>>
         jobs:
@@ -536,8 +586,30 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
+    build_13:
+        when: <<pipeline.parameters.run_build_flatpak_x86_2008>>
+        jobs:
+        - build-flatpak-x86-2008:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+                tags:
+                    only: /.*/
+    build_14:
+        when: <<pipeline.parameters.run_build_flatpak_x86_1808>>
+        jobs:
+        - build-flatpak-x86-1808:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+                tags:
+                    only: /.*/
 # Fedora is being removed from the supplied list of environments so don't build
-#    build_12:
+#    build_15:
 #        when: <<pipeline.parameters.run_build_fedora>>
 #        jobs:
 #        - build-fedora:
@@ -548,7 +620,7 @@ workflows:
 #                    - tmp
 #                tags:
 #                    only: /.*/
-    build_13:
+    build_16:
         when: <<pipeline.parameters.run_build_mingw>>
         jobs:
         - build-mingw:
@@ -559,7 +631,7 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-    build_14:
+    build_17:
         when: <<pipeline.parameters.run_build_macos>>
         jobs:
         - build-macos:
@@ -570,7 +642,7 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-    build_15:
+    build_18:
         when: <<pipeline.parameters.run_build_android_arm64>>
         jobs:
         - build-android-arm64:
@@ -581,7 +653,7 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-    build_16:
+    build_19:
         when: <<pipeline.parameters.run_build_android_armhf>>
         jobs:
         - build-android-armhf:

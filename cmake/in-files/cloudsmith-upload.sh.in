@@ -64,20 +64,24 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
     if [ ! "$DEPLOY_USE_ORB" ]; then
         if pyenv versions 2>&1 >/dev/null; then
             pyenv versions
-            if ! pyenv global 3.8.6 2>&1 >/dev/null; then
-                if ! pyenv global 3.7.1 2>&1 >/dev/null; then
-                    if ! pyenv global 3.7.0 2>&1>/dev/null; then
-                        sudo apt install software-properties-common
-                        sudo add-apt-repository ppa:deadsnakes/ppa -y
-                        sudo apt update
-                        sudo apt install -y python3.7
-                        sudo rm /usr/bin/python3
-                        sudo ln -s /usr/bin/python3.7 /usr/bin/python3
-                        sudo python3 -m pip install --upgrade pip
-                        pyenv global 3.7
+            if ! pyenv global 3.9.1 2>&1 >/dev/null; then
+                if ! pyenv global 3.8.6 2>&1 >/dev/null; then
+                    if ! pyenv global 3.7.1 2>&1 >/dev/null; then
+                        if ! pyenv global 3.7.0 2>&1>/dev/null; then
+                            if ! pyenv global 3.5.2 2>&1>/dev/null; then
+                                sudo apt install software-properties-common
+                                sudo apt update
+                                sudo apt install -y python3.7 python3-pip
+                                sudo rm /usr/bin/python3
+                                sudo ln -s /usr/bin/python3.7 /usr/bin/python3
+                                sudo python3.7 -m pip install --upgrade pip
+                                pyenv global 3.7
+                            fi
+                        fi
                     fi
                 fi
             fi
+            python3 --version
             pip install -U pip
             python3 -m pip install cloudsmith-cli
             pyenv rehash
@@ -87,7 +91,6 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
         elif apt-get --version 2>&1 >/dev/null; then
             COUNTER=0
             sudo apt install software-properties-common
-            sudo add-apt-repository ppa:deadsnakes/ppa -y
             sudo apt update
             sudo apt install -y python3.7
             sudo rm /usr/bin/python3
@@ -103,10 +106,6 @@ if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
             done
             sudo python3 -m pip install --upgrade pip
             sudo python3 -m pip install -q cloudsmith-cli
-    #    else
-    #        sudo -H python3 -m ensurepip
-    #        sudo -H python3 -m pip install -q setuptools
-    #        sudo -H python3 -m pip install -q cloudsmith-cli
         fi
     fi
 fi
