@@ -307,7 +307,7 @@ jobs:
             - run: ci/cloudsmith-upload.sh
     build-flatpak:
         machine:
-            image: circleci/classic:201808-01
+            image: ubuntu-2004:202010-01
         environment:
         - OCPN_TARGET:  flatpak
         - FLATPAK_BRANCH: stable
@@ -323,12 +323,13 @@ jobs:
             - run: ci/cloudsmith-upload.sh
     build-flatpak-x86-1808:
         machine:
-            image: circleci/classic:201808-01
+            image: ubuntu-2004:202010-01
         environment:
         - OCPN_TARGET:  flatpak
         - FLATPAK_BRANCH: stable
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 18.08
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
@@ -336,22 +337,29 @@ jobs:
         - when:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
+            - cloudsmith/ensure-api-key
+            - cloudsmith/install-cli
             - run: ci/cloudsmith-upload.sh
     build-flatpak-x86-2008:
         machine:
-            image: circleci/classic:201808-01
+            image: ubuntu-2004:202010-01
         environment:
         - OCPN_TARGET:  flatpak
         - FLATPAK_BRANCH: beta
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 20.08
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
-        - run: bash ci/circleci-build-flatpak.sh
+        - run:
+            command: bash ci/circleci-build-flatpak.sh
+            no_output_timeout: 30m
         - when:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
+            - cloudsmith/ensure-api-key
+            - cloudsmith/install-cli
             - run: ci/cloudsmith-upload.sh
     build-flatpak-arm64:
         machine:
@@ -362,6 +370,7 @@ jobs:
         - FLATPAK_BRANCH: beta
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 20.08
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
@@ -369,6 +378,8 @@ jobs:
         - when:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
+            - cloudsmith/ensure-api-key
+            - cloudsmith/install-cli
             - run: ci/cloudsmith-upload.sh
     build-fedora:
         docker:
