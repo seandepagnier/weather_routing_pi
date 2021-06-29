@@ -12,67 +12,37 @@
 
 # bailout on errors and echo commands.
 set -xe
-##sudo apt-get -qq update
+sudo apt-get -qq update
 
 #PLUGIN=bsb4
 
-DOCKER_SOCK="unix:///var/run/docker.sock"
-if [ -n "$TRAVIS" ]; then
-    TOPDIR=/opencpn-ci
-elif [ -n "$CIRCLECI" ]; then
-   TOPDIR=/root/project
+sudo apt install flatpak flatpak-builder
+
+flatpak remote-add --user --if-not-exists \
+    flathub https://flathub.org/repo/flathub.flatpakrepo
+
+
+if [ "$FLATPAK_BRANCH" = "beta" ]; then
+        flatpak install --user -y flathub org.freedesktop.Sdk//20.08 >/dev/null
+        flatpak remote-add --user --if-not-exists flathub-beta \
+            https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+        flatpak install --user -y flathub-beta \
+            org.opencpn.OpenCPN >/dev/null
 else
-   TOPDIR=/opencpn-ci
+        flatpak install --user -y flathub org.freedesktop.Sdk//18.08 >/dev/null
+        flatpak remote-add --user --if-not-exists flathub \
+            https://flathub.org/repo/flathub.flatpakrepo
+        flatpak install --user -y flathub \
+            org.opencpn.OpenCPN >/dev/null
+        FLATPAK_BRANCH='stable'
 fi
 
-echo "DOCKER_OPTS=\"-H tcp://127.0.0.1:2375 -H $DOCKER_SOCK -s devicemapper\"" \
-    | sudo tee /etc/default/docker > /dev/null
-
-if [ -n "$CIRCLECI" ]; then
-    sudo service docker restart;
-    sleep 5;
-    sudo docker pull fedora:28;
-    sleep 2
-fi
-
-DOCKER_CONTAINER_ID=$(docker ps | grep fedora | awk '{print $1}')
-if [ "" = "$DOCKER_CONTAINER_ID" ]; then
-    docker run --privileged -d -ti -e "container=docker"  \
-        -e TOPDIR=$TOPDIR \
-        -v /sys/fs/cgroup:/sys/fs/cgroup \
-        -v $(pwd):$TOPDIR:rw \
-        fedora:28   /usr/sbin/init
-    DOCKER_CONTAINER_ID=$(docker ps | grep fedora | awk '{print $1}')
-fi
-
-echo $CIRCLE_BRANCH
-docker logs $DOCKER_CONTAINER_ID
-if [ -n "$CIRCLECI" ]; then
-  docker exec -ti $DOCKER_CONTAINER_ID /bin/bash -xec \
-    "export CIRCLECI=$CIRCLECI;
-    export CIRCLE_BRANCH=\"$CIRCLE_BRANCH\";
-    export CIRCLE_TAG=\"$CIRCLE_TAG\";
-    export CIRCLE_PROJECT_USERNAME=\"$CIRCLE_PROJECT_USERNAME\";
-    export CIRCLE_PROJECT_REPONAME=\"$CIRCLE_PROJECT_REPONAME\";
-    export GIT_REPOSITORY_SERVER=\"$GIT_REPOSITORY_SERVER\";
-    export OCPN_TARGET=$OCPN_TARGET;
-    export FLATPAK_BRANCH=$FLATPAK_BRANCH;
-    bash -xe $TOPDIR/ci/docker-build-flatpak.sh 28;
-         echo -ne \"------\nEND OPENCPN-CI BUILD\n\";"
+rm -rf build && mkdir build && cd build
+if [ "$FLATPAK_BRANCH" = 'beta' ]; then
+  cmake -DOCPN_FLATPAK_CONFIG=ON -DSDK_VER=20.08 ..
 else
-  docker exec -ti $DOCKER_CONTAINER_ID /bin/bash -xec \
-    "export CIRCLECI=true;
-    export CIRCLE_BRANCH=updates;
-    export OCPN_TARGET=flatpak;
-    export FLATPAK_BRANCH=$FLATPAK_BRANCH;
-    export SDK_VER=$SDK_VER;
-    bash -xe $TOPDIR/ci/docker-build-flatpak.sh 28;
-         echo -ne \"------\nEND OPENCPN-CI BUILD\n\";"
+  cmake -DOCPN_FLATPAK_CONFIG=ON -DSDK_VER=18.08 ..
 fi
 
-docker ps -a
-
-if [ -n "$CIRCLECI" ]; then
-    docker stop $DOCKER_CONTAINER_ID
-    docker rm -v $DOCKER_CONTAINER_ID
-fi
+make flatpak-build
+make flatpak-pkg
