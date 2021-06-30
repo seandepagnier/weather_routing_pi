@@ -53,7 +53,7 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "28")
-set(VERSION_TWEAK "0")
+set(VERSION_TWEAK "1")
 set(VERSION_DATE "28/06/2021")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -136,13 +136,6 @@ include("PluginConfigure")
 
 add_definitions(-DUSE_S57)
 
-IF(PLUGIN_USE_SVG)
-    MESSAGE(STATUS "${CMLOC}SVG support enabled...")
-    IF(NOT QT_ANDROID)
-        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
-    ENDIF(NOT QT_ANDROID)
-ENDIF(PLUGIN_USE_SVG)
-
 #======== Below from cmakelists.txt  weather_routing_pi
 # ----Remember to Add your project Set(SRCS and set(HDRS  etc..
 
@@ -202,20 +195,25 @@ SET (HDRS
 
 set(EXTSRC
 )
+# set(EXTINCLUDE     extinclude/ODAPI.h     extinclude/ODJSONSchemas.h)
+
+set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
 set(LIBHDRS
     libs/GL/gl.h
     libs/GL/gl_private.h
     libs/GL/glext.h
     libs/GL/glu.h
-    libs/wx/include/json_defs.h
-    libs/wx/include/jsonreader.h
-    libs/wx/include/jsonval.h
-    libs/wx/include/jsonwriter.h)
+    libs/wxJSON/include/json_defs.h
+    libs/wxJSON/include/jsonreader.h
+    libs/wxJSON/include/jsonval.h
+    libs/wxJSON/include/jsonwriter.h)
 
 add_definitions(-DPLUGIN_USE_SVG)
 
 set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
+
+# Do not need Json Schema Validation
 
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
@@ -230,12 +228,13 @@ SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
 ##=============================================================
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/android/wx)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 # These 3 are included down below
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
