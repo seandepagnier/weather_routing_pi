@@ -214,7 +214,7 @@ available and after hitting “*Reset*” most of the settings can be left alone
 
 Please follow this tutorial carefully and you will succeed the first time. Once you get familiar with the interface and have had successes, learn all the features gradually, changing and adjusting one setting at a time.
 
-==== 1.Setup Grib_pi Data
+=== 1.Setup Grib_pi Data
 
 link:../included_plugins/grib_weather.html[Grib_pi] is installed with OpenCPN. Learn how to use it and download a fresh Grib file with wind, current & waves.
 
@@ -226,7 +226,7 @@ link:../included_plugins/grib_weather.html[Grib_pi] is installed with OpenCPN. L
 
 image::ccc-castine-grib.png[]
 
-==== 2. Setup Climatology_pi Data
+=== 2. Setup Climatology_pi Data
 
 link:climatology.html[Climatology_pi] should be installed as directed.
 
@@ -249,7 +249,7 @@ image::climatology-wind.jpeg[]
 Climatology Configuration of Wind Roses (Size=100 and Spacing=50 is good
 too.) +
 
-==== 3. Install GSHHS High Resolution Background
+=== 3. Install GSHHS High Resolution Background
 
 Download and install to improve routing with “Detect Land” checked.
 
@@ -257,7 +257,7 @@ Download and install to improve routing with “Detect Land” checked.
 
 If you are working with Land Interface a lot, this is not optional! Best to install it.
 
-==== 4. Weather Routing Setup
+=== 4. Weather Routing Setup
 
 ===== Four Transatlantic Configurations that will Compute using Climatology Wind Data
 
@@ -300,11 +300,11 @@ Pathname list.
 
 There are 4 Weather Routings in “*Weather-Routing-Setup*” that should *Complete* using the wind data from Climatology. +
 
-==== 5. WR Not a substitute for sound judgment & realistic goals
+=== 5. WR Not a substitute for sound judgment & realistic goals
 
 *You* must _Configure_ weather_routing to match your _sound judgment_ and _realistic goals_. You are in control, use your own judgement when you review the results. *This cannot be emphasized enough.* Weather_Routing_pi is just a tool in your hands, you are in control.
 
-==== 6. WeatherRoutingConfiguration.XML Menu
+=== 6. WeatherRoutingConfiguration.XML Menu
 
 image::weatherroutingconfiguration-positions.jpeg[]
 
@@ -332,7 +332,7 @@ image::wr-new-position.jpeg[]
 
 image::wr-new-configuration.jpeg[]
 
-==== 7. Weather Routing Configuration Menu
+=== 7. Weather Routing Configuration Menu
 
 * Scan the setting to check that they are as shown in the image.
 
@@ -344,7 +344,7 @@ image::wr-wr-configuration.jpeg[]
 as described above.
 * From the _Weather Routing Configuration Menu_ click *Grib Time* to set the Start Date/Time used by the “Configuration” for the routing. The *Grib Time* used will be the current frame used and visible in Grib_pi. There are other ways to do this, but use this way to start.
 
-==== 8. WR Configuration > Boat.xml Menu - Edit
+=== 8. WR Configuration > Boat.xml Menu - Edit
 
 Weather_routing_pi uses _[Boat].xml_ files to store multiple
 _[Polar].pol, *.csv or *.txt_ filenames which are used with the Current ”_Configuration_”. Also the _[Boat].xml_ file can be _“Save as Boat”_ to another boat filename such as _Boat-Test.xml_ or
@@ -474,7 +474,7 @@ image::wr-config-boat-polar-test-xml-stats-tab.jpeg[]
 
 * Then “*Close*” *Weather Routing Configuration* Menu.
 
-==== 9. Compute "Configuration" in WeatherRoutingConfiguration.xml Menu
+=== 9. Compute "Configuration" in WeatherRoutingConfiguration.xml Menu
 
 * In the _WR WeatherRoutingConfiguration.xml_ menu, highlight the
 _Configuration_ you've created and select *Compute*.
@@ -483,7 +483,7 @@ _Configuration_ you've created and select *Compute*.
 
 image::wr-compute.jpg[]
 
-==== 10. Messages in Configuration Window
+=== 10. Messages in Configuration Window
 
 In the Configuration Menu after “Compute”, a message will show to the right of the Configuration.
 
@@ -544,7 +544,7 @@ image::wd-boat-edit.jpeg[]
 Configuration and Edit
 Boat.xml,title="WR Configuration and Edit Boat.xml",width=600]]
 
-==== 12. View
+=== 12. View
 
 ===== Settings
 
@@ -559,7 +559,7 @@ can set the alternate route thickness to zero.
 
 ===== Cursor Position
 
-==== 13. Use with Grib_pi
+=== 13. Use with Grib_pi
 
 Boat position (round circle) is when stepping through the grib file (assuming you use a grib file and not climatology of course).
 
@@ -570,13 +570,13 @@ Moreover, if multiple routes are computed and shown (selected), when stepping th
 that: when you step through the grib you will see the boat position at that current grib time (not “the multipier of the two time intervals”).
 This can be right on an isochrone or between two isochrones (if grib interval is smaller than wxrte time interval).
 
-==== 14. Use with Climatology
+=== 14. Use with Climatology
 
-==== 15. Use with Route Manager
+=== 15. Use with Route Manager
 
 The *Route Manager* can be used for listing the weather route. _Right click_ a weather route and pick “_Properties_”. Also a Weather Routing can be Exported to a gpx file or saved to a Route in Route Manager.
 
-==== 16. Other Uses
+=== 16. Other Uses
 
 In addition to “Standard actions” Weather_Routing_pi will work with
 other *Plugins*
