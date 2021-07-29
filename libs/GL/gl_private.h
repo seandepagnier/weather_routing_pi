@@ -76,8 +76,6 @@ GLAPI void GLAPIENTRY glVertex2d( GLdouble x, GLdouble y );
 GLAPI void GLAPIENTRY glVertex2f( GLfloat x, GLfloat y );
 GLAPI void GLAPIENTRY glVertex2i( GLint x, GLint y );
 GLAPI void GLAPIENTRY glVertex3f( GLfloat x, GLfloat y, GLfloat z );
-GLAPI void GLAPIENTRY glVertex3dv( const GLdouble *v );
-GLAPI void GLAPIENTRY glGetDoublev( GLenum pname, GLdouble *params );
 
 GLAPI void GLAPIENTRY glColor4ub( GLubyte red, GLubyte green,
                                     GLubyte blue, GLubyte alpha );
@@ -134,7 +132,6 @@ GLAPI void GLAPIENTRY glTranslatef( GLfloat x, GLfloat y, GLfloat z );
 
 GLAPI void GLAPIENTRY glReadBuffer( GLenum mode );
 GLAPI void GLAPIENTRY glColor3ubv( const GLubyte *v );
-GLAPI void GLAPIENTRY glColor4fv( const GLfloat *v );
 
 /*
  * Depth Buffer
@@ -337,8 +334,6 @@ void (* eglGetProcAddress(   char const * procname))( void );
 #define GL_SCISSOR_BIT                          0x00080000
 #define GL_ALL_ATTRIB_BITS                      0x000FFFFF
 
-#define GL_CURRENT_COLOR                        0x0B00
-
 /* Hints */
 #define GL_PERSPECTIVE_CORRECTION_HINT          0x0C50
 #define GL_POINT_SMOOTH_HINT                    0x0C51
@@ -486,15 +481,6 @@ GLAPI void GLAPIENTRY glTexCoordPointer( GLint size, GLenum type,
 #define GLU_TESS_WINDING_ABS_GEQ_TWO       100134
 #define GL_COLOR_ARRAY                          0x8076
 #define GL_TEXTURE_COORD_ARRAY                  0x8078
-
-/* Matrix Mode */
-#define GL_MATRIX_MODE                          0x0BA0
-#define GL_MODELVIEW                            0x1700
-#define GL_PROJECTION                           0x1701
-#define GL_TEXTURE                              0x1702
-
-#define GL_MODELVIEW_MATRIX                     0x0BA6
-#define GL_PROJECTION_MATRIX                    0x0BA7
 
 #ifdef __cplusplus
 }
@@ -717,6 +703,12 @@ typedef double		GLclampd;	/* double precision float in [0,1] */
 #define GL_T2F_N3F_V3F				0x2A2B
 #define GL_T2F_C4F_N3F_V3F			0x2A2C
 #define GL_T4F_C4F_N3F_V4F			0x2A2D
+
+/* Matrix Mode */
+#define GL_MATRIX_MODE				0x0BA0
+#define GL_MODELVIEW				0x1700
+#define GL_PROJECTION				0x1701
+#define GL_TEXTURE				0x1702
 
 /* Points */
 #define GL_POINT_SMOOTH				0x0B10

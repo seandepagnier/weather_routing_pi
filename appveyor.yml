@@ -16,7 +16,6 @@ environment:
   OCPN_TARGET: MSVC
 
 install:
-  # VS2015 and earlier version - '"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x86'
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
 
   # sent environment variables for wxWidgets
@@ -38,14 +37,8 @@ install:
   - ps: Start-FileDownload https://download.opencpn.org/s/E2p4nLDzeqx4SdX/download -FileName wxWidgets-3.1.2.7z
   - cmd: 7z x wxWidgets-3.1.2.7z -o%WXWIN% > null
 
-  # some debugging information
-  # - cmake --help
-  # - set Displays sensitive password!
+  - set
 
-  # build wxWidgets - Disabled as we provide prebuilt WX to save time
-  #- cmd: cd %WXWIN%\build\msw\
-  #- cmd: nmake -f makefile.vc BUILD=release SHARED=1 CFLAGS=/D_USING_V120_SDK71_ CXXFLAGS=/D_USING_V120_SDK71_
-  #- cmd: nmake -f makefile.vc BUILD=debug SHARED=1 CFLAGS=/D_USING_V120_SDK71_ CXXFLAGS=/D_USING_V120_SDK71_							  
 before_build:
   - cd c:\project\ocpn_project
   - cd buildwin

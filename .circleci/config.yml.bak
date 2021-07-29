@@ -50,7 +50,7 @@ parameters:
         default: true
     run_build_fedora:
         type: boolean
-        default: false
+        default: true
     run_build_mingw:
         type: boolean
         default: true
@@ -112,7 +112,7 @@ jobs:
             - run: ci/cloudsmith-upload.sh
     build-armhf-bionic-64:
         machine:
-            image: ubuntu-2004:202104-01
+            image: ubuntu-1604:202010-01
         environment:
         - OCPN_TARGET=bionic-arm64
         - OCPN_BRANCH=master
@@ -415,7 +415,7 @@ jobs:
             - run: ci/cloudsmith-upload.sh
     build-macos:
         macos:
-            xcode: "12.5.1"
+            xcode: "11.0.0"
         environment:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg

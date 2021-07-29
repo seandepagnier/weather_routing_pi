@@ -248,7 +248,7 @@ if(NOT WIN32 AND NOT APPLE)
         message(STATUS "${CMLOC}Optimisation: -O2 -s")
     endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
 
-    add_definitions(" -DCMAKE_INSTALL_PREFIX=\\\"${CMAKE_INSTALL_PREFIX}\\\"")
+    add_definitions(" -DPREFIX=\\\"${CMAKE_INSTALL_PREFIX}\\\"")
     # profiling with gprof ADD_DEFINITIONS( -pg ) SET(CMAKE_EXE_LINKER_FLAGS -pg) profiling with gcov ADD_DEFINITIONS( "-fprofile-arcs -ftest-coverage" ) SET(EXTRA_LIBS ${EXTRA_LIBS} "gcov")
 endif(NOT WIN32 AND NOT APPLE)
 
