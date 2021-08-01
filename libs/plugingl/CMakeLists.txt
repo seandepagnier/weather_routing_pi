@@ -23,6 +23,66 @@ if(UNIX)
     add_definitions("-fpic")
 endif(UNIX)
 
+if  (QT_ANDROID)
+
+    include_directories(BEFORE ${qt_android_include})
+    IF(_wx_selected_config MATCHES "androideabi-qt-arm64")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/include")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/include/QtCore")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/include/QtWidgets")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/include/QtGui")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/include/QtOpenGL")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/include/QtTest")
+
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/wxWidgets/libarm64/wx/include/arm-linux-androideabi-qt-unicode-static-3.1")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/wxWidgets/include")
+
+        SET(wxWidgets_LIBRARIES
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/lib/libQt5Core.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/lib/libQt5OpenGL.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/lib/libQt5Widgets.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/lib/libQt5Gui.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm64_O3/qtbase/lib/libQt5AndroidExtras.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/opencpn/API-117/libarm64/libgorp.so
+
+        -lc++_shared
+        -lz
+        libGLESv2.so
+        libEGL.so
+          )
+
+    ELSE(_wx_selected_config MATCHES "androideabi-qt-arm64")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/include")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/include/QtCore")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/include/QtWidgets")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/include/QtGui")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/include/QtOpenGL")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/include/QtTest")
+
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/wxWidgets/libarmhf/wx/include/arm-linux-androideabi-qt-unicode-static-3.1")
+        set(qt_android_include ${qt_android_include} "${OCPN_Android_Common}/wxWidgets/include")
+
+        ADD_DEFINITIONS( -DOCPN_ARMHF )
+
+        SET(wxWidgets_LIBRARIES
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/lib/libQt5Core.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/lib/libQt5OpenGL.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/lib/libQt5Widgets.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/lib/libQt5Gui.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/qt5/build_arm32_19_O3/qtbase/lib/libQt5AndroidExtras.so
+        ${CMAKE_CURRENT_SOURCE_DIR}/${OCPN_Android_Common}/opencpn/API-117/libarmhf/libgorp.so
+
+        -lc++_shared
+        -lz
+        libGLESv2.so
+        libEGL.so
+          )
+
+    ENDIF(_wx_selected_config MATCHES "androideabi-qt-arm64")
+
+endif (QT_ANDROID)
+
+
 ADD_LIBRARY(${PACKAGE_NAME}_LIB_PLUGINGL STATIC ${SRC_PLUGINGL})
 target_include_directories(${PACKAGE_NAME}_LIB_PLUGINGL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(ocpn::plugingl ALIAS ${PACKAGE_NAME}_LIB_PLUGINGL)
