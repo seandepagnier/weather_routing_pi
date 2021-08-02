@@ -52,9 +52,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "28")
-set(VERSION_TWEAK "3")
-set(VERSION_DATE "01/08/2021")#DD/MM/YYYY format
+set(VERSION_PATCH "29")
+set(VERSION_TWEAK "0")
+set(VERSION_DATE "02/08/2021")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -275,12 +275,12 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
+#------- Change below to match project requirements --------------
+
 # Needed for android builds
 if(QT_ANDROID)
     include_directories(BEFORE ${qt_android_include})
 endif(QT_ANDROID)
-
-#------- Change below to match project requirements --------------
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 add_subdirectory(libs/jsoncpp)
