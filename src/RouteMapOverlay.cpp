@@ -745,7 +745,7 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
 #ifndef __OCPN__ANDROID__
             if(!dc.GetDC())
                 glEnd();
-#eneif
+#endif
         }
         Unlock();
         return;
