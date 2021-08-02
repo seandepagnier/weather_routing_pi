@@ -736,14 +736,16 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
         // never draw comfort if cursor route
         assert(comfortRoute == false);
         if (!rte) {
+#ifndef __OCPN__ANDROID__
             if(!dc.GetDC())
                 glBegin(GL_LINES);
-
+#endif
             for(Position *p = pos; p && p->parent; p = p->parent)
                 DrawLine(p, p->parent, dc, vp);
-
+#ifndef __OCPN__ANDROID__
             if(!dc.GetDC())
                 glEnd();
+#eneif
         }
         Unlock();
         return;
