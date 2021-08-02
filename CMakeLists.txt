@@ -275,6 +275,11 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
+# Needed for android builds
+if(QT_ANDROID)
+    include_directories(BEFORE ${qt_android_include})
+endif(QT_ANDROID)
+
 #------- Change below to match project requirements --------------
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
@@ -289,10 +294,6 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 add_subdirectory(libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
-# Needed for android builds
-if(QT_ANDROID)
-    include_directories(BEFORE ${qt_android_include})
-endif(QT_ANDROID)
 
 # ----- Do not change - needed to build app ----- ##
 #========================================================

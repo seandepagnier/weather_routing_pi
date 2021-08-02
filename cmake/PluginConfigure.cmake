@@ -267,6 +267,11 @@ if(APPLE)
     add_definitions(" -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_")
 endif(APPLE)
 
+# bdbcat Disable noisey compiler warning for android
+if(QT_ANDROID)
+    add_definitions(" -Wno-inconsistent-missing-override")
+endif(QT_ANDROID)
+
 # Add some definitions to satisfy MS
 if(MSVC)
     add_definitions(-D__MSVC__)
