@@ -1,7 +1,7 @@
 site:
   title: Weather Routing Manual
   url:  https://nowhere.net
-  start_page: weather_routing:ROOT:weather_routing.adoc
+  start_page: weather_routing::index.adoc
 
 content:
   sources:

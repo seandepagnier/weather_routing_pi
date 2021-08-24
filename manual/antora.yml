@@ -1,4 +1,3 @@
 name: weather_routing
-title: weather_routing
+title: Weather Routing Manual
 version: '0.1'
-start_page: ROOT:weather_routing.adoc 
