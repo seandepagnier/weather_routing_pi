@@ -63,7 +63,7 @@ File Collection (cloud)]
 * https://l-36.com/polar_polars.php[L_36 Polar_Polars]
 * https://distantshores.ca/boatblog_files/sailing-polar-performance.php[Distant
 Shores on Polar Performance] Good advice, adjust VPP Polars for Cruising
-* xref:#_boat_performance_data_-_polar_data[Boat
+* xref:#_boat_performance_data_polar_data[Boat
 Performance Data]. Record in consistent conditions for various
 conditions, see why.
 ** http://www.ockam.com/2013/06/03/what-are-polars/[Ockham:What are Polars?]
@@ -126,7 +126,7 @@ selected in the “Configuration”.
 . *Square*: Small squares along the route, are *sail/polar file* changes [Not shown].
 . *Circle* on the route is the calculated *Boat location* for that time frame.
 . *Configuration* and *Computation* of a routing is at the center of the plugin.
-* xref:#_settings.html[Configuration Defaults] Options and Constraints you may need for reference.
+* xref:#_settings[Configuration Defaults] Options and Constraints you may need for reference.
 * link:{attachmentsdir}/configuration.html[Configuration Terminology]
 Definitions available from within the Plugin, *Help > Information* Menu. Reference
 xref:opencpn-plugins:misc:terminology.adoc[Common Terms] used in this Manual.
@@ -317,7 +317,7 @@ If the plugin is downloaded and installed, with default settings
 unchanged (or “Reset All” is used), the plugin should create an
 optimized weather routing with just a few specific additional settings and “computation”.
 
-* Complete xref:#_setup_grib_pi_data[Setup Grib_pi Data] and xref:#_setup_climatology_pi_data[Setup
+* Complete xref:#_1_setup_grib_pi_data[Setup Grib_pi Data] and xref:#_2_setup_climatology_pi_data[Setup
 Climatology_pi Data] as described above.
 
 * Start by clicking on the Toolbar Weather_routing plugin Icon to open the Weather_routing_Configuration Menu.
@@ -367,7 +367,7 @@ link:{attachmentsdir}/boat-test-xml.zip[Three Boat.xml zipped files]
 unzip to
 _C:\ProgramData\opencpn\plugins\weather_routing\boat_ which are
 preconfigured files that should work with the Polar and WeatherRoutingConfiguration.XML file downloads. These files are the same
-as xref:#_weather_routing_setup[Weather_Routing_Setup]* above.
+as xref:#_4_weather_routing_setup[Weather_Routing_Setup]* above.
 
 * Boat.XML
 * Boat-test.XML
@@ -404,7 +404,7 @@ link:{attachmentsdir}/polars-pol.zip[Polars-Pol.zip]
 
 Please Download, unzip and copy the six *.pol files listed below into your data\polars directory. For Windows use:
 _C:\ProgramData\opencpn\plugins\weather_routing\data\polars_ These files are the same as
-xref:#_weather_routing_setup[Weather_Routing_Setup] above.
+xref:#_4_weather_routing_setup[Weather_Routing_Setup] above.
 
 Three Stepped Range TWS Files used together (use either Sail or Power for TWS-0-6)
 
@@ -650,7 +650,7 @@ recently.
 . When this happens go back to basics, Reset to default settings. See the http://www.cruisersforum.com/forums/f134/weather-routing-100060-2.html#post2461969[CF Post] 
 
 about this and refer to the default list in this manual above. Or
-download the xref:#_weather_routing_setup[Weather_Routing_Setup] above, install it again and start over.
+download the xref:#_4_weather_routing_setup[Weather_Routing_Setup] above, install it again and start over.
 
 === Routings, with climatology only, seem to be missing voyage data, such as duration, time of start and finish--If we are using a specific date and time for the start, why is this happening?
 
