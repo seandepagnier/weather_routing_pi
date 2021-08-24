@@ -257,7 +257,7 @@ too.) +
 
 Download and install a GSHHS High Resolution Background to improve routing with “Detect Land” checked using the 
 
-xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adocr[Chart downloader]
+xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chart downloader]
 
 If you are working with Land Interface a lot, this is not optional! Best to install it.
 
@@ -698,7 +698,7 @@ Create a new position with the same name to replace it. There is then a prompt t
 * Voyage Recordings to create polars: Use Opencpn VDR_pi RPI3 or Yacht Devices Voyage Recorder
 * Yacht Devices using Excel:
 
-http://www.yachtd.com/downloads/polar_diagram.pdf[Case: How to plot a polar diagram for a yacht using data collected by Voyage Recorder]
+https://www.yachtd.com/downloads/polar_diagram.pdf[Case: How to plot a polar diagram for a yacht using data collected by Voyage Recorder]
 
 * Additional Polars http://download.meltemus.com/polars/[Qtvlm Polars]
 
