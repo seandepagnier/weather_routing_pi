@@ -1,0 +1,20 @@
+site:
+  title: Two Can Plugin Manual
+  url:  https://nowhere.net
+  start_page: weather_routing:ROOT:weather_routing.adoc
+
+content:
+  sources:
+    - url: ../..
+      start_path: manual/weather_routing
+      branches: HEAD
+      edit_url: https://github.com/opencpn-manuals/weather_routing_pi/edit/master/{path}
+
+ui:   
+  bundle:
+    url: https://gitlab.com/leamas/antora-ui-default/-/raw/master/latest/ui-bundle.zip
+    snapshot: true
+
+output:
+  dir: ./docs
+  clean: true              
