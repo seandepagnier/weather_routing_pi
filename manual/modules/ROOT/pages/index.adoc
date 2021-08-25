@@ -188,8 +188,8 @@ before doing anything else with it
 Double-click the downloaded file (with “weather_routing_pi” in the name and ”.exe“ as extension) and follow the set-up instructions. If you are doing parallel installs of OpenCPN make sure the plugin goes into the proper version of OpenCPN!
 
 That's it. But before you can actually *use* Weather_Routing_pi, you first have to
-link:https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:plugins:install_and_enable#enabling_a_plugin[Enable] the plug-in in OpenCPN.
-
+xref:opencpn-plugins:misc:plugin-install.adoc#_plugin_enabledisable[Enable]
+the plug-in in OpenCPN.
 xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi plugin] is included with OpenCPN, but you will need to install
 xref:climatology::index.adoc[Climatology_pi plugin] if you wish to use that type of data.
 
@@ -587,7 +587,7 @@ other *Plugins*
 Weather Routing will use two grib files that are loaded by Grib_pi. This
 is useful when you have downloaded a GFS Wind and Pressure Grib, and an
 RTOFS Current Grib of similar time period and resolution. First
-https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:plugins:included_plugins:grib_weather#load_two_grib_files_concurrently_wind_current[Load
+xref:opencpn-plugins:grib_weather:grib_weather.adoc#_load_two_grib_files_concurrently_wind_current[Load
 two Grib Files Concurrently (Wind + Current)] in Grib_pi. Then in WR
 Configuration check the Currents box.
 
