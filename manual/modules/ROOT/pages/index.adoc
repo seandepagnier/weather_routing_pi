@@ -1,4 +1,4 @@
-== Weather Routing Pi
+= Weather Routing Pi
 
 image::wr-icon.jpeg[wr-icon]
 
@@ -6,38 +6,40 @@ Author: Sean D'Epagnier +
 Maintainers: Rick Gleason, Jon Gough and the Plugin Team +
 PI Manager Workflow: Testplugin
 
-=== Links
+== Links
 
 * Source: https://github.com/seandepagnier/weather_routing_pi +
 * Maintainer Source: https://github.com/rgleason/weather_routing_pi +
 * Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html +
 * Forum: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html +
 
-=== Purpose of Weather Routing (WR)
+== Purpose of Weather Routing (WR)
 
-https://routing.luckgrib.com/intro/index.html[Luckygrib] has superb introductory documentation for WeatherRouting. This started out as an excellent grib viewer/download for ipad and imac only. This documentation is worth reviewing first for general principals.
+https://routing.luckgrib.com/intro/index.html[Luckygrib] has superb
+introductory documentation for WeatherRouting. This started out as an
+excellent grib viewer/download for ipad and imac only. This documentation
+is worth reviewing first for general principals.
 
-==== Create optimized Weather Routes based on:
+== Create optimized Weather Routes based on:
 
-* link:../included_plugins/grib_weather.html[Grib_pi plugin] using
+* xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi plugin] using
 downloaded predictive grib files (grb, grb2) with wind, wave & current data
-* link:climatology.html[Climatology_pi plugin] using built in NOAA 30 year data, averaged by month with wind, wave and current data
-* link:../../charts/chart_sources.html#high_resolution_background_map[GSHHS
-High Resolution Background] It is easiest and best to install GSHHS using the
-https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:charts:chart_downloader_tab[Options
-> Chart > Chartdownloader]. Required to improve routing with “Detect Land” checked.
+* xref:climatology::index.adoc[Climatology plugin] using built in NOAA 30 year
+  data, averaged by month with wind, wave and current data
+* A high resolution GSHHS background map, required to improve routing with
+  “Detect Land” checked. It is easiest and best to install GSHHS using the
+  xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Options > Chart > Chartdownloader].
 * Your Boat's Performance Data - Starting sources VPP Calculated Polars or Measurement in various conditions (see below)
 
-==== Boat Performance Data - Polar Data
+== Boat Performance Data - Polar Data
 
 The plugin also requires Boat performance data (polar data). There are many Polar Data files built in and included as a part of the plugin. Also Polar Data can be developed from:
 
 * Boat Instrument data created while sailing in non-current conditions.
 See
-** link:../sailing/polar.html[Polar_pi]
-** link:../logs/vdr.html[VDR_pi]
-** link:../../../supplementary_software/nmea_instruments.html#nmea_server_for_tests[VDRplayer Manual]javascript:%20indexmenu_18973814515a5cc87ac6b23.o(80);
-** link:../../../supplementary_software/polauto.html[Polauto (Windows)]
+** xref:polar::index.adoc[Polar_pi]
+** xref:vdr::index.adoc[VDRPlayer Manual]
+** https://www.plaisance-pratique.com/polauto-mesurer-la-polaire-reeller[Polauto (Windows)]
 * VPP Velocity Prediction Programs using physical measurements of the boat.
 * Additionally there are many Polar Data files available in the
 Weather_routing Plugin.
@@ -48,7 +50,7 @@ weather_routing_pi. The plugin will convert the file to a format it can use (fix
 
 Note: Grib data is predictive data, and as such it will be subject to change. Generally data past 3-4 days it is unreliable, and the longest grib available is 16 days (with a larger time interval between data points). For longer voyages, Climatology_pi data can be used as an alternative data source to extend the routing calculations.
 
-==== Boat Performance Data - Outside Sources
+== Boat Performance Data - Outside Sources
 
 * Weather_Routing_pi has a full set of polar files, but there are other
 sources.
@@ -61,14 +63,14 @@ File Collection (cloud)]
 * https://l-36.com/polar_polars.php[L_36 Polar_Polars]
 * https://distantshores.ca/boatblog_files/sailing-polar-performance.php[Distant
 Shores on Polar Performance] Good advice, adjust VPP Polars for Cruising
-* link:weather_routing.html#boat_performance_data_-_polar_data[Boat
+* xref:#_boat_performance_data_polar_data[Boat
 Performance Data]. Record in consistent conditions for various
 conditions, see why.
 ** http://www.ockam.com/2013/06/03/what-are-polars/[Ockham:What are Polars?]
 ** http://www.ockam.com/2008/02/19/make-polar/[Ockham: Make your own?]
 ** https://www.yachtingworld.com/features/5-tips-developing-polar-diagrams-optimise-speed-71464[Yachting World: Polars 5 tips]
 
-=== What is Weather Routing useful for?
+== What is Weather Routing useful for?
 
 * Trip or voyage planning.
 * Determining good weather windows for starting the trip.
@@ -84,7 +86,7 @@ conditions, see why.
 * Useful for crew members planning airline tickets, but only as a rough estimate.
 * Remember that it is only as good as predictive and average data!
 
-=== What does Weather Routing look like?
+== What does Weather Routing look like?
 
 *Weather Routing*: Calculation of the fastest/safest route from a
 starting point to an ending point given the current national weather forecasts, available wind data, current oceanic currents , the performance of your vessel, and comfort criteria (storms, wind, waves, etc.) http://www.altendorff.co.uk/archives/1151[More about Optimum
@@ -95,7 +97,7 @@ image::weather_route_data_types_1.png[]
 When the weather route is displayed, *Grib* and *Climatology*
 calculations use different _color schemes_. as in the route above.
 
-==== Wind Data Sources - Grib and Climatology
+== Wind Data Sources - Grib and Climatology
 
 . *Isochrones* While calculating a Weather Routing the plugin will
 calculate the location of the boat for a given time interval (eg: 1 hr, 4hr, 6 hr or 12hr ) and display an isochrone contour line which
@@ -114,7 +116,7 @@ Cuba to Puerto Rico,title="Irma Cuba to Puerto Rico"]]
 
 Example: Routing from Cuba to Puerto Rico through Hurricane Irma.(Don't ever do this!) Showing Grib_pi “Weather Data” (Right Click on Chart) and Weather_routing View > Report & View > Plot.
 
-==== Terminology and Route Icons
+== Terminology and Route Icons
 
 . *Route or Optimal Route:* Thick magenta line from the start “triangle” to the finish “X”.
 . *Cursor Route*: Thin yellow line that follows the cursor around. This is the optimal route to the cursor.
@@ -124,14 +126,15 @@ selected in the “Configuration”.
 . *Square*: Small squares along the route, are *sail/polar file* changes [Not shown].
 . *Circle* on the route is the calculated *Boat location* for that time frame.
 . *Configuration* and *Computation* of a routing is at the center of the plugin.
-* link:weather_routing/settings.html[Configuration Defaults] Options and Constraints you may need for reference.
-* link:weather_routing/information.html[Configuration Terminology]
-Definitions available from within the Plugin, *Help > Information* Menu. Reference link:../../terminology.html[Common Terms] used in this Manual.
+* xref:#_settings[Configuration Defaults] Options and Constraints you may need for reference.
+* link:{attachmentsdir}/configuration.html[Configuration Terminology]
+Definitions available from within the Plugin, *Help > Information* Menu. Reference
+xref:opencpn-plugins:misc:terminology.adoc[Common Terms] used in this Manual.
 . Also look at the next screenshot below for examples.
 
-==== Techniques and Tools
+== Techniques and Tools
 
-. *link:weather_routing/information.html[Configuration Terminology]*
+. *link:{attachmentsdir}/configuration.html[Configuration Terminology]*
 Definitions available from within the Plugin, *Help > Information* Menu. Review this carefully while stepping through the plugin menus, looking particularly at *Edit Boat.xml* and *Edit Polar File (.csv, .txt, .pol)*
 Understand the menu system here and how it works. Boat.xml simply
 contains a list of boat polar files to use in the routing. The polar files can be edited, saved and saved as.
@@ -147,7 +150,7 @@ Menu and “Wind speed at Cursor” on. It is very useful for diagnostics along 
 routing, highlight the Configuration, pick _View_ in the menu at the top then select *Settings, Statistics, Report, Plot or Cursor* for more information. (See screenshot below for examples)
 . *WeatherRouting settings* Pick View > Settings.
 
-==== Summary
+== Summary
 
 . Use the *Grib Plugin* and recently downloaded grib files for
 completing grib predictive routing (1-8 days).
@@ -158,7 +161,7 @@ routes, (most useful in prevailing winds areas).
 . Your first goal should be to read this manual several times while
 trying to understand the menus and structure. Then to make a routing yourself. The “Configuration” and “Computation” of an optimal weather routing is at the heart of this plugin.
 
-=== Cleanup of Prior Installation
+== Cleanup of Prior Installation
 
 Generally we recommend that the plugin and configuration artifacts
 should be completely removed before installation of the new version, in order to allow the intended initialization files to be copied from the System files ProgramFiles (x86) folders to User Files ProgramData. The plugin expects a clean environment before initializing and copying the appropriate files into the user directories. You must “Clean” your opencpn files of all weather_routing files and folders or the initialization that is required will not occur. For windows users, from:
@@ -169,7 +172,7 @@ Weather_routing.exe as administrator.
 . C:\ProgramData\opencpn\plugins —> Remove the Weather_routing
 directory.
 
-=== Download and Installation
+== Download and Installation
 
 https://opencpn.org/OpenCPN/plugins/weatherroute.html[Download Page:
 Linux, Windows, Mac]
@@ -184,26 +187,27 @@ before doing anything else with it
 
 Double-click the downloaded file (with “weather_routing_pi” in the name and ”.exe“ as extension) and follow the set-up instructions. If you are doing parallel installs of OpenCPN make sure the plugin goes into the proper version of OpenCPN!
 
-That's it. But before you can actually *use* Weather_Routing_pi, you first have to link:../install_and_enable.html[Enable] the plug-in in OpenCPN.
+That's it. But before you can actually *use* Weather_Routing_pi, you first have to
+link:https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:plugins:install_and_enable#enabling_a_plugin[Enable] the plug-in in OpenCPN.
 
-link:../included_plugins/grib_weather.html[Grib_pi plugin] is included with OpenCPN, but you will need to install
-link:climatology.html[Climatology_pi plugin] if you wish to use that type of data.
+xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi plugin] is included with OpenCPN, but you will need to install
+xref:climatology::index.adoc[Climatology_pi plugin] if you wish to use that type of data.
 
-==== Enable OpenGL
+=== Enable OpenGL
 
 You need to activate OpenGL in order to have the route display on top of the grib layer!
 
-==== Source Code
+=== Source Code
 
 https://github.com/seandepagnier/weather_routing_pi
 
-==== Cruisers Forum Thread
+=== Cruisers Forum Thread
 
 http://www.cruisersforum.com/forums/f134/weather-routing-100060.html[Weather Routing]
 
-=== Standard Actions
+== Standard Actions
 
-==== Goal
+=== Goal
 
 Weather_routing is remarkably flexible, but with that comes complexity. New users must not dive in changing settings without understanding what they are doing or how it affects “*Computation*”.
 
@@ -216,7 +220,7 @@ Please follow this tutorial carefully and you will succeed the first time. Once 
 
 === 1.Setup Grib_pi Data
 
-link:../included_plugins/grib_weather.html[Grib_pi] is installed with OpenCPN. Learn how to use it and download a fresh Grib file with wind, current & waves.
+xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi] is installed with OpenCPN. Learn how to use it and download a fresh Grib file with wind, current & waves.
 
 * Initially the grib area should be larger than the area between start and finish by at least two time intervals,
 
@@ -228,7 +232,7 @@ image::ccc-castine-grib.png[]
 
 === 2. Setup Climatology_pi Data
 
-link:climatology.html[Climatology_pi] should be installed as directed.
+xref:climatology::index.adoc[Climatology_pi] should be installed as directed.
 
 * Enable Climatology_pi. Learn how to use it.
 
@@ -251,15 +255,15 @@ too.) +
 
 === 3. Install GSHHS High Resolution Background
 
-Download and install to improve routing with “Detect Land” checked.
+Download and install a GSHHS High Resolution Background to improve routing with “Detect Land” checked using the 
 
-* link:../../charts/chart_sources.html#high_resolution_background_map[GSHHS High Resolution Background]
+xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chart downloader]
 
 If you are working with Land Interface a lot, this is not optional! Best to install it.
 
 === 4. Weather Routing Setup
 
-===== Four Transatlantic Configurations that will Compute using Climatology Wind Data
+=== Four Transatlantic Configurations that will Compute using Climatology Wind Data
 
 Confirm that the Weather_Routing Plugin has been installed.
 
@@ -280,7 +284,7 @@ _C:\ProgramData\opencpn\plugins\weather_routing\polars_
 
 Weather Route setup for MacOS and for inclusion in the Weather Routing wiki.
 
-===== Run some Weather Routing Routes
+==== Run some Weather Routing Routes
 
 . Start Climatology_pi, although it will start automatically if called.
 . Start Grib_pi (normally used, but not necessary with the default
@@ -296,7 +300,7 @@ Pathname list.
 . Try “Computing” the other routes, noticing how the settings have been changed, and what files are being used.
 . Once you are pretty confident about this, go to the next step, which is to create your own configurations.
 
-===== Computation of 4 Routes
+==== Computation of 4 Routes
 
 There are 4 Weather Routings in “*Weather-Routing-Setup*” that should *Complete* using the wind data from Climatology. +
 
@@ -313,7 +317,7 @@ If the plugin is downloaded and installed, with default settings
 unchanged (or “Reset All” is used), the plugin should create an
 optimized weather routing with just a few specific additional settings and “computation”.
 
-* Complete link:weather_routing.html#setup_grib_pi_data[Setup Grib_pi Data] and link:weather_routing.html#setup_climatology_pi_data[Setup
+* Complete xref:#_1_setup_grib_pi_data[Setup Grib_pi Data] and xref:#_2_setup_climatology_pi_data[Setup
 Climatology_pi Data] as described above.
 
 * Start by clicking on the Toolbar Weather_routing plugin Icon to open the Weather_routing_Configuration Menu.
@@ -358,14 +362,12 @@ Configurations due to _Polar:Fail_ messages, which is often because the single p
 To help new users when starting out, we will create a *Boat-test.xml*
 file that references three “polar-xx-xxx-x-xx.pol” files which cover a full TWS (True Wind Speed) range of 0-60 knots. The Weather_routing Configuration will utilize the best polar information from the multiple polar files in *Boat-test.xml* after computing the “Sail/Polar Crossover” calculations between the different polar files being used.
 
-link:boat-test-xml.zip[Three Boat.xml zipped files] 
+link:{attachmentsdir}/boat-test-xml.zip[Three Boat.xml zipped files] 
 
 unzip to
 _C:\ProgramData\opencpn\plugins\weather_routing\boat_ which are
 preconfigured files that should work with the Polar and WeatherRoutingConfiguration.XML file downloads. These files are the same
-as
-*https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:toolbar_buttons:plugins:weather:weather_routing#weather_routing_setup[Weather_Routing_Setup]*
-above.
+as xref:#_4_weather_routing_setup[Weather_Routing_Setup]* above.
 
 * Boat.XML
 * Boat-test.XML
@@ -398,12 +400,11 @@ useful polars for your boat. +
  +
 *Polar Files for Learning (User Friendly)*
 
-link:weather_routing/polars-pol.zip[Polars-Pol.zip]
+link:{attachmentsdir}/polars-pol.zip[Polars-Pol.zip]
 
 Please Download, unzip and copy the six *.pol files listed below into your data\polars directory. For Windows use:
 _C:\ProgramData\opencpn\plugins\weather_routing\data\polars_ These files are the same as
-*https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:toolbar_buttons:plugins:weather:weather_routing#weather_routing_setup[Weather_Routing_Setup]*
-above.
+xref:#_4_weather_routing_setup[Weather_Routing_Setup] above.
 
 Three Stepped Range TWS Files used together (use either Sail or Power for TWS-0-6)
 
@@ -443,21 +444,21 @@ configuration by selecting *Boat-Test.xml* at the Boat section “….” just
 ahead of “Edit” in the “Configuration” Menu. Once that completes
 properly, then create a “Boat.xml” file for your boat with reference to your normal boat polars and use that.
 
-===== Plot Tab
+==== Plot Tab
 
 Shows the highlighted polar file graphically as a familiar polar
 diagram. Note that the dropdown menus at the bottom provide different useful ways of viewing the boat performance data.
 
 image::wr-config-boat-polar-test.xml-polar-tab.jpeg[]
 
-===== Cross over Chart Tab
+=== Cross over Chart Tab
 
 Shows the Sail/Polar Cross over calculations.
 
 image::wr-config-boat-polar-text-xml-cross-over-chart-tab.jpeg[] 
  
 
-===== Stats Tab
+=== Stats Tab
 
 Shows target speeds.
 
@@ -481,7 +482,7 @@ _Configuration_ you've created and select *Compute*.
 
 * Now new isochrones will be created and a weather routing from Boston to Halifax will be “*completed*”.
 
-image::wr-compute.jpg[]
+image::wr-compute.jpeg[]
 
 === 10. Messages in Configuration Window
 
@@ -546,18 +547,18 @@ Boat.xml,title="WR Configuration and Edit Boat.xml",width=600]]
 
 === 12. View
 
-===== Settings
+==== Settings
 
 To eliminate the black lines of all Alternate Routes, in Settings you
 can set the alternate route thickness to zero.
 
-===== Statistics
+==== Statistics
 
-===== Report
+==== Report
 
-===== Plot
+==== Plot
 
-===== Cursor Position
+==== Cursor Position
 
 === 13. Use with Grib_pi
 
@@ -616,19 +617,19 @@ Configuration > Options > Basic Tab > Check “Detect Boundary”
 Set various parameters (range in meters, degrees, time in seconds or
 minutes, speed etc.)
 
-=== FAQ
+== FAQ
 
 This section is meant to deal with various questions that might arise
 when using the pi. Example: (Why) Can(‘t) I? Answer: +
 
-==== Why does the "Computation" of a "Configuration" always fail with the message "Polar:Fail"? It is very frustrating.
+=== Why does the "Computation" of a "Configuration" always fail with the message "Polar:Fail"? It is very frustrating.
 
 . See:
 https://www.cruisersforum.com/forums/f134/weather-routing-100060-71.html#post2461392[CF Thread Polar Fail]
 
 . {blank}
 
-==== What can I do about "Polar:Fail"?
+=== What can I do about "Polar:Fail"?
 
 . Add other polars to the boat file to cover those wind speeds.
 . Increase or Decrease the Interval, try 1 hr to 8hr. This does make a difference, and sometimes an alternate optimal route will appear.
@@ -642,18 +643,16 @@ accordingly.
 . Zoom into where it fails and look. Near land can cause problems.
 . Try making a slightly new Destination point if it fails just short.
 
-==== I can't seem to get this to complete a weather routing, what is wrong?
+=== I can't seem to get this to complete a weather routing, what is wrong?
 
 . Undo the most recent changes you have made if you had it was working
 recently.
 . When this happens go back to basics, Reset to default settings. See the http://www.cruisersforum.com/forums/f134/weather-routing-100060-2.html#post2461969[CF Post] 
 
 about this and refer to the default list in this manual above. Or
-download the
-*https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:toolbar_buttons:plugins:weather:weather_routing#weather_routing_setup[Weather_Routing_Setup]*
-above, install it again and start over.
+download the xref:#_4_weather_routing_setup[Weather_Routing_Setup] above, install it again and start over.
 
-==== Routings, with climatology only, seem to be missing voyage data, such as duration, time of start and finish--If we are using a specific date and time for the start, why is this happening?
+=== Routings, with climatology only, seem to be missing voyage data, such as duration, time of start and finish--If we are using a specific date and time for the start, why is this happening?
 
 It is most likely that the routing did not reach the destination.
 -Understand that the routing ends if destination is inside two
@@ -661,21 +660,21 @@ isochrones, which is likely what you have, but remember between these two isochr
 
 Try a new destination (or start) well outside of the harbor. This issue occurs at both the start and the finish when the routing is tends to be near land with islands, harbors and complex shorelines, or try shortening the interval.
 
-==== Why doesn't synchronize position on route, display with grib display? No red circle.
+=== Why doesn't synchronize position on route, display with grib display? No red circle.
 
 Try uninstalling the weather_routing plugin and removing all files and configuration from the system as outlined in the manual then re-install and make a new configuration. Now you should see a red circle moving along the route as you step thru the Grib file.
 
-==== Edit Boat > Plot Tab What is the difference between the faint yellow line and the magenta line?
+=== Edit Boat > Plot Tab What is the difference between the faint yellow line and the magenta line?
 
 . These are the optimum upwind and downwind lines for best velocity made good. The colors show up best with the left dropdown set on “Speed” rather than “Plot”
 
 image::editboat-plottab.png[]
 
-==== View > Route Position > Boat Speed
+=== View > Route Position > Boat Speed
 
 . Boat Speed is shown as SOG and SOW when they are different. If they are the same, only one value is shown.
 
-==== Weather_Routing Time Intervals and Grib Data Time Intervals
+=== Weather_Routing Time Intervals and Grib Data Time Intervals
 
 When you step through the grib you will see the boat position at that current grib time. This can be right on an isochrone or between two isochrones (if grib interval is smaller than wxrte time interval).
 
@@ -685,29 +684,29 @@ Weather_routing will then interpolate the Grib file interval down to 10 minutes.
 
 For example: From the WeatherRoutingConfiguration results the arrival time is 21:33, for a departure at 12:00. This means a duration of 9 hours, or three grib intervals of 3 hours. Consistent with the 3 steps in grib controller (3 hour time intervals). If you have weather_routing time interval set to 10 minutes, the boat will skip over 18 isochrones for each step of the grib controller.
 
-==== How do I eliminate all black alternate routes?
+=== How do I eliminate all black alternate routes?
 
 View > Settings “Alternates for all isochrones” is unchecked and there are still black alternate routes showing. How do I eliminate them? Set alternate route thickness to “0” on the View > Settings menu.
 
-==== How can I edit or move an existing WR Position?
+=== How can I edit or move an existing WR Position?
 
 Create a new position with the same name to replace it. There is then a prompt to overwrite the old location. This works from the context menu on the chart also.
 
-=== Supplemental Hardware and Software
+== Supplemental Hardware and Software
 
 * Polar tools - Polar_pi, Polauto (Windows) (See above)
 * Voyage Recordings to create polars: Use Opencpn VDR_pi RPI3 or Yacht Devices Voyage Recorder
 * Yacht Devices using Excel:
 
-http://www.yachtd.com/downloads/polar_diagram.pdf[Case: How to plot a polar diagram for a yacht using data collected by Voyage Recorder]
+https://www.yachtd.com/downloads/polar_diagram.pdf[Case: How to plot a polar diagram for a yacht using data collected by Voyage Recorder]
 
 * Additional Polars http://download.meltemus.com/polars/[Qtvlm Polars]
 
 We contributed so there may be duplicates.
 
-=== Warnings
+== Warnings
 
-==== Warning about Data
+=== Warning about Data
 
 Weather_routing is only as good as the data provided by the Grib plugin and the Climatology plugin.
 
@@ -717,11 +716,11 @@ Weather_routing is only as good as the data provided by the Grib plugin and the 
 healthy “grain of salt” as any good sailor (who looks out to the
 horizon) should know.
 
-==== Warning about Weather Routes
+=== Warning about Weather Routes
 
 The weather routes created may not consider or “see” normal navigation considerations and issues, therefore every route should be checked very carefully for navigation markers, shallow depths, bad currents, rocks, land and other obstacles and hazards.
 
-==== Developer Notes regarding Packaging for Configuration of the Installation files
+=== Developer Notes regarding Packaging for Configuration of the Installation files
 
 Stelian wrote:
 
@@ -740,11 +739,11 @@ There was an hour issue too, the file had 09:00 (local time I suppose), I put 00
 
 I also renamed a boat.XML file to .xml (notice case), it's more standard that way (I know that windows doesn't care much, but on the other systems the conventions are quite strong).
 
-=== Notes
+== Notes
 
 New dialog to display which sail plan is at the cursor in View→Cursor Position. Alternately it might be interesting to have a display option to color the route map the same as the cross-over chart. There is a box on the route to show each sail change.
 
-=== Author
+== Author
 
 Weather_routing_pi is written by Sean D`Epagnier programmer excellente.
 http://seandepagnier.users.sourceforge.net/[Sean's Website]
