@@ -1,0 +1,151 @@
+== Help Information
+
+This page is available from within the plugin via the *Help* Menu by
+selecting *Information*
+
+Weather Routing Plugin for OpenCPN by Sean Depagnier
+
+=== Introduction
+
+The Weather Routing Plugin is designed to compute iteratively positions
+the boat could possibly make at a certain time. By merging the results
+of many calculations, it is possible to form a map determining routes to
+any given location within the map.
+
+=== Quick Start
+
+First, load the grib file used for routing using the grib plugin. Next,
+open the Weather Routing plugin from the main toolbar and right click
+the map and Select "Weather Route Position" at the starting location.
+Repeat this step for the destination. Now, in the Weather Routing window
+from the Configuration menu (next to File) Select "New". From here you
+must configure your vessel correctly in the boat dialog; add a polar to
+specify how the boat sails. When ready, select "Compute" from the
+Configuration menu to compute the weather route.
+
+=== Background
+
+Integration with the grib plugin allows for knowledge of weather
+conditions. The climatology plugin can also provide a source of data for
+longer voyages, but be warned that using the climatology data,
+especially in variable wind areas is unlikely to give realistic results.
+Using climatology for currents is more useful and can be used with grib
+wind data when grib current data is not available.
+
+For example, in the case where data is valid from both sources, grib
+will always be choosen. If current data is available from climatology,
+and only wind from grib, then the grib wind is used with the climatology
+current.
+
+The grib time selected on the timeline at the time the computation is
+started can be syncronized. From there, the grib timeline data is
+accessed as the computation proceeds. Once a computation is completed,
+the course and position of the boat as it sails along the computed route
+can be viewed during grib playback.
+
+Wind data is required; if no Current or Swell data is available, they
+are assumed to be zero.
+
+== Configuration
+
+=== Basic Tab
+
+==== Start
+
+* Position: Select start position from drop down menu
+
+==== End
+
+* Position: Select end position from drop down menu
+
+==== Time
+
+* Date: Select Date
+* Grib Time: Sets date & time to Grib_pi active file date & time. Adds
+checkmark.
+* Current Time: Sets date & time to current date and time. Removes
+checkmark.
+
+==== Time Step
+
+* Time to sail before considering a course or sail change. This is the
+difference in time between the isochrons on the map. Small time-steps
+are needed to navigate through narrow channels and give a more accurate
+result. Generally the route's computed time becomes faster with smaller
+time steps as it can find a more optimal route with more variation,
+however it will take longer to calculate (generally four times longer
+for half the time step).
+* Hours, Minutes, Seconds
+
+
+== Boat
+
+=== Path to Boat.xml
+
+* Click on the "..." to set the path or change the Boat.xml file.
+* Windows Example:
+C:\ProgramData\opencpn\plugins\weather_routing\boats\NorthStar.XML
+
+=== Edit Boat.xml
+
+* Edit _Boat.xml_ opens up a menu intense portion of the Routing
+Configuration:
+* *Plot Tab* specifies the parameters for the plot displayed.
+** *Polar* Typical polar diagram showing boat speeds at a given wind
+speed.
+** *Speed* Plot boat speed across all wind speeds at a given wind angle.
+** The tracking displays give data based on the mouse position over the
+plot.
+* *Crossover Tab* Shows the relationship of the polars and which one is
+used for each condition.
+* ** Stats** Shows optimal Target Boat Speeds and Angles at
+downwind/upwind port/starboard tacks at various wind speeds.
+* Bottom Drop Down Menus
+** *Polar* diagram and *Speed* orthogonal diagram
+** *True Wind Direction / True Wind Speed* Selection of combinations of
+Wind direction & speed to use.
+* *Add Polar* Files from the Boat.xml file.
+* *Remove Polar* Files from the Boat.xml file.
+* *Open Boat* Open an existing boat file.
+* *Save Boat* Save current boat file.
+* *Save As Boat* Save current boat file to a new name.
+* Multiple polar files can be added to the Boat.xml for:
+** See the example polar files.
+** Wind Ranges (light, medium, heavy) and corresponding Sail Sets.
+** Sea State (flat, chop, rough)
+** Bottom Condition
+** Power Polar for light winds
+** The best polar file will be automatically selected for the routing
+when the route is being "Computed".
+* *Edit* _Polar File (.csv .txt .pol)_ opens up another window which
+permits editing the polar file.
+** *Grid Tab* Edit values in individual cells. Note use of:
+*** blank = Interpolate from nearby values, if at least one set of
+values of tws/twd are entered in the column/row.
+*** 0 = Not recognized by the program, will remove these it edited.
+Sometimes a polar will contain 0's. They should be removed.
+*** 0.0 = Specifies invalid (cannot be used). Boat won't move and can't
+go there.
+*** *Cancel* and *Save*
+** *Dimensions Tab* Use to add or remove wind angle/speed columns/rows
+*** Set the values in the the first column (twa) and first row (tws).
+*** *Cancel* and *Save*
+** *Generate Tab* Generate a boat polar from Boat Characteristics (VPP)
+or from actual Measurements of Wind Dir/Speed.
+*** *Cancel* and *Save*
+*** This feature is not fully implemented.
+
+== Constraints
+
+=== Max Diverted Course
+
+* Maximum course error to continue toward destination. Not all possible
+courses will be considered and therefore the most optimal route may not
+be found. This usually (but not in all cases) is obvious when the
+optimal route is sometimes near the edge of the graph. Using a
+reasonable value can greatly speeds the rate of computation.
+
+=== Max True Wind
+
+* Knots. Do not navigate in areas
+

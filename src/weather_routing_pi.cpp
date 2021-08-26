@@ -110,7 +110,7 @@ int weather_routing_pi::Init()
       // Get a pointer to the opencpn display canvas, to use as a parent for the WEATHER_ROUTING dialog
       m_parent_window = GetOCPNCanvasWindow();
 
-      m_pWeather_Routing = NULL;
+//      m_pWeather_Routing = NULL;
 
 #ifdef PLUGIN_USE_SVG
       m_leftclick_tool_id = InsertPlugInToolSVG(_T( "WeatherRouting" ),

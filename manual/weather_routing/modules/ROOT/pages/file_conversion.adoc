@@ -1,0 +1,148 @@
+
+======File Conversion======
+
+===Polar File Conversion===
+
+**Opencpn** weather_routing_pi and the required polar format
+
+The plugin has a useful **Edit** mode for polars under //WeatherRouting Configuration > Boat > Edit//, then highlight the polar and Select **Edit**.
+The //Dimension Tab// enables adding and deleting columns and rows.
+
+{{opencpn:manual:plugins:weather_routing:wxrte-edit-polar-file.png?400|Edit Polar File}}
+
+Changing the anomalous value 4.7 to 6.6 for a smoother curve at 47 degrees and 10 knots TWS.
+
+
+The weather_routing_pi plugin references several files located in //c:/ProgramData/opencpn/plugins/weather_routing//.
+
+To see where these files are set in the plugin, select a route or make a new one. Pick //Configuration --> Edit//.
+Then pick //Boat > Edit// a tabbed dialogue box will open.
+
+**Plot Details Tab** has //Open, Save and Save as// buttons. This is the pointer to the <boat>.xml file which contains the boat characteristics, it is initially set to "boat.xml". After you have gone through all the tabs and set the boat's Lwl, Loa, Displacement, etc. you should "Save as" using your boat's name. Then "open" that file each time weather_routing needs those settings.
+
+Initially under <Configuration > Edit > Boat Edit > Plot Details [tab] the file referenced is "boat.xml". 
+Make sure you have a file "boat.xml" in your opencpn data directory, if you are having troubles, download a boat.xml file and "load" it.
+
+The second file is under <Configuration > Edit > Boat Edit > Polar [tab] and this is an optional polar file "<boat>.csv". "Polar File" Tab shows the path of the Polar file being used, if one exists, otherwise the program has builtin VPP calculation using the boats characteristics which have been entered, which is in effect when the path shows as "<computed>". 
+
+If you have prepared a polar file in the Opencpn format for your boat, you can load it into the plugin from this tab, and after you "Save" from the "Plot Details" tab, the pathname willl be remembered [note the pathname in the sample <boat>.XML file below].
+
+Sometimes the plugin is picky about these files. If it is close the plugin and opencpn and reopen, to reset it. Then try again. The two sample files are shown below. They are paired. If you load the XML file the referenced polar file will be loaded if it is in the path and the correct format.
+
+__Shannon38-opencpn-r____oundtrip.XML__ [This is the <boat>.XML file]\\
+<?xml version="1.0" encoding="utf-8" ?>\\
+<OCPNWeatherRoutingBoat version="0.9" creator="Opencpn Weather Routing plugin">\\
+<BoatCharacteristics displacement_tons="21" lwl_ft="34" loa_ft="38" beam_ft="11" />\\
+<BoatDrag frictional_drag="0.0170" wake_drag="0.9500" />\\
+<Plan Name="Initial Plan" computed="0" csvFileName="//__C:\ProgramData\opencpn\Shannon38-opencpn.CSV__//" />\\
+</OCPNWeatherRoutingBoat>
+
+__Shannon38-opencpn.CSV__ [This is the <boat polar>.csv file.]\\
+twa/tws;6;8;10;12;14;16;20\\
+0;0.00;0.00;0.00;0.00;0.00;0.00;0.00\\
+30;0.00;0.00;0.00;0.00;0.00;0.00;0.00\\
+40;2.80;4.10;4.40;4.70;4.90;5.00;5.10\\
+45;4.00;4.90;5.20;5.50;5.70;5.80;5.90\\
+52;4.50;5.40;6.10;6.40;6.60;6.70;6.80\\
+60;5.00;6.00;6.50;6.70;6.80;6.90;7.00\\
+75;5.50;6.40;6.80;7.00;7.20;7.30;7.40\\
+90;5.70;6.60;7.00;7.30;7.50;7.60;7.70\\
+110;5.80;6.70;7.10;7.40;7.60;7.70;7.90\\
+120;5.50;6.50;7.00;7.30;7.60;7.90;8.20\\
+135;4.80;6.00;6.60;7.00;7.40;7.70;8.30\\
+150;4.00;5.00;5.90;6.50;6.90;7.30;7.90\\
+165;3.70;4.80;5.20;6.20;6.60;6.90;7.50\\
+180;3.30;4.20;4.70;5.90;6.30;6.60;7.20\\
+
+
+**qtVLM Polar Format** \\
+[[http://wiki.virtual-loup-de-mer.org/index.php/QtVlm_Polar_Diagram]]\\
+Extension of the file name. Csv\\
+Separator ';' (semicolon)\\
+Double-entry table
+  * The first cell always contains 'TWA \ TWS'
+  * The first line lists the wind forces. Vlm does not go beyond 60 knots of wind.
+
+Beginning of each line gives the look, then each value corresponding to the shape and strength of the wind (column heading).
+
+The digital data of the polar use a decimal point, 'that is the point.' An integer (no point ended) is valid.
+Whites are valid (value = 0.0) but discouraged. Thank you for being explicit.
+
+Text file format is UNIX ie lines that are terminated by LF (Line Feed) and not CR (Carriage Return) and LF. A good text editor windows (PsPad or Notepad + +) knows rerecord this format.
+
+TWA\TWS;0;2;4;6;8;10;12;14;16;18;20;22;24;26;28;30;32;34;36;38;40;42;44;46;48;50;52;54;56;58;60\\
+0;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000;0.000\\
+5;0.000;0.210;0.420;0.630;0.800;0.860;0.920;0.940;0.950;0.970;0.980;0.980;0.990;0.950;0.880;0.810;0.740;0.670;0.600;0.530;0.460;0.370;0.280;0.190;0.090;0.000;0.000;0.000;0.000;0.000;0.000\\
+
+=====
+
+**Maxsea Polar Format** (same as Adrena, or SailGrib WR)
+[[http://www.sailgrib.com/wr-user-guide|http://www.sailgrib.com/wr-user-guide]]
+
+The first row defines the True Wind Speed.\\
+The first column defines the True Wind Angle.\\
+In the example, the theoretical hull speed for various wind velocities and wind angles is in the cells.\\
+Modify the True Wind Speed values in the first row. The example below uses 10 and 30 Kts.\\
+Enter these values in the first row and delete the other columns.
+
+In an Excel spreadsheet
+TWA 10 15 20 25\\
+30 2.0 5.4 7.2 7.9\\
+90 4.7 9.5 11.5 12.8\\
+150 2.9 7.4 10.5 13.0
+
+
+[[http://www.sailingperformance.com/Products.html]]\\
+Expedition [[http://www.expeditionmarine.com/index.html]]\\
+Isler [[http://www.islersailing.com/new_page_3.htm]]\\
+BLUR Boats and Polars [[http://www.blur.se/boats/]]
+
+**Bluewater Racing, and Expedition Polar file format**\\
+[[http://www.bluewaterracing.com/bluewater.htm#_Toc343740589]]
+ 
+Quote:\\
+A polar file is a sequence of lines. Each line describes the curve for one windspeed, //ws//. Optionally, the first line may begin with the string "pol", in which case it is treated as a comment line. This klunky format is not my idea; it is for compatibility with //Expedition// and other software tools, and because it loads easily into spreadsheet tools such as //Excel//.
+
+Each curve is described on one line of the text file by a windspeed, followed by a sequence of pairs of True Wind Angle and boatspeed. (TWA in degrees, BSP in knots)
+eg: 
+
+10 30 0 45 6 90 8.1 160 7 180 5\\
+15 30 0 40 8 90 12 150 10 165 9 170 5\\
+
+This gives two curves, one for windspeed 10, one for windspeed 15. Different curves may have different TWA points, and different numbers of points. The line for windspeed 10 specifies a boatspeed of zero knots at a true wind angle of 30 degrees, a boatspeed of six knots at TWA 45, 8.1 knots at 90, seven knots at 160 degrees, and five knots at 180 degrees.
+
+There can be a zero windspeed curve with non-zero boatspeed, i.e., “when the wind is gone, the motor's on.”
+
+Rules for the data in polar files:
+  - One windspeed curve per line.
+  - There must be a least 3 points per curve.
+  - There must be at least one non-zero windspeed curve.
+  - The minimum TWA is zero, and the maximum is 180.
+  - The 2nd smallest TWA in a line is the best VMG upwind angle for that windspeed. The 2nd largest TWA is the best VMG downwind angle for that 
+  - The first TWA should be less than any 2nd TWA in any curve. Ideally, zero.
+  - The last TWA should be greater than any 2nd-to-last TWA in any curve. Ideally, 180
+
+If these rules are broken, the behavior of the program is undetermined.
+
+**Example**\\
+2 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+4 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+6 24 28 32 36 40 44 48 52 __4.5__ 56 60 __5__ 64 68 72 76 __5.5__ 80 84 88 92 __5.7__ 96 100 104 108 112 __5.8__ 116 120 __5.5__ 124 128 132 136 __4.8__ 140 144 148 152 __4__ 156 160 164 168 172 176 180\\
+8 24 28 32 36 40 44 48 52 __5.4__ 56 60 __6__ 64 68 72 76 __6.4__ 80 84 88 92 __6.6__ 96 100 104 108 112__ 6.7__ 116 120 __6.5__ 124 128 132 136 __6__ 140 144 148 152 __5__ 156 160 164 168 172 176 180\\
+10 24 28 32 36 40 44 48 52 __6.1__ 56 60 __6.5__ 64 68 72 76 __6.8__ 80 84 88 92__ 7__ 96 100 104 108 112 __7.1__ 116 120 7 124 128 132 136 __6.6__ 140 144 148 152 __5.9__ 156 160 164 168 172 176 180\\
+12 24 28 32 36 40 44 48 52 6.4 56 60 6.7 64 68 72 76__ 7__ 80 84 88 92 __7.3__ 96 100 104 108 112 __7.4__ 116 120 7.3 124 128 132 136 7 140 144 148 152 __6.5__ 156 160 164 168 172 176 180\\
+14 24 28 32 36 40 44 48 52 6.8 56 60 6.8 64 68 72 76 7.2 80 84 88 92 7.5 96 100 104 108 112 7.6 116 120 7.6 124 128 132 136 7.4 140 144 148 152 6.9 156 160 164 168 172 176 180\\
+16 24 28 32 36 40 44 48 52 6.7 56 60 6.9 64 68 72 76 7.3 80 84 88 92 7.6 96 100 104 108 112 7.7 116 120 7.9 124 128 132 136 7.7 140 144 148 152 7.3 156 160 164 168 172 176 180\\
+18 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+20 24 28 32 36 40 44 48 52 6.7 56 60 7 64 68 72 76 7.4 80 84 88 92 7.7 96 100 104 108 112 7.9 116 120 8.2 124 128 132 136 8.3 140 144 148 152 7.9 156 160 164 168 172 176 180\\
+22 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+24 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+26 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+28 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+30 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+32 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+34 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180\\
+36 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100 104 108 112 116 120 124 128 132 136 140 144 148 152 156 160 164 168 172 176 180
+
+**Other Information and Alternatives for Weather_Routing** 
+Refer to this link in the wiki [[opencpn:opencpn_user_manual:plugins:weather:weather_routing|Weather Routing]]

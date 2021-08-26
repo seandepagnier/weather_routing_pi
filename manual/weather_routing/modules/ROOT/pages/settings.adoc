@@ -1,0 +1,73 @@
+== Configuration Defaults
+
+=== Weather Routing Plugin
+
+The following is a list of the default *Configuration* Constraints and
+Options. Use this list to check your settings if you are having trouble.
+
+=== Basic Tab
+==== Start
+==== End
+==== Date
+==== Time
+==== Boat
+
+. Boat.xml path
+. Boat.xml edit
+
+==== Constraints
+
+. Max Diverted Course 76 degrees
+. Max True Wind 100 knots
+. Max Apparent Wind 100 knots
+. Max Swell 20 meters - Ordered List Item
+
+==== Options
+
+. Time step 1 hour 0 min 0 sec
+. Detect Land Checked (when first starting, uncheck it)
+. Detect Boundary Unchecked
+. Currents Unchecked
+. Optimize tacking Unchecked
+
+==== Data Source
+
+. First use a freshly downloaded grib of the entire route area (a little
+larger than then route), making sure that it is for a big enough time
+interval. Then set the Grib_pi at least one frame later than the start
+time.
+. Grib Unchecked - You will need to check this.
+. Climatology Disabled - You can leave this disabled when you are
+starting. You can run routes using Climatology alone, or you can use the
+30 year Noaa data averages to extend calculations for a long trip both
+at the start and finish. There will be an indicator on the preferred
+route when the data source changes.
+. Last Valid if Data Deficient - Unchecked If your grib file is not long
+enough checking this can help.
+
+=== Advanced Tab
+
+==== Constraints
+
+. Max Latitude 90 degrees
+. Wind vs Current 0 (disabled) Factor for waves and hobby horsing
+. Max Course Angle 180 degrees
+. Max Search Angle 120 degrees
+. Cyclones Avoid Crossing Cyclone Tracks Unchecked within X months X
+days 1 month 0 days
+
+==== Options
+
+. Inverted Regions Unchecked
+. Integrator Newton
+. Anchoring Unchecked
+. Wind Strength is 100 percent
+. Tacking Time 0 (disabled)
+. Safety Margin from land 0 nm
+. Courses Relative to True Wind from 0 degrees to 180 degrees by 5
+degrees
+
+If you are having trouble, set the Configuration to these defaults or
+select Configuration > *Reset All Advanced*:
+
+//*Boat* //

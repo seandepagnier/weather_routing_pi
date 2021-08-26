@@ -50,20 +50,14 @@ Note: Grib data is predictive data, and as such it will be subject to change. Ge
 
 ==== Boat Performance Data - Outside Sources
 
-* Weather_Routing_pi has a full set of polar files, but there are other
-sources.
-* https://www.seapilot.com/features/download-polar-files/[Seapilot Polar
-Files]
-* https://www.cruisersforum.com/forums/f121/polar-files-collection-219560.html[Polar
-File Collection (cloud)]
+* Weather_Routing_pi has a full set of polar files, but there are other sources.
+* https://www.seapilot.com/features/download-polar-files/[Seapilot PolarFiles]
+* https://www.cruisersforum.com/forums/f121/polar-files-collection-219560.html[PolarFile Collection (cloud)]
 * http://download.meltemus.com/polars/[qtvlm polars]
 * https://jieter.github.io/orc-data/site/[ORC Polars]
 * https://l-36.com/polar_polars.php[L_36 Polar_Polars]
-* https://distantshores.ca/boatblog_files/sailing-polar-performance.php[Distant
-Shores on Polar Performance] Good advice, adjust VPP Polars for Cruising
-* link:weather_routing.html#boat_performance_data_-_polar_data[Boat
-Performance Data]. Record in consistent conditions for various
-conditions, see why.
+* https://distantshores.ca/boatblog_files/sailing-polar-performance.php[DistantShores on Polar Performance] Good advice, adjust VPP Polars for Cruising
+* link:weather_routing.html#boat_performance_data_-_polar_data[BoatPerformance Data]. Record in consistent conditions for various conditions, see why.
 ** http://www.ockam.com/2013/06/03/what-are-polars/[Ockham:What are Polars?]
 ** http://www.ockam.com/2008/02/19/make-polar/[Ockham: Make your own?]
 ** https://www.yachtingworld.com/features/5-tips-developing-polar-diagrams-optimise-speed-71464[Yachting World: Polars 5 tips]

@@ -1,0 +1,17 @@
+site:
+  title: Weather_Routing_pi Manual
+  url:  https://nowhere.net
+  start_page: weather_routing:ROOT:weather_routing.adoc
+content:
+  sources:
+    - url: ../
+      start_path: manual/weather_routing/
+      branches: HEAD
+      edit_url: true
+ui:   
+  bundle:
+    url: https://gitlab.com/leamas/antora-ui-default/-/raw/master/latest/ui-bundle.zip
+    snapshot: true
+output:
+  dir: ./docs
+  clean: true              
