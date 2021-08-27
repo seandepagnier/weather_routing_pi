@@ -1,11 +1,11 @@
 = Weather Routing Pi
 
 
-image::wr-icon2.svg[wr-icon, 60, 60, role=left]
+image::wr-icon2.svg[wr-icon, 60, 60, role=left] 
 
 Author: Sean D'Epagnier,  August 26, 2021,  Version v1.0 +
 Maintainers: Rick Gleason, Jon Gough and the Plugin Team +
-Development Details: PI Manager Workflow uses Testplugin Template
+Development Details: PI Manager Workflow uses Testplugin Template +
 
 == Links
 
@@ -589,7 +589,7 @@ Try a new destination (or start) well outside of the harbor. This issue occurs a
 *Why doesn't synchronize position on route, display with grib display?*
 Try uninstalling the weather_routing plugin and removing all files and configuration from the system as outlined in the manual then re-install and make a new configuration. Now you should see a red circle moving along the route as you step thru the Grib file.
 
-=== faint yellow line and the magenta line?
+=== What are the faint yellow line and the magenta line?
 
 *Edit Boat > Plot Tab What is the difference*
 These are the optimum upwind and downwind lines for best velocity made good. The colors show up best with the left dropdown set on “Speed” rather than “Plot”
