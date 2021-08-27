@@ -37,7 +37,7 @@ is worth reviewing first for general principals.
 
 Trip or voyage planning. +
 Finding good weather windows for trip starts. +
-Calculation multiple routes at the same time. +
+Calculation of multiple routes at the same time. +
 Highlight and step through multiple “completed' routes at the same time. +
 Study for best routes dependent on goals and constraints set. +
 Adjust Wind Speed as a percentage, which helps to set realistic goals. +
