@@ -24,7 +24,7 @@ is worth reviewing first for general principals.
 
 == Create optimized WR Routes based on:
 
-* Your boat's xref:_boat_performance_data_polar_data[Boat Performance Data - Polar File] or xref:_boat_performance_data_outside_sources[Outside Polar File Sources]. Accuracy in given conditions is significant. 
+* Your boat's xref:#_boat_performance_data_polar_data[Boat Performance Data - Polar Data] or xref:#_boat_performance_data_outside_sources[Outside Polar File Sources]. Accuracy in given conditions is significant. 
 ** xref:polar::index.adoc[Polar_pi] to create Polar Files from xref:vdr::index.adoc[VDR plugin] recordings.
 ** Polars expressing the Boat's Performance Data or VPP Calculated Polars or Measurement in specific sea conditions.
 ** Many polar sample files are provided for an easier start up.
@@ -32,7 +32,7 @@ is worth reviewing first for general principals.
 * xref:climatology::index.adoc[Climatology_pi] 30 years of NOAA date, averaged by month with wind, wave and current as an alternative data source to extend the routing calculations for longer voyages.
 * xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Options > Chart > Chartdownloader]
  to install a high resolution (GSHHS) background map, *required to improve routing* when “_Detect Land_” is checked.
-* xref:odraw::index.adoc [ODraw_pi] to create "boundarys" for routing avoidance of sea and land areas.
+* xref:ocpn_odraw::odraw.adoc [ODraw_pi] to create "boundarys" for routing avoidance of sea and land areas.
 
 == What is WR useful for?
 
@@ -409,15 +409,14 @@ There are many reasons a *Computation* cannot complete, or fail. The computation
 
 . Wind Data (grib_pi or climatology_pi) - Start & End data/time of the file, interval downloaded.
 . Boat Polar File - Correct format, with a wind range that matches the grib data.
-. Time Interval Issues - Sometimes a 1/2hr or 1hr interval will yield a better route than 3hr or 3hr. Sometimes that is the difference between “Completion” and “Fail”.
+. Time Interval Issues - Sometimes 1/2 -1 hr interval will yield a better route than 3-4 hr and it may help “Complete”.
 . Max Diverted Route - Normal setting is 100 degrees, which speeds up calculations, but with longer time intervals, you may have to set this on something like 140-160 degrees to complete the routing, particularly when the Finish is near land with Islands and Peninsulas around.
 . Configuration settings which must be made to be compatible with the data to Complete:
 .. Interval Issues - Too long a calculation interval for the distance between start and end.
 .. Land Detail - Detect land is checked and the High Resolution GSHHS
 Shoreline is not installed.
-.. Land Interface Issues - Routing near land is complex, if there is a failure at the interface with land zoom in and look at the Isobars. Sometimes they are not calculated for all locations due to the complexity of the land (limited by too many iterations). In that case try making a new Weather Routing Position nearby where there are isobars shown.
-.. Max Diverted Course - When “Polar:Fail” or “Polar:No Data” occurs
-near the “finish” using large Time Intervals (4hr - 24hr). Zoom in and look at the route, isochrones, finish, and land. If the route is almost completed to “Finish” (with land, islands and peninsulas around) try changing Max Diverted Course from 100 degrees to 150 degrees and run it again. It will probably complete.
+.. Land Interface Failure - Routing near land is complex, zoom in and look at the Isobars. Sometimes they are not calculated for all locations due to the complexity of the land (not enough detail or iterations). Try new Weather Routing Position nearby where there are isobars shown, or shorten the time interval or max diverted course.
+.. Max Diverted Course - When “Polar:Fail” or “Polar:No Data” occurs near the “finish” using large Time Intervals (4hr - 24hr). Zoom in and look at the route, isochrones, finish, and land. If the route is almost completed to “Finish” (with land, islands and peninsulas around) try changing Max Diverted Course from 100 degrees to 150 degrees and run it again. It will probably complete.
 
 Different Time Intervals - Everything Else is the same.
 
@@ -434,16 +433,12 @@ File may not have the required winds specified. The grib file may have periods o
 Provides setup flexibility for various factors:
 
 . Start location, date and time. End location.
-. Step duration for isochrones in hours and minutes (12 hours for long
-routes, 1 hour for shorter)
+. Step duration for isochrones in hours and minutes (12 hours for long routes, 1 hour for shorter)
 . For Time Step I generally start larger and once things are working, go smaller, the distance governs what the tme step is.
-. Divide the time expected to sail the course into 10 and use that
-number for the Time Step. Then adjust as needed.
-. Degree Steps (5 degree steps is faster than 1 degree steps). Generally
-leave Courses (relative to true wind) alone, From 0 to 180 by 5 degrees is fine.
+. Divide the time expected to sail the course into 10 and use that number for the Time Step. Then adjust as needed.
+. Degree Steps (5 is faster than 1). Generally leave Courses (relative to true wind) alone, From 0 to 180 by 5 degrees is fine.
 . Boat Performance based on editing boat specifications or based on a polar data file.
-. Set constraints on various factors such as max wind, swell, waves,
-latitude, max diverted course etc…
+. Set constraints on various factors such as max wind, swell, waves, latitude, max diverted course etc…
 . Start Grib_pi and/or Climatology_pi
 . Set Grib_pi to the date and time you want to use.
 . Then go to the Weather_routing Config menu and pick “Grib Time”
@@ -536,7 +531,7 @@ Weather_Routing_pi has a full set of polar files, but there are other sources:
 * https://jieter.github.io/orc-data/site/[ORC Polars]
 * https://l-36.com/polar_polars.php[L_36 Polar_Polars]
 * https://distantshores.ca/boatblog_files/sailing-polar-performance.php[Distant Shores on Polar Performance] Good advice, adjust VPP Polars for Cruising
-* xref:#_boat_performance_data_polar_data[Boat Performance Data]. Record in consistent conditions for various conditions, see why.
+* xref:#_boat_performance_data_polar_data[Boat Performance Data - Polar Data]. Record in consistent conditions for various conditions, see why.
 ** http://www.ockam.com/2013/06/03/what-are-polars/[Ockham:What are Polars?]
 ** http://www.ockam.com/2008/02/19/make-polar/[Ockham: Make your own?]
 ** https://www.yachtingworld.com/features/5-tips-developing-polar-diagrams-optimise-speed-71464[Yachting World: Polars 5 tips]
@@ -554,13 +549,12 @@ Frequently Asked Questions is intended to answer questions that might arise.
 === What can I do about "Polar:Fail"?
 
 . Add other polars to the boat file to cover those wind speeds.
-. Increase or Decrease the Interval, try 1 hr to 8hr. This does make a difference, and sometimes an alternate optimal route will appear.
+. Increase/Decrease the Interval, try 1-8 hr sometimes an alternate optimal route will appear.
 . Reduce Wind to 50% or 25%.
 . Increase Wind to 110% or 125%.
 . Use Boat.XML or Boat-Test.xml with TWS 0-60 knots.(original file, unchanged)
 . Use a different set of Polars.
-. Find the high or low wind area and times, then change the route
-accordingly.
+. Find the high or low wind area and times, then change the route accordingly.
 . Try a different grib file from another time with in the same area.
 . Zoom into where it fails and look. Near land can cause problems.
 . Try making a slightly new Destination point if it fails just short.
@@ -580,8 +574,7 @@ download the xref:#_4_weather_routing_setup[Weather_Routing_Setup] above, instal
 *If we are using a specific date and time for the start, why is this happening?*
 
 It is most likely that the routing did not reach the destination.
--Understand that the routing ends if destination is inside two
-isochrones, which is likely what you have, but remember between these two isochrones the boat can only move in straight lines and if there's land in the way, the destination could be unreachable. Islands and Harbors are very prone to this kind of issue.
+-Understand that the routing ends if destination is inside two isochrones, which is likely what you have, but remember between these two isochrones the boat can only move in straight lines and if there's land in the way, the destination could be unreachable. Islands and Harbors are very prone to this kind of issue.
 
 Try a new destination (or start) well outside of the harbor. This issue occurs at both the start and the finish when the routing is tends to be near land with islands, harbors and complex shorelines, or try shortening the interval.
 
