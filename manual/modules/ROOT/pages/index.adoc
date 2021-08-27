@@ -11,7 +11,8 @@ Development Details: PI Manager Workflow uses Testplugin Template +
 
 * Source: https://github.com/seandepagnier/weather_routing_pi +
 * Maintainer Source: https://github.com/rgleason/weather_routing_pi +
-* Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html +
+* Plugin Download, Install and Enable: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions]+
+* Legacy Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html +
 * Cruiser's Forum Thread: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html[Weather_Routing_pi] +
 
 == Purpose of Weather Routing (WR)
