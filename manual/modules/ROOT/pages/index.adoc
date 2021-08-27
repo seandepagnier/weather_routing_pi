@@ -329,11 +329,11 @@ Use either Sail or Power for TWS-0-6
 . TWS-0-20.pol (sail set medium winds -120% Jib)
 . TWS-20-60.pol (sail set heavy winds - Trysail + Storm Jib)
 
-image::tws-0-6-power.jpg[title="tws-0-6-power.pol",width=200,link="_images/tws-0-6-power.pol"]
+image::tws-0-6-power.jpg[title="tws-0-6-power.pol",width=200,link="_images/tws-0-6-power.jpg"]
 
-image::tws-6-20.jpg[title="tws-6-20.pol",width=500,link="_images/tws-6-20.pol"]
+image::tws-6-20.jpg[title="tws-6-20.pol",width=500,link="_images/tws-6-20.jpg"]
 
-image::tws-20-60.jpg[title="tws-20-60.pol",width=500,link="_images/tws-20-60..pol"]
+image::tws-20-60.jpg[title="tws-20-60.pol",width=500,link="_images/tws-20-60.jpg"]
 
 *Single File with Full Range TWS 0-60 knots*
 
