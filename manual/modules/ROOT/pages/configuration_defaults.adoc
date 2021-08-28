@@ -1,28 +1,28 @@
-== Configuration Defaults
+= Configuration Defaults
 
-=== Weather Routing Plugin
+== Weather Routing Plugin
 
 The following is a list of the default *Configuration* Constraints and
 Options. Use this list to check your settings if you are having trouble.
 
-=== Basic Tab
-==== Start
-==== End
-==== Date
-==== Time
-==== Boat
+== Basic Tab
+=== Start
+=== End
+=== Date
+=== Time
+=== Boat
 
 . Boat.xml path
 . Boat.xml edit
 
-==== Constraints
+=== Constraints
 
 . Max Diverted Course 76 degrees
 . Max True Wind 100 knots
 . Max Apparent Wind 100 knots
 . Max Swell 20 meters - Ordered List Item
 
-==== Options
+=== Options
 
 . Time step 1 hour 0 min 0 sec
 . Detect Land Checked (when first starting, uncheck it)
@@ -30,7 +30,7 @@ Options. Use this list to check your settings if you are having trouble.
 . Currents Unchecked
 . Optimize tacking Unchecked
 
-==== Data Source
+=== Data Source
 
 . First use a freshly downloaded grib of the entire route area (a little
 larger than then route), making sure that it is for a big enough time
@@ -45,9 +45,9 @@ route when the data source changes.
 . Last Valid if Data Deficient - Unchecked If your grib file is not long
 enough checking this can help.
 
-=== Advanced Tab
+== Advanced Tab
 
-==== Constraints
+=== Constraints
 
 . Max Latitude 90 degrees
 . Wind vs Current 0 (disabled) Factor for waves and hobby horsing
@@ -56,7 +56,7 @@ enough checking this can help.
 . Cyclones Avoid Crossing Cyclone Tracks Unchecked within X months X
 days 1 month 0 days
 
-==== Options
+=== Options
 
 . Inverted Regions Unchecked
 . Integrator Newton
@@ -70,4 +70,3 @@ degrees
 If you are having trouble, set the Configuration to these defaults or
 select Configuration > *Reset All Advanced*:
 
-//*Boat* //

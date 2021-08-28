@@ -1,76 +1,113 @@
-== Irma Examples
+= Irma Hurricane Examples
 
-=== Five Configurations that will Compute
+== Five Configurations that will Compute
 
 Confirm that the Weather_Routing Plugin has been installed.
 
-__*Files & Pathnames* __
+=== Files & Pathnames
 
 It is important that you use this configuration for Windows (Linux use
 comparable User accessible directories):
 
-. Main Path for support files:
-_C:\ProgramData\opencpn\plugins\weather_routing_
-. WeatherRoutingConfiguration.xml:
-_C:\ProgramData\opencpn\plugins\weather_routing_
-. Polar Files (.pol,.txt,.csv):
-_C:\ProgramData\opencpn\plugins\weather_routing\polars_
+. Main Path for support files: _C:\ProgramData\opencpn\plugins\weather_routing_
+. WeatherRoutingConfiguration.xml: _C:\ProgramData\opencpn\plugins\weather_routing_
+. Polar Files (.pol,.txt,.csv): _C:\ProgramData\opencpn\plugins\weather_routing\polars_
 . Boat.Xml Files: _C:\ProgramData\opencpn\plugins\weather_routing\boat_
-. Grib-Sample File:
-_C:\ProgramData\opencpn\plugins\weather_routing\grib-sample_
+. Grib-Sample File: _C:\ProgramData\opencpn\plugins\weather_routing\grib-sample_
 
-(Note the weather_routing installation may not create these files in the
-correct location, and may put them under _C:\Program Files
-(x86)\opencpn\plugins\weather_routing/data_. If this is the case, just
-download the Weather Routing Setup files below and install as shown
-above.
+Weather_routing installation may not create these files in the correct location, and may put them under
 
-==== Weather Routing Setup Files
+* C:\Program Files (x86)\opencpn\plugins\weather_routing/data 
+ 
+If this is the case, just download the Weather Routing Setup files below and install as shown above.
 
-Download and Unzip files and directories to
-_C:\ProgramData\opencpn\plugins\weather_routing_
+=== Weather Routing Setup Files
 
-image:/opencpn/manual/plugins/weather_routing/weather-routing-setup.zip[Weather
-Routing Setup]
+Download and Unzip files and directories to _C:\ProgramData\opencpn\plugins\weather_routing_
+
+link:{attachmentsdir}/weather-routing-setup.zip[Weather Routing Setup Zip File]
 
 Unzip and install files & directories into
 _C:\ProgramData\opencpn\plugins\weather_routing_ to follow the locations
 above. These files will provide you with sample files to help learn how
 to weather_route.
 
-==== Run some Weather Routing Routes
+=== Run some Weather Routing Routes
 
 . Start Climatology_pi, although it will start automatically if called.
-. Start Grib_pi and open the Irma-Jose-2017090618.gfs.grib2 file located
-in _C:\ProgramData\opencpn\plugins\weather_routing\grib-sample_ or just
-copy it to your normal grib file location.
-. Set the Grib Date to Wed, Sept 6 2017, UTC 21:00 and get the screen
-centered on the grib.
-. Then open Weather_routing_pi, you may be pointing at the wrong
-directory, so Pick "_File > Open_" and browse to
-_C:\ProgramData\opencpn\plugins\weather_routing_ and then select and
-open "_WeatherRoutingConfiguration.xml_".
-. Confirm the "Boat section" path is correct as shown above in the
-Pathname list.
-. Confirm the "Polar" path is correct as shown above in the Pathname
-list.
-. In the menu you should find 5 configurations for routes in the
-Caribbean.
-. Pick a route and then select "Compute from the bottom of the menu.
-. Check that the isobars and route is drawn. Then step through the
-Grib_pi changing the time to see where the boat is located and how the
-wind changes.
-. Try "Computing" the other routes, noticing how the settings have been
-changed, and what files are being used.
-. Once you are pretty confident about this, go to the next step, which
-is to create your own configurations.
+. Start Grib_pi and open the Irma-Jose-2017090618.gfs.grib2 file.
+.. This file is located in _C:\ProgramData\opencpn\plugins\weather_routing\grib-sample_ 
+.. or just copy it to your normal grib file location.
+. Set the Grib Date to Wed, Sept 6 2017, UTC 21:00 and get the screen centered on the grib.
+. Then open Weather_routing_pi. 
+.. you may be pointing at the wrong directory, so Pick "_File > Open_" and browse to
+.. _C:\ProgramData\opencpn\plugins\weather_routing_
+.. Then select and open "_WeatherRoutingConfiguration.xml_".
+. Confirm the "Boat section" path is correct as shown above in the Pathname list.
+. Confirm the "Polar" path is correct as shown above in the Pathname list.
+. In the menu you should find 5 configurations for routes in the Caribbean.
+. Pick a route configuration and then select _Compute_ from the bottom of the menu.
+. Check that the isobars and route is drawn. 
+. Then step through the Grib_pi:
+.. Changing the time to see where the boat is located and how the wind changes.
+. Try _Computing_ the other routes.
+.. Notice how the Configuration settings have been changed.
+.. Notice what files are being used.
+. Once you are pretty confident about this, go to the next step.
+. Which is to create your own configurations.
 
-==== Computation of 5 Routes
+=== Computation of 5 Routes
 
-These are 5 Weather Routings in "*Weather-Routing-Setup*" that should
-*Complete* when using the small grib file for hurricane Irma.
-Weather_routing would not normally be used for this, however
+These are 5 Weather Routings in "*Weather-Routing-Setup*" that should *Complete* when using the small grib file for hurricane Irma. 
 
-pandoc 2.14.0.2
+Weather_routing would not normally be used for this weather, as it is time to haul, however in emergency situations it could be used to develop _avoidance measures by setting conservative maximum wind speeds_ in your configuration. 
 
-https://pandoc.org
+These routings below do find *circuitous avoidance routes* based upon their _Configuration values_, but the values could be made even more _conservative_. The purpose of these examples is to illustrate the dependence of _Completed_ routings on a number of values and constraints. 
+
+When a routing _Fails_, the user needs to learn and understand what values need to be adjusted. Adjustment of Time Interval is just one of the settings to be considered in Weather Route Configuration. 
+
+image::wr-setup-1-4hr.jpg[title="First Routing Default Settings - 4 hr Interval",width=500,link="_images/wr-setup-1-4hr.jpg"]
+
+image::wr-setup-2-5hr.jpg[title="Second routing- 5hr Interval",width=500,link="_images/wr-setup-2-5hr.jpg"]
+
+image::wr-setup-3-2hr.jpg[title="Third Routing Default Settings - 2 hr Interval",width=500,link="_images/wr-setup-3-2hr.jpg"]
+
+image::wr-setup-4-3hr.jpg[title="Fourth Routing Default Settings - 3 hr Interval",width=500,link="_images/wr-setup-4-3hr.jpg"]
+
+image::wr-setup-5-4hr.jpg[title="Fifth routing- 4hr Interval",width=500,link="_images/wr-setup-5-4hr.jpg"]
+
+Computation of Routes from Cape Canaveral with different Intervals
+
+These routes are also in “Weather-Routing-Setup Zip Files” and illustrate how different Time Intervals may interact with Land causing Failures depending on the configuration of the Finish point with land masses. Notice that Cape Canaveral 4 & 5 (4 & 5 hour Time Intervals) both Failed. 
+
+Changing to a _smaller Time Interval_ is a reasonable response to help *Complete* and so is changing the _Default Max Diverted Course from 100 to 150 degrees_, both of which require more computation. The other alternative is to use a different Weather Routing Position for the Finish, which is further away from the interfering land masses.
+
+Note that the optimum weather route that is computed changes with the Time Interval due to interaction with Land mass at the edges of the Wind data. Choosing Finish points that are clear from Land Masses, Smaller Time Intervals and greater Max Diverted Course will generally help in these cases. 
+
+The very different routes taken with each time interval all result in Trip times of 5days-1/2hr to 5days-4-1/2hrs which are quite small differences given the divergent routes. In planning your trips you may want to take advantage of these alternatives which are shown with use of different Time Intervals, depending on your goals. 
+
+image::wr-setup-cc-1-1hr.jpg[title="From Cape Canaveral 1- 1hr Interval",width=500,link="_images/wr-setup-cc-1-1hr.jpg"]
+
+image::wr-setup-cc-2-2hr.jpg[title="From Cape Canaveral 2- 2hr Interval",width=500,link="_images/wr-setup-cc-2-2hr.jpg"]
+
+image::wr-setup-cc-3-3hr.jpg[title="From Cape Canaveral 3- 3hr Interval",width=500,link="_images/wr-setup-cc-3-3hr.jpg"]
+
+image::wr-setup-cc-4-4hr-fail.jpg[title="From Cape Canaveral 4- 4hr Interval Polar: Failed",width=500,link="_images/wr-setup-cc-4-4hr-fail.jpg"]
+
+image::wr-setup-cc-4-4hr-fail-zoom.jpg[title="From Cape Canaveral 4- 4hr Interval Polar: Failed Zoomed",width=500,link="_images/wr-setup-cc-4-4hr-fail-zoom.jpg"]
+
+image::wr-setup-cc-5-5hr-fail.jpg[title="From Cape Canaveral - 5 hr Interval Polar: Failed",width=500,link="_images/wr-setup-cc-5-5hr-fail-zoom.jpg"]
+
+image::wr-setup-cc-5-5hr-maxdiv-150-complete.jpg[title="From Cape Canaveral - 5 hr Interval: Fail Zoomed (Changed MaxDiv=150) Complete",width=500,link="_images/wr-setup-cc-5-5hr-maxdiv-150-complete.jpg"]
+
+image::wr-setup-cc-6-6hr.jpg[title="From Cape Canaveral - 6 hr Interval - On Default MaxDiv=100 Complete",width=500,link="_images/wr-setup-cc-6-6hr.jpg"]
+
+When there is a Compute Failure try to understand why. Zoom in to where the routing is failing, to see and determine that the Time Interval or Destination Point is not right or too close at the complex land - sea interface. Then change the Time Interval or move the Destination Point further out to sea where the routing calculations can be made more easily. This is just one configuration consideration, there are others.
+
+Here is a good example of “Avoidance Routing” around Irma. The polars could be made more conservative (and should be), and the routing will probably “fail” which would be a warning that a better “weather window” is needed. Time to prepare for the hurricane rather than running weather-routings!.  Avoidance of Irma into the Gulf and along Florida Shore.
+
+image::wx-rte-irma-avoidance-routing.png[title="From Cape Canaveral - 6 hr Interval - Irma Avoidance Routing",width=500,link="_images/wx-rte-irma-avoidance-routing.png"]
+
+WR Not a substitute for sound judgment & realistic goals
+
+Why try to route into Irma? You must Configure weather_routing to match your sound judgment and realistic goals. You are in control, use your own judgement when you review the results. This cannot be emphasized enough. Weather_Routing_pi is just a tool in your hands, you are in control.
