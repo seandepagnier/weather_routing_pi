@@ -1,18 +1,16 @@
-== Help Information
+= Help Information
 
-This page is available from within the plugin via the *Help* Menu by
-selecting *Information*
+This Information is available from within the plugin from 
+the *Help* Menu by selecting *Information*
 
-Weather Routing Plugin for OpenCPN by Sean Depagnier
-
-=== Introduction
+== Introduction
 
 The Weather Routing Plugin is designed to compute iteratively positions
 the boat could possibly make at a certain time. By merging the results
 of many calculations, it is possible to form a map determining routes to
 any given location within the map.
 
-=== Quick Start
+== Quick Start
 
 First, load the grib file used for routing using the grib plugin. Next,
 open the Weather Routing plugin from the main toolbar and right click
@@ -23,7 +21,7 @@ must configure your vessel correctly in the boat dialog; add a polar to
 specify how the boat sails. When ready, select "Compute" from the
 Configuration menu to compute the weather route.
 
-=== Background
+== Background
 
 Integration with the grib plugin allows for knowledge of weather
 conditions. The climatology plugin can also provide a source of data for
@@ -50,43 +48,35 @@ are assumed to be zero.
 
 === Basic Tab
 
-==== Start
+==== Start - Date & Time
 
-* Position: Select start position from drop down menu
+* Make new postions by Right-click on the Chart and select  _Weather Route Position_ 
+* Position: Select Start _Weather Route Position_ from drop down menu
+* Date: Select Date & Time (Must be within grib time frame)
+** Grib Time: Sets date & time to Grib_pi active file date & time. Adds checkmark.
+** Current Time: Sets date & time to current date and time. Removes checkmark.
 
 ==== End
 
-* Position: Select end position from drop down menu
-
-==== Time
-
-* Date: Select Date
-* Grib Time: Sets date & time to Grib_pi active file date & time. Adds
-checkmark.
-* Current Time: Sets date & time to current date and time. Removes
-checkmark.
+* Position: Select End  _Weather Route Postion_ from drop down menu
 
 ==== Time Step
 
-* Time to sail before considering a course or sail change. This is the
-difference in time between the isochrons on the map. Small time-steps
-are needed to navigate through narrow channels and give a more accurate
-result. Generally the route's computed time becomes faster with smaller
-time steps as it can find a more optimal route with more variation,
-however it will take longer to calculate (generally four times longer
-for half the time step).
-* Hours, Minutes, Seconds
+* Time to sail before considering a course or sail change. 
+* This is the difference in time between the isochrons on the map. 
+* Small time-steps are needed to navigate through narrow channels and give a more accurate result. 
+* Generally the route's finish becomes earlier with smaller time steps because a more optimal route is found,
+however calculation will take longer (generally four times longer for half the time step).
 
+=== Boat
 
-== Boat
-
-=== Path to Boat.xml
+==== Path to Boat.xml
 
 * Click on the "..." to set the path or change the Boat.xml file.
 * Windows Example:
-C:\ProgramData\opencpn\plugins\weather_routing\boats\NorthStar.XML
+** _C:\ProgramData\opencpn\plugins\weather_routing\boats\NorthStar.XML_
 
-=== Edit Boat.xml
+==== Edit Boat.xml
 
 * Edit _Boat.xml_ opens up a menu intense portion of the Routing
 Configuration:
@@ -135,17 +125,21 @@ or from actual Measurements of Wind Dir/Speed.
 *** *Cancel* and *Save*
 *** This feature is not fully implemented.
 
-== Constraints
+=== Constraints
 
-=== Max Diverted Course
+==== Max Diverted Course
 
 * Maximum course error to continue toward destination. Not all possible
 courses will be considered and therefore the most optimal route may not
-be found. This usually (but not in all cases) is obvious when the
+be found. 
+* This usually (but not in all cases) is obvious when the
 optimal route is sometimes near the edge of the graph. Using a
 reasonable value can greatly speeds the rate of computation.
 
-=== Max True Wind
+==== Max True Wind
 
 * Knots. Do not navigate in areas
 
+=== Advanced Tab
+
+* See the xref:configuration_defaults.adoc[Configuration Defaults] Page

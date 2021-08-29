@@ -2,71 +2,110 @@
 
 == Weather Routing Plugin
 
-The following is a list of the default *Configuration* Constraints and
-Options. Use this list to check your settings if you are having trouble.
+This lists *default Configuration* settings. Hitting *Reset all Advanced* will reset the _Advanced Tab_ configuration to these default settings.
+
+NOTE: Upoin intial installation (following the instructions), the plugin should be setup to allow the user to select any of the _Configurations_ from the Main Menu and then press _Compute_ and the routing should _Complete_  
+
+NOTE: If you are _learning_ at this point and want to run the *Examples*, don't change the _configuration defaults_.
 
 == Basic Tab
-=== Start
-=== End
-=== Date
-=== Time
+
+. All of these settings are set "out of the box" for the first _Compute_.
+. Don't tough anything.
+
+=== Start Position 
+
+. Make Weather Route Position by right-click in Opencpn on the chart and select "Weather Route position"
+. Select Start Position by selection from the dropdown.
+
+=== Start Time
+
+. Select Start Date & Time -User Selection
+. Must within the grib file time window unless climatology is working too.
+. Two options _Grib Time_ and _Current Time_
+
+=== End Position
+
+. Make Weather Route Position by right-click in Opencpn on the chart and select "Weather Route position"
+. Select Start Position by selection from the dropdown.
+
+=== Time Step
+
+. Intially this is set to 12 hours to have a fast calculation.
+. Select between 30 min and 12 hours.
+. For routing failures first try setting this for a shorter time step.
+
 === Boat
 
-. Boat.xml path
-. Boat.xml edit
+. Boat.xml path  - For startup examples, select _plugins\weather_routing\boats\Boat-Climatology.xml_
+. Boat.xml edit  - View and get familiar with this interface.
+.. In _Boat-Climatology.xml_ 4 Sample Polar files have been added.
+.. Highlight one of the Polars and select from the Tabs (Plot, Cross Over and Stats)
+.. At the bottom select how to view the polar True/Apparent, etc.
+.. In the Right menu select _Edit_ to see how Editing a polar works.
+.. Close or Save this menu.
 
-=== Constraints
+=== Constraints - Defaults
 
 . Max Diverted Course 76 degrees
 . Max True Wind 100 knots
 . Max Apparent Wind 100 knots
-. Max Swell 20 meters - Ordered List Item
+. Max Swell 20 meters
 
-=== Options
+=== Options - Defaults
 
-. Time step 1 hour 0 min 0 sec
-. Detect Land Checked (when first starting, uncheck it)
-. Detect Boundary Unchecked
-. Currents Unchecked
-. Optimize tacking Unchecked
+. Time step: 1 hour 0 min 0 sec
+. Detect Land: Checked (when first starting, uncheck it, requires High Res GSHHS)
+. Detect Boundary: Unchecked
+. Currents: Unchecked
+. Optimize tacking: Unchecked
 
-=== Data Source
+=== Data Source - Defaults
 
-. First use a freshly downloaded grib of the entire route area (a little
+. Default Examples
+.. The wind data source used for these examples is Climatology.
+.. Climatology must be installed and enabled.
+
+. For your own use
+.. Download a fresh grib of the entire route area (a little
 larger than then route), making sure that it is for a big enough time
-interval. Then set the Grib_pi at least one frame later than the start
-time.
-. Grib Unchecked - You will need to check this.
-. Climatology Disabled - You can leave this disabled when you are
-starting. You can run routes using Climatology alone, or you can use the
-30 year Noaa data averages to extend calculations for a long trip both
-at the start and finish. There will be an indicator on the preferred
-route when the data source changes.
-. Last Valid if Data Deficient - Unchecked If your grib file is not long
-enough checking this can help.
+interval. 
+.. Then set the Grib_pi at least one frame later than the start time.
+.. Grib Unchecked - You will need to check this.
+.. Climatology - Leave disabled or enabled depending..
+... Use Climatology alone.
+... Use Climatology (30 year Noaa data averages) to extend long trip calcs both at the start and finish. 
+... When data sources change there will be a color indication.
+. Last Valid if Data Deficient - Uncheck. If your grib file is not long enough checking this can help.
 
 == Advanced Tab
 
-=== Constraints
+. Generally the default constraints work well.
+. These constraints speed up calculations.
+. Some adjustments may be necessary if a route does not complete.
+. However first decrease _Time Step_ and increase _Max Diverted Course_
 
-. Max Latitude 90 degrees
-. Wind vs Current 0 (disabled) Factor for waves and hobby horsing
-. Max Course Angle 180 degrees
-. Max Search Angle 120 degrees
-. Cyclones Avoid Crossing Cyclone Tracks Unchecked within X months X
-days 1 month 0 days
+=== Constraints - Defaults
 
-=== Options
+. Max Latitude: 90 degrees
+. Wind vs Current: 0 (disabled) Factor for waves and hobby horsing
+. Max Course Angle: 180 degrees
+. Max Search Angle: 120 degrees
+. Cyclones Avoid Crossing Cyclone Tracks: Unchecked  (Climatology needed)
+.. within X months X  days: within 1 month 0 days
 
-. Inverted Regions Unchecked
-. Integrator Newton
-. Anchoring Unchecked
-. Wind Strength is 100 percent
-. Tacking Time 0 (disabled)
-. Safety Margin from land 0 nm
-. Courses Relative to True Wind from 0 degrees to 180 degrees by 5
-degrees
+=== Options - Defaults
+
+. Inverted Regions: Unchecked
+. Integrator: Newton
+. Anchoring: Unchecked
+. Wind Strength: 100 percent
+. Tacking Time: 0 (disabled)
+. Safety Margin from land: 0 nm
+. Courses Relative to True Wind: 
+.. From 0 degrees to 180 degrees
+.. by 5 degrees steps
 
 If you are having trouble, set the Configuration to these defaults or
-select Configuration > *Reset All Advanced*:
+select *Configuration > Reset all Advanced*:
 

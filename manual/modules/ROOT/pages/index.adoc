@@ -1,7 +1,7 @@
 = Weather Routing Pi
 
 
-image::wr-icon2.svg[wr-icon, 60, 60, role=left] 
+image::wr-icon2.svg[wr-icon, 80, 80, role=left] 
 
 Author: Sean D'Epagnier,  August 26, 2021,  Version v1.0 +
 Maintainers: Rick Gleason, Jon Gough and the Plugin Team +
@@ -11,9 +11,42 @@ Development Details: PI Manager Workflow uses Testplugin Template +
 
 * Source: https://github.com/seandepagnier/weather_routing_pi +
 * Maintainer Source: https://github.com/rgleason/weather_routing_pi +
-* Plugin Download, Install and Enable: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions]+
+* Plugin Download, Install and Enable: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions] +
 * Legacy Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html +
 * Cruiser's Forum Thread: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html[Weather_Routing_pi] +
+
+== Associated Plugins
+
+=== Create optimized routes based on:
+
+*Weather and Land Data: Land Mass, wind, wave and current* 
+
+* xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chartdownloader] to download High resolution (GSHHS) required to _Detect Land_.
+* xref:climatology::index.adoc[Climatology_pi] Data for default examples and longer voyages. 30 years of NOAA wind, wave & Current data, averaged by month.
+* xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi (grb, grb2)] Data predictive wind, wave & current. Used daily, but not with initial Examples.
+
+*Boat Performance Data: Polar Files*
+
+The quest for _perfect_ polars. There are many factors involved.
+
+* xref:polar::index.adoc[Polar_pi] Create Polar files from nmea0183 data.
+* xref:vdr::index.adoc[VDR_pi] Record OpenCPN nmea0183 data stream
+
+* Your boat's xref:_boat_performance_data_polar_data[Boat Performance Data - Polar Data] or xref:_boat_performance_data_outside_sources[Outside Polar File Sources].  Accuracy may vary significantly in different conditions. 
+** Polar sample files (700) provided. Accuracy on your boat may vary.
+** Actual performance measured in specific sea conditions (without current) recorded by xref:vdr::index.adoc[VDR_pi] and converted by xref:polar::index.adoc[Polar_pi].
+** Calculated Polars  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP)] and https://www.orc.org/index.asp?id=21[ORC]. Usually based on theoretical and optimal conditions.   
+
+*Boundaries: Routing Avoidance*
+
+* xref:ocpn_odraw::odraw.adoc [ODraw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
+
+== Navigation Sub Pages
+
+. xref:help_information.adoc[Help > Information]
+. xref:configuration_defaults.adoc[Configuration Defaults]
+. xref:irma_examples.adoc[Irma Hurricane Example]
+. xref:polar_file_conversion.adoc[Polar File Conversiom]
 
 == Purpose of Weather Routing (WR)
 
@@ -22,37 +55,28 @@ introductory documentation for WeatherRouting. This started out as an
 excellent grib viewer/download for ipad and imac only. This documentation
 is worth reviewing first for general principals.
 
-== Create optimized WR Routes based on:
-
-* Your boat's xref:<<boat_performance_data_polar_data>>[Boat Performance Data - Polar Data] or xref:<<boat_performance_data_outside_sources>>[Outside Polar File Sources]. Accuracy in given conditions is significant. 
-** xref:polar::index.adoc[Polar_pi] to create Polar Files from xref:vdr::index.adoc[VDR plugin] recordings.
-** Polars expressing the Boat's Performance Data or VPP Calculated Polars or Measurement in specific sea conditions.
-** Many polar sample files are provided for an easier start up.
-* xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi] downloaded predictive grib files (grb, grb2) with wind, wave & current data.
-* xref:climatology::index.adoc[Climatology_pi] 30 years of NOAA date, averaged by month with wind, wave and current as an alternative data source to extend the routing calculations for longer voyages.
-* xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Options > Chart > Chartdownloader]
- to install a high resolution (GSHHS) background map, *required to improve routing* when “_Detect Land_” is checked.
-* xref:ocpn_odraw::odraw.adoc [ODraw_pi] to create "boundarys" for routing avoidance of sea and land areas.
-
 == What is WR useful for?
 
-Trip or voyage planning. +
-Finding good weather windows for trip starts. +
-Calculation of multiple routes at the same time. +
-Highlight and step through multiple “completed' routes at the same time. +
-Study for best routes dependent on goals and constraints set. +
-Adjust Wind Speed as a percentage, which helps to set realistic goals. +
-Include multiple polars in your Boat file for different conditons and sail sets. +
-Include a motoring polar in your Boat file particularly for light winds. +
-Route around predicted high winds (hurricanes & typhoons), areas of light winds, large waves, etc. +
-Show possible sail changes and % crossover. +
-Compare routes with Grib file currents enabled and disabled. +
-Attach two downloaded grib files one for weather and one for currents (same location and times). +
-Summary  metro table of the voyage for good weather visual. +
-Number of tacks, % upwind/downwind, etc. to determine how difficult the voyage will be. +
-Trip Summaries: Estimated total time, distance, average speed etc. to help determine the stores needed. +
-Planning airline tickets (but only as a very very rough estimate). +
-Remember that it is only as good as the accuracy of your polars and predictive and average data! +
+. Trip or voyage planning.
+. Finding good weather windows for trip starts.
+. Calculation of multiple routes at the same time.
+. Highlight and step through multiple “completed' routes at the same time.
+. Study for best routes dependent on goals and constraints set.
+.. Adjust Wind Speed as a percentage, which helps to set realistic goals.
+.. Include multiple polars in your Boat file for different conditons and sail sets.
+.. Include a motoring polar in your Boat file particularly for light winds.
+.. Power Boat use for trip start time, fuel reduction, comfort routing and ETA.
+.. Route around predicted high winds (hurricanes), light winds, large waves, etc.
+.. Show possible sail changes and % crossover.
+.. Compare routes with Grib file currents enabled and disabled.
+.. Attach two downloaded grib files (weather and current) with similar location and time.
+. Summary  metro table of the voyage for good weather visual.
+. Views and Reports
+.. View settings.
+.. Number of tacks, % upwind/downwind, etc. to determine how difficult the voyage will be.
+.. Trip Summaries: Estimated total time, distance, average speed etc. to help determine the stores needed.
+. Planning airline tickets (but only as a very very rough estimate).
+. Remember that it is only as good as the accuracy of your polars and predictive and average data!
 
 == What does WR look like?
 
@@ -77,7 +101,7 @@ Think of Isochrones as showing an intermediate destination time lines with diffe
 
 image::irma-cuba-2-puerto-rico.jpg[title="Hurricane Irma from Cuba to Puerto Rico",width=600,link="_images/irma-cuba-2-puerto-rico.jpg"] 
 
-Example: Routing from Cuba to Puerto Rico through Hurricane Irma in avoidance mode.(Don't ever try to do this!) Showing Grib_pi “Weather Data” (Right Click on Chart) and *Weather_routing View > Report & View > Plot*.  See the Irma Hurricane Examples page down below Item #22, after you have finished this.
+Example: Routing around Hurricane Irma in avoidance mode. Showing colored Grib_pi *Weather Data Table* exposed with a _Right Click on Chart_ and the *Trip Summary Window* activated by  _Weather_routing View > Report & View > Plot_.  
 
 == Terminology and Route Icons
 
@@ -91,12 +115,12 @@ Example: Routing from Cuba to Puerto Rico through Hurricane Irma in avoidance mo
 . xref:opencpn-plugins:misc:terminology.adoc[Terminology Reference] used in this Manual.
 . *Configuration* and *Computation* of a optimal routing is at the center of the plugin.
 * xref:configuration_defaults.adoc[Configuration Defaults] are reset after hitting _Reset all Advanced_.
-* *Configuration* The plugin comes installed ready with a number of configurations to _Compute_ successfully.
+* *Configuration* Five default configurations using Climatology_pi. Initial Default Examples ready to _Compute_ and _Complete_. 
 * *Compute* After configuration of the routing, select _Compute_. The routing will _Complete_  or  _Fail with a message_  
 
 == Techniques and Tools
 
-Weather Routing is a deep plugin which can use three other plugins concurrently, so stick to basics when starting out.
+Weather Routing is a deep plugin which can use six other plugins concurrently, so stick to basics when starting out.
 
 . *Grib Step Through Time Interval* Step through the Grib file changing time interval, frame by frame, hour by hour, to understand the Routing.
 * *Grib Time* Routing Start time must be inside the particular grib file's time period. If the routing takes longer than the grib, the routing will _fail:grib_ unless Climatology_pi is enabled and set in Weather_routing. Start time can be set quickly in WR Menu _Configuration > Basic Tab > Grib Time button_  As you learn more, you can refine start and end times.  
@@ -121,9 +145,9 @@ Weather_routing is remarkably flexible, but with that comes complexity. New user
 
 . Generally the Configuration Default settings are the most reliable available. After hitting *Reset all Advanced* most of the advanced configuration settings can be left alone.
 . However there are definitely some Configuration settings the user must set manually in order to get any results! 
-. The goal here is to *Complete* your first routing successfully.
+. The goal first goal is to *Complete* your first routing successfully.
 
-Please follow this tutorial carefully and you will succeed the first time. Once you get familiar with the interface and have had successes, learn all the features gradually, changing and adjusting one setting at a time. Use *Reset* to go back the working defaults when you run into trouble.
+Please follow this tutorial carefully and you will succeed the first time. Once you get familiar with the interface and have had successes, learn all the features gradually, changing and adjusting one setting at a time. Use *Reset Advanced Tab* to go back the working defaults when you run into trouble, or install the example files again for a fresh start.
 
 == Cleanup Prior WR Installation
 
@@ -150,7 +174,7 @@ image::ccc-castine-grib.png[title="Grib Display Control",width=500,link="_images
 
 === 2. Setup Climatology_pi
 
-xref:climatology::index.adoc[Climatology_pi] should be installed and enabled as directed.
+xref:climatology::index.adoc[Climatology_pi] must be installed and enabled as directed for default examples to work.
 
 * *Climatology_pi* is *Enabled* under Opencpn _Options > Plugins_.
 * *Weather_Routing* in the Menu  _Configuration > New or Edit > Data Source > Climatology_ select from the Dropdown Menu _Most Likely_ which we use almost exclusively.
@@ -178,20 +202,21 @@ Use xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chart do
 
 === 4. Setup Weather_Routing_pi
 
-xref:opencpn-plugins:misc:plugin-install.adoc[Install] and xref:opencpn-plugins:misc:plugin-install.adoc#_plugin_enabledisable[Enable] the weather_routing plugin from within OpenCPN using _Options > Plugins_
+xref:opencpn-plugins:misc:plugin-install.adoc[Install Plugins] and xref:opencpn-plugins:misc:plugin-install.adoc#_plugin_enabledisable[Enable] the weather_routing plugin from within OpenCPN using _Options > Plugins_
 
 That's it. But before you can actually *use* Weather_Routing_pi, you first have to 
 
 * Confirm that the Weather_Routing Plugin has been installed and enabled.
 * Enable xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi plugin] which is included with OpenCPN.
-* Confirm xref:climatology::index.adoc[Climatology_pi plugin] has been installed and enabled (required by Sample files).
+* Confirm xref:climatology::index.adoc[Climatology_pi plugin] has been installed and enabled (required by Default Example files).
 * Confirn that Climatology has been set to _Most Likely_ in Weather_routing Configuration.
 * Confirm that GSHHS High resolution files have been installed.
 
 Note: Legacy PI Package installation files are still available from https://opencpn.org/OpenCPN/plugins/weatherroute.html[Download Page -Linux, Windows, Mac].  Make sure you choose the file that is compatible with your computer system. +
 
 === 5. Enable OpenGL
-You must activate OpenGL in order to have the route display on top of the grib layer!
+
+Activate OpenGL in order to have the route display on top of the grib layer! +
 _Options > Dispay > Advanced > Check Use Accelerated Graphics_
 
 === 6. Check Files & Pathnames
@@ -219,24 +244,27 @@ This is the typical configuration for Windows (Linux uses comparable User access
 
 === 8. Four Transatlantic Configurations
 
-The plugin is packaged wit 4 configurations using *Climatology Wind Data* that should *Compute* out of the box. The 4 Weather Routing Configurations in the *Weather-Routing-Setup* with require installation and Enabling *Climatology_pi* and selecting Climatology dropdown menu  _Most Likely_ in the WR Configuration. +
+The plugin is packaged with 4 configurations using *Climatology Wind Data* that should *Compute* out of the box. The 4 Weather Routing Configurations in the *Weather-Routing-Configuration* with require installation and Enabling *Climatology_pi* and selecting Climatology dropdown menu  _Most Likely_ in the WR Configuration.
+
+To run one of the initally installed examples simply highlight one of the routing _Configurations_ in the main menu and then select _Compute_.
 
 === 9. WR use requires realistic goals & sound judgment
 
-You should _Configure_ weather_routing to match your _sound judgment_ and _realistic goals_. You are in control, use your own judgement when you review the results. Weather_Routing_pi is just a tool in your hands, you are in control.
+After learning through use of the Examples, you should _Configure_ weather_routing to match your _sound judgment_ and _realistic goals_. You are in control, use your own judgement when you review the results. Weather_Routing_pi is just a tool in your hands, you are in control.
 
 === 10. WeatherRoutingConfiguration.XML Menu
 
 image::weatherroutingconfiguration-positions.jpg[title="WeatherRoutingConfiguration.xml Positions",width=500,link="_images/weatherroutingconfiguration-positions.jpg"]
 
-If the plugin is installed and enabled,  with default settings unchanged (or “Reset all Advanced” is used), the plugin should create an optimized weather routing with just a few specific additional settings and “computation”.
+If the plugin is installed and enabled, with default settings unchanged or _Reset all Advanced_ is used, the plugin should create an optimized weather routing with just a few specific additional settings and _Computation_.
 
-* Complete xref:#_1_setup_grib_pi[Setup Grib_pi Data] and xref:#_2_setup_climatology_pi[Setup
-Climatology_pi Data] as described above.
+* Complete xref:#_1_setup_grib_pi[Setup Grib_pi Data] and xref:#_2_setup_climatology_pi[Setup Climatology_pi Data] as described above.
 
 * Start by clicking on the Toolbar Weather_routing plugin Icon to open the Weather_routing_Configuration Menu.
 
 * WR WeatherRoutingConfiguration.xml Menu
+
+* NOTE: You are now *diverging from the Example files*, and learning how to *configure a new route* using Climatology Data.
 
 * Define two *Weather Route Positions* on the chart within the “grib
 area”. Hover the mouse at a selected location, _Right Click_, and then pick “*Weather Route Position*” from the popup menu. Make a “*Boston*” and a “*Halifax*” Weather Route Position.
@@ -260,6 +288,7 @@ image::wr-wr-configuration.jpg[title="WR Configuration Menu",width=500,link="_im
 
 * *Set Start Date & Time*. If you have set start date & time in Grib_pi
 as described above.
+* NOTE: You can download appropriate grib data and load it into grib_pi for this exercise, or you can just use Climatology data, it won't make a difference.
 * From the _Weather Routing Configuration Menu_ click *Grib Time* to set the Start Date/Time used by the “Configuration” for the routing. The *Grib Time* used will be the current frame used and visible in Grib_pi. There are other ways to do this, but use this way to start.
 
 === 12. WR Configuration > Boat.xml Menu - Edit
@@ -273,7 +302,9 @@ image::wr-config-boat-xml.jpg[title="WR Configuration Boat.xml",width=500,link="
 Many new users have have trouble “Completing” Weather Route
 Configurations due to _Polar:Fail_ messages, which is often because the single polar they have used only has TWS from 6-20 knots and does not span the entire true wind speed range of the particular grib file being used.
 
-To help new users when starting out, we will create a *Boat-test.xml*
+NOTE: This files below are an earlier example and are still useful at times. However the plugin now comes configured with a new set of Example files all ready _built_in_. It it best to use those examples unless you want to start out fresh. The file names are similar but the details are a little different.  We will try to update the files below to match the one in the distribution, ..at some point.
+
+To help new users when starting out, we have created a *Boat-test.xml*
 file that references three “polar-xx-xxx-x-xx.pol” files which cover a full TWS (True Wind Speed) range of 0-60 knots. The Weather_routing Configuration will utilize the best polar information from the multiple polar files in *Boat-test.xml* after computing the “Sail/Polar Crossover” calculations between the different polar files being used.
 
 link:{attachmentsdir}/boat-test-xml.zip[Three Boat.xml zipped files] 
@@ -544,7 +575,10 @@ Weather_Routing_pi has a full set of polar files, but there are other sources:
 
 == Polar File Conversion
 
-xref:polar_conversion.adoc[Polar File Conversion] Examples
+Sometimes a good polar is available for appropriate conditions, but it just needs to be converted for use in OpenCPN.
+Often this is automatically handled by Polar_pi or Weather_routing, but sometimes manual editing is necessary.
+
+xref:polar_file_conversion.adoc[Polar File Conversion] Examples
 
 == FAQ
 
@@ -659,5 +693,4 @@ I also renamed a boat.XML file to .xml (notice case), it's more standard that wa
 
 == Author
 
-Weather_routing_pi is written by Sean D`Epagnier programmer excellente.
-http://seandepagnier.users.sourceforge.net/[Sean's Website]
+Weather_routing_pi programming by Sean D`Epagnier http://seandepagnier.users.sourceforge.net/[Sean's Website]
