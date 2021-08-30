@@ -58,7 +58,7 @@ is worth reviewing first for general principals.
 == What is WR useful for?
 
 . Trip or voyage planning.
-. Finding good weather windows for trip starts.
+. Establishing good weather windows for trip starts.
 . Calculation of multiple routes at the same time.
 . Highlight and step through multiple “completed' routes at the same time.
 . Study for best routes dependent on goals and constraints set.
