@@ -22,20 +22,21 @@ Development Details: PI Manager Workflow uses Testplugin Template +
 *Weather and Land Data: Land Mass, wind, wave and current* 
 
 * xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chartdownloader] to download High resolution (GSHHS) required to _Detect Land_.
-* xref:climatology::index.adoc[Climatology_pi] Data for default examples and longer voyages. 30 years of NOAA wind, wave & Current data, averaged by month.
+* xref:climatology::index.adoc[Climatology_pi] Data for default examples and longer voyages. 30 years of NOAA wind, wave & Current data, averaged by month. Climatology is required to run the Examples.
 * xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi (grb, grb2)] Data predictive wind, wave & current. Used daily, but not with initial Examples.
+* Install and Enable these plugins now: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions] +
 
 *Boat Performance Data: Polar Files*
 
-The quest for _perfect_ polars. There are many factors involved.
+The quest for _perfect_ polars. There are many factors involved and various sources.
 
-* xref:polar::index.adoc[Polar_pi] Create Polar files from nmea0183 data.
-* xref:vdr::index.adoc[VDR_pi] Record OpenCPN nmea0183 data stream
+* xref:polar::index.adoc[Polar_pi] Create Polar files from recorded nmea0183 or vdr data.
+* xref:vdr::index.adoc[VDR_pi] Record the OpenCPN nmea0183 data stream.
 
 * Your boat's xref:_boat_performance_data_polar_data[Boat Performance Data - Polar Data] or xref:_boat_performance_data_outside_sources[Outside Polar File Sources].  Accuracy may vary significantly in different conditions. 
-** Polar sample files (700) provided. Accuracy on your boat may vary.
-** Actual performance measured in specific sea conditions (without current) recorded by xref:vdr::index.adoc[VDR_pi] and converted by xref:polar::index.adoc[Polar_pi].
-** Calculated Polars  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP)] and https://www.orc.org/index.asp?id=21[ORC]. Usually based on theoretical and optimal conditions.   
+** *Polar sample files:* (700) provided. Accuracy for your boat may vary dependent on sails, bottom condition and sea state.
+** *Actual performance:* measured in specific sea conditions recorded by xref:vdr::index.adoc[VDR_pi] and converted by xref:polar::index.adoc[Polar_pi]. Best recordings are with Zero current, noting sea state.
+** *Calculated Polars:*  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP)] and https://www.orc.org/index.asp?id=21[ORC]. Usually based on theoretical and optimal conditions.   
 
 *Boundaries: Routing Avoidance*
 
