@@ -5,7 +5,7 @@ image::wr-icon2.svg[wr-icon, 80, 80, role=left]
 
 Author: Sean D'Epagnier,  August 26, 2021,  Version v1.0 +
 Maintainers: Rick Gleason, Jon Gough and the Plugin Team +
-Development Details: PI Manager Workflow uses Testplugin Template +
+Development Details: PI Manager (PIM) Workflow uses the Testplugin Template +
 
 == Links
 
@@ -121,7 +121,7 @@ Example: Routing around Hurricane Irma in avoidance mode. Showing colored Grib_p
 
 == Techniques and Tools
 
-Weather Routing is a deep plugin which can use six other plugins concurrently, so stick to basics when starting out.
+Weather Routing is a "very capable" plugin which can use six other plugins concurrently, so stick to basics when starting out.
 
 . *Grib Step Through Time Interval* Step through the Grib file changing time interval, frame by frame, hour by hour, to understand the Routing.
 * *Grib Time* Routing Start time must be inside the particular grib file's time period. If the routing takes longer than the grib, the routing will _fail:grib_ unless Climatology_pi is enabled and set in Weather_routing. Start time can be set quickly in WR Menu _Configuration > Basic Tab > Grib Time button_  As you learn more, you can refine start and end times.  
