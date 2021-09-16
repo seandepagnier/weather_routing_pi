@@ -3,9 +3,9 @@
 
 image::wr-icon2.svg[wr-icon, 80, 80, role=left] 
 
-+ Author: Sean D'Epagnier,  August 26, 2021,  Version v1.0
-+ Maintainers: Rick Gleason, Jon Gough and the Plugin Team
-+ Development Details: PI Manager (PIM) Workflow uses the Testplugin Template
+Author: Sean D'Epagnier,  August 26, 2021,  Version v1.0 +
+Maintainers: Rick Gleason, Jon Gough and the Plugin Team +
+Development Details: PI Manager (PIM) Workflow uses the Testplugin Template +
 
 == Links
 

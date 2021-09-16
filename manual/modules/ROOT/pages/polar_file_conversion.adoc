@@ -70,7 +70,7 @@ This is a typical *<boat_polar>.csv* or *<boat_polar>.pol*, the first polar file
 
 === qtVLM Polar Format
 
-http://wiki.virtual-loup-de-mer.org/index.php/QtVlm_Polar_Diagram
+https://www.starpath.com/qtVlm/#polar
 
 . Extension of the file name. Csv
 . Separator ';' (semicolon)
@@ -113,7 +113,7 @@ BLUR Boats and Polars http://www.blur.se/boats/ +
 
 === Bluewater Racing, and Expedition Polar file format
 
-http://www.bluewaterracing.com/bluewater.htm#_Toc343740589
+https://bluewaterracing.com/htdocs/help/pages/polarmanager.htm
  
 Quote:  A polar file is a sequence of lines. Each line describes the curve for one windspeed, _ws_. Optionally, the first line may begin with the string "pol", in which case it is treated as a comment line. This klunky format is not my idea; it is for compatibility with _Expedition_ and other software tools, and because it loads easily into spreadsheet tools such as _Excel_.
 
