@@ -3,17 +3,17 @@
 
 image::wr-icon2.svg[wr-icon, 80, 80, role=left] 
 
-Author: Sean D'Epagnier,  August 26, 2021,  Version v1.0 +
-Maintainers: Rick Gleason, Jon Gough and the Plugin Team +
-Development Details: PI Manager (PIM) Workflow uses the Testplugin Template +
++ Author: Sean D'Epagnier,  August 26, 2021,  Version v1.0
++ Maintainers: Rick Gleason, Jon Gough and the Plugin Team
++ Development Details: PI Manager (PIM) Workflow uses the Testplugin Template
 
 == Links
 
-* Source: https://github.com/seandepagnier/weather_routing_pi +
-* Maintainer Source: https://github.com/rgleason/weather_routing_pi +
-* Plugin Download, Install and Enable: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions] +
-* Legacy Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html +
-* Cruiser's Forum Thread: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html[Weather_Routing_pi] +
+* Source: https://github.com/seandepagnier/weather_routing_pi 
+* Maintainer Source: https://github.com/rgleason/weather_routing_pi 
+* Plugin Download, Install and Enable: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions] 
+* Legacy Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html 
+* Cruiser's Forum Thread: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html[Weather_Routing_pi] 
 
 == Associated Plugins
 
@@ -24,7 +24,7 @@ Development Details: PI Manager (PIM) Workflow uses the Testplugin Template +
 * xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chartdownloader] to download High resolution (GSHHS) required to _Detect Land_.
 * xref:climatology::index.adoc[Climatology_pi] Data for default examples and longer voyages. 30 years of NOAA wind, wave & Current data, averaged by month. Climatology is required to run the Examples.
 * xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi (grb, grb2)] Data predictive wind, wave & current. Used daily, but not with initial Examples.
-* Install and Enable these plugins now: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions] +
+* Install and Enable these plugins now: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions]
 
 *Boat Performance Data: Polar Files*
 
@@ -40,7 +40,7 @@ The quest for _perfect_ polars. There are many factors involved and various sour
 
 *Boundaries: Routing Avoidance*
 
-* xref:ocpn_odraw::index.adoc [ODraw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
+* xref:opencpn-plugins:ocpn_odraw::index.adoc[ODraw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
 
 == Navigation Sub Pages
 
@@ -188,7 +188,8 @@ Climatology NOAA 30 year average Wind and Current data in September near Cape Lo
 
 image::climatology-wind.jpg[title="Set Size to 100 and Spacing to 50",width=500,link="_images/climatology-wind.jpg"]
 
-Climatology Configuration of Wind Roses Size=100 and Spacing=50 is good. +
++ Climatology Configuration of Wind Roses Size=100 and Spacing=50 is good. 
+
 
 === 3. Install GSHHS High Resolution Background
 
@@ -203,7 +204,7 @@ Use xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chart do
 
 === 4. Setup Weather_Routing_pi
 
-xref:opencpn-plugins:misc:plugin-install.adoc[Install Plugins] and xref:opencpn-plugins:misc:plugin-install.adoc#_plugin_enabledisable[Enable] the weather_routing plugin from within OpenCPN using _Options > Plugins_
+xref:opencpn-plugins:misc:plugin-install.adoc[Install and Enable Plugins] and the weather_routing plugin from within OpenCPN using _Options > Plugins_
 
 That's it. But before you can actually *use* Weather_Routing_pi, you first have to 
 
@@ -213,11 +214,11 @@ That's it. But before you can actually *use* Weather_Routing_pi, you first have 
 * Confirn that Climatology has been set to _Most Likely_ in Weather_routing Configuration.
 * Confirm that GSHHS High resolution files have been installed.
 
-Note: Legacy PI Package installation files are still available from https://opencpn.org/OpenCPN/plugins/weatherroute.html[Download Page -Linux, Windows, Mac].  Make sure you choose the file that is compatible with your computer system. +
++ Note: Legacy PI Package installation files are still available from https://opencpn.org/OpenCPN/plugins/weatherroute.html[Download Page -Linux, Windows, Mac].  Make sure you choose the file that is compatible with your computer system.
 
 === 5. Enable OpenGL
 
-Activate OpenGL in order to have the route display on top of the grib layer! +
++ Activate OpenGL in order to have the route display on top of the grib layer! 
 _Options > Dispay > Advanced > Check Use Accelerated Graphics_
 
 === 6. Check Files & Pathnames
@@ -305,15 +306,15 @@ Configurations due to _Polar:Fail_ messages, which is often because the single p
 
 NOTE: This files below are an earlier example and are still useful at times. However the plugin now comes configured with a new set of Example files all ready _built_in_. It it best to use those examples unless you want to start out fresh. The file names are similar but the details are a little different.  We will try to update the files below to match the one in the distribution, ..at some point.
 
-To help new users when starting out, we have created a *Boat-test.xml*
-file that references three “polar-xx-xxx-x-xx.pol” files which cover a full TWS (True Wind Speed) range of 0-60 knots. The Weather_routing Configuration will utilize the best polar information from the multiple polar files in *Boat-test.xml* after computing the “Sail/Polar Crossover” calculations between the different polar files being used.
+To help new users when starting out, we have created a *Boat-test.xml* file that references 
+three “polar-xx-xxx-x-xx.pol” files which cover a full TWS (True Wind Speed) range of 0-60 knots. 
+The Weather_routing Configuration will utilize the best polar information from the multiple polar files in *Boat-test.xml* after computing the “Sail/Polar Crossover” calculations between the different polar files being used.
 
 link:{attachmentsdir}/boat-test-xml.zip[Three Boat.xml zipped files] 
 
-unzip to
-_C:\ProgramData\opencpn\plugins\weather_routing\boat_ which are
-preconfigured files that should work with the Polar and WeatherRoutingConfiguration.XML file downloads. These files are the same
-as xref:#_4_weather_routing_setup[Weather_Routing_Setup]* above.
+unzip to  _C:\ProgramData\opencpn\plugins\weather_routing\boat_ which are
+preconfigured files that should work with the Polar and WeatherRoutingConfiguration.XML file downloads. 
+These files are the same as xref:#_4_weather_routing_setup[Weather_Routing_Setup]* above.
 
 * Boat.XML
 * Boat-test.XML
@@ -341,8 +342,7 @@ range of True Wind Speed (TWS) is represented (0-60 knots).
 NOTE: These files can be inspected and edited with a text editor such as
 Notepad++ or they can more easily be edited using the _Polar section_
 *Edit* Menu and the two Tabs *Grid* and *Dimensions*. Learn how they are
-formatted (particularly *.pol) as this will assist you in creating
-useful polars for your boat. +
+formatted (particularly *.pol) as this will assist you in creating useful polars for your boat. 
  
 *Polar Files for Learning (User Friendly)*
 
@@ -359,7 +359,7 @@ Use either Sail or Power for TWS-0-6
 . TWS-0-6-Power.pol (power for light winds)
 . TWS-0-6.pol (sail set light winds - 170% Jib)
 . TWS-0-20.pol (sail set medium winds -120% Jib)
-. TWS-20-60.pol (sail set heavy winds - Trysail + Storm Jib)
+. TWS-20-60.pol (sail set heavy winds - Trysail and Storm Jib)
 
 image::tws-0-6-power.jpg[title="tws-0-6-power.pol",width=200,link="_images/tws-0-6-power.jpg"]
 
@@ -503,19 +503,18 @@ Moreover, if multiple routes are computed and shown (selected), when stepping th
 
 When you step through the grib you will see the boat position at that current grib time (not “the multipier of the two time intervals”). This can be right on an isochrone or between two isochrones (if grib interval is smaller than wxrte time interval).
 
-=== 19. Two Grib Files (Wind + Current)
+=== 19. Two Grib Files (Wind and Current)
 
 Weather Routing will use two grib files that are loaded by Grib_pi. This
 is useful when you have downloaded a GFS Wind and Pressure Grib, and an
 RTOFS Current Grib of similar time period and resolution. First
 xref:opencpn-plugins:grib_weather:grib_weather.adoc#_load_two_grib_files_concurrently_wind_current[Load
-two Grib Files Concurrently (Wind + Current)] in Grib_pi. Then in WR
+two Grib Files Concurrently (Wind and Current)] in Grib_pi. Then in WR
 Configuration check the Currents box.
 
-image::wx-route-2grib-grib_current.jpg[title="WR Two Grib Weather + Current",width=500,link="_images/wx-route-2grib-grib_current.jpg"]
+image::wx-route-2grib-grib_current.jpg[title="WR Two Grib Weather and Current",width=500,link="_images/wx-route-2grib-grib_current.jpg"]
 
-In this Baltic Sea example there is an underlying current file with black arrows and the area of the grib is shown in light read. The wind +
-pressure grib is shown with brown arrows with feathers.
++ In this Baltic Sea example there is an underlying current file with black arrows and the area of the grib is shown in light read. The wind pressure grib is shown with brown arrows with feathers.
 
 === 20. Use with Route Manager
 
@@ -539,7 +538,7 @@ Configuration > Options > Basic Tab > Check “Detect Boundary”
 
 . Hurricane Avoidance - Really understanding hurricanes is complex, let the software help you understand.
 . Sample files showing how time interval and max diverted course adjustments may help *completion*
-. Review the xref:irma_examples.html[Irma Hurricane Examples] page and download and install the example files.
+. Review the xref:irma_examples.adoc[Irma Hurricane Examples] page and download and install the example files.
 
 == Boat Performance Data - Polar Data
 
@@ -606,10 +605,8 @@ Frequently Asked Questions is intended to answer questions that might arise.
 
 === WR does not complete?
 
-. Undo the most recent changes you have made if you had it was working
-recently.
+. Undo the most recent changes you have made, if you had it working recently.
 . When this happens go back to basics, Reset to Configuration Default settings. See the http://www.cruisersforum.com/forums/f134/weather-routing-100060-2.html#post2461969[CF Post] 
-
 about this and refer to the default list in this manual above. Or
 download the xref:#_4_weather_routing_setup[Weather_Routing_Setup] above, install it again and start over.
 
