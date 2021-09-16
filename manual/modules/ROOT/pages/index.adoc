@@ -36,7 +36,7 @@ The quest for _perfect_ polars. There are many factors involved and various sour
 * Your boat's xref:_boat_performance_data_polar_data[Boat Performance Data - Polar Data] or xref:_boat_performance_data_outside_sources[Outside Polar File Sources].  Accuracy may vary significantly in different conditions. 
 ** *Polar sample files:* (700) provided. Accuracy for your boat may vary dependent on sails, bottom condition and sea state.
 ** *Actual performance:* measured in specific sea conditions recorded by xref:vdr::index.adoc[VDR_pi] and converted by xref:polar::index.adoc[Polar_pi]. Best recordings are with Zero current, noting sea state.
-** *Calculated Polars:*  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP)] and https://www.orc.org/index.asp?id=21[ORC]. Usually based on theoretical and optimal conditions.   
+** *Calculated Polars:*  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP) - L-36.com list] and https://www.orc.org/index.asp?id=21[ORC Offshore Racing Congress] and https://www.orc.org/rules/ORC%20VPP%20documentation%202021.pdf[ORC VPP Documentation PDF]. Usually based on theoretical and optimal conditions.   
 
 *Boundaries: Routing Avoidance*
 
@@ -47,7 +47,7 @@ The quest for _perfect_ polars. There are many factors involved and various sour
 . xref:help_information.adoc[Help > Information]
 . xref:configuration_defaults.adoc[Configuration Defaults]
 . xref:irma_examples.adoc[Irma Hurricane Example]
-. xref:polar_file_conversion.adoc[Polar File Conversiom]
+. xref:polar_file_conversion.adoc[Polar File Conversion]
 
 == Purpose of Weather Routing (WR)
 
@@ -64,7 +64,7 @@ is worth reviewing first for general principals.
 . Highlight and step through multiple “completed' routes at the same time.
 . Study for best routes dependent on goals and constraints set.
 .. Adjust Wind Speed as a percentage, which helps to set realistic goals.
-.. Include multiple polars in your Boat file for different conditons and sail sets.
+.. Include multiple polars in your Boat file for different conditions and sail sets.
 .. Include a motoring polar in your Boat file particularly for light winds.
 .. Power Boat use for trip start time, fuel reduction, comfort routing and ETA.
 .. Route around predicted high winds (hurricanes), light winds, large waves, etc.
@@ -81,7 +81,7 @@ is worth reviewing first for general principals.
 
 == What does WR look like?
 
-*Weather Routing*: Calculation of the fastest/safest route from a starting point to an ending point given the current national weather forecasts, available wind data, current oceanic currents , the performance of your vessel, and comfort criteria (storms, wind, waves, etc.) http://www.altendorff.co.uk/archives/1151[More about Optimum Weather Route]
+*Weather Routing*: Calculation of the fastest/safest route from a starting point to an ending point given the current national weather forecasts, available wind data, current oceanic currents , the performance of your vessel, and comfort criteria (storms, wind, waves, etc.) http://www.altendorff.co.uk/archives/1151[Altendorff Routing Algorithms - More about Optimum Weather Route]
 
 image::weather_route_data_types_1.jpg[title="Weather Routing using Grib and Climatology Data",width=550,link="_images/weather_route_data_types_1.jpg"]
 
@@ -129,7 +129,7 @@ Weather Routing is a "very capable" plugin which can use six other plugins concu
 . *Grib Weather Table*: When a grib shows on the screen, right click and pick _Weather Table_ (see screenshot below)
 . *WeatherRouting additional information* After computation of a routing, highlight the Configuration, pick _View_ in the menu at the top then select *Settings, Statistics, Report, Plot or Cursor* for more information. (see screenshot below0 
 . *WeatherRouting View settings* Pick View > Settings.
-. xref:help-information.adoc[Help > Information] (Configuration) Access this page from the *Help > Information* Menu. Review while stepping through the plugin menus, looking particularly at *Edit Boat.xml* and *Edit Polar File (.csv, .txt, .pol)* Try to understand the menu system. Boat.xml simply contains a list of boat polar files to use in the routing. The polar files can be edited, saved and saved as.
+. xref:help_information.adoc[Help > Information Menu] (Configuration) Access this page from the *Help > Information* Menu. Review while stepping through the plugin menus, looking particularly at *Edit Boat.xml* and *Edit Polar File (.csv, .txt, .pol)* Try to understand the menu system. Boat.xml simply contains a list of boat polar files to use in the routing. The polar files can be edited, saved and saved as.
 
 == Summary
 
@@ -214,11 +214,11 @@ That's it. But before you can actually *use* Weather_Routing_pi, you first have 
 * Confirn that Climatology has been set to _Most Likely_ in Weather_routing Configuration.
 * Confirm that GSHHS High resolution files have been installed.
 
-+ Note: Legacy PI Package installation files are still available from https://opencpn.org/OpenCPN/plugins/weatherroute.html[Download Page -Linux, Windows, Mac].  Make sure you choose the file that is compatible with your computer system.
+Note: Legacy PI Package installation files are still available from https://opencpn.org/OpenCPN/plugins/weatherroute.html[Download Page -Linux, Windows, Mac].  Make sure you choose the file that is compatible with your computer system.
 
 === 5. Enable OpenGL
 
-+ Activate OpenGL in order to have the route display on top of the grib layer! 
+Activate OpenGL in order to have the route display on top of the grib layer! 
 _Options > Dispay > Advanced > Check Use Accelerated Graphics_
 
 === 6. Check Files & Pathnames
