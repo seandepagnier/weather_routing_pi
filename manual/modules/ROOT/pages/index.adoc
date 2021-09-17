@@ -11,9 +11,9 @@ Development Details: PI Manager (PIM) Workflow uses the Testplugin Template +
 
 * Source: https://github.com/seandepagnier/weather_routing_pi 
 * Maintainer Source: https://github.com/rgleason/weather_routing_pi 
-* Plugin Download, Install and Enable: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions] 
+* Installation Instructions: xref:opencpn-plugins:misc:plugin-install.adoc[Plugin Download, Install and Enable]
 * Legacy Downloads: https://opencpn.org/OpenCPN/plugins/weatherroute.html 
-* Cruiser's Forum Thread: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html[Weather_Routing_pi] 
+* Cruiser's Forum Thread: http://www.cruisersforum.com/forums/f134/weather-routing-100060.html[Weather_Routing_pi]
 
 == Associated Plugins
 
@@ -24,7 +24,7 @@ Development Details: PI Manager (PIM) Workflow uses the Testplugin Template +
 * xref:opencpn-plugins:chart_downloader_tab:chart_downloader_tab.adoc[Chartdownloader] to download High resolution (GSHHS) required to _Detect Land_.
 * xref:climatology::index.adoc[Climatology_pi] Data for default examples and longer voyages. 30 years of NOAA wind, wave & Current data, averaged by month. Climatology is required to run the Examples.
 * xref:opencpn-plugins:grib_weather:grib_weather.adoc[Grib_pi (grb, grb2)] Data predictive wind, wave & current. Used daily, but not with initial Examples.
-* Install and Enable these plugins now: xref:opencpn-plugins:misc:plugin-install.adoc[Instructions]
+* xref:opencpn-plugins:misc:plugin-install.adoc[Instructions] Install and Enable these plugins now.
 
 *Boat Performance Data: Polar Files*
 
@@ -34,13 +34,13 @@ The quest for _perfect_ polars. There are many factors involved and various sour
 * xref:vdr::index.adoc[VDR_pi] Record the OpenCPN nmea0183 data stream.
 
 * Your boat's xref:_boat_performance_data_polar_data[Boat Performance Data - Polar Data] or xref:_boat_performance_data_outside_sources[Outside Polar File Sources].  Accuracy may vary significantly in different conditions. 
-** *Polar sample files:* (700) provided. Accuracy for your boat may vary dependent on sails, bottom condition and sea state.
-** *Actual performance:* measured in specific sea conditions recorded by xref:vdr::index.adoc[VDR_pi] and converted by xref:polar::index.adoc[Polar_pi]. Best recordings are with Zero current, noting sea state.
+** *Polar sample files:* (700) provided from within the plugin. Accuracy for your boat may vary dependent on loading of stores, sails, sail trim, bottom condition and sea state. Many of these polars, some developed by the Builder's Marine Architect using VPP assuming ideal conditions, are overly optimistic! WP has a simple solution, adjust the Wind Strength percent under the Configuration Advanced Tab until you get some good recordings to use.
+** *Actual performance:* measured in specific sea conditions recorded by xref:vdr::index.adoc[VDR_pi] and converted by xref:polar::index.adoc[Polar_pi]. The best recordings are with Zero current, noting sea state and sails set and trim.
 ** *Calculated Polars:*  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP) - L-36.com list] and https://www.orc.org/index.asp?id=21[ORC Offshore Racing Congress] and https://www.orc.org/rules/ORC%20VPP%20documentation%202021.pdf[ORC VPP Documentation PDF]. Usually based on theoretical and optimal conditions.   
 
 *Boundaries: Routing Avoidance*
 
-* xref:opencpn-plugins:ocpn_draw::index.adoc[ODraw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
+* xref:ocpn_draw::index.adoc[Ocpn_Draw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
 
 == Navigation Sub Pages
 
@@ -146,7 +146,7 @@ Weather_routing is remarkably flexible, but with that comes complexity. New user
 
 . Generally the Configuration Default settings are the most reliable available. After hitting *Reset all Advanced* most of the advanced configuration settings can be left alone.
 . However there are definitely some Configuration settings the user must set manually in order to get any results! 
-. The goal first goal is to *Complete* your first routing successfully.
+. The *first goal* is to *Complete* your first routing successfully.
 
 Please follow this tutorial carefully and you will succeed the first time. Once you get familiar with the interface and have had successes, learn all the features gradually, changing and adjusting one setting at a time. Use *Reset Advanced Tab* to go back the working defaults when you run into trouble, or install the example files again for a fresh start.
 
@@ -314,7 +314,7 @@ link:{attachmentsdir}/boat-test-xml.zip[Three Boat.xml zipped files]
 
 unzip to  _C:\ProgramData\opencpn\plugins\weather_routing\boat_ which are
 preconfigured files that should work with the Polar and WeatherRoutingConfiguration.XML file downloads. 
-These files are the same as xref:#_4_weather_routing_setup[Weather_Routing_Setup]* above.
+These files are the same as xref:#_4_setup_weather_routing[4. Setup Weather Routing]* above.
 
 * Boat.XML
 * Boat-test.XML
@@ -350,7 +350,7 @@ link:{attachmentsdir}/polars-pol.zip[Polars-Pol.zip]
 
 Please Download, unzip and copy the six *.pol files listed below into your data\polars directory. For Windows use:
 _C:\ProgramData\opencpn\plugins\weather_routing\data\polars_ These files are the same as
-xref:#_4_weather_routing_setup[Weather_Routing_Setup] above.
+xref:#_4_setup_weather_routing[4. Setup Weather Routing] above.
 
 *Three Stepped Range TWS Files used together* 
 
@@ -493,6 +493,8 @@ can set the alternate route thickness to zero.
 
 === 17. Use with Climatology
 
+First job  xref:#_2_setup_climatology[See 2. Setup Climatology] as many of the samples included with Weather_Routing use Climatology. Don't forget to Enable Climatology and under WR Configuration pick "Most Likely" for Climatology.
+
 === 18. Use with Grib_pi
 
 Boat position (round circle) is when stepping through the grib file (assuming you use a grib file and not climatology of course).
@@ -520,9 +522,9 @@ image::wx-route-2grib-grib_current.jpg[title="WR Two Grib Weather and Current",w
 
 The *Route Manager* can be used for listing the weather route. _Right click_ a weather route and pick “_Properties_”. Also a Weather Routing can be Exported to a gpx file or saved to a Route in Route Manager.
 
-=== 21. Ocpn_Draw_pi (Boundary with guid)
+=== 21. Ocpn_Draw_pi (Boundaries with guid)
 
-Create Boundaries recognized by Weather_Routing_pi. Useful for guiding routing.
+Create Boundaries recognized by Weather_Routing_pi. Boundary avoidance is useful for guiding the routing. Create a boundary in Ocpn_Draw, make sure it is visible and then in WR check "Detect Boundary" under Configuration Options 
 
 image:::wr-ockam-polar-grib-4day-with-boundary.jpg[title="WR Ockam Polar Grib 4 day with boundary",width=600,link="_images/wr-ockam-polar-grib-4day-with-boundary.jpg"]
 
@@ -608,7 +610,7 @@ Frequently Asked Questions is intended to answer questions that might arise.
 . Undo the most recent changes you have made, if you had it working recently.
 . When this happens go back to basics, Reset to Configuration Default settings. See the http://www.cruisersforum.com/forums/f134/weather-routing-100060-2.html#post2461969[CF Post] 
 about this and refer to the default list in this manual above. Or
-download the xref:#_4_weather_routing_setup[Weather_Routing_Setup] above, install it again and start over.
+download the xref:#_4_setup_weather_routing[4. Setup Weather Routing] above, install it again and start over.
 
 === Routings not completing
 
@@ -663,7 +665,7 @@ Create a new position with the same name to replace it. There is then a prompt t
 *Data* Weather_routing is only as good as the data provided by the Grib plugin and the Climatology plugin.
 
 . *Grib plugin*: Depends on recent download grib files from Noaa and other sources. Downloaded Grib predicitions can change significantly over several days. The longer the grib prediction is, the less reliable the grib can be.
-. *Climatology plugin*: Can be used for analyzing long crusing routes through various seasons and constraints, but does not take into account the current weather conditions which often vary significantly from the 30 year average, especially outside of prevailing wind areas.
+. *Climatology plugin*: Can be used for analyzing long cruising routes through various seasons and constraints, but does not take into account the current weather conditions which often vary significantly from the 30 year average, especially outside of prevailing wind areas.
 . *These planning tools* may be helpful, but should be taken with a healthy “grain of salt” as any good sailor (who looks out to the horizon) should know.
 
 *Weather Routes* The weather routes created may not consider or “see” normal navigation considerations and issues, therefore every route should be checked very carefully for navigation markers, shallow depths, bad currents, rocks, land and other obstacles and hazards.
