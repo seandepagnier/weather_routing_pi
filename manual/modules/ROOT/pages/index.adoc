@@ -44,7 +44,7 @@ The quest for _perfect_ polars. There are many factors involved and various sour
 
 == Navigation Sub Pages
 
-. xref::opencpn-plugins:misc:help_information.adoc[Help > Information]
+. xref:help_information.adoc[Help > Information]
 . xref:configuration_defaults.adoc[Configuration Defaults]
 . xref:irma_examples.adoc[Irma Hurricane Example]
 . xref:polar_file_conversion.adoc[Polar File Conversion]
@@ -112,7 +112,7 @@ Example: Routing around Hurricane Irma in avoidance mode. Showing colored Grib_p
 . *X*: End point defined by the “Weather Routing Position” selected in the “Configuration”.
 . *Square*: Small squares along the route, are *sail/polar file* changes (Not shown).
 . *Circle* on the route is the calculated *Boat location* for that time frame as set in Grib_pi. 
-. xref::opencpn-plugins:misc:help_information.adoc[Help > Information Menu] (Configuration) Menus and Definitions 
+. xref:help_information.adoc[Help > Information Menu] (Configuration) Menus and Definitions 
 . xref:opencpn-plugins:misc:terminology.adoc[Terminology Reference] used in this Manual.
 . *Configuration* and *Computation* of a optimal routing is at the center of the plugin.
 * xref:configuration_defaults.adoc[Configuration Defaults] are reset after hitting _Reset all Advanced_.
@@ -129,7 +129,7 @@ Weather Routing is a "very capable" plugin which can use six other plugins concu
 . *Grib Weather Table*: When a grib shows on the screen, right click and pick _Weather Table_ (see screenshot below)
 . *WeatherRouting additional information* After computation of a routing, highlight the Configuration, pick _View_ in the menu at the top then select *Settings, Statistics, Report, Plot or Cursor* for more information. (see screenshot below0 
 . *WeatherRouting View settings* Pick View > Settings.
-. xref:opencpn-plugins:misc:help_information.adoc[Help > Information Menu] (Configuration) Access this page from the *Help > Information* Menu. Review while stepping through the plugin menus, looking particularly at *Edit Boat.xml* and *Edit Polar File (.csv, .txt, .pol)* Try to understand the menu system. Boat.xml simply contains a list of boat polar files to use in the routing. The polar files can be edited, saved and saved as.
+. xref:help_information.adoc[Help > Information Menu] (Configuration) Access this page from the *Help > Information* Menu. Review while stepping through the plugin menus, looking particularly at *Edit Boat.xml* and *Edit Polar File (.csv, .txt, .pol)* Try to understand the menu system. Boat.xml simply contains a list of boat polar files to use in the routing. The polar files can be edited, saved and saved as.
 
 == Summary
 
