@@ -36,11 +36,12 @@ The quest for _perfect_ polars. There are many factors involved and various sour
 * Your boat's xref:_boat_performance_data_polar_data[Boat Performance Data - Polar Data] or xref:_boat_performance_data_outside_sources[Outside Polar File Sources].  Accuracy may vary significantly in different conditions. Three sources for Polar Files:
 ** *Polar sample files:* (700) provided from within the plugin. Accuracy for your boat may vary dependent on loading of stores, sails, sail trim, bottom condition and sea state. Many of these polars, some developed by the Builder's Marine Architect using VPP assuming ideal conditions, are overly optimistic! WP has a simple solution, adjust the Wind Strength percent under the Configuration Advanced Tab until you get some good recordings to use.
 ** *Actual performance:* measured in specific sea conditions recorded by xref:vdr::index.adoc[VDR_pi] and converted by xref:polar::index.adoc[Polar_pi]. The best recordings are with Zero current, noting sea state and sails set and trim.
-** *Calculated Polars:*  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP) - L-36.com list] and https://www.orc.org/index.asp?id=21[ORC Offshore Racing Congress] and https://www.orc.org/rules/ORC%20VPP%20documentation%202021.pdf[ORC VPP Documentation PDF]. Usually based on theoretical and optimal conditions.   
+** *Calculated Polars:*  https://l-36.com/vpp.php[Velocity Prediction Programs (VPP) - L-36.com list] and https://www.orc.org/index.asp?id=21[ORC Offshore Racing Congress] and https://www.orc.org/rules/ORC%20VPP%20documentation%202021.pdf[ORC VPP Documentation PDF]. Another reasonable one I like is https://techsail.com/sailfish-yacht-analyzer/#tab-1[TechSail Sailfish Yacht Analyzer].  These VVP are usually based on theoretical and optimal conditions.   
 
 *Boundaries: Routing Avoidance*
 
 * xref:ocpn_draw::index.adoc[Ocpn_Draw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
+
 
 == Navigation Sub Pages
 
