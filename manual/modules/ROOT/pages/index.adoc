@@ -315,7 +315,7 @@ link:{attachmentsdir}/boat-test-xml.zip[Three Boat.xml zipped files]
 
 unzip to  _C:\ProgramData\opencpn\plugins\weather_routing\boat_ which are
 preconfigured files that should work with the Polar and WeatherRoutingConfiguration.XML file downloads. 
-These files are the same as xref:#_4_setup_weather_routing[4. Setup Weather Routing]* above.
+These files are the same as xref:#_4_setup_weather_routing_pi[4. Setup Weather Routing]* above.
 
 * Boat.XML
 * Boat-test.XML
@@ -351,7 +351,7 @@ link:{attachmentsdir}/polars-pol.zip[Polars-Pol.zip]
 
 Please Download, unzip and copy the six *.pol files listed below into your data\polars directory. For Windows use:
 _C:\ProgramData\opencpn\plugins\weather_routing\data\polars_ These files are the same as
-xref:#_4_setup_weather_routing[4. Setup Weather Routing] above.
+xref:#_4_setup_weather_routing_pi[4. Setup Weather Routing] above.
 
 *Three Stepped Range TWS Files used together* 
 
@@ -494,7 +494,7 @@ can set the alternate route thickness to zero.
 
 === 17. Use with Climatology
 
-First job  xref:#_2_setup_climatology[See 2. Setup Climatology] as many of the samples included with Weather_Routing use Climatology. Don't forget to Enable Climatology and under WR Configuration pick "Most Likely" for Climatology.
+First job  xref:#_2_setup_climatology_pi[See 2. Setup Climatology] as many of the samples included with Weather_Routing use Climatology. Don't forget to Enable Climatology and under WR Configuration pick "Most Likely" for Climatology.
 
 === 18. Use with Grib_pi
 
@@ -611,7 +611,7 @@ Frequently Asked Questions is intended to answer questions that might arise.
 . Undo the most recent changes you have made, if you had it working recently.
 . When this happens go back to basics, Reset to Configuration Default settings. See the http://www.cruisersforum.com/forums/f134/weather-routing-100060-2.html#post2461969[CF Post] 
 about this and refer to the default list in this manual above. Or
-download the xref:#_4_setup_weather_routing[4. Setup Weather Routing] above, install it again and start over.
+download the xref:#_4_setup_weather_routing_pi[4. Setup Weather Routing] above, install it again and start over.
 
 === Routings not completing
 
