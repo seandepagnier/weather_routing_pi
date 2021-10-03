@@ -12,20 +12,20 @@
 
 # bailout on errors and echo commands.
 set -xe
-sudo apt-get -qq update
+sudo apt-get -q -y --allow-unauthenticated --allow-downgrades --allow-remove-essential --allow-change-held-packages update
 
 #PLUGIN=bsb4
 
-sudo apt install flatpak flatpak-builder
+sudo apt --allow-unauthenticated --allow-downgrades --allow-remove-essential --allow-change-held-packages install flatpak flatpak-builder
 
 flatpak remote-add --user --if-not-exists \
-    flathub https://flathub.org/repo/flathub.flatpakrepo
+    flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 
 if [ "$FLATPAK_BRANCH" = "beta" ]; then
         flatpak install --user -y flathub org.freedesktop.Sdk//20.08 >/dev/null
         flatpak remote-add --user --if-not-exists flathub-beta \
-            https://flathub.org/beta-repo/flathub-beta.flatpakrepo
+            https://dl.flathub.org/beta-repo/flathub-beta.flatpakrepo
         flatpak install --user -y flathub-beta \
             org.opencpn.OpenCPN >/dev/null
 else

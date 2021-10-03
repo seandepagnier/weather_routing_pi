@@ -57,6 +57,9 @@ parameters:
     run_build_macos:
         type: boolean
         default: true
+    run_build_macos_wx315:
+        type: boolean
+        default: true
     run_build_android_arm64:
         type: boolean
         default: true
@@ -420,6 +423,25 @@ jobs:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
         - DEPLOY_USE_ORB: true
+        - WXVERSION: 312
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-macos.sh
+        - when:
+            condition: <<pipeline.parameters.run_workflow_deploy>>
+            steps:
+            - cloudsmith/ensure-api-key
+            - cloudsmith/install-cli
+            - run: ci/cloudsmith-upload.sh
+    build-macos-wx315:
+        macos:
+            xcode: "12.5.1"
+        environment:
+        - OCPN_TARGET:  macos
+        - CLOUDSMITH_PKG_EXT: pkg
+        - DEPLOY_USE_ORB: true
+        - WXVERSION: 315
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
@@ -456,10 +478,6 @@ jobs:
             condition: <<pipeline.parameters.run_workflow_deploy>>
             steps:
             - run: ci/cloudsmith-upload.sh
-            # the next process relies on circleci local being run with "--volume --volume <full path to directory for build> /circleci-output:/home/circleci/circleci-output"
-            # it will copy the generated gz file to the local drive so that it can be tested without neededing cloudsmith for the deployment. It is adised to use the "-e DONT_DEPLOY=true"
-            # setting on the circleci command line as this will supress the deploy to cloudsmith whilst generating all the required deployment files
-            #- run: sudo cp build/*.gz ~/circleci-output
 workflows:
     build_1:
         when: <<pipeline.parameters.run_build_armhf_stretch>>
@@ -654,6 +672,17 @@ workflows:
                 tags:
                     only: /.*/
     build_18:
+        when: <<pipeline.parameters.run_build_macos_wx315>>
+        jobs:
+        - build-macos-wx315:
+            filters:
+                branches:
+                    ignore:
+                    - devel
+                    - tmp
+                tags:
+                    only: /.*/
+    build_19:
         when: <<pipeline.parameters.run_build_android_arm64>>
         jobs:
         - build-android-arm64:
@@ -664,7 +693,7 @@ workflows:
                     - tmp
                 tags:
                     only: /.*/
-    build_19:
+    build_20:
         when: <<pipeline.parameters.run_build_android_armhf>>
         jobs:
         - build-android-armhf:

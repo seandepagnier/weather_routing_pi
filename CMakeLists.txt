@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.174  28/06/2021  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.175.4  03/10/2021  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -53,8 +53,8 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "30")
-set(VERSION_TWEAK "4")
-set(VERSION_DATE "07/08/2021")#DD/MM/YYYY format
+set(VERSION_TWEAK "12")
+set(VERSION_DATE "03/10/2021")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -114,7 +114,6 @@ message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 project(${PACKAGE})
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
 
 #========================================================
 include("PluginSetup")
@@ -219,7 +218,9 @@ set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 ## Required to collect all the set( headers and SRCS  - Adjust as required
 ## This add_library  can be used in conditionals below.
 ##================================================================================
+
 SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
+
 ##=========================================
 
 
@@ -228,18 +229,27 @@ SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
 ##=============================================================
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/android/wx)
+# include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/android/wx)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
+# include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+
 # These 3 are included down below
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
+
+if(QT_ANDROID)
+    include_directories(BEFORE ${qt_android_include})
+    include_directories( ${CMAKE_SOURCE_DIR}/extinclude/GLES2)
+
+    #    #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES)
+endif(QT_ANDROID)
 
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
@@ -267,8 +277,8 @@ ENDIF(NOT UNIX)
 
 IF(WIN32)
     IF(MSVC)
-        include_directories(${CMAKE_SOURCE_DIR}/buildwin/include)
-        target_link_libraries(${PACKAGE_NAME} "${CMAKE_SOURCE_DIR}/buildwin/zlib1.lib")
+        include_directories(${PROJECT_SOURCE_DIR}/buildwin/include)
+        target_link_libraries(${PACKAGE_NAME} "${PROJECT_SOURCE_DIR}/buildwin/zlib1.lib")
     ELSE()
         # MINGW
         target_link_libraries(${PACKAGE_NAME} "-lz")
