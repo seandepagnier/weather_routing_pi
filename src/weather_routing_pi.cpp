@@ -93,6 +93,7 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
       b_in_boundary_reply = false;
       m_tCursorLatLon.Connect(wxEVT_TIMER, wxTimerEventHandler
                               ( weather_routing_pi::OnCursorLatLonTimer ), NULL, this);
+      m_pWeather_Routing = NULL;
 }
 
 weather_routing_pi::~weather_routing_pi()
@@ -110,7 +111,7 @@ int weather_routing_pi::Init()
       // Get a pointer to the opencpn display canvas, to use as a parent for the WEATHER_ROUTING dialog
       m_parent_window = GetOCPNCanvasWindow();
 
-//      m_pWeather_Routing = NULL;
+      m_pWeather_Routing = NULL;
 
 #ifdef PLUGIN_USE_SVG
       m_leftclick_tool_id = InsertPlugInToolSVG(_T( "WeatherRouting" ),
