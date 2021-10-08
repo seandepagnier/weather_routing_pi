@@ -31,7 +31,7 @@ if [ "$FLATPAK_BRANCH" = "beta" ]; then
 else
         flatpak install --user -y flathub org.freedesktop.Sdk//18.08 >/dev/null
         flatpak remote-add --user --if-not-exists flathub \
-            https://flathub.org/repo/flathub.flatpakrepo
+           https://dl.flathub.org/repo/flathub.flatpakrepo
         flatpak install --user -y flathub \
             org.opencpn.OpenCPN >/dev/null
         FLATPAK_BRANCH='stable'
