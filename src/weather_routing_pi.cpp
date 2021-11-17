@@ -90,6 +90,32 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
+	  
+	// Create the PlugIn icons  -from shipdriver
+    // loads png file for the listing panel icon
+    wxFileName fn;
+    auto path = GetPluginDataDir("weather_routing_pi");
+    fn.SetPath(path);
+    fn.AppendDir("data");
+    fn.SetFullName("weather_routing_panel.png");
+
+    path = fn.GetFullPath();
+
+    wxInitAllImageHandlers();
+
+    wxLogDebug(wxString("Using icon path: ") + path);
+    if (!wxImage::CanRead(path)) {
+        wxLogDebug("Initiating image handlers.");
+        wxInitAllImageHandlers();
+    }
+    wxImage panelIcon(path);
+    if (panelIcon.IsOk())
+        m_panelBitmap = wxBitmap(panelIcon);
+    else
+        wxLogWarning("Weather_Routing Navigation Panel icon has NOT been loaded");
+// End of from Shipdriver	
+	  
+	  
       b_in_boundary_reply = false;
       m_tCursorLatLon.Connect(wxEVT_TIMER, wxTimerEventHandler
                               ( weather_routing_pi::OnCursorLatLonTimer ), NULL, this);
@@ -179,10 +205,14 @@ int weather_routing_pi::GetPlugInVersionMinor()
       return PLUGIN_VERSION_MINOR;
 }
 
-wxBitmap *weather_routing_pi::GetPlugInBitmap()
-{
-    return new wxBitmap(_img_WeatherRouting->ConvertToImage().Copy());
-}
+// wxBitmap *weather_routing_pi::GetPlugInBitmap()
+//{
+//    return new wxBitmap(_img_WeatherRouting->ConvertToImage().Copy());
+//}
+
+// Shipdriver uses the climatology_panel.png file to make the bitmap.
+wxBitmap *weather_routing_pi::GetPlugInBitmap()  { return &m_panelBitmap; }
+// End of shipdriver process
 
 wxString weather_routing_pi::GetCommonName()
 {

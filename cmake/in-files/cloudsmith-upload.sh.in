@@ -228,31 +228,43 @@ pwd
 ls -la
 ls -la ~/.
 
+# Find if file exists in directory
+function have_any() {
+    [ $# -gt 0 ]
+}
+
 if [ ! -z ${LOCAL_DEPLOY+x} ]; then
     if [ -d "/home/circleci/circleci-output" ]; then
         sudo cp build/*.gz ~/circleci-output
-        sudo cp build/*.deb ~/circleci-output
+        if have_any ./build/*.deb; then
+            sudo cp build/*.deb ~/circleci-output
+        elif have_any ./build/*.exe; then
+            sudo cp build/*.exe ~/circleci-output
+        fi
     else
         echo "Directory ~/circleci-output not found"
     fi
 elif [ $LOCAL_BUILD = false ]; then
-    cloudsmith push raw --republish --no-wait-for-sync \
-        --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
-        --version ${VERSION} \
-        --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
-        $REPO $xml
-
-    cloudsmith push raw --republish --no-wait-for-sync \
-        --name $tarball_name \
-        --version ${VERSION} \
-        --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
-        $REPO $tarball
-
-    if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
+# Only upload if the owner did the pull request. Non-owners probably don't have security to upload to the cloudsmith repository
+    if [ "$CIRCLE_PROJECT_USERNAME" = "$CIRCLE_USERNAME" ]; then
         cloudsmith push raw --republish --no-wait-for-sync \
-            --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+            --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
             --version ${VERSION} \
-            --summary "@PACKAGE@ .${PKG_EXT} installation package" \
-            $REPO $pkg
+            --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
+            $REPO $xml
+
+        cloudsmith push raw --republish --no-wait-for-sync \
+            --name $tarball_name \
+            --version ${VERSION} \
+            --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
+            $REPO $tarball
+
+        if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
+            cloudsmith push raw --republish --no-wait-for-sync \
+                --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+                --version ${VERSION} \
+                --summary "@PACKAGE@ .${PKG_EXT} installation package" \
+                $REPO $pkg
+        fi
     fi
 fi

@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.176.1  08/10/2021  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.180 17/11/2021  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -30,12 +30,14 @@
 set(CMLOC "CMakeLists: ")
 
 # define minimum cmake version
-cmake_minimum_required(VERSION 3.1.1)
+cmake_minimum_required(VERSION 3.5.1)
 if(COMMAND cmake_policy)
     if(POLICY CMP0043)
         cmake_policy(SET CMP0043 NEW)
     endif(POLICY CMP0043)
     cmake_policy(SET CMP0048 NEW)
+# Need cmake 3.13 to implement this, but raspbian builds are at 3.7.2 and bionic at 3.10 and xenial builds at 3.5.1
+#    cmake_policy(SET CMP0076 NEW)
     if(POLICY CMP0077)
         cmake_policy(SET CMP0077 NEW)
     endif(POLICY CMP0077)
@@ -52,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "32")
+set(VERSION_PATCH "33")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "10/10/2021")#DD/MM/YYYY format
+set(VERSION_DATE "17/11/2021")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -66,22 +68,18 @@ set(PARENT "opencpn")
 #Now set in plugin configure, needed to build flatpak, also locally.
 #set(GIT_REPOSITORY_SERVER "github.com")
 
-#No longer needed, queried.
-# set(GIT_USER "rgleason")
-# set(GIT_REPOSITORY_NAME "weather_routing_pi")
-
 ## Specifies Cloudsmith upload repository suffix for each catalog
 set(PROD "prod")   #Standard Repos
 set(BETA "beta")   #Standard Repos
 set(ALPHA "alpha") #Standard Repos
 
-#set(CLOUDSMITH_USER "rick-gleason")
-set(CLOUDSMITH_USER "opencpn")
-
 # Set if  Cloudsmith Base Repository name does not match your Git Repository name.
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Ricks's customization
 set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #without the _pi
+
+set(CLOUDSMITH_USER "opencpn")
+#set(CLOUDSMITH_USER "rick-gleason")
 
 # Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
@@ -95,6 +93,8 @@ option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# Use local version of GLU library
+#set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 #set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
 # Don't use local version of GLU library
@@ -212,7 +212,15 @@ add_definitions(-DPLUGIN_USE_SVG)
 
 set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 
+
+# ----- If using JSON validation in plugin section below is needed ----- ##
+
+
 # Do not need Json Schema Validation
+
+
+# ----- If using JSON validation in plugin section above is needed ----- ##
+
 
 ##================================================================================
 ## Required to collect all the set( headers and SRCS  - Adjust as required
@@ -245,11 +253,12 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
 
 if(QT_ANDROID)
-    include_directories(BEFORE ${qt_android_include})
     include_directories( ${CMAKE_SOURCE_DIR}/extinclude/GLES2)
-
-    #    #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES)
 endif(QT_ANDROID)
+
+##
+## ----- Change above to match project requirements for android build ----- ##
+##
 
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
@@ -267,6 +276,24 @@ if(NOT OCPN_FLATPAK_CONFIG)
 endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
+
+#
+# ----- If using JSON validation in plugin section below is needed ----- ##
+#
+
+# Do not need Json Schema Validation
+
+
+# ----- If using JSON validation in plugin section above is needed ----- ##
+#
+
+##
+## ----- Change above to match project requirements ----- ##
+##
+
+##
+## ----- do not change next section - needed to configure build process ----- ##
+##
 
 IF(NOT UNIX)
     include_directories(src/zlib-1.2.3)
@@ -305,6 +332,7 @@ add_subdirectory(libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
 
+# Needed for all builds
 # ----- Do not change - needed to build app ----- ##
 #========================================================
 include("PluginInstall")

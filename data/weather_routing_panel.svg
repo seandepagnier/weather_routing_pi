@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
-   sodipodi:docname="weather_routing_pi.svg"
+   sodipodi:docname="weather_routing_panel.svg"
    id="svg8"
    style="fill-rule:evenodd;clip-rule:evenodd;"
    xml:space="preserve"
@@ -21,12 +21,12 @@
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
      id="defs12" /><sodipodi:namedview
-     inkscape:current-layer="g1806"
+     inkscape:current-layer="svg8"
      inkscape:window-maximized="1"
      inkscape:window-y="-8"
      inkscape:window-x="-8"
      inkscape:cy="17.52381"
-     inkscape:cx="13.352381"
+     inkscape:cx="12.933333"
      inkscape:zoom="26.25"
      showgrid="false"
      id="namedview10"
@@ -42,7 +42,11 @@
      pagecolor="#ffffff"
      inkscape:document-rotation="0"
      inkscape:pagecheckerboard="0" /><g
-     id="g4276"><rect
+     id="g4276"
+     style="display:none"
+     inkscape:export-filename="C:\Users\fcgle\source\weather_routing_pi\data\g4276.png"
+     inkscape:export-xdpi="95.537247"
+     inkscape:export-ydpi="95.537247"><rect
        style="fill:#282828"
        height="32.154999"
        width="32.021999"
