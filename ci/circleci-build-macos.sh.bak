@@ -15,7 +15,7 @@ for pkg in cairo cmake gettext libarchive libexif python wget; do
     brew link --overwrite $pkg || brew install $pkg
 done
 
-if [ -n "$WXVERSION" ] && [ "$WXVERSION" -eq "315" ]; then
+if [ -n "$WXVERSION" ] && [ "$WXVERSION" eq "315" ]; then
     curl -o wx315_opencpn50_macos1010.tar.xz https://download.opencpn.org/s/MCiRiq4fJcKD56r/download
     tar xJf wx315_opencpn50_macos1010.tar.xz -C /tmp
     WX_EXECUTABLE=/tmp/wx315_opencpn50_macos1010/bin/wx-config

@@ -77,6 +77,7 @@ commands:
                     - run: sudo rm /usr/bin/python3
                     - run: sudo ln -s /usr/bin/python3.7 /usr/bin/python3
                     - run: ls -la /usr/bin/python*
+                    - run: sudo apt install -y python3.7 python3-pip
                 - when:
                     condition: <<parameters.use-orb>>
                     steps:
@@ -169,7 +170,7 @@ jobs:
             install-python: true
     build-bionic:
         docker:
-        - image: circleci/buildpack-deps:bionic-scm
+        - image: cimg/base:stable-18.04
         environment:
         - OCPN_TARGET:  bionic
         - DEPLOY_USE_ORB: true
@@ -187,7 +188,7 @@ jobs:
         - deploy-code
     build-bionic-gtk3:
         docker:
-        - image: circleci/buildpack-deps:bionic-scm
+        - image: cimg/base:stable-18.04
         environment:
         - BUILD_GTK3: true
         - OCPN_TARGET:  bionic-gtk3
@@ -206,7 +207,7 @@ jobs:
         - deploy-code
     build-focal-gtk3:
         docker:
-        - image: circleci/buildpack-deps:focal-scm
+        - image: cimg/base:stable-20.04
         environment:
         - BUILD_GTK3: true
         - OCPN_TARGET: focal-gtk3
@@ -328,28 +329,28 @@ jobs:
         - deploy-code
     build-android-arm64:
         docker:
-        - image: circleci/android:api-28-ndk
+        - image: cimg/android:2021.10.2-ndk
+        resource_class: large
         environment:
         - OCPN_TARGET:  android-arm64
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
         - run: bash ci/circleci-build-android-arm64.sh
-        - when:
-            condition: <<pipeline.parameters.run_workflow_deploy>>
-            steps:
-            - run: ci/cloudsmith-upload.sh
+        - deploy-code:
+            install-python: true
     build-android-armhf:
         docker:
-        - image: circleci/android:api-28-ndk
+        - image: cimg/android:2021.10.2-ndk
+        resource_class: large
         environment:
         - OCPN_TARGET:  android-armhf
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
         - run: bash ci/circleci-build-android-armhf.sh
-        - when:
-            condition: <<pipeline.parameters.run_workflow_deploy>>
-            steps:
-            - run: ci/cloudsmith-upload.sh
+        - deploy-code:
+            install-python: true
 
