@@ -54,7 +54,7 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "37")
+set(VERSION_PATCH "38")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE "17/02/2021")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
