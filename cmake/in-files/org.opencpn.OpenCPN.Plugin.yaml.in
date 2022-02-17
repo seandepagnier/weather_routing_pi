@@ -13,12 +13,14 @@ modules:
     config-opts:
         - -DCMAKE_INSTALL_PREFIX=/app/extensions/${PACKAGE}
         - -DOCPN_FLATPAK_BUILD=ON
+        - -DOCPN_TARGET=${OCPN_TARGET}
         - -DSDK_VER=${SDK_VER}
+        - -DWX_VER=${WX_VER}
     build-options:
         cflags: -fPIC
         cxxflags: -fPIC -DFLATPAK
         strip: true
     sources:
        - type: git
-         url: git://${GIT_REPOSITORY_SERVER}/${GIT_REPOSITORY}
+         url: https://${GIT_REPOSITORY_SERVER}/${GIT_REPOSITORY}
          ${GIT_BRANCH_OR_TAG}: ${GIT_REPOSITORY_ITEM}

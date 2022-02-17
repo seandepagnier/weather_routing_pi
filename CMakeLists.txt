@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.185.0 08/12/2021  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.193.0 07/02/2021  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "35")
+set(VERSION_PATCH "37")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "08/12/2021")#DD/MM/YYYY format
+set(VERSION_DATE "17/02/2021")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -194,7 +194,10 @@ SET (HDRS
 
 set(EXTSRC
 )
-# set(EXTINCLUDE     extinclude/ODAPI.h     extinclude/ODJSONSchemas.h)
+# set(EXTINCLUDE     
+#    extinclude/ODAPI.h     
+#    extinclude/ODJSONSchemas.h
+#)
 
 set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
@@ -253,7 +256,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
 
 if(QT_ANDROID)
-    include_directories( ${CMAKE_SOURCE_DIR}/extinclude/GLES2)
+    include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
 endif(QT_ANDROID)
 
 ##

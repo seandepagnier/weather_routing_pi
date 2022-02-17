@@ -124,9 +124,9 @@ echo $tarball_basename
 
 source $BUILD_DIR/pkg_version.sh
 if [ -n "${OCPN_TARGET}" ]; then
-    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@@PKG_TARGET_WX_VER@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
 else
-    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@-${PKG_TARGET_VERSION}-tarball
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@@PKG_TARGET_WX_VER@-${PKG_TARGET_VERSION}-tarball
 fi
 
 if [ "$(ls $BUILD_DIR/*.${PKG_EXT})" ]; then
@@ -248,7 +248,7 @@ elif [ $LOCAL_BUILD = false ]; then
 # Only upload if the owner did the pull request. Non-owners probably don't have security to upload to the cloudsmith repository
     if [ "$CIRCLE_PROJECT_USERNAME" = "$CIRCLE_USERNAME" ]; then
         cloudsmith push raw --republish --no-wait-for-sync \
-            --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
+            --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@@PKG_TARGET_WX_VER@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
             --version ${VERSION} \
             --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
             $REPO $xml
@@ -261,7 +261,7 @@ elif [ $LOCAL_BUILD = false ]; then
 
         if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
             cloudsmith push raw --republish --no-wait-for-sync \
-                --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+                --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@PKG_TARGET_WX_VER@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
                 --version ${VERSION} \
                 --summary "@PACKAGE@ .${PKG_EXT} installation package" \
                 $REPO $pkg
