@@ -63,10 +63,10 @@ workflows:
             <<: *std-filters
         - build-macos-wx315:
             <<: *std-filters
-        - build-android-arm64:
-            <<: *std-filters
-        - build-android-armhf:
-            <<: *std-filters
+##        - build-android-arm64:
+##            <<: *std-filters
+##        - build-android-armhf:
+##            <<: *std-filters
 
 orbs:
     cloudsmith: cloudsmith/cloudsmith@1.0.4
@@ -313,6 +313,7 @@ jobs:
         - BUILD_GTK3: true
         - OCPN_TARGET:  bionic-gtk3
         - DEPLOY_USE_ORB: true
+        - BUILD_ENV=ubuntu
         steps:
         - checkout
         - run: >
@@ -332,6 +333,7 @@ jobs:
         - BUILD_GTK3: true
         - OCPN_TARGET: focal-gtk3
         - DEPLOY_USE_ORB: true
+        - BUILD_ENV=ubuntu
         steps:
         - checkout
         - run: >
