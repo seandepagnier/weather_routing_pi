@@ -432,10 +432,11 @@ jobs:
         resource_class: arm.medium
         environment:
         - OCPN_TARGET:  flatpak-arm64
-        - FLATPAK_BRANCH: beta
+        - FLATPAK_BRANCH: stable
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 20.08
         - DEPLOY_USE_ORB: true
+        - WXWIDGETS_FORCE_VERSION: 3.0
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
