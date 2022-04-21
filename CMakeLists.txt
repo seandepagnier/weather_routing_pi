@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.194.1 02/04/2022  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.196.0 02/04/2022  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "40")
-set(VERSION_TWEAK "1")
-set(VERSION_DATE "12/04/2021")#DD/MM/YYYY format
+set(VERSION_PATCH "41")
+set(VERSION_TWEAK "0")
+set(VERSION_DATE "15/04/2022")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -94,7 +94,8 @@ option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 set(CMAKE_CXX_STANDARD 11)
 
 # Use local version of GLU library
-#set(USE_LOCAL_GLU TRUE)
+# requires libs/glu directory
+set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 #set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
 # Don't use local version of GLU library
@@ -194,10 +195,10 @@ SET (HDRS
 
 set(EXTSRC
 )
-# set(EXTINCLUDE     
-#    extinclude/ODAPI.h     
-#    extinclude/ODJSONSchemas.h
-#)
+ set(EXTINCLUDE     
+    extinclude/ODAPI.h     
+    extinclude/ODJSONSchemas.h
+)
 
 set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
@@ -240,14 +241,12 @@ SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
 ##=============================================================
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-# include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/android/wx)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-# include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wx/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 
 # These 3 are included down below
