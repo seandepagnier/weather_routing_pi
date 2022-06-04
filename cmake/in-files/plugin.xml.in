@@ -16,7 +16,7 @@
 
   <target>${PKG_TARGET_FULL}</target>
   <build-target>${PKG_BUILD_TARGET}</build-target>
-  <build-gtk>${PKG_BUILD_GTK}</build-gtk>
+  <build-gtk>${PKG_BUILT_WITH_GTK}</build-gtk>
   <target-version>${PKG_TARGET_VERSION}</target-version>
   <target-arch>${ARCH}</target-arch>
   <tarball-url>

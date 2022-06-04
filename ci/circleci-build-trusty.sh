@@ -7,7 +7,7 @@ set -xe
 sudo apt-get -qq update
 sudo apt-get install devscripts equivs gdebi libglu1-mesa-dev
 
-# Install extra libs
+# Install extra build libs
 ME=$(echo ${0##*/} | sed 's/\.sh//g')
 EXTRA_LIBS=extras/extra_libs.txt
 if test -f "$EXTRA_LIBS"; then

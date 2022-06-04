@@ -1,0 +1,13 @@
+# add flatpak-build args in here like this:
+#finish-args:
+#    - --socket=x11
+#    - --socket=pulseaudio
+#    - --filesystem=home
+#    - --device=all
+# be carefull about indents and naming.
+finish-args:
+    - --socket=x11
+    - --socket=pulseaudio
+    - --filesystem=home
+    - --device=all
+

@@ -12,6 +12,16 @@
 
 # bailout on errors and echo commands.
 set -xe
+
+if [ "${CIRCLECI_LOCAL,,}" = "true" ]; then
+    if [[ -d ~/circleci-cache ]]; then
+        if [[ -f ~/circleci-cache/apt-proxy ]]; then
+            cat ~/circleci-cache/apt-proxy | sudo tee -a /etc/apt/apt.conf.d/00aptproxy
+            cat /etc/apt/apt.conf.d/00aptproxy
+        fi
+    fi
+fi
+
 sudo apt-get -q -y --allow-unauthenticated --allow-downgrades --allow-remove-essential --allow-change-held-packages update
 
 #PLUGIN=bsb4

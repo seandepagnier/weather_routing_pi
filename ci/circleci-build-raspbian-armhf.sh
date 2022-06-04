@@ -6,7 +6,7 @@
 
 # bailout on errors and echo commands.
 set -xe
-#sudo apt-get -qq update
+sudo apt-get -qq update
 
 DOCKER_SOCK="unix:///var/run/docker.sock"
 
@@ -20,12 +20,7 @@ else
     docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 fi
 
-docker run --privileged -d -ti -e "container=docker"  -v $(pwd):/ci-source:rw -v ~/source_top:/source_top $DOCKER_IMAGE /bin/bash
-
-DOCKER_CONTAINER_ID=$(docker ps | grep $DOCKER_IMAGE | awk '{print $1}')
-
-echo $OCPN_TARGET
-docker exec -ti $DOCKER_CONTAINER_ID /bin/bash -xec \
+docker run --privileged -d -ti -e "container=docker"  \
     -e "CIRCLECI=$CIRCLECI" \
     -e "CIRCLE_BRANCH=$CIRCLE_BRANCH" \
     -e "CIRCLE_TAG=$CIRCLE_TAG" \
@@ -34,15 +29,16 @@ docker exec -ti $DOCKER_CONTAINER_ID /bin/bash -xec \
     -e "GIT_REPOSITORY_SERVER=$GIT_REPOSITORY_SERVER" \
     -e "OCPN_TARGET=$OCPN_TARGET" \
     -e "BUILD_GTK3=$BUILD_GTK3" \
+    -e "BUILD_ENV=$BUILD_ENV" \
     -e "TZ=$TZ" \
-    -e "DEBIAN_FRONTEND=$DEBIAN_FRONTEND"
+    -e "DEBIAN_FRONTEND=$DEBIAN_FRONTEND" \
+    -v $(pwd):/ci-source:rw -v ~/source_top:/source_top $DOCKER_IMAGE /bin/bash
 
-# Run build script
+DOCKER_CONTAINER_ID=$(docker ps | grep $DOCKER_IMAGE | awk '{print $1}')
+
+echo $OCPN_TARGET
+# Construct and run build script
 rm -f build.sh
-echo "export BUILD_GTK3=$BUILD_GTK3" | tee -a build.sh
-#cat >> build.sh << "EOF"
-#echo "Acquire::http::Proxy \"http://192.168.1.1:3142\";" | tee -a /etc/apt/apt.conf.d/00aptproxy
-#EOF
 
 if [ "$BUILD_ENV" = "raspbian" ]; then
     if [ "$OCPN_TARGET" = "buster-armhf" ]; then
@@ -81,13 +77,18 @@ else
         software-properties-common devscripts equivs wget git build-essential gettext wx-common libgtk2.0-dev libwxbase3.0-dev libbz2-dev libcurl4-openssl-dev libexpat1-dev libcairo2-dev libarchive-dev liblzma-dev libexif-dev lsb-release openssl libssl-dev
 EOF5
         if [ "$OCPN_TARGET" = "buster-armhf" ]; then
-           cat >> build.sh << "EOF6"
-           apt-get -y --no-install-recommends --fix-missing install libwxgtk3.0-dev
+            echo "BUILD_GTK3: $BUILD_GTK3"
+            if [ ! -n "$BUILD_GTK3" ] || [ "$BUILD_GTK3" = "false" ]; then
+                echo "Building for GTK2"
+                cat >> build.sh << "EOF6"
+                apt-get -y --no-install-recommends --fix-missing install libwxgtk3.0-dev
 EOF6
-        else
-            cat >> build.sh << "EOF7"
-            apt-get -y --no-install-recommends --fix-missing install libwxgtk3.0-gtk3-dev
+            else
+                echo "Building for GTK3"
+                cat >> build.sh << "EOF7"
+                apt-get -y --no-install-recommends --fix-missing install libwxgtk3.0-gtk3-dev
 EOF7
+            fi
         fi
         if [ "$OCPN_TARGET" = "focal-armhf" ]; then
             cat >> build.sh << "EOF8"
@@ -111,6 +112,21 @@ EOF10
     fi
 fi
 
+# Install extra build libs
+ME=$(echo ${0##*/} | sed 's/\.sh//g')
+EXTRA_LIBS=./ci/extras/extra_libs.txt
+if test -f "$EXTRA_LIBS"; then
+    while read line; do
+        sudo apt-get install $line
+    done < $EXTRA_LIBS
+fi
+EXTRA_LIBS=./ci/extras/${ME}_extra_libs.txt
+if test -f "$EXTRA_LIBS"; then
+    while read line; do
+        sudo apt-get install $line
+    done < $EXTRA_LIBS
+fi
+
 cat build.sh
 
 if type nproc &> /dev/null
@@ -119,7 +135,7 @@ then
 fi
 
 docker exec -ti \
-    $DOCKER_CONTAINER_ID /bin/bash -xec "bash -xe ci-source/build.sh; export BUILD_ENV=$BUILD_ENV; export BUILD_GTK3=$BUILD_GTK3; rm -rf ci-source/build; mkdir ci-source/build; cd ci-source/build; cmake ..; make $BUILD_FLAGS; make package; chmod -R a+rw ../build;"
+    $DOCKER_CONTAINER_ID /bin/bash -xec "bash -xe ci-source/build.sh; rm -rf ci-source/build; mkdir ci-source/build; cd ci-source/build; cmake ..; make $BUILD_FLAGS; make package; chmod -R a+rw ../build;"
 
 echo "Stopping"
 docker ps -a

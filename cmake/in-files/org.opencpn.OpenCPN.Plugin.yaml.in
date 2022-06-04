@@ -5,6 +5,9 @@ sdk: org.freedesktop.Sdk//${SDK_VER}
 build-extension: true
 separate-locales: false
 appstream-compose: false
+${finish_args}
+${build_options}
+
 modules:
   - name: ${PACKAGE}
     no-autogen: true
@@ -24,3 +27,4 @@ modules:
        - type: git
          url: https://${GIT_REPOSITORY_SERVER}/${GIT_REPOSITORY}
          ${GIT_BRANCH_OR_TAG}: ${GIT_REPOSITORY_ITEM}
+${flatpak_extra_modules}

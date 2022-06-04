@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.196.0 02/04/2022  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.209.0 04/06/2022  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "41")
+set(VERSION_PATCH "42")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "15/04/2022")#DD/MM/YYYY format
+set(VERSION_DATE "06/06/2022")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -97,7 +97,7 @@ set(CMAKE_CXX_STANDARD 11)
 # requires libs/glu directory
 set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
-#set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
+set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
 # Don't use local version of GLU library
 #set(USE_LOCAL_GLU FALSE)             #not operational
 

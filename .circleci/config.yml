@@ -27,6 +27,9 @@ workflows:
             <<: *std-filters
         - build-armhf-debian-buster:
             <<: *std-filters
+## Ready to build gtk3 version of armhf debian buster
+        - build-armhf-debian-buster-gtk3:
+            <<: *std-filters
 ## Derecated in favour of ubuntu-armhf:20.04 build - 14/01/2022
 ##        - build-armhf-bullseye:
 ##            <<: *std-filters
@@ -60,13 +63,13 @@ workflows:
         - build-flatpak-arm64:
             <<: *std-filters
         - build-macos:
-            <<: *std-filters
+           <<: *std-filters
         - build-macos-wx315:
-            <<: *std-filters
+           <<: *std-filters
         - build-android-arm64:
-            <<: *std-filters
+           <<: *std-filters
         - build-android-armhf:
-            <<: *std-filters
+           <<: *std-filters
 
 orbs:
     cloudsmith: cloudsmith/cloudsmith@1.0.4
@@ -87,32 +90,20 @@ commands:
                 - when:
                     condition: <<parameters.install-python>>
                     steps:
-                    - run: sudo apt install software-properties-common
-                    - run: sudo add-apt-repository ppa:deadsnakes/ppa -y
-                    - run: sudo apt update
-                    - run: sudo apt install -y python3.7
-                    - run: ls -la /usr/bin/python*
-                    - run: sudo rm /usr/bin/python3
-                    - run: sudo ln -s /usr/bin/python3.7 /usr/bin/python3
-                    - run: ls -la /usr/bin/python*
-                    - run: sudo apt install -y python3.7 python3-pip
+                    - run: sudo apt install -y python3-pip
+                    - run: python3.8 -m pip install cloudsmith-cli
                 - when:
                     condition: <<parameters.use-orb>>
                     steps:
                     - cloudsmith/ensure-api-key
                     - cloudsmith/install-cli
                 - run: ci/cloudsmith-upload.sh
-    # add - use-apt-proxy before the '- run: ci/circleci-build*.sh' if building locally and there is an apt proxy available. It will speed up the build considerably if on a slow connection.
-    use-apt-proxy:
-        parameters:
-            use-proxy:
-                type: boolean
-                default: true
-        steps:
-            - when:
-                condition: <<parameters.use-proxy>>
-                steps:
-                - run: echo "Acquire::http::Proxy \"http://192.168.1.1:3142\";" | sudo tee -a /etc/apt/apt.conf.d/00aptproxy
+
+    # if you want to use a local proxy add Acquire::http::Proxy \"http://192.168.1.1:3142\"; to a file called circleci-cache/apt-proxy. This will require
+    #    --volume {your local directory}/circleci-cache:/home/circleci/circleci-cache
+    # on the circleci local command line so that the docker image script can have access to the directory
+    # if you are on a slow or data limited internet link you can put a copy of master.zip here, or allow one to be downloaded by the script, as it is used by the android builds to
+    # provide the wxWidgets QT information.
 
 jobs:
     build-armhf-stretch:
@@ -171,6 +162,23 @@ jobs:
         - DOCKER_IMAGE=jongough/debian-armhf:buster
         - BUILD_FLAGS=-j3
         - BUILD_ENV=debian
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-armhf-debian-buster-gtk3:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=buster-armhf
+        - DOCKER_IMAGE=jongough/debian-armhf:buster
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - BUILD_GTK3: true
         - DEPLOY_USE_ORB: true
         steps:
         - checkout
@@ -486,7 +494,6 @@ jobs:
         resource_class: large
         environment:
         - OCPN_TARGET:  android-armhf
-        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ci/*.sh

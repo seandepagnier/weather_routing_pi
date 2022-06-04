@@ -4,20 +4,30 @@
 # Build the Debian artifacts
 #
 set -xe
+
+if [ "${CIRCLECI_LOCAL,,}" = "true" ]; then
+    if [[ -d ~/circleci-cache ]]; then
+        if [[ -f ~/circleci-cache/apt-proxy ]]; then
+            cat ~/circleci-cache/apt-proxy | sudo tee -a /etc/apt/apt.conf.d/00aptproxy
+            cat /etc/apt/apt.conf.d/00aptproxy
+        fi
+    fi
+fi
+
 sudo apt-get -qq update
 sudo apt-get install devscripts equivs
 
 rm -rf build && mkdir build && cd build
 
-# Install extra libs
+# Install extra build libs
 ME=$(echo ${0##*/} | sed 's/\.sh//g')
-EXTRA_LIBS=../ci/extras/extra_libs.txt
+EXTRA_LIBS=./ci/extras/extra_libs.txt
 if test -f "$EXTRA_LIBS"; then
     while read line; do
         sudo apt-get install $line
     done < $EXTRA_LIBS
 fi
-EXTRA_LIBS=../ci/extras/${ME}_extra_libs.txt
+EXTRA_LIBS=./ci/extras/${ME}_extra_libs.txt
 if test -f "$EXTRA_LIBS"; then
     while read line; do
         sudo apt-get install $line
