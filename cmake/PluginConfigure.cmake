@@ -359,6 +359,7 @@ IF(DEFINED _wx_selected_config)
         MESSAGE (STATUS "${CMLOC}Using GLESv2 for Android")
         ADD_DEFINITIONS(-DUSE_ANDROID_GLES2)
         ADD_DEFINITIONS(-DUSE_GLSL)
+        ADD_DEFINITIONS(-DocpnUSE_GLES2)
         include_directories( ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES )
         set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} ${PROJECT_SOURCE_DIR}/libs/glshim/include/GLES)
 

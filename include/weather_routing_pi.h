@@ -52,10 +52,10 @@ std::cout << x << std::endl; } while (0)
 #ifndef _WEATHER_ROUTINGPI_H_
 #define _WEATHER_ROUTINGPI_H_
 
-#ifndef __OCPN__ANDROID__
+//#ifndef __OCPN__ANDROID__
 #define GetDateCtrlValue GetValue
 #define GetTimeCtrlValue GetValue
-#endif
+//#endif
 
 #include "version.h"
 
@@ -102,8 +102,8 @@ public:
       wxString GetShortDescription();
       wxString GetLongDescription();
 	  //from Shipdriver for definition of panel icon
-	  wxBitmap m_panelBitmap; 	  
-	  
+	  wxBitmap m_panelBitmap;
+
       bool InBoundary(double lat, double lon);
 
       bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
