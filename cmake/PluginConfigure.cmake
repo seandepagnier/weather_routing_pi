@@ -270,10 +270,11 @@ if(MINGW)
 endif(MINGW)
 
 if(APPLE)
-    add_definitions("-Wall -Wno-unused -fexceptions -Wno-overloaded-virtual")
-    add_definitions(" -g -fno-strict-aliasing")
-    add_definitions(" -Wno-deprecated -Wno-deprecated-declarations -Wno-unknown-pragmas")
-    add_definitions(" -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_")
+    string(APPEND CMAKE_CXX_FLAGS " -Wall -Wno-unused -fexceptions -Wno-overloaded-virtual")
+    string(APPEND CMAKE_CXX_FLAGS " -g -fno-strict-aliasing")
+    string(APPEND CMAKE_CXX_FLAGS " -Wno-deprecated -Wno-deprecated-declarations -Wno-unknown-pragmas")
+    string(APPEND CMAKE_CXX_FLAGS " -D_WCHAR_H_CPLUSPLUS_98_CONFORMANCE_")
+    string(APPEND CMAKE_CXX_FLAGS " -DAPPLE")
 endif(APPLE)
 
 # Add some definitions to satisfy MS

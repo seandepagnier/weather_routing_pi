@@ -51,13 +51,13 @@ workflows:
             <<: *std-filters
         - build-buster:
             <<: *std-filters
-        - build-flatpak-arm64:
-            <<: *std-filters
         - build-flatpak-x86-2008:
             <<: *std-filters
         - build-flatpak-x86-2008-beta:
             <<: *std-filters
         - build-flatpak-x86-1808:
+            <<: *std-filters
+        - build-flatpak-arm64:
             <<: *std-filters
         - build-macos:
             <<: *std-filters
@@ -436,7 +436,6 @@ jobs:
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 20.08
         - DEPLOY_USE_ORB: true
-        - WXWIDGETS_FORCE_VERSION: 3.0
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
