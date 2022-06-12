@@ -35,6 +35,15 @@
 #include "SettingsDialog.h"
 #include "georef.h"
 
+
+void WR_GetCanvasPixLL(PlugIn_ViewPort *vp, wxPoint *pp, double lat, double lon)
+{
+    wxPoint2DDouble pix_double;
+    GetDoubleCanvasPixLL(vp, &pix_double, lat, lon);
+    pp->x = (int)wxRound(pix_double.m_x);
+    pp->y = (int)wxRound(pix_double.m_y);
+}
+
 RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
     : wxThread(wxTHREAD_JOINABLE), m_RouteMapOverlay(routemapoverlay)
 {
@@ -235,8 +244,8 @@ void RouteMapOverlay::DrawLine(RoutePoint *p1, RoutePoint *p2,
                                piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint p1p, p2p;
-    GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
-    GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
+    WR_GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
+    WR_GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
 
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC()) {
@@ -265,8 +274,8 @@ void RouteMapOverlay::DrawLine(RoutePoint *p1, wxColour &color1, RoutePoint *p2,
 #endif
 
     wxPoint p1p, p2p;
-    GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
-    GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
+    WR_GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
+    WR_GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
 
     SetColor(dc, color1);
 #ifndef __OCPN__ANDROID__
@@ -386,7 +395,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
         if(!std::isnan(configuration.StartLat)) {
             wxPoint r;
-            GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
+            WR_GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
             SetColor(dc, *wxBLUE, true);
             SetWidth(dc, 3, true);
             dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
@@ -396,7 +405,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
         if(!std::isnan(configuration.EndLat)) {
             wxPoint r;
-            GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
+            WR_GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
             SetColor(dc, *wxRED, true);
             SetWidth(dc, 3, true);
             dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
@@ -414,7 +423,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             /* center display list on start lat/lon */
 
             wxPoint point;
-            GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+            WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
             glTranslated(point.x, point.y, 0);
             glScalef(vp.view_scale_ppm / NORM_FACTOR, vp.view_scale_ppm / NORM_FACTOR, 1);
@@ -569,7 +578,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         if (positionOnRoute != NULL)
         {
             wxPoint r;
-            GetCanvasPixLL(&vp, &r, positionOnRoute->lat, positionOnRoute->lon);
+            WR_GetCanvasPixLL(&vp, &r, positionOnRoute->lat, positionOnRoute->lon);
             wxColour ownBlue(20, 83, 186);
             SetColor(dc, ownBlue, true);
             dc.StrokeCircle( r.x, r.y, 7 );
@@ -609,7 +618,7 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
         if(itt->polar == polar)
             continue;
         wxPoint r;
-        GetCanvasPixLL(&vp, &r, itt->lat, itt->lon);
+        WR_GetCanvasPixLL(&vp, &r, itt->lat, itt->lon);
         int s = 6;
 #ifndef __OCPN__ANDROID__
         if(!dc.GetDC()) {
@@ -836,7 +845,7 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, piD
            break; // don't draw if grib time is after end
 
         wxPoint r;
-        GetCanvasPixLL(&vp, &r,
+        WR_GetCanvasPixLL(&vp, &r,
                            plat + d*(it->lat - plat), plon + d*heading_resolve(it->lon - plon));
 
         dc.DrawCircle( r.x, r.y, 7 );
@@ -877,7 +886,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
     for ( std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); it++)
     {
         wxPoint p;
-        GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
+        WR_GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
 
         // available
         //   WG VWG : winds over ground
@@ -916,7 +925,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
 
     // Draw the wind barbs
     wxPoint point;
-    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
     wxColour colour;
     if (apparentWind)
     {
@@ -985,10 +994,10 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
     nvp.rotation = nvp.skew = 0;
 
     wxPoint p1, p2, p3, p4;
-    GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
-    GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
-    GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
-    GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
 
     wxRect r;
     r.x = wxMin(wxMin(p1.x, p2.x), wxMin(p3.x, p4.x));
@@ -1022,7 +1031,7 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
         Lock();
 
         wxPoint p;
-        GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
+        WR_GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
         int xoff = p.x%(int)step, yoff = p.y%(int)step;
 
         IsoChronList::iterator it = origin.end();
@@ -1112,7 +1121,7 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
     wxColour colour(180, 140, 14);
 
     wxPoint point;
-    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
     if(dc.GetDC())
         dc.SetPen( wxPen( colour, 2 ) );
@@ -1175,10 +1184,10 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
     nvp.rotation = nvp.skew = 0;
 
     wxPoint p1, p2, p3, p4;
-    GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
-    GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
-    GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
-    GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
 
     wxRect r;
     r.x = wxMin(wxMin(p1.x, p2.x), wxMin(p3.x, p4.x));
@@ -1211,7 +1220,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
         Lock();
 
         wxPoint p;
-        GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
+        WR_GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
         int xoff = p.x%(int)step, yoff = p.y%(int)step;
 
         IsoChronList::iterator it = origin.end();
@@ -1310,7 +1319,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
     wxColour colour(0, 0, 0);
 
     wxPoint point;
-    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
     if(dc.GetDC())
         dc.SetPen( wxPen( colour, 2 ) );
