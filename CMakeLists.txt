@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.209.0 04/06/2022  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.211.0 06/13/2022  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,7 +54,7 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "43")
+set(VERSION_PATCH "44")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE  "06/06/2022")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
@@ -242,7 +242,7 @@ SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/glu/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)

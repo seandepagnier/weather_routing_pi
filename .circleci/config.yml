@@ -52,6 +52,8 @@ workflows:
             <<: *std-filters
         - build-focal-gtk3:
             <<: *std-filters
+        - build-jammy:
+            <<: *std-filters
         - build-buster:
             <<: *std-filters
         - build-flatpak-x86-2008:
@@ -348,6 +350,24 @@ jobs:
             echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal main" | sudo tee -a /etc/apt/sources.list
         - run: >
             echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal-updates main" | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - deploy-code
+    build-jammy:
+        docker:
+        - image: cimg/base:edge-22.04
+        environment:
+        - BUILD_GTK3: true
+        - OCPN_TARGET: jammy
+        - DEPLOY_USE_ORB: true
+        - BUILD_ENV=ubuntu
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy-updates main" | sudo tee -a /etc/apt/sources.list
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
