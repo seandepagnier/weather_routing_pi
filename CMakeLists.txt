@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.211.0 06/13/2022  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.212.0 06/16/2022  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "44")
+set(VERSION_PATCH "45")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "06/06/2022")#DD/MM/YYYY format
+set(VERSION_DATE  "16/06/2022")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -231,7 +231,11 @@ set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 ## This add_library  can be used in conditionals below.
 ##================================================================================
 
+
+
 SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
+
+
 
 ##=========================================
 
@@ -257,6 +261,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 if(QT_ANDROID)
     include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
 endif(QT_ANDROID)
+
 
 ##
 ## ----- Change above to match project requirements for android build ----- ##
