@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.212.0 06/16/2022  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.213.0 17/06/2022  DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "13")
-set(VERSION_PATCH "45")
+set(VERSION_PATCH "46")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "16/06/2022")#DD/MM/YYYY format
+set(VERSION_DATE  "17/06/2022")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
