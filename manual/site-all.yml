@@ -1,0 +1,25 @@
+site:
+  title: Weather Routing Manual
+  url:  https://nowhere.net
+  start_page: weather_routing::index.adoc
+  start_page: weather_routing::irma_examples.adoc
+  start_page: weather_routing::information.adoc
+  start_page: weather_routing::configuration_defaults.adoc
+  start_page: weather_routing::file_conversion.adoc
+  
+
+content:
+  sources:
+    - url: ..
+      start_path: manual
+      branches: HEAD
+      edit_url: https://github.com/opencpn-manuals/weather_routing_pi/edit/master/{path}
+
+ui:   
+  bundle:
+    url: https://gitlab.com/leamas/antora-ui-default/-/raw/master/latest/ui-bundle.zip
+    snapshot: true
+
+output:
+  dir: ./docs
+  clean: true              

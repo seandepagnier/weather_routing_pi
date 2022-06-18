@@ -27,13 +27,22 @@
 #include <wx/glcanvas.h>
 
 #include "ocpn_plugin.h"
-#include "plugingl/pidc.h"
+#include "pidc.h"
 #include "json/json.h"
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "SettingsDialog.h"
 #include "georef.h"
+
+
+void WR_GetCanvasPixLL(PlugIn_ViewPort *vp, wxPoint *pp, double lat, double lon)
+{
+    wxPoint2DDouble pix_double;
+    GetDoubleCanvasPixLL(vp, &pix_double, lat, lon);
+    pp->x = (int)wxRound(pix_double.m_x);
+    pp->y = (int)wxRound(pix_double.m_y);
+}
 
 RouteMapOverlayThread::RouteMapOverlayThread(RouteMapOverlay &routemapoverlay)
     : wxThread(wxTHREAD_JOINABLE), m_RouteMapOverlay(routemapoverlay)
@@ -107,7 +116,7 @@ bool RouteMapOverlay::Start(wxString &error)
         error = _("Configuration specifies cyclone track avoidance and Climatology cyclone data is not available");
         return false;
     }
- 
+
     if(configuration.DetectBoundary &&
        !RouteMap::ODFindClosestBoundaryLineCrossing) {
         error = _("Configuration specifies boundary exclusion but ocpn_draw_pi boundary data not available");
@@ -235,8 +244,8 @@ void RouteMapOverlay::DrawLine(RoutePoint *p1, RoutePoint *p2,
                                piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint p1p, p2p;
-    GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
-    GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
+    WR_GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
+    WR_GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
 
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC()) {
@@ -265,8 +274,8 @@ void RouteMapOverlay::DrawLine(RoutePoint *p1, wxColour &color1, RoutePoint *p2,
 #endif
 
     wxPoint p1p, p2p;
-    GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
-    GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
+    WR_GetCanvasPixLL(&vp, &p1p, p1->lat, p1->lon);
+    WR_GetCanvasPixLL(&vp, &p2p, p2->lat, p2->lon);
 
     SetColor(dc, color1);
 #ifndef __OCPN__ANDROID__
@@ -309,6 +318,7 @@ static wxColour TransparentColor(wxColor c)
 void RouteMapOverlay::RenderIsoRoute(IsoRoute *r, wxColour &grib_color, wxColour &climatology_color,
                                      piDC &dc, PlugIn_ViewPort &vp)
 {
+
     SkipPosition *s = r->skippoints;
     if(!s)
         return;
@@ -385,7 +395,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
         if(!std::isnan(configuration.StartLat)) {
             wxPoint r;
-            GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
+            WR_GetCanvasPixLL(&vp, &r, configuration.StartLat, configuration.StartLon);
             SetColor(dc, *wxBLUE, true);
             SetWidth(dc, 3, true);
             dc.DrawLine(r.x, r.y-10, r.x+10, r.y+7);
@@ -395,7 +405,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
         if(!std::isnan(configuration.EndLat)) {
             wxPoint r;
-            GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
+            WR_GetCanvasPixLL(&vp, &r, configuration.EndLat, configuration.EndLon);
             SetColor(dc, *wxRED, true);
             SetWidth(dc, 3, true);
             dc.DrawLine(r.x-10, r.y-10, r.x+10, r.y+10);
@@ -403,7 +413,9 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         }
 
         static const double NORM_FACTOR = 16;
-        bool use_dl = vp.m_projection_type == PI_PROJECTION_MERCATOR;
+
+        // Do not use displaylist processing to avoid incorrect vp calculations in O562+
+        bool use_dl = false; //vp.m_projection_type == PI_PROJECTION_MERCATOR;
 #ifndef __OCPN__ANDROID__
         if(!dc.GetDC() && use_dl) {
             glPushMatrix();
@@ -411,7 +423,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             /* center display list on start lat/lon */
 
             wxPoint point;
-            GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+            WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
             glTranslated(point.x, point.y, 0);
             glScalef(vp.view_scale_ppm / NORM_FACTOR, vp.view_scale_ppm / NORM_FACTOR, 1);
@@ -433,7 +445,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 
                 if(!m_overlaylist)
                     m_overlaylist = glGenLists(1);
-            
+
                 glNewList(m_overlaylist, GL_COMPILE);
 
                 nvp.clat = configuration.StartLat, nvp.clon = configuration.StartLon;
@@ -467,7 +479,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 #ifndef __OCPN__ANDROID__
                 if(!dc.GetDC())
                     glBegin(GL_LINES);
-#endif                
+#endif
                 for(; it != origin.end(); ++it)
                     for(IsoRouteList::iterator rit = (*it)->routes.begin();
                         rit != (*it)->routes.end(); ++rit) {
@@ -485,7 +497,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                 {  0,   0, 128}, {  0, 192,   0}, {  0, 128, 192}, {  0, 255,   0},
                 {  0,   0, 255}, {  0, 128, 128}, {  0, 255,   0}, {  0, 192, 192},
                 {  0, 128, 255}, {  0, 255, 128}, {  0,   0, 255}, {  0, 192,   0},
-                {  0,   0, 128}, {  0, 255,   0}, {  0, 192, 128}, {  0, 128, 255}, 
+                {  0,   0, 128}, {  0, 255,   0}, {  0, 192, 128}, {  0, 128, 255},
                 {  0, 192,   0}, {  0, 128,   0}, {  0,   0, 255}, {  0, 192, 192}};
 #if 0
                 {255, 127,   0}, {255, 127, 127},
@@ -508,17 +520,17 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                     wxColor grib_color(routecolors[c][0], routecolors[c][1], routecolors[c][2], 224);
                     wxColor climatology_color(255-routecolors[c][0], routecolors[c][2],
                                               routecolors[c][1], 224);
-                
+
                     for(IsoRouteList::iterator j = (*i)->routes.begin(); j != (*i)->routes.end(); ++j)
                         RenderIsoRoute(*j, grib_color, climatology_color, dc, nvp);
-                
+
                     if(++c == (sizeof routecolors) / (sizeof *routecolors))
                         c = 0;
                     Lock();
                 }
                 Unlock();
             }
-        
+
 #ifndef __OCPN__ANDROID__
             if(!dc.GetDC() && use_dl) {
                 glEndList();
@@ -528,7 +540,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
 #endif
         }
     }
-    
+
     int RouteThickness = settingsdialog.m_sRouteThickness->GetValue();
     if(RouteThickness) {
         wxColour CursorColor = settingsdialog.m_cpCursorRoute->GetColour(),
@@ -559,20 +571,20 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
         bool apparent = settingsdialog.m_cbDisplayApparentWindBarbs->GetValue();
         if (lineWidth > 0)
             RenderWindBarbsOnRoute(dc, vp, lineWidth, apparent);
-            
+
         // CUSTOMIZATION
         // Display the position of the cursor on route
         // where the infos are read from Route Position window
         if (positionOnRoute != NULL)
         {
             wxPoint r;
-            GetCanvasPixLL(&vp, &r, positionOnRoute->lat, positionOnRoute->lon);
+            WR_GetCanvasPixLL(&vp, &r, positionOnRoute->lat, positionOnRoute->lon);
             wxColour ownBlue(20, 83, 186);
             SetColor(dc, ownBlue, true);
             dc.StrokeCircle( r.x, r.y, 7 );
         }
-        
-        
+
+
         if(MarkAtPolarChange) {
             SetColor(dc, Darken(DestinationColor), true);
             SetWidth(dc, (RouteThickness+1)/2, true);
@@ -588,7 +600,7 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
 
     if(!pos)
         return;
-    
+
     std::list<PlotData> plot = GetPlotData(cursor_route);
     std::list<PlotData>::iterator itt =  plot.begin();
     if (itt == plot.end()) {
@@ -598,15 +610,15 @@ void RouteMapOverlay::RenderPolarChangeMarks(bool cursor_route, piDC &dc, PlugIn
 #ifndef __OCPN__ANDROID__
     if(!dc.GetDC())
         glBegin(GL_LINES);
-#endif    
-    
+#endif
+
     int polar = itt->polar;
     for(; itt != plot.end(); itt++)
     {
         if(itt->polar == polar)
             continue;
         wxPoint r;
-        GetCanvasPixLL(&vp, &r, itt->lat, itt->lon);
+        WR_GetCanvasPixLL(&vp, &r, itt->lat, itt->lon);
         int s = 6;
 #ifndef __OCPN__ANDROID__
         if(!dc.GetDC()) {
@@ -641,9 +653,9 @@ int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
      * All these calculations are empirical and just made from experience and how
      * people feel sailing comfort which is a highly subjective value...
      */
-    
+
     double level_calc = 0.0;
-    
+
     // Define mximum constants. Over this value, sailing comfort is very impacted
     // (coef > 1) and automatically displayed in red.
     // Definitions:
@@ -653,13 +665,13 @@ int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
     double MAX_WV = 27;     // Vigilant over 27knts == 7B
     double MAX_AW = 35;     // Upwind start at 35° from wind
     double MAX_WVHT = 5;    // No more than 5m waves
-    
+
     // Wind impact exponentially on sailing comfort
     // We propose a power 3 function as difficulties increase exponentially
     // Over 30knts, it starts to be tough
     double WV = plot.VW;
     double WV_normal = pow(WV/MAX_WV, 3);
-   
+
     // Wind direction impact on sailing comfort.
     // Ex: if you decide to sail upwind with 30knts, it is not the same
     // conditions as if you sail downwind (impact of waves, heel, and more).
@@ -670,7 +682,7 @@ int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
     double mu = 35;
     double amp = 20;
     double AW_normal = amp * (1/(teta*pow((2*M_PI), 0.5))) * exp(-pow(AW-mu, 2)/(2*pow(teta,2)));
-    
+
     // If available, add swell conditions in comfort model.
     // Use same exponential function for swell as sailing
     // comfort exponentially decrease with swell height.
@@ -678,11 +690,11 @@ int RouteMapOverlay::sailingConditionLevel(const PlotData &plot) const
     double WVHT_normal = 0.0;
     if (WVHT > 0)
         WVHT_normal = pow(WVHT/MAX_WVHT, 2);
-    
+
     // Calculate score
     // Use an OR function X,Y E [0,1], f(X,Y) = 1-(1-X)(1-Y)
     level_calc = 1 - (1 - WV_normal * (1 + AW_normal) * (1 + WVHT_normal));
-    
+
     if (level_calc <= 0.5)
         // Light conditions, enjoy ;-)
         return 1;
@@ -736,14 +748,16 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
         // never draw comfort if cursor route
         assert(comfortRoute == false);
         if (!rte) {
+#ifndef __OCPN__ANDROID__
             if(!dc.GetDC())
                 glBegin(GL_LINES);
-
+#endif
             for(Position *p = pos; p && p->parent; p = p->parent)
                 DrawLine(p, p->parent, dc, vp);
-
+#ifndef __OCPN__ANDROID__
             if(!dc.GetDC())
                 glEnd();
+#endif
         }
         Unlock();
         return;
@@ -783,8 +797,8 @@ void RouteMapOverlay::RenderCourse(bool cursor_route, piDC &dc, PlugIn_ViewPort 
             wxColor c = sailingConditionColor(sailingConditionLevel(*itt));
             DrawLine(to, c, from, lc, dc, vp);
             lc = c;
-        } 
-        else 
+        }
+        else
             DrawLine(to, from, dc, vp);
     }
 
@@ -806,12 +820,12 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, piD
     Position *pos = cursor_route ? last_cursor_position : last_destination_position;
     if(!pos)
         return;
-    
+
     std::list<PlotData> plot = GetPlotData(cursor_route);
-    
+
     for(auto it = plot.begin(); it != plot.end(); )  {
         wxDateTime ittime = it->time;
-        
+
         wxDateTime timestart = ittime;
         double plat = it->lat;
         double plon = it->lon;
@@ -831,7 +845,7 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, piD
            break; // don't draw if grib time is after end
 
         wxPoint r;
-        GetCanvasPixLL(&vp, &r,
+        WR_GetCanvasPixLL(&vp, &r,
                            plat + d*(it->lat - plat), plon + d*heading_resolve(it->lon - plon));
 
         dc.DrawCircle( r.x, r.y, 7 );
@@ -850,7 +864,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
      * OpenCPN's licence
      * March, 2018
      */
-    
+
     if (vp.bValid == false)
         return;
 
@@ -864,7 +878,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
     // lon, wind info for each points, only if needed.
     std::list<PlotData> plot = GetPlotData(false);
 
-    // if no route has been calculated by WeatherRouting, 
+    // if no route has been calculated by WeatherRouting,
     // then stops the method.
     if (plot.empty())
         return;
@@ -872,8 +886,8 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
     for ( std::list<PlotData>::iterator it = plot.begin(); it != plot.end(); it++)
     {
         wxPoint p;
-        GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
-        
+        WR_GetCanvasPixLL(&nvp, &p, it->lat, it->lon);
+
         // available
         //   WG VWG : winds over ground
         //   W VW : winds over water
@@ -883,11 +897,11 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
         //   B  VB  : boat speed over water
         float windSpeed = it->VW;
         float windDirection = it->W; // heading_resolve(it->B - it->W);
-        
+
         // By default, display true wind
         float finalWindSpeed = windSpeed;
         float finalWindDirection = windDirection;
-        
+
         if (apparentWind)
         {
             finalWindSpeed = Polar::VelocityApparentWind(it->VB,
@@ -899,7 +913,7 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
                                              heading_resolve(it->B - windDirection),
                                              it->VW));
         }
-        
+
         // Draw barbs
         g_barbsOnRoute_LineBufferOverlay.setLineWidth(lineWidth);
         g_barbsOnRoute_LineBufferOverlay.pushWindArrowWithBarbs(wind_barb_route_cache,
@@ -908,10 +922,10 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
                                                                 +nvp.rotation, it->lat < 0, true);
     }
     wind_barb_route_cache.Finalize();
-    
+
     // Draw the wind barbs
     wxPoint point;
-    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
     wxColour colour;
     if (apparentWind)
     {
@@ -923,26 +937,26 @@ void RouteMapOverlay::RenderWindBarbsOnRoute(piDC &dc, PlugIn_ViewPort &vp, int 
         wxColour purple(170, 0, 170);
         colour = purple;
     }
-    
+
     if(dc.GetDC())
     {
         dc.SetPen(wxPen(colour, 2));
     }
-    
+
 #if defined(ocpnUSE_GL) && !defined(__OCPN__ANDROID__)
     else
     {
         // Mandatory to avoid display issue when moving map
         // (map disappear to show a gray background...)
         glPushMatrix();
-        
+
         // Anti-aliasing options to render
         // wind barbs at best quality (copy from grip_pi)
         glEnable(GL_BLEND);
         glEnable(GL_LINE_SMOOTH);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        
+
         glColor3ub(colour.Red(), colour.Green(), colour.Blue());
         glLineWidth(lineWidth);
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -980,10 +994,10 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
     nvp.rotation = nvp.skew = 0;
 
     wxPoint p1, p2, p3, p4;
-    GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
-    GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
-    GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
-    GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
 
     wxRect r;
     r.x = wxMin(wxMin(p1.x, p2.x), wxMin(p3.x, p4.x));
@@ -993,7 +1007,7 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
 
     // we could somehow "append" to the cache as passing occurs when zoomed really far
     // in rather than making a complete cache... but how complex does it need to be?
-    // quick an dirty, convert to double or integer may overflow 
+    // quick an dirty, convert to double or integer may overflow
     bool nocache = (double)r.width*(double)r.height > (double)(vp.rv_rect.width*vp.rv_rect.height*4) ||
         vp.m_projection_type != PI_PROJECTION_MERCATOR;
 
@@ -1017,9 +1031,9 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
         Lock();
 
         wxPoint p;
-        GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
+        WR_GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
         int xoff = p.x%(int)step, yoff = p.y%(int)step;
-    
+
         IsoChronList::iterator it = origin.end();
         it--;
         for(double x = r.x + xoff; x<r.x+r.width; x+=step) {
@@ -1028,7 +1042,7 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
                 GetCanvasLLPix( &nvp, wxPoint(x, y), &lat, &lon );
 
                 Position p(lat, configuration.positive_longitudes ? positive_degrees(lon) : lon);
-                
+
                 // find the first isochron we are outside of using the isochron from
                 // the last point as an initial guess to reduce the amount of expensive Contains calls
                 if(!(*it)->Contains(p)) {
@@ -1107,7 +1121,7 @@ void RouteMapOverlay::RenderWindBarbs(piDC &dc, PlugIn_ViewPort &vp)
     wxColour colour(180, 140, 14);
 
     wxPoint point;
-    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
     if(dc.GetDC())
         dc.SetPen( wxPen( colour, 2 ) );
@@ -1170,10 +1184,10 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
     nvp.rotation = nvp.skew = 0;
 
     wxPoint p1, p2, p3, p4;
-    GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
-    GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
-    GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
-    GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p1, latmin, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p2, latmin, lonmax );
+    WR_GetCanvasPixLL( &nvp, &p3, latmax, lonmin );
+    WR_GetCanvasPixLL( &nvp, &p4, latmax, lonmax );
 
     wxRect r;
     r.x = wxMin(wxMin(p1.x, p2.x), wxMin(p3.x, p4.x));
@@ -1183,7 +1197,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
 
     // we could somehow "append" to the cache as passing occurs when zoomed really far
     // in rather than making a complete cache... but how complex does it need to be?
-    // quick an dirty, convert to double or integer may overflow 
+    // quick an dirty, convert to double or integer may overflow
     bool nocache = (double)r.width*(double)r.height > (double)(vp.rv_rect.width*vp.rv_rect.height*9) ||
         vp.m_projection_type != PI_PROJECTION_MERCATOR;
 
@@ -1206,9 +1220,9 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
         Lock();
 
         wxPoint p;
-        GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
+        WR_GetCanvasPixLL( &nvp, &p, configuration.StartLat, configuration.StartLon );
         int xoff = p.x%(int)step, yoff = p.y%(int)step;
-    
+
         IsoChronList::iterator it = origin.end();
         it--;
         for(double x = r.x + xoff; x<r.x+r.width; x+=step) {
@@ -1217,7 +1231,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
                 GetCanvasLLPix( &nvp, wxPoint(x, y), &lat, &lon );
 
                 Position p(lat, configuration.positive_longitudes ? positive_degrees(lon) : lon);
-                
+
                 // find the first isochron we are outside of using the isochron from
                 // the last point as an initial guess to reduce the amount of expensive Contains calls
                 if(!(*it)->Contains(p)) {
@@ -1244,7 +1258,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
                 configuration.grib_is_data_deficient = (*it)->m_Grib_is_data_deficient;
                 p.grib_is_data_deficient = configuration.grib_is_data_deficient;
                 bool v1, v2;
-                
+
                 v1 = p.GetCurrentData(configuration, W1, VW1, data_mask1);
 
                 it++;
@@ -1261,7 +1275,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
                 // XX climatology angle is to not from
                 if ((data_mask1 & Position::CLIMATOLOGY_CURRENT))
                     W1 += 180.0;
-                if ((data_mask2 & Position::CLIMATOLOGY_CURRENT)) 
+                if ((data_mask2 & Position::CLIMATOLOGY_CURRENT))
                     W2 += 180.0;
 #endif
 
@@ -1305,7 +1319,7 @@ void RouteMapOverlay::RenderCurrent(piDC &dc, PlugIn_ViewPort &vp)
     wxColour colour(0, 0, 0);
 
     wxPoint point;
-    GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
+    WR_GetCanvasPixLL(&vp, &point, configuration.StartLat, configuration.StartLon);
 
     if(dc.GetDC())
         dc.SetPen( wxPen( colour, 2 ) );
@@ -1352,7 +1366,7 @@ void RouteMapOverlay::GetLLBounds(double &latmin, double &latmax, double &lonmin
     latmin = INFINITY, lonmin = INFINITY;
     latmax = -INFINITY, lonmax = -INFINITY;
 
-    IsoChron *last = origin.back();    
+    IsoChron *last = origin.back();
     for(IsoRouteList::iterator it = last->routes.begin(); it != last->routes.end(); ++it) {
         Position *pos = (*it)->skippoints->point;
         do {
@@ -1375,7 +1389,7 @@ void RouteMapOverlay::RequestGrib(wxDateTime time)
     v["Hour"] = time.GetHour();
     v["Minute"] = time.GetMinute();
     v["Second"] = time.GetSecond();
-    
+
     Json::FastWriter w;
 
     SendPluginMessage("GRIB_TIMELINE_RECORD_REQUEST", w.write(v));
@@ -1403,7 +1417,7 @@ std::list<PlotData> &RouteMapOverlay::GetPlotData(bool cursor_route)
         RouteMapConfiguration configuration = GetConfiguration();
         Lock();
         IsoChronList::iterator it = origin.begin(), itp;
-        
+
         for(Position *p = pos; p; p=p->parent)
             if(++it == origin.end()) {
                 Unlock();
@@ -1634,7 +1648,7 @@ void RouteMapOverlay::UpdateDestination()
         for(IsoRouteList::iterator it = isochron->routes.begin(); it != isochron->routes.end(); ++it) {
             configuration.grib = isochron->m_Grib;
             configuration.grib_is_data_deficient = isochron->m_Grib_is_data_deficient;
-            
+
             configuration.time = isochron->time;
             configuration.UsedDeltaTime = isochron->delta;
             (*it)->PropagateToEnd(configuration, mindt, endp, minH,
@@ -1684,7 +1698,7 @@ Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, d
     /* Method to find the closest calculated position of the boat on
      * the weather route based on the cursor position
      */
-    
+
     double dist = INFINITY;
     std::list<PlotData> plot = GetPlotData(false);
     bool found = false;
@@ -1703,7 +1717,7 @@ Position* RouteMapOverlay::getClosestRoutePositionFromCursor(double cursorLat, d
     }
     if (!found)
         return nullptr;
-    
+
     // Get full position
     Position *pos = last_destination_position;
     for(Position *p = pos; p && p->parent; p = p->parent)

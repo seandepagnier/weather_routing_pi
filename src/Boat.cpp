@@ -26,7 +26,7 @@
 #include <wx/wx.h>
 #include <wx/filename.h>
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 
 #include "weather_routing_pi.h"
 #include "Utilities.h"

@@ -61,36 +61,50 @@ fi
 set -x
 
 if [ "$CIRCLECI" ] || [ "$TRAVIS" ]; then
-    if pyenv versions 2>&1 >/dev/null; then
-        pyenv versions
-        if ! pyenv global 3.7.1 2>&1 >/dev/null; then
-            if ! pyenv global 3.7.0 2>&1>/dev/null; then
-                pyenv global 3.5.2
+    if [ ! "$DEPLOY_USE_ORB" ]; then
+        if pyenv versions 2>&1 >/dev/null; then
+            pyenv versions
+            if ! pyenv global 3.9.1 2>&1 >/dev/null; then
+                if ! pyenv global 3.8.6 2>&1 >/dev/null; then
+                    if ! pyenv global 3.7.1 2>&1 >/dev/null; then
+                        if ! pyenv global 3.7.0 2>&1>/dev/null; then
+                            if ! pyenv global 3.5.2 2>&1>/dev/null; then
+                                sudo apt install software-properties-common
+                                sudo apt update
+                                sudo apt install -y python3.8 python3-pip
+                                sudo rm /usr/bin/python3
+                                sudo ln -s /usr/bin/python3.8 /usr/bin/python3
+                                pyenv global 3.8
+                            fi
+                        fi
+                    fi
+                fi
             fi
+            python3 --version
+            sudo python3 -m pip install cloudsmith-cli
+            pyenv rehash
+        elif dnf --version 2>&1 >/dev/null; then
+            sudo dnf -y install python3-pip python3-setuptools
+            sudo python3 -m pip install -q cloudsmith-cli
+        elif apt-get --version 2>&1 >/dev/null; then
+            COUNTER=0
+            sudo apt install software-properties-common
+            sudo apt update
+            sudo apt install -y python3.8
+            sudo rm /usr/bin/python3
+            sudo ln -s /usr/bin/python3.8 /usr/bin/python3
+            until
+                sudo apt-get install python3-pip python3-setuptools
+            do
+                if [ "$COUNTER" -gt  "20" ]; then
+                    exit -1
+                fi
+                sleep 5
+                ((COUNTER++))
+            done
+            sudo python3 -m pip install --upgrade pip
+            sudo python3 -m pip install -q cloudsmith-cli
         fi
-       #pyenv global 3.7.1
-        python3 -m pip install --upgrade pip
-        python3 -m pip install -q cloudsmith-cli
-        pyenv rehash
-    elif dnf --version 2>&1 >/dev/null; then
-        sudo dnf install python3-pip python3-setuptools
-        sudo python3 -m pip install -q cloudsmith-cli
-    elif apt-get --version 2>&1 >/dev/null; then
-        COUNTER=0
-        until
-            sudo apt-get install python3-pip python3-setuptools
-        do
-            if [ "$COUNTER" -gt  "20" ]; then
-                exit -1
-            fi
-            sleep 5
-            ((COUNTER++))
-        done
-        sudo python3 -m pip install -q cloudsmith-cli
-    else
-        sudo -H python3 -m ensurepip
-        sudo -H python3 -m pip install -q setuptools
-        sudo -H python3 -m pip install -q cloudsmith-cli
     fi
 fi
 
@@ -108,9 +122,9 @@ echo $tarball_basename
 
 source $BUILD_DIR/pkg_version.sh
 if [ -n "${OCPN_TARGET}" ]; then
-    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
 else
-    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@-${PKG_TARGET_VERSION}-tarball
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-${PKG_TARGET_VERSION}-tarball
 fi
 
 if [ "$(ls $BUILD_DIR/*.${PKG_EXT})" ]; then
@@ -182,7 +196,7 @@ cat $xml
 ls -l $BUILD_DIR
 cur_dir=$(pwd)
 gunzip -f $tarball
-cd $BUILD_DIR
+cd "$BUILD_DIR"
 rm -f metadata.xml
 tarball_tar=$(ls *.tar)
 xml_here=$(ls *.xml)
@@ -193,6 +207,7 @@ if [ "$TRAVIS" ] || [ "$CIRCLECI" ]; then
     cd build_tar
     tar -xf $tarball_tar
     rm *.tar
+    rm -rf root
     cp ../metadata.xml .
     tar -cf build_tarfile.tar *
     tar -tf build_tarfile.tar
@@ -205,28 +220,49 @@ else
 fi
 tar -tf $tarball_tar
 gzip -f $tarball_tar
-cd $cur_dir
+pwd
+cd "$cur_dir"
 pwd
 ls -la
+ls -la ~/.
 
-if [ $LOCAL_BUILD = false ]; then
-    cloudsmith push raw --republish --no-wait-for-sync \
-        --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
-        --version ${VERSION} \
-        --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
-        $REPO $xml
+# Find if file exists in directory
+function have_any() {
+    [ $# -gt 0 ]
+}
 
-    cloudsmith push raw --republish --no-wait-for-sync \
-        --name $tarball_name \
-        --version ${VERSION} \
-        --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
-        $REPO $tarball
-
-    if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
+if [ ! -z ${LOCAL_DEPLOY+x} ]; then
+    if [ -d "/home/circleci/circleci-output" ]; then
+        sudo cp build/*.gz ~/circleci-output
+        if have_any ./build/*.deb; then
+            sudo cp build/*.deb ~/circleci-output
+        elif have_any ./build/*.exe; then
+            sudo cp build/*.exe ~/circleci-output
+        fi
+    else
+        echo "Directory ~/circleci-output not found"
+    fi
+elif [ $LOCAL_BUILD = false ]; then
+# Only upload if the owner did the pull request. Non-owners probably don't have security to upload to the cloudsmith repository
+    if [ "$CIRCLE_PROJECT_USERNAME" = "$CIRCLE_USERNAME" ]; then
         cloudsmith push raw --republish --no-wait-for-sync \
-            --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+            --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
             --version ${VERSION} \
-            --summary "@PACKAGE@ .${PKG_EXT} installation package" \
-            $REPO $pkg
+            --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
+            $REPO $xml
+
+        cloudsmith push raw --republish --no-wait-for-sync \
+            --name $tarball_name \
+            --version ${VERSION} \
+            --summary "@PACKAGE@ opencpn plugin tarball for automatic installation" \
+            $REPO $tarball
+
+        if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
+            cloudsmith push raw --republish --no-wait-for-sync \
+                --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+                --version ${VERSION} \
+                --summary "@PACKAGE@ .${PKG_EXT} installation package" \
+                $REPO $pkg
+        fi
     fi
 fi

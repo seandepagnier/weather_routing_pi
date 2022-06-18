@@ -1,71 +1,312 @@
 ---
 version: 2.1
+
+parameters:
+    run_workflow_deploy:
+        type: boolean
+        default: true
+
+std-filters: &std-filters
+    filters:
+        branches:
+            ignore:
+            - devel
+            - tmp
+        tags:
+            only: /.*/
+
+workflows:
+    build_all:
+        jobs:
+        - build-armhf-stretch:
+            <<: *std-filters
+## Derecated in favour of ubuntu-armhf:18.04 build - 14/01/2022
+##        - build-armhf-raspbian-buster:
+##            <<: *std-filters
+        - build-armhf-ubuntu-buster:
+            <<: *std-filters
+        - build-armhf-debian-buster:
+            <<: *std-filters
+## Ready to build gtk3 version of armhf debian buster
+        - build-armhf-debian-buster-gtk3:
+            <<: *std-filters
+## Derecated in favour of ubuntu-armhf:20.04 build - 14/01/2022
+##        - build-armhf-bullseye:
+##            <<: *std-filters
+        - build-armhf-debian-bullseye:
+            <<: *std-filters
+## Currently circleci does not build armf64 correctly due to no suitable docker image
+##        - build-armhf-bionic-64:
+##            <<: *std-filters
+        - build-arm64-debian-bullseye:
+            <<: *std-filters
+        - build-armhf-ubuntu-focal:
+            <<: *std-filters
+## Not required as flatpak build used instead - 14/01/2022
+##        - build-armhf-ubuntu-focal-64:
+##            <<: *std-filters
+## Removed as no suitable python3 version for xenial available - 19/01/2022
+##        - build-xenial:
+##            <<: *std-filters
+        - build-bionic:
+            <<: *std-filters
+        - build-bionic-gtk3:
+            <<: *std-filters
+        - build-focal-gtk3:
+            <<: *std-filters
+        - build-jammy:
+            <<: *std-filters
+        - build-buster:
+            <<: *std-filters
+        - build-flatpak-x86-2008:
+            <<: *std-filters
+        - build-flatpak-x86-2008-beta:
+            <<: *std-filters
+        - build-flatpak-x86-1808:
+            <<: *std-filters
+        - build-flatpak-arm64:
+            <<: *std-filters
+        - build-macos:
+           <<: *std-filters
+        - build-macos-wx315:
+           <<: *std-filters
+        - build-android-arm64:
+           <<: *std-filters
+        - build-android-armhf:
+           <<: *std-filters
+
+orbs:
+    cloudsmith: cloudsmith/cloudsmith@1.0.4
+
+commands:
+    deploy-code:
+        parameters:
+            install-python:
+                type: boolean
+                default: false
+            use-orb:
+                type: env_var_name
+                default: DEPLOY_USE_ORB
+        steps:
+            - when:
+                condition: <<pipeline.parameters.run_workflow_deploy>>
+                steps:
+                - when:
+                    condition: <<parameters.install-python>>
+                    steps:
+                    - run: sudo apt install -y python3-pip
+                    - run: python3.8 -m pip install cloudsmith-cli
+                - when:
+                    condition: <<parameters.use-orb>>
+                    steps:
+                    - cloudsmith/ensure-api-key
+                    - cloudsmith/install-cli
+                - run: ci/cloudsmith-upload.sh
+
+    # if you want to use a local proxy add Acquire::http::Proxy \"http://192.168.1.1:3142\"; to a file called circleci-cache/apt-proxy. This will require
+    #    --volume {your local directory}/circleci-cache:/home/circleci/circleci-cache
+    # on the circleci local command line so that the docker image script can have access to the directory
+    # if you are on a slow or data limited internet link you can put a copy of master.zip here, or allow one to be downloaded by the script, as it is used by the android builds to
+    # provide the wxWidgets QT information.
+
 jobs:
     build-armhf-stretch:
-        machine: true
+        machine:
+            image: ubuntu-2004:202104-01
         environment:
         - OCPN_TARGET=stretch-armhf
-        - DOCKER_IMAGE=jongough/raspbian-stretch:latest
+        - DOCKER_IMAGE=balenalib/raspberry-pi-debian:stretch
         - BUILD_FLAGS=-j3
         - BUILD_ENV=raspbian
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
         - run:
             command: ci/circleci-build-raspbian-armhf.sh
             no_output_timeout: 30m
-        - run: ci/cloudsmith-upload.sh
-    build-armhf-buster:
-        machine: true
+        - deploy-code
+    build-armhf-raspbian-buster:
+        machine:
+            image: ubuntu-2004:202104-01
         environment:
         - OCPN_TARGET=buster-armhf
-        - DOCKER_IMAGE=jongough/raspbian-buster:plugin_build_tooling_current
+        - DOCKER_IMAGE=balenalib/raspberry-pi-debian:buster
         - BUILD_FLAGS=-j3
         - BUILD_ENV=raspbian
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
         - run:
             command: ci/circleci-build-raspbian-armhf.sh
             no_output_timeout: 30m
-        - run: ci/cloudsmith-upload.sh
+        - deploy-code
+    build-armhf-ubuntu-buster:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=buster-armhf
+        - DOCKER_IMAGE=jongough/ubuntu-armhf:18.04
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=ubuntu
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-armhf-debian-buster:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=buster-armhf
+        - DOCKER_IMAGE=jongough/debian-armhf:buster
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-armhf-debian-buster-gtk3:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=buster-armhf
+        - DOCKER_IMAGE=jongough/debian-armhf:buster
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-armhf-bullseye:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=bullseye-armhf
+        - DOCKER_IMAGE=balenalib/raspberry-pi-debian:bullseye
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=raspbian
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-armhf-debian-bullseye:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=bullseye-armhf
+        - DOCKER_IMAGE=jongough/debian-armhf:bullseye
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+
+    build-arm64-debian-bullseye:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=bullseye-arm64
+        - DOCKER_IMAGE=arm64v8/debian:bullseye-backports
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+
     build-armhf-bionic-64:
-        machine: true
+        machine:
+            image: ubuntu-2004:202104-01
         environment:
         - OCPN_TARGET=bionic-arm64
         - OCPN_BRANCH=master
         - DOCKER_IMAGE=arm64v8/ubuntu:18.04
         - BUILD_FLAGS=-j3
         - BUILD_ENV=ubuntu
+        - DEPLOY_USE_ORB: false
         steps:
         - checkout
         - run: chmod a+x ./ci/*.sh
         - run:
             command: ci/circleci-build-raspbian-armhf.sh
             no_output_timeout: 30m
-        - run: ci/cloudsmith-upload.sh
-    build-trusty:
-        docker:
-        - image: circleci/buildpack-deps:trusty-scm
+        - deploy-code
+    build-armhf-ubuntu-focal:
+        machine:
+            image: ubuntu-2004:202104-01
         environment:
-        - OCPN_TARGET:  trusty
+        - OCPN_TARGET=focal-armhf
+        - OCPN_BRANCH=master
+        - DOCKER_IMAGE=jongough/ubuntu-armhf:20.04
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=ubuntu
+        - TZ="America/New_York"
+        - DEBIAN_FRONTEND="noninteractive"
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
-        - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ trusty main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: cat /etc/apt/sources.list
-        - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-trusty.sh
-        - run: ci/cloudsmith-upload.sh
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-armhf-ubuntu-focal-64:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=focal-arm64
+        - OCPN_BRANCH=master
+        - DOCKER_IMAGE=arm64v8/ubuntu:20.04
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=ubuntu
+        - TZ=America/New_York
+        - DEBIAN_FRONTEND=noninteractive
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
     build-xenial:
         docker:
         - image: circleci/buildpack-deps:xenial-scm
         environment:
         - OCPN_TARGET:  xenial
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: >
@@ -77,30 +318,33 @@ jobs:
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
-        - run: ci/cloudsmith-upload.sh
+        - deploy-code
     build-bionic:
         docker:
-        - image: circleci/buildpack-deps:bionic-scm
+        - image: cimg/base:stable-18.04
         environment:
         - OCPN_TARGET:  bionic
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: >
             echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic main"
-            | sudo tee -a /etc/apt/sources.list
+            | sudo tee -a /etc/apt/sources.list#    build_15:
         - run: >
             echo "deb-src http://us.archive.ubuntu.com/ubuntu/ bionic-updates main"
             | sudo tee -a /etc/apt/sources.list
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
-        - run: ci/cloudsmith-upload.sh
+        - deploy-code
     build-bionic-gtk3:
         docker:
-        - image: circleci/buildpack-deps:bionic-scm
+        - image: cimg/base:stable-18.04
         environment:
         - BUILD_GTK3: true
         - OCPN_TARGET:  bionic-gtk3
+        - DEPLOY_USE_ORB: true
+        - BUILD_ENV=ubuntu
         steps:
         - checkout
         - run: >
@@ -112,47 +356,49 @@ jobs:
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
-        - run: ci/cloudsmith-upload.sh
-    build-focal:
-        docker:
-        - image: circleci/buildpack-deps:focal-scm
-        environment:
-        - OCPN_TARGET:  focal
-        steps:
-        - checkout
-        - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal-updates main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: cat /etc/apt/sources.list
-        - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-debian.sh
-        - run: ci/cloudsmith-upload.sh
+        - deploy-code
     build-focal-gtk3:
         docker:
-        - image: circleci/buildpack-deps:focal-scm
+        - image: cimg/base:stable-20.04
         environment:
         - BUILD_GTK3: true
         - OCPN_TARGET: focal-gtk3
+        - DEPLOY_USE_ORB: true
+        - BUILD_ENV=ubuntu
         steps:
         - checkout
         - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal main"
-            | sudo tee -a /etc/apt/sources.list
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal main" | sudo tee -a /etc/apt/sources.list
         - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal-updates main"
-            | sudo tee -a /etc/apt/sources.list
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ focal-updates main" | sudo tee -a /etc/apt/sources.list
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
-        - run: ci/cloudsmith-upload.sh
+        - deploy-code
+    build-jammy:
+        docker:
+        - image: cimg/base:edge-22.04
+        environment:
+        - BUILD_GTK3: true
+        - OCPN_TARGET: jammy
+        - DEPLOY_USE_ORB: true
+        - BUILD_ENV=ubuntu
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy-updates main" | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - deploy-code
     build-buster:
         docker:
         - image: circleci/buildpack-deps:buster-scm
         environment:
         - OCPN_TARGET:  buster
+        - DEPLOY_USE_ORB: true
         steps:
         - checkout
         - run: >
@@ -164,169 +410,135 @@ jobs:
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
-        - run: ci/cloudsmith-upload.sh
+        - deploy-code
     build-flatpak:
         machine:
-            image: circleci/classic:201808-01
+            image: ubuntu-2004:202010-01
         environment:
         - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: stable
         - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 20.08
+        - WXWIDGETS_FORCE_VERSION: 3.0
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
         - run: bash ci/circleci-build-flatpak.sh
-        - run: bash ci/cloudsmith-upload.sh
-    build-fedora:
-        docker:
-        - image: fedora:29
+        - when:
+            condition: <<pipeline.parameters.run_workflow_deploy>>
+            steps:
+            - run: ci/cloudsmith-upload.sh
+    build-flatpak-x86-1808:
+        machine:
+            image: ubuntu-2004:202010-01
         environment:
-        - OCPN_TARGET:  fedora
+        - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: stable
+        - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 18.08
+        - DEPLOY_USE_ORB: true
         steps:
-        - run: su -c "dnf install -q -y git openssh-clients openssh-server"
         - checkout
         - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-fedora.sh
-        - run: ci/cloudsmith-upload.sh
-    build-mingw:
-        docker:
-        - image: fedora:29
+        - run: bash ci/circleci-build-flatpak.sh
+        - deploy-code
+    build-flatpak-x86-2008:
+        machine:
+            image: ubuntu-2004:202010-01
         environment:
-        - OCPN_TARGET:  mingw
-        - CLOUDSMITH_PKG_EXT: exe
+        - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: stable
+        - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 20.08
+        - DEPLOY_USE_ORB: true
         steps:
-        - run: su -c "dnf install -q -y git openssh-clients openssh-server"
         - checkout
         - run: chmod a+x ci/*.sh
-        - run: bash ci/circleci-build-mingw.sh
-        - run: bash ci/cloudsmith-upload.sh
+        - run:
+            command: bash ci/circleci-build-flatpak.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-flatpak-x86-2008-beta:
+        machine:
+            image: ubuntu-2004:202010-01
+        environment:
+        - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: beta
+        - WX_VER: wx315
+        - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 20.08
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run:
+            command: bash ci/circleci-build-flatpak.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-flatpak-arm64:
+        machine:
+            image: ubuntu-2004:202101-01
+        resource_class: arm.medium
+        environment:
+        - OCPN_TARGET:  flatpak-arm64
+        - FLATPAK_BRANCH: stable
+        - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 20.08
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-flatpak.sh
+        - deploy-code
     build-macos:
         macos:
-            xcode: "10.0.0"
+            xcode: "12.5.1"
         environment:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
+        - DEPLOY_USE_ORB: true
+        - WXVERSION: 312
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
         - run: bash ci/circleci-build-macos.sh
-        - run: bash ci/cloudsmith-upload.sh
-workflows:
-    version: 2
-    build_all:
-        jobs:
-        - build-armhf-stretch:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-        - build-armhf-buster:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-# Currently circleci does not build armf64 correctly due to no suitable docker image
-#        - build-armhf-bionic-64:
-#            filters:
-#                branches:
-#                    ignore:
-#                    - devel
-#                    - tmp
-#                tags:
-#                    only: /.*/
-        - build-trusty:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-        - build-xenial:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-        - build-bionic:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-        - build-bionic-gtk3:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-# there is no focal gtk2 available so this will not be built
-#        - build-focal:
-#            filters:
-#                branches:
-#                    ignore:
-#                    - devel
-#                    - tmp
-#                tags:
-#                    only: /.*/
-        - build-focal-gtk3:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-        - build-buster:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-        - build-flatpak:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-# Fedora is being removed from the supplied list of environments so don't build
-#        - build-fedora:
-#            filters:
-#                branches:
-#                    ignore:
-#                    - devel
-#                    - tmp
-#                tags:
-#                    only: /.*/
-        - build-mingw:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
-        - build-macos:
-            filters:
-                branches:
-                    ignore:
-                    - devel
-                    - tmp
-                tags:
-                    only: /.*/
+        - deploy-code
+    build-macos-wx315:
+        macos:
+            xcode: "12.5.1"
+        environment:
+        - OCPN_TARGET:  macos
+        - CLOUDSMITH_PKG_EXT: pkg
+        - DEPLOY_USE_ORB: true
+        - WXVERSION: 315
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-macos.sh
+        - deploy-code
+    build-android-arm64:
+        docker:
+        - image: cimg/android:2021.10.2-ndk
+        resource_class: large
+        environment:
+        - OCPN_TARGET:  android-arm64
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-android-arm64.sh
+        - deploy-code:
+            install-python: true
+    build-android-armhf:
+        docker:
+        - image: cimg/android:2021.10.2-ndk
+        resource_class: large
+        environment:
+        - OCPN_TARGET:  android-armhf
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run: bash ci/circleci-build-android-armhf.sh
+        - deploy-code:
+            install-python: true
 

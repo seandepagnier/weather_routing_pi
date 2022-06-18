@@ -27,7 +27,7 @@
 #include <math.h>
 #include <wx/wx.h>
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 
 #include "Utilities.h"
 

@@ -35,7 +35,7 @@
 
 #include <wx/glcanvas.h>
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 
 #include "Utilities.h"
 #include "Boat.h"
@@ -131,7 +131,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
       m_positionOnRoute(nullptr)
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/PlugIns/WeatherRouting" ) );
+    pConf->SetPath ( _T( "/Plugins/WeatherRouting" ) );
     
     wxIcon icon;
     icon.CopyFromBitmap(*_img_WeatherRouting);

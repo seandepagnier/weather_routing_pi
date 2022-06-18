@@ -30,7 +30,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "tinyxml/tinyxml.h"
+#include "tinyxml.h"
 
 #include "Utilities.h"
 #include "Boat.h"

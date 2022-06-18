@@ -4,38 +4,87 @@
 # Build the  MacOS artifacts
 #
 
-# Fix broken ruby on the CircleCI image:
-if [ -n "$CI" ]; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-fi
-
 set -xe
 
 set -o pipefail
-for pkg in cairo cmake libarchive libexif wget; do
-    brew list $pkg 2>&1 >/dev/null || brew install $pkg 2>&1 >/dev/null || brew upgrade $pkg
-done
-brew list python@2 2>&1 >/dev/null && brew unlink python@2
-brew reinstall python3
+# Check if the cache is with us. If not, re-install brew.
+brew list --versions libexif || brew update-reset
 
-wget -q http://opencpn.navnux.org/build_deps/wx312_opencpn50_macos109.tar.xz
-tar xJf wx312_opencpn50_macos109.tar.xz -C /tmp
-export PATH="/usr/local/opt/gettext/bin:$PATH"
-echo 'export PATH="/usr/local/opt/gettext/bin:$PATH"' >> ~/.bash_profile
+for pkg in cairo cmake gettext libarchive libexif python wget; do
+    brew list --versions $pkg || brew install $pkg || brew install $pkg || :
+    brew link --overwrite $pkg || brew install $pkg
+done
+
+if [ -n "$WXVERSION" ] && [ "$WXVERSION" -eq "315" ]; then
+    echo "Building for WXVERSION 315";
+    WX_URL=https://download.opencpn.org/s/MCiRiq4fJcKD56r/download
+    WX_DOWNLOAD=/tmp/wx315_opencpn50_macos1010.tar.xz
+    WX_EXECUTABLE=/tmp/wx315_opencpn50_macos1010/bin/wx-config
+    WX_CONFIG="--prefix=/tmp/wx315_opencpn50_macos1010"
+    MACOSX_DEPLOYMENT_TARGET=10.10
+else
+    echo "Building for WXVERSION 312";
+    WX_URL=https://download.opencpn.org/s/rwoCNGzx6G34tbC/download
+    WX_DOWNLOAD=/tmp/wx312B_opencpn50_macos109.tar.xz
+    WX_EXECUTABLE=/tmp/wx312B_opencpn50_macos109/bin/wx-config
+    WX_CONFIG="--prefix=/tmp/wx312B_opencpn50_macos109"
+    MACOSX_DEPLOYMENT_TARGET=10.9
+fi
+
+# Download required binaries using wget, since curl causes an issue with Xcode 13.1 and some specific certificates.
+# Inspect the response code to see if the file is downloaded properly.
+# If the download failed or file does not exist, then exit with an error.
+# For local purposes: only download if it has not been downloaded already. That does not harm building on CircleCI.
+if [ ! -f "$WX_DOWNLOAD" ]; then
+  echo "Downloading $WX_DOWNLOAD";
+  SERVER_RESPONSE=$(wget --server-response  -O $WX_DOWNLOAD $WX_URL 2>&1 | grep "HTTP"/ | awk '{print $2}')
+  if [ $SERVER_RESPONSE -ne 200 ]; then
+    echo "Fatal error: could not download $WX_DOWNLOAD. Server response: $SERVER_RESPONSE."
+    exit 0
+  fi
+fi
+if [ -f "$WX_DOWNLOAD" ]; then
+  echo "$WX_DOWNLOAD exists"
+else
+  echo "Fatal error: $WX_DOWNLOAD does not exist";
+  exit 0
+fi
+
+# Unpack the binaries to /tmp
+tar xJf $WX_DOWNLOAD -C /tmp
+
+# Extend PATH, only when necesary
+INCLUDE_DIR_GETTEXT="/usr/local/opt/gettext/bin:"
+
+if [[ ":$PATH:" != *$INCLUDE_DIR_GETTEXT* ]]; then
+  echo "Your path is missing $INCLUDE_DIR_GETTEXT. Trying to add it automatically:"
+  export PATH=$INCLUDE_DIR_GETTEXT$PATH
+  echo 'export PATH="'$INCLUDE_DIR_GETTEXT'$PATH"' >> ~/.bash_profile
+else
+    echo "Path includes $INCLUDE_DIR_GETTEXT"
+fi
+
+export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
+
+# use brew to get Packages.pkg
+if brew list --cask --versions packages; then
+    version=$(brew list --cask --versions packages)
+    version="${version/"packages "/}"
+    sudo installer \
+        -pkg /usr/local/Caskroom/packages/$version/packages/Packages.pkg \
+        -target /
+else
+    brew install --cask packages
+fi
 
 rm -rf build && mkdir build && cd build
 cmake \
-  -DwxWidgets_CONFIG_EXECUTABLE=/tmp/wx312_opencpn50_macos109/bin/wx-config \
-  -DwxWidgets_CONFIG_OPTIONS="--prefix=/tmp/wx312_opencpn50_macos109" \
+  -DwxWidgets_CONFIG_EXECUTABLE=$WX_EXECUTABLE \
+  -DwxWidgets_CONFIG_OPTIONS=$WX_CONFIG \
   -DCMAKE_INSTALL_PREFIX= \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
   "/" \
   ..
 make -sj2
 make package
-
-wget -q http://opencpn.navnux.org/build_deps/Packages.dmg
-hdiutil attach Packages.dmg
-sudo installer -pkg "/Volumes/Packages 1.2.5/Install Packages.pkg" -target "/"
-make create-pkg
 

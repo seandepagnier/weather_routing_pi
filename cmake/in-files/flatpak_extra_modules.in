@@ -1,0 +1,14 @@
+# add flatpak-options args in here like this:
+#    - name: libusb
+#      config-opts:
+#          - --disable-shared
+#          - --enable-static
+#          - --disable-udev
+#          - --prefix=/app/extensions/${PACKAGE}
+#      sources:
+#          - type: archive
+#            url: https://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.24/libusb-1.0.24.tar.bz2
+#            sha256: 7efd2685f7b327326dcfb85cee426d9b871fd70e22caa15bb68d595ce2a2b12a
+#      cleanup: ["/include", "/lib/*.a", "/lib/*.la", "/lib/pkgconfig"]
+#
+# be carefull about indents and naming.

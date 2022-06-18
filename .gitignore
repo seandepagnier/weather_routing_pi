@@ -1,4 +1,4 @@
 build/
-src/version.h
+buildwin/
 .directory
-
+po/POTFILES.in.test
