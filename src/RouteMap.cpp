@@ -760,8 +760,6 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             return false;
     }
 
-    double timeseconds = configuration.UsedDeltaTime;
-    double dist;
 
     bool first_avoid = true;
     Position *rp;
@@ -774,6 +772,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
 
     for(auto it = configuration.DegreeSteps.begin();
         it != configuration.DegreeSteps.end(); it++) {
+        double timeseconds = configuration.UsedDeltaTime;
+        double dist;
 
 
         double H = heading_resolve(*it);
@@ -810,16 +810,17 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         if (polar == -1)
             polar = newpolar;
         
-        if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
-                             B, VB, BG, VBG, dist, newpolar))
-            continue;
-        
         /* did we tack thru the wind? apply penalty */
         bool tacked = false;
         if(parent_heading*H < 0 && fabs(parent_heading - H) < 180) {
             timeseconds -= configuration.TackingTime;
             tacked = true;
         }
+
+        if(!ComputeBoatSpeed(configuration, timeseconds, WG, VWG, W, VW, C, VC, H, atlas, data_mask,
+                             B, VB, BG, VBG, dist, newpolar))
+            continue;
+
 
         double dlat, dlon;
         if(configuration.Integrator == RouteMapConfiguration::RUNGE_KUTTA) {
