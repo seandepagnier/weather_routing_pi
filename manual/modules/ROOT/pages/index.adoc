@@ -40,7 +40,7 @@ The quest for _perfect_ polars. There are many factors involved and various sour
 
 *Boundaries: Routing Avoidance*
 
-* xref:ocpn_draw::index.adoc[Ocpn_Draw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
+* https://opencpn-manuals.github.io/plugins/ocpn_draw/0.1/index.html[Ocpn_Draw_pi] Create boundaries for routing avoidance: dangerous areas, sea, land, storm or hurricane.
 
 
 == Navigation Sub Pages
