@@ -128,7 +128,7 @@ void ReportDialog::SetRouteMapOverlays(std::list<RouteMapOverlay*> routemapoverl
         
         // CUSTOMIZATION
         // Display sailing comfort in the report
-        page += ("Sailing comfort") + wxString(_T(": ")) \
+        page += _("Sailing comfort") + wxString(_T(": ")) \
                 + (*it)->sailingConditionText((*it)->RouteInfo(RouteMapOverlay::COMFORT)) \
                 + _T("<dt>\n");
 

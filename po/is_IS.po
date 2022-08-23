@@ -3,17 +3,17 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-07-24 12:37+0200\n"
-"PO-Revision-Date: 2022-07-31 01:56\n"
+"PO-Revision-Date: 2022-07-31 01:57\n"
 "Last-Translator: \n"
-"Language-Team: Arabic\n"
-"Language: ar_SA\n"
+"Language-Team: Icelandic\n"
+"Language: is_IS\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Crowdin-Project: opencpn\n"
 "X-Crowdin-Project-ID: 49843\n"
-"X-Crowdin-Language: ar\n"
+"X-Crowdin-Language: is\n"
 "X-Crowdin-File: /plugins/weather_routing_pi/po/weather_routing_pi.pot\n"
 "X-Crowdin-File-ID: 126\n"
 
@@ -52,7 +52,7 @@ msgstr ""
 #: src/WeatherRouting.cpp:83 src/WeatherRouting.cpp:981
 #: src/WeatherRouting.cpp:990 src/WeatherRoutingUI.cpp:700
 msgid "Boat"
-msgstr ""
+msgstr "Bátur"
 
 #: include/WeatherRoutingUI.h:509 src/StatisticsDialog.cpp:45
 msgid "Weather Routing Statistics"
@@ -112,7 +112,7 @@ msgstr ""
 
 #: src/BoatDialog.cpp:71
 msgid "Filename"
-msgstr ""
+msgstr "Skráarnafn"
 
 #: src/BoatDialog.cpp:105 src/BoatDialog.cpp:707 src/BoatDialog.cpp:757
 #: src/BoatDialog.cpp:843 src/BoatDialog.cpp:849 src/BoatDialog.cpp:906
@@ -135,7 +135,7 @@ msgstr ""
 
 #: src/BoatDialog.cpp:842
 msgid "Failed to save"
-msgstr ""
+msgstr "Mistókst að vista"
 
 #: src/BoatDialog.cpp:848
 msgid "Failed to revert"
@@ -232,7 +232,7 @@ msgstr ""
 
 #: src/Polar.cpp:230
 msgid "Failed to open."
-msgstr ""
+msgstr "Mistókst að opna."
 
 #: src/Polar.cpp:235
 msgid "Failed to read."
@@ -291,7 +291,7 @@ msgstr ""
 
 #: src/ReportDialog.cpp:83 src/ReportDialog.cpp:353 src/ReportDialog.cpp:393
 msgid " to "
-msgstr ""
+msgstr " til "
 
 #: src/ReportDialog.cpp:83
 msgid "Route from "
@@ -325,7 +325,7 @@ msgstr ""
 #: src/ReportDialog.cpp:113 src/ReportDialog.cpp:244
 #: src/WeatherRoutingUI.cpp:753 src/WeatherRoutingUI.cpp:766
 msgid "knots"
-msgstr ""
+msgstr "hnútar"
 
 #: src/ReportDialog.cpp:101
 msgid "Average Speed Over Ground (SOG)"
@@ -345,7 +345,7 @@ msgstr ""
 
 #: src/ReportDialog.cpp:117 src/WeatherRoutingUI.cpp:779
 msgid "meters"
-msgstr ""
+msgstr "metrar"
 
 #: src/ReportDialog.cpp:118
 msgid "Upwind"
@@ -389,7 +389,7 @@ msgstr ""
 
 #: src/ReportDialog.cpp:215 src/ReportDialog.cpp:289
 msgid "to"
-msgstr ""
+msgstr "til"
 
 #: src/ReportDialog.cpp:216
 msgid "configurations"
@@ -409,7 +409,7 @@ msgstr ""
 
 #: src/ReportDialog.cpp:251 src/ReportDialog.cpp:361
 msgid "none"
-msgstr ""
+msgstr "enginn"
 
 #: src/ReportDialog.cpp:255
 msgid "any"
@@ -417,7 +417,7 @@ msgstr ""
 
 #: src/ReportDialog.cpp:288 src/ReportDialog.cpp:350 src/ReportDialog.cpp:380
 msgid " and "
-msgstr ""
+msgstr " og "
 
 #: src/ReportDialog.cpp:297
 msgid "Best Sailing Comfort"
@@ -437,7 +437,7 @@ msgstr ""
 
 #: src/ReportDialog.cpp:359
 msgid "all months"
-msgstr ""
+msgstr "allir mánuðir"
 
 #: src/ReportDialog.cpp:367
 msgid "All routes are safe from cyclones."
@@ -604,19 +604,19 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:251
 msgid "Name"
-msgstr ""
+msgstr "Nafn"
 
 #: src/WeatherRouting.cpp:252
 msgid "Lat"
-msgstr ""
+msgstr "Breidd"
 
 #: src/WeatherRouting.cpp:253
 msgid "Lon"
-msgstr ""
+msgstr "Lengd"
 
 #: src/WeatherRouting.cpp:539
 msgid "Enter Name"
-msgstr ""
+msgstr "Settu inn nafn"
 
 #: src/WeatherRouting.cpp:539
 msgid "New Position"
@@ -654,7 +654,7 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:768 src/WeatherRouting.cpp:921
 msgid "Wind"
-msgstr ""
+msgstr "Vindur"
 
 #: src/WeatherRouting.cpp:769 src/WeatherRouting.cpp:922
 msgid "Current"
@@ -731,11 +731,11 @@ msgstr ""
 
 #: src/WeatherRouting.cpp:2168
 msgid "Land"
-msgstr ""
+msgstr "Land"
 
 #: src/WeatherRouting.cpp:2172
 msgid "Boundary"
-msgstr ""
+msgstr "Landamæri"
 
 #: src/WeatherRouting.cpp:2176
 msgid "Failed"
@@ -783,19 +783,19 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:19
 msgid "&Open"
-msgstr ""
+msgstr "&Opna"
 
 #: src/WeatherRoutingUI.cpp:23
 msgid "&Save"
-msgstr ""
+msgstr "&Vista"
 
 #: src/WeatherRoutingUI.cpp:29 src/WeatherRoutingUI.cpp:2313
 msgid "&Close"
-msgstr ""
+msgstr "&Loka"
 
 #: src/WeatherRoutingUI.cpp:32
 msgid "&File"
-msgstr ""
+msgstr "&Skrá"
 
 #: src/WeatherRoutingUI.cpp:36
 msgid "&New Position"
@@ -808,11 +808,11 @@ msgstr ""
 #: src/WeatherRoutingUI.cpp:44 src/WeatherRoutingUI.cpp:67
 #: src/WeatherRoutingUI.cpp:162
 msgid "&Delete"
-msgstr ""
+msgstr "&Eyða"
 
 #: src/WeatherRoutingUI.cpp:48
 msgid "Delete &All"
-msgstr ""
+msgstr "E&yða öllu"
 
 #: src/WeatherRoutingUI.cpp:51
 msgid "&Position"
@@ -820,7 +820,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:55 src/WeatherRoutingUI.cpp:150
 msgid "&New"
-msgstr ""
+msgstr "&Ný"
 
 #: src/WeatherRoutingUI.cpp:58 src/WeatherRoutingUI.cpp:173
 msgid "&Batch"
@@ -829,28 +829,28 @@ msgstr ""
 #: src/WeatherRoutingUI.cpp:61 src/WeatherRoutingUI.cpp:153
 #: src/WeatherRoutingUI.cpp:2018
 msgid "&Edit"
-msgstr ""
+msgstr "&Breyta"
 
 #: src/WeatherRoutingUI.cpp:64 src/WeatherRoutingUI.cpp:167
 msgid "&GoTo"
-msgstr ""
+msgstr "&Fara til"
 
 #: src/WeatherRoutingUI.cpp:70
 msgid "Delete All"
-msgstr ""
+msgstr "Eyða öllu"
 
 #: src/WeatherRoutingUI.cpp:75 src/WeatherRoutingUI.cpp:156
 #: src/WeatherRoutingUI.cpp:332
 msgid "&Compute"
-msgstr ""
+msgstr "&Reikna"
 
 #: src/WeatherRoutingUI.cpp:78 src/WeatherRoutingUI.cpp:159
 msgid "Compute &All"
-msgstr ""
+msgstr "Reykna &allt"
 
 #: src/WeatherRoutingUI.cpp:81 src/WeatherRoutingUI.cpp:170
 msgid "&Stop"
-msgstr ""
+msgstr "&Stopp"
 
 #: src/WeatherRoutingUI.cpp:85 src/WeatherRoutingUI.cpp:177
 msgid "&Reset All"
@@ -858,15 +858,15 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:90
 msgid "E&xport"
-msgstr ""
+msgstr "F&lytja út"
 
 #: src/WeatherRoutingUI.cpp:93
 msgid "Export All"
-msgstr ""
+msgstr "Flytja allt út"
 
 #: src/WeatherRoutingUI.cpp:99
 msgid "&Filter"
-msgstr ""
+msgstr "&Sía"
 
 #: src/WeatherRoutingUI.cpp:102
 msgid "&Configuration"
@@ -874,7 +874,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:106 src/WeatherRoutingUI.cpp:183
 msgid "&Settings"
-msgstr ""
+msgstr "&Stillingar"
 
 #: src/WeatherRoutingUI.cpp:110 src/WeatherRoutingUI.cpp:187
 msgid "S&tatistics"
@@ -898,7 +898,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:129
 msgid "&View"
-msgstr ""
+msgstr "S&koða"
 
 #: src/WeatherRoutingUI.cpp:133
 msgid "&Information"
@@ -910,11 +910,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:141
 msgid "&About"
-msgstr ""
+msgstr "&Um"
 
 #: src/WeatherRoutingUI.cpp:144
 msgid "&Help"
-msgstr ""
+msgstr "&Hjálp"
 
 #: src/WeatherRoutingUI.cpp:181
 msgid "View"
@@ -1002,7 +1002,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:670
 msgid "Date"
-msgstr ""
+msgstr "Dagsetning"
 
 #: src/WeatherRoutingUI.cpp:677
 msgid "Grib Time"
@@ -1014,11 +1014,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:711
 msgid "..."
-msgstr ""
+msgstr "..."
 
 #: src/WeatherRoutingUI.cpp:714
 msgid "Edit"
-msgstr ""
+msgstr "Breyta"
 
 #: src/WeatherRoutingUI.cpp:724 src/WeatherRoutingUI.cpp:952
 msgid "Constraints"
@@ -1032,7 +1032,7 @@ msgstr ""
 #: src/WeatherRoutingUI.cpp:987 src/WeatherRoutingUI.cpp:998
 #: src/WeatherRoutingUI.cpp:3035 src/WeatherRoutingUI.cpp:3053
 msgid "degrees"
-msgstr ""
+msgstr "gráður"
 
 #: src/WeatherRoutingUI.cpp:744
 msgid "Max True Wind"
@@ -1048,19 +1048,19 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:820
 msgid "h"
-msgstr ""
+msgstr "t"
 
 #: src/WeatherRoutingUI.cpp:829
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #: src/WeatherRoutingUI.cpp:838
 msgid "s"
-msgstr ""
+msgstr "s"
 
 #: src/WeatherRoutingUI.cpp:849 src/WeatherRoutingUI.cpp:1055
 msgid "Options"
-msgstr ""
+msgstr "Valkostir"
 
 #: src/WeatherRoutingUI.cpp:856
 msgid "Detect Land"
@@ -1112,7 +1112,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:928
 msgid " Close"
-msgstr ""
+msgstr " Loka"
 
 #: src/WeatherRoutingUI.cpp:938
 msgid "Basic"
@@ -1144,11 +1144,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1026
 msgid "Months"
-msgstr ""
+msgstr "Mánuðir"
 
 #: src/WeatherRoutingUI.cpp:1033
 msgid "Days"
-msgstr ""
+msgstr "Dagar"
 
 #: src/WeatherRoutingUI.cpp:1067
 msgid "Inverted Regions"
@@ -1185,7 +1185,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1124
 msgid "Seconds"
-msgstr ""
+msgstr "Sekúndur"
 
 #: src/WeatherRoutingUI.cpp:1136
 msgid "Safety Margin From Land"
@@ -1201,11 +1201,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1162 src/WeatherRoutingUI.cpp:2563
 msgid "From"
-msgstr ""
+msgstr "Frá"
 
 #: src/WeatherRoutingUI.cpp:1169 src/WeatherRoutingUI.cpp:2574
 msgid "To"
-msgstr ""
+msgstr "Til"
 
 #: src/WeatherRoutingUI.cpp:1182 src/WeatherRoutingUI.cpp:2585
 msgid "By"
@@ -1217,7 +1217,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1197
 msgid "Degrees"
-msgstr ""
+msgstr "Gráður"
 
 #: src/WeatherRoutingUI.cpp:1213
 msgid "Reset all Advanced Parameters"
@@ -1294,7 +1294,7 @@ msgstr ""
 #: src/WeatherRoutingUI.cpp:1586 src/WeatherRoutingUI.cpp:1599
 #: src/WeatherRoutingUI.cpp:1611 src/WeatherRoutingUI.cpp:3293
 msgid "Wind Direction"
-msgstr ""
+msgstr "Vindátt"
 
 #: src/WeatherRoutingUI.cpp:1586 src/WeatherRoutingUI.cpp:1599
 #: src/WeatherRoutingUI.cpp:1611
@@ -1349,7 +1349,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1794 src/WeatherRoutingUI.cpp:2635
 msgid "Close"
-msgstr ""
+msgstr "Loka"
 
 #: src/WeatherRoutingUI.cpp:1862
 msgid "Plot"
@@ -1385,7 +1385,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1946 src/WeatherRoutingUI.cpp:3286
 msgid "Wind Speed"
-msgstr ""
+msgstr "Vindhraði"
 
 #: src/WeatherRoutingUI.cpp:1959
 msgid "Stats"
@@ -1393,7 +1393,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:1968
 msgid "Speed"
-msgstr ""
+msgstr "Hraði"
 
 #: src/WeatherRoutingUI.cpp:1974
 msgid "Apparent Wind Dir / Apparent Wind Speed"
@@ -1421,27 +1421,27 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2012
 msgid "Up"
-msgstr ""
+msgstr "Upp"
 
 #: src/WeatherRoutingUI.cpp:2015
 msgid "Down"
-msgstr ""
+msgstr "Niður"
 
 #: src/WeatherRoutingUI.cpp:2021 src/WeatherRoutingUI.cpp:2538
 #: src/WeatherRoutingUI.cpp:3185 src/WeatherRoutingUI.cpp:3231
 #: src/WeatherRoutingUI.cpp:3312
 msgid "Add"
-msgstr ""
+msgstr "Bæta við"
 
 #: src/WeatherRoutingUI.cpp:2024 src/WeatherRoutingUI.cpp:2541
 #: src/WeatherRoutingUI.cpp:3188 src/WeatherRoutingUI.cpp:3234
 #: src/WeatherRoutingUI.cpp:3342
 msgid "Remove"
-msgstr ""
+msgstr "Fjarlægja"
 
 #: src/WeatherRoutingUI.cpp:2030
 msgid "Open Boat"
-msgstr ""
+msgstr "Opna bát"
 
 #: src/WeatherRoutingUI.cpp:2033
 msgid "Save Boat"
@@ -1520,15 +1520,15 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2426
 msgid "Daily"
-msgstr ""
+msgstr "Daglega"
 
 #: src/WeatherRoutingUI.cpp:2429
 msgid "Weekly"
-msgstr ""
+msgstr "Vikulega"
 
 #: src/WeatherRoutingUI.cpp:2432
 msgid "Monthly"
-msgstr ""
+msgstr "Mánaðarlega"
 
 #: src/WeatherRoutingUI.cpp:2451
 msgid "Sources"
@@ -1556,7 +1556,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2551
 msgid "Boats"
-msgstr ""
+msgstr "Bátar"
 
 #: src/WeatherRoutingUI.cpp:2604
 msgid "100"
@@ -1564,15 +1564,15 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2607
 msgid "80 to 120"
-msgstr ""
+msgstr "80 til 120"
 
 #: src/WeatherRoutingUI.cpp:2617
 msgid "Wind Strength"
-msgstr ""
+msgstr "Vindstyrkur"
 
 #: src/WeatherRoutingUI.cpp:2629
 msgid "Reset"
-msgstr ""
+msgstr "Endurstilla"
 
 #: src/WeatherRoutingUI.cpp:2632 src/WeatherRoutingUI.cpp:3614
 msgid "Generate"
@@ -1588,11 +1588,11 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:2723
 msgid "Reset All"
-msgstr ""
+msgstr "Endurstilla allt"
 
 #: src/WeatherRoutingUI.cpp:2726
 msgid "Done"
-msgstr ""
+msgstr "Lokið"
 
 #: src/WeatherRoutingUI.cpp:2795 src/WeatherRoutingUI.cpp:2952
 msgid "Sail Changes"
@@ -1624,19 +1624,19 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3013
 msgid "name"
-msgstr ""
+msgstr "nafn"
 
 #: src/WeatherRoutingUI.cpp:3028
 msgid "latitude"
-msgstr ""
+msgstr "breiddargráða"
 
 #: src/WeatherRoutingUI.cpp:3042 src/WeatherRoutingUI.cpp:3060
 msgid "minutes"
-msgstr ""
+msgstr "mínútur"
 
 #: src/WeatherRoutingUI.cpp:3046
 msgid "longitude"
-msgstr ""
+msgstr "lengdargráða"
 
 #: src/WeatherRoutingUI.cpp:3136
 msgid "Leave any cell blank to automatically interpolate from nearby values.  Use a value of 0.0 to specify invalid (cannot be used)\n"
@@ -1725,7 +1725,7 @@ msgstr ""
 
 #: src/WeatherRoutingUI.cpp:3428
 msgid "tons"
-msgstr ""
+msgstr "tonn"
 
 #: src/WeatherRoutingUI.cpp:3432
 msgid "Sail Area"
