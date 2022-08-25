@@ -88,7 +88,7 @@ const wxString WeatherRouting::column_names[NUM_COLS] = {_("Visible"), _("Boat")
                                                          _("Avg Current"), _("Max Current"),
                                                          _("Avg Swell"), _("Max Swell"),
                                                          _("Upwind Percentage"),
-                                                         _("Port Starboard"), _("Tacks", "Comfort"),
+                                                         _("Port Starboard"), _("Tacks"),_("Comfort"),
                                                          _("State")};
 
 static int sortcol, sortorder = 1;
