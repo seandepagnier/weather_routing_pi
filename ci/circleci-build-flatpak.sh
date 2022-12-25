@@ -28,14 +28,36 @@ sudo apt-get -q -y --allow-unauthenticated --allow-downgrades --allow-remove-ess
 
 sudo apt --allow-unauthenticated --allow-downgrades --allow-remove-essential --allow-change-held-packages install flatpak flatpak-builder
 
+# Install extra build libs
+ME=$(echo ${0##*/} | sed 's/\.sh//g')
+EXTRA_LIBS=./ci/extras/extra_libs.txt
+if test -f "$EXTRA_LIBS"; then
+    sudo apt update
+    while read line; do
+        sudo apt-get install $line
+    done < $EXTRA_LIBS
+fi
+EXTRA_LIBS=./ci/extras/${ME}_extra_libs.txt
+if test -f "$EXTRA_LIBS"; then
+    sudo apt update
+    while read line; do
+        sudo apt-get install $line
+    done < $EXTRA_LIBS
+fi
+
 if [ -n "$CI" ]; then
     sudo apt update
 
     # Avoid using outdated TLS certificates, see #210.
     sudo apt install --reinstall  ca-certificates
 
-    # Install flatpak and flatpak-builder
+    # Use updated flatpak workaround
+    sudo add-apt-repository -y ppa:alexlarsson/flatpak
+    sudo apt update
+
+    # Install flatpak and flatpak-builder - obsoleted by flathub
     sudo apt install flatpak flatpak-builder
+
 fi
 
 flatpak remote-add --user --if-not-exists \

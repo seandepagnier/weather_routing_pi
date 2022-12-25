@@ -3,7 +3,8 @@ shallow_clone: false
 clone_depth: 10
 
 image:
-- Visual Studio 2017
+  - Visual Studio 2022
+  - Visual Studio 2017
 
 platform:
 # - x64
@@ -15,42 +16,70 @@ test: OFF
 environment:
   OCPN_TARGET: MSVC
 
-install:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+matrix:
+# allow either job to fail and the other to complete
+  fast_finish: false
 
-  # sent environment variables for wxWidgets
-  - set WXWIN=C:\wxWidgets-3.1.2
-  - set wxWidgets_ROOT_DIR=%WXWIN%
-  - set wxWidgets_LIB_DIR=%WXWIN%\lib\vc_dll
-  - cmd: SET PATH=%PATH%;%WXWIN%;%wxWidgets_LIB_DIR%;C:\Program Files (x86)\Poedit\Gettexttools\bin
+init:
+  - appveyor version
+
+for:
+-
+  matrix:
+    only:
+    - image: Visual Studio 2017
+  install:
+    - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+    - set WX_VER=
+    - set WXWIN=c:\wxWidgets-3.1.2
+    - set wxWidgets_ROOT_DIR=%WXWIN%
+    - set wxWidgets_LIB_DIR=%WXWIN%\lib\vc_dll
+    - set cmake_parms=-T v141_xp
+    - SET PATH=%PATH%;%WXWIN%;%wxWidgets_LIB_DIR%;C:\Program Files (x86)\Poedit\Gettexttools\bin
 
   # install dependencies:
-  - choco install poedit
-  - choco install git
+    - choco install poedit
+    - choco install git
 
-  # http://opencpn.navnux.org/build_deps/nsis-3.04-setup.exe - no longer available, replaced with below
-  - ps: Start-FileDownload https://download.opencpn.org/s/54HsBDLNzRZLL6i/download  -FileName nsis-3.04-setup.exe
-  - cmd: nsis-3.04-setup.exe /S
+    - ps: Start-FileDownload https://download.opencpn.org/s/54HsBDLNzRZLL6i/download  -FileName nsis-3.04-setup.exe
+    - cmd: nsis-3.04-setup.exe /S
 
   # Download and unzip wxwidgets
-  # http://opencpn.navnux.org/build_deps/wxWidgets-3.1.2.7z - no longer available, replaced with below
-  - ps: Start-FileDownload https://download.opencpn.org/s/E2p4nLDzeqx4SdX/download -FileName wxWidgets-3.1.2.7z
-  - cmd: 7z x wxWidgets-3.1.2.7z -o%WXWIN% > null
+    - ps: Start-FileDownload https://download.opencpn.org/s/E2p4nLDzeqx4SdX/download -FileName wxWidgets-3.1.2.7z
+    - cmd: 7z x wxWidgets-3.1.2.7z -o%WXWIN% > null
 
-  - set
+-
+  matrix:
+    only:
+    - image: Visual Studio 2022
+  install:
+    - call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
+    - set WX_VER=32
+    - set WXWIN=C:\wxWidgets-3.2.1
+    - set wxWidgets_ROOT_DIR=%WXWIN%
+    - set wxWidgets_LIB_DIR=%WXWIN%\lib\vc_dll
+    - set cmake_parms=-A Win32
+    - SET PATH=%PATH%;%WXWIN%;%wxWidgets_LIB_DIR%;C:\Program Files\Poedit\Gettexttools\bin
+
+    # install dependencies:
+    - choco install poedit
+    - choco install git
+    - choco install wget
+
+    # Download and unzip wxwidgets
+    - wget -nv https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.1/wxMSW-3.2.1_vc14x_Dev.7z
+    - wget -nv https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.1/wxWidgets-3.2.1-headers.7z
+    - 7z x -o%WXWIN% wxMSW-3.2.1_vc14x_Dev.7z
+    - 7z x -o%WXWIN% wxWidgets-3.2.1-headers.7z
 
 before_build:
   - cd c:\project\ocpn_project
-  - cd buildwin
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/PVW32Con.exe
-  - cd ..
   - rm -rf build && mkdir build && cd build
-  #- ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_lib/4.99.1405-vc141_xp/opencpn.lib - no longer available, replaced with below
   - ps: Start-FileDownload https://sourceforge.net/projects/opencpnplugins/files/opencpn.lib
-  # http://opencpn.navnux.org/build_deps/OpenCPN_buildwin-4.99a.7z - no longer available, replaced with below
   - ps: Start-FileDownload https://download.opencpn.org/s/oibxM3kzfzKcSc3/download -FileName OpenCPN_buildwin-4.99a.7z
   - cmd: 7z x -y OpenCPN_buildwin-4.99a.7z -oc:\project\ocpn_project\buildwin
-  - cmake -T v141_xp ..
+  - cmake -A Win32 ..
 
 build_script:
   - cmake --build . --target package --config Release
@@ -62,16 +91,3 @@ build_script:
 artifacts:
   - path: 'build\*.exe'
     name: installer
-
-# Removed from process as not providing real benefit at the moment
-#deploy:
-#  description: 'release created by AppVeyor CI'
-#  provider: GitHub
-#  #auth_token: '%GitHub_auth_token%'
-#  auth_token: '%GIT-PTOKEN-testplugin_pi-INTO-APPVEYOR%'
-#  artifact: installer,portable
-#  draft: true
-#  prerelease: true
-#  on:
-#    appveyor_repo_tag: true # deploy on tag push only
-#    configuration: Release  # Debug contains non-redist MS DLLs
