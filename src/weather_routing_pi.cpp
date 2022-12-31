@@ -46,7 +46,7 @@ wxString    g_ReceivedMessage;
 
 //Define minimum and maximum versions of the climatology plugin supported
 #define CLIMATOLOGY_MAX_MAJOR 1
-#define CLIMATOLOGY_MAX_MINOR 4
+#define CLIMATOLOGY_MAX_MINOR 5
 #define CLIMATOLOGY_MIN_MAJOR 0
 #define CLIMATOLOGY_MIN_MINOR 10
 
