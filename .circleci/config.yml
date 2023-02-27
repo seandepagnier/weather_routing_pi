@@ -27,6 +27,8 @@ workflows:
             <<: *std-filters
         - build-armhf-debian-buster:
             <<: *std-filters
+        - build-arm64-debian-buster:
+            <<: *std-filters
 ## Ready to build gtk3 version of armhf debian buster
         - build-armhf-debian-buster-gtk3:
             <<: *std-filters
@@ -40,6 +42,8 @@ workflows:
 ## Currently circleci does not build armf64 correctly due to no suitable docker image
 ##        - build-armhf-bionic-64:
 ##            <<: *std-filters
+        - build-arm64-debian-bullseye:
+            <<: *std-filters
         - build-armhf-ubuntu-focal:
             <<: *std-filters
 ## Not required as flatpak build used instead - 14/01/2022
@@ -58,25 +62,28 @@ workflows:
             <<: *std-filters
         - build-buster:
             <<: *std-filters
+        - build-bullseye:
+            <<: *std-filters
         - build-flatpak-x86-2008:
+            <<: *std-filters
+        - build-flatpak-x86-2208:
             <<: *std-filters
 ## Been removed from allowable environments
 ##        - build-flatpak-x86-2008-beta:
 ##            <<: *std-filters
-        - build-flatpak-x86-1808:
-            <<: *std-filters
+## Obsolete not available anymore
+##        - build-flatpak-x86-1808:
+##            <<: *std-filters
         - build-flatpak-arm64:
             <<: *std-filters
         - build-macos:
              <<: *std-filters
         - build-macos-wx32:
              <<: *std-filters
-## No -  builds, but unuseable
-##        - build-android-arm64:
-##             <<: *std-filters
-## No -  builds, but unuseable
-##        - build-android-armhf:
-##             <<: *std-filters
+        - build-android-arm64:
+             <<: *std-filters
+        - build-android-armhf:
+             <<: *std-filters
 ## Work in progress to allow circleci to do windows builds
 ##        - build-msvc-2022:
 ##            <<: *std-filters
@@ -224,6 +231,23 @@ jobs:
         - BUILD_FLAGS=-j3
         - BUILD_ENV=debian
         - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-raspbian-armhf.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-arm64-debian-buster:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=buster-arm64
+        - DOCKER_IMAGE=jongough/debian-arm64:buster
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - BUILD_GTK3: false
         - DEPLOY_USE_ORB: true
         steps:
         - checkout
@@ -385,6 +409,7 @@ jobs:
         - image: cimg/base:edge-22.04
         environment:
         - BUILD_GTK3: true
+        - WX_VER: wx32
         - OCPN_TARGET: jammy
         - DEPLOY_USE_ORB: true
         - BUILD_ENV=ubuntu
@@ -394,9 +419,11 @@ jobs:
             echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
         - run: >
             echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy-updates main" | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb [trusted=yes] https://ppa.launchpadcontent.net/bdbcat/opencpn/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-debian.sh
+        - run: ci/circleci-build-jammy.sh
         - deploy-code
     build-buster:
         docker:
@@ -411,6 +438,25 @@ jobs:
             | sudo tee -a /etc/apt/sources.list
         - run: >
             echo "deb-src http://ftp.us.debian.org/debian buster-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - deploy-code
+    build-bullseye:
+        docker:
+        - image: circleci/buildpack-deps:bullseye-scm
+        environment:
+        - OCPN_TARGET:  bullseye
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian bullseye main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian bullseye-updates main"
             | sudo tee -a /etc/apt/sources.list
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
@@ -472,6 +518,22 @@ jobs:
         - WX_VER: wx32
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 20.08
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ci/*.sh
+        - run:
+            command: bash ci/circleci-build-flatpak.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-flatpak-x86-2208:
+        machine:
+            image: ubuntu-2004:202010-01
+        environment:
+        - OCPN_TARGET:  flatpak
+        - FLATPAK_BRANCH: beta
+        - CLOUDSMITH_PKG_EXT: gz
+        - SDK_VER: 22.08
         - DEPLOY_USE_ORB: true
         steps:
         - checkout
@@ -556,3 +618,5 @@ jobs:
         steps:
         - checkout
         - run: ci/circleci-build-msvc
+        - deploy-code:
+            install-python: true
