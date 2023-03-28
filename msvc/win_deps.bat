@@ -119,4 +119,4 @@ if not exist "%WXWIN%" (
 )
 dir cache
 type cache/wx-config
-::refreshenv
+refreshenv

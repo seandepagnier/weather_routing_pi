@@ -42,8 +42,6 @@ workflows:
 ## Currently circleci does not build armf64 correctly due to no suitable docker image
 ##        - build-armhf-bionic-64:
 ##            <<: *std-filters
-        - build-arm64-debian-bullseye:
-            <<: *std-filters
         - build-armhf-ubuntu-focal:
             <<: *std-filters
 ## Not required as flatpak build used instead - 14/01/2022
@@ -247,7 +245,6 @@ jobs:
         - DOCKER_IMAGE=jongough/debian-arm64:buster
         - BUILD_FLAGS=-j3
         - BUILD_ENV=debian
-        - BUILD_GTK3: false
         - DEPLOY_USE_ORB: true
         steps:
         - checkout
@@ -409,7 +406,7 @@ jobs:
         - image: cimg/base:edge-22.04
         environment:
         - BUILD_GTK3: true
-        - WX_VER: wx32
+        - WX_VER: 32
         - OCPN_TARGET: jammy
         - DEPLOY_USE_ORB: true
         - BUILD_ENV=ubuntu
@@ -423,7 +420,7 @@ jobs:
             echo "deb [trusted=yes] https://ppa.launchpadcontent.net/bdbcat/opencpn/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-jammy.sh
+        - run: ci/circleci-build-debian.sh
         - deploy-code
     build-buster:
         docker:
@@ -515,7 +512,7 @@ jobs:
         environment:
         - OCPN_TARGET:  flatpak
         - FLATPAK_BRANCH: beta
-        - WX_VER: wx32
+        - WX_VER: 32
         - CLOUDSMITH_PKG_EXT: gz
         - SDK_VER: 20.08
         - DEPLOY_USE_ORB: true
@@ -564,7 +561,7 @@ jobs:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
         - DEPLOY_USE_ORB: true
-        - WXVERSION: 312
+        - WX_VER: 312
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
@@ -577,7 +574,7 @@ jobs:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
         - DEPLOY_USE_ORB: true
-        - WXVERSION: 32
+        - WX_VER: 32
         steps:
         - checkout
         - run: chmod a+x ci/*.sh
@@ -613,7 +610,7 @@ jobs:
         environment:
         - OCPN_TARGET: MSVC
         - MSVC_VERSION: 2022
-        - WXVERSION: 32
+        - WX_VER: 32
         - DEPLOY_USE_ORB: true
         steps:
         - checkout

@@ -15,7 +15,7 @@ for pkg in cairo cmake gettext libarchive libexif python wget; do
     brew link --overwrite $pkg || brew install $pkg
 done
 
-if [ -n "$WXVERSION" ] && [ "$WXVERSION" -eq "32" ]; then
+if [ -n "$WX_VER" ] && [ "$WX_VER" -eq "32" ]; then
     echo "Building for WXVERSION 32";
     WX_URL=https://download.opencpn.org/s/Djqm4SXzYjF8nBw/download
     WX_DOWNLOAD=/tmp/wx321_opencpn50_macos1010.tar.xz

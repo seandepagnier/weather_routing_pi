@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.226.0 17/02/2023 DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.230.0 05/03/2023 DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -53,10 +53,10 @@ set(SHORT_DESCRIPTION "Compute optimal routes based on weather and constraints."
 set(LONG_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")				  
 
 set(VERSION_MAJOR "1")
-set(VERSION_MINOR "13")
-set(VERSION_PATCH "52")
+set(VERSION_MINOR "14")
+set(VERSION_PATCH "0")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "27/02/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "28/03/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")

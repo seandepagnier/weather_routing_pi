@@ -61,7 +61,7 @@ for:
     - image: Visual Studio 2022
   install:
     - call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
-    - set WX_VER=wx32
+    - set WX_VER=32
     - set WXWIN=C:\wxWidgets-3.2.1
     - set wxWidgets_ROOT_DIR=%WXWIN%
     - set wxWidgets_LIB_DIR=%WXWIN%\lib\vc_dll

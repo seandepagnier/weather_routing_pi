@@ -5,7 +5,7 @@ set "SCRIPTDIR=%~dp0"
 set "GIT_HOME=C:\Program Files\Git"
 if "%CONFIGURATION%" == "" set "CONFIGURATION=RelWithDebInfo"
 
-set wx_vers="wx%WXVERSION%"
+set wx_vers="wx%WX_VER%"
 echo Building %wx_vers%
 
 PATH %SCRIPTDIR%.local\bin;%PATH%
