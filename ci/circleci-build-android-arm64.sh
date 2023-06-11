@@ -72,10 +72,10 @@ cmake  \
   ..
 
 # Get number of processors and use this on make to speed up build
-procs=$(awk -F- '{print $2}' /sys/fs/cgroup/cpuset/cpuset.cpus)
-procs=$((procs + 1))
-make_cmd="make -j"$procs
-eval $make_cmd
+#procs=$(awk -F- '{print $2}' /sys/fs/cgroup/cpuset/cpuset.cpus)
+#procs=$((procs + 1))
+#make_cmd="make -j"$procs
+#eval $make_cmd
 make package
 
 #  All below for local docker build

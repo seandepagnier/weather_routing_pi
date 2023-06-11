@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.230.0 05/03/2023 DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.238.0 09/06/2023 DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "14")
-set(VERSION_PATCH "0")
+set(VERSION_PATCH "1")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "28/03/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "11/06/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov571")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -195,7 +195,7 @@ SET (HDRS
 
 set(EXTSRC
 )
- set(EXTINCLUDE     
+set(EXTINCLUDE     
     extinclude/ODAPI.h     
     extinclude/ODJSONSchemas.h
 )
@@ -253,19 +253,13 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 
-# These 3 are included down below
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
-
-if(QT_ANDROID)
-    include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
-endif(QT_ANDROID)
-
-
 ##
 ## ----- Change above to match project requirements for android build ----- ##
 ##
+
+#if(QT_ANDROID)
+#    include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
+#endif(QT_ANDROID)
 
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
