@@ -2,9 +2,6 @@ clone_folder: c:\project\ocpn_project
 shallow_clone: false
 clone_depth: 10
 
-image:
-  - Visual Studio 2022
-  - Visual Studio 2017
 
 platform:
 # - x64
@@ -13,15 +10,19 @@ platform:
 configuration: Release
 test: OFF
 
-#build_cloud: docker
-
 environment:
   OCPN_TARGET: MSVC
-#  build_cloud: QEMU_WIN10
-#  APPVEYOR_BUILD_WORKER_IMAGE: install_vs2022.ps1
-# docker environment not working on appveyor 20230115
-#  docker_image: Windows
-#  docker_pull: always
+
+# use enviornment matrix with job_name to allow build of one or more environments
+  matrix:
+  - job_name: Visual Studio 2017
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+
+## This can be built in Circleci and is currently the FE2 default
+##
+#  - job_name: Visual Studio 2022
+#    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
+
 
 matrix:
 # allow either job to fail and the other to complete
@@ -34,7 +35,7 @@ for:
 -
   matrix:
     only:
-    - image: Visual Studio 2017
+      - job_name: Visual Studio 2017
   install:
     - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
     - set WX_VER=
@@ -58,7 +59,7 @@ for:
 -
   matrix:
     only:
-    - image: Visual Studio 2022
+      - job_name: Visual Studio 2022
   install:
     - call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
     - set WX_VER=32

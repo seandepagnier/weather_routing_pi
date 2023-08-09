@@ -25,48 +25,35 @@
 ::
 
 @echo off
+echo In win_deps
 
 setlocal enabledelayedexpansion
-
-if not exist "%HomeDrive%%HomePath%\.local\bin\pathman.exe" (
-    pushd "%HomeDrive%%HomePath%\.local\bin"
-    powershell /? >nul 2>&1
-    if errorlevel 1 set "PATH=%PATH%;C:\Windows\System32\WindowsPowerShell\v1.0"
-    curl.exe -sA "windows/10 x86"  -o webi-pwsh-install.ps1 ^
-        https://webi.ms/packages/_webi/webi-pwsh.ps1
-    powershell.exe -ExecutionPolicy Bypass -File webi-pwsh-install.ps1
-    webi.bat pathman
-    popd
-)
-pathman list > nul 2>&1
-if errorlevel 1 set "PATH=%PATH%;%HomeDrive%\%HomePath%\.local\bin"
-pathman add %HomeDrive%%HomePath%\.local\bin >nul
 
 git --version > nul 2>&1
 if errorlevel 1 (
    set "GIT_HOME=C:\Program Files\Git"
    if not exist "!GIT_HOME!" choco install -y git
-   pathman add !GIT_HOME!\cmd > nul
 )
-
+echo done git
 :: Install choco cmake and add it's persistent user path element
 ::
 cmake --version > nul 2>&1
 if errorlevel 1 (
   set "CMAKE_HOME=C:\Program Files\CMake"
-  choco install -y cmake
-  pathman add "!CMAKE_HOME!\bin" > nul
-  echo Adding !CMAKE_HOME!\bin to path
+  choco install -y --no-progress cmake
+::  pathman add "!CMAKE_HOME!\bin" > nul
+::  echo Adding !CMAKE_HOME!\bin to path
 )
 
 :: Install choco poedit and add it's persistent user path element
 ::
 set "POEDIT_HOME=C:\Program Files (x86)\Poedit\Gettexttools"
 if not exist "%POEDIT_HOME%" choco install -y poedit
-pathman add "%POEDIT_HOME%\bin" > nul
+::pathman add "%POEDIT_HOME%\bin" > nul
 
 :: Update required python stuff
 ::
+echo doing python
 python --version > nul 2>&1 && python -m ensurepip > nul 2>&1
 if errorlevel 1 choco install -y python
 python --version
@@ -83,12 +70,12 @@ if "%~1"=="wx32" (
   set "WXWIN=%SCRIPTDIR%..\cache\wxWidgets-3.2.1"
   set "wxWidgets_ROOT_DIR=!WXWIN!"
   set "wxWidgets_LIB_DIR=!WXWIN!\lib\vc14x_dll"
-  set "TARGET_TUPLE=msvc-wx32;10;x86_64"
+  set "TARGET_TUPLE=msvc-wx32"
 ) else (
   set "WXWIN=%SCRIPTDIR%..\cache\wxWidgets-3.1.2"
   set "wxWidgets_ROOT_DIR=!WXWIN!"
   set "wxWidgets_LIB_DIR=!WXWIN!\lib\vc_dll"
-  set "TARGET_TUPLE=msvc;10;x86_64"
+  set "TARGET_TUPLE=msvc"
 )
 
 if not exist %SCRIPTDIR%\..\cache ( mkdir %SCRIPTDIR%\..\cache )
@@ -118,5 +105,5 @@ if not exist "%WXWIN%" (
   )
 )
 dir cache
-type cache/wx-config
+type cache\wx-config.bat
 refreshenv

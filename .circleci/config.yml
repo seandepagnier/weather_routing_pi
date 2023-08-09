@@ -5,6 +5,8 @@ parameters:
     run_workflow_deploy:
         type: boolean
         default: true
+
+## Start of build control of O58 and O562 plugins
 ## run_workflow_deploy_O58
 ##    type: boolean
 ##    default: true
@@ -24,9 +26,9 @@ std-filters: &std-filters
 workflows:
     build_all:
         jobs:
-##  --------------------
+###  --------------------
 ## OpenCPN 5.8 Plugins
-## ---------------------
+## ----------------------
         - build-android-arm64:
              <<: *std-filters
         - build-android-armhf:
@@ -37,16 +39,18 @@ workflows:
             <<: *std-filters
         - build-flatpak-x86-2208:
             <<: *std-filters
-## No flatpak-armhf - Insufficient performance.
-## See appveyor for Windows build.
-## Work in progress to allow circleci to do windows builds
-##        - build-msvc-wx32-2022:
-##            <<: *std-filters
+## flatpak-armhf has Insufficient performance.
+## Appveyor can also build for Windows.
+        - build-msvc-wx32-2022:
+            <<: *std-filters
         - build-debian-arm64-12-bookworm:
             <<: *std-filters
         - build-debian-armhf-12-bookworm:
             <<: *std-filters
         - build-debian-x86_64-12-bookworm:
+            <<: *std-filters
+## KEEP needed for Raspbian OpenCPN v5.8(wx32) 
+        - build-ubuntu-x86_64-2204-jammy:
             <<: *std-filters
 ## ---------------------
 ## OpenCPN 5.6.2 Plugins
@@ -54,20 +58,10 @@ workflows:
 ## Frozen - 28/05/2023
         - build-macos:
              <<: *std-filters
-## See appveyor for Windows build.
+## Appveyor also builds for Windows.
 ## Frozen - 28/05/2023
 ##        - build-msvc-2022:
 ##            <<: *std-filters
-## Deprecated in favour of flatpak:22.08 build - 28/05/2023
-##        - build-flatpak-arm64-2008:
-##            <<: *std-filters
-## Deprecated in favour of flatpak:22.08 build - 28/05/2023
-##        - build-flatpak-x86-2008:
-##            <<: *std-filters
-## Deprecated in favour of flatpak:22.08 build - 28/05/2023  ??
-##        - build-flatpak:
-##            <<: *std-filters
-## No flatpak-armhf - Insufficient performance.
 ## Frozen - 28/05/2023
         - build-debian-armhf-10-buster:
             <<: *std-filters
@@ -89,43 +83,20 @@ workflows:
 ## Frozen - 28/05/2023
         - build-debian-x86_64-11-bullseye:
             <<: *std-filters
-## Not needed. Deps not met. - 30/04/2023           
-##        - build-debian-armhf-11-bullseye-wx32:
-##            <<: *std-filters
-## Not needed. Deps not met. - 30/04/2023
-##        - build-debian-x86_64-11-bullseye-wx32:
-##            <<: *std-filters       
-## Frozen - 28/05/2023  KEEP some users.
-        - build-raspian-armhf-913-stretch:
+## -------------------------------------
+## UBUNTU OS  Frozen - 28/05/2023  DROP
+## -------------------------------------
+## KEEP needed for Raspbian OpenCPN v5.6 
+        - build-ubuntu-armhf-1804-buster:
             <<: *std-filters
-##
-## UBUNTU OS
-## Frozen - 28/05/2023  DROP
-##        - build-ubuntu-armhf-1804-buster:
-##            <<: *std-filters
-## Frozen - 28/05/2023  DROP
 ##        - build-ubuntu-x86_64-1804-bionic:
 ##            <<: *std-filters
-## Frozen - 28/05/2023  DROP
 ##        - build-ubuntu-x86_64-1804-bionic-gtk3:
 ##            <<: *std-filters
-## Frozen - 28/05/2023  DROP
 ##        - build-ubuntu-armhf-2004-focal-gtk3:
 ##            <<: *std-filters
-## Frozen - 28/05/2023 DROP
 ##        - build-ubuntu-x86_64-2004-focal-gtk3:
 ##            <<: *std-filters
-## Frozen - 28/05/2023 KEEP (an unfortunate special case)
-        - build-ubuntu-x86_64-2204-jammy:
-            <<: *std-filters
-## Deprecated in favour of ubuntu-armhf:18.04 buster build - 14/01/2022
-##        - build-raspbian-armhf-buster:
-##            <<: *std-filters
-## Deprecated in favour of ubuntu-armhf:20.04 build - 14/01/2022
-##        - build-armhf-bullseye:
-##            <<: *std-filters
-
-
 orbs:
     cloudsmith: cloudsmith/cloudsmith@1.0.4
     win: circleci/windows@5.0
@@ -136,9 +107,9 @@ commands:
             install-python:
                 type: boolean
                 default: false
-            use-orb:
-                type: env_var_name
-                default: DEPLOY_USE_ORB
+            DEPLOY-USE-ORB:
+                type: boolean
+                default: true
         steps:
             - when:
                 condition: <<pipeline.parameters.run_workflow_deploy>>
@@ -149,11 +120,11 @@ commands:
                     - run: sudo apt install -y python3-pip
                     - run: python3.8 -m pip install cloudsmith-cli
                 - when:
-                    condition: <<parameters.use-orb>>
+                    condition: <<parameters.DEPLOY-USE-ORB>>
                     steps:
                     - cloudsmith/ensure-api-key
                     - cloudsmith/install-cli
-                - run: ci/cloudsmith-upload.sh
+                - run: bash ci/cloudsmith-upload.sh
 
     # if you want to use a local proxy add Acquire::http::Proxy \"http://192.168.1.1:3142\"; to a file called circleci-cache/apt-proxy. This will require
     #    --volume {your local directory}/circleci-cache:/home/circleci/circleci-cache
@@ -190,10 +161,10 @@ jobs:
         - run: bash ci/circleci-build-android-armhf.sh
         - deploy-code:
             install-python: true
-## See appveyor for Windows build.
     build-macos-wx32:
         macos:
             xcode: "12.5.1"
+        resource_class: macos.x86.medium.gen2
         environment:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
@@ -205,17 +176,21 @@ jobs:
         - run: bash ci/circleci-build-macos.sh
         - deploy-code
     build-msvc-wx32-2022:
-        executor: win/server-2022
+        executor:
+            name: win/server-2022
+            shell: cmd.exe
         environment:
         - OCPN_TARGET: MSVC
         - MSVC_VERSION: 2022
         - WX_VER: 32
-        - DEPLOY_USE_ORB: true
         steps:
         - checkout
-        - run: ci/circleci-build-msvc
+        - run:
+            privileged: False
+            shell: cmd.exe
+            command: ci\circleci-build-msvc.bat
         - deploy-code:
-            install-python: true
+            DEPLOY-USE-ORB: false
     build-flatpak-arm64-2208:
         machine:
             image: ubuntu-2004:202101-01
@@ -302,12 +277,35 @@ jobs:
             command: ci/circleci-build-ubuntu-docker.sh
             no_output_timeout: 30m
         - deploy-code
+## KEEP needed for Raspbian OpenCPN v5.8(wx32)
+    build-ubuntu-x86_64-2204-jammy:
+        docker:
+        - image: cimg/base:edge-22.04
+        environment:
+        - BUILD_GTK3: true
+        - WX_VER: 32
+        - OCPN_TARGET: jammy
+        - DEPLOY_USE_ORB: true
+        - BUILD_ENV=ubuntu
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy-updates main" | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb [trusted=yes] https://ppa.launchpadcontent.net/bdbcat/opencpn/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - deploy-code
 ## ---------------------
 ## OpenCPN 5.6.2 Plugins
 ## ---------------------
     build-macos:
         macos:
             xcode: "12.5.1"
+        resource_class: macos.x86.medium.gen2
         environment:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
@@ -318,60 +316,8 @@ jobs:
         - run: chmod a+x ci/*.sh
         - run: bash ci/circleci-build-macos.sh
         - deploy-code
-## Deprecated in favour of flatpak:22.08 build using O5.8 - 28/05/2023
-    build-flatpak-arm64-2008:
-        machine:
-            image: ubuntu-2004:202101-01
-        resource_class: arm.medium
-        environment:
-        - OCPN_TARGET:  flatpak-arm64
-        - FLATPAK_BRANCH: stable
-        - CLOUDSMITH_PKG_EXT: gz
-        - SDK_VER: 20.08
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - run: chmod a+x ci/*.sh
-        - run:
-            command: bash ci/circleci-build-flatpak.sh
-        - deploy-code
-## Deprecated in favour of flatpak:22.08 build using O5.8- 28/05/2023
-    build-flatpak-x86-2008:
-        machine:
-            image: ubuntu-2004:202010-01
-        environment:
-        - OCPN_TARGET:  flatpak
-        - FLATPAK_BRANCH: stable
-        - CLOUDSMITH_PKG_EXT: gz
-        - SDK_VER: 20.08
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - run: chmod a+x ci/*.sh
-        - run:
-            command: bash ci/circleci-build-flatpak.sh
-            no_output_timeout: 30m
-        - deploy-code
-## Deprecated in favour of flatpak:22.08 build using O5.8- 28/05/2023
-    build-flatpak:
-        machine:
-            image: ubuntu-2004:202010-01
-        environment:
-        - OCPN_TARGET:  flatpak
-        - FLATPAK_BRANCH: stable
-        - CLOUDSMITH_PKG_EXT: gz
-        - SDK_VER: 20.08
-        - WXWIDGETS_FORCE_VERSION: 3.0
-        steps:
-        - checkout
-        - run: chmod a+x ci/*.sh
-        - run:
-            command: bash ci/circleci-build-flatpak.sh
-        - when:
-            condition: <<pipeline.parameters.run_workflow_deploy>>
-            steps:
-            - run: ci/cloudsmith-upload.sh
-## See appveyor for Windows build.
+## Appveyor builds Windows including WinXT.
+## If below is used, will WinXT work?
     build-msvc-2022:
         executor: win/server-2022
         environment:
@@ -506,71 +452,10 @@ jobs:
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
         - deploy-code
- ## Not needed. Not used. - 30/04/2023
-    build-debian-armhf-11-bullseye-wx32:
-        machine:
-            image: ubuntu-2004:202104-01
-        environment:
-        - OCPN_TARGET=bullseye-armhf
-        - DOCKER_IMAGE=jongough/debian-armhf:bullseye
-        - BUILD_FLAGS=-j3
-        - BUILD_ENV=debian
-        - WX_VER: 32
-        - BUILD_GTK3: true
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - run: chmod a+x ./ci/*.sh
-        - run:
-            command: ci/circleci-build-ubuntu-docker.sh
-            no_output_timeout: 30m
-        - deploy-code
-## Not needed. Not used. - 30/04/2023
-    build-debian-arm64-11-bullseye-wx32:
-        machine:
-            image: ubuntu-2004:2023.04.2
-        environment:
-        - OCPN_TARGET=bullseye-arm64
-        - DOCKER_IMAGE=arm64v8/debian:bullseye-backports
-        - BUILD_FLAGS=-j3
-        - BUILD_ENV=debian
-        - WX_VER: 32
-        - BUILD_GTK3: true
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - restore_cache:
-            name: Restore build machine dependencies
-            keys:
-                - arm64-debian-bullseye-wx32-{{ checksum "CMakeLists.txt" }}
-#                - arm64-debian-bullseye-wx32-
-        - run: chmod a+x ./ci/*.sh
-        - run:
-            command: ci/circleci-build-ubuntu-docker.sh
-            no_output_timeout: 30m
-        - deploy-code
-        - save_cache:
-            name: Save build machine cache
-            key: arm64-debian-bullseye-wx32-{{ checksum "CMakeLists.txt" }}
-            paths: ./
- ## Debian RPI - needed, some users
-    build-raspian-armhf-913-stretch:
-        machine:
-            image: ubuntu-2004:202104-01
-        environment:
-        - OCPN_TARGET=stretch-armhf
-        - DOCKER_IMAGE=balenalib/raspberry-pi-debian:stretch
-        - BUILD_FLAGS=-j3
-        - BUILD_ENV=raspbian
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - run: chmod a+x ./ci/*.sh
-        - run:
-            command: ci/circleci-build-ubuntu-docker.sh
-            no_output_timeout: 30m
-        - deploy-code           
-## Ubuntu OS  - All are Old & Deprecated, now using debian above.
+## -------------------------------------------
+## Ubuntu OS - Generally deprecated and not used.
+## -------------------------------------------
+## KEEP needed for Raspbian OpenCPN v5.6 
     build-ubuntu-armhf-1804-buster:
         machine:
             image: ubuntu-2004:202104-01
@@ -662,42 +547,4 @@ jobs:
         - run: cat /etc/apt/sources.list
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
-        - deploy-code
-    build-ubuntu-x86_64-2204-jammy:
-        docker:
-        - image: cimg/base:edge-22.04
-        environment:
-        - BUILD_GTK3: true
-        - WX_VER: 32
-        - OCPN_TARGET: jammy
-        - DEPLOY_USE_ORB: true
-        - BUILD_ENV=ubuntu
-        steps:
-        - checkout
-        - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
-        - run: >
-            echo "deb-src http://us.archive.ubuntu.com/ubuntu/ jammy-updates main" | sudo tee -a /etc/apt/sources.list
-        - run: >
-            echo "deb [trusted=yes] https://ppa.launchpadcontent.net/bdbcat/opencpn/ubuntu/ jammy main" | sudo tee -a /etc/apt/sources.list
-        - run: cat /etc/apt/sources.list
-        - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-debian.sh
-        - deploy-code
-## Deprecated in favour of ubuntu-armhf:18.04 buster build - 14/01/2022
-    build-raspbian-armhf-buster:
-        machine:
-            image: ubuntu-2004:202104-01
-        environment:
-        - OCPN_TARGET=buster-armhf
-        - DOCKER_IMAGE=balenalib/raspberry-pi-debian:buster
-        - BUILD_FLAGS=-j3
-        - BUILD_ENV=raspbian
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - run: chmod a+x ./ci/*.sh
-        - run:
-            command: ci/circleci-build-ubuntu-docker.sh
-            no_output_timeout: 30m
         - deploy-code
