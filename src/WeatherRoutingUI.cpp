@@ -335,10 +335,10 @@ WeatherRoutingPanel::WeatherRoutingPanel( wxWindow* parent, wxWindowID id, const
 	m_bExport = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Export"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer116->Add( m_bExport, 0, wxALL, 5 );
 
-    m_bExportRoute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("Export Route"), wxDefaultPosition, wxDefaultSize, 0 );
-    fgSizer116->Add( m_bExportRoute, 0, wxALL, 5 );
+        m_bExportRoute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("Export Route"), wxDefaultPosition, wxDefaultSize, 0 );
+        fgSizer116->Add( m_bExportRoute, 0, wxALL, 5 );
 
-    m_gProgress = new wxGauge( sbSizer29->GetStaticBox(), wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
+        m_gProgress = new wxGauge( sbSizer29->GetStaticBox(), wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
 	m_gProgress->SetValue( 0 );
 	fgSizer116->Add( m_gProgress, 0, wxALL|wxEXPAND, 5 );
 

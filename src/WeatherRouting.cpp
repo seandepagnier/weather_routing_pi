@@ -1971,9 +1971,9 @@ void WeatherRouting::SetEnableConfigurationMenu()
     m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size() > 0);
 
     bool cnt = m_panel->m_lWeatherRoutes->GetItemCount() > 0;
-    //m_mDeleteAll->Enable(cnt);
-    //m_mComputeAll->Enable(cnt);
-    //m_mExportAll->Enable(cnt);
+    m_mDeleteAll->Enable(cnt);
+    m_mComputeAll->Enable(cnt);
+    m_mExportAll->Enable(cnt);
 }
 
 void WeatherRouting::UpdateConfigurations()
@@ -2050,9 +2050,9 @@ bool WeatherRouting::AddConfiguration(RouteMapConfiguration &configuration)
     if(m_panel->m_lWeatherRoutes->GetColumnCount())
         UpdateItem(m_panel->m_lWeatherRoutes->InsertItem(item));
 
-    //m_mDeleteAll->Enable();
-    //m_mComputeAll->Enable();
-    //m_mExportAll->Enable();
+    m_mDeleteAll->Enable();
+    m_mComputeAll->Enable();
+    m_mExportAll->Enable();
     return true;
 }
 
