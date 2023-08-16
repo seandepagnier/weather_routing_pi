@@ -335,7 +335,10 @@ WeatherRoutingPanel::WeatherRoutingPanel( wxWindow* parent, wxWindowID id, const
 	m_bExport = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Export"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer116->Add( m_bExport, 0, wxALL, 5 );
 
-	m_gProgress = new wxGauge( sbSizer29->GetStaticBox(), wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
+    m_bExportRoute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("Export Route"), wxDefaultPosition, wxDefaultSize, 0 );
+    fgSizer116->Add( m_bExportRoute, 0, wxALL, 5 );
+
+    m_gProgress = new wxGauge( sbSizer29->GetStaticBox(), wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );
 	m_gProgress->SetValue( 0 );
 	fgSizer116->Add( m_gProgress, 0, wxALL|wxEXPAND, 5 );
 
@@ -682,7 +685,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	fgSizer111->Add( m_staticText30, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
 	m_tpTime = new wxTimePickerCtrl( sbStart->GetStaticBox(), wxID_ANY, wxDefaultDateTime, wxDefaultPosition, wxDefaultSize, wxDP_DEFAULT );
-	fgSizer111->Add( m_tpTime, 1, wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL|wxEXPAND|wxALL, 5 );
+	fgSizer111->Add( m_tpTime, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 5 );
 
 	m_bCurrentTime = new wxButton( sbStart->GetStaticBox(), wxID_ANY, _("Current Time"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer111->Add( m_bCurrentTime, 1, wxALIGN_CENTER_VERTICAL|wxEXPAND|wxALL, 5 );
@@ -1558,14 +1561,14 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 
 	m_staticText138 = new wxStaticText( this, wxID_ANY, _("Position"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText138->Wrap( -1 );
-	fgSizer12->Add( m_staticText138, 1, wxALL|wxALIGN_RIGHT|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer12->Add( m_staticText138, 1, wxALL|wxALIGN_RIGHT|wxEXPAND, 5 );
 
 	m_sPosition = new wxSlider( this, wxID_ANY, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	fgSizer12->Add( m_sPosition, 1, wxALL|wxEXPAND, 5 );
 
 	m_staticText139 = new wxStaticText( this, wxID_ANY, _("Scale"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText139->Wrap( -1 );
-	fgSizer12->Add( m_staticText139, 1, wxALL|wxALIGN_RIGHT|wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer12->Add( m_staticText139, 1, wxALL|wxALIGN_RIGHT|wxEXPAND, 5 );
 
 	m_sScale = new wxSlider( this, wxID_ANY, 100, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	fgSizer12->Add( m_sScale, 1, wxALL|wxEXPAND, 5 );
@@ -1639,7 +1642,7 @@ PlotDialogBase::PlotDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	m_sdbSizer4->AddButton( m_sdbSizer4OK );
 	m_sdbSizer4->Realize();
 
-	fgSizer16->Add( m_sdbSizer4, 1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	fgSizer16->Add( m_sdbSizer4, 1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
 	fgSizer97->Add( fgSizer16, 1, wxEXPAND, 5 );
@@ -2981,7 +2984,7 @@ RoutePositionDialog::RoutePositionDialog( wxWindow* parent, wxWindowID id, const
 	m_sdbSizer5->AddButton( m_sdbSizer5OK );
 	m_sdbSizer5->Realize();
 
-	fgSizer90->Add( m_sdbSizer5, 1, wxEXPAND|wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	fgSizer90->Add( m_sdbSizer5, 1, wxEXPAND|wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
 	this->SetSizer( fgSizer90 );

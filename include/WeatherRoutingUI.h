@@ -75,6 +75,7 @@ class WeatherRoutingBase : public wxFrame
 		wxMenuItem* m_mComputeAll;
 		wxMenuItem* m_mStop;
 		wxMenuItem* m_mExport;
+        wxMenuItem* m_mExportRoute;
 		wxMenuItem* m_mExportAll;
 		wxMenu* m_mView;
 		wxMenu* m_mHelp;
@@ -108,7 +109,8 @@ class WeatherRoutingBase : public wxFrame
 		virtual void OnStop( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnResetAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }
+        virtual void OnExportRoute( wxCommandEvent& event ) { event.Skip(); }
+        virtual void OnExportAll( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnFilter( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSettings( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStatistics( wxCommandEvent& event ) { event.Skip(); }
@@ -159,6 +161,7 @@ class WeatherRoutingPanel : public wxPanel
 		virtual void OnWeatherRouteKeyDown( wxListEvent& event ) { event.Skip(); }
 		virtual void OnCompute( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnExport( wxCommandEvent& event ) { event.Skip(); }
+        virtual void OnExportRoute( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:
@@ -167,6 +170,7 @@ class WeatherRoutingPanel : public wxPanel
 		wxListCtrl* m_lWeatherRoutes;
 		wxButton* m_bCompute;
 		wxButton* m_bExport;
+        wxButton* m_bExportRoute;
 		wxGauge* m_gProgress;
 
 		WeatherRoutingPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString );

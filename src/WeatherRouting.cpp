@@ -45,6 +45,7 @@
 #include "WeatherRouting.h"
 #include "AboutDialog.h"
 #include "icons.h"
+#include "navobj_util.h"
 
 /* XPM */
 static const char *eye[]={
@@ -310,6 +311,7 @@ WeatherRouting::WeatherRouting(wxWindow *parent, weather_routing_pi &plugin)
     m_panel->m_lWeatherRoutes->Connect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnWeatherRouteKeyDown ), NULL, this );
     m_panel->m_bCompute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnCompute ), NULL, this );
     m_panel->m_bExport->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExport ), NULL, this );
+    m_panel->m_bExportRoute->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExportRoute ), NULL, this );
 
 
 #ifdef __OCPN__ANDROID__ 
@@ -342,7 +344,8 @@ WeatherRouting::~WeatherRouting( )
     m_panel->m_lWeatherRoutes->Disconnect( wxEVT_COMMAND_LIST_KEY_DOWN, wxListEventHandler( WeatherRouting::OnWeatherRouteKeyDown ), NULL, this );
     m_panel->m_bCompute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnCompute ), NULL, this );
     m_panel->m_bExport->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExport ), NULL, this );
-    
+    m_panel->m_bExportRoute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExportRoute ), NULL, this );
+
     Stop();
 
     m_SettingsDialog.SaveSettings();
@@ -1527,6 +1530,14 @@ void WeatherRouting::OnExport ( wxCommandEvent& event )
         Export(**it);
 }
 
+void WeatherRouting::OnExportRoute ( wxCommandEvent& event )
+{
+    std::list<RouteMapOverlay *>routemapoverlays = CurrentRouteMaps(true);
+    for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
+        it != routemapoverlays.end(); it++)
+        ExportRoute(**it);
+}
+
 void WeatherRouting::OnExportAll( wxCommandEvent& event )
 {
     for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++)
@@ -1960,9 +1971,9 @@ void WeatherRouting::SetEnableConfigurationMenu()
     m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size() > 0);
 
     bool cnt = m_panel->m_lWeatherRoutes->GetItemCount() > 0;
-    m_mDeleteAll->Enable(cnt);
-    m_mComputeAll->Enable(cnt);
-    m_mExportAll->Enable(cnt);
+    //m_mDeleteAll->Enable(cnt);
+    //m_mComputeAll->Enable(cnt);
+    //m_mExportAll->Enable(cnt);
 }
 
 void WeatherRouting::UpdateConfigurations()
@@ -2039,9 +2050,9 @@ bool WeatherRouting::AddConfiguration(RouteMapConfiguration &configuration)
     if(m_panel->m_lWeatherRoutes->GetColumnCount())
         UpdateItem(m_panel->m_lWeatherRoutes->InsertItem(item));
 
-    m_mDeleteAll->Enable();
-    m_mComputeAll->Enable();
-    m_mExportAll->Enable();
+    //m_mDeleteAll->Enable();
+    //m_mComputeAll->Enable();
+    //m_mExportAll->Enable();
     return true;
 }
 
@@ -2466,6 +2477,101 @@ void WeatherRouting::Export(RouteMapOverlay &routemapoverlay)
     newPath->pWaypointList->Clear();
 
     delete newPath;
+
+    GetParent()->Refresh();
+}
+
+void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
+{
+    std::list<PlotData> plotdata = routemapoverlay.GetPlotData(false);
+
+    if(plotdata.empty()) {
+        wxMessageDialog mdlg(this, _("Empty Route, nothing to export\n"),
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+        mdlg.ShowModal();
+        return;
+    }
+
+
+    SimpleRoute new_route;
+    wxDateTime display_time = routemapoverlay.StartTime();
+    if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
+        display_time = display_time.FromUTC();
+
+    new_route.m_RouteNameString = "WXRoute_"  + display_time.Format(_T("%m-%d-%y_%H:%M"));
+    new_route.m_GUID = GetNewGUID();
+    //new_route.m_PlannedSpeed = 1.;
+
+    // XXX double check time is really end time, not start time off by one.
+    RouteMapConfiguration c = routemapoverlay.GetConfiguration();
+    new_route.m_RouteStartString = c.Start;
+    new_route.m_RouteEndString = c.End;
+
+
+    std::vector<double> lat;
+    std::vector<double> lon;
+    std::vector<wxDateTime> time;
+    std::vector<double> vmga;
+    for(auto const &it0 : plotdata) {
+        lat.push_back(it0.lat);
+        lon.push_back(heading_resolve(it0.lon));
+        time.push_back(it0.time);
+        vmga.push_back(-1.);
+    }
+
+    unsigned int ip = 0;
+    for(auto const &it1 : plotdata) {
+        // calculate leg parameters, mainly VMG
+        double vmg = -1.;
+        if (ip < time.size() - 1) {
+            wxTimeSpan delta_time = time[ip + 1] - time[ip];
+            double secs = delta_time.GetSeconds().ToDouble();
+            double distance = DistGreatCircle_Plugin(lat[ip + 1], lon[ip + 1],
+                                                     lat[ip], lon[ip]);
+            vmg = (distance / secs) * 3600;
+        }
+        vmga[ip+1] = vmg;  // assign VMG to last (or second) point in leg
+        ip++;
+    }
+
+    unsigned int ip1 = 0;
+    for(auto const &it : plotdata) {
+        SimpleRoutePoint*  newPoint = new SimpleRoutePoint
+                (it.lat, heading_resolve(it.lon),
+                 _T("circle"), "WX-Route Point",
+                 GetNewGUID());
+
+        if (vmga[ip1] >= 0.)
+            newPoint->m_seg_vmg = vmga[ip1];
+
+        newPoint->m_CreateTime = it.time;
+        new_route.AddPoint(newPoint);
+        ip1++;
+    }
+
+
+    // last point, missing if config didn't succeed
+    Position *p = routemapoverlay.GetDestination();
+    if (p) {
+        SimpleRoutePoint*  newPoint = new SimpleRoutePoint
+                (p->lat, p->lon, _T("circle"), _("Weather Route Destination"));
+        newPoint->m_CreateTime =  routemapoverlay.EndTime();
+        new_route.AddPoint(newPoint);
+    }
+
+    SimpleNavObjectXML *navobj = new SimpleNavObjectXML;
+    navobj->CreateNavObjGPXRoute(new_route);
+
+    wxString export_path = weather_routing_pi::StandardPath()
+                                   + _T("PlannedRoutes/");
+    if (!wxDir::Exists(export_path))
+        wxDir::Make(export_path);
+
+    export_path += new_route.m_RouteNameString;
+    export_path += ".gpx";
+    navobj->save_file(export_path.ToStdString().c_str() );
+
+    delete navobj;
 
     GetParent()->Refresh();
 }

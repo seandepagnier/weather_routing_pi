@@ -164,6 +164,7 @@ SET(SRCS
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
+            src/navobj_util.cpp
 )
 
 SET (HDRS
@@ -191,6 +192,7 @@ SET (HDRS
             include/zuFile.h
             include/georef.h
             include/GribRecord.h
+            include/navobj_util.h
 )
 
 set(EXTSRC
@@ -252,6 +254,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
 
 ##
 ## ----- Change above to match project requirements for android build ----- ##

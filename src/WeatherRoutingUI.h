@@ -167,6 +167,7 @@ class WeatherRoutingPanel : public wxPanel
 		wxListCtrl* m_lWeatherRoutes;
 		wxButton* m_bCompute;
 		wxButton* m_bExport;
+        wxButton* m_bExportRoute;
 		wxGauge* m_gProgress;
 
 		WeatherRoutingPanel( wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 500,300 ), long style = wxTAB_TRAVERSAL, const wxString& name = wxEmptyString );
