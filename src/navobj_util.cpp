@@ -82,25 +82,6 @@ static bool GPXCreateWpt(pugi::xml_node node, SimpleRoutePoint *pr) {
     s.Printf(_T("%.9f"), pr->m_lon);
     node.append_attribute("lon") = s.mb_str();
 
-/*
-    if (flags & OUT_TIME) {
-        child = node.append_child("time");
-        if (pr->m_timestring.Len())
-            child.append_child(pugi::node_pcdata)
-                    .set_value(pr->m_timestring.mb_str());
-        else {
-            wxDateTime dt = pr->GetCreateTime();
-            if ( !dt.IsValid() )
-                dt = wxDateTime::Now();
-
-            wxString t = dt.ToUTC().FormatISODate()
-                    .Append(_T("T"))
-                    .Append(dt.ToUTC().FormatISOTime())
-                    .Append(_T("Z"));
-            child.append_child(pugi::node_pcdata).set_value(t.mb_str());
-        }
-    }
-*/
     if (!pr->m_MarkName.IsEmpty() ) {
         wxCharBuffer buffer = pr->m_MarkName.ToUTF8();
         if (buffer.data()) {
