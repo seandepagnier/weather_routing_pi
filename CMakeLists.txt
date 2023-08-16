@@ -335,6 +335,10 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 add_subdirectory(libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
+add_subdirectory(libs/pugixml)
+target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
+
 # Needed for all builds
 # ----- Do not change - needed to build app ----- ##
 #========================================================
