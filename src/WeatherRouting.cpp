@@ -2562,15 +2562,46 @@ void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
     SimpleNavObjectXML *navobj = new SimpleNavObjectXML;
     navobj->CreateNavObjGPXRoute(new_route);
 
-    wxString export_path = weather_routing_pi::StandardPath()
+    wxString export_path_base = weather_routing_pi::StandardPath()
                                    + _T("PlannedRoutes")
                                    + wxFileName::GetPathSeparator();
-    if (!wxDir::Exists(export_path))
-        wxDir::Make(export_path);
+    if (!wxDir::Exists(export_path_base))
+        wxDir::Make(export_path_base);
 
-    export_path += new_route.m_RouteNameString;
-    export_path += ".gpx";
-    navobj->save_file(export_path.ToStdString().c_str() );
+    // Handle duplicate file names by adding "(n)" as needed
+    export_path_base += new_route.m_RouteNameString;
+    wxString export_path = export_path_base + ".gpx";
+    if (wxFileName::Exists(export_path)){
+        int iv = 1;
+        bool bok = false;
+        wxString tname, vadd;
+        while (!bok && iv < 10) {
+            vadd.Printf("(%d)", iv);
+            wxString tname = export_path_base + vadd + ".gpx";
+            if (wxFileName::Exists(tname)) {
+                iv++;
+            } else
+                bok = true;
+        }
+        if (bok)
+            export_path_base += vadd;
+    }
+
+    export_path = export_path_base + ".gpx";
+
+    bool bsave_ok = navobj->save_file(export_path.ToStdString().c_str() );
+    if (bsave_ok){
+        wxMessageBox(_("GPX Route file created") + ".\n\n"
+                        + export_path + "\n",
+                     _("OpenCPN Weather Routing Plugin"),
+                     wxOK );
+    }
+    else {
+        wxMessageBox(_("GPX Route file export failed") + ".\n\n"
+                               + export_path + "\n",
+                _("OpenCPN Weather Routing Plugin"),
+                wxICON_ERROR | wxOK );
+    }
 
     delete navobj;
 
