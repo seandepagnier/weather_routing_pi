@@ -2498,7 +2498,7 @@ void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
     if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
         display_time = display_time.FromUTC();
 
-    new_route.m_RouteNameString = "WXRoute_"  + display_time.Format(_T("%m-%d-%y_%H:%M"));
+    new_route.m_RouteNameString = "WXRoute_"  + display_time.Format(_T("%m-%d-%y_%H-%M"));
     new_route.m_GUID = GetNewGUID();
     //new_route.m_PlannedSpeed = 1.;
 
@@ -2563,7 +2563,8 @@ void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
     navobj->CreateNavObjGPXRoute(new_route);
 
     wxString export_path = weather_routing_pi::StandardPath()
-                                   + _T("PlannedRoutes/");
+                                   + _T("PlannedRoutes")
+                                   + wxFileName::GetPathSeparator();
     if (!wxDir::Exists(export_path))
         wxDir::Make(export_path);
 
