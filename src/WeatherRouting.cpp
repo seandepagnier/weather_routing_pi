@@ -2492,21 +2492,20 @@ void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
         return;
     }
 
+    RouteMapConfiguration c = routemapoverlay.GetConfiguration();
 
     SimpleRoute new_route;
+    new_route.m_GUID = GetNewGUID();
+
     wxDateTime display_time = routemapoverlay.StartTime();
     if(m_SettingsDialog.m_cbUseLocalTime->GetValue())
         display_time = display_time.FromUTC();
 
     new_route.m_RouteNameString = "WXRoute_"  + display_time.Format(_T("%m-%d-%y_%H-%M"));
-    new_route.m_GUID = GetNewGUID();
-    //new_route.m_PlannedSpeed = 1.;
+    new_route.m_RouteNameString += "_"  + c.Start + "_" + c.End;
 
-    // XXX double check time is really end time, not start time off by one.
-    RouteMapConfiguration c = routemapoverlay.GetConfiguration();
     new_route.m_RouteStartString = c.Start;
     new_route.m_RouteEndString = c.End;
-
 
     std::vector<double> lat;
     std::vector<double> lon;
