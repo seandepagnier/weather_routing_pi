@@ -162,6 +162,7 @@ public:
 
   double m_lat, m_lon;
   double m_seg_vmg;
+  wxDateTime etd;
   wxString m_MarkName;
   wxString m_MarkDescription;
   wxString m_GUID;

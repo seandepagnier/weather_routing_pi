@@ -2506,6 +2506,7 @@ void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
 
     new_route.m_RouteStartString = c.Start;
     new_route.m_RouteEndString = c.End;
+    new_route.m_PlannedDeparture = routemapoverlay.StartTime();
 
     std::vector<double> lat;
     std::vector<double> lon;
@@ -2544,6 +2545,9 @@ void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
             newPoint->m_seg_vmg = vmga[ip1];
 
         newPoint->m_CreateTime = it.time;
+        if (ip1 > 0)
+          newPoint->etd = time[ip1-1];
+
         new_route.AddPoint(newPoint);
         ip1++;
     }

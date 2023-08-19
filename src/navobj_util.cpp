@@ -109,7 +109,23 @@ static bool GPXCreateWpt(pugi::xml_node node, SimpleRoutePoint *pr) {
     sps.Printf("%.3f", pr->m_seg_vmg);
     child.append_attribute("planned_speed") = sps.mbc_str();
 
- //   if (ext_name == _T ( "opencpn:rte_properties" )) {
+    if (pr->etd.IsValid()) {
+        pugi::xml_attribute use = child.append_attribute("etd");
+        use.set_value(pr->etd.FormatISOCombined().mb_str());
+    }
+
+    //<opencpn:rte_properties planned_speed="44.0" etd="2023-08-18T00:00:00" />
+
+/*
+    if (ext_name == _T ( "opencpn:rte_properties" )) {
+        for (pugi::xml_attribute attr = ext_child.first_attribute(); attr;
+             attr = attr.next_attribute()) {
+            if (!strcmp(attr.name(), "planned_speed"))
+              plan_speed = attr.as_double();
+            else if (!strcmp(attr.name(), "etd"))
+              etd = attr.as_string();
+*/
+            //   if (ext_name == _T ( "opencpn:rte_properties" )) {
  //       for (pugi::xml_attribute attr = ext_child.first_attribute(); attr;
  //            attr = attr.next_attribute()) {
  //           if (!strcmp(attr.name(), "planned_speed"))
@@ -418,6 +434,6 @@ bool SimpleNavObjectXML::CreateNavObjGPXRoute(const SimpleRoute &Route) {
 
     GPXCreateRoute(new_node, Route);
 
-    save(std::cout);
+    //save(std::cout);
     return true;
 }
