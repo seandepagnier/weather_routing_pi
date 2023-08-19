@@ -1966,6 +1966,7 @@ void WeatherRouting::SetEnableConfigurationMenu()
     m_mCompute->Enable(current);
     m_panel->m_bCompute->Enable(current);
     m_mExport->Enable(current);
+    m_mExportRoute->Enable(current);
     m_panel->m_bExport->Enable(current);
 
     m_mStop->Enable(m_WaitingRouteMaps.size() + m_RunningRouteMaps.size() > 0);

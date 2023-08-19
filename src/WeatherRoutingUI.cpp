@@ -87,10 +87,13 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 
 	m_mConfiguration->AppendSeparator();
 
-	m_mExport = new wxMenuItem( m_mConfiguration, wxID_ANY, wxString( _("E&xport") ) + wxT('\t') + wxT("Ctrl+X"), wxEmptyString, wxITEM_NORMAL );
+	m_mExport = new wxMenuItem( m_mConfiguration, wxID_ANY, wxString( _("Export") ) , wxEmptyString, wxITEM_NORMAL );
 	m_mConfiguration->Append( m_mExport );
 
-	m_mExportAll = new wxMenuItem( m_mConfiguration, wxID_ANY, wxString( _("Export All") ) , wxEmptyString, wxITEM_NORMAL );
+    m_mExportRoute = new wxMenuItem( m_mConfiguration, wxID_ANY, wxString( _("E&xportRoute") ) + wxT('\t') + wxT("Ctrl+X"), wxEmptyString, wxITEM_NORMAL );
+    m_mConfiguration->Append( m_mExportRoute );
+
+    m_mExportAll = new wxMenuItem( m_mConfiguration, wxID_ANY, wxString( _("Export All") ) , wxEmptyString, wxITEM_NORMAL );
 	m_mConfiguration->Append( m_mExportAll );
 
 	m_mConfiguration->AppendSeparator();
@@ -231,6 +234,7 @@ WeatherRoutingBase::WeatherRoutingBase( wxWindow* parent, wxWindowID id, const w
 	m_mConfiguration->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnStop ), this, m_mStop->GetId());
 	m_mConfiguration->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnResetAll ), this, m_mResetAll->GetId());
 	m_mConfiguration->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnExport ), this, m_mExport->GetId());
+    m_mConfiguration->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnExportRoute ), this, m_mExportRoute->GetId());
 	m_mConfiguration->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnExportAll ), this, m_mExportAll->GetId());
 	m_mConfiguration->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnFilter ), this, m_mFilter->GetId());
 	m_mView->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( WeatherRoutingBase::OnSettings ), this, m_mSettings->GetId());
@@ -332,10 +336,10 @@ WeatherRoutingPanel::WeatherRoutingPanel( wxWindow* parent, wxWindowID id, const
 	m_bCompute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Compute"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer116->Add( m_bCompute, 0, wxALL, 5 );
 
-	m_bExport = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Export"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_bExport = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("&Export results as internal Track"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer116->Add( m_bExport, 0, wxALL, 5 );
 
-        m_bExportRoute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("Export Route"), wxDefaultPosition, wxDefaultSize, 0 );
+        m_bExportRoute = new wxButton( sbSizer29->GetStaticBox(), wxID_ANY, _("Export results as GPX Route file"), wxDefaultPosition, wxDefaultSize, 0 );
         fgSizer116->Add( m_bExportRoute, 0, wxALL, 5 );
 
         m_gProgress = new wxGauge( sbSizer29->GetStaticBox(), wxID_ANY, 100, wxDefaultPosition, wxDefaultSize, wxGA_HORIZONTAL );

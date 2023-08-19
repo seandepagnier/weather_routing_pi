@@ -75,6 +75,7 @@ class WeatherRoutingBase : public wxFrame
 		wxMenuItem* m_mComputeAll;
 		wxMenuItem* m_mStop;
 		wxMenuItem* m_mExport;
+        wxMenuItem* m_mExportRoute;
 		wxMenuItem* m_mExportAll;
 		wxMenu* m_mView;
 		wxMenu* m_mHelp;
