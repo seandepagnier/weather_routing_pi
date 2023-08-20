@@ -106,7 +106,7 @@ static bool GPXCreateWpt(pugi::xml_node node, SimpleRoutePoint *pr) {
 
     child = child_ext.append_child("opencpn:rte_properties");
     wxString sps;
-    sps.Printf("%.3f", pr->m_seg_vmg);
+    sps.Printf("%.6f", pr->m_seg_vmg);
     child.append_attribute("planned_speed") = sps.mbc_str();
 
     if (pr->etd.IsValid()) {
@@ -333,7 +333,7 @@ static bool GPXCreateRoute(pugi::xml_node node, const SimpleRoute &Route) {
     if (0/*Route.m_PlannedSpeed != ROUTE_DEFAULT_SPEED*/) {
         child = child_ext.append_child("opencpn:planned_speed");
         wxString s;
-        s.Printf(_T("%.2f"), Route.m_PlannedSpeed);
+        s.Printf(_T("%.8f"), Route.m_PlannedSpeed);
         child.append_child(pugi::node_pcdata).set_value(s.mb_str());
     }
 
