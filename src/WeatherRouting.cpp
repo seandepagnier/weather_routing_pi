@@ -2556,11 +2556,19 @@ void WeatherRouting::ExportRoute(RouteMapOverlay &routemapoverlay)
     }
 
     unsigned int ip1 = 0;
+    // Use some part of new route GUID to uniquely name route points
+    wxString route_name_suffix = new_route.m_GUID.AfterLast('-').Truncate(4);
+
     for(auto const &it : plotdata) {
+        wxString wp_name("WX-Route-Point-");
+        wp_name += route_name_suffix;
+        wxString np;
+        np.Printf("-%d", ip1);
+        wp_name += np;
+
         SimpleRoutePoint*  newPoint = new SimpleRoutePoint
                 (it.lat, heading_resolve(it.lon),
-                 _T("circle"), "WX-Route Point",
-                 GetNewGUID());
+                 _T("circle"), wp_name, GetNewGUID());
 
         if (vmga[ip1] >= 0.)
             newPoint->m_seg_vmg = vmga[ip1];
