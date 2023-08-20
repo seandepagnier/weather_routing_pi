@@ -1533,9 +1533,29 @@ void WeatherRouting::OnExport ( wxCommandEvent& event )
 void WeatherRouting::OnExportRoute ( wxCommandEvent& event )
 {
     std::list<RouteMapOverlay *>routemapoverlays = CurrentRouteMaps(true);
+    int nfail = 0;
     for(std::list<RouteMapOverlay *>::iterator it = routemapoverlays.begin();
-        it != routemapoverlays.end(); it++)
-        ExportRoute(**it);
+        it != routemapoverlays.end(); it++){
+
+        std::list<PlotData> plotdata = (*it)->GetPlotData(false);
+
+        if(plotdata.empty())
+            nfail++;
+        else
+            ExportRoute(**it);
+
+    }
+    if (nfail){
+        wxString nc;
+        nc.Printf("%d ", nfail);
+        wxString msg(_("Route export failed"));
+        msg += "\n";
+        msg += nc;
+        msg += _("Route(s) not computed, cannot export");
+        wxMessageDialog mdlg(this, msg,
+                             _("Weather Routing"), wxOK | wxICON_WARNING);
+         mdlg.ShowModal();
+    }
 }
 
 void WeatherRouting::OnExportAll( wxCommandEvent& event )
