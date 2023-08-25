@@ -1136,6 +1136,12 @@ void WeatherRouting::OnGoTo( wxCommandEvent& event )
 
 void WeatherRouting::OnDelete( wxCommandEvent& event )
 {
+    //  Stop all computations to avoid thread corruption.
+    //  Probably could do better to stop only the computation of selected configuration
+    //  But stopping all is safer.
+    //  Sess: https://github.com/rgleason/weather_routing_pi/issues/103
+    Stop();
+
     long index = m_panel->m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if (index < 0) return;
 
