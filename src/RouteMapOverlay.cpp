@@ -582,7 +582,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
             WR_GetCanvasPixLL(&vp, &r, positionOnRoute->lat, positionOnRoute->lon);
             wxColour ownBlue(20, 83, 186);
             SetColor(dc, ownBlue, true);
-            double circle_size = 7 * g_WINDipFactor;
+            double circle_size = 7 / g_WINDipFactor;
             dc.StrokeCircle( r.x, r.y, circle_size );
         }
 
@@ -850,7 +850,7 @@ void RouteMapOverlay::RenderBoatOnCourse(bool cursor_route, wxDateTime time, piD
         WR_GetCanvasPixLL(&vp, &r,
                            plat + d*(it->lat - plat), plon + d*heading_resolve(it->lon - plon));
 
-        double circle_size = 7 * g_WINDipFactor;
+        double circle_size = 7 / g_WINDipFactor;
         dc.DrawCircle( r.x, r.y, circle_size );
         break;
     }
