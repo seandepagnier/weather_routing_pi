@@ -168,6 +168,7 @@ private:
     void OnDeleteAll( wxCommandEvent& event );
     void OnFilter( wxCommandEvent& event );
     void OnExport( wxCommandEvent& event );
+    void OnExportRoute( wxCommandEvent& event );
     void OnExportAll( wxCommandEvent& event );
     void OnSettings( wxCommandEvent& event );
     void OnStatistics( wxCommandEvent& event );
@@ -198,6 +199,7 @@ private:
 
     RouteMap *SelectedRouteMap();
     void Export(RouteMapOverlay &routemapoverlay);
+    void ExportRoute(RouteMapOverlay &routemapoverlay);
 
     void Start(RouteMapOverlay *routemapoverlay);
     void StartAll();

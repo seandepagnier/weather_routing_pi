@@ -164,6 +164,7 @@ SET(SRCS
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
+            src/navobj_util.cpp
 )
 
 SET (HDRS
@@ -191,6 +192,7 @@ SET (HDRS
             include/zuFile.h
             include/georef.h
             include/GribRecord.h
+            include/navobj_util.h
 )
 
 set(EXTSRC
@@ -252,6 +254,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
 
 ##
 ## ----- Change above to match project requirements for android build ----- ##
@@ -331,6 +334,12 @@ target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 add_subdirectory(libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
+
+IF (MSVC)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
+add_subdirectory(libs/pugixml)
+target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
+ENDIF (MSVC)
 
 # Needed for all builds
 # ----- Do not change - needed to build app ----- ##
