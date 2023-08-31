@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.213.0 17/06/2022  DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.253.0 07/08/2023 DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -53,14 +53,14 @@ set(SHORT_DESCRIPTION "Compute optimal routes based on weather and constraints."
 set(LONG_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")				  
 
 set(VERSION_MAJOR "1")
-set(VERSION_MINOR "13")
-set(VERSION_PATCH "46")
+set(VERSION_MINOR "15")
+set(VERSION_PATCH "3")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "17/06/2022")#DD/MM/YYYY format
-set(OCPN_MIN_VERSION "ov50")
+set(VERSION_DATE  "31/08/2023")#DD/MM/YYYY format
+set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
-set(TP_COMMENT "  * Release for O5 using CI")
+set(TP_COMMENT "  * Release for O571 or o58 using CI")
 
 set(PARENT "opencpn")
 
@@ -164,6 +164,7 @@ SET(SRCS
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
+            src/navobj_util.cpp
 )
 
 SET (HDRS
@@ -191,11 +192,12 @@ SET (HDRS
             include/zuFile.h
             include/georef.h
             include/GribRecord.h
+            include/navobj_util.h
 )
 
 set(EXTSRC
 )
- set(EXTINCLUDE     
+set(EXTINCLUDE     
     extinclude/ODAPI.h     
     extinclude/ODJSONSchemas.h
 )
@@ -252,20 +254,15 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
-
-# These 3 are included down below
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
-
-if(QT_ANDROID)
-    include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
-endif(QT_ANDROID)
-
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
 
 ##
 ## ----- Change above to match project requirements for android build ----- ##
 ##
+
+#if(QT_ANDROID)
+#    include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
+#endif(QT_ANDROID)
 
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
@@ -337,6 +334,12 @@ target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 add_subdirectory(libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
+
+IF (MSVC)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
+add_subdirectory(libs/pugixml)
+target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
+ENDIF (MSVC)
 
 # Needed for all builds
 # ----- Do not change - needed to build app ----- ##

@@ -38,6 +38,8 @@
 Json::Value g_ReceivedJSONMsg;
 wxString    g_ReceivedMessage;
 
+double      g_WINDipFactor;
+
 // Define minimum and maximum versions of the grib plugin supported
 #define GRIB_MAX_MAJOR 4
 #define GRIB_MAX_MINOR 1
@@ -46,7 +48,7 @@ wxString    g_ReceivedMessage;
 
 //Define minimum and maximum versions of the climatology plugin supported
 #define CLIMATOLOGY_MAX_MAJOR 1
-#define CLIMATOLOGY_MAX_MINOR 4
+#define CLIMATOLOGY_MAX_MINOR 5
 #define CLIMATOLOGY_MIN_MAJOR 0
 #define CLIMATOLOGY_MIN_MINOR 10
 
@@ -90,7 +92,7 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
-	  
+
 	// Create the PlugIn icons  -from shipdriver
     // loads png file for the listing panel icon
     wxFileName fn;
@@ -113,9 +115,9 @@ weather_routing_pi::weather_routing_pi(void *ppimgr)
         m_panelBitmap = wxBitmap(panelIcon);
     else
         wxLogWarning("Weather_Routing Navigation Panel icon has NOT been loaded");
-// End of from Shipdriver	
-	  
-	  
+// End of from Shipdriver
+
+
       b_in_boundary_reply = false;
       m_tCursorLatLon.Connect(wxEVT_TIMER, wxTimerEventHandler
                               ( weather_routing_pi::OnCursorLatLonTimer ), NULL, this);
@@ -159,6 +161,8 @@ int weather_routing_pi::Init()
 
       m_route_menu_id = AddCanvasMenuItem (new wxMenuItem(&dummy_menu, -1, _("Weather Route Analysis")), this, "Route" );
       // SetCanvasMenuItemViz(m_route_menu_id, false, "Route");
+
+    g_WINDipFactor = 1.0;
 
       //    And load the configuration items
       LoadConfig();
@@ -407,6 +411,18 @@ void weather_routing_pi::SetPluginMessage(wxString &message_id, wxString &messag
             }
         }
     }
+    // Capture some OCPN core parameters, if present
+    else if(message_id == _T("OpenCPN Config"))
+    {
+        Json::Reader r;
+        Json::Value v;
+        r.parse(static_cast<std::string>(message_body), v);
+
+        if (v["OpenCPN Display DIP Scale Factor"].isDouble()) {
+            g_WINDipFactor = v["OpenCPN Display DIP Scale Factor"].asDouble();
+        }
+    }
+
 }
 
 

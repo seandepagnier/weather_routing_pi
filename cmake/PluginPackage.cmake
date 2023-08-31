@@ -91,7 +91,11 @@ if(UNIX AND NOT APPLE)
     # need apt-get install rpm, for rpmbuild
     set(PACKAGE_DEPS "${PACKAGE_DEPS},opencpn, bzip2, gzip")
     message(STATUS "${CMLOC}PACKAGE_DEPS: ${PACKAGE_DEPS}")
-    set(CPACK_GENERATOR "DEB;TGZ")
+    if(NOT QT_ANDROID)
+        set(CPACK_GENERATOR "DEB;TGZ")
+    else()
+        set(CPACK_GENERATOR "TGZ")
+    endif()
 
     set(CPACK_DEBIAN_PACKAGE_NAME ${PACKAGING_NAME})
     set(CPACK_DEBIAN_PACKAGE_DEPENDS ${PACKAGE_DEPS})
