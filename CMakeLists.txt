@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.253.0 07/08/2023 DD/MM/YYYY format				 
+# Frontend2 Author: Jon Gough  TP v1.0.253.0 07/08/2023 DD/MM/YYYY format
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -50,13 +50,13 @@ set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(PACKAGE "weather_routing_pi")
 set(SHORT_DESCRIPTION "Compute optimal routes based on weather and constraints.")
-set(LONG_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")				  
+set(LONG_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "15")
-set(VERSION_PATCH "3")
+set(VERSION_PATCH "4")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "31/08/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "02/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -82,7 +82,7 @@ set(CLOUDSMITH_USER "opencpn")
 #set(CLOUDSMITH_USER "rick-gleason")
 
 # Set Plugin info-url, summary and description
-set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
+set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
 set(XML_DESCRIPTION ${LONG_DESCRIPTION})
 
@@ -197,8 +197,8 @@ SET (HDRS
 
 set(EXTSRC
 )
-set(EXTINCLUDE     
-    extinclude/ODAPI.h     
+set(EXTINCLUDE
+    extinclude/ODAPI.h
     extinclude/ODJSONSchemas.h
 )
 
