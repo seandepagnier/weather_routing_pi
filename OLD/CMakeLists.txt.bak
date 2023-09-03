@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.253.0 07/08/2023 DD/MM/YYYY format
+# Frontend2 Author: Jon Gough  TP v1.0.238.0 09/06/2023 DD/MM/YYYY format				 
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -50,14 +50,14 @@ set(TITLE_NAME "weatherrouting")
 set(PACKAGE_CONTACT "Sean d'Epagnier")
 set(PACKAGE "weather_routing_pi")
 set(SHORT_DESCRIPTION "Compute optimal routes based on weather and constraints.")
-set(LONG_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")
+set(LONG_DESCRIPTION "WR features include: optimal routing subject to various constraints based on weather data, automatic boat polar computation.")				  
 
 set(VERSION_MAJOR "1")
-set(VERSION_MINOR "15")
-set(VERSION_PATCH "6")
+set(VERSION_MINOR "14")
+set(VERSION_PATCH "1")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "03/09/2023")#DD/MM/YYYY format
-set(OCPN_MIN_VERSION "ov58")
+set(VERSION_DATE  "11/06/2023")#DD/MM/YYYY format
+set(OCPN_MIN_VERSION "ov571")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
 set(TP_COMMENT "  * Release for O571 or o58 using CI")
@@ -82,7 +82,7 @@ set(CLOUDSMITH_USER "opencpn")
 #set(CLOUDSMITH_USER "rick-gleason")
 
 # Set Plugin info-url, summary and description
-set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")
+set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")  
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
 set(XML_DESCRIPTION ${LONG_DESCRIPTION})
 
@@ -164,7 +164,6 @@ SET(SRCS
             src/zuFile.cpp
             src/georef.c
             src/GribRecord.cpp
-            src/navobj_util.cpp
 )
 
 SET (HDRS
@@ -192,15 +191,14 @@ SET (HDRS
             include/zuFile.h
             include/georef.h
             include/GribRecord.h
-            include/navobj_util.h
 )
 
-#set(EXTSRC
-#)
-#set(EXTINCLUDE
-#    extinclude/ODAPI.h
-#    extinclude/ODJSONSchemas.h
-#)
+set(EXTSRC
+)
+set(EXTINCLUDE     
+    extinclude/ODAPI.h     
+    extinclude/ODJSONSchemas.h
+)
 
 set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
@@ -216,7 +214,7 @@ set(LIBHDRS
 
 add_definitions(-DPLUGIN_USE_SVG)
 
-#set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
+set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 
 
 # ----- If using JSON validation in plugin section below is needed ----- ##
@@ -233,8 +231,9 @@ add_definitions(-DPLUGIN_USE_SVG)
 ## This add_library  can be used in conditionals below.
 ##================================================================================
 
-SET(SRC ${SRCS} ${HDRS})
-##SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
+
+
+SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
 
 
 
@@ -246,24 +245,21 @@ SET(SRC ${SRCS} ${HDRS})
 ##=============================================================
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpnsrc/glu/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
-
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)   #added with plugDC
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
-
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
 
 ##
 ## ----- Change above to match project requirements for android build ----- ##
 ##
 
+#if(QT_ANDROID)
+#    include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
+#endif(QT_ANDROID)
 
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
@@ -276,10 +272,8 @@ if(NOT OCPN_FLATPAK_CONFIG)
     message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
 
     add_subdirectory(libs/tinyxml)
-    add_subdirectory(libs/pluginDC)
 
     target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
-    target_link_libraries(${PACKAGE_NAME} ocpn::pluginDC)	
 endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
@@ -337,12 +331,6 @@ target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 add_subdirectory(libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
-
-IF (MSVC)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
-add_subdirectory(libs/pugixml)
-target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
-ENDIF (MSVC)
 
 # Needed for all builds
 # ----- Do not change - needed to build app ----- ##
