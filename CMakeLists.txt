@@ -20,12 +20,11 @@
 # Frontend2 Author: Jon Gough  TP v1.0.254.0 09/09/2023 DD/MM/YYYY format
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
-## ----- When changing this file do NOT change the order in which sections occur        ----- ##
-## ----- Changes should only be made between the section blocks that identify where     ----- ##
-## ----- these changes should be. The whole configuration process relies on this        ----- ##
-## ----- sequence to be successful                                                      ----- ##
-
-##----- Modify section below to include all the details for your plugin ----- ##
+## -- When changing this file do NOT change the order of the sections.    -- ##
+## -- Make changes only between the section blocks identified             -- ##
+## -- The whole configuration process relies on this sequence for success.-- ##
+##
+## -- Modify section below to include all the details for your plugin.    -- ##
 
 set(CMLOC "CMakeLists: ")
 
@@ -54,7 +53,7 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "15")
-set(VERSION_PATCH "8")
+set(VERSION_PATCH "9")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE  "06/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
@@ -64,8 +63,8 @@ set(TP_COMMENT "  * Release for O571 or o58 using CI")
 
 set(PARENT "opencpn")
 
-#Used to set up a local webserver with git loaded, for testing purposes.
-#Now set in plugin configure, needed to build flatpak, also locally.
+#Use to set up a local webserver with git installed.
+#Default is github.com. Now set in pluginconfigure.cmake
 #set(GIT_REPOSITORY_SERVER "github.com")
 
 ## Specifies Cloudsmith upload repository suffix for each catalog
@@ -77,11 +76,10 @@ set(ALPHA "alpha") #Standard Repos
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Ricks's customization
 set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #without the _pi
-
+# Set the following to use OpenCPN cloudsmith repositories instead of own repositories
 set(CLOUDSMITH_USER "opencpn")
 #set(CLOUDSMITH_USER "rick-gleason")
 
-# Set Plugin info-url, summary and description
 set(XML_INFO_URL "https://opencpn.org/OpenCPN/plugins/weatherroute.html")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
 set(XML_DESCRIPTION ${LONG_DESCRIPTION})
@@ -136,8 +134,7 @@ include("PluginConfigure")
 
 add_definitions(-DUSE_S57)
 
-## ---- Below from cmakelists.txt  weather_routing_pi
-## ---- Remember to Add your project SET(SRCS and SET(HDRS  etc..
+## ---- Section Below - Add your project SET(SRCS and SET(HDRS  etc..
 
 SET(SRCS
             src/weather_routing_pi.cpp
@@ -209,6 +206,7 @@ set(LIBHDRS
 
 add_definitions(-DPLUGIN_USE_SVG)
 
+## ----- Section above - Add your project SET(SRCS and SET(HDRS  etc..
 ## ----- If using JSON validation in plugin section below is needed ----- ##
 
 # Do not need Json Schema Validation
@@ -217,7 +215,7 @@ add_definitions(-DPLUGIN_USE_SVG)
 
 
 ##================================================================================
-## Required to collect all the set( headers and SRCS  - Adjust as required
+## Change as required to collect all the set( headers and SRCS
 ## This add_library  can be used in conditionals below.
 ##================================================================================
 
@@ -242,10 +240,8 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
 
-##
-## ----- Change above to match project requirements for android build ----- ##
-##
 
+## Change target_sources to match your project needs.
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
 ##=================================================
@@ -318,7 +314,7 @@ include("PluginInstall")
 include("PluginLocalization")
 include("PluginPackage")
 #========================================================
-## ----- do not change section above - needed to configure build process ----- ##
+## ----- Do not change section above - needed to configure build process ----- ##
 
 message(STATUS "${CMLOC}include directories: ")
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)

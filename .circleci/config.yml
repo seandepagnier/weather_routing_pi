@@ -49,7 +49,7 @@ workflows:
             <<: *std-filters
         - build-debian-x86_64-12-bookworm:
             <<: *std-filters
-## KEEP needed for Raspbian OpenCPN v5.8(wx32) 
+## KEEP needed for Raspbian OpenCPN v5.8(wx32)
         - build-ubuntu-x86_64-2204-jammy:
             <<: *std-filters
 ## ---------------------
@@ -73,7 +73,7 @@ workflows:
             <<: *std-filters
 ## Frozen - 28/05/2023
         - build-debian-x86_64-10-buster:
-            <<: *std-filters       
+            <<: *std-filters
 ## Frozen - 28/05/2023
         - build-debian-armhf-11-bullseye:
             <<: *std-filters
@@ -86,7 +86,7 @@ workflows:
 ## -------------------------------------
 ## UBUNTU OS  Frozen - 28/05/2023  DROP
 ## -------------------------------------
-## KEEP needed for Raspbian OpenCPN v5.6 
+## KEEP needed for Raspbian OpenCPN v5.6
         - build-ubuntu-armhf-1804-buster:
             <<: *std-filters
 ##        - build-ubuntu-x86_64-1804-bionic:
@@ -455,7 +455,7 @@ jobs:
 ## -------------------------------------------
 ## Ubuntu OS - Generally deprecated and not used.
 ## -------------------------------------------
-## KEEP needed for Raspbian OpenCPN v5.6 
+## KEEP needed for Raspbian OpenCPN v5.6
     build-ubuntu-armhf-1804-buster:
         machine:
             image: ubuntu-2004:202104-01

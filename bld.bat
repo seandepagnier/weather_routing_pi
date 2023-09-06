@@ -1,5 +1,11 @@
 REM FE2  Testplugin
 
+
+REM  Requires wxWidgets setup
+REM  C:\Users\fcgle\source\wxWidgets-3.1.2
+REM  C:\Users\fcgle\source\wxWidgets-3.2.2
+REM  Visual Studio 15 2017  installed
+REM  Visual Studio 17 2022  installed
 REM --------------------------------------
 REM  For Opencpn 5.8 and wxWidgets-3.2.2 using Visual Studio 15 2017
 REM --------------------------------------

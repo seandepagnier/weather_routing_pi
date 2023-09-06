@@ -1,0 +1,143 @@
+Consolidated List  - Move to OLD directory  (Keeps Mingw)
+
+03/06/2023  08:24 PM    <DIR>          extinclude     
+03/06/2023  08:24 PM    <DIR>          extsrc   
+03/06/2023  08:24 PM    <DIR>          ocpninclude
+03/06/2023  08:24 PM    <DIR>          ocpnsrc
+03/06/2023  08:51 PM    <DIR>          Resources
+03/06/2023  08:24 PM   ci          934 circleci-build-macos-new.sh
+03/06/2023  08:24 PM   ci        1,150 circleci-build-trusty.sh
+03/06/2023  08:24 PM   ci        1,154 travis-build-raspbian-armhf-part1.sh  <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   ci          765 travis-build-raspbian-armhf-part2.sh  <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   cmake     2,762 FindGTK3.cmake                <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   cmake       821 FindTinyXML.cmake             <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   cmake     1,122 SimpleWxConfig.cmake         <---MOVE TO OLD DIR
+03/06/2023  08:24 PM             1,404 .travis.yml
+12/15/2022  09:50 AM                83 wx-config.bat
+03/06/2023  08:24 PM             9,532 Read-Build.md
+03/06/2023  08:24 PM            11,415 Frontend2.md
+03/06/2023  08:24 PM               772 README 
+03/06/2023  08:24 PM             6,838 Testplugin-CI-CMake-v1.0.160.txt
+  
+
+Directory of C:\Users\fcgle\source\watchdog_pi
+
+08/30/2023  01:30 PM    <DIR>          .
+08/16/2023  07:19 AM    <DIR>          ..
+08/06/2023  07:00 PM    <DIR>          .circleci
+03/06/2023  08:24 PM               271 .editorconfig
+08/01/2023  02:07 PM                58 .gitignore
+08/08/2023  09:26 AM    <DIR>          build       <-- Only local
+03/06/2023  08:24 PM    <DIR>          buildosx    <-- KEEP
+03/06/2023  08:24 PM    <DIR>          buildwin        <--- Moved to OLD
+08/30/2023  01:26 PM    <DIR>          ci          <-- KEEP
+08/06/2023  07:04 PM    <DIR>          cmake       <-- KEEP
+03/06/2023  08:24 PM    <DIR>          data        <-- KEEP
+03/06/2023  08:24 PM    <DIR>          extinclude      <--- Bdbcat made new libs folder ODAPI and json-schema-validator
+                                                            and then MOVED to OLD GLES2 ODAPI.h etc-failed. 
+                                                            See https://github.com/rgleason/watchdog_pi/pull/56
+															Note many changes to includes in various files.
+03/06/2023  08:24 PM    <DIR>          extsrc          <--- Bdbcat MOVED to Libs   json-schema-validate used by some plugins
+08/30/2023  12:46 PM    <DIR>          include     <-- KEEP
+08/30/2023  12:46 PM    <DIR>          libs        <-- KEEP
+03/06/2023  08:24 PM    <DIR>          manual      <-- KEEP
+03/06/2023  08:24 PM    <DIR>          mingw       <-- KEEP
+08/06/2023  07:06 PM    <DIR>          msvc        <-- KEEP holds batch file
+03/06/2023  08:24 PM    <DIR>          ocpninclude     <--- Moved to OLD  cutil.h linmath.h pluginmanager.h shaders.h TexFont.h vector2D.h
+03/06/2023  08:24 PM    <DIR>          ocpnsrc         <--- Moved to OLDcutil.cpp  TexFont.cpp
+08/08/2023  09:25 AM    <DIR>          po          <-- KEEP
+03/06/2023  08:51 PM    <DIR>          Resources       <---Moved to OLD  Empty
+08/30/2023  12:46 PM    <DIR>          src         <-- KEEP
+
+08/30/2023  12:46 PM            11,302 CMakeLists.txt <-- KEEP
+03/06/2023  08:24 PM             1,404 .travis.yml        <--- Moved to OLD
+08/06/2023  07:29 PM             3,175 appveyor.yml  <-- KEEP
+
+07/31/2023  08:24 PM           824,015 Watchdog-old.fbp  <-- Moved to OLD
+08/06/2023  08:23 AM           853,565 Watchdog.fbp  <-- KEEP
+
+06/11/2023  09:43 AM             3,063 bld.bat      USEFUL BATCH FILES
+12/15/2022  09:50 AM                83 wx-config.bat  <---  Moved to OLD
+06/16/2022  09:28 AM             2,644 fe2xcopy.bat
+06/16/2022  09:55 AM               123 gitadd.bat
+
+03/06/2023  08:24 PM            35,147 LICENSE      TEXT FILES CLEANUP
+03/06/2023  08:24 PM             9,532 Read-Build.md   <---   Moved to OLD
+03/06/2023  08:24 PM            11,415 Frontend2.md    <---   Moved to OLD
+03/06/2023  08:24 PM               772 README          <---   Moved to OLD
+03/06/2023  08:24 PM             6,838 Testplugin-CI-CMake-v1.0.160.txt <---  Moved to OLD
+
+              17 File(s)      1,763,407 bytes
+              21 Dir(s)  578,546,827,264 bytes free
+
+Directory of C:\Users\fcgle\source\watchdog_pi\ci
+
+08/30/2023  01:15 PM    <DIR>          .
+08/30/2023  12:54 PM    <DIR>          ..
+06/09/2023  11:10 AM             2,821 circleci-build-android-arm64.sh  <---KEEP
+03/06/2023  08:24 PM             3,328 circleci-build-android-armhf.sh  <---KEEP
+08/06/2023  07:29 PM             1,414 circleci-build-debian.sh         <---KEEP
+03/06/2023  08:24 PM               242 circleci-build-fedora.sh         <---KEEP mingw
+03/06/2023  08:24 PM             2,924 circleci-build-flatpak.sh        <---KEEP
+03/06/2023  08:24 PM             1,442 circleci-build-jammy.sh          <---KEEP
+03/06/2023  08:24 PM               934 circleci-build-macos-new.sh           <---MOVE TO OLD DIR
+03/11/2023  10:35 AM             3,001 circleci-build-macos.sh          <---KEEP
+03/06/2023  08:24 PM               305 circleci-build-mingw.sh          <---MOVE mingw
+08/06/2023  07:30 PM             1,874 circleci-build-msvc.bat          <---KEEP
+03/06/2023  08:24 PM             1,150 circleci-build-trusty.sh             <---MOVE TO OLD DIR
+05/01/2023  08:08 PM             7,173 circleci-build-ubuntu-docker.sh  <---KEEP
+03/06/2023  08:24 PM               141 cloudsmith-upload.sh             <---KEEP
+08/01/2023  02:07 PM             1,132 control                          <---KEEP
+08/06/2023  07:01 PM    <DIR>          extras                           <---KEEP
+03/06/2023  08:24 PM             1,503 opencpn-deps.spec                <---KEEP for mingw 
+03/06/2023  08:24 PM               807 opencpn-fedora.spec              <---KEEP for Fedora 
+03/06/2023  08:24 PM             1,154 travis-build-raspbian-armhf-part1.sh  <---MOVE TO OLD DIR
+03/06/2023  08:24 PM               765 travis-build-raspbian-armhf-part2.sh  <---MOVE TO OLD DIR
+              19 File(s)         32,110 bytes
+			  
+Directory of C:\Users\fcgle\source\watchdog_pi\ci\extras
+
+08/30/2023  01:27 PM    <DIR>          .
+08/30/2023  01:26 PM    <DIR>          ..
+08/05/2023  08:15 PM                17 build-ubuntu-x86_64-2204-jammy_extra_libs.txt   <---KEEP?
+03/06/2023  08:24 PM                21 circleci-build-flatpak_extra_libs.txt           <---KEEP?
+03/06/2023  08:24 PM                 7 extra_libs.txt                                  <---KEEP?
+03/06/2023  08:24 PM               495 README.txt
+
+Directory of C:\Users\fcgle\source\watchdog_pi\cmake
+
+08/30/2023  02:27 PM    <DIR>          .
+08/30/2023  02:18 PM    <DIR>          ..
+03/06/2023  08:24 PM    <DIR>          in-files
+03/06/2023  08:24 PM             2,762 FindGTK3.cmake                <---MOVE TO OLD DIR
+03/06/2023  08:24 PM               821 FindTinyXML.cmake             <---MOVE TO OLD DIR
+08/06/2023  07:32 PM            35,147 gpl.txt                   <-- KEEP
+06/09/2023  11:11 AM            30,928 PluginConfigure.cmake     <-- KEEP
+03/06/2023  08:24 PM             6,406 PluginInstall.cmake       <-- KEEP
+03/06/2023  08:24 PM             5,363 PluginLocalization.cmake  <-- KEEP
+08/06/2023  07:31 PM             8,356 PluginPackage.cmake       <-- KEEP
+08/06/2023  07:31 PM            13,873 PluginSetup.cmake         <-- KEEP
+03/06/2023  08:24 PM             1,109 readme.txt                <-- KEEP
+03/06/2023  08:24 PM             1,122 SimpleWxConfig.cmake         <---MOVE TO OLD DIR
+              11 File(s)        105,887 bytes
+			   
+Directory of C:\Users\fcgle\source\watchdog_pi\cmake\in-files   
+
+(This is where the magic happens to build all the versions!)
+
+08/30/2023  02:32 PM    <DIR>          .
+08/30/2023  02:30 PM    <DIR>          ..
+03/06/2023  08:24 PM             8,896 cloudsmith-upload.sh.in    <-- KEEP
+03/06/2023  08:24 PM               292 flatpak_args.in            <-- KEEP
+03/06/2023  08:24 PM               579 flatpak_extra_modules.in   <-- KEEP
+03/06/2023  08:24 PM               203 flatpak_options.in         <-- KEEP
+10/28/2021  08:45 PM           147,114 NSIS.template.in           <-- KEEP
+03/06/2023  08:24 PM               822 org.opencpn.OpenCPN.Plugin.yaml.in <-- KEEP
+03/06/2023  08:24 PM               377 pkg_version.sh.in          <-- KEEP
+03/06/2023  08:24 PM               824 plugin.xml.in              <-- KEEP
+03/06/2023  08:24 PM               672 PluginCPackOptions.cmake.in <-- KEEP
+03/06/2023  08:24 PM               666 readme.txt                 <-- KEEP
+10/28/2021  08:45 PM               753 version.h.in               <-- KEEP
+03/06/2023  08:24 PM             2,019 wxWTranslateCatalog.h.in   <-- KEEP
+              13 File(s)        163,217 bytes
+               2 Dir(s)  577,381,982,208 bytes free
