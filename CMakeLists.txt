@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "15")
-set(VERSION_PATCH "6")
+set(VERSION_PATCH "7")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "03/09/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "05/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -195,13 +195,6 @@ SET (HDRS
             include/navobj_util.h
 )
 
-#set(EXTSRC
-#)
-#set(EXTINCLUDE
-#    extinclude/ODAPI.h
-#    extinclude/ODJSONSchemas.h
-#)
-
 set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
 set(LIBHDRS
@@ -215,9 +208,6 @@ set(LIBHDRS
     libs/wxJSON/include/jsonwriter.h)
 
 add_definitions(-DPLUGIN_USE_SVG)
-
-#set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
-
 
 # ----- If using JSON validation in plugin section below is needed ----- ##
 
@@ -234,8 +224,6 @@ add_definitions(-DPLUGIN_USE_SVG)
 ##================================================================================
 
 SET(SRC ${SRCS} ${HDRS})
-##SET(SRC ${SRCS} ${HDRS} ${SRC_LIBTESS2} )
-
 
 
 ##=========================================
@@ -258,7 +246,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
 
 ##
 ## ----- Change above to match project requirements for android build ----- ##
@@ -279,7 +267,7 @@ if(NOT OCPN_FLATPAK_CONFIG)
     add_subdirectory(libs/pluginDC)
 
     target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
-    target_link_libraries(${PACKAGE_NAME} ocpn::pluginDC)	
+    target_link_libraries(${PACKAGE_NAME} ocpn::pluginDC)
 endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
@@ -328,11 +316,7 @@ endif(QT_ANDROID)
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 add_subdirectory(libs/jsoncpp)
-target_link_libraries(${PACKAGE_NAME} ${PACKAGE_NAME}_LIB_PLUGINJSON)
-
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
-add_subdirectory(libs/plugingl)
-target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
+target_link_libraries(${PACKAGE_NAME} JSONCPP)
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
 add_subdirectory(libs/libtess2)
