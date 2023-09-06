@@ -17,7 +17,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.253.0 07/08/2023 DD/MM/YYYY format
+# Frontend2 Author: Jon Gough  TP v1.0.254.0 09/09/2023 DD/MM/YYYY format
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "15")
-set(VERSION_PATCH "7")
+set(VERSION_PATCH "8")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "05/09/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "06/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -110,7 +110,7 @@ endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
 set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
 message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 
-## ----- The statements below are used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
+## ----- Statements below used to setup standard variables required by the CMAKE process -- Do not remove - ##
 
 project(${PACKAGE})
 
@@ -119,7 +119,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 #========================================================
 include("PluginSetup")
 #========================================================
-## ----- The above is used to setup standard variables that are required by the CMAKE process - do not remove ----- ##
+## ----- Above used to setup standard variables required by CMAKE process - Do not remove ----- ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 
 set(CMAKE_VERBOSE_MAKEFILE "Activate verbose mode for make files" ON)
@@ -136,8 +136,8 @@ include("PluginConfigure")
 
 add_definitions(-DUSE_S57)
 
-#======== Below from cmakelists.txt  weather_routing_pi
-# ----Remember to Add your project Set(SRCS and set(HDRS  etc..
+## ---- Below from cmakelists.txt  weather_routing_pi
+## ---- Remember to Add your project SET(SRCS and SET(HDRS  etc..
 
 SET(SRCS
             src/weather_routing_pi.cpp
@@ -209,13 +209,11 @@ set(LIBHDRS
 
 add_definitions(-DPLUGIN_USE_SVG)
 
-# ----- If using JSON validation in plugin section below is needed ----- ##
-
+## ----- If using JSON validation in plugin section below is needed ----- ##
 
 # Do not need Json Schema Validation
 
-
-# ----- If using JSON validation in plugin section above is needed ----- ##
+## ----- If using JSON validation in plugin section above is needed ----- ##
 
 
 ##================================================================================
@@ -225,12 +223,8 @@ add_definitions(-DPLUGIN_USE_SVG)
 
 SET(SRC ${SRCS} ${HDRS})
 
-
-##=========================================
-
-
 ##=============================================================
-# Modify/configure 'Include' Directories below for the Plugin
+## Modify/configure 'Include' Directories below for the Plugin
 ##=============================================================
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
@@ -252,11 +246,9 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
 ## ----- Change above to match project requirements for android build ----- ##
 ##
 
-
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
 ##=================================================
-
 
 
 if(NOT OCPN_FLATPAK_CONFIG)
@@ -272,22 +264,14 @@ endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
 
-#
-# ----- If using JSON validation in plugin section below is needed ----- ##
-#
+##
+## ----- If using JSON validation section below is needed ----- ##
+##
 
 # Do not need Json Schema Validation
 
-
-# ----- If using JSON validation in plugin section above is needed ----- ##
-#
-
 ##
-## ----- Change above to match project requirements ----- ##
-##
-
-##
-## ----- do not change next section - needed to configure build process ----- ##
+## ----- Do not change next section - needed to configure build process ----- ##
 ##
 
 IF(NOT UNIX)
@@ -307,7 +291,7 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
-#------- Change below to match project requirements --------------
+##------- Change below to match project requirements --------------
 
 # Needed for android builds
 if(QT_ANDROID)
@@ -328,15 +312,14 @@ add_subdirectory(libs/pugixml)
 target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
 ENDIF (MSVC)
 
-# Needed for all builds
-# ----- Do not change - needed to build app ----- ##
+## Needed for all builds Do not change - needed to build app --- ##
 #========================================================
 include("PluginInstall")
 include("PluginLocalization")
 include("PluginPackage")
 #========================================================
 ## ----- do not change section above - needed to configure build process ----- ##
-##
+
 message(STATUS "${CMLOC}include directories: ")
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
