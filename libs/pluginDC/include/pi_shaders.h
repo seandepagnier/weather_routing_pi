@@ -29,7 +29,7 @@
 #include "wx/wx.h"
 #endif //precompiled headers
 
-#ifdef ocpnUSE_GLES2
+#ifdef USE_ANDROID_GLES2
 #include "GLES2/gl2.h"
 #endif
 

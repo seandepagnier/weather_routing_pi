@@ -998,7 +998,7 @@ void piDC::DrawGLLineArray( int n, float *vertex_array, float *color_array,  boo
                     glLineWidth( wxMax(GLMinSymbolLineWidth, 1) );
             }
 
-#ifndef ocpnUSE_GLES2
+#ifndef USE_ANDROID_GLES2
 
             glBegin( GL_LINE_STRIP );
             for( int i = 0; i < n; i++ )

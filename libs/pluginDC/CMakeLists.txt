@@ -4,15 +4,15 @@
 ## License:     GPLv3
 ##---------------------------------------------------------------------------
 
-if (TARGET ocpn::plugingl)
+if (TARGET ocpn::pluginDC)
     return ()
 endif ()
 
-set(SAVE_CMLOC_PLUGINGLL ${CMLOC})
-set(CMLOC "CMakeLists_PLUGINGL: ")
+set(SAVE_CMLOC_PLUGINDCL ${CMLOC})
+set(CMLOC "CMakeLists_PLUGINDC: ")
 
-message(STATUS "${CMLOC}Building PluginGL")
-SET(SRC_PLUGINGL
+message(STATUS "${CMLOC}Building PluginDC")
+SET(SRC_PLUGINDC
           src/pidc.cpp
           src/pi_shaders.cpp
           src/TexFont.cpp
@@ -27,7 +27,7 @@ endif(UNIX)
 if  (QT_ANDROID)
 
 #    include_directories(BEFORE ${qt_android_include})
-    message(STATUS "${CMLOC}Building PluginGL: qt_android_include:  ${qt_android_include}")
+    message(STATUS "${CMLOC}Building PluginDC: qt_android_include:  ${qt_android_include}")
 #	include_directories(${qt_android_include})
 #  There is probably a much simpler way to do this...
     IF(_wx_selected_config MATCHES "androideabi-qt-arm64")
@@ -112,8 +112,8 @@ if  (QT_ANDROID)
 endif(QT_ANDROID)
 
 
-ADD_LIBRARY(${PACKAGE_NAME}_LIB_PLUGINGL STATIC ${SRC_PLUGINGL})
-target_include_directories(${PACKAGE_NAME}_LIB_PLUGINGL PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(ocpn::plugingl ALIAS ${PACKAGE_NAME}_LIB_PLUGINGL)
+ADD_LIBRARY(${PACKAGE_NAME}_LIB_PLUGINDC STATIC ${SRC_PLUGINDC})
+target_include_directories(${PACKAGE_NAME}_LIB_PLUGINDC PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(ocpn::pluginDC ALIAS ${PACKAGE_NAME}_LIB_PLUGINDC)
 
-set(CMLOC ${SAVE_CMLOC_PLUGINGL})
+set(CMLOC ${SAVE_CMLOC_PLUGINDC})

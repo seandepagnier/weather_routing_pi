@@ -23,8 +23,6 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  **************************************************************************/
 #include <wx/wx.h>
-// #include <GL/gl.h>
-// #include <GL/glu.h>
 
 #ifdef __OCPN__ANDROID__
 #include "qdebug.h"
