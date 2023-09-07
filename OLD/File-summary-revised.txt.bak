@@ -5,27 +5,19 @@ Consolidated List  - Move to OLD directory  (Keeps Mingw)
 03/06/2023  08:24 PM    <DIR>          ocpninclude
 03/06/2023  08:24 PM    <DIR>          ocpnsrc
 03/06/2023  08:51 PM    <DIR>          Resources
-03/06/2023  08:24 PM   ci          934 circleci-build-macos-new.sh           <---MOVE TO OLD DIR
-03/06/2023  08:24 PM   ci        1,150 circleci-build-trusty.sh              <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   ci          934 circleci-build-macos-new.sh
+03/06/2023  08:24 PM   ci        1,150 circleci-build-trusty.sh
 03/06/2023  08:24 PM   ci        1,154 travis-build-raspbian-armhf-part1.sh  <---MOVE TO OLD DIR
 03/06/2023  08:24 PM   ci          765 travis-build-raspbian-armhf-part2.sh  <---MOVE TO OLD DIR
-03/06/2023  08:24 PM   cmake     2,762 FindGTK3.cmake                 <---MOVE TO OLD DIR
-03/06/2023  08:24 PM   cmake       821 FindTinyXML.cmake              <---MOVE TO OLD DIR
-03/06/2023  08:24 PM   cmake     1,122 SimpleWxConfig.cmake           <---MOVE TO OLD DIR
-03/06/2023  08:24 PM             1,404 .travis.yml                    <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   cmake     2,762 FindGTK3.cmake                <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   cmake       821 FindTinyXML.cmake             <---MOVE TO OLD DIR
+03/06/2023  08:24 PM   cmake     1,122 SimpleWxConfig.cmake         <---MOVE TO OLD DIR
+03/06/2023  08:24 PM             1,404 .travis.yml
 12/15/2022  09:50 AM                83 wx-config.bat
-03/06/2023  08:24 PM             9,532 Read-Build.md                 <---MOVE TO OLD DIR
-03/06/2023  08:24 PM            11,415 Frontend2.md                  <---MOVE TO OLD DIR
-03/06/2023  08:24 PM               772 README                        <---MOVE TO OLD DIR   
-Copy OLD\extinclude\nlohmann TO libs\json-schema-validation\
-Copy  OLD\extsrc\json-schema-validator .cpp files  to libs/json-schema-validation/
-Copy  libs\pluginDC  from Watchdog  to libs\pluginDC
+03/06/2023  08:24 PM             9,532 Read-Build.md
+03/06/2023  08:24 PM            11,415 Frontend2.md
+03/06/2023  08:24 PM               772 README 
 03/06/2023  08:24 PM             6,838 Testplugin-CI-CMake-v1.0.160.txt
-
-To CMakeLists.txt
-   include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
-   include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC/include)
-   
   
 
 Directory of C:\Users\fcgle\source\watchdog_pi

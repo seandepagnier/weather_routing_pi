@@ -2,6 +2,7 @@
 ## Author:      Sean d'Epagnier
 ##***************************************************************************
 ## *   Copyright (C) 2010 by Sean d'Epagnier                              *
+## *   License:     GPLv3+
 ## *   This program is free software; you can redistribute it and/or modify  *
 ## *   it under the terms of the GNU General Public License as published by  *
 ## *   the Free Software Foundation; either version 2 of the License, or     *
@@ -17,7 +18,8 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough  TP v1.0.254.0 09/09/2023 DD/MM/YYYY format
+# Frontend2 Author: Jon Gough 
+# Testplugn(TP) v1.0.254.0 09/09/2023 DD/MM/YYYY format
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## -- When changing this file do NOT change the order of the sections.    -- ##
@@ -53,9 +55,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "15")
-set(VERSION_PATCH "9")
+set(VERSION_PATCH "10")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "06/09/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "07/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -76,6 +78,7 @@ set(ALPHA "alpha") #Standard Repos
 #set(CLOUDSMITH_BASE_REPOSITORY "${GIT_REPOSITORY_NAME}")
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins")  #Ricks's customization
 set(CLOUDSMITH_BASE_REPOSITORY "weather-routing")  #without the _pi
+
 # Set the following to use OpenCPN cloudsmith repositories instead of own repositories
 set(CLOUDSMITH_USER "opencpn")
 #set(CLOUDSMITH_USER "rick-gleason")
@@ -96,10 +99,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
-# Don't use local version of GLU library
-#set(USE_LOCAL_GLU FALSE)             #not operational
-
-option(USE_GL "Enable OpenGL support" ON)  #WxRoute requires on
+# For Weatherfax this must be set ON or it fails to compile
+option(USE_GL "Enable OpenGL support" ON)
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -192,7 +193,10 @@ SET (HDRS
             include/navobj_util.h
 )
 
-set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+set(LIBSSRC 
+    libs/wxJSON/src/jsonreader.cpp
+    libs/wxJSON/src/jsonval.cpp
+    libs/wxJSON/src/jsonwriter.cpp)
 
 set(LIBHDRS
     libs/GL/gl.h
@@ -245,7 +249,6 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
 ##=================================================
 target_sources(${PACKAGE_NAME} PUBLIC ${SRC})
 ##=================================================
-
 
 if(NOT OCPN_FLATPAK_CONFIG)
     # Build environment not available when flatpak is being configured so following statements will not work
