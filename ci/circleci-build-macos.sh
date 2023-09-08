@@ -24,7 +24,7 @@ if [ -n "$WX_VER" ] && [ "$WX_VER" -eq "32" ]; then
     MACOSX_DEPLOYMENT_TARGET=10.10
 else
     echo "Building for WXVERSION 315";
-	WX_URL=https://download.opencpn.org/s/MCiRiq4fJcKD56r/download
+    WX_URL=https://download.opencpn.org/s/MCiRiq4fJcKD56r/download
     WX_DOWNLOAD=/tmp/wx315_opencpn50_macos1010.tar.xz
     WX_EXECUTABLE=/tmp/wx315_opencpn50_macos1010/bin/wx-config
     WX_CONFIG="--prefix=/tmp/wx315_opencpn50_macos1010"
