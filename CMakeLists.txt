@@ -216,6 +216,16 @@ SET(SRC ${SRCS} ${HDRS})
 ##=============================================================
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)   #added with plugDC
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
+
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
+
 
 ## Change target_sources to match your project needs.
 ##=================================================
@@ -247,9 +257,6 @@ if(NOT OCPN_FLATPAK_CONFIG)
     add_subdirectory(opencpn-libs/pugixml)
     target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
 
-    add_subdirectory(opencpn-libs/libtess2)
-    target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
-
     IF(NOT UNIX)
         add_subdirectory(opencpn-libs/bzip2)
         target_link_libraries(${PACKAGE_NAME} ocpn::bzip2)
@@ -272,6 +279,7 @@ add_definitions(-DTIXML_USE_STL)
 
 IF(WIN32)
     IF(MSVC)
+        #include_directories(${PROJECT_SOURCE_DIR}/buildwin/include)
         target_link_libraries(${PACKAGE_NAME} "${PROJECT_SOURCE_DIR}/buildwin/zlib1.lib")
     ELSE()
         # MINGW
@@ -286,7 +294,12 @@ if(QT_ANDROID)
     include_directories(BEFORE ${qt_android_include})
 endif(QT_ANDROID)
 
+add_subdirectory(opencpn-libs/libtess2)
+target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
+#IF (MSVC)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
+#ENDIF (MSVC)
 
 ## Needed for all builds Do not change - needed to build app --- ##
 #========================================================
