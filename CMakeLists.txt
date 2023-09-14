@@ -262,6 +262,9 @@ if(NOT OCPN_FLATPAK_CONFIG)
         target_link_libraries(${PACKAGE_NAME} ocpn::bzip2)
     ENDIF(NOT UNIX)
 
+    add_subdirectory(opencpn-libs/libtess2)
+    target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
+
 endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
@@ -294,8 +297,6 @@ if(QT_ANDROID)
     include_directories(BEFORE ${qt_android_include})
 endif(QT_ANDROID)
 
-add_subdirectory(opencpn-libs/libtess2)
-target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
 #IF (MSVC)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
