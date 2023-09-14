@@ -77,6 +77,8 @@ else
     brew install --cask packages
 fi
 
+git submodule update --init opencpn-libs
+
 rm -rf build && mkdir build && cd build
 cmake \
   -DwxWidgets_CONFIG_EXECUTABLE=$WX_EXECUTABLE \
@@ -85,6 +87,6 @@ cmake \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
   "/" \
   ..
-make -sj2
+make 
 make package
 
