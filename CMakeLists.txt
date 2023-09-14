@@ -257,6 +257,11 @@ if(NOT OCPN_FLATPAK_CONFIG)
     add_subdirectory(opencpn-libs/pugixml)
     target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
 
+    IF(NOT UNIX)
+        add_subdirectory(opencpn-libs/bzip2)
+        target_link_libraries(${PACKAGE_NAME} ocpn::bzip2)
+    ENDIF(NOT UNIX)
+
 endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
@@ -271,10 +276,6 @@ add_definitions(-DTIXML_USE_STL)
 ## ----- Do not change next section - needed to configure build process ----- ##
 ##
 
-IF(NOT UNIX)
-#    add_subdirectory(opencpn-libs/plugingl)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::bzip2)
-ENDIF(NOT UNIX)
 
 IF(WIN32)
     IF(MSVC)
