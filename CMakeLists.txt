@@ -193,20 +193,6 @@ SET (HDRS
             include/navobj_util.h
 )
 
-set(LIBSSRC 
-    libs/wxJSON/src/jsonreader.cpp
-    libs/wxJSON/src/jsonval.cpp
-    libs/wxJSON/src/jsonwriter.cpp)
-
-set(LIBHDRS
-    libs/GL/gl.h
-    libs/GL/gl_private.h
-    libs/GL/glext.h
-    libs/GL/glu.h
-    libs/wxJSON/include/json_defs.h
-    libs/wxJSON/include/jsonreader.h
-    libs/wxJSON/include/jsonval.h
-    libs/wxJSON/include/jsonwriter.h)
 
 add_definitions(-DPLUGIN_USE_SVG)
 
@@ -230,14 +216,14 @@ SET(SRC ${SRCS} ${HDRS})
 ##=============================================================
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)   #added with plugDC
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)   #added with plugDC
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
 
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
 
 
@@ -250,11 +236,21 @@ if(NOT OCPN_FLATPAK_CONFIG)
     # Build environment not available when flatpak is being configured so following statements will not work
     message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
 
-    add_subdirectory(libs/tinyxml)
-    add_subdirectory(libs/pluginDC)
+    add_subdirectory(opencpn-libs/api-16)
+    add_subdirectory(opencpn-libs/tinyxml)
+    add_subdirectory(opencpn-libs/plugingl)
+    add_subdirectory(opencpn-libs/ODAPI)
+    add_subdirectory(opencpn-libs/jsonlib)
 
+    target_link_libraries(${PACKAGE_NAME} ocpn::api)
     target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
-    target_link_libraries(${PACKAGE_NAME} ocpn::pluginDC)
+    target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
+    target_link_libraries(${PACKAGE_NAME} ocpn::odapi)
+    target_link_libraries(${PACKAGE_NAME} ocpn::jsonlib)
+
+    add_subdirectory(opencpn-libs/pugixml)
+    target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
+
 endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
@@ -270,15 +266,13 @@ add_definitions(-DTIXML_USE_STL)
 ##
 
 IF(NOT UNIX)
-    include_directories(src/zlib-1.2.3)
-    include_directories(libs/bzip2)
-    add_subdirectory(libs/bzip2)
-    target_link_libraries(${PACKAGE_NAME} ocpn::bzip2)
+#    add_subdirectory(opencpn-libs/plugingl)
+#    target_link_libraries(${PACKAGE_NAME} ocpn::bzip2)
 ENDIF(NOT UNIX)
 
 IF(WIN32)
     IF(MSVC)
-        include_directories(${PROJECT_SOURCE_DIR}/buildwin/include)
+        #include_directories(${PROJECT_SOURCE_DIR}/buildwin/include)
         target_link_libraries(${PACKAGE_NAME} "${PROJECT_SOURCE_DIR}/buildwin/zlib1.lib")
     ELSE()
         # MINGW
@@ -293,19 +287,12 @@ if(QT_ANDROID)
     include_directories(BEFORE ${qt_android_include})
 endif(QT_ANDROID)
 
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-add_subdirectory(libs/jsoncpp)
-target_link_libraries(${PACKAGE_NAME} JSONCPP)
-
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/libtess2/include)
-add_subdirectory(libs/libtess2)
+add_subdirectory(opencpn-libs/libtess2)
 target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
 
-IF (MSVC)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
-add_subdirectory(libs/pugixml)
-target_link_libraries(${PACKAGE_NAME} ocpn::pugixml)
-ENDIF (MSVC)
+#IF (MSVC)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pugixml)
+#ENDIF (MSVC)
 
 ## Needed for all builds Do not change - needed to build app --- ##
 #========================================================
