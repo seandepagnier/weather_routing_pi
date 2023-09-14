@@ -236,16 +236,22 @@ if(NOT OCPN_FLATPAK_CONFIG)
     # Build environment not available when flatpak is being configured so following statements will not work
     message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
 
-    add_subdirectory(opencpn-libs/api-16)
-    add_subdirectory(opencpn-libs/tinyxml)
-    add_subdirectory(opencpn-libs/plugingl)
-    add_subdirectory(opencpn-libs/ODAPI)
-    add_subdirectory(opencpn-libs/jsonlib)
+    add_subdirectory(opencpn-libs/WindowsHeaders)
+    target_link_libraries(${PACKAGE_NAME} windows::headers)
 
+    add_subdirectory(opencpn-libs/api-16)
     target_link_libraries(${PACKAGE_NAME} ocpn::api)
+
+    add_subdirectory(opencpn-libs/tinyxml)
     target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
+
+    add_subdirectory(opencpn-libs/plugingl)
     target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
+
+    add_subdirectory(opencpn-libs/ODAPI)
     target_link_libraries(${PACKAGE_NAME} ocpn::odapi)
+
+    add_subdirectory(opencpn-libs/jsonlib)
     target_link_libraries(${PACKAGE_NAME} ocpn::jsonlib)
 
     add_subdirectory(opencpn-libs/pugixml)
