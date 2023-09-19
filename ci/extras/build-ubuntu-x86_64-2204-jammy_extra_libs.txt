@@ -1,2 +1,0 @@
-libwxgtk3.2-dev
-

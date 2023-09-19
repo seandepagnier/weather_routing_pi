@@ -6,9 +6,10 @@
 
 set -xe
 
+pwd
+
 git submodule update --init opencpn-libs
 
-pwd
 ls -la
 
 #sudo apt-get -q update

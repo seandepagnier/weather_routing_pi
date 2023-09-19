@@ -49,40 +49,32 @@ workflows:
             <<: *std-filters
         - build-debian-x86_64-12-bookworm:
             <<: *std-filters
-## KEEP needed for Raspbian OpenCPN v5.8(wx32)
-        - build-ubuntu-x86_64-2204-jammy:
-            <<: *std-filters
-## ---------------------
-## OpenCPN 5.6.2 Plugins
-## ---------------------
-## Frozen - 28/05/2023
-        - build-macos:
-             <<: *std-filters
-## Appveyor also builds for Windows.
-## Frozen - 28/05/2023
-##        - build-msvc-2022:
-##            <<: *std-filters
-## Frozen - 28/05/2023
-        - build-debian-armhf-10-buster:
-            <<: *std-filters
-## Frozen - 28/05/2023
-        - build-debian-armhf-10-buster-gtk3:
-            <<: *std-filters
-## Frozen - 28/05/2023
-        - build-debian-arm64-10-buster:
-            <<: *std-filters
-## Frozen - 28/05/2023
-        - build-debian-x86_64-10-buster:
-            <<: *std-filters
-## Frozen - 28/05/2023
         - build-debian-armhf-11-bullseye:
             <<: *std-filters
-## Frozen - 28/05/2023
         - build-debian-arm64-11-bullseye:
             <<: *std-filters
-## Frozen - 28/05/2023
         - build-debian-x86_64-11-bullseye:
             <<: *std-filters
+## KEEP needed for Jammy with wx32
+        - build-ubuntu-x86_64-2204-jammy:
+            <<: *std-filters
+## -------------------------------------------
+## OpenCPN 5.6.2 Plugins  Frozen - 28/05/2023
+## ------------------------------------------
+        - build-macos:
+             <<: *std-filters
+## Appveyor no longer builds for Windows.
+        - build-msvc-2022:
+            <<: *std-filters
+        - build-debian-armhf-10-buster:
+            <<: *std-filters
+        - build-debian-armhf-10-buster-gtk3:
+            <<: *std-filters
+        - build-debian-arm64-10-buster:
+            <<: *std-filters
+        - build-debian-x86_64-10-buster:
+            <<: *std-filters
+
 ## -------------------------------------
 ## UBUNTU OS  Frozen - 28/05/2023  DROP
 ## -------------------------------------
@@ -277,7 +269,61 @@ jobs:
             command: ci/circleci-build-ubuntu-docker.sh
             no_output_timeout: 30m
         - deploy-code
-## KEEP needed for Raspbian OpenCPN v5.8(wx32)
+    build-debian-armhf-11-bullseye:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=bullseye-armhf
+        - DOCKER_IMAGE=jongough/debian-armhf:bullseye
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-ubuntu-docker.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-debian-arm64-11-bullseye:
+        machine:
+            image: ubuntu-2004:202104-01
+        environment:
+        - OCPN_TARGET=bullseye-arm64
+        - DOCKER_IMAGE=arm64v8/debian:bullseye-backports
+        - BUILD_FLAGS=-j3
+        - BUILD_ENV=debian
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        steps:
+        - checkout
+        - run: chmod a+x ./ci/*.sh
+        - run:
+            command: ci/circleci-build-ubuntu-docker.sh
+            no_output_timeout: 30m
+        - deploy-code
+    build-debian-x86_64-11-bullseye:
+        docker:
+        - image: circleci/buildpack-deps:bullseye-scm
+        environment:
+        - OCPN_TARGET:  bullseye
+        - BUILD_GTK3: true
+        - DEPLOY_USE_ORB: true
+        - BUILD_ENV=debian
+        steps:
+        - checkout
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian bullseye main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: >
+            echo "deb-src http://ftp.us.debian.org/debian bullseye-updates main"
+            | sudo tee -a /etc/apt/sources.list
+        - run: cat /etc/apt/sources.list
+        - run: chmod a+x ci/*.sh
+        - run: ci/circleci-build-debian.sh
+        - deploy-code
+## KEEP needed for OpenCPN v5.8 Jammy wx32 build
     build-ubuntu-x86_64-2204-jammy:
         docker:
         - image: cimg/base:edge-22.04
@@ -316,20 +362,24 @@ jobs:
         - run: chmod a+x ci/*.sh
         - run: bash ci/circleci-build-macos.sh
         - deploy-code
-## Appveyor builds Windows including WinXT.
-## If below is used, will WinXT work?
+## Appveyor doesn't build for Windows now.
+## If below is used, WinXT will not work.
     build-msvc-2022:
-        executor: win/server-2022
+        executor:
+            name: win/server-2022
+            shell: cmd.exe
         environment:
         - OCPN_TARGET: MSVC
         - MSVC_VERSION: 2022
         - WX_VER: 31
-        - DEPLOY_USE_ORB: true
         steps:
         - checkout
-        - run: ci/circleci-build-msvc
+        - run:
+            privileged: False
+            shell: cmd.exe
+            command: ci\circleci-build-msvc.bat
         - deploy-code:
-            install-python: true
+            DEPLOY-USE-ORB: false
     build-debian-armhf-10-buster:
         machine:
             image: ubuntu-2004:202104-01
@@ -398,60 +448,7 @@ jobs:
         - run: chmod a+x ci/*.sh
         - run: ci/circleci-build-debian.sh
         - deploy-code
-    build-debian-armhf-11-bullseye:
-        machine:
-            image: ubuntu-2004:202104-01
-        environment:
-        - OCPN_TARGET=bullseye-armhf
-        - DOCKER_IMAGE=jongough/debian-armhf:bullseye
-        - BUILD_FLAGS=-j3
-        - BUILD_ENV=debian
-        - BUILD_GTK3: true
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - run: chmod a+x ./ci/*.sh
-        - run:
-            command: ci/circleci-build-ubuntu-docker.sh
-            no_output_timeout: 30m
-        - deploy-code
-    build-debian-arm64-11-bullseye:
-        machine:
-            image: ubuntu-2004:202104-01
-        environment:
-        - OCPN_TARGET=bullseye-arm64
-        - DOCKER_IMAGE=arm64v8/debian:bullseye-backports
-        - BUILD_FLAGS=-j3
-        - BUILD_ENV=debian
-        - BUILD_GTK3: true
-        - DEPLOY_USE_ORB: true
-        steps:
-        - checkout
-        - run: chmod a+x ./ci/*.sh
-        - run:
-            command: ci/circleci-build-ubuntu-docker.sh
-            no_output_timeout: 30m
-        - deploy-code
-    build-debian-x86_64-11-bullseye:
-        docker:
-        - image: circleci/buildpack-deps:bullseye-scm
-        environment:
-        - OCPN_TARGET:  bullseye
-        - BUILD_GTK3: true
-        - DEPLOY_USE_ORB: true
-        - BUILD_ENV=debian
-        steps:
-        - checkout
-        - run: >
-            echo "deb-src http://ftp.us.debian.org/debian bullseye main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: >
-            echo "deb-src http://ftp.us.debian.org/debian bullseye-updates main"
-            | sudo tee -a /etc/apt/sources.list
-        - run: cat /etc/apt/sources.list
-        - run: chmod a+x ci/*.sh
-        - run: ci/circleci-build-debian.sh
-        - deploy-code
+
 ## -------------------------------------------
 ## Ubuntu OS - Generally deprecated and not used.
 ## -------------------------------------------

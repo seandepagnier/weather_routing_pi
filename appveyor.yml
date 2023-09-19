@@ -4,8 +4,8 @@ clone_depth: 10
 
 
 platform:
-# - x64
-  - Win32
+#  - x64
+#  - Win32
 
 configuration: Release
 test: OFF
@@ -82,6 +82,7 @@ for:
 
 before_build:
   - cd c:\project\ocpn_project
+  - git submodule update --init opencpn-libs
   - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/PVW32Con.exe
   - rm -rf build && mkdir build && cd build
   - ps: Start-FileDownload https://sourceforge.net/projects/opencpnplugins/files/opencpn.lib
