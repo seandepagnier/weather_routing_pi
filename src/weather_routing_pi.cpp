@@ -88,7 +88,7 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 #include "icons.h"
 
 weather_routing_pi::weather_routing_pi(void *ppimgr)
-      :opencpn_plugin_116(ppimgr)
+      :opencpn_plugin_117(ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
@@ -208,6 +208,15 @@ int weather_routing_pi::GetPlugInVersionMinor()
 {
       return PLUGIN_VERSION_MINOR;
 }
+
+int weather_routing_pi::GetPlugInVersionPatch()
+{
+      return PLUGIN_VERSION_PATCH;
+}:
+int weather_routing_pi::GetPlugInVersionPost()
+{
+      return PLUGIN_VERSION_TWEAK;
+}:
 
 // wxBitmap *weather_routing_pi::GetPlugInBitmap()
 //{
