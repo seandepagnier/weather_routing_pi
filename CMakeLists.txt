@@ -244,8 +244,10 @@ if(NOT OCPN_FLATPAK_CONFIG)
 	# so following statements will not work
     message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
 
-    add_subdirectory(opencpn-libs/WindowsHeaders)
-    target_link_libraries(${PACKAGE_NAME} windows::headers)
+    IF(MSVC)
+        add_subdirectory(opencpn-libs/WindowsHeaders)
+        target_link_libraries(${PACKAGE_NAME} windows::headers)
+    ENDIF(MSVC)
 
     add_subdirectory(opencpn-libs/api-17)
     target_link_libraries(${PACKAGE_NAME} ocpn::api)
@@ -253,7 +255,7 @@ if(NOT OCPN_FLATPAK_CONFIG)
     add_subdirectory(opencpn-libs/tinyxml)
     target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
 
-    add_subdirectory(opencpn-libs/ODAPI)
+    add_subdirectory(opencpn-libs/odapi)
     target_link_libraries(${PACKAGE_NAME} ocpn::odapi)
 
     add_subdirectory(opencpn-libs/jsonlib)
