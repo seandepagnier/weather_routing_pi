@@ -213,6 +213,7 @@ int weather_routing_pi::GetPlugInVersionPatch()
 {
       return PLUGIN_VERSION_PATCH;
 }
+
 int weather_routing_pi::GetPlugInVersionPost()
 {
       return PLUGIN_VERSION_TWEAK;
