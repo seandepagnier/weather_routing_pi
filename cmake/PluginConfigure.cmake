@@ -646,6 +646,13 @@ else(NOT QT_ANDROID)
 
     # Needed for android builds
     include_directories(BEFORE ${qt_android_include})
+	
+	if(USE_LOCAL_GLU)
+        message(STATUS "${CMLOC} Android:Adding local GLU")
+        add_subdirectory(opencpn-libs/glu)
+        message(STATUS "${CMLOC}PACKAGE_NAME: ${PACKAGE_NAME}")
+        target_link_libraries(${PACKAGE_NAME} ocpn::glu_static)
+    endif()
 
 endif(NOT QT_ANDROID)
 
