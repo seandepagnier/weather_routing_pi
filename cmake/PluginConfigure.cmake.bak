@@ -502,8 +502,6 @@ if((NOT OPENGLES_FOUND) AND (NOT QT_ANDROID))
         message(STATUS "${CMLOC}PACKAGE_NAME: ${PACKAGE_NAME}")
         target_link_libraries(${PACKAGE_NAME} ocpn::glu_static)
         add_definitions(-DocpnUSE_GL)
-
-        set(wxWidgets_USE_LIBS ${wxWidgets_USE_LIBS} gl)
         message(STATUS "${CMLOC}    Revised GL Lib (with local): " ${OPENGL_LIBRARIES})
     elseif(OPENGL_FOUND)
 
