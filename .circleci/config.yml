@@ -74,7 +74,6 @@ workflows:
             <<: *std-filters
         - build-debian-x86_64-10-buster:
             <<: *std-filters
-
 ## -------------------------------------
 ## UBUNTU OS  Frozen - 28/05/2023  DROP
 ## -------------------------------------
@@ -155,8 +154,7 @@ jobs:
             install-python: true
     build-macos-wx32:
         macos:
-            xcode: "12.5.1"
-        resource_class: macos.x86.medium.gen2
+            xcode: "13.4"
         environment:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
@@ -350,8 +348,7 @@ jobs:
 ## ---------------------
     build-macos:
         macos:
-            xcode: "12.5.1"
-        resource_class: macos.x86.medium.gen2
+            xcode: "13.4"
         environment:
         - OCPN_TARGET:  macos
         - CLOUDSMITH_PKG_EXT: pkg
