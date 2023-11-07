@@ -44,24 +44,6 @@ if(UNIX)
     endif(PROFILING)
 endif(UNIX)
 
-if(APPLE)
-    install(
-        TARGETS ${PACKAGE_NAME}
-        RUNTIME
-        LIBRARY DESTINATION OpenCPN.app/Contents/PlugIns)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/data)
-        install(DIRECTORY data DESTINATION OpenCPN.app/Contents/SharedSupport/plugins/${PACKAGE_NAME})
-    endif()
-
-    if(EXISTS ${PROJECT_SOURCE_DIR}/UserIcons)
-        install(DIRECTORY UserIcons DESTINATION OpenCPN.app/Contents/SharedSupport/plugins/${PACKAGE_NAME})
-    endif()
-
-    find_package(ZLIB REQUIRED)
-    target_link_libraries(${PACKAGE_NAME} ${ZLIB_LIBRARIES})
-
-endif(APPLE)
-
 if(UNIX AND NOT APPLE AND NOT QT_ANDROID)
     find_package(BZip2 REQUIRED)
     include_directories(${BZIP2_INCLUDE_DIR})
@@ -129,6 +111,8 @@ if(UNIX AND NOT APPLE)
 endif(UNIX AND NOT APPLE)
 
 if(APPLE)
+    message(STATUS "${CMLOC}Install Prefix: ${CMAKE_INSTALL_PREFIX}")
+
     # For Apple build, we need to copy the "data" directory contents to the build directory, so that the packager can pick them up.
     if(NOT EXISTS "${PROJECT_BINARY_DIR}/data/")
         file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/data/")
@@ -156,6 +140,13 @@ if(APPLE)
             file(COPY ${_currentDataFile} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/UserIcons)
         endforeach(_currentDataFile)
     endif()
+
+    # On macos, fix paths which points to the build environment, make sure they
+    # refers to runtime locations
+    message(STATUS "Adjusting MacOS library paths")
+    install(CODE "execute_process(
+      COMMAND bash -c ${PROJECT_SOURCE_DIR}/cmake/fix-macos-libs.sh
+    )")
 
     install(
         TARGETS ${PACKAGE_NAME}

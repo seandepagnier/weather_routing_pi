@@ -84,10 +84,12 @@ rm -rf build && mkdir build && cd build
 cmake \
   -DwxWidgets_CONFIG_EXECUTABLE=$WX_EXECUTABLE \
   -DwxWidgets_CONFIG_OPTIONS=$WX_CONFIG \
-  -DCMAKE_INSTALL_PREFIX= \
+  -DCMAKE_INSTALL_PREFIX=app/files \
+  -DBUILD_TYPE_PACKAGE:STRING=tarball \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
   "/" \
   ..
-make 
+make
+make install
 make package
 
