@@ -54,6 +54,24 @@ endif(UNIX AND NOT APPLE AND NOT QT_ANDROID)
 
 set(PARENT opencpn)
 
+if(APPLE)
+    install(
+        TARGETS ${PACKAGE_NAME}
+        RUNTIME
+        LIBRARY DESTINATION OpenCPN.app/Contents/PlugIns)
+    if(EXISTS ${PROJECT_SOURCE_DIR}/data)
+        install(DIRECTORY data DESTINATION OpenCPN.app/Contents/SharedSupport/plugins/${PACKAGE_NAME})
+    endif()
+
+    if(EXISTS ${PROJECT_SOURCE_DIR}/UserIcons)
+        install(DIRECTORY UserIcons DESTINATION OpenCPN.app/Contents/SharedSupport/plugins/${PACKAGE_NAME})
+    endif()
+
+    find_package(ZLIB REQUIRED)
+    target_link_libraries(${PACKAGE_NAME} ${ZLIB_LIBRARIES})
+
+endif(APPLE)
+
 # Based on code from nohal
 if(NOT CMAKE_INSTALL_PREFIX)
     set(CMAKE_INSTALL_PREFIX ${TENTATIVE_PREFIX})
