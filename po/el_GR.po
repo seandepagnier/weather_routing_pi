@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-20 16:36-0400\n"
-"PO-Revision-Date: 2023-10-04 18:33\n"
+"POT-Creation-Date: 2023-10-21 15:04+0200\n"
+"PO-Revision-Date: 2023-11-09 21:22\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -21,15 +21,15 @@ msgstr ""
 #: src/ConfigurationDialog.cpp:330 src/ConfigurationDialog.cpp:483
 #: src/ReportDialog.cpp:316 src/SettingsDialog.cpp:224
 #: src/WeatherRouting.cpp:235 src/WeatherRouting.cpp:552
-#: src/WeatherRouting.cpp:1132 src/WeatherRouting.cpp:1403
-#: src/WeatherRouting.cpp:1425 src/WeatherRouting.cpp:1556
-#: src/WeatherRouting.cpp:1668 src/WeatherRouting.cpp:1728
-#: src/WeatherRouting.cpp:1763 src/WeatherRouting.cpp:1780
-#: src/WeatherRouting.cpp:1880 src/WeatherRouting.cpp:1889
-#: src/WeatherRouting.cpp:1974 src/WeatherRouting.cpp:2428
-#: src/WeatherRouting.cpp:2461 src/WeatherRouting.cpp:2511
-#: src/weather_routing_pi.cpp:145 src/weather_routing_pi.cpp:149
-#: src/weather_routing_pi.cpp:304 src/weather_routing_pi.cpp:350
+#: src/WeatherRouting.cpp:1132 src/WeatherRouting.cpp:1409
+#: src/WeatherRouting.cpp:1431 src/WeatherRouting.cpp:1562
+#: src/WeatherRouting.cpp:1674 src/WeatherRouting.cpp:1734
+#: src/WeatherRouting.cpp:1769 src/WeatherRouting.cpp:1786
+#: src/WeatherRouting.cpp:1886 src/WeatherRouting.cpp:1895
+#: src/WeatherRouting.cpp:1980 src/WeatherRouting.cpp:2434
+#: src/WeatherRouting.cpp:2467 src/WeatherRouting.cpp:2517
+#: src/weather_routing_pi.cpp:147 src/weather_routing_pi.cpp:151
+#: src/weather_routing_pi.cpp:318 src/weather_routing_pi.cpp:364
 msgid "Weather Routing"
 msgstr "Δρομολόγιο βάσει του καιρού"
 
@@ -117,7 +117,7 @@ msgstr "Όνομα αρχείου"
 
 #: src/BoatDialog.cpp:105 src/BoatDialog.cpp:707 src/BoatDialog.cpp:757
 #: src/BoatDialog.cpp:843 src/BoatDialog.cpp:849 src/BoatDialog.cpp:906
-#: src/WeatherRouting.cpp:2628 src/WeatherRouting.cpp:2634
+#: src/WeatherRouting.cpp:2634 src/WeatherRouting.cpp:2640
 msgid "OpenCPN Weather Routing Plugin"
 msgstr "Πρόσθετο OpenCPN Weather Routing"
 
@@ -466,19 +466,19 @@ msgstr "Τα δελτία του Weather routing δίνουν την επισκ�
 msgid "Weather Routing Report"
 msgstr "ΔΕΛΤΙΟ Weather Routing"
 
-#: src/RouteMapOverlay.cpp:103
+#: src/RouteMapOverlay.cpp:104
 msgid "error, thread already created\n"
 msgstr "σφάλμα, το τμήμα έχει ήδη δημιουργηθεί\n"
 
-#: src/RouteMapOverlay.cpp:116
+#: src/RouteMapOverlay.cpp:117
 msgid "Configuration specifies cyclone track avoidance and Climatology cyclone data is not available"
 msgstr "Η παρούσα διαμόρφωση απαιτεί την αποφυγή της πορείας του κυκλώνα αλλά δεν υπάρχουν κλιματολογικά δεδομένα για κυκλώνες"
 
-#: src/RouteMapOverlay.cpp:122
+#: src/RouteMapOverlay.cpp:123
 msgid "Configuration specifies boundary exclusion but ocpn_draw_pi boundary data not available"
 msgstr "Η παρούσα διαμόρφωση απαιτεί την αποφυγή της περιοχής αλλά δεν υπάρχουν δεδομένα από το πρόσθετο ocpn_draw"
 
-#: src/RouteMapOverlay.cpp:128
+#: src/RouteMapOverlay.cpp:129
 msgid "Configuration does not allow grib or climatology wind data"
 msgstr "Η παρούσα διαμόρφωση δεν επιτρέπει δεδομένα ανέμου από grib ή κλιματολογικά"
 
@@ -668,7 +668,7 @@ msgid "Cursor outside computed route map"
 msgstr "Ο κέρσορας είναι εκτός του χάρτη της υπολογισμένης πορείας"
 
 #: src/WeatherRouting.cpp:768 src/WeatherRouting.cpp:921
-#: src/WeatherRouting.cpp:2188 src/WeatherRoutingUI.cpp:896
+#: src/WeatherRouting.cpp:2194 src/WeatherRoutingUI.cpp:896
 msgid "Grib"
 msgstr "Grib"
 
@@ -693,136 +693,136 @@ msgstr "Ρεύμα"
 msgid "Cannot goto invalid route(s)."
 msgstr "Δεν μπορώ να πάω, οι διαδρομές δεν ισχύουν."
 
-#: src/WeatherRouting.cpp:1295 src/WeatherRouting.cpp:1311
+#: src/WeatherRouting.cpp:1301 src/WeatherRouting.cpp:1317
 msgid "Select Configuration"
 msgstr "Επιλέξτε διαμόρφωση"
 
-#: src/WeatherRouting.cpp:1402
+#: src/WeatherRouting.cpp:1408
 msgid "Zero time span forbidden, aborting."
 msgstr "Δεν πειτρέπεται μηδενικό χρονικό διάστημα."
 
-#: src/WeatherRouting.cpp:1425
+#: src/WeatherRouting.cpp:1431
 msgid "Batch configuration"
 msgstr "Μαζική διαμόρφωση"
 
-#: src/WeatherRouting.cpp:1551
+#: src/WeatherRouting.cpp:1557
 msgid "Route export failed"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1554
+#: src/WeatherRouting.cpp:1560
 msgid "Route(s) not computed, cannot export"
 msgstr ""
 
-#: src/WeatherRouting.cpp:1612
+#: src/WeatherRouting.cpp:1618
 msgid "WeatherRoutingInformation.html"
 msgstr "WeatherRoutingInformation.html"
 
-#: src/WeatherRouting.cpp:1667
+#: src/WeatherRouting.cpp:1673
 msgid "Failed to start configuration: "
 msgstr "Απέτυχε να αρχίσει τη διαμόρφωση: "
 
-#: src/WeatherRouting.cpp:1738
+#: src/WeatherRouting.cpp:1744
 msgid "Failed to load file."
 msgstr "Απέτυχε η φόρτωση του αρχείου."
 
-#: src/WeatherRouting.cpp:1743
+#: src/WeatherRouting.cpp:1749
 msgid "Invalid xml file"
 msgstr "Μη έγκυρο αρχείο xml"
 
-#: src/WeatherRouting.cpp:1763
+#: src/WeatherRouting.cpp:1769
 msgid "Load"
 msgstr "Φόρτωση"
 
-#: src/WeatherRouting.cpp:1779
+#: src/WeatherRouting.cpp:1785
 msgid "File contains duplicate position name, discaring\n"
 msgstr "Το αρχείο περιέχει διπλό όνομα θέσης\n"
 
-#: src/WeatherRouting.cpp:1870
+#: src/WeatherRouting.cpp:1876
 msgid "Unrecognized xml node"
 msgstr "Άγνωστος κόμβος xml"
 
-#: src/WeatherRouting.cpp:1973
+#: src/WeatherRouting.cpp:1979
 msgid "Failed to save xml file: "
 msgstr "Απέτυχε η αποθήκευση του αρχείου xml: "
 
-#: src/WeatherRouting.cpp:2177
+#: src/WeatherRouting.cpp:2183
 msgid "Invalid Start/End "
 msgstr "Μη έγκυρη έναρξη/λήξη "
 
-#: src/WeatherRouting.cpp:2180
+#: src/WeatherRouting.cpp:2186
 msgid "Computing..."
 msgstr "Υπολογισμός..."
 
-#: src/WeatherRouting.cpp:2184
+#: src/WeatherRouting.cpp:2190
 msgid "Complete"
 msgstr "Ολοκλήρωση"
 
-#: src/WeatherRouting.cpp:2192 src/WeatherRoutingUI.cpp:1975
+#: src/WeatherRouting.cpp:2198 src/WeatherRoutingUI.cpp:1975
 #: src/WeatherRoutingUI.cpp:2794 src/WeatherRoutingUI.cpp:2951
 msgid "Polar"
 msgstr "Πολικό διάγραμμα"
 
-#: src/WeatherRouting.cpp:2196
+#: src/WeatherRouting.cpp:2202
 msgid "No Data"
 msgstr "Δεν υπάρχουν δεδομένα"
 
-#: src/WeatherRouting.cpp:2200
+#: src/WeatherRouting.cpp:2206
 msgid "Land"
 msgstr "Ξηρά"
 
-#: src/WeatherRouting.cpp:2204
+#: src/WeatherRouting.cpp:2210
 msgid "Boundary"
 msgstr "Όριο"
 
-#: src/WeatherRouting.cpp:2208
+#: src/WeatherRouting.cpp:2214
 msgid "Failed"
 msgstr "Απέτυχε"
 
-#: src/WeatherRouting.cpp:2214
+#: src/WeatherRouting.cpp:2220
 msgid "Waiting..."
 msgstr "Σε αναμονή..."
 
-#: src/WeatherRouting.cpp:2217
+#: src/WeatherRouting.cpp:2223
 msgid "Not Computed"
 msgstr "Δεν υπολογίσθηκε"
 
-#: src/WeatherRouting.cpp:2427
+#: src/WeatherRouting.cpp:2433
 msgid "No Weather Route selected"
 msgstr "Δεν επιλέχθηκε Weather Route"
 
-#: src/WeatherRouting.cpp:2460 src/WeatherRouting.cpp:2510
+#: src/WeatherRouting.cpp:2466 src/WeatherRouting.cpp:2516
 msgid "Empty Route, nothing to export\n"
 msgstr "Κενή διαδρομή, δεν εξάγεται\n"
 
-#: src/WeatherRouting.cpp:2471
+#: src/WeatherRouting.cpp:2477
 msgid "Weather Route "
 msgstr "Δρομολόγιο βάσει του καιρού "
 
-#: src/WeatherRouting.cpp:2480
+#: src/WeatherRouting.cpp:2486
 msgid "Weather Route Point"
 msgstr "Σημείο για Weather Route"
 
-#: src/WeatherRouting.cpp:2490 src/WeatherRouting.cpp:2589
+#: src/WeatherRouting.cpp:2496 src/WeatherRouting.cpp:2595
 msgid "Weather Route Destination"
 msgstr "Προορισμός Weather Routing"
 
-#: src/WeatherRouting.cpp:2626
+#: src/WeatherRouting.cpp:2632
 msgid "GPX Route file created"
 msgstr ""
 
-#: src/WeatherRouting.cpp:2632
+#: src/WeatherRouting.cpp:2638
 msgid "GPX Route file export failed"
 msgstr ""
 
-#: src/WeatherRouting.cpp:2653
+#: src/WeatherRouting.cpp:2659
 msgid "Zero Time Step"
 msgstr "Μηδενικό χρονικό βήμα"
 
-#: src/WeatherRouting.cpp:2661
+#: src/WeatherRouting.cpp:2667
 msgid "inside exclusion boundary"
 msgstr "εντός αποκλεισμένης περιοχής"
 
-#: src/WeatherRouting.cpp:2668
+#: src/WeatherRouting.cpp:2674
 msgid "lies outside of Max Latitude constraint"
 msgstr "είναι εκτός μεγίστου επιτρεπτού γ. πλάτους"
 
@@ -1856,24 +1856,24 @@ msgstr "MyButton"
 msgid "Boat Characteristics"
 msgstr "Χαρακτηριστικά του πλοίου"
 
-#: src/weather_routing_pi.cpp:154 src/weather_routing_pi.cpp:157
+#: src/weather_routing_pi.cpp:156 src/weather_routing_pi.cpp:159
 msgid "Weather Route Position"
 msgstr "Θέση του Weather Route"
 
-#: src/weather_routing_pi.cpp:160
+#: src/weather_routing_pi.cpp:162
 msgid "Weather Route Analysis"
 msgstr "Ανάλυση του δρομολογίου βάσει του καιρού"
 
-#: src/weather_routing_pi.cpp:301
+#: src/weather_routing_pi.cpp:315
 msgid "Grib plugin version not supported."
 msgstr "Δεν υποστηρίζεται αυτή η έκδοση του πρόσθετου Grib."
 
-#: src/weather_routing_pi.cpp:303 src/weather_routing_pi.cpp:349
+#: src/weather_routing_pi.cpp:317 src/weather_routing_pi.cpp:363
 #, c-format
 msgid "Use versions %d.%d to %d.%d"
 msgstr "Χρησιμοποιείστε τις εκδοχές %d.%d μέχρι %d.%d"
 
-#: src/weather_routing_pi.cpp:347
+#: src/weather_routing_pi.cpp:361
 msgid "Climatology plugin version not supported, no climatology data."
 msgstr "Η έκδοση αυτή του προσθέτου Κλιματολογίας δεν υποστηρίζεται. Όχι κλιματολογικά δεδομένα."
 
