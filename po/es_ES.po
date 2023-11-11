@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-20 16:36-0400\n"
-"PO-Revision-Date: 2023-10-19 09:17\n"
+"POT-Creation-Date: 2023-10-21 15:04+0200\n"
+"PO-Revision-Date: 2023-11-09 21:22\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -21,15 +21,15 @@ msgstr ""
 #: src/ConfigurationDialog.cpp:330 src/ConfigurationDialog.cpp:483
 #: src/ReportDialog.cpp:316 src/SettingsDialog.cpp:224
 #: src/WeatherRouting.cpp:235 src/WeatherRouting.cpp:552
-#: src/WeatherRouting.cpp:1132 src/WeatherRouting.cpp:1403
-#: src/WeatherRouting.cpp:1425 src/WeatherRouting.cpp:1556
-#: src/WeatherRouting.cpp:1668 src/WeatherRouting.cpp:1728
-#: src/WeatherRouting.cpp:1763 src/WeatherRouting.cpp:1780
-#: src/WeatherRouting.cpp:1880 src/WeatherRouting.cpp:1889
-#: src/WeatherRouting.cpp:1974 src/WeatherRouting.cpp:2428
-#: src/WeatherRouting.cpp:2461 src/WeatherRouting.cpp:2511
-#: src/weather_routing_pi.cpp:145 src/weather_routing_pi.cpp:149
-#: src/weather_routing_pi.cpp:304 src/weather_routing_pi.cpp:350
+#: src/WeatherRouting.cpp:1132 src/WeatherRouting.cpp:1409
+#: src/WeatherRouting.cpp:1431 src/WeatherRouting.cpp:1562
+#: src/WeatherRouting.cpp:1674 src/WeatherRouting.cpp:1734
+#: src/WeatherRouting.cpp:1769 src/WeatherRouting.cpp:1786
+#: src/WeatherRouting.cpp:1886 src/WeatherRouting.cpp:1895
+#: src/WeatherRouting.cpp:1980 src/WeatherRouting.cpp:2434
+#: src/WeatherRouting.cpp:2467 src/WeatherRouting.cpp:2517
+#: src/weather_routing_pi.cpp:147 src/weather_routing_pi.cpp:151
+#: src/weather_routing_pi.cpp:318 src/weather_routing_pi.cpp:364
 msgid "Weather Routing"
 msgstr "Enrutamiento meteorológico"
 
@@ -117,7 +117,7 @@ msgstr "Nombre de archivo"
 
 #: src/BoatDialog.cpp:105 src/BoatDialog.cpp:707 src/BoatDialog.cpp:757
 #: src/BoatDialog.cpp:843 src/BoatDialog.cpp:849 src/BoatDialog.cpp:906
-#: src/WeatherRouting.cpp:2628 src/WeatherRouting.cpp:2634
+#: src/WeatherRouting.cpp:2634 src/WeatherRouting.cpp:2640
 msgid "OpenCPN Weather Routing Plugin"
 msgstr "Plugin Weather Routing de OpenCPN"
 
@@ -466,19 +466,19 @@ msgstr "Los informes de enrutamiento meteorológico dan una descripción de una 
 msgid "Weather Routing Report"
 msgstr "Informe de enrutamiento meteorológico"
 
-#: src/RouteMapOverlay.cpp:103
+#: src/RouteMapOverlay.cpp:104
 msgid "error, thread already created\n"
 msgstr "error, amenaza ya creada\n"
 
-#: src/RouteMapOverlay.cpp:116
+#: src/RouteMapOverlay.cpp:117
 msgid "Configuration specifies cyclone track avoidance and Climatology cyclone data is not available"
 msgstr "La configuración especifica la ruta para evitar los ciclones y la data de climatología de ciclones no está disponible"
 
-#: src/RouteMapOverlay.cpp:122
+#: src/RouteMapOverlay.cpp:123
 msgid "Configuration specifies boundary exclusion but ocpn_draw_pi boundary data not available"
 msgstr "La configuración especifica da la exclusión de límites pero los datos de límite de ocpn_draw_pi no están disponibles"
 
-#: src/RouteMapOverlay.cpp:128
+#: src/RouteMapOverlay.cpp:129
 msgid "Configuration does not allow grib or climatology wind data"
 msgstr "La configuración no permite acceso a la data grib o a la climatología de vientos"
 
@@ -668,7 +668,7 @@ msgid "Cursor outside computed route map"
 msgstr "Cursor fuera del mapa de la ruta computada"
 
 #: src/WeatherRouting.cpp:768 src/WeatherRouting.cpp:921
-#: src/WeatherRouting.cpp:2188 src/WeatherRoutingUI.cpp:896
+#: src/WeatherRouting.cpp:2194 src/WeatherRoutingUI.cpp:896
 msgid "Grib"
 msgstr "Grib"
 
@@ -693,136 +693,136 @@ msgstr "Corriente"
 msgid "Cannot goto invalid route(s)."
 msgstr "No se puede ir a ruta(s) no válidas."
 
-#: src/WeatherRouting.cpp:1295 src/WeatherRouting.cpp:1311
+#: src/WeatherRouting.cpp:1301 src/WeatherRouting.cpp:1317
 msgid "Select Configuration"
 msgstr "Seleccione configuración"
 
-#: src/WeatherRouting.cpp:1402
+#: src/WeatherRouting.cpp:1408
 msgid "Zero time span forbidden, aborting."
 msgstr "Prohibido lapso de tiempo cero, abortando."
 
-#: src/WeatherRouting.cpp:1425
+#: src/WeatherRouting.cpp:1431
 msgid "Batch configuration"
 msgstr "Configuración por lotes"
 
-#: src/WeatherRouting.cpp:1551
+#: src/WeatherRouting.cpp:1557
 msgid "Route export failed"
 msgstr "Error al exportar ruta"
 
-#: src/WeatherRouting.cpp:1554
+#: src/WeatherRouting.cpp:1560
 msgid "Route(s) not computed, cannot export"
 msgstr "Ruta(s) no calculafa(s), no se puede exportar"
 
-#: src/WeatherRouting.cpp:1612
+#: src/WeatherRouting.cpp:1618
 msgid "WeatherRoutingInformation.html"
 msgstr "WeatherRoutingInformation.html"
 
-#: src/WeatherRouting.cpp:1667
+#: src/WeatherRouting.cpp:1673
 msgid "Failed to start configuration: "
 msgstr "No se pudo empezar la configuración: "
 
-#: src/WeatherRouting.cpp:1738
+#: src/WeatherRouting.cpp:1744
 msgid "Failed to load file."
 msgstr "Fallo al cargar el archivo."
 
-#: src/WeatherRouting.cpp:1743
+#: src/WeatherRouting.cpp:1749
 msgid "Invalid xml file"
 msgstr "Archivo xml no válido"
 
-#: src/WeatherRouting.cpp:1763
+#: src/WeatherRouting.cpp:1769
 msgid "Load"
 msgstr "Carga"
 
-#: src/WeatherRouting.cpp:1779
+#: src/WeatherRouting.cpp:1785
 msgid "File contains duplicate position name, discaring\n"
 msgstr "El archivo contiene nombres de posición duplicados, descartando\n"
 
-#: src/WeatherRouting.cpp:1870
+#: src/WeatherRouting.cpp:1876
 msgid "Unrecognized xml node"
 msgstr "Nodo xml no reconocido"
 
-#: src/WeatherRouting.cpp:1973
+#: src/WeatherRouting.cpp:1979
 msgid "Failed to save xml file: "
 msgstr "Error al guardar el archivo xml: "
 
-#: src/WeatherRouting.cpp:2177
+#: src/WeatherRouting.cpp:2183
 msgid "Invalid Start/End "
 msgstr "Inicio/Fin no válido "
 
-#: src/WeatherRouting.cpp:2180
+#: src/WeatherRouting.cpp:2186
 msgid "Computing..."
 msgstr "Calculando..."
 
-#: src/WeatherRouting.cpp:2184
+#: src/WeatherRouting.cpp:2190
 msgid "Complete"
 msgstr "Completado"
 
-#: src/WeatherRouting.cpp:2192 src/WeatherRoutingUI.cpp:1975
+#: src/WeatherRouting.cpp:2198 src/WeatherRoutingUI.cpp:1975
 #: src/WeatherRoutingUI.cpp:2794 src/WeatherRoutingUI.cpp:2951
 msgid "Polar"
 msgstr "Polar"
 
-#: src/WeatherRouting.cpp:2196
+#: src/WeatherRouting.cpp:2202
 msgid "No Data"
 msgstr "No hay datos"
 
-#: src/WeatherRouting.cpp:2200
+#: src/WeatherRouting.cpp:2206
 msgid "Land"
 msgstr "Tierra"
 
-#: src/WeatherRouting.cpp:2204
+#: src/WeatherRouting.cpp:2210
 msgid "Boundary"
 msgstr "Límite"
 
-#: src/WeatherRouting.cpp:2208
+#: src/WeatherRouting.cpp:2214
 msgid "Failed"
 msgstr "Fallo"
 
-#: src/WeatherRouting.cpp:2214
+#: src/WeatherRouting.cpp:2220
 msgid "Waiting..."
 msgstr "Esperando..."
 
-#: src/WeatherRouting.cpp:2217
+#: src/WeatherRouting.cpp:2223
 msgid "Not Computed"
 msgstr "No computado"
 
-#: src/WeatherRouting.cpp:2427
+#: src/WeatherRouting.cpp:2433
 msgid "No Weather Route selected"
 msgstr "No hay ruta climatológica seleccionada"
 
-#: src/WeatherRouting.cpp:2460 src/WeatherRouting.cpp:2510
+#: src/WeatherRouting.cpp:2466 src/WeatherRouting.cpp:2516
 msgid "Empty Route, nothing to export\n"
 msgstr "Ruta vacía, nada que exportar\n"
 
-#: src/WeatherRouting.cpp:2471
+#: src/WeatherRouting.cpp:2477
 msgid "Weather Route "
 msgstr "Ruta Meteorológica "
 
-#: src/WeatherRouting.cpp:2480
+#: src/WeatherRouting.cpp:2486
 msgid "Weather Route Point"
 msgstr "Punta de ruta climatológica"
 
-#: src/WeatherRouting.cpp:2490 src/WeatherRouting.cpp:2589
+#: src/WeatherRouting.cpp:2496 src/WeatherRouting.cpp:2595
 msgid "Weather Route Destination"
 msgstr "Data Meteorológica de la Ruta de Destino"
 
-#: src/WeatherRouting.cpp:2626
+#: src/WeatherRouting.cpp:2632
 msgid "GPX Route file created"
 msgstr "Archivo de ruta GPX creado"
 
-#: src/WeatherRouting.cpp:2632
+#: src/WeatherRouting.cpp:2638
 msgid "GPX Route file export failed"
 msgstr "Error al exportar el archivo de ruta GPX"
 
-#: src/WeatherRouting.cpp:2653
+#: src/WeatherRouting.cpp:2659
 msgid "Zero Time Step"
 msgstr "Configuración de Tiempo Cero"
 
-#: src/WeatherRouting.cpp:2661
+#: src/WeatherRouting.cpp:2667
 msgid "inside exclusion boundary"
 msgstr "dentro del límite de exclusión"
 
-#: src/WeatherRouting.cpp:2668
+#: src/WeatherRouting.cpp:2674
 msgid "lies outside of Max Latitude constraint"
 msgstr "yace fuera de la restricción de Máxima Latitud"
 
@@ -1856,24 +1856,24 @@ msgstr ""
 msgid "Boat Characteristics"
 msgstr "Características del Barco"
 
-#: src/weather_routing_pi.cpp:154 src/weather_routing_pi.cpp:157
+#: src/weather_routing_pi.cpp:156 src/weather_routing_pi.cpp:159
 msgid "Weather Route Position"
 msgstr "Posición Ruta climatológica"
 
-#: src/weather_routing_pi.cpp:160
+#: src/weather_routing_pi.cpp:162
 msgid "Weather Route Analysis"
 msgstr "Análisis de ruta meteorológica"
 
-#: src/weather_routing_pi.cpp:301
+#: src/weather_routing_pi.cpp:315
 msgid "Grib plugin version not supported."
 msgstr "Versión del plugin Grib no soportada."
 
-#: src/weather_routing_pi.cpp:303 src/weather_routing_pi.cpp:349
+#: src/weather_routing_pi.cpp:317 src/weather_routing_pi.cpp:363
 #, c-format
 msgid "Use versions %d.%d to %d.%d"
 msgstr "Use las versiones %d.%d a %d.%d"
 
-#: src/weather_routing_pi.cpp:347
+#: src/weather_routing_pi.cpp:361
 msgid "Climatology plugin version not supported, no climatology data."
 msgstr "Versión del plugin Climatology no soportada, no hay datos climatológicos."
 
