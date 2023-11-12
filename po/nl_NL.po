@@ -273,7 +273,7 @@ msgstr "Waarschuwing: 0 waarden gevonden in polar.\n"
 "Deze metingen worden met elkaar verbonden.\n"
 "Om interpolated te specificeren, laat lege waarden staan.\n"
 "Gebruik 0.0 in plaats van 0\n"
-" om de koers als 'ongeldig' te specificeren"
+" om de koers als 'ongeldig' te specificeren\n"
 
 #: src/Polar.cpp:313
 msgid "Too few measurements."
