@@ -29,10 +29,6 @@
 #include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
-#ifdef WIN32
-#include "glew.h"
-#endif
-
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
@@ -170,10 +166,6 @@ int weather_routing_pi::Init()
 
       //    And load the configuration items
       LoadConfig();
-
-#ifdef WIN32
-    glewInit();
-#endif
 
       return (WANTS_OVERLAY_CALLBACK |
               WANTS_OPENGL_OVERLAY_CALLBACK |
@@ -553,12 +545,9 @@ bool weather_routing_pi::RenderOverlay(wxDC &wxdc, PlugIn_ViewPort *vp)
     return false;
 }
 
-GLAPI void APIENTRY glUseProgram(GLuint program);
-
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
-        glUseProgram(0);
         piDC dc;
         dc.SetVP(vp);
         m_pWeather_Routing->Render(dc, *vp);
