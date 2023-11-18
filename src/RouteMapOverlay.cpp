@@ -25,7 +25,6 @@
 
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
-#include <GLES2/gl2.h>
 
 #include "ocpn_plugin.h"
 #include "pidc.h"
