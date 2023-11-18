@@ -36,7 +36,7 @@
 #include "weather_routing_pi.h"
 
 #ifdef WIN32
-#include "glew/glew.h"
+#include "glew.h"
 #endif
 
 Json::Value g_ReceivedJSONMsg;
