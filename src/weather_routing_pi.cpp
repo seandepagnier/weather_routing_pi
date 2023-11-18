@@ -29,15 +29,15 @@
 #include <wx/treectrl.h>
 #include <wx/fileconf.h>
 
+#ifdef WIN32
+#include "glew.h"
+#endif
+
 #include "Utilities.h"
 #include "Boat.h"
 #include "RouteMapOverlay.h"
 #include "WeatherRouting.h"
 #include "weather_routing_pi.h"
-
-#ifdef WIN32
-#include "glew.h"
-#endif
 
 Json::Value g_ReceivedJSONMsg;
 wxString    g_ReceivedMessage;
@@ -553,9 +553,12 @@ bool weather_routing_pi::RenderOverlay(wxDC &wxdc, PlugIn_ViewPort *vp)
     return false;
 }
 
+GLAPI void APIENTRY glUseProgram(GLuint program);
+
 bool weather_routing_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
     if(m_pWeather_Routing && m_pWeather_Routing->IsShown()) {
+        glUseProgram(0);
         piDC dc;
         dc.SetVP(vp);
         m_pWeather_Routing->Render(dc, *vp);

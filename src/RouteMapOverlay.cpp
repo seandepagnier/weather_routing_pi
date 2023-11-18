@@ -385,13 +385,10 @@ static wxColour Darken(wxColour c)
     return wxColour(c.Red()*2/3, c.Green()*2/3, c.Blue()*2/3, c.Alpha());
 }
 
-GLAPI void APIENTRY glUseProgram(GLuint program);
-
 void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                              piDC &dc, PlugIn_ViewPort &vp, bool justendroute,
                              RoutePoint* positionOnRoute)
 {
-    glUseProgram(0);
     dc.SetPen(*wxBLACK); // reset pen
     dc.SetBrush( *wxTRANSPARENT_BRUSH); // reset brush
     if(!justendroute) {
