@@ -25,6 +25,7 @@
 
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
+#include <GLES2/gl2.h>
 
 #include "ocpn_plugin.h"
 #include "pidc.h"
@@ -389,6 +390,7 @@ void RouteMapOverlay::Render(wxDateTime time, SettingsDialog &settingsdialog,
                              piDC &dc, PlugIn_ViewPort &vp, bool justendroute,
                              RoutePoint* positionOnRoute)
 {
+    glUseProgram(0);
     dc.SetPen(*wxBLACK); // reset pen
     dc.SetBrush( *wxTRANSPARENT_BRUSH); // reset brush
     if(!justendroute) {
