@@ -35,6 +35,10 @@
 #include "WeatherRouting.h"
 #include "weather_routing_pi.h"
 
+#ifdef WIN32
+#include "glew/glew.h"
+#endif
+
 Json::Value g_ReceivedJSONMsg;
 wxString    g_ReceivedMessage;
 
@@ -166,6 +170,10 @@ int weather_routing_pi::Init()
 
       //    And load the configuration items
       LoadConfig();
+
+#ifdef WIN32
+    glewInit();
+#endif
 
       return (WANTS_OVERLAY_CALLBACK |
               WANTS_OPENGL_OVERLAY_CALLBACK |

@@ -244,6 +244,10 @@ if(NOT OCPN_FLATPAK_CONFIG)
     if(WIN32)
         add_subdirectory(opencpn-libs/WindowsHeaders)
         target_link_libraries(${PACKAGE_NAME} windows::headers)
+
+        include_directories("${CMAKE_SOURCE_DIR}/glew")
+        link_libraries(${CMAKE_SOURCE_DIR}/glew32.lib )
+
     endif()
 
     add_subdirectory(opencpn-libs/api-17)
