@@ -1,4 +1,6 @@
-build*
+cmake-build*
+build/*
+.idea*
 .directory
 po/POTFILES.in.test
 temp
