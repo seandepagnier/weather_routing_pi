@@ -1,6 +1,7 @@
 ::
 :: Build the msvc artifacts
 ::
+
 set "SCRIPTDIR=%~dp0"
 set "GIT_HOME=C:\Program Files\Git"
 if "%CONFIGURATION%" == "" set "CONFIGURATION=RelWithDebInfo"
@@ -26,6 +27,10 @@ if errorlevel 1 (
   set "VS_HOME=C:\Program Files\Microsoft Visual Studio\2022"
   call "%VS_HOME%\Community\VC\Auxiliary\Build\vcvars32.bat"
 )
+
+git submodule update --init opencpn-libs
+
+dir
 
 if exist build (rmdir /s /q build)
 mkdir build && cd build

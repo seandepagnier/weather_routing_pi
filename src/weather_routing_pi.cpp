@@ -42,13 +42,13 @@ double      g_WINDipFactor;
 
 // Define minimum and maximum versions of the grib plugin supported
 #define GRIB_MAX_MAJOR 4
-#define GRIB_MAX_MINOR 1
+#define GRIB_MAX_MINOR 2
 #define GRIB_MIN_MAJOR 4
 #define GRIB_MIN_MINOR 1
 
 //Define minimum and maximum versions of the climatology plugin supported
 #define CLIMATOLOGY_MAX_MAJOR 1
-#define CLIMATOLOGY_MAX_MINOR 5
+#define CLIMATOLOGY_MAX_MINOR 6
 #define CLIMATOLOGY_MIN_MAJOR 0
 #define CLIMATOLOGY_MIN_MINOR 10
 
@@ -88,7 +88,7 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 #include "icons.h"
 
 weather_routing_pi::weather_routing_pi(void *ppimgr)
-      :opencpn_plugin_116(ppimgr)
+      :opencpn_plugin_117(ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
@@ -207,6 +207,16 @@ int weather_routing_pi::GetPlugInVersionMajor()
 int weather_routing_pi::GetPlugInVersionMinor()
 {
       return PLUGIN_VERSION_MINOR;
+}
+
+int weather_routing_pi::GetPlugInVersionPatch()
+{
+      return PLUGIN_VERSION_PATCH;
+}
+
+int weather_routing_pi::GetPlugInVersionPost()
+{
+      return PLUGIN_VERSION_TWEAK;
 }
 
 // wxBitmap *weather_routing_pi::GetPlugInBitmap()

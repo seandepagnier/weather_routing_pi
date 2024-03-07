@@ -122,9 +122,9 @@ echo $tarball_basename
 
 source $BUILD_DIR/pkg_version.sh
 if [ -n "${OCPN_TARGET}" ]; then
-    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@COMPOUND_ARCH_DASH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-${PKG_TARGET_VERSION}-${OCPN_TARGET}-tarball
 else
-    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-${PKG_TARGET_VERSION}-tarball
+    tarball_name=@PACKAGE_NAME@-@PACKAGE_VERSION@-${PKG_TARGET}-@COMPOUND_ARCH_DASH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-${PKG_TARGET_VERSION}-tarball
 fi
 
 if [ "$(ls $BUILD_DIR/*.${PKG_EXT})" ]; then
@@ -175,7 +175,7 @@ fi
 echo $VERSION
 echo $REPO
 
-if [ "$APPVEYOR" ] || [ LOCAL_BUILD=true ]; then
+if [ "$APPVEYOR" ] || [ $LOCAL_BUILD=true ]; then
     echo 'substituting xml file variables for windows build'
     while read line; do
         line=${line//--pkg_repo--/$REPO}
@@ -201,7 +201,7 @@ rm -f metadata.xml
 tarball_tar=$(ls *.tar)
 xml_here=$(ls *.xml)
 cp -f $xml_here metadata.xml
-if [ "$TRAVIS" ] || [ "$CIRCLECI" ]; then
+if [ "$TRAVIS" ] || [ "$CIRCLECI" ] || [ ! -z ${LOCAL_DEPLOY+x} ]; then
     mkdir build_tar
     cp $tarball_tar build_tar/.
     cd build_tar
@@ -235,9 +235,9 @@ if [ ! -z ${LOCAL_DEPLOY+x} ]; then
     if [ -d "/home/circleci/circleci-output" ]; then
         sudo cp build/*.gz ~/circleci-output
         if have_any ./build/*.deb; then
-            sudo cp build/*.deb ~/circleci-output
+            sudo cp ./build/*.deb ~/circleci-output
         elif have_any ./build/*.exe; then
-            sudo cp build/*.exe ~/circleci-output
+            sudo cp ./build/*.exe ~/circleci-output
         fi
     else
         echo "Directory ~/circleci-output not found"
@@ -246,7 +246,7 @@ elif [ $LOCAL_BUILD = false ]; then
 # Only upload if the owner did the pull request. Non-owners probably don't have security to upload to the cloudsmith repository
     if [ "$CIRCLE_PROJECT_USERNAME" = "$CIRCLE_USERNAME" ]; then
         cloudsmith push raw --republish --no-wait-for-sync \
-            --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
+            --name @PACKAGE_NAME@-@PACKAGE_VERSION@-@PKG_TARGET@-@COMPOUND_ARCH_DASH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-@PKG_TARGET_VERSION@-${OCPN_TARGET}-metadata \
             --version ${VERSION} \
             --summary "@PACKAGE@ opencpn plugin metadata for automatic installation" \
             $REPO $xml
@@ -259,7 +259,7 @@ elif [ $LOCAL_BUILD = false ]; then
 
         if [ "${PKG_EXT}" != "gz" ] && [ "$pkg" != "" ]; then
             cloudsmith push raw --republish --no-wait-for-sync \
-                --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@ARCH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
+                --name opencpn-package-@PACKAGE@-@PACKAGE_VERSION@-@PKG_TARGET@-@COMPOUND_ARCH_DASH@@PKG_TARGET_WX_VER@@PKG_BUILD_GTK@-@PKG_TARGET_VERSION@-${OCPN_TARGET}.${PKG_EXT} \
                 --version ${VERSION} \
                 --summary "@PACKAGE@ .${PKG_EXT} installation package" \
                 $REPO $pkg

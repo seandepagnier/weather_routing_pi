@@ -74,7 +74,7 @@ std::cout << x << std::endl; } while (0)
 #undef MAX
 #endif
 
-#include "json/json.h"
+#include <json/json.h>
 
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition
@@ -84,7 +84,7 @@ std::cout << x << std::endl; } while (0)
 
 class WeatherRouting;
 
-class weather_routing_pi : public wxEvtHandler, public opencpn_plugin_116
+class weather_routing_pi : public wxEvtHandler, public opencpn_plugin_117
 {
 public:
       weather_routing_pi(void *ppimgr);
@@ -97,6 +97,9 @@ public:
       int GetAPIVersionMinor();
       int GetPlugInVersionMajor();
       int GetPlugInVersionMinor();
+      int GetPlugInVersionPatch();
+      int GetPlugInVersionPost();
+	  
       wxBitmap *GetPlugInBitmap();
       wxString GetCommonName();
       wxString GetShortDescription();

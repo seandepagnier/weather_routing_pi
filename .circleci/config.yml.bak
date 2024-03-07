@@ -33,9 +33,8 @@ workflows:
              <<: *std-filters
         - build-android-armhf:
              <<: *std-filters
-# macos-universal covers this, duplicate.
-#        - build-macos-wx32:
-#             <<: *std-filters
+        - build-macos-wx32:
+             <<: *std-filters
         - build-flatpak-arm64-2208:
             <<: *std-filters
         - build-flatpak-x86-2208:

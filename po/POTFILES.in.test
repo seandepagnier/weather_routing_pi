@@ -22,6 +22,7 @@ src/icons.cpp
 src/zuFile.cpp
 src/georef.c
 src/GribRecord.cpp
+src/navobj_util.cpp
 include/weather_routing_pi.h
 include/WeatherRouting.h
 include/ConfigurationDialog.h
@@ -46,3 +47,4 @@ include/icons.h
 include/zuFile.h
 include/georef.h
 include/GribRecord.h
+include/navobj_util.h

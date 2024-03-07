@@ -23,12 +23,12 @@ if [ -n "$WX_VER" ] && [ "$WX_VER" -eq "32" ]; then
     WX_CONFIG="--prefix=/tmp/wx321_opencpn50_macos1010"
     MACOSX_DEPLOYMENT_TARGET=10.10
 else
-    echo "Building for WXVERSION 312";
-    WX_URL=https://download.opencpn.org/s/rwoCNGzx6G34tbC/download
-    WX_DOWNLOAD=/tmp/wx312B_opencpn50_macos109.tar.xz
-    WX_EXECUTABLE=/tmp/wx312B_opencpn50_macos109/bin/wx-config
-    WX_CONFIG="--prefix=/tmp/wx312B_opencpn50_macos109"
-    MACOSX_DEPLOYMENT_TARGET=10.9
+    echo "Building for WXVERSION 315";
+    WX_URL=https://download.opencpn.org/s/MCiRiq4fJcKD56r/download
+    WX_DOWNLOAD=/tmp/wx315_opencpn50_macos1010.tar.xz
+    WX_EXECUTABLE=/tmp/wx315_opencpn50_macos1010/bin/wx-config
+    WX_CONFIG="--prefix=/tmp/wx315_opencpn50_macos1010"
+    MACOSX_DEPLOYMENT_TARGET=10.10
 fi
 
 # Download required binaries using wget, since curl causes an issue with Xcode 13.1 and some specific certificates.
@@ -66,25 +66,30 @@ fi
 
 export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
 
+# MacOS .pkg installer is deprecated in OCPN 5.6.2+
 # use brew to get Packages.pkg
-if brew list --cask --versions packages; then
-    version=$(brew list --cask --versions packages)
-    version="${version/"packages "/}"
-    sudo installer \
-        -pkg /usr/local/Caskroom/packages/$version/packages/Packages.pkg \
-        -target /
-else
-    brew install --cask packages
-fi
+#if brew list --cask --versions packages; then
+#    version=$(brew list --cask --versions packages)
+#    version="${version/"packages "/}"
+#    sudo installer \
+#        -pkg /usr/local/Caskroom/packages/$version/packages/Packages.pkg \
+#        -target /
+#else
+#    brew install --cask packages
+#fi
+
+git submodule update --init opencpn-libs
 
 rm -rf build && mkdir build && cd build
 cmake \
   -DwxWidgets_CONFIG_EXECUTABLE=$WX_EXECUTABLE \
   -DwxWidgets_CONFIG_OPTIONS=$WX_CONFIG \
-  -DCMAKE_INSTALL_PREFIX= \
+  -DCMAKE_INSTALL_PREFIX=app/files \
+  -DBUILD_TYPE_PACKAGE:STRING=tarball \
   -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
   "/" \
   ..
-make -sj2
+make
+make install
 make package
 
