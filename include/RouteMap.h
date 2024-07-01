@@ -380,9 +380,8 @@ struct RouteMapConfiguration {
     double SafetyMarginLand;
 
     bool AvoidCycloneTracks;
-    // Avoid cyclone tracks within CycloneMonths months of climatology data.
+    // Avoid cyclone tracks within ( 30*CycloneMonths + CycloneDays ) days of climatology data.
     int CycloneMonths;
-    // Avoid cyclone tracks within CycloneDays days of climatology data.
     int CycloneDays;
 
     bool UseGrib;
