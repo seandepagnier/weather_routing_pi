@@ -67,21 +67,24 @@ public:
     double PropagateToPoint(double dlat, double dlon, RouteMapConfiguration &cf, double &H, int &data_mask, bool end = true);
 };
 
+/*
+ * A RoutePoint that has a time associated with it, along with navigation and weather data.
+*/
 class PlotData : public RoutePoint
 {
 public:
-    wxDateTime time;
-    double delta;
-    double VBG;      // Velocity of Boat over ground, in knots.
+    wxDateTime time; // The time when the boat reaches this position, based on the route calculation.
+    double delta;    // The time in seconds from the previous position to this position.
+    double VBG;      // Velocity of boat over ground, in knots.
     double BG;       // Boat direction over ground.
-    double VB;       // Velocity of Boat over water, in knots.
+    double VB;       // Velocity of boat over water, in knots.
     double B;        // Boat direction over water.
     double VW;       // Velocity of wind over water, in knots.
     double W;        // Wind direction over water.
     double VWG;      // Velocity of wind over ground, in knots.
     double WG;       // Wind direction over ground.
-    double VC;       // Velocity of Current over ground, in knots.
-    double C;        // Sea Current Direction over ground.
+    double VC;       // Velocity of current over ground, in knots.
+    double C;        // Sea current direction over ground.
     double WVHT;     // Swell height, in meters.
     double VW_GUST;  // Gust wind speed, in knots.
 };
