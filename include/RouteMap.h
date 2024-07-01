@@ -416,7 +416,12 @@ struct RouteMapConfiguration {
     double StartLat, StartLon; // The latitude and longitude of the starting position.
     double EndLat, EndLon; // The latitude and longitude of the destination position.
 
-    double StartEndBearing; /* The bearing calculated from start and end */
+    /*
+     * The initial bearing from Start position to End position, in degrees,
+     * taking into consideration the ellipsoidal shape of the Earth.
+     * A boat sailing the great circle route will not follow the initial bearing.
+    */
+    double StartEndBearing; 
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,
     this means the map cannot cross both 0 and 180 longitude.
     To fully support this requires a lot more logic and would probably slow the algorithm
