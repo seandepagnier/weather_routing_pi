@@ -411,6 +411,7 @@ struct RouteMapConfiguration {
     // The angular resolution at each step of the route calculation, in degrees.
     // Lower values provide finer resolution but increase computation time.
     // Higher values provide coarser resolution, but faster computation time.
+    // The allowed range of resolution is from 0.1 to 60 degrees.
     double ByDegrees;
 
 
