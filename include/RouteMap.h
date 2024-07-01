@@ -371,6 +371,7 @@ struct RouteMapConfiguration {
     // If the starting or destination position is beyond this latitude, the route calculation will fail.
     double MaxLatitude;
     // The penalty time to tack the boat, in seconds.
+    // The penalty time is added to the route calculation for each tack.
     double TackingTime;
     // Balance the influence of the wind and the ocean current on the route calculation.
     double WindVSCurrent;
