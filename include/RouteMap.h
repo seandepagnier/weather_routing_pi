@@ -140,7 +140,7 @@ public:
     int quadrant;
 };
 
-/* a closed loop of isochrone positions */
+/* A closed loop of isochrone positions */
 class IsoRoute
 {
 public:
@@ -420,9 +420,9 @@ struct RouteMapConfiguration {
     double EndLat, EndLon; // The latitude and longitude of the destination position.
 
     /*
-     * The initial bearing from Start position to End position, in degrees,
-     * taking into consideration the ellipsoidal shape of the Earth.
-     * A boat sailing the great circle route will not follow the initial bearing.
+     * The initial bearing from Start position to End position, following the Great Circle
+     * route and taking into consideration the ellipsoidal shape of the Earth.
+     * Note: a boat sailing the great circle route will gradually change the bearing to the destination.
     */
     double StartEndBearing; 
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,
