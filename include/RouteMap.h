@@ -412,6 +412,7 @@ struct RouteMapConfiguration {
     // Lower values provide finer resolution but increase computation time.
     // Higher values provide coarser resolution, but faster computation time.
     // The allowed range of resolution is from 0.1 to 60 degrees.
+    // The default value is 5 degrees.
     double ByDegrees;
 
 
