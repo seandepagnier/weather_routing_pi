@@ -38,6 +38,7 @@ class IsoRoute;
 typedef std::list<IsoRoute*> IsoRouteList;
 
 class PlotData;
+
 class RoutePoint {
 public:
     RoutePoint(double latitude = 0., double longitude = 0., int sp = -1, int t=0, bool d = false) :
@@ -53,11 +54,16 @@ public:
     bool grib_is_data_deficient;
 
     bool GetPlotData(RoutePoint *next, double dt, RouteMapConfiguration &configuration, PlotData &data);
+    // @brief Return the wind data at the route point.
     bool GetWindData(RouteMapConfiguration &configuration, double &W, double &VW, int &data_mask);
+    // @brief Return the current data at the route point.
     bool GetCurrentData(RouteMapConfiguration &configuration, double &C, double &VC, int &data_mask);
 
+    // @brief Return true if the route point crosses land.
     bool CrossesLand(double dlat, double dlon);
+    // @brief Return true if the route point enters a boundary.
     bool EntersBoundary(double dlat, double dlon);
+    // @brief Propagate the route point to a specific point.
     double PropagateToPoint(double dlat, double dlon, RouteMapConfiguration &cf, double &H, int &data_mask, bool end = true);
 };
 
@@ -66,8 +72,18 @@ class PlotData : public RoutePoint
 public:
     wxDateTime time;
     double delta;
-    double VBG, BG, VB, B, VW, W, VWG, WG, VC, C, WVHT;
-    double VW_GUST;
+    double VBG;      // Velocity of Boat over ground, in knots.
+    double BG;       // Boat direction over ground.
+    double VB;       // Velocity of Boat over water, in knots.
+    double B;        // Boat direction over water.
+    double VW;       // Velocity of wind over water, in knots.
+    double W;        // Wind direction over water.
+    double VWG;      // Velocity of wind over ground, in knots.
+    double WG;       // Wind direction over ground.
+    double VC;       // Velocity of Current over ground, in knots.
+    double C;        // Sea Current Direction over ground.
+    double WVHT;     // Swell height, in meters.
+    double VW_GUST;  // Gust wind speed, in knots.
 };
 
 class SkipPosition;
@@ -121,7 +137,7 @@ public:
     int quadrant;
 };
 
-/* a closed loop of positions */
+/* a closed loop of isochrone positions */
 class IsoRoute
 {
 public:
@@ -305,50 +321,102 @@ struct RouteMapPosition {
 };
 
 
+/* Configuration parameters for a route between two points. */
 struct RouteMapConfiguration {
     RouteMapConfiguration () : StartLon(0), EndLon(0), 
           grib(nullptr), grib_is_data_deficient(false) {} /* avoid waiting forever in update longitudes */
     bool Update();
 
     wxString RouteGUID;       /* Route GUID if any */
-    wxString Start;
+    wxString Start;           /* The name of starting position, which is resolved to StartLat/StartLon. */
     wxString StartGUID;
 
-    wxString End;
+    wxString End;             /* The name of the destination position, which is resolved to EndLat/EndLon. */
     wxString EndGUID;
 
-    wxDateTime StartTime;
+    wxDateTime StartTime;     /* The time when the boat leaves the starting position. */
 
     double DeltaTime; /* default time in seconds between propagations */
     double UsedDeltaTime; /* time in seconds between propagations */
 
-    Boat boat;
-    wxString boatFileName;
+    Boat boat;                /* The polars of the boat, used for the route calculation. */
+    wxString boatFileName;    /* The name of the boat XML file referencing polars. */
     
     enum IntegratorType { NEWTON, RUNGE_KUTTA } Integrator;
 
-    double MaxDivertedCourse, MaxCourseAngle, MaxSearchAngle, MaxTrueWindKnots, MaxApparentWindKnots;
-    double MaxSwellMeters, MaxLatitude, TackingTime, WindVSCurrent;
+    // The maximum angle the boat can be diverted from the bearing to the destination,
+    // at each step of the route calculation, in degrees.
+    // This represents the angle away from Start to End bearing (StartEndBearing).
+    // The normal setting is 100 degrees, which speeds up calculations.
+    // If the route needs to go around land, islands or peninsulas, the user can increase the value.
+    // E.g. the boat may have to go in the opposite direction then back to the destination bearing.
+    double MaxDivertedCourse;
+    // The maximum deviation away from the direct route.
+    double MaxCourseAngle;
+    // The maximum angle at each step of the route calculation.
+    double MaxSearchAngle;
+    // The calculated route will avoid a path where the true wind is above this value in knots.
+    double MaxTrueWindKnots;
+    // The calculated route will avoid a path where the gust wind is above this value in knots.
+    double MaxApparentWindKnots;
+
+    // The calculated route will avoid swells larger than this value in meters.
+    // If the grib data does not contain swell information, the maximum swell value is ignored.
+    // If there is no route within the maximum swell value, the route calculation will fail.
+    double MaxSwellMeters;
+    // The calculated route will not go beyond this latitude, as an absolute value.
+    // If the starting or destination position is beyond this latitude, the route calculation will fail.
+    double MaxLatitude;
+    // The penalty time to tack the boat, in seconds.
+    double TackingTime;
+    // Balance the influence of the wind and the ocean current on the route calculation.
+    double WindVSCurrent;
+    // The minimum safety distance to land, in nautical miles.
+    // The calculated route will avoid land within this distance.
     double SafetyMarginLand;
 
     bool AvoidCycloneTracks;
-    int CycloneMonths, CycloneDays;
+    // Avoid cyclone tracks within CycloneMonths months of climatology data.
+    int CycloneMonths;
+    // Avoid cyclone tracks within CycloneDays days of climatology data.
+    int CycloneDays;
 
     bool UseGrib;
     enum ClimatologyDataType {DISABLED, CURRENTS_ONLY, CUMULATIVE_MAP, CUMULATIVE_MINUS_CALMS, MOST_LIKELY, AVERAGE};
     enum ClimatologyDataType ClimatologyType;
     bool AllowDataDeficient;
-    double WindStrength; // wind speed multiplier
+    double WindStrength; // wind speed multiplier. 1.0 is 100% of the wind speed in the grib.
 
-    bool DetectLand, DetectBoundary, Currents, OptimizeTacking, InvertedRegions, Anchoring;
+    // If true, the route calculation will avoid land, outside the SafetyMarginLand.
+    bool DetectLand;
+    // If true, the route calculation will avoid exclusion boundaries.
+    bool DetectBoundary;
+    // If true and grib data contains ocean currents, the route calculation will use ocean current data.
+    bool Currents;
+    // If true, avoid polar dead zones.
+    // If false, avoid upwind course (polar angle too low) or downwind no-go zone (polar angle too high).
+    bool OptimizeTacking;
+    bool InvertedRegions;
+    bool Anchoring;
 
-    double FromDegree, ToDegree, ByDegrees;
+    // Do not go below this minimum True Wind angle at each step of the route calculation.
+    // The default value is 0 degrees.
+    double FromDegree;
+    // Do not go above this maximum True Wind angle at each step of the route calculation.
+    // The default value is 180 degrees.
+    double ToDegree;
+    // The angular resolution at each step of the route calculation, in degrees.
+    // Lower values provide finer resolution but increase computation time.
+    // Higher values provide coarser resolution, but faster computation time.
+    double ByDegrees;
+
 
     /* computed values */
     std::list<double> DegreeSteps;
-    double StartLat, StartLon, EndLat, EndLon;
+    double StartLat, StartLon; // The latitude and longitude of the starting position.
+    double EndLat, EndLon; // The latitude and longitude of the destination position.
 
-    double StartEndBearing; /* calculated from start and end */
+    double StartEndBearing; /* The bearing calculated from start and end */
     bool positive_longitudes; /* longitudes are either 0 to 360 or -180 to 180,
     this means the map cannot cross both 0 and 180 longitude.
     To fully support this requires a lot more logic and would probably slow the algorithm
@@ -356,6 +424,9 @@ struct RouteMapConfiguration {
 
     // parameters
     WR_GribRecordSet *grib;
+    // The time of the current isochrone step in the route calculation.
+    // The time starts at StartTime and is incremented for each step until the destination is reached,
+    // or the route calculation fails.
     wxDateTime time;
     bool grib_is_data_deficient, polar_failed, wind_data_failed;
     bool land_crossing, boundary_crossing;
