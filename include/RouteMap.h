@@ -105,6 +105,7 @@ public:
     bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
 
     double Distance(Position *p);
+    // Return the number of times the sail configuration has changed.
     int SailChanges();
     double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
    
@@ -289,7 +290,7 @@ protected:
     }
 };
 
-/* list of routes with equal time to reach */
+/* list of isochrone routes with equal time to reach their endpoint from the same starting point. */
 class IsoChron
 {
 public:
@@ -303,7 +304,10 @@ public:
     void ResetDrawnFlag();
 
     IsoRouteList routes;
+    // The time at which all isochone routes reach their endpoint.
+    // All routes in this isochrone have equal travel time from the starting point.
     wxDateTime time;
+    // The time in seconds from the previous isochrone to this isochrone.
     double delta;
     Shared_GribRecordSet m_SharedGrib;
     WR_GribRecordSet *m_Grib;
