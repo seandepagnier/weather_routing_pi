@@ -377,7 +377,12 @@ struct RouteMapConfiguration {
     // The penalty time to tack the boat, in seconds.
     // The penalty time is added to the route calculation for each tack.
     double TackingTime;
-    // Balance the influence of the wind and the ocean current on the route calculation.
+    // When wind opposes current rough seas can be produced.
+    // This constraint takes the dot product of the current and wind vectors, and if the result exceeds this value,
+    // navigation in this area is avoided.
+    // For example, a value of 60 would avoid 30 knots of wind opposing a 2 knot current as well as
+    // 20 knots of wind opposing a 3 knot current.
+    // Higher values allow for rougher conditions. The special value 0 (default) allows any conditions.
     double WindVSCurrent;
     // The minimum safety distance to land, in nautical miles.
     // The calculated route will avoid land within this distance.
@@ -403,7 +408,13 @@ struct RouteMapConfiguration {
     // If true, avoid polar dead zones.
     // If false, avoid upwind course (polar angle too low) or downwind no-go zone (polar angle too high).
     bool OptimizeTacking;
+    // In some cases it may be possible to reach a location from two different routes (imagine either side of an island)
+    // which is further away from the destination before the destination can be reached.
+    // The algorithm must invert and work inwards on this inverted region to possibly reach the destination.
     bool InvertedRegions;
+    // In some cases, it may be preferable to anchor (assuming it isn't too deep) rather than continue to
+    // navigate if there is a contrary current which is swifter than the boat can travel.
+    // This allows the route to reach the destination sooner by sitting in place until the current abades.
     bool Anchoring;
 
     // Do not go below this minimum True Wind angle at each step of the route calculation.
