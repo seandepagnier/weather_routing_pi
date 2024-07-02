@@ -200,10 +200,10 @@ private:
     RouteMap *SelectedRouteMap();
     void Export(RouteMapOverlay &routemapoverlay);
     void ExportRoute(RouteMapOverlay &routemapoverlay);
-    /* Start the computation of the selected route. */
+    /* Start the computation of the specified route. */
     void Start(RouteMapOverlay *routemapoverlay);
     void StartAll();
-    /* Stop the computation of the selected routes. */
+    /* Stop the computation of the specified route. */
     void Stop(RouteMapOverlay *routemapoverlay);
     /* Stop the computation of all routes. */
     void StopAll();
