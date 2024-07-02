@@ -1,0 +1,288 @@
+#!/usr/bin/bash
+#
+# Update a plugin with new shipdriver templates.
+#
+# usage: ./update-templates [-t] [treeish]
+#
+# Merge changes from upstream shipdriver repo into
+# current branch.
+#
+# See UPDATE-TEMPLATES.md for more info
+
+function usage() {
+    cat << EOT
+Usage:
+    update-templates [-T]  <treeish>
+    update-templates [-h |-l]
+
+
+Parameters:
+    treeish:
+         A shipdriver tag or branch.
+    Recommended usage is using the latest stable (non-beta) tag
+
+Options:
+    -l   List available shipdriver tags
+    -h   Print this message and exit
+    -T   Test mode, do not auto-update
+
+Examples:
+    update-templates -l                   -- List available tags
+    update-templates sd3.0.2              -- Update from sd3.0.2 tag
+    update-templates shipdriver/v3.0      -- Update from v3.0 release branch
+    update-templates shipdriver/master    -- Update from development branch
+EOT
+}
+
+function list_sd_tags() {
+    # List all tags in shipdriver remote with a 'sd' prefix
+    git ls-remote --tags shipdriver \
+        | sed  -n -e '/{}/d' -e 's|.*tags/||' -e '/^sd/p'
+}
+
+function init_shipdriver_remote() {
+    # Set up the shipdriver remote
+    if git ls-remote --exit-code shipdriver &>/dev/null; then
+        git remote remove shipdriver
+        echo "Removing existing shipdriver remote."
+    fi
+    echo "Adding new shipdriver remote"
+    git remote add shipdriver https://github.com/Rasbats/shipdriver_pi.git
+    # Fetch all available shipdriver sd* tags
+    for t in $(list_sd_tags); do
+        git fetch -q shipdriver refs/tags/$t:refs/tags/$t --no-tags
+    done
+}
+
+function update_dir() {
+    # Update directory $1 from shipdriver treeish $2
+    local d=$1
+    local treeish=$2
+
+    echo "Updating $d"
+    if [ -d $d ]; then git rm -rf $d/*; fi
+    git checkout $treeish $d
+    git add $d
+    git diff-index --quiet --cached HEAD -- || {
+        git commit -m "Templates: Updating $d"
+    }
+}
+
+
+# Exec on tmpfile to avoid file lock when updating script on Windows.
+# The directory /c exists on git bash on Windows, and hopefully only there.
+if [[ -d /c && "$0" =~ .*update-templates ]]; then
+    tmpfile=$(mktemp)
+    cp $0 $tmpfile
+    exec $tmpfile $@
+fi
+
+# Handle options and parameters
+usage="Usage: $0 [-t] [-T] [treeish]"
+merge_opt=""
+while getopts "Thl" opt; do
+    case "${opt}" in
+        T)  test_mode=true
+            ;;
+        h)  usage; exit 0
+            ;;
+        l)  do_list_tags="true"
+            ;;
+        *)  usage >&2; exit 1
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+if [ -n "$do_list_tags" ]; then
+    if [ -z "$test_mode" ]; then init_shipdriver_remote; fi
+    list_sd_tags
+    exit 0
+fi
+
+if [ -z "$1" ]; then
+    usage >&2
+    exit 1
+fi
+
+test -z "$test_mode" || set -x
+
+source_treeish=$1
+
+# Refuse to run unless the index is clean:
+clean=$(git status --porcelain)
+if [ -n "$clean" ]; then
+    echo "Please commit or stash pending changes. Aborting."
+    exit 1
+fi
+
+# Set up a generic sed -i command  for MacOS and Linux/GNU (#505).
+case $OSTYPE in
+  darwin*) SED_I="sed -i.bak"
+           ;;
+  *)       SED_I="sed -i"
+           ;;
+esac
+
+if [ -z "$test_mode" ]; then
+    init_shipdriver_remote
+
+    echo "Checking for updates of updates-templates script"
+    if ! git diff --quiet HEAD $source_treeish -- update-templates; then
+        git checkout $source_treeish update-templates
+        cat << EOT
+update-templates script is updated to latest version. Please commit
+changes and re-run script.
+EOT
+        exit 0
+    fi
+fi
+
+git rev-parse --verify -q $source_treeish || {
+    echo "Unknown tag or branch $source_treeish -- giving up."
+    exit 1
+}
+
+# Updating  standard directories
+for dir in cmake ci scripts buildwin; do
+    update_dir $dir $source_treeish
+done
+
+# If Plugin.cmake exists we should also update CMakeLists.txt
+if [ -f Plugin.cmake ]; then CMakeLists=CMakeLists.txt; fi
+
+echo "Templates: Updating other files"
+for f in \
+    appveyor.yml \
+    Changelog.md \
+    .circleci \
+    .clang-format \
+    .cmake-format.yaml \
+    .gitattributes \
+    .gitignore \
+    INSTALL.md \
+    plugin.xml.in \
+    .travis.yml \
+    update-templates \
+    UPDATE_TEMPLATES.md \
+    $CMakeLists
+do
+    if test -d $f; then git rm -rf $f; fi
+    git checkout $source_treeish $f
+    git add $f || git add --renormalize $f
+done
+git commit -m "Templates: Updating other files"
+
+# Handle opencpn-libs submodule
+test -d opencpn-libs || \
+    git submodule add https://github.com/opencpn/opencpn-libs.git opencpn-libs
+git submodule update --remote --merge opencpn-libs
+git add opencpn-libs
+git diff-index --quiet --cached HEAD -- || {
+    echo "Updating opencpn-libs submodule"
+    git commit -m "opencpn-libs: Update to latest version."
+}
+sed -i 's|leamas/opencpn-libs|opencpn/opencpn-libs|g' \
+    .git/modules/opencpn-libs/config || :
+
+
+# Update flatpak runtime version as required:
+$SED_I \
+    -e '/sdk: org.freedesktop.Sdk/s/20.08/22.08/' \
+    -e '/^runtime-version:/s/:.*/: beta/' \
+  flatpak/org.opencpn.OpenCPN.Plugin.*.yaml
+git add flatpak
+git diff-index --quiet --cached HEAD -- || {
+    echo "Updating Updating flatpak runtime version to 22.08"
+    git commit -m "opencpn-libs: Update to latest version."
+}
+
+# Check for files/dirs which are private, but should be copied on first run.
+for f in  \
+    config.h.in \
+    build-deps \
+    build-conf.rc \
+    libs \
+    build-deps/macos-cache-stamp \
+    build-deps/0001-matrix.h-Patch-attributes-handling-wxwidgets-22790.patch \
+    UPDATE_PLUGIN_API.md
+do
+    if test -e $f; then continue; fi
+    git checkout $source_treeish $f
+done
+git diff-index --quiet --cached HEAD -- || {
+    echo "Adding initial versions of private data"
+    git commit -m "Adding initial versions of private data"
+}
+
+# Update wxwidgets deps in build-deps/control to handle wxwidgets 3.2
+wxtemp=$(mktemp)
+cat >$wxtemp << EOF
+ base-files (>=11) | libwxgtk3.0-dev,
+ base-files (>=11) | libwxgtk3.0-0v5 | libwxgtk3.0-0,
+ base-files (>=10) | libwxgtk-webview3.0-dev,
+ base-files (<< 10) | libwxgtk3.2-dev | libwxgtk3.0-gtk3-dev,
+ base-files (<< 10) | libwxgtk-webview3.2-dev | libwxgtk-webview3.0-gtk3-dev,
+EOF
+
+grep -q "libwxgtk3.2" build-deps/control || {
+    $SED_I -e '/libwxgtk/s/^.*$/LIBWXGTK/' \
+           -e '1,/LIBWXGTK/s/LIBWXGTK/WX_DEPS/' \
+           -e "/WX_DEPS/r$wxtemp" \
+           -e '/WX_DEPS/d' -e '/LIBWXGTK/d' \
+           -e '/Build-Depends/,/python/s/^$/FOO/' -e '/^FOO/d' \
+      build-deps/control
+}
+rm -f $wxtemp
+
+git diff --quiet build-deps/control || {
+    echo "Updating wxwidgets dependencies in build-deps/control"
+    git add build-deps/control
+    git commit -m "build-deps/control: Updating wxwidgets dependencies"
+}
+
+if [ -e update-ignored ]; then
+    echo "Revert changes in blacklisted files."
+    for f in $(cat update-ignored); do
+        git checkout HEAD $f
+    done
+fi
+
+for f in buildosx buildwin/NSIS* libs/AndroidLibs.cmake mingw .drone.yml; do
+    if test -e $f; then git rm -rf $f; fi
+done
+git diff-index --quiet --cached HEAD -- || {
+    echo "Removing unused files"
+    git commit -am "Templates: Removing obsoleted and unused files."
+}
+
+if [ -f cmake/TemplateVersion ]; then
+    our_manifest=$(echo flatpak/org.opencpn.OpenCPN.Plugin.*.yaml)
+    echo "Append shipdriver flatpak manifest's log of changes to $our_manifest"
+
+    prev_commit=$(sed -n '/commit:/s/.*: *//p' cmake/TemplateVersion)
+    src_manifest=flatpak/org.opencpn.OpenCPN.Plugin.shipdriver.yaml
+    git checkout $source_treeish $src_manifest
+    git diff  $prev_commit $src_manifest | sed 's/^/# /' \
+        >> $our_manifest
+    git rm -f $src_manifest
+fi
+
+echo "Create or update cmake/TemplateVersion"
+echo "# Created by update-templates" > cmake/TemplateVersion
+echo "date: $(date -u +'%Y-%m-%d %H:%M UTC')" >> cmake/TemplateVersion
+commit=$(git rev-parse --short $source_treeish)
+echo "commit: $commit" >> cmake/TemplateVersion
+tags=$(git tag --contains $commit)
+echo "tags: $tags" >> cmake/TemplateVersion
+git add cmake/TemplateVersion
+git commit -m "cmake: Update TemplateVersion to $commit"
+
+cat << EOF
+
+
+Shipdriver templates has been updated. Please review Changelog.md for info
+about changes in last release.
+
+See UPDATE_TEMPLATES.md for more info.
+EOF
