@@ -76,33 +76,7 @@ SET(SRC
     src/navobj_util.cpp
 )
 
-SET (HDRS
-    include/weather_routing_pi.h
-    include/WeatherRouting.h
-    include/ConfigurationDialog.h
-    include/SettingsDialog.h
-    include/PlotDialog.h
-    include/BoatDialog.h
-    include/StatisticsDialog.h
-    include/ReportDialog.h
-    include/FilterRoutesDialog.h
-    include/ConfigurationBatchDialog.h
-    include/EditPolarDialog.h
-    include/AboutDialog.h
-    include/Polar.h
-    include/Boat.h
-    include/RouteMap.h
-    include/RouteMapOverlay.h
-    include/Utilities.h
-    include/LineBufferOverlay.h
-    include/PolygonRegion.h
-    include/WeatherRoutingUI.h
-    include/icons.h
-    include/zuFile.h
-    include/georef.h
-    include/GribRecord.h
-    include/navobj_util.h
-)
+include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(PKG_API_LIB api-18)  #  A dir in opencpn-libs/ e. g., api-17 or api-16
 
@@ -113,6 +87,12 @@ endmacro ()
 
 macro(add_plugin_libraries)
   # Add libraries required by this plugin
+  add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/libtess2")
+  target_link_libraries(${PACKAGE_NAME} ocpn::libtess2)
+
+  add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/odapi")
+  target_link_libraries(${PACKAGE_NAME} ocpn::odapi)
+
   add_subdirectory("${CMAKE_SOURCE_DIR}/opencpn-libs/tinyxml")
   target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
 
