@@ -1,102 +1,21 @@
-clone_folder: c:\project\ocpn_project
+---
+clone_folder: c:\project\opencpn\plugin_src
 shallow_clone: false
 clone_depth: 10
 
+image:
+  - Visual Studio 2022
 
 platform:
-#  - x64
-#  - Win32
+  - Win32
 
-configuration: Release
-test: OFF
-
-environment:
-  OCPN_TARGET: MSVC
-
-# use enviornment matrix with job_name to allow build of one or more environments
-  matrix:
-  - job_name: Visual Studio 2017
-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-
-## This can be built in Circleci and is currently the FE2 default
-##
-#  - job_name: Visual Studio 2022
-#    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-
-
-matrix:
-# allow either job to fail and the other to complete
-  fast_finish: false
-
-init:
-  - appveyor version
-
-for:
--
-  matrix:
-    only:
-      - job_name: Visual Studio 2017
-  install:
-    - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
-    - set WX_VER=
-    - set WXWIN=c:\wxWidgets-3.1.2
-    - set wxWidgets_ROOT_DIR=%WXWIN%
-    - set wxWidgets_LIB_DIR=%WXWIN%\lib\vc_dll
-    - set cmake_parms=-T v141_xp
-    - SET PATH=%PATH%;%WXWIN%;%wxWidgets_LIB_DIR%;C:\Program Files (x86)\Poedit\Gettexttools\bin
-
-  # install dependencies:
-    - choco install poedit
-    - choco install git
-
-    - ps: Start-FileDownload https://download.opencpn.org/s/54HsBDLNzRZLL6i/download  -FileName nsis-3.04-setup.exe
-    - cmd: nsis-3.04-setup.exe /S
-
-  # Download and unzip wxwidgets
-    - ps: Start-FileDownload https://download.opencpn.org/s/E2p4nLDzeqx4SdX/download -FileName wxWidgets-3.1.2.7z
-    - cmd: 7z x wxWidgets-3.1.2.7z -o%WXWIN% > null
-
--
-  matrix:
-    only:
-      - job_name: Visual Studio 2022
-  install:
-    - call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
-    - set WX_VER=32
-    - set WXWIN=C:\wxWidgets-3.2.1
-    - set wxWidgets_ROOT_DIR=%WXWIN%
-    - set wxWidgets_LIB_DIR=%WXWIN%\lib\vc_dll
-    - set cmake_parms=-A Win32
-    - SET PATH=%PATH%;%WXWIN%;%wxWidgets_LIB_DIR%;C:\Program Files\Poedit\Gettexttools\bin
-
-    # install dependencies:
-    - choco install poedit
-    - choco install git
-    - choco install wget
-
-    # Download and unzip wxwidgets
-    - wget -nv https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.1/wxMSW-3.2.1_vc14x_Dev.7z
-    - wget -nv https://github.com/wxWidgets/wxWidgets/releases/download/v3.2.1/wxWidgets-3.2.1-headers.7z
-    - 7z x -o%WXWIN% wxMSW-3.2.1_vc14x_Dev.7z
-    - 7z x -o%WXWIN% wxWidgets-3.2.1-headers.7z
+configuration: RelWithDebInfo
+test: false
 
 before_build:
-  - cd c:\project\ocpn_project
   - git submodule update --init opencpn-libs
-  - ps: Start-FileDownload https://downloads.sourceforge.net/project/opencpnplugins/opencpn_packaging_data/PVW32Con.exe
-  - rm -rf build && mkdir build && cd build
-  - ps: Start-FileDownload https://sourceforge.net/projects/opencpnplugins/files/opencpn.lib
-  - ps: Start-FileDownload https://download.opencpn.org/s/oibxM3kzfzKcSc3/download -FileName OpenCPN_buildwin-4.99a.7z
-  - cmd: 7z x -y OpenCPN_buildwin-4.99a.7z -oc:\project\ocpn_project\buildwin
-  - cmake %cmake_parms% ..
+  - set "VS_HOME=C:\Program Files\Microsoft Visual Studio\2022"
+  - call "%VS_HOME%\Community\VC\Auxiliary\Build\vcvars32.bat"
 
 build_script:
-  - cmake --build . --target package --config Release
-  - python -m ensurepip
-  - python -m pip install -q setuptools
-  - python -m pip install -q cloudsmith-cli
-  - bash ../build/cloudsmith-upload.sh
-
-artifacts:
-  - path: 'build\*.exe'
-    name: installer
+  - call ci\appveyor.bat
