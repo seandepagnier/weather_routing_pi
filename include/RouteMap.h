@@ -437,8 +437,8 @@ struct RouteMapConfiguration {
 
     /* computed values */
     std::list<double> DegreeSteps;
-    double StartLat, StartLon; // The latitude and longitude of the starting position.
-    double EndLat, EndLon; // The latitude and longitude of the destination position.
+    double StartLat, StartLon; // The latitude and longitude of the starting position, in decimal degrees.
+    double EndLat, EndLon; // The latitude and longitude of the destination position, in decimal degrees.
 
     /*
      * The initial bearing from Start position to End position, following the Great Circle
