@@ -1,95 +1,85 @@
 #!/usr/bin/env bash
 
-#
+
 # Build the  MacOS artifacts
+
+
+# Copyright (c) 2021 Alec Leamas
 #
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
 
-set -xe
+set -x
 
-set -o pipefail
+# Load local environment if it exists i. e., this is a local build
+if [ -f ~/.config/local-build.rc ]; then source ~/.config/local-build.rc; fi
+
+git submodule update --init opencpn-libs
+
+# If applicable,  restore /usr/local from cache.
+if [[ -n "$CI" && -f /tmp/local.cache.tar ]]; then
+  sudo rm -rf /usr/local/*
+  sudo tar -C /usr -xf /tmp/local.cache.tar
+fi
+
+# Set up build directory
+rm -rf build-osx  && mkdir build-osx
+
+# Create a log file.
+exec > >(tee build-osx/build.log) 2>&1
+
+export MACOSX_DEPLOYMENT_TARGET=10.10
+
+# Return latest version of $1, optionally using option $2
+pkg_version() { brew list --versions $2 $1 | tail -1 | awk '{print $2}'; }
+
+#
 # Check if the cache is with us. If not, re-install brew.
 brew list --versions libexif || brew update-reset
 
-for pkg in cairo cmake gettext libarchive libexif python wget; do
+# Install packaged dependencies
+here=$(cd "$(dirname "$0")"; pwd)
+for pkg in $(sed '/#/d' < $here/../build-deps/macos-deps);  do
     brew list --versions $pkg || brew install $pkg || brew install $pkg || :
     brew link --overwrite $pkg || brew install $pkg
 done
 
-if [ -n "$WX_VER" ] && [ "$WX_VER" -eq "32" ]; then
-    echo "Building for WXVERSION 32";
-    WX_URL=https://download.opencpn.org/s/Djqm4SXzYjF8nBw/download
-    WX_DOWNLOAD=/tmp/wx321_opencpn50_macos1010.tar.xz
-    WX_EXECUTABLE=/tmp/wx321_opencpn50_macos1010/bin/wx-config
-    WX_CONFIG="--prefix=/tmp/wx321_opencpn50_macos1010"
-    MACOSX_DEPLOYMENT_TARGET=10.10
-else
-    echo "Building for WXVERSION 315";
-    WX_URL=https://download.opencpn.org/s/MCiRiq4fJcKD56r/download
-    WX_DOWNLOAD=/tmp/wx315_opencpn50_macos1010.tar.xz
-    WX_EXECUTABLE=/tmp/wx315_opencpn50_macos1010/bin/wx-config
-    WX_CONFIG="--prefix=/tmp/wx315_opencpn50_macos1010"
-    MACOSX_DEPLOYMENT_TARGET=10.10
-fi
+export OPENSSL_ROOT_DIR='/usr/local/opt/openssl'
 
-# Download required binaries using wget, since curl causes an issue with Xcode 13.1 and some specific certificates.
-# Inspect the response code to see if the file is downloaded properly.
-# If the download failed or file does not exist, then exit with an error.
-# For local purposes: only download if it has not been downloaded already. That does not harm building on CircleCI.
-if [ ! -f "$WX_DOWNLOAD" ]; then
-  echo "Downloading $WX_DOWNLOAD";
-  SERVER_RESPONSE=$(wget --server-response  -O $WX_DOWNLOAD $WX_URL 2>&1 | grep "HTTP"/ | awk '{print $2}')
-  if [ $SERVER_RESPONSE -ne 200 ]; then
-    echo "Fatal error: could not download $WX_DOWNLOAD. Server response: $SERVER_RESPONSE."
-    exit 0
-  fi
-fi
-if [ -f "$WX_DOWNLOAD" ]; then
-  echo "$WX_DOWNLOAD exists"
-else
-  echo "Fatal error: $WX_DOWNLOAD does not exist";
-  exit 0
-fi
-
-# Unpack the binaries to /tmp
-tar xJf $WX_DOWNLOAD -C /tmp
-
-# Extend PATH, only when necesary
-INCLUDE_DIR_GETTEXT="/usr/local/opt/gettext/bin:"
-
-if [[ ":$PATH:" != *$INCLUDE_DIR_GETTEXT* ]]; then
-  echo "Your path is missing $INCLUDE_DIR_GETTEXT. Trying to add it automatically:"
-  export PATH=$INCLUDE_DIR_GETTEXT$PATH
-  echo 'export PATH="'$INCLUDE_DIR_GETTEXT'$PATH"' >> ~/.bash_profile
-else
-    echo "Path includes $INCLUDE_DIR_GETTEXT"
-fi
-
-export MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET
-
-# MacOS .pkg installer is deprecated in OCPN 5.6.2+
-# use brew to get Packages.pkg
-#if brew list --cask --versions packages; then
-#    version=$(brew list --cask --versions packages)
-#    version="${version/"packages "/}"
-#    sudo installer \
-#        -pkg /usr/local/Caskroom/packages/$version/packages/Packages.pkg \
-#        -target /
-#else
-#    brew install --cask packages
-#fi
-
-git submodule update --init opencpn-libs
-
-rm -rf build && mkdir build && cd build
+# Build and package
+cd build-osx
 cmake \
-  -DwxWidgets_CONFIG_EXECUTABLE=$WX_EXECUTABLE \
-  -DwxWidgets_CONFIG_OPTIONS=$WX_CONFIG \
-  -DCMAKE_INSTALL_PREFIX=app/files \
-  -DBUILD_TYPE_PACKAGE:STRING=tarball \
-  -DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET \
-  "/" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX= \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.10 \
+  -DOCPN_TARGET_TUPLE="darwin-wx32;10;x86_64" \
   ..
-make
-make install
-make package
 
+if [[ -z "$CI" ]]; then
+    echo '$CI not found in environment, assuming local setup'
+    echo "Complete build using 'cd build-osx; make tarball' or so."
+    exit 0
+fi
+
+# nor-reproducible error on first invocation, seemingly tarball-conf-stamp
+# is not created as required.
+make VERBOSE=1 tarball || make VERBOSE=1 tarball
+
+# Install cloudsmith needed by upload script
+python3 -m pip install -q --user cloudsmith-cli
+
+# Required by git-push
+python3 -m pip install -q --user cryptography
+
+# python3 installs in odd place not on PATH, teach upload.sh to use it:
+pyvers=$(python3 --version | awk '{ print $2 }')
+pyvers=$(echo $pyvers | sed -E 's/[\.][0-9]+$//')    # drop last .z in x.y.z
+py_dir=$(ls -d  /Users/*/Library/Python/$pyvers/bin)
+echo "export PATH=\$PATH:$py_dir" >> ~/.uploadrc
+
+# Create the cached /usr/local archive
+if [ -n "$CI"  ]; then
+  tar -C /usr -cf /tmp/local.cache.tar  local
+fi
