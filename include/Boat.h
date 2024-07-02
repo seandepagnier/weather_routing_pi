@@ -25,6 +25,10 @@
 
 #include "Polar.h"
 
+/* 
+ * This class is responsible for loading and saving the polars of a given boat to disk.
+ * and for finding the fastest polar for a given wind and heading.
+*/
 class Boat
 {
 public:
