@@ -76,7 +76,9 @@ SET(SRC
     src/navobj_util.cpp
 )
 
-include_directories(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/include
+)
 
 set(PKG_API_LIB api-18)  #  A dir in opencpn-libs/ e. g., api-17 or api-16
 
