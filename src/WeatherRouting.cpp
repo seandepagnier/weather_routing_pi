@@ -346,7 +346,7 @@ WeatherRouting::~WeatherRouting( )
     m_panel->m_bExport->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExport ), NULL, this );
     m_panel->m_bExportRoute->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( WeatherRouting::OnExportRoute ), NULL, this );
 
-    Stop();
+    StopAll();
 
     m_SettingsDialog.SaveSettings();
 
@@ -1140,7 +1140,7 @@ void WeatherRouting::OnDelete( wxCommandEvent& event )
     //  Probably could do better to stop only the computation of selected configuration
     //  But stopping all is safer.
     //  Sess: https://github.com/rgleason/weather_routing_pi/issues/103
-    Stop();
+    StopAll();
 
     long index = m_panel->m_lWeatherRoutes->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
     if (index < 0) return;
@@ -1290,7 +1290,10 @@ void WeatherRouting::OnComputeAll ( wxCommandEvent& event )
 
 void WeatherRouting::OnStop( wxCommandEvent& event )
 {
-    Stop();
+    std::list<RouteMapOverlay*> currentroutemaps = CurrentRouteMaps();
+    for(auto it = currentroutemaps.begin();it != currentroutemaps.end(); it++)
+        Stop(*it);
+    UpdateComputeState();
 }
 
 #define FAIL(X) do { error = X; goto failed; } while(0)
@@ -1706,7 +1709,7 @@ void WeatherRouting::OnComputationTimer( wxTimerEvent & )
         return;
     }
 
-    Stop();
+    StopAll();
 }
 
 void WeatherRouting::OnHideConfigurationTimer( wxTimerEvent & )
@@ -2722,7 +2725,16 @@ void WeatherRouting::StartAll()
     }
 }
 
-void WeatherRouting::Stop()
+void WeatherRouting::Stop(RouteMapOverlay *routemapoverlay) {
+    routemapoverlay->Stop();
+    // Wait for threads to finish
+    while(routemapoverlay->Running())
+        wxThread::Sleep(100);
+    routemapoverlay->ResetFinished();
+    routemapoverlay->DeleteThread();
+}
+
+void WeatherRouting::StopAll()
 {
     /* stop all the threads at once, rather than waiting for each one before
        telling the next to stop */
@@ -2764,7 +2776,7 @@ void WeatherRouting::Stop()
 void WeatherRouting::Reset()
 {
     if(m_bRunning)
-        Stop();
+        StopAll();
 
     for(int i=0; i<m_panel->m_lWeatherRoutes->GetItemCount(); i++) {
         WeatherRoute *weatherroute =

@@ -203,7 +203,8 @@ private:
 
     void Start(RouteMapOverlay *routemapoverlay);
     void StartAll();
-    void Stop();
+    void Stop(RouteMapOverlay *routemapoverlay);
+    void StopAll();
 
     void DeleteRouteMaps(std::list<RouteMapOverlay *>routemapoverlays);
     RouteMapConfiguration DefaultConfiguration();
