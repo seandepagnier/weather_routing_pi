@@ -358,9 +358,13 @@ struct RouteMapConfiguration {
     // If the route needs to go around land, islands or peninsulas, the user can increase the value.
     // E.g. the boat may have to go in the opposite direction then back to the destination bearing.
     double MaxDivertedCourse;
-    // The maximum deviation away from the direct route.
+    // The maximum angle the boat can be diverted from the bearing to the destination,
+    // based on the starting position to the destination (unlike MaxDivertedCourse which is the angle
+    // at each step of the route calculation).
     double MaxCourseAngle;
-    // The maximum angle at each step of the route calculation.
+    // How much the boat course can change at each step of the route calculation.
+    // A value of 180 gives the maximum flexibility of boat movement, but increases the computation time.
+    // A minimum of 90 is usually needed for tacking, a value of 120 is recommended with strong currents.
     double MaxSearchAngle;
     // The calculated route will avoid a path where the true wind is above this value in knots.
     double MaxTrueWindKnots;
