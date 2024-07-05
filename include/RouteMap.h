@@ -458,7 +458,10 @@ struct RouteMapConfiguration {
     // or the route calculation fails.
     wxDateTime time;
     bool grib_is_data_deficient, polar_failed, wind_data_failed;
-    bool land_crossing, boundary_crossing;
+    // Set to true if the route crossed land.
+    bool land_crossing;
+    // Set to true if the route crossed a boundary.
+    bool boundary_crossing;
 };
 
 bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
