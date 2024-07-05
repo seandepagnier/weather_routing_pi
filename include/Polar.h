@@ -51,7 +51,8 @@ enum class PolarErrorCode {
     EmptyPolarData,        // The polar file contains no data.
     WindAngleOutOfRange,   // The input heading is out of the polar range, either too much upwind or too much downwind.
     WindSpeedOutOfBounds,  // The input wind speed is either below the minimum polar wind or above the maximum polar wind.
-    NegativeBoatSpeed      // The calculated boat speed is negative.
+    NegativeBoatSpeed,     // The calculated boat speed is negative.
+    BoatSpeedNaNValue      // The polar data contains NaN boat speed value.
 };
 
 class Polar
@@ -118,7 +119,9 @@ private:
     }; // num_wind_speeds
     bool VMGAngle(SailingWindSpeed &ws1, SailingWindSpeed &ws2, float VW, float &W);
 
+    // The true wind speed for each wind angle in 'degree_steps'.
     std::vector<SailingWindSpeed> wind_speeds;
+    // The values of the true wind angle for which true wind speed is reported.
     std::vector<double> degree_steps;
     unsigned int degree_step_index[DEGREES];
 };

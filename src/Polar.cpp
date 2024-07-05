@@ -304,6 +304,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
                                         "To specify interpolated, leave blank values.\n"
                                         "To specify course as 'invalid' use 0.0 rather than 0\n"));
                         warn_zeros = true;
+                        s = 0;
                     } else if(*token) {
                         s = strtod(token, 0);
                         if(s < .05)
@@ -326,6 +327,8 @@ bool Polar::Open(const wxString &filename, wxString &message)
     UpdateSpeeds();
 
     FileName = wxString::FromUTF8(filename);
+    if (message != wxEmptyString)
+        wxLogMessage(message);
     return true;
     
 failed:
@@ -568,6 +571,10 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking, Pola
     if(VB < 0) {
         // with faulty polars, extrapolation, sometimes results in negative boat speed
         if (error_code) *error_code = PolarErrorCode::NegativeBoatSpeed;
+        return NAN;
+    } else if (VB == NAN) {
+        // This happens if the Polar contains NAN values.
+        if (error_code) *error_code = PolarErrorCode::BoatSpeedNaNValue;
         return NAN;
     }
 
