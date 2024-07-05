@@ -867,8 +867,6 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             d2 *= cos(deg2rad(dlat))/2; // correct for latitude
             bearing = rad2deg(atan2(d2, d1));
 
-            //double bearing, dist2end;
-            //ll_gc_ll_reverse(configuration.EndLat, configuration.EndLon, lat, lon, &bearing, &dist2end);
             if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxCourseAngle)
                 continue;
         }
