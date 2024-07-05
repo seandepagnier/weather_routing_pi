@@ -439,7 +439,14 @@ void Polar::OptimizeTackingSpeed()
 }
 #endif
 
-// return index of wind speed in table which less than our wind speed
+/*
+ * Finds the indices of the two wind speeds in the polar table
+ * that are just below and above the given true wind speed value.
+ *
+ * @param VW The target true wind speed value.
+ * @param VW1i Output parameter: Index of the wind speed just below the target value.
+ * @param VW2i Output parameter: Index of the wind speed just above the target value.
+ */
 void Polar::ClosestVWi(double VW, int &VW1i, int &VW2i)
 {
     for(unsigned int VWi = 1; VWi < wind_speeds.size()-1; VWi++)
@@ -449,6 +456,7 @@ void Polar::ClosestVWi(double VW, int &VW1i, int &VW2i)
             return;
         }
 
+    // If the target wind speed is greater than all available wind speeds, set indices to the last wind speed.
     VW2i = wind_speeds.size()-1;
     VW1i = VW2i > 0 ? VW2i - 1 : 0;
 }
@@ -484,22 +492,33 @@ bool Polar::VMGAngle(SailingWindSpeed &ws1, SailingWindSpeed &ws2, float VW, flo
 /**
  * Calculate the boat speed (VB) based on the wind angle (W) and wind speed (VW) using the polar data.
  *
- * @param W The wind angle in degrees.
- * @param VW The wind speed in knots.
+ * @param W The true wind angle in degrees.
+ * @param VW The true wind speed in knots.
  * @param bound If true, the wind speed must be within the bounds of the polar data.
  *              For example, if the wind speed is 25 knots and the polar data only goes up to 20 knots,
  *              the function will return NAN.
  *              If false, the wind speed is extrapolated if outside the bounds.
  * @param optimize_tacking Flag indicating whether to optimize for tacking angles.
- * @return The boat speed (VB) in knots.
+ * @param[out] error_code The error code if NaN is returned.
+ * @return The boat speed (VB) in knots, or NaN in the following scenarios:
+ *   - If the wind speed (VW) is negative.
+ *   - If the polar data is empty (no degree steps or wind speeds defined).
+ *   - If optimize_tacking is false and the wind angle (W) is outside the range of the polar data.
+ *   - If bound is true and the wind speed (VW) is outside the range of the polar data.
+ *   - If the calculated boat speed is negative (which can happen with faulty polars or during extrapolation).
  */
-double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
+double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking, PolarErrorCode* error_code)
 {
-    if(VW < 0)
+    if (error_code) *error_code = PolarErrorCode::None;
+    if(VW < 0) {
+        if (error_code) *error_code = PolarErrorCode::NegativeWindSpeed;
         return NAN;
+    }
 
-    if(!degree_steps.size() || !wind_speeds.size())
+    if(!degree_steps.size() || !wind_speeds.size()) {
+        if (error_code) *error_code = PolarErrorCode::EmptyPolarData;
         return NAN;
+    }
 
     W = positive_degrees(W);
 
@@ -507,12 +526,16 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
     if(W > 180)
         W = 360 - W;
     
-    if(!optimize_tacking && (W < degree_steps[0] || W > degree_steps[degree_steps.size()-1]))
+    if(!optimize_tacking && (W < degree_steps[0] || W > degree_steps[degree_steps.size()-1])) {
         // Avoid upwind course (polar angle too low) or downwind no-go zone (polar angle too high).
+        if (error_code) *error_code = PolarErrorCode::WindAngleOutOfRange;
         return NAN;
+    }
 
-    if(bound && (VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW))
+    if(bound && (VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW)) {
+        if (error_code) *error_code = PolarErrorCode::WindSpeedOutOfBounds;
         return NAN;
+    }
 
     unsigned int W1i = degree_step_index[(int)floor(W)];
     unsigned int W2i = W1i +1;
@@ -529,7 +552,7 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
     if(optimize_tacking) {
         float vmgW = W;
         if(VMGAngle(ws1, ws2, VW, vmgW))
-            return Speed(vmgW, VW, bound)*cos(deg2rad(vmgW))/cos(deg2rad(W));
+            return Speed(vmgW, VW, bound, false, error_code)*cos(deg2rad(vmgW))/cos(deg2rad(W));
     }
 
     double VW1 = ws1.VW, VW2 = ws2.VW;
@@ -542,8 +565,11 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
 
     double VB  = interp_value(W, W1, W2, VB1, VB2);
 
-    if(VB < 0) // with faulty polars, extrapolation, sometimes results in negative boat speed
+    if(VB < 0) {
+        // with faulty polars, extrapolation, sometimes results in negative boat speed
+        if (error_code) *error_code = PolarErrorCode::NegativeBoatSpeed;
         return NAN;
+    }
 
     return VB;
 }

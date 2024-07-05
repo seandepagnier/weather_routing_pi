@@ -44,6 +44,16 @@ class Boat;
 
 #define DEGREES 360
 
+// Error codes when Polar::Speed returns NaN.
+enum class PolarErrorCode {
+    None,                  // No error has occurred.
+    NegativeWindSpeed,     // The input true wind speed is negative.
+    EmptyPolarData,        // The polar file contains no data.
+    WindAngleOutOfRange,   // The input heading is out of the polar range, either too much upwind or too much downwind.
+    WindSpeedOutOfBounds,  // The input wind speed is either below the minimum polar wind or above the maximum polar wind.
+    NegativeBoatSpeed      // The calculated boat speed is negative.
+};
+
 class Polar
 {
 public:
@@ -63,7 +73,7 @@ public:
     void OptimizeTackingSpeeds();
     void ClosestVWi(double VW, int &VW1i, int &VW2i);
 
-    double Speed(double W, double VW, bool bound=false, bool optimize_tacking=false);
+    double Speed(double W, double VW, bool bound=false, bool optimize_tacking=false, PolarErrorCode* error_code=NULL);
     double SpeedAtApparentWindDirection(double A, double VW, double *pW=0);
     double SpeedAtApparentWindSpeed(double W, double VA);
     double SpeedAtApparentWind(double A, double VA, double *pW=0);

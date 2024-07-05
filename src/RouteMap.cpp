@@ -639,6 +639,7 @@ static inline bool ComputeBoatSpeed
  double &B, double &VB, double &BG, double &VBG, double &dist, int newpolar)
 {
     Polar &polar = configuration.boat.Polars[newpolar];
+    PolarErrorCode error_code = PolarErrorCode::None;
     if((data_mask & Position::CLIMATOLOGY_WIND) &&
        (configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MAP ||
         configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)) {
@@ -652,23 +653,25 @@ static inline bool ComputeBoatSpeed
             double VBc, mind = polar.MinDegreeStep();
             // if tacking
             if(fabs(dir) < mind)
-                VBc = polar.Speed(mind, atlas.VW[i], true, configuration.OptimizeTacking)
+                VBc = polar.Speed(mind, atlas.VW[i], true, configuration.OptimizeTacking, &error_code)
                     * cos(deg2rad(mind)) / cos(deg2rad(dir));
             else
-                VBc = polar.Speed(dir, atlas.VW[i], true, configuration.OptimizeTacking);
+                VBc = polar.Speed(dir, atlas.VW[i], true, configuration.OptimizeTacking, &error_code);
 
             VB += atlas.directions[i]*VBc;
         }
 
         if(configuration.ClimatologyType == RouteMapConfiguration::CUMULATIVE_MINUS_CALMS)
             VB *= 1-atlas.calm;
-    } else
-        VB = polar.Speed(H, VW, true, configuration.OptimizeTacking);
+    } else {
+        VB = polar.Speed(H, VW, true, configuration.OptimizeTacking, &error_code);
+    }
 
     /* failed to determine speed.. */
     if(std::isnan(B) || std::isnan(VB)) {
         // when does this hit??
-        printf("polar failed bad! %f %f %f %f\n", W, VW, B, VB);
+        wxLogWarning("polar failed. V: %f VW: %f B: %f VB: %f H: %f. Error: %d",
+            W, VW, B, VB, H, error_code);
         configuration.polar_failed = true;
         return false; //B = VB = 0;
     }
@@ -864,6 +867,8 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
             d2 *= cos(deg2rad(dlat))/2; // correct for latitude
             bearing = rad2deg(atan2(d2, d1));
 
+            //double bearing, dist2end;
+            //ll_gc_ll_reverse(configuration.EndLat, configuration.EndLon, lat, lon, &bearing, &dist2end);
             if(fabs(heading_resolve(configuration.StartEndBearing - bearing)) > configuration.MaxCourseAngle)
                 continue;
         }
