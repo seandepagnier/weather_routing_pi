@@ -325,13 +325,13 @@ class ConfigurationDialogBase : public wxDialog
 
 	public:
 		wxDatePickerCtrl* m_dpStartDate;
-		wxCheckBox* m_cbCurrents;
+		wxCheckBox* m_cbCurrents; // specify whether to use currents or not.
 		wxCheckBox* m_cbUseGrib;
 		wxChoice* m_cClimatologyType;
 		wxCheckBox* m_cbAvoidCycloneTracks;
-		wxSpinCtrl* m_sFromDegree;
-		wxSpinCtrl* m_sToDegree;
-		wxTextCtrl* m_tByDegrees;
+		wxSpinCtrl* m_sFromDegree; // Minimum course relative to true wind.
+		wxSpinCtrl* m_sToDegree;   // Maximum course relative to true wind.
+		wxSpinCtrl* m_sByDegrees;  // 
 
 		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~ConfigurationDialogBase();
