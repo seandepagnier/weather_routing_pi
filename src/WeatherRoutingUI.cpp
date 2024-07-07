@@ -1144,7 +1144,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText241->Wrap( -1 );
 	fgSizer11511->Add( m_staticText241, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-	m_sSafetyMarginLand = new wxSpinCtrl( sbOptions1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 140,-1 ), wxSP_ARROW_KEYS, 0, 100, 0 );
+	m_sSafetyMarginLand = new wxSpinCtrlDouble( sbOptions1->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 140,-1 ), wxSP_ARROW_KEYS, 0, 100, 0 /* initial value */, 0.1 /* inc */ );
 	fgSizer11511->Add( m_sSafetyMarginLand, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_staticText1211 = new wxStaticText( sbOptions1->GetStaticBox(), wxID_ANY, _("NM"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1371,7 +1371,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sTackingTime->Connect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sSafetyMarginLand->Connect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sSafetyMarginLand->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sSafetyMarginLand->Connect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sFromDegree->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sToDegree->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sByDegrees->Connect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
@@ -1524,7 +1524,7 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sTackingTime->Disconnect( wxEVT_MOUSEWHEEL, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
 	m_sTackingTime->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sSafetyMarginLand->Disconnect( wxEVT_MOTION, wxMouseEventHandler( ConfigurationDialogBase::EnableSpin ), NULL, this );
-	m_sSafetyMarginLand->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sSafetyMarginLand->Disconnect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sFromDegree->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sToDegree->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sByDegrees->Disconnect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );

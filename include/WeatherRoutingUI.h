@@ -300,7 +300,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText121;
 		wxStaticText* m_staticText241;
-		wxSpinCtrl* m_sSafetyMarginLand;
+		wxSpinCtrlDouble* m_sSafetyMarginLand;
 		wxStaticText* m_staticText1211;
 		wxStaticText* m_staticText113;
 		wxStaticText* m_staticText115;

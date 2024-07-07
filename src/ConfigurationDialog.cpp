@@ -245,7 +245,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(AvoidCycloneTracks);
     SET_SPIN(CycloneMonths);
     SET_SPIN(CycloneDays);
-    SET_SPIN(SafetyMarginLand);
+    SET_SPIN_DECIMAL(SafetyMarginLand);
 
     SET_CHECKBOX(DetectLand);
     SET_CHECKBOX(DetectBoundary);

@@ -1855,7 +1855,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
 
                 configuration.DetectLand = AttributeBool(e, "DetectLand", true);
-                configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 2.);
+                configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 0.);
                 configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
                 configuration.Currents = AttributeBool(e, "Currents", true);
                 configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
