@@ -105,6 +105,7 @@ public:
     bool Propagate(IsoRouteList &routelist, RouteMapConfiguration &configuration);
 
     double Distance(Position *p);
+    // Return the number of times the sail configuration has changed.
     int SailChanges();
     double PropagateToEnd(RouteMapConfiguration &configuration, double &H, int &data_mask);
    
@@ -289,7 +290,7 @@ protected:
     }
 };
 
-/* list of routes with equal time to reach */
+/* list of isochrone routes with equal time to reach their endpoint from the same starting point. */
 class IsoChron
 {
 public:
@@ -303,7 +304,10 @@ public:
     void ResetDrawnFlag();
 
     IsoRouteList routes;
+    // The time at which all isochone routes reach their endpoint.
+    // All routes in this isochrone have equal travel time from the starting point.
     wxDateTime time;
+    // The time in seconds from the previous isochrone to this isochrone.
     double delta;
     Shared_GribRecordSet m_SharedGrib;
     WR_GribRecordSet *m_Grib;
@@ -354,9 +358,13 @@ struct RouteMapConfiguration {
     // If the route needs to go around land, islands or peninsulas, the user can increase the value.
     // E.g. the boat may have to go in the opposite direction then back to the destination bearing.
     double MaxDivertedCourse;
-    // The maximum deviation away from the direct route.
+    // The maximum angle the boat can be diverted from the bearing to the destination,
+    // based on the starting position to the destination (unlike MaxDivertedCourse which is the angle
+    // at each step of the route calculation).
     double MaxCourseAngle;
-    // The maximum angle at each step of the route calculation.
+    // How much the boat course can change at each step of the route calculation.
+    // A value of 180 gives the maximum flexibility of boat movement, but increases the computation time.
+    // A minimum of 90 is usually needed for tacking, a value of 120 is recommended with strong currents.
     double MaxSearchAngle;
     // The calculated route will avoid a path where the true wind is above this value in knots.
     double MaxTrueWindKnots;
@@ -373,7 +381,12 @@ struct RouteMapConfiguration {
     // The penalty time to tack the boat, in seconds.
     // The penalty time is added to the route calculation for each tack.
     double TackingTime;
-    // Balance the influence of the wind and the ocean current on the route calculation.
+    // When wind opposes current rough seas can be produced.
+    // This constraint takes the dot product of the current and wind vectors, and if the result exceeds this value,
+    // navigation in this area is avoided.
+    // For example, a value of 60 would avoid 30 knots of wind opposing a 2 knot current as well as
+    // 20 knots of wind opposing a 3 knot current.
+    // Higher values allow for rougher conditions. The special value 0 (default) allows any conditions.
     double WindVSCurrent;
     // The minimum safety distance to land, in nautical miles.
     // The calculated route will avoid land within this distance.
@@ -399,7 +412,13 @@ struct RouteMapConfiguration {
     // If true, avoid polar dead zones.
     // If false, avoid upwind course (polar angle too low) or downwind no-go zone (polar angle too high).
     bool OptimizeTacking;
+    // In some cases it may be possible to reach a location from two different routes (imagine either side of an island)
+    // which is further away from the destination before the destination can be reached.
+    // The algorithm must invert and work inwards on this inverted region to possibly reach the destination.
     bool InvertedRegions;
+    // In some cases, it may be preferable to anchor (assuming it isn't too deep) rather than continue to
+    // navigate if there is a contrary current which is swifter than the boat can travel.
+    // This allows the route to reach the destination sooner by sitting in place until the current abades.
     bool Anchoring;
 
     // Do not go below this minimum True Wind angle at each step of the route calculation.
@@ -418,8 +437,8 @@ struct RouteMapConfiguration {
 
     /* computed values */
     std::list<double> DegreeSteps;
-    double StartLat, StartLon; // The latitude and longitude of the starting position.
-    double EndLat, EndLon; // The latitude and longitude of the destination position.
+    double StartLat, StartLon; // The latitude and longitude of the starting position, in decimal degrees.
+    double EndLat, EndLon; // The latitude and longitude of the destination position, in decimal degrees.
 
     /*
      * The initial bearing from Start position to End position, following the Great Circle
@@ -439,7 +458,10 @@ struct RouteMapConfiguration {
     // or the route calculation fails.
     wxDateTime time;
     bool grib_is_data_deficient, polar_failed, wind_data_failed;
-    bool land_crossing, boundary_crossing;
+    // Set to true if the route crossed land.
+    bool land_crossing;
+    // Set to true if the route crossed a boundary.
+    bool boundary_crossing;
 };
 
 bool operator!=(const RouteMapConfiguration &c1, const RouteMapConfiguration &c2);
