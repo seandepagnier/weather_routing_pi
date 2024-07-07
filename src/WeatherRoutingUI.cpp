@@ -1190,7 +1190,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_staticText117->Wrap( -1 );
 	bSizer3->Add( m_staticText117, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 );
 
-	m_sByDegrees = new wxSpinCtrl( sbCourses->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 140,-1 ), wxSP_ARROW_KEYS, 1, 60, 5 );
+	m_sByDegrees = new wxSpinCtrlDouble( sbCourses->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 140,-1 ), wxSP_ARROW_KEYS, 0.1, 60.0, 5.0, 0.1 /*inc*/ );
 	bSizer3->Add( m_sByDegrees, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 	m_staticText118 = new wxStaticText( sbCourses->GetStaticBox(), wxID_ANY, _("Degrees"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1374,7 +1374,7 @@ ConfigurationDialogBase::ConfigurationDialogBase( wxWindow* parent, wxWindowID i
 	m_sSafetyMarginLand->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sFromDegree->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sToDegree->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sByDegrees->Connect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
+	m_sByDegrees->Connect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_bResetAdvanced->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnResetAdvanced ), NULL, this );
 }
 
@@ -1527,7 +1527,7 @@ ConfigurationDialogBase::~ConfigurationDialogBase()
 	m_sSafetyMarginLand->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sFromDegree->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
 	m_sToDegree->Disconnect( wxEVT_COMMAND_SPINCTRL_UPDATED, wxSpinEventHandler( ConfigurationDialogBase::OnUpdateSpin ), NULL, this );
-	m_sByDegrees->Disconnect( wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
+	m_sByDegrees->Disconnect( wxEVT_COMMAND_SPINCTRLDOUBLE_UPDATED, wxCommandEventHandler( ConfigurationDialogBase::OnUpdate ), NULL, this );
 	m_bResetAdvanced->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ConfigurationDialogBase::OnResetAdvanced ), NULL, this );
 
 }

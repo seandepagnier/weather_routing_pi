@@ -172,6 +172,12 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 #define SET_SPIN(FIELD) \
     SET_SPIN_VALUE(FIELD, (*it).FIELD)
 
+#define SET_SPIN_DECIMAL_VALUE(FIELD, VALUE)                                          \
+    SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, double, value)
+
+#define SET_SPIN_DECIMAL(FIELD) \
+    SET_SPIN_DECIMAL_VALUE(FIELD, (*it).FIELD)
+
 #ifdef __OCPN__ANDROID__
 #define NO_EDITED_CONTROLS 1
 #else
@@ -220,7 +226,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_SPIN(FromDegree);
     SET_SPIN(ToDegree);
-    SET_SPIN(ByDegrees);
+    SET_SPIN_DECIMAL(ByDegrees);
 
     SET_CHOICE_VALUE(Integrator, ((*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA ?
                                   _T("Runge Kutta") : _T("Newton")));
@@ -309,7 +315,7 @@ void ConfigurationDialog::OnResetAdvanced( wxCommandEvent& event )
 
     m_sFromDegree->SetValue(0);
     m_sToDegree->SetValue(180);
-    m_sByDegrees->SetValue(5);
+    m_sByDegrees->SetValue(5.0);
 
     m_bBlockUpdate = false;
     Update();

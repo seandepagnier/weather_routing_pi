@@ -331,7 +331,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxCheckBox* m_cbAvoidCycloneTracks;
 		wxSpinCtrl* m_sFromDegree; // Minimum course relative to true wind.
 		wxSpinCtrl* m_sToDegree;   // Maximum course relative to true wind.
-		wxSpinCtrl* m_sByDegrees;  // The increment course angle when calculating a isochrone route.
+		wxSpinCtrlDouble* m_sByDegrees;  // The increment course angle when calculating a isochrone route.
 
 		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~ConfigurationDialogBase();
