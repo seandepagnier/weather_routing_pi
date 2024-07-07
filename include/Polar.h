@@ -52,7 +52,7 @@ enum class PolarErrorCode {
     WindAngleOutOfRange,   // The input heading is out of the polar range, either too much upwind or too much downwind.
     WindSpeedOutOfBounds,  // The input wind speed is either below the minimum polar wind or above the maximum polar wind.
     NegativeBoatSpeed,     // The calculated boat speed is negative.
-    BoatSpeedNaNValue      // The polar data contains NaN boat speed value.
+    BoatSpeedNaNValue      // The polar data contains NaN boat speed value, which represents unknown speed.
 };
 
 class Polar

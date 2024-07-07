@@ -572,7 +572,7 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking, Pola
         // with faulty polars, extrapolation, sometimes results in negative boat speed
         if (error_code) *error_code = PolarErrorCode::NegativeBoatSpeed;
         return NAN;
-    } else if (VB == NAN) {
+    } else if (isnan(VB)) {
         // This happens if the Polar contains NAN values.
         if (error_code) *error_code = PolarErrorCode::BoatSpeedNaNValue;
         return NAN;
