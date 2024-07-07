@@ -1865,7 +1865,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
 
                 configuration.FromDegree = AttributeDouble(e, "FromDegree", 0);
                 configuration.ToDegree = AttributeDouble(e, "ToDegree", 180);
-                configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5);
+                configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5.);
 
                 if(configuration.boatFileName == lastboatFileName)
                     configuration.boat = lastboat;

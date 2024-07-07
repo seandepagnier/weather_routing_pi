@@ -72,7 +72,10 @@ protected:
         wxDynamicCast(event.GetEventObject(), wxSpinCtrl)->Enable();
         event.Skip();
     }
-
+    void EnableSpinDouble( wxMouseEvent& event ) {
+        wxDynamicCast(event.GetEventObject(), wxSpinCtrlDouble)->Enable();
+        event.Skip();
+    }
     void OnAvoidCyclones( wxCommandEvent& event );
     void OnAddDegreeStep( wxCommandEvent& event );
     void OnRemoveDegreeStep( wxCommandEvent& event );

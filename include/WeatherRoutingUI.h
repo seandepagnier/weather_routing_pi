@@ -317,6 +317,7 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnBoatFilename( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
+		virtual void EnableSpinDouble( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
