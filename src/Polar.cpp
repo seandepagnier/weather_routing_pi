@@ -304,7 +304,7 @@ bool Polar::Open(const wxString &filename, wxString &message)
                                         "To specify interpolated, leave blank values.\n"
                                         "To specify course as 'invalid' use 0.0 rather than 0\n"));
                         warn_zeros = true;
-                        s = 0;
+                        // Intentionally set s = NAN. This is to indicate the boat speed is unknow.
                     } else if(*token) {
                         s = strtod(token, 0);
                         if(s < .05)
