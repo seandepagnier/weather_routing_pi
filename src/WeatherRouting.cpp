@@ -1855,7 +1855,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
                 configuration.WindStrength = AttributeDouble(e, "WindStrength", 1);
 
                 configuration.DetectLand = AttributeBool(e, "DetectLand", true);
-                configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 2.);
+                configuration.SafetyMarginLand = AttributeDouble(e, "SafetyMarginLand", 0.);
                 configuration.DetectBoundary = AttributeBool(e, "DetectBoundary", false);
                 configuration.Currents = AttributeBool(e, "Currents", true);
                 configuration.OptimizeTacking = AttributeBool(e, "OptimizeTacking", false);
@@ -1865,7 +1865,7 @@ bool WeatherRouting::OpenXML(wxString filename, bool reportfailure)
 
                 configuration.FromDegree = AttributeDouble(e, "FromDegree", 0);
                 configuration.ToDegree = AttributeDouble(e, "ToDegree", 180);
-                configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5);
+                configuration.ByDegrees = AttributeDouble(e, "ByDegrees", 5.);
 
                 if(configuration.boatFileName == lastboatFileName)
                     configuration.boat = lastboat;

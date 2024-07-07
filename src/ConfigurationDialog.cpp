@@ -172,6 +172,12 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 #define SET_SPIN(FIELD) \
     SET_SPIN_VALUE(FIELD, (*it).FIELD)
 
+#define SET_SPIN_DOUBLE_VALUE(FIELD, VALUE)                                          \
+    SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, double, value)
+
+#define SET_SPIN_DOUBLE(FIELD) \
+    SET_SPIN_DOUBLE_VALUE(FIELD, (*it).FIELD)
+
 #ifdef __OCPN__ANDROID__
 #define NO_EDITED_CONTROLS 1
 #else
@@ -220,7 +226,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_SPIN(FromDegree);
     SET_SPIN(ToDegree);
-    SET_CONTROL_VALUE(wxString::Format(_T("%f"), (*it).ByDegrees), m_tByDegrees, SetValue, wxString, _T(""));
+    SET_SPIN_DOUBLE(ByDegrees);
 
     SET_CHOICE_VALUE(Integrator, ((*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA ?
                                   _T("Runge Kutta") : _T("Newton")));
@@ -239,7 +245,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(AvoidCycloneTracks);
     SET_SPIN(CycloneMonths);
     SET_SPIN(CycloneDays);
-    SET_SPIN(SafetyMarginLand);
+    SET_SPIN_DOUBLE(SafetyMarginLand);
 
     SET_CHECKBOX(DetectLand);
     SET_CHECKBOX(DetectBoundary);
@@ -309,7 +315,7 @@ void ConfigurationDialog::OnResetAdvanced( wxCommandEvent& event )
 
     m_sFromDegree->SetValue(0);
     m_sToDegree->SetValue(180);
-    m_tByDegrees->SetValue(_T("5"));
+    m_sByDegrees->SetValue(5.0);
 
     m_bBlockUpdate = false;
     Update();
@@ -462,8 +468,7 @@ void ConfigurationDialog::Update()
 
         GET_SPIN(FromDegree);
         GET_SPIN(ToDegree);
-        if(!m_tByDegrees->GetValue().empty())
-            m_tByDegrees->GetValue().ToDouble(&configuration.ByDegrees);
+        GET_SPIN(ByDegrees);
 
         (*it)->SetConfiguration(configuration);
 
@@ -476,8 +481,7 @@ void ConfigurationDialog::Update()
             refresh = true; // update drawing
     }
 
-    double by;
-    m_tByDegrees->GetValue().ToDouble(&by);
+    double by = m_sByDegrees->GetValue();
     if(m_sToDegree->GetValue() - m_sFromDegree->GetValue() < 2*by) {
         wxMessageDialog mdlg(this, _("Warning: less than 4 different degree steps specified\n"),
                              wxString(_("Weather Routing"), wxOK | wxICON_WARNING));
