@@ -172,11 +172,11 @@ void ConfigurationDialog::OnBoatFilename( wxCommandEvent& event )
 #define SET_SPIN(FIELD) \
     SET_SPIN_VALUE(FIELD, (*it).FIELD)
 
-#define SET_SPIN_DECIMAL_VALUE(FIELD, VALUE)                                          \
+#define SET_SPIN_DOUBLE_VALUE(FIELD, VALUE)                                          \
     SET_CONTROL_VALUE(VALUE, m_s##FIELD, SetValue, double, value)
 
-#define SET_SPIN_DECIMAL(FIELD) \
-    SET_SPIN_DECIMAL_VALUE(FIELD, (*it).FIELD)
+#define SET_SPIN_DOUBLE(FIELD) \
+    SET_SPIN_DOUBLE_VALUE(FIELD, (*it).FIELD)
 
 #ifdef __OCPN__ANDROID__
 #define NO_EDITED_CONTROLS 1
@@ -226,7 +226,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
 
     SET_SPIN(FromDegree);
     SET_SPIN(ToDegree);
-    SET_SPIN_DECIMAL(ByDegrees);
+    SET_SPIN_DOUBLE(ByDegrees);
 
     SET_CHOICE_VALUE(Integrator, ((*it).Integrator == RouteMapConfiguration::RUNGE_KUTTA ?
                                   _T("Runge Kutta") : _T("Newton")));
@@ -245,7 +245,7 @@ void ConfigurationDialog::SetConfigurations(std::list<RouteMapConfiguration> con
     SET_CHECKBOX(AvoidCycloneTracks);
     SET_SPIN(CycloneMonths);
     SET_SPIN(CycloneDays);
-    SET_SPIN_DECIMAL(SafetyMarginLand);
+    SET_SPIN_DOUBLE(SafetyMarginLand);
 
     SET_CHECKBOX(DetectLand);
     SET_CHECKBOX(DetectBoundary);
