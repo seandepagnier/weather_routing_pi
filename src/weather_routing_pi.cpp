@@ -41,8 +41,8 @@ wxString    g_ReceivedMessage;
 double      g_WINDipFactor;
 
 // Define minimum and maximum versions of the grib plugin supported
-#define GRIB_MAX_MAJOR 4
-#define GRIB_MAX_MINOR 2
+#define GRIB_MAX_MAJOR 5
+#define GRIB_MAX_MINOR 0
 #define GRIB_MIN_MAJOR 4
 #define GRIB_MIN_MINOR 1
 
