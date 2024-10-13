@@ -300,7 +300,7 @@ class ConfigurationDialogBase : public wxDialog
 		wxSpinCtrl* m_sTackingTime;
 		wxStaticText* m_staticText121;
 		wxStaticText* m_staticText241;
-		wxSpinCtrl* m_sSafetyMarginLand;
+		wxSpinCtrlDouble* m_sSafetyMarginLand;
 		wxStaticText* m_staticText1211;
 		wxStaticText* m_staticText113;
 		wxStaticText* m_staticText115;
@@ -317,6 +317,7 @@ class ConfigurationDialogBase : public wxDialog
 		virtual void OnBoatFilename( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnEditBoat( wxCommandEvent& event ) { event.Skip(); }
 		virtual void EnableSpin( wxMouseEvent& event ) { event.Skip(); }
+		virtual void EnableSpinDouble( wxMouseEvent& event ) { event.Skip(); }
 		virtual void OnUpdateSpin( wxSpinEvent& event ) { event.Skip(); }
 		virtual void OnClose( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAvoidCyclones( wxCommandEvent& event ) { event.Skip(); }
@@ -325,13 +326,13 @@ class ConfigurationDialogBase : public wxDialog
 
 	public:
 		wxDatePickerCtrl* m_dpStartDate;
-		wxCheckBox* m_cbCurrents;
+		wxCheckBox* m_cbCurrents; // specify whether to use currents or not.
 		wxCheckBox* m_cbUseGrib;
 		wxChoice* m_cClimatologyType;
 		wxCheckBox* m_cbAvoidCycloneTracks;
-		wxSpinCtrl* m_sFromDegree;
-		wxSpinCtrl* m_sToDegree;
-		wxTextCtrl* m_tByDegrees;
+		wxSpinCtrl* m_sFromDegree; // Minimum course relative to true wind.
+		wxSpinCtrl* m_sToDegree;   // Maximum course relative to true wind.
+		wxSpinCtrlDouble* m_sByDegrees;  // The increment course angle when calculating a isochrone route.
 
 		ConfigurationDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Weather Routing Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxDEFAULT_DIALOG_STYLE );
 		~ConfigurationDialogBase();

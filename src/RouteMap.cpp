@@ -117,6 +117,8 @@ static Json::Value RequestGRIB(const wxDateTime &t, const wxString &what, double
     return error;
 }
 
+// Return the swell height at the specified lat/long location.
+// @return the swell height in meters. 0 if no data is available.
 static double Swell(RouteMapConfiguration &configuration, double lat, double lon)
 {
     WR_GribRecordSet *grib = configuration.grib;
@@ -144,6 +146,7 @@ static double Swell(RouteMapConfiguration &configuration, double lat, double lon
     return height;
 }
 
+// Return the wind gust speed for the specified lat/long location, in knots.
 static double Gust(RouteMapConfiguration &configuration, double lat, double lon)
 {
     WR_GribRecordSet *grib = configuration.grib;
@@ -171,6 +174,7 @@ static double Gust(RouteMapConfiguration &configuration, double lat, double lon)
 }
 
 
+// Return the wind speed from the grib at the specified lat/long location, in knots.
 static bool GribWind(RouteMapConfiguration &configuration, double lat, double lon,
                             double &WG, double &VWG)
 {
@@ -752,6 +756,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
         return false;
 
     if(configuration.WindVSCurrent) {
+        /* Calculate the wind vector (Wx, Wy) and ocean current vector (Cx, Cy). */
         /* these are already computed in OverWater.. could optimize by reusing them */
         double Wx = VW*cos(deg2rad(W)), Wy = VW*sin(deg2rad(W));
         double Cx = VC*cos(deg2rad(C) + M_PI), Cy = VC*sin(deg2rad(C) + M_PI);
@@ -929,7 +934,7 @@ bool Position::Propagate(IsoRouteList &routelist, RouteMapConfiguration &configu
                 double latBorderDown1, lonBorderDown1, latBorderDown2, lonBorderDown2;
                 
                 // Test if land is found within a rectangle with
-                // dimensiosn (dist, distSecure). Tests borders, plus diag,
+                // dimensions (dist, distSecure). Tests borders, plus diag,
                 // and middle of each side...
                 //            <- dist ->
                 // |-------------------------------|

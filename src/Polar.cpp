@@ -481,7 +481,17 @@ bool Polar::VMGAngle(SailingWindSpeed &ws1, SailingWindSpeed &ws2, float VW, flo
     return true;
 }
 
-/* compute boat speed from true wind angle and true wind speed
+/**
+ * Calculate the boat speed (VB) based on the wind angle (W) and wind speed (VW) using the polar data.
+ *
+ * @param W The wind angle in degrees.
+ * @param VW The wind speed in knots.
+ * @param bound If true, the wind speed must be within the bounds of the polar data.
+ *              For example, if the wind speed is 25 knots and the polar data only goes up to 20 knots,
+ *              the function will return NAN.
+ *              If false, the wind speed is extrapolated if outside the bounds.
+ * @param optimize_tacking Flag indicating whether to optimize for tacking angles.
+ * @return The boat speed (VB) in knots.
  */
 double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
 {
@@ -498,6 +508,7 @@ double Polar::Speed(double W, double VW, bool bound, bool optimize_tacking)
         W = 360 - W;
     
     if(!optimize_tacking && (W < degree_steps[0] || W > degree_steps[degree_steps.size()-1]))
+        // Avoid upwind course (polar angle too low) or downwind no-go zone (polar angle too high).
         return NAN;
 
     if(bound && (VW < wind_speeds[0].VW || VW > wind_speeds[wind_speeds.size()-1].VW))
