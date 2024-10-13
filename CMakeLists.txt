@@ -65,7 +65,7 @@ set(VERSION_DATE  "13/10/2024")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 
 set(OCPN_API_VERSION_MAJOR "1")
-set(OCPN_API_VERSION_MINOR "17")
+set(OCPN_API_VERSION_MINOR "18")
 set(TP_COMMENT "  * Release using CI")
 
 set(PARENT "opencpn")
