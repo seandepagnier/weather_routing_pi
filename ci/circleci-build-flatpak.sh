@@ -45,6 +45,7 @@ if test -f "$EXTRA_LIBS"; then
     done < $EXTRA_LIBS
 fi
 
+git config --global protocol.file.allow always
 git submodule update --init opencpn-libs
 
 if [ -n "$CI" ]; then
@@ -54,8 +55,15 @@ if [ -n "$CI" ]; then
     sudo apt install --reinstall  ca-certificates
 
     # Use updated flatpak workaround
-    sudo add-apt-repository -y ppa:alexlarsson/flatpak
-    sudo apt update
+#    sudo add-apt-repository -y ppa:alexlarsson/flatpak
+#    sudo apt update
+
+    # Handle possible outdated key for google packages, see #486
+    wget -q -O - https://cli-assets.heroku.com/apt/release.key \
+        | sudo apt-key add -
+    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub \
+        | sudo apt-key add -
+
 
     # Install flatpak and flatpak-builder - obsoleted by flathub
     sudo apt install flatpak flatpak-builder

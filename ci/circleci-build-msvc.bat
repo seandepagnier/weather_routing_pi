@@ -18,6 +18,8 @@ dir %SCRIPTDIR%..\msvc
 call %SCRIPTDIR%..\msvc\win_deps.bat %wx_vers%
 path %SCRIPTDIR%.local\bin;%PATH%;"C:\Program Files\CMake\bin"
 call "%SCRIPTDIR%..\cache\wx-config.bat"
+set PATH=%EXTRA_PATH%;%PATH%
+echo EXTRA_PATH: %EXTRA_PATH%
 echo USING wxWidgets_LIB_DIR: %wxWidgets_LIB_DIR%
 echo USING wxWidgets_ROOT_DIR: %wxWidgets_ROOT_DIR%
 echo USING OCPN_TARGET_TUPLE: %TARGET_TUPLE%
@@ -41,6 +43,10 @@ wget https://download.opencpn.org/s/oibxM3kzfzKcSc3/download/OpenCPN_buildwin-4.
 7z x -y OpenCPN_buildwin-4.99a.7z -o..\buildwin
 wget https://download.opencpn.org/s/54HsBDLNzRZLL6i/download/nsis-3.04-setup.exe
 nsis-3.04-setup.exe /S
+
+echo Check if poedit has been installed
+poedit -version
+echo Done check
 
 echo Create build environment
 

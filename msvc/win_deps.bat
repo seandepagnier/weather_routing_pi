@@ -29,6 +29,10 @@ echo In win_deps
 
 setlocal enabledelayedexpansion
 
+if not exist %SCRIPTDIR%\..\cache ( mkdir %SCRIPTDIR%\..\cache )
+set "CONFIG_FILE=%SCRIPTDIR%\..\cache\wx-config.bat"
+set EXTRA_PATH=
+
 git --version > nul 2>&1
 if errorlevel 1 (
    set "GIT_HOME=C:\Program Files\Git"
@@ -41,15 +45,15 @@ cmake --version > nul 2>&1
 if errorlevel 1 (
   set "CMAKE_HOME=C:\Program Files\CMake"
   choco install -y --no-progress cmake
-::  pathman add "!CMAKE_HOME!\bin" > nul
-::  echo Adding !CMAKE_HOME!\bin to path
+  set "EXTRA_PATH=%CMAKE_HOME%\bin;%EXTRA_PATH%"
 )
 
 :: Install choco poedit and add it's persistent user path element
 ::
-set "POEDIT_HOME=C:\Program Files (x86)\Poedit\Gettexttools"
-if not exist "%POEDIT_HOME%" choco install -y poedit
-::pathman add "%POEDIT_HOME%\bin" > nul
+set "POEDIT_HOME=C:\Program Files (x86)\Poedit\GettextTools"
+if not exist "%POEDIT_HOME%" (choco install -y poedit)
+dir "%POEDIT_HOME%"
+set "EXTRA_PATH=%POEDIT_HOME%\bin;%EXTRA_PATH%"
 
 :: Update required python stuff
 ::
@@ -78,9 +82,9 @@ if "%~1"=="wx32" (
   set "TARGET_TUPLE=msvc"
 )
 
-if not exist %SCRIPTDIR%\..\cache ( mkdir %SCRIPTDIR%\..\cache )
-set "CONFIG_FILE=%SCRIPTDIR%\..\cache\wx-config.bat"
-echo set "wxWidgets_ROOT_DIR=%wxWidgets_ROOT_DIR%" > %CONFIG_FILE%
+:: Add settings to CONFIG_FILE to allow them to be set in the calling batch file
+echo set "EXTRA_PATH=%EXTRA_PATH%" > %CONFIG_FILE%
+echo set "wxWidgets_ROOT_DIR=%wxWidgets_ROOT_DIR%" >> %CONFIG_FILE%
 echo set "wxWidgets_LIB_DIR=%wxWidgets_LIB_DIR%" >> %CONFIG_FILE%
 echo set "TARGET_TUPLE=%TARGET_TUPLE%" >> %CONFIG_FILE%
 
@@ -105,5 +109,5 @@ if not exist "%WXWIN%" (
   )
 )
 dir cache
-type cache\wx-config.bat
+type "%CONFIG_FILE%"
 refreshenv

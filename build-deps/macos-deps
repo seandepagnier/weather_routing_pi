@@ -1,0 +1,7 @@
+# brew packages installed in macos ci build
+cmake
+gettext
+libexif
+python
+wget
+openssl@3

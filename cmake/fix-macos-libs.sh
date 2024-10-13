@@ -4,9 +4,11 @@
 # location ot the target MacOS system where they are installed
 # as part of OpenCPN
 
+echo "starting fix-macos-libs.sh"
 readonly RUNTIME_PATH="@executable_path/../Frameworks/"
 
 plugin=$(find . -maxdepth 1 -name '*.dylib')
+echo $plugin
 for lib in $(otool -L "$plugin" | awk ' /wx/ {print $1}'); do
     libdir=${lib%/*}
     if [ "$libdir" = "$lib" ]; then
