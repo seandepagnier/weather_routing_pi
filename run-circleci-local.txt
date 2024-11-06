@@ -1,0 +1,1 @@
+circleci local execute build-debian-x86_64-11-bullseye -e CIRCLECI_LOCAL=true -v "/home/jon/opencpn/circleci-output:/home/circleci/circleci-output" -v "/home/jon/opencpn/circleci-cache:/home/circleci/circleci-cache" -e LOCAL_DEPLOY=true -e CLOUDSMITH_API_KEY="123"

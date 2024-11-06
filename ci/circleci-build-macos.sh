@@ -10,12 +10,12 @@ set -o pipefail
 # Check if the cache is with us. If not, re-install brew.
 brew list --versions libexif || brew update-reset
 
-for pkg in cairo cmake gettext libarchive libexif python wget; do
+for pkg in cairo cmake gettext libarchive libexif python3 wget; do
     brew list --versions $pkg || brew install $pkg || brew install $pkg || :
     brew link --overwrite $pkg || brew install $pkg
 done
 
-if [ -n "$WX_VER" ] && [ "$WX_VER" -eq "32" ]; then
+if [ -n "${WX_VER}" ] && [ "${WX_VER}" -eq "32" ]; then
     echo "Building for WXVERSION 32";
     WX_URL=https://download.opencpn.org/s/Djqm4SXzYjF8nBw/download
     WX_DOWNLOAD=/tmp/wx321_opencpn50_macos1010.tar.xz
@@ -30,6 +30,9 @@ else
     WX_CONFIG="--prefix=/tmp/wx315_opencpn50_macos1010"
     MACOSX_DEPLOYMENT_TARGET=10.10
 fi
+
+#Install python virtual environment
+/usr/bin/python3 -m venv $HOME/cs-venv
 
 # Download required binaries using wget, since curl causes an issue with Xcode 13.1 and some specific certificates.
 # Inspect the response code to see if the file is downloaded properly.

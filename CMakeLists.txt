@@ -18,8 +18,8 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough 
-# Testplugin(TP) v1.0.286.3 29/12/2023 DD/MM/YYYY format
+# Frontend2 Author: Jon Gough Testplugin(TP)
+# v1.0.304.0 20/09/2024 DD/MM/YYYY
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## -- When changing this file do NOT change the order of the sections.    -- ##
@@ -32,18 +32,21 @@ set(CMLOC "CMakeLists: ")
 
 # define minimum cmake version
 cmake_minimum_required(VERSION 3.5.1)
-if(COMMAND cmake_policy)
-    if(POLICY CMP0043)
-        cmake_policy(SET CMP0043 NEW)
-    endif(POLICY CMP0043)
-    cmake_policy(SET CMP0048 NEW)
-    if(POLICY CMP0076)
-        cmake_policy(SET CMP0076 NEW)
-    endif(POLICY CMP0076)
-    if(POLICY CMP0077)
-        cmake_policy(SET CMP0077 NEW)
-    endif(POLICY CMP0077)
-endif(COMMAND cmake_policy)
+if (COMMAND cmake_policy)
+  if (POLICY CMP0043)
+    cmake_policy(SET CMP0043 NEW)
+  endif (POLICY CMP0043)
+  cmake_policy(SET CMP0048 NEW)
+  if (POLICY CMP0076)
+    cmake_policy(SET CMP0076 NEW)
+  endif (POLICY CMP0076)
+  if (POLICY CMP0077)
+    cmake_policy(SET CMP0077 NEW)
+  endif (POLICY CMP0077)
+endif (COMMAND cmake_policy)
+
+# set for vscode/vscodium
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
 # define plugin name, owner and versions
 set(VERBOSE_NAME "WeatherRouting")
@@ -56,9 +59,9 @@ set(LONG_DESCRIPTION "WR features include: optimal routing subject to various co
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "15")
-set(VERSION_PATCH "18")
-set(VERSION_TWEAK "6")
-set(VERSION_DATE  "21/01/2023")#DD/MM/YYYY format
+set(VERSION_PATCH "19")
+set(VERSION_TWEAK "0")
+set(VERSION_DATE  "13/10/2024")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 
 set(OCPN_API_VERSION_MAJOR "1")
@@ -96,19 +99,28 @@ option(PLUGIN_USE_SVG "Use SVG graphics" ON)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# Use local version of GLU library requires libs/glu directory
+# set(USE_LOCAL_GLU FALSE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")   #not operational
 # For Weatherfax this must be set ON or it fails to compile
 option(USE_GL "Enable OpenGL support" ON)
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
-if("${CMAKE_BUILD_TYPE}" STREQUAL "")
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build" FORCE)
-endif("${CMAKE_BUILD_TYPE}" STREQUAL "")
-set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo" "MinSizeRel")
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
+  set(CMAKE_BUILD_TYPE
+      "Release"
+      CACHE STRING "Choose the type of build" FORCE
+  )
+endif ("${CMAKE_BUILD_TYPE}" STREQUAL "")
+set_property(
+  CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "" "Debug" "Release" "RelWithDebInfo"
+                                  "MinSizeRel"
+)
 message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 
-## ----- Statements below used to setup standard variables required by the CMAKE process -- Do not remove - ##
+# ----- Statements below used to setup standard variables required by the CMAKE  -##
+# ----- process -- Do not remove -##
 
 project(${PACKAGE})
 
@@ -138,7 +150,8 @@ include("PluginConfigure")
 
 add_definitions(-DUSE_S57)
 
-## ---- Section Below - Add your project SET(SRCS and SET(HDRS  etc..
+## ----- Section above - Add your project SET(SRCS and SET(HDRS  etc.-------##
+
 
 SET(SRCS
             src/weather_routing_pi.cpp
@@ -227,15 +240,15 @@ target_sources(${PACKAGE_NAME} PUBLIC ${SRC} )
 
 ##==============================================================
 
-if(NOT OCPN_FLATPAK_CONFIG)
-    # Build environment not available when flatpak is being configured 
-	# so following statements will not work
-    message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
+if (NOT OCPN_FLATPAK_CONFIG)
+  # Build environment not available when flatpak is being configured
+  # so following statements will not work
+  message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
 
-    if (WIN32)
-        add_subdirectory(opencpn-libs/WindowsHeaders)
-        target_link_libraries(${PACKAGE_NAME} windows::headers)
-    endif (WIN32)
+  if (WIN32)
+    add_subdirectory(opencpn-libs/WindowsHeaders)
+    target_link_libraries(${PACKAGE_NAME} windows::headers)
+  endif (WIN32)
 
     add_subdirectory(opencpn-libs/api-17)
     target_link_libraries(${PACKAGE_NAME} ocpn::api)
@@ -289,9 +302,9 @@ ENDIF()
 ##------- Change below to match project requirements --------------
 
 # Needed for android builds
-if(QT_ANDROID)
-    include_directories(BEFORE ${qt_android_include})
-endif(QT_ANDROID)
+if (QT_ANDROID)
+  include_directories(BEFORE ${qt_android_include})
+endif (QT_ANDROID)
 
 ## Needed for all builds Do not change - needed to build app -------------##
 ##===============================================================
@@ -304,8 +317,11 @@ include("PluginPackage")
 ## ----- Do not change section above - needed to configure build process --##
 
 message(STATUS "${CMLOC}include directories: ")
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-foreach(dir ${dirs})
-    message(STATUS "${CMLOC}dir='${dir}'")
-endforeach()
-
+get_property(
+  dirs
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  PROPERTY INCLUDE_DIRECTORIES
+)
+foreach (dir ${dirs})
+  message(STATUS "${CMLOC}dir='${dir}'")
+endforeach ()
